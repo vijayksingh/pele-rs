@@ -63,6 +63,23 @@ function renderError(error) {
   return error instanceof RangeError?fromNativeError({name:'PeleError',message:'Diagram is nested too deeply.',code:'limit',type:null,line:0,column:0,snippet:''}):error;
 }
 
+// Disposed bridges may stay alive until the current WeakRef job ends. Drop
+// transport storage without changing caller-owned objects or allocating empty
+// containers. Keep registry identity for helpers borrowed by another document.
+function disposedBridgeInvoke() { throw new TypeError('Public model document is disposed'); }
+function releaseDisposedBridge(bridge) {
+  bridge.graph = null;
+  bridge.strings = null;
+  bridge.stringIds = null;
+  bridge.objects = null;
+  bridge.root = null;
+  bridge.hostIds = null;
+  bridge.hostValues = null;
+  // Break adoption closures that can otherwise retain the model environment.
+  bridge.invoke = disposedBridgeInvoke;
+  bridge.activeInvoke = undefined;
+}
+
 function operationError(error, bridge) {
   if (error.kind === 'pele') return fromNativeError(error.value);
   if (error.kind === 'peleUtf16') {
@@ -401,7 +418,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     dispose(model) {
       const document = documents.get(model);
       if (document?.busy || document?.nativeBusy) throw new TypeError('Public model document is already in use');
-      if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free(); }
+      if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free();if(document.bridge)releaseDisposedBridge(document.bridge); }
     }
   };
   return renderer;
