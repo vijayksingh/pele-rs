@@ -12,8 +12,15 @@ pub(crate) use native::resolved_svg;
 pub use native::NativeTheme;
 use regex::Regex;
 use std::sync::OnceLock;
-pub(crate) fn esc(text: &str) -> String {
-    let mut out = String::new();
+pub(crate) fn esc(text: &str) -> std::borrow::Cow<'_, str> {
+    use std::borrow::Cow;
+    if !text
+        .bytes()
+        .any(|byte| matches!(byte, b'&' | b'<' | b'>' | b'"' | 0..=8 | 11 | 12 | 14..=31 | 127))
+    {
+        return Cow::Borrowed(text);
+    }
+    let mut out = String::with_capacity(text.len());
     for c in text.chars() {
         match c {
             '&' => out.push_str("&amp;"),
@@ -24,10 +31,14 @@ pub(crate) fn esc(text: &str) -> String {
             _ => out.push(c),
         }
     }
-    out
+    Cow::Owned(out)
 }
 pub(crate) fn esc_text(text: &str) -> Result<String, PeleError> {
-    Ok(esc(&decode_entities(text)?))
+    let decoded = decode_entities(text)?;
+    match esc(&decoded) {
+        std::borrow::Cow::Borrowed(_) => Ok(decoded),
+        std::borrow::Cow::Owned(escaped) => Ok(escaped),
+    }
 }
 pub(crate) fn js_num(n: f64) -> String {
     let mut b = ryu_js::Buffer::new();
