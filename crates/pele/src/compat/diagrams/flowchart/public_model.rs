@@ -139,7 +139,7 @@ static SCHEMA: ModelSchema = ModelSchema {
 };
 pub struct FlowchartPublicState {
     graph: ModelGraph,
-    imported: Result<FlowchartModel, PeleError>,
+    imported: std::cell::OnceCell<Result<FlowchartModel, PeleError>>,
 }
 impl FlowchartPublicState {
     /// Shared DB projection for actual renderer variants such as Swimlane.
@@ -154,7 +154,10 @@ impl FlowchartPublicState {
         Ok(model)
     }
     pub(crate) fn render_model(&self) -> Result<&FlowchartModel, PeleError> {
-        self.imported.as_ref().map_err(Clone::clone)
+        self.imported
+            .get_or_init(|| imported(&self.graph))
+            .as_ref()
+            .map_err(Clone::clone)
     }
 }
 fn error(message: impl Into<String>) -> PeleError {
@@ -1982,7 +1985,7 @@ fn create_state(
         PublicError::Pele(e) => e,
         _ => error("Flowchart public export failed"),
     })?;
-    let imported = imported(&graph);
+    let imported = std::cell::OnceCell::new();
     Ok(FlowchartPublicState { graph, imported })
 }
 impl PublicDiagramModule for Flowchart {
@@ -1992,7 +1995,7 @@ impl PublicDiagramModule for Flowchart {
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
-        let imported = imported(&graph);
+        let imported = std::cell::OnceCell::new();
         Ok(FlowchartPublicState { graph, imported })
     }
     fn create_public(&self, m: &FlowchartModel) -> Result<Self::PublicState, PeleError> {
@@ -2016,7 +2019,7 @@ impl PublicDiagramModule for Flowchart {
         Ok(s.graph.clone())
     }
     fn apply_public(&self, s: &mut Self::PublicState, g: ModelGraph) -> Result<(), PeleError> {
-        s.imported = imported(&g);
+        s.imported.take();
         s.graph = g;
         Ok(())
     }
@@ -2028,7 +2031,7 @@ impl PublicDiagramModule for Flowchart {
         _: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
         let result = invoke(&mut s.graph, call);
-        s.imported = imported(&s.graph);
+        s.imported.take();
         result
     }
     fn render_public(

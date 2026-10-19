@@ -183,7 +183,7 @@ static SCHEMA: ModelSchema = ModelSchema {
 };
 pub struct ErPublicState {
     graph: ModelGraph,
-    model: Result<ErModel, PeleError>,
+    model: std::cell::OnceCell<Result<ErModel, PeleError>>,
 }
 fn invalid(message: &str) -> PeleError {
     let mut e = PeleError::new(message, ErrorCode::Semantic);
@@ -613,12 +613,12 @@ impl PublicDiagramModule for Er {
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
-        let model = imported(&graph);
+        let model = std::cell::OnceCell::new();
         Ok(ErPublicState { graph, model })
     }
     fn create_public(&self, m: &ErModel) -> Result<ErPublicState, PeleError> {
         let graph = initial(m)?;
-        let model = imported(&graph);
+        let model = std::cell::OnceCell::new();
         Ok(ErPublicState { graph, model })
     }
     fn export_public(&self, s: &ErPublicState) -> Result<ModelGraph, PeleError> {
@@ -626,7 +626,7 @@ impl PublicDiagramModule for Er {
     }
     fn apply_public(&self, s: &mut ErPublicState, g: ModelGraph) -> Result<(), PeleError> {
         g.validate()?;
-        s.model = imported(&g);
+        s.model.take();
         s.graph = g;
         Ok(())
     }
@@ -638,7 +638,7 @@ impl PublicDiagramModule for Er {
         _: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
         let result = Context::new(&mut s.graph).invoke(c);
-        s.model = imported(&s.graph);
+        s.model.take();
         result
     }
     fn render_public(
@@ -648,7 +648,15 @@ impl PublicDiagramModule for Er {
         o: &RenderSettings,
         h: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        self.render(s.model.as_ref().map_err(Clone::clone)?, c, o, h)
+        self.render(
+            s.model
+                .get_or_init(|| imported(&s.graph))
+                .as_ref()
+                .map_err(Clone::clone)?,
+            c,
+            o,
+            h,
+        )
     }
 }
 fn type_error(s: &str) -> PublicError {
