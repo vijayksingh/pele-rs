@@ -1752,13 +1752,108 @@ const SCHEMA: ModelSchema = ModelSchema {
     }],
     methods: METHODS,
 };
+// Construction-only token: the fresh object cannot be finished twice or used
+// as an imported receiver. Values/child nodes may be created before finishing
+// the root, preserving the canonical graph's existing allocation order.
+struct InitialObject(u32);
 impl Context<'_> {
-    fn strings_array(&mut self, values: &[String]) -> Result<Atom, PublicError> {
+    fn initial_object(
+        &mut self,
+        prototype: Option<PrototypeId>,
+    ) -> Result<InitialObject, PublicError> {
+        let node = match prototype {
+            Some(prototype) => Node::Instance {
+                prototype,
+                properties: vec![],
+            },
+            None => Node::Object { properties: vec![] },
+        };
+        let Atom::Ref(id) = self.node(node)? else {
+            unreachable!()
+        };
+        Ok(InitialObject(id))
+    }
+    fn finish_initial_object(
+        &mut self,
+        object: InitialObject,
+        fields: Vec<(&str, Atom)>,
+    ) -> Result<Atom, PublicError> {
+        let id = object.0;
+        debug_assert!(self.g.nodes[id as usize].properties().is_empty());
+        // Fixed small construction records. Keep duplicate assignment semantics
+        // without allocating the general imported-object property HashMap.
+        self.g.nodes[id as usize]
+            .properties_mut()
+            .reserve(fields.len());
+        for (name, value) in fields {
+            self.tick(1)?;
+            let Atom::String(key) = self.text(name)? else {
+                unreachable!()
+            };
+            let previous = self.g.nodes[id as usize]
+                .properties()
+                .iter()
+                .position(|property| property.key == key);
+            if let Some(previous) = previous {
+                self.g.nodes[id as usize].properties_mut()[previous].value = value;
+            } else {
+                self.room(1)?;
+                self.g.nodes[id as usize].properties_mut().push(Property {
+                    key,
+                    value,
+                    flags: 7,
+                });
+            }
+            self.changed(id);
+        }
+        Ok(Atom::Ref(id))
+    }
+    fn initial_record(&mut self, fields: Vec<(&str, Atom)>) -> Result<Atom, PublicError> {
+        let object = self.initial_object(None)?;
+        self.finish_initial_object(object, fields)
+    }
+    fn initial_array(&mut self, values: Vec<Atom>) -> Result<Atom, PublicError> {
+        let array = self.node(Node::Array {
+            length: 0,
+            properties: vec![],
+        })?;
+        let Atom::Ref(id) = array else { unreachable!() };
+        for (index, value) in values.into_iter().enumerate() {
+            // Preserve push's read("push"), own("push"), own("length") and
+            // set(index) charges, including the length check between 3 and 4.
+            // The original first property index is empty and charges zero.
+            self.tick(1)?;
+            self.tick(1)?;
+            self.tick(1)?;
+            if index >= 1_000_000 {
+                return Err(limit().into());
+            }
+            self.tick(1)?;
+            let Atom::String(key) = self.text(&index.to_string())? else {
+                unreachable!()
+            };
+            self.room(1)?;
+            let Node::Array { length, properties } = &mut self.g.nodes[id as usize] else {
+                unreachable!()
+            };
+            properties.push(Property {
+                key,
+                value,
+                flags: 7,
+            });
+            *length = (index + 1) as u32;
+            self.changed(id);
+        }
+        Ok(Atom::Ref(id))
+    }
+}
+impl Context<'_> {
+    fn initial_strings_array(&mut self, values: &[String]) -> Result<Atom, PublicError> {
         let values = values
             .iter()
             .map(|s| self.text(s))
             .collect::<Result<_, _>>()?;
-        self.array(values)
+        self.initial_array(values)
     }
     fn optional_text(&mut self, value: Option<&str>) -> Result<Atom, PublicError> {
         value.map_or(Ok(Atom::Undefined), |s| self.text(s))
@@ -1767,7 +1862,7 @@ impl Context<'_> {
         let raw_data = self.text(&t.raw.data)?;
         let raw_start = self.optional_text(t.raw.start.as_deref())?;
         let raw_end = self.text(&t.raw.end)?;
-        let raw = self.record(vec![
+        let raw = self.initial_record(vec![
             ("data", raw_data),
             ("start", raw_start),
             ("end", raw_end),
@@ -1800,10 +1895,10 @@ impl Context<'_> {
             fields.push((k, Atom::Bool(v)));
         }
         fields.push(("order", Atom::Number(t.order as f64)));
-        fields.push(("classes", self.strings_array(&t.classes)?));
+        fields.push(("classes", self.initial_strings_array(&t.classes)?));
         fields.push(("prevTaskId", self.optional_text(t.prev_task_id.as_deref())?));
         fields.push(("raw", raw));
-        self.record(fields)
+        self.initial_record(fields)
     }
 }
 fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
@@ -1829,7 +1924,7 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
             entries: by_id,
             properties: vec![],
         })?;
-        let tasks = c.array(tasks)?;
+        let tasks = c.initial_array(tasks)?;
         let links = m
             .links
             .iter()
@@ -1839,10 +1934,7 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
             entries: links,
             properties: vec![],
         })?;
-        let root = c.node(Node::Instance {
-            prototype: PROTO,
-            properties: vec![],
-        })?;
+        let root = c.initial_object(Some(PROTO))?;
         let mut fields = vec![("type", c.text("gantt")?)];
         for (k, v) in [
             ("title", m.title.as_deref()),
@@ -1856,20 +1948,20 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
             ("axisFormat", c.text(&m.axis_format)?),
             ("tickInterval", c.optional_text(m.tick_interval.as_deref())?),
             ("todayMarker", c.text(&m.today_marker)?),
-            ("includes", c.strings_array(&m.includes)?),
-            ("excludes", c.strings_array(&m.excludes)?),
+            ("includes", c.initial_strings_array(&m.includes)?),
+            ("excludes", c.initial_strings_array(&m.excludes)?),
             ("inclusiveEndDates", Atom::Bool(m.inclusive_end_dates)),
             ("topAxis", Atom::Bool(m.top_axis)),
             ("displayMode", c.text(&m.display_mode)?),
             ("weekday", c.optional_text(m.weekday.as_deref())?),
             ("weekend", c.text(&m.weekend)?),
-            ("sections", c.strings_array(&m.sections)?),
+            ("sections", c.initial_strings_array(&m.sections)?),
             ("links", links),
             ("tasks", tasks),
             ("byId", by_id),
         ]);
         let (section, count, order, last) = m.public_builder_state();
-        let options = c.record(vec![])?;
+        let options = c.initial_record(vec![])?;
         fields.extend([
             ("currentSection", c.text(section)?),
             ("taskCount", Atom::Number(count as f64)),
@@ -1888,11 +1980,9 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
             })?;
             fields.push((k, set));
         }
-        let days = c.array(days.into_iter().map(Atom::Bool).collect())?;
+        let days = c.initial_array(days.into_iter().map(Atom::Bool).collect())?;
         fields.extend([("excludedDays", days), ("datedTokens", Atom::Bool(dated))]);
-        for (k, v) in fields {
-            c.set(&root, k, v)?;
-        }
+        let root = c.finish_initial_object(root, fields)?;
         c.g.root = root;
         Ok(())
     })();

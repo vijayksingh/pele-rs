@@ -1,0 +1,109 @@
+{
+  "provenance": "Frozen pele-rs SVG-root package, production source 0aba8ef; storage regression, not upstream oracle",
+  "wasmSHA256": "6c3fca583babada8323ef7dca2f0dd1320749d2ed5bdb4e46e550e18268ecee3",
+  "graphBinarySHA256": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+  "cases": [
+    {
+      "id": "gantt/small",
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "graphSHA256": "c263f34438900d150e108d339b2f97fd16dcf37fa20afe04c10e20c5e9f1e4e1",
+      "nodes": 35,
+      "strings": 100,
+      "binaryBytes": 3860
+    },
+    {
+      "id": "gantt/medium",
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "graphSHA256": "9eecad07cfd8335b1d6f540251103ccd3ebb4c16d4ee197a2ef4b4b0a3417e07",
+      "nodes": 155,
+      "strings": 280,
+      "binaryBytes": 15484
+    },
+    {
+      "id": "gantt/large",
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d\nTask 48:t48,2024-01-21,1d\nTask 49:t49,2024-01-22,2d\nTask 50:t50,2024-01-23,3d\nTask 51:t51,2024-01-24,4d\nTask 52:t52,2024-01-25,1d\nTask 53:t53,2024-01-26,2d\nTask 54:t54,2024-01-27,3d\nTask 55:t55,2024-01-28,4d\nTask 56:t56,2024-01-01,1d\nTask 57:t57,2024-01-02,2d\nTask 58:t58,2024-01-03,3d\nTask 59:t59,2024-01-04,4d\nTask 60:t60,2024-01-05,1d\nTask 61:t61,2024-01-06,2d\nTask 62:t62,2024-01-07,3d\nTask 63:t63,2024-01-08,4d\nTask 64:t64,2024-01-09,1d\nTask 65:t65,2024-01-10,2d\nTask 66:t66,2024-01-11,3d\nTask 67:t67,2024-01-12,4d\nTask 68:t68,2024-01-13,1d\nTask 69:t69,2024-01-14,2d\nTask 70:t70,2024-01-15,3d\nTask 71:t71,2024-01-16,4d\nTask 72:t72,2024-01-17,1d\nTask 73:t73,2024-01-18,2d\nTask 74:t74,2024-01-19,3d\nTask 75:t75,2024-01-20,4d\nTask 76:t76,2024-01-21,1d\nTask 77:t77,2024-01-22,2d\nTask 78:t78,2024-01-23,3d\nTask 79:t79,2024-01-24,4d\nTask 80:t80,2024-01-25,1d\nTask 81:t81,2024-01-26,2d\nTask 82:t82,2024-01-27,3d\nTask 83:t83,2024-01-28,4d\nTask 84:t84,2024-01-01,1d\nTask 85:t85,2024-01-02,2d\nTask 86:t86,2024-01-03,3d\nTask 87:t87,2024-01-04,4d\nTask 88:t88,2024-01-05,1d\nTask 89:t89,2024-01-06,2d\nTask 90:t90,2024-01-07,3d\nTask 91:t91,2024-01-08,4d\nTask 92:t92,2024-01-09,1d\nTask 93:t93,2024-01-10,2d\nTask 94:t94,2024-01-11,3d\nTask 95:t95,2024-01-12,4d\nTask 96:t96,2024-01-13,1d\nTask 97:t97,2024-01-14,2d\nTask 98:t98,2024-01-15,3d\nTask 99:t99,2024-01-16,4d\nTask 100:t100,2024-01-17,1d\nTask 101:t101,2024-01-18,2d\nTask 102:t102,2024-01-19,3d\nTask 103:t103,2024-01-20,4d\nTask 104:t104,2024-01-21,1d\nTask 105:t105,2024-01-22,2d\nTask 106:t106,2024-01-23,3d\nTask 107:t107,2024-01-24,4d\nTask 108:t108,2024-01-25,1d\nTask 109:t109,2024-01-26,2d\nTask 110:t110,2024-01-27,3d\nTask 111:t111,2024-01-28,4d\nTask 112:t112,2024-01-01,1d\nTask 113:t113,2024-01-02,2d\nTask 114:t114,2024-01-03,3d\nTask 115:t115,2024-01-04,4d\nTask 116:t116,2024-01-05,1d\nTask 117:t117,2024-01-06,2d\nTask 118:t118,2024-01-07,3d\nTask 119:t119,2024-01-08,4d\nTask 120:t120,2024-01-09,1d\nTask 121:t121,2024-01-10,2d\nTask 122:t122,2024-01-11,3d\nTask 123:t123,2024-01-12,4d\nTask 124:t124,2024-01-13,1d\nTask 125:t125,2024-01-14,2d\nTask 126:t126,2024-01-15,3d\nTask 127:t127,2024-01-16,4d\nTask 128:t128,2024-01-17,1d\nTask 129:t129,2024-01-18,2d\nTask 130:t130,2024-01-19,3d\nTask 131:t131,2024-01-20,4d\nTask 132:t132,2024-01-21,1d\nTask 133:t133,2024-01-22,2d\nTask 134:t134,2024-01-23,3d\nTask 135:t135,2024-01-24,4d\nTask 136:t136,2024-01-25,1d\nTask 137:t137,2024-01-26,2d\nTask 138:t138,2024-01-27,3d\nTask 139:t139,2024-01-28,4d\nTask 140:t140,2024-01-01,1d\nTask 141:t141,2024-01-02,2d\nTask 142:t142,2024-01-03,3d\nTask 143:t143,2024-01-04,4d\nTask 144:t144,2024-01-05,1d\nTask 145:t145,2024-01-06,2d\nTask 146:t146,2024-01-07,3d\nTask 147:t147,2024-01-08,4d\nTask 148:t148,2024-01-09,1d\nTask 149:t149,2024-01-10,2d\nTask 150:t150,2024-01-11,3d\nTask 151:t151,2024-01-12,4d\nTask 152:t152,2024-01-13,1d\nTask 153:t153,2024-01-14,2d\nTask 154:t154,2024-01-15,3d\nTask 155:t155,2024-01-16,4d\nTask 156:t156,2024-01-17,1d\nTask 157:t157,2024-01-18,2d\nTask 158:t158,2024-01-19,3d\nTask 159:t159,2024-01-20,4d\nTask 160:t160,2024-01-21,1d\nTask 161:t161,2024-01-22,2d\nTask 162:t162,2024-01-23,3d\nTask 163:t163,2024-01-24,4d\nTask 164:t164,2024-01-25,1d\nTask 165:t165,2024-01-26,2d\nTask 166:t166,2024-01-27,3d\nTask 167:t167,2024-01-28,4d\nTask 168:t168,2024-01-01,1d\nTask 169:t169,2024-01-02,2d\nTask 170:t170,2024-01-03,3d\nTask 171:t171,2024-01-04,4d\nTask 172:t172,2024-01-05,1d\nTask 173:t173,2024-01-06,2d\nTask 174:t174,2024-01-07,3d\nTask 175:t175,2024-01-08,4d\nTask 176:t176,2024-01-09,1d\nTask 177:t177,2024-01-10,2d\nTask 178:t178,2024-01-11,3d\nTask 179:t179,2024-01-12,4d\nTask 180:t180,2024-01-13,1d\nTask 181:t181,2024-01-14,2d\nTask 182:t182,2024-01-15,3d\nTask 183:t183,2024-01-16,4d\nTask 184:t184,2024-01-17,1d\nTask 185:t185,2024-01-18,2d\nTask 186:t186,2024-01-19,3d\nTask 187:t187,2024-01-20,4d\nTask 188:t188,2024-01-21,1d\nTask 189:t189,2024-01-22,2d\nTask 190:t190,2024-01-23,3d\nTask 191:t191,2024-01-24,4d\nTask 192:t192,2024-01-25,1d\nTask 193:t193,2024-01-26,2d\nTask 194:t194,2024-01-27,3d\nTask 195:t195,2024-01-28,4d\nTask 196:t196,2024-01-01,1d\nTask 197:t197,2024-01-02,2d\nTask 198:t198,2024-01-03,3d\nTask 199:t199,2024-01-04,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "graphSHA256": "5b348d1f7c45b2205d4b12068d529e8c624c24a053d53926f0d2b48b910e3691",
+      "nodes": 611,
+      "strings": 888,
+      "binaryBytes": 58692
+    },
+    {
+      "id": "empty",
+      "source": "gantt",
+      "options": {},
+      "graphSHA256": "29b119ec7ca9f2dd0b114d65c76fa069302da66a2cd192280c626628c6d27306",
+      "nodes": 11,
+      "strings": 33,
+      "binaryBytes": 1078
+    },
+    {
+      "id": "metadata",
+      "source": "gantt\ntitle **Build**\naccTitle: Accessible\naccDescr: Schedule\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\nincludes 2024-01-06\nexcludes weekends\nsection Work\nTask:active,done,crit,milestone,a,2024-01-01,2d\nFollow:b,after a,1d",
+      "options": {},
+      "graphSHA256": "2fdfde49dda62b45372846b127d15fe53af9f6518b200b3314f8b3123b149881",
+      "nodes": 17,
+      "strings": 73,
+      "binaryBytes": 2258
+    },
+    {
+      "id": "duplicates",
+      "source": "gantt\ndateFormat YYYY-MM-DD\nsection A\nFirst:same,2024-01-01,1d\nSecond:same,2024-01-02,2d\nsection A\nThird:t,after same,3d",
+      "options": {},
+      "graphSHA256": "962fedc56f40a6c7a627f5dc430cf0f32dfc2914a0ac5ca601a82f51552b1b62",
+      "nodes": 20,
+      "strings": 72,
+      "binaryBytes": 2359
+    },
+    {
+      "id": "unicode",
+      "source": "gantt\ndateFormat YYYY-MM-DD\nsection 漢字\nCafé 😀:a,2024-01-01,1d\nNext:b,after a,2d",
+      "options": {},
+      "graphSHA256": "5989b856df6d863970534f898c41ae689dab86a49c9457db0ba3100c40985f32",
+      "nodes": 17,
+      "strings": 67,
+      "binaryBytes": 2040
+    },
+    {
+      "id": "dates",
+      "source": "gantt\ndateFormat YYYY-MM-DD\nA:a,2024-01-01,2024-01-03\nB:b,after a,2d\nC:c,after b,1d",
+      "options": {},
+      "graphSHA256": "174bd92fad3999183c6ea182f5a45233ea6353cbc9cf86f3813bca66e7be63b1",
+      "nodes": 20,
+      "strings": 72,
+      "binaryBytes": 2313
+    },
+    {
+      "id": "internedKeys",
+      "source": "gantt\ntitle push\ndateFormat YYYY-MM-DD\nsection length\n0:push,2024-01-01,1d\nlength:0,after push,2d\npush:length,after 0,1d\nclick push call callback() href \"https://example.com\"",
+      "options": {},
+      "graphSHA256": "8db721dacfdfb5ad0f3bb43e590a3589743446982a4bfde850d6bea726c56ed0",
+      "nodes": 20,
+      "strings": 69,
+      "binaryBytes": 2403
+    }
+  ]
+}
