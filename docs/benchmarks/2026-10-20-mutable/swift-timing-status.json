@@ -1,0 +1,19 @@
+{
+  "attemptedAt": "2026-10-19T21:28:34.259Z",
+  "mode": "local-swift-api-timing",
+  "completed": false,
+  "samplesPublished": false,
+  "reason": "Timing guard refused active unrelated Swift compilation before measured work. Functional correctness checks completed independently; no timing claim follows.",
+  "correctness": {
+    "numericTests": 4,
+    "allFamilyCases": 1023,
+    "lanes": 3,
+    "allFamilyDrawings": 3069,
+    "additionalNumericCases": 287,
+    "workloads": 21,
+    "apiStages": 8,
+    "workloadStageChecks": 168
+  },
+  "nativeSourceRevision": "9c6995d",
+  "sdk": "Universal macOS ARM64 and x86_64 built from source; standalone consumer verified host archive byte identity."
+}

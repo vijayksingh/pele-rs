@@ -175,34 +175,44 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 
 ## Performance
 
-**The current WASM build does not meet the goal of matching Pele JS.** Independent
-VM measurements across 21 workloads show warm source rendering takes
-1.75–4.76× the Pele JS time. No speedup over JS or GPU acceleration is claimed. Profiling identified SVG
-coordinate formatting as a hot path; removing intermediate formatting allocations
-reduces median source-render time across the 21 Canvas cases by 10.9% against
-a fresh control. Two small workload conditions regressed in that run; complete
-samples and limitations are retained in [the profile and optimization report](docs/benchmarks/2026-10-19-profile/).
-The performance release gate still fails all 126 measured conditions; 0.3 remains unreleased.
+**The WASM performance gate still fails all 126 measured conditions; 0.3 remains unreleased.**
+The latest complete measurement covers transport commit `a7696d9` (before the
+subsequent fresh-Flowchart construction experiment). Against a fresh VM control,
+median mutable parse time fell **14.6%** and retained mutable render time fell
+**23.0%**, across 42 conditions per stage. All 42 retained-render conditions
+improved; three parse conditions regressed more than 5%. Source rendering showed
+no median improvement in this layer and still takes **1.74–5.27×** the JS time.
+No JS speedup or GPU acceleration is claimed.
+
+The changes borrow native snapshots, defer unused typed projections, skip only
+acknowledged unchanged imports, and reduce host property publication. Complete
+samples, regressions, package hashes and the failed release gate are in the
+[mutable transport report](docs/benchmarks/2026-10-20-mutable/).
+The earlier coordinate-format pass and its separate 10.9% Canvas source-render
+improvement remain documented in the [profile report](docs/benchmarks/2026-10-19-profile/).
 
 Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
 Same browser, inputs and cached Canvas metrics; nine alternating trials after
-at least 100 ms warmup per API. Complete SVG and dimensions match before/after.
+at least 500 ms warmup per API. Complete SVG and dimensions match before/after.
 Large workloads use 200 units, except Sankey (199 links) and Railroad (60 rules).
+Source-render measurements for that exact artifact:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| Flowchart | 1.344 ms | 2.625 ms | 1.95× |
-| Sequence | 0.519 ms | 1.125 ms | 2.17× |
-| ER | 2.788 ms | 6.900 ms | 2.48× |
-| Pie | 0.275 ms | 0.684 ms | 2.49× |
-| Sankey | 0.844 ms | 1.675 ms | 1.99× |
-| Gantt | 0.688 ms | 2.700 ms | 3.93× |
-| Railroad | 0.781 ms | 1.987 ms | 2.54× |
+| Flowchart | 1.338 ms | 2.612 ms | 1.95× |
+| Sequence | 0.506 ms | 1.094 ms | 2.16× |
+| ER | 2.775 ms | 6.950 ms | 2.50× |
+| Pie | 0.281 ms | 0.694 ms | 2.47× |
+| Sankey | 0.850 ms | 1.650 ms | 1.94× |
+| Gantt | 0.703 ms | 2.775 ms | 3.95× |
+| Railroad | 0.794 ms | 2.088 ms | 2.63× |
 
 Swift runs here on Apple M1 Pro because the Linux VM lacks the macOS/AppKit SDK.
 Previous baseline seven-trial medians (48 units; Railroad 15 rules), before
-the coordinate optimization. Current Swift numeric checks pass; a timing refresh
-was aborted when another Kamui build started. These figures are historical:
+the coordinate optimization. The transport core passed local Swift checks for
+1,023 all-family numeric cases through three lanes plus all 21 shared workloads
+through eight APIs. A timing refresh was refused while unrelated compilation
+was active. These figures are historical:
 
 | Medium workload | Source render | Retained render | Mutable render |
 | --- | ---: | ---: | ---: |
