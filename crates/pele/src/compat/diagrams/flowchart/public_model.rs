@@ -650,10 +650,37 @@ impl<'a> Arena<'a> {
             .collect::<Result<Vec<_>, _>>()?;
         self.array(values)
     }
+    // Only for objects allocated by record/ordered in this call. Track keys in
+    // insertion order rather than building the general imported-node index.
+    fn assign_fresh<'k>(
+        &mut self,
+        id: u32,
+        keys: &mut Vec<&'k str>,
+        key: &'k str,
+        value: Atom,
+    ) -> Result<(), PublicError> {
+        if let Some(index) = keys.iter().position(|existing| *existing == key) {
+            self.g.nodes[id as usize].properties_mut()[index].value = value;
+            return Ok(());
+        }
+        if self.work >= MAX_WORK {
+            return Err(limit().into());
+        }
+        self.work += 1;
+        let string_id = self.intern(key.into())?;
+        self.g.nodes[id as usize].properties_mut().push(Property {
+            key: string_id,
+            value,
+            flags: 7,
+        });
+        keys.push(key);
+        Ok(())
+    }
     fn record(&mut self, values: Vec<(&str, Atom)>) -> Result<u32, PublicError> {
         let id = self.object()?;
+        let mut keys = Vec::with_capacity(values.len());
         for (k, v) in values {
-            self.assign(id, k, v)?
+            self.assign_fresh(id, &mut keys, k, v)?
         }
         Ok(id)
     }
@@ -754,14 +781,15 @@ impl<'a> Arena<'a> {
         order: &[&'static str],
     ) -> Result<u32, PublicError> {
         let id = self.object()?;
+        let mut keys = Vec::with_capacity(fields.len());
         for key in order {
             if let Some((_, v)) = fields.iter().find(|(k, _)| k == key) {
-                self.assign(id, key, v.clone())?
+                self.assign_fresh(id, &mut keys, key, v.clone())?
             }
         }
         for (k, v) in fields {
             if !order.contains(&k) && !matches!(v, Atom::Undefined) {
-                self.assign(id, k, v)?
+                self.assign_fresh(id, &mut keys, k, v)?
             }
         }
         Ok(id)

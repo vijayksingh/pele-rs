@@ -190,6 +190,92 @@ impl RenderResources for Host<'_> {
     }
 }
 #[test]
+fn repeated_and_unknown_origin_keys_preserve_binary_snapshots_and_rendering() {
+    let source = "flowchart LR\nsubgraph S[Group]\nA[Alpha] -->|edge| B[Beta]\nend\nclassDef hot fill:#f00\nclass A hot";
+    let mut canonical =
+        pele::compat::diagrams::flowchart::parse(source, &ParseOptions::default()).unwrap();
+    // Explicitly ordered undefined values must remain own properties. Other
+    // unmentioned undefined fields stay absent, as in the ordinary parse lane.
+    for order in &mut canonical.public_origin.nodes {
+        if !order.contains(&"linkTarget") {
+            order.push("linkTarget");
+        }
+    }
+    for order in &mut canonical.public_origin.edges {
+        if !order.contains(&"animation") {
+            order.push("animation");
+        }
+    }
+    assert!(!canonical.public_origin.nodes.is_empty());
+    assert!(!canonical.public_origin.edges.is_empty());
+    let mut repeated = canonical.clone();
+    for order in repeated
+        .public_origin
+        .nodes
+        .iter_mut()
+        .chain(&mut repeated.public_origin.edges)
+    {
+        let original = order.clone();
+        order.clear();
+        // Unknown names cannot allocate graph strings; repeated known names
+        // retain the first property slot and incur no extra exchange entries.
+        for key in &original {
+            order.extend(["unknown-origin-key", *key, *key]);
+        }
+        order.extend(std::iter::repeat_n(original[0], 4096));
+    }
+    let config = Engine::empty()
+        .inspect(source, &Default::default())
+        .unwrap()
+        .prepared
+        .config;
+    let mut ordinary = PublicDocument::from_module(Flowchart, &canonical, config.clone()).unwrap();
+    let mut duplicate = PublicDocument::from_module(Flowchart, &repeated, config).unwrap();
+    let snapshot = |document: &PublicDocument| {
+        encode_binary_exchange(
+            document.revision(),
+            &document.snapshot().unwrap(),
+            &[],
+            DEFAULT_BINARY_BUDGET,
+        )
+        .unwrap()
+    };
+    assert_eq!(snapshot(&ordinary), snapshot(&duplicate));
+    let graph = ordinary.snapshot().unwrap();
+    assert!(!graph.strings.iter().any(|s| s.is("unknown-origin-key")));
+    let nodes = reference(field(&graph, root(&graph), "nodes"));
+    let Node::Map { entries, .. } = &graph.nodes[nodes as usize] else {
+        panic!("nodes map")
+    };
+    for (_, node) in entries {
+        assert!(matches!(
+            field(&graph, reference(node), "linkTarget"),
+            Atom::Undefined
+        ));
+        assert!(!keys(&graph, reference(node))
+            .iter()
+            .any(|key| key == "icon"));
+    }
+    // A later public method still indexes and mutates these fresh records.
+    for document in [&mut ordinary, &mut duplicate] {
+        success(call(document, "addVertex", |graph| {
+            let id = string(graph, "A");
+            let options = value(graph, &serde_json::json!({"text":"Updated","type":"text"}));
+            vec![id, options]
+        }));
+    }
+    assert_eq!(snapshot(&ordinary), snapshot(&duplicate));
+    let options = RenderOptions::default();
+    let expected = ordinary.render(&options, &mut MetricsResources).unwrap();
+    let actual = duplicate.render(&options, &mut MetricsResources).unwrap();
+    assert_eq!(
+        serde_json::to_value(actual).unwrap(),
+        serde_json::to_value(expected).unwrap()
+    );
+    assert_eq!(snapshot(&ordinary), snapshot(&duplicate));
+}
+
+#[test]
 fn historical_flowchart_corpus_matches_through_mutable_public_documents() {
     let fixture: Json =
         serde_json::from_str(include_str!("../../../fixtures/pele/flowchart.json")).unwrap();
