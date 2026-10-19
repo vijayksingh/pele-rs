@@ -109,9 +109,10 @@ export class ModelRegistry {
   }
 }
 export class ModelBridge {
-  constructor(graph, schema, registry, invoke) {
+  constructor(graph, schema, registry, invoke, prevalidatedRegistration) {
     this.registry = registry;
-    this.registration = registry.registration(schema);
+    if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || registry.schemas.get(`${schema.id}:${schema.version}`) !== prevalidatedRegistration)) throw new TypeError('Invalid prevalidated model registration');
+    this.registration = prevalidatedRegistration ?? registry.registration(schema);
     if(this.registration.documents.length>256)this.registration.documents=this.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
     this.registration.documents.push(new WeakRef(this));
     this.disposed=false;

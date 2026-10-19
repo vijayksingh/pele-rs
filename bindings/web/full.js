@@ -92,6 +92,8 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   const liveProviders=new Map(canonicalProviders.map(provider=>[provider.type,{provider,native:true}]));
   function syncProviders(){for(const [type,entry] of liveProviders){const native=builtinDiagramType(entry.provider)===type;if(native!==entry.native){if(native)registryCall(()=>nativeValue(()=>{nativeRegistry.register_builtin(type);return '{"version":2,"ok":true,"result":null}';}));else registryCall(()=>foreignValue(()=>nativeRegistry.register_foreign(type,entry.provider)));entry.native=native;}}}
   const documents = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry();
+  // Native keys identify captured immutable metadata, scoped to this renderer.
+  const schemaRegistrations = new Map();
   const finalizer = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(handle => handle.free()) : null;
   let registryBusy = false;
   const registryCall = operation => {
@@ -149,7 +151,17 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     } finally { entry.busy = false; }
   }
   function adoptMutable(mutable, preparedType, existingBridge) {
-          const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
+          const snapshot = binaryResult(()=>mutable.snapshot_binary());
+          // Raw-model adoption already has a bridge. Validate its native metadata
+          // afresh before reusing it; never trust a cache hit on this path.
+          const schemaKey = existingBridge ? undefined : mutable.schema_cache_key?.();
+          let registration = typeof schemaKey === 'string' ? schemaRegistrations.get(schemaKey) : undefined;
+          if(!registration) {
+            registration = registry.registration(result(mutable.schema()));
+            if(existingBridge && registration !== existingBridge.registration) throw new TypeError('Conflicting native model schema identity');
+            if(typeof schemaKey === 'string') schemaRegistrations.set(schemaKey,registration);
+          }
+          const schema = registration.schema;
           const rawType=mutable.entry_type(), live=preparedType===undefined?liveProviders.get(rawType):undefined;
           const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider, confirmedGraph: false, unchangedApplyIsNoop: mutable.unchanged_public_graph_is_noop?.() === true};
           const invoke = (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
@@ -160,7 +172,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
           });
-          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke);
+          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration);
           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
           entry.confirmedGraph = true;
