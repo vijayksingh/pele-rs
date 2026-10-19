@@ -337,6 +337,33 @@ impl ModelSchema {
         Ok(())
     }
 }
+/// Private validation state for one captured immutable registration. Never used
+/// by public validators accepting arbitrary (possibly stack-owned) schemas.
+/// Construction validates before allocating the retained membership indexes.
+pub(super) struct CompiledSchema {
+    methods: HashSet<MethodId>,
+    prototypes: HashSet<PrototypeId>,
+}
+impl CompiledSchema {
+    pub(super) fn new(schema: &'static ModelSchema) -> Result<Self, PeleError> {
+        schema.validate()?;
+        Ok(Self {
+            methods: schema.methods.iter().map(|method| method.id).collect(),
+            prototypes: schema
+                .prototypes
+                .iter()
+                .map(|prototype| prototype.id)
+                .collect(),
+        })
+    }
+    pub(super) fn methods(&self) -> &HashSet<MethodId> {
+        &self.methods
+    }
+    pub(super) fn prototypes(&self) -> &HashSet<PrototypeId> {
+        &self.prototypes
+    }
+}
+
 /// IDs refer to the document's current graph, including detached retained nodes.
 /// Borrowed receivers are passed unchanged; the typed module owns receiver rules.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -349,6 +376,21 @@ impl MethodCall {
     pub fn validate(&self, g: &ModelGraph, schema: &ModelSchema) -> Result<(), PeleError> {
         g.validate_schema(schema)?;
         let methods: HashSet<_> = schema.methods.iter().map(|m| m.id).collect();
+        self.validate_after_graph(g, &methods)
+    }
+    pub(super) fn validate_compiled(
+        &self,
+        g: &ModelGraph,
+        schema: &CompiledSchema,
+    ) -> Result<(), PeleError> {
+        g.validate_compiled(schema)?;
+        self.validate_after_graph(g, schema.methods())
+    }
+    fn validate_after_graph(
+        &self,
+        g: &ModelGraph,
+        methods: &HashSet<MethodId>,
+    ) -> Result<(), PeleError> {
         if !methods.contains(&self.method) {
             return Err(invalid("Public model method is unavailable"));
         }

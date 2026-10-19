@@ -1,13 +1,17 @@
 use super::{
-    Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph, ModelSchema, ModelSchemaView,
-    PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
+    schema::CompiledSchema, Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph,
+    ModelSchema, ModelSchemaView, PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 use crate::compat::{
     DiagramId, DiagramModule, EdgeLimit, Engine, ErrorCode, ModuleDescriptor, Object, OutputLimit,
     ParseContext, ParseLimits, ParseOptions, PeleError, RenderOptions, RenderResources,
     RenderResult, RenderSettings, Rendered, SourceLimit,
 };
-use std::{any::Any, borrow::Cow, sync::Arc};
+use std::{
+    any::Any,
+    borrow::Cow,
+    sync::{Arc, OnceLock},
+};
 /// Typed codec opt-in. Parsing, geometry and rendering remain in the native module.
 pub trait PublicDiagramModule: DiagramModule {
     type PublicState: Send + 'static;
@@ -371,9 +375,23 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
 struct Registration {
     descriptor: ModuleDescriptor,
     schema: &'static ModelSchema,
+    compiled_schema: OnceLock<Result<CompiledSchema, PeleError>>,
     shared_functions: &'static [SharedFunction],
     function_shapes: &'static [FunctionShape],
     codec: Box<dyn Erased>,
+}
+impl Registration {
+    fn compiled_schema(&self) -> Result<&CompiledSchema, PeleError> {
+        // Register stays infallible. Cache validation (including its error) only
+        // where this captured schema would already have been checked.
+        self.compiled_schema
+            .get_or_init(|| CompiledSchema::new(self.schema))
+            .as_ref()
+            .map_err(Clone::clone)
+    }
+    fn validate_graph(&self, graph: &ModelGraph) -> Result<(), PeleError> {
+        graph.validate_compiled(self.compiled_schema()?)
+    }
 }
 #[derive(Default)]
 pub struct PublicEngine {
@@ -463,6 +481,7 @@ impl PublicEngine {
         let registration = Arc::new(Registration {
             descriptor,
             schema,
+            compiled_schema: OnceLock::new(),
             shared_functions,
             function_shapes,
             codec: Box::new(Codec(shared)),
@@ -593,7 +612,7 @@ impl PublicEngine {
         config: Object,
     ) -> Result<PublicDocument, PeleError> {
         let registration = self.graph_registration(id)?;
-        graph.validate_schema(registration.schema)?;
+        registration.validate_graph(&graph)?;
         let state = registration.codec.create_graph(graph)?;
         Ok(PublicDocument {
             registration,
@@ -663,6 +682,7 @@ impl PublicDocument {
             registration: Arc::new(Registration {
                 descriptor,
                 schema,
+                compiled_schema: OnceLock::new(),
                 shared_functions,
                 function_shapes,
                 codec: Box::new(Codec(Arc::new(module))),
@@ -694,6 +714,7 @@ impl PublicDocument {
             registration: Arc::new(Registration {
                 descriptor,
                 schema,
+                compiled_schema: OnceLock::new(),
                 shared_functions,
                 function_shapes,
                 codec: Box::new(Codec(Arc::new(module))),
@@ -737,7 +758,7 @@ impl PublicDocument {
     /// only implement owned export retain that export and its original errors.
     pub fn snapshot_view(&self) -> Result<Cow<'_, ModelGraph>, PeleError> {
         let graph = self.graph_view()?;
-        graph.validate_schema(self.registration.schema)?;
+        self.registration.validate_graph(&graph)?;
         Ok(graph)
     }
     pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
@@ -754,7 +775,7 @@ impl PublicDocument {
             .revision
             .checked_add(1)
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        graph.validate_schema(self.registration.schema)?;
+        self.registration.validate_graph(&graph)?;
         self.registration.codec.apply(&mut self.state, graph)?;
         self.revision = next_revision;
         Ok(())
@@ -781,7 +802,7 @@ impl PublicDocument {
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
         {
             let before = self.graph_view()?;
-            call.validate(&before, self.registration.schema)?;
+            call.validate_compiled(&before, self.registration.compiled_schema()?)?;
         }
         let mut result = self
             .registration

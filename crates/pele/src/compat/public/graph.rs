@@ -1,5 +1,5 @@
 //! Flat host value graph. UTF-16, IEEE numbers and object identity survive JSON.
-use super::{MethodId, ModelSchema, PrototypeId};
+use super::{schema::CompiledSchema, MethodId, ModelSchema, PrototypeId};
 use crate::compat::{ErrorCode, PeleError};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -177,6 +177,18 @@ impl ModelGraph {
         self.validate()?;
         let methods: HashSet<_> = schema.methods.iter().map(|m| m.id).collect();
         let prototypes: HashSet<_> = schema.prototypes.iter().map(|p| p.id).collect();
+        self.validate_schema_ids(&methods, &prototypes)
+    }
+    pub(super) fn validate_compiled(&self, schema: &CompiledSchema) -> Result<(), PeleError> {
+        // Every graph still pays its structural/reference/work validation.
+        self.validate()?;
+        self.validate_schema_ids(schema.methods(), schema.prototypes())
+    }
+    fn validate_schema_ids(
+        &self,
+        methods: &HashSet<MethodId>,
+        prototypes: &HashSet<PrototypeId>,
+    ) -> Result<(), PeleError> {
         let atom = |a: &Atom| -> Result<(), PeleError> {
             if let Atom::BuiltinFunction(id) = a {
                 if !methods.contains(&MethodId(*id)) {
