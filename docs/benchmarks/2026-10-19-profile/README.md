@@ -48,3 +48,64 @@ PLAYWRIGHT_BROWSERS_PATH="$PWD/browsers" node scripts/perf/profile-web.mjs \
 
 To inspect a raw profile, decompress its `.cpuprofile.gz` file and load it in
 Chrome DevTools' JavaScript profiler.
+
+## Coordinate-format optimization
+
+The candidate writes the existing rounded hundredths directly into a stack
+buffer, then creates one owned string. No numeric rounding, zero, non-finite,
+callback, model or public API policy changes. Default WASM optimization remains
+`s`; no schema-cache or O3 experiment was applied.
+
+The complete 126-condition VM benchmark was run for the candidate, then a fresh
+unmodified baseline control, then the candidate again. All three raw reports
+are retained: `coordinate.json`, `coordinate-control.json`, and
+`coordinate-confirmation.json`. Every run verifies complete SVG and dimensions
+before and after each workload/resource pair. Package hashes freeze inputs.
+
+Against the adjacent control, confirmation reduces the median of case-wise
+Canvas source-render times by 10.9% (9.8% when normalized to each run's JS
+control). Fixed-metric source rendering improves by 9.5% raw / 8.5% normalized.
+These are medians of relative changes across cases, not pooled operation times.
+Large Canvas source renders improve 2.3–16.4%. Mutable parse is not the target
+of this change; no parse improvement is claimed.
+
+Two source-render conditions exceed the fresh control by more than 5%:
+Flowchart/small/fixed +7.1%, Sankey/small/Canvas +8.9%. Small results and GC/JIT
+variance remain visible in the raw reports. This is not a regression-free or
+universal speed claim. The first candidate run showed larger improvements;
+the adjacent control/confirmation pair is used for the current headline.
+
+Canvas source rendering still takes 1.75–4.76 times JS (median case ratio 2.54).
+`release-gate.json` fails all 126 conditions, including mutable parse/render.
+**0.3 must not be released.** The new checker validates the whole matrix,
+source and harness hashes, warmup/trials, and the actual package bytes before
+checking each WASM median against its matching JS median:
+
+```sh
+node scripts/perf/check-web-parity.mjs   docs/benchmarks/2026-10-19-profile/coordinate-confirmation.json   dist/package-web/package
+# Expected exit 1 until every measured condition matches or beats JS.
+```
+
+Functional checks: six Rust numeric integration tests, including all 1,023
+all-family numeric cases through source/immutable/mutable lanes; twelve browser
+checks covering all 33 families and numeric/error/callback behavior across
+Chromium, Firefox and WebKit. The universal native SDK was rebuilt from the optimized core. Four local Swift
+`RenderNumberTests` passed, including all 1,023 cases across 33 families through
+source, immutable and mutable rendering (3,069 all-family drawings), plus the
+287-case numeric fixture and explicit Date/error/recovery checks.
+
+
+## Local Swift validation and timing boundary
+
+The current standalone Swift consumer verifies all 21 shared workloads through
+eight public API paths (168 rows), including immutable and mutable ownership,
+graph snapshot/apply, rendering, and disposal. See `swift-verified.json` for
+exact source/SDK/binary input hashes and complete SVG/dimension comparisons.
+This report contains **correctness only**, not latency samples.
+
+A new timed run aborted after one workload because `guardQuiet` detected a
+concurrent Kamui `swift-build` process. Partial samples were discarded; no
+unrelated process was stopped. `swift-timing-status.json` records the boundary.
+The root README keeps earlier Swift baseline timings explicitly labelled;
+no current Swift speed improvement is claimed. Retry the existing Swift timing
+command when the local build/profiling work is idle.

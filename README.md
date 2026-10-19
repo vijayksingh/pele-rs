@@ -177,7 +177,12 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 
 **The current WASM build does not meet the goal of matching Pele JS.** Independent
 VM measurements across 21 workloads show warm source rendering takes
-1.92–5.25× the Pele JS time. No speedup or GPU acceleration is claimed.
+1.75–4.76× the Pele JS time. No speedup over JS or GPU acceleration is claimed. Profiling identified SVG
+coordinate formatting as a hot path; removing intermediate formatting allocations
+reduces median source-render time across the 21 Canvas cases by 10.9% against
+a fresh control. Two small workload conditions regressed in that run; complete
+samples and limitations are retained in [the profile and optimization report](docs/benchmarks/2026-10-19-profile/).
+The performance release gate still fails all 126 measured conditions; 0.3 remains unreleased.
 
 Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
 Same browser, inputs and cached Canvas metrics; nine alternating trials after
@@ -186,16 +191,18 @@ Large workloads use 200 units, except Sankey (199 links) and Railroad (60 rules)
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| Flowchart | 1.387 ms | 3.025 ms | 2.18× |
-| Sequence | 0.512 ms | 1.344 ms | 2.62× |
-| ER | 2.900 ms | 8.050 ms | 2.78× |
-| Pie | 0.281 ms | 0.769 ms | 2.73× |
-| Sankey | 0.869 ms | 1.987 ms | 2.29× |
-| Gantt | 0.719 ms | 2.975 ms | 4.14× |
-| Railroad | 0.756 ms | 2.325 ms | 3.07× |
+| Flowchart | 1.344 ms | 2.625 ms | 1.95× |
+| Sequence | 0.519 ms | 1.125 ms | 2.17× |
+| ER | 2.788 ms | 6.900 ms | 2.48× |
+| Pie | 0.275 ms | 0.684 ms | 2.49× |
+| Sankey | 0.844 ms | 1.675 ms | 1.99× |
+| Gantt | 0.688 ms | 2.700 ms | 3.93× |
+| Railroad | 0.781 ms | 1.987 ms | 2.54× |
 
 Swift runs here on Apple M1 Pro because the Linux VM lacks the macOS/AppKit SDK.
-Seven-trial medium-workload medians (48 units; Railroad 15 rules):
+Previous baseline seven-trial medians (48 units; Railroad 15 rules), before
+the coordinate optimization. Current Swift numeric checks pass; a timing refresh
+was aborted when another Kamui build started. These figures are historical:
 
 | Medium workload | Source render | Retained render | Mutable render |
 | --- | ---: | ---: | ---: |
@@ -210,7 +217,8 @@ Seven-trial medium-workload medians (48 units; Railroad 15 rules):
 The Swift and VM figures cannot be compared across machines. Timings include
 public API/ownership costs, and exclude startup, downloads and SVG painting.
 Larger compiler and schema-cache experiments showed no reliable overall win and
-remain out of the default. See [methodology, all stages and raw results](docs/benchmarks/2026-10-19-vm/README.md).
+remain out of the default. See [current profiles, all stages and raw results](docs/benchmarks/2026-10-19-profile/README.md)
+and [the archived baseline methodology](docs/benchmarks/2026-10-19-vm/README.md).
 
 ## Build and verification
 

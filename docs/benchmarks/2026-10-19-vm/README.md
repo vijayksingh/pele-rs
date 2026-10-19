@@ -1,4 +1,7 @@
-# Current performance measurement — 2026-10-19
+# Baseline performance measurement — 2026-10-19
+
+This is the archived baseline before coordinate-format optimization. See the
+[current profiling and optimization report](../2026-10-19-profile/README.md).
 
 **The no-slower-than-Pele-JS target is not met.** Default warm source rendering
 on the 21 matched cases is 1.92–5.25× the JavaScript time
