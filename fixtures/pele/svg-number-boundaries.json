@@ -1,0 +1,441 @@
+{
+  "oracleRevision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "source": "railroad-beta\nrule = terminal(\"x\");",
+  "cases": [
+    {
+      "id": "padding/0",
+      "paddingBits": "0000000000000000",
+      "ruleNameX": "0",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 72 52\" width=\"72\" height=\"52\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"0\" y=\"14.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8,39H20M52,39H64\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36\" y=\"42.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 72,
+        "height": 52,
+        "links": []
+      },
+      "widthBits": "4052000000000000",
+      "heightBits": "404a000000000000"
+    },
+    {
+      "id": "padding/1",
+      "paddingBits": "8000000000000000",
+      "ruleNameX": "0",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 72 52\" width=\"72\" height=\"52\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"0\" y=\"14.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8,39H20M52,39H64\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36\" y=\"42.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 72,
+        "height": 52,
+        "links": []
+      },
+      "widthBits": "4052000000000000",
+      "heightBits": "404a000000000000"
+    },
+    {
+      "id": "padding/2",
+      "paddingBits": "3f747ae147ae147a",
+      "ruleNameX": "0",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 73 53\" width=\"73\" height=\"53\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"0\" y=\"14.56\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8.01,39H20.01M52.01,39H64.01\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4.01\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68.01\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20.01\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36.01\" y=\"42.86\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 73,
+        "height": 53,
+        "links": []
+      },
+      "widthBits": "4052400000000000",
+      "heightBits": "404a800000000000"
+    },
+    {
+      "id": "padding/3",
+      "paddingBits": "3f747ae147ae147b",
+      "ruleNameX": "0.01",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 73 53\" width=\"73\" height=\"53\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"0.01\" y=\"14.56\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8.01,39H20.01M52.01,39H64.01\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4.01\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68.01\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20.01\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36.01\" y=\"42.86\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 73,
+        "height": 53,
+        "links": []
+      },
+      "widthBits": "4052400000000000",
+      "heightBits": "404a800000000000"
+    },
+    {
+      "id": "padding/4",
+      "paddingBits": "3f747ae147ae147c",
+      "ruleNameX": "0.01",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 73 53\" width=\"73\" height=\"53\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"0.01\" y=\"14.56\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8.01,39H20.01M52.01,39H64.01\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4.01\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68.01\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20.01\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36.01\" y=\"42.86\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 73,
+        "height": 53,
+        "links": []
+      },
+      "widthBits": "4052400000000000",
+      "heightBits": "404a800000000000"
+    },
+    {
+      "id": "padding/5",
+      "paddingBits": "bf747ae147ae147a",
+      "ruleNameX": "0",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 72 52\" width=\"72\" height=\"52\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"0\" y=\"14.54\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8,39H20M52,39H64\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36\" y=\"42.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 72,
+        "height": 52,
+        "links": []
+      },
+      "widthBits": "4052000000000000",
+      "heightBits": "404a000000000000"
+    },
+    {
+      "id": "padding/6",
+      "paddingBits": "bf747ae147ae147b",
+      "ruleNameX": "0",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 72 52\" width=\"72\" height=\"52\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"0\" y=\"14.54\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8,39H20M52,39H64\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36\" y=\"42.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 72,
+        "height": 52,
+        "links": []
+      },
+      "widthBits": "4052000000000000",
+      "heightBits": "404a000000000000"
+    },
+    {
+      "id": "padding/7",
+      "paddingBits": "bf747ae147ae147c",
+      "ruleNameX": "-0.01",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 72 52\" width=\"72\" height=\"52\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-0.01\" y=\"14.54\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M8,39H20M52,39H64\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"4\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"68\" cy=\"39\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"20\" y=\"26\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"36\" y=\"42.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 72,
+        "height": 52,
+        "links": []
+      },
+      "widthBits": "4052000000000000",
+      "heightBits": "404a000000000000"
+    },
+    {
+      "id": "padding/8",
+      "paddingBits": "3ff0147ae147ae13",
+      "ruleNameX": "1",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 75 55\" width=\"75\" height=\"55\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1\" y=\"15.56\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M9,40H21.01M53.01,40H65.01\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"5.01\" cy=\"40\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"69.01\" cy=\"40\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"21.01\" y=\"27\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"37\" y=\"43.86\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 75,
+        "height": 55,
+        "links": []
+      },
+      "widthBits": "4052c00000000000",
+      "heightBits": "404b800000000000"
+    },
+    {
+      "id": "padding/9",
+      "paddingBits": "3ff0147ae147ae14",
+      "ruleNameX": "1",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 75 55\" width=\"75\" height=\"55\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1\" y=\"15.56\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M9,40H21.01M53.01,40H65.01\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"5.01\" cy=\"40\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"69.01\" cy=\"40\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"21.01\" y=\"27\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"37\" y=\"43.86\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 75,
+        "height": 55,
+        "links": []
+      },
+      "widthBits": "4052c00000000000",
+      "heightBits": "404b800000000000"
+    },
+    {
+      "id": "padding/10",
+      "paddingBits": "3ff0147ae147ae15",
+      "ruleNameX": "1.01",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 75 55\" width=\"75\" height=\"55\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1.01\" y=\"15.56\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M9.01,40H21.01M53.01,40H65.01\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"5.01\" cy=\"40\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"69.01\" cy=\"40\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"21.01\" y=\"27\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"37.01\" y=\"43.86\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 75,
+        "height": 55,
+        "links": []
+      },
+      "widthBits": "4052c00000000000",
+      "heightBits": "404b800000000000"
+    },
+    {
+      "id": "padding/11",
+      "paddingBits": "bff0147ae147ae13",
+      "ruleNameX": "-1",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 70 50\" width=\"70\" height=\"50\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-1\" y=\"13.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M7,38H19M51,38H63\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"3\" cy=\"38\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"67\" cy=\"38\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"19\" y=\"25\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"35\" y=\"41.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 70,
+        "height": 50,
+        "links": []
+      },
+      "widthBits": "4051800000000000",
+      "heightBits": "4049000000000000"
+    },
+    {
+      "id": "padding/12",
+      "paddingBits": "bff0147ae147ae14",
+      "ruleNameX": "-1",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 70 50\" width=\"70\" height=\"50\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-1\" y=\"13.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M7,38H19M51,38H63\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"3\" cy=\"38\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"67\" cy=\"38\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"19\" y=\"25\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"35\" y=\"41.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 70,
+        "height": 50,
+        "links": []
+      },
+      "widthBits": "4051800000000000",
+      "heightBits": "4049000000000000"
+    },
+    {
+      "id": "padding/13",
+      "paddingBits": "bff0147ae147ae15",
+      "ruleNameX": "-1.01",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 70 50\" width=\"70\" height=\"50\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-1.01\" y=\"13.54\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M7,38H19M51,38H63\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"3\" cy=\"38\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"67\" cy=\"38\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"19\" y=\"25\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"35\" y=\"41.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 70,
+        "height": 50,
+        "links": []
+      },
+      "widthBits": "4051800000000000",
+      "heightBits": "4049000000000000"
+    },
+    {
+      "id": "padding/14",
+      "paddingBits": "41cdcd64ffff5c28",
+      "ruleNameX": "999999999.99",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 2000000072 2000000052\" width=\"2000000072\" height=\"2000000052\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"999999999.99\" y=\"1000000014.54\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M1000000007.99,1000000038.99H1000000019.99M1000000051.99,1000000038.99H1000000063.99\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"1000000003.99\" cy=\"1000000038.99\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"1000000067.99\" cy=\"1000000038.99\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"1000000019.99\" y=\"1000000025.99\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"1000000035.99\" y=\"1000000042.84\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 2000000072,
+        "height": 2000000052,
+        "links": []
+      },
+      "widthBits": "41ddcd6512000000",
+      "heightBits": "41ddcd650d000000"
+    },
+    {
+      "id": "padding/15",
+      "paddingBits": "41cdcd64ffff5c29",
+      "ruleNameX": "1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 2000000072 2000000052\" width=\"2000000072\" height=\"2000000052\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1000000000\" y=\"1000000014.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M1000000008,1000000039H1000000020M1000000052,1000000039H1000000064\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"1000000004\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"1000000068\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"1000000020\" y=\"1000000026\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"1000000036\" y=\"1000000042.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 2000000072,
+        "height": 2000000052,
+        "links": []
+      },
+      "widthBits": "41ddcd6512000000",
+      "heightBits": "41ddcd650d000000"
+    },
+    {
+      "id": "padding/16",
+      "paddingBits": "41cdcd64ffff5c2a",
+      "ruleNameX": "1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 2000000072 2000000052\" width=\"2000000072\" height=\"2000000052\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1000000000\" y=\"1000000014.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M1000000008,1000000039H1000000020M1000000052,1000000039H1000000064\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"1000000004\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"1000000068\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"1000000020\" y=\"1000000026\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"1000000036\" y=\"1000000042.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 2000000072,
+        "height": 2000000052,
+        "links": []
+      },
+      "widthBits": "41ddcd6512000000",
+      "heightBits": "41ddcd650d000000"
+    },
+    {
+      "id": "padding/17",
+      "paddingBits": "c1cdcd64ffff5c28",
+      "ruleNameX": "-999999999.99",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 -1999999927 -1999999947\" width=\"-1999999927\" height=\"-1999999947\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-999999999.99\" y=\"-999999985.44\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M-999999991.99,-999999960.99H-999999979.99M-999999947.99,-999999960.99H-999999935.99\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-999999995.99\" cy=\"-999999960.99\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-999999931.99\" cy=\"-999999960.99\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-999999979.99\" y=\"-999999973.99\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-999999963.99\" y=\"-999999957.14\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": -1999999927,
+        "height": -1999999947,
+        "links": []
+      },
+      "widthBits": "c1ddcd64edc00000",
+      "heightBits": "c1ddcd64f2c00000"
+    },
+    {
+      "id": "padding/18",
+      "paddingBits": "c1cdcd64ffff5c29",
+      "ruleNameX": "-999999999.99",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 -1999999927 -1999999947\" width=\"-1999999927\" height=\"-1999999947\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-999999999.99\" y=\"-999999985.44\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M-999999991.99,-999999960.99H-999999979.99M-999999947.99,-999999960.99H-999999935.99\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-999999995.99\" cy=\"-999999960.99\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-999999931.99\" cy=\"-999999960.99\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-999999979.99\" y=\"-999999973.99\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-999999963.99\" y=\"-999999957.14\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": -1999999927,
+        "height": -1999999947,
+        "links": []
+      },
+      "widthBits": "c1ddcd64edc00000",
+      "heightBits": "c1ddcd64f2c00000"
+    },
+    {
+      "id": "padding/19",
+      "paddingBits": "c1cdcd64ffff5c2a",
+      "ruleNameX": "-1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 -1999999927 -1999999947\" width=\"-1999999927\" height=\"-1999999947\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-1000000000\" y=\"-999999985.45\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M-999999992,-999999961H-999999980M-999999948,-999999961H-999999936\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-999999996\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-999999932\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-999999980\" y=\"-999999974\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-999999964\" y=\"-999999957.15\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": -1999999927,
+        "height": -1999999947,
+        "links": []
+      },
+      "widthBits": "c1ddcd64edc00000",
+      "heightBits": "c1ddcd64f2c00000"
+    },
+    {
+      "id": "padding/20",
+      "paddingBits": "41cdcd64ffffffff",
+      "ruleNameX": "1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 2000000072 2000000052\" width=\"2000000072\" height=\"2000000052\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1000000000\" y=\"1000000014.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M1000000008,1000000039H1000000020M1000000052,1000000039H1000000064\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"1000000004\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"1000000068\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"1000000020\" y=\"1000000026\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"1000000036\" y=\"1000000042.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 2000000072,
+        "height": 2000000052,
+        "links": []
+      },
+      "widthBits": "41ddcd6512000000",
+      "heightBits": "41ddcd650d000000"
+    },
+    {
+      "id": "padding/21",
+      "paddingBits": "41cdcd6500000000",
+      "ruleNameX": "1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 2000000072 2000000052\" width=\"2000000072\" height=\"2000000052\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1000000000\" y=\"1000000014.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M1000000008,1000000039H1000000020M1000000052,1000000039H1000000064\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"1000000004\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"1000000068\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"1000000020\" y=\"1000000026\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"1000000036\" y=\"1000000042.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 2000000072,
+        "height": 2000000052,
+        "links": []
+      },
+      "widthBits": "41ddcd6512000000",
+      "heightBits": "41ddcd650d000000"
+    },
+    {
+      "id": "padding/22",
+      "paddingBits": "41cdcd6500000001",
+      "ruleNameX": "1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 2000000073 2000000053\" width=\"2000000073\" height=\"2000000053\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"1000000000\" y=\"1000000014.55\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M1000000008,1000000039H1000000020M1000000052,1000000039H1000000064\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"1000000004\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"1000000068\" cy=\"1000000039\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"1000000020\" y=\"1000000026\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"1000000036\" y=\"1000000042.85\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 2000000073,
+        "height": 2000000053,
+        "links": []
+      },
+      "widthBits": "41ddcd6512400000",
+      "heightBits": "41ddcd650d400000"
+    },
+    {
+      "id": "padding/23",
+      "paddingBits": "c1cdcd64ffffffff",
+      "ruleNameX": "-1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 -1999999927 -1999999947\" width=\"-1999999927\" height=\"-1999999947\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-1000000000\" y=\"-999999985.45\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M-999999992,-999999961H-999999980M-999999948,-999999961H-999999936\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-999999996\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-999999932\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-999999980\" y=\"-999999974\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-999999964\" y=\"-999999957.15\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": -1999999927,
+        "height": -1999999947,
+        "links": []
+      },
+      "widthBits": "c1ddcd64edc00000",
+      "heightBits": "c1ddcd64f2c00000"
+    },
+    {
+      "id": "padding/24",
+      "paddingBits": "c1cdcd6500000000",
+      "ruleNameX": "-1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 -1999999928 -1999999948\" width=\"-1999999928\" height=\"-1999999948\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-1000000000\" y=\"-999999985.45\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M-999999992,-999999961H-999999980M-999999948,-999999961H-999999936\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-999999996\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-999999932\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-999999980\" y=\"-999999974\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-999999964\" y=\"-999999957.15\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": -1999999928,
+        "height": -1999999948,
+        "links": []
+      },
+      "widthBits": "c1ddcd64ee000000",
+      "heightBits": "c1ddcd64f3000000"
+    },
+    {
+      "id": "padding/25",
+      "paddingBits": "c1cdcd6500000001",
+      "ruleNameX": "-1000000000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 -1999999928 -1999999948\" width=\"-1999999928\" height=\"-1999999948\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-1000000000\" y=\"-999999985.45\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"M-999999992,-999999961H-999999980M-999999948,-999999961H-999999936\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-999999996\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-999999932\" cy=\"-999999961\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-999999980\" y=\"-999999974\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-999999964\" y=\"-999999957.15\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": -1999999928,
+        "height": -1999999948,
+        "links": []
+      },
+      "widthBits": "c1ddcd64ee000000",
+      "heightBits": "c1ddcd64f3000000"
+    },
+    {
+      "id": "padding/26",
+      "paddingBits": "444b1ae4d6e2ef50",
+      "ruleNameX": "999999999999999900000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 2e+21 2e+21\" width=\"2e+21\" height=\"2e+21\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"999999999999999900000\" y=\"999999999999999900000\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"999999999999999900000\" cy=\"999999999999999900000\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"999999999999999900000\" cy=\"999999999999999900000\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"999999999999999900000\" y=\"999999999999999900000\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"999999999999999900000\" y=\"999999999999999900000\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": 2e+21,
+        "height": 2e+21,
+        "links": []
+      },
+      "widthBits": "445b1ae4d6e2ef50",
+      "heightBits": "445b1ae4d6e2ef50"
+    },
+    {
+      "id": "padding/27",
+      "paddingBits": "c44b1ae4d6e2ef50",
+      "ruleNameX": "-999999999999999900000",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 -2e+21 -2e+21\" width=\"-2e+21\" height=\"-2e+21\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-999999999999999900000\" y=\"-999999999999999900000\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-999999999999999900000\" cy=\"-999999999999999900000\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-999999999999999900000\" cy=\"-999999999999999900000\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-999999999999999900000\" y=\"-999999999999999900000\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-999999999999999900000\" y=\"-999999999999999900000\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": -2e+21,
+        "height": -2e+21,
+        "links": []
+      },
+      "widthBits": "c45b1ae4d6e2ef50",
+      "heightBits": "c45b1ae4d6e2ef50"
+    },
+    {
+      "id": "padding/28",
+      "paddingBits": "7ff8000000000000",
+      "ruleNameX": "NaN",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 NaN NaN\" width=\"NaN\" height=\"NaN\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"NaN\" y=\"NaN\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"NaN\" cy=\"NaN\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"NaN\" cy=\"NaN\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"NaN\" y=\"NaN\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"NaN\" y=\"NaN\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": null,
+        "height": null,
+        "links": []
+      },
+      "widthBits": "7ff8000000000000",
+      "heightBits": "7ff8000000000000"
+    },
+    {
+      "id": "padding/29",
+      "paddingBits": "7ff0000000000000",
+      "ruleNameX": "Infinity",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 NaN Infinity\" width=\"NaN\" height=\"Infinity\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"Infinity\" y=\"Infinity\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"Infinity\" cy=\"Infinity\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"Infinity\" cy=\"Infinity\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"Infinity\" y=\"Infinity\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"Infinity\" y=\"Infinity\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": null,
+        "height": null,
+        "links": []
+      },
+      "widthBits": "7ff8000000000000",
+      "heightBits": "7ff0000000000000"
+    },
+    {
+      "id": "padding/30",
+      "paddingBits": "fff0000000000000",
+      "ruleNameX": "-Infinity",
+      "result": {
+        "type": "railroad",
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-railroad\" viewBox=\"0 0 NaN -Infinity\" width=\"NaN\" height=\"-Infinity\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_hw:var(--pele-heading-weight,bold);--_fm:var(--pele-font-mono,monospace);font:13px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"railroad\"><g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"11\" text-anchor=\"middle\"><g class=\"pele-rule\" data-id=\"rule\"><text class=\"pele-rule-name\" x=\"-Infinity\" y=\"-Infinity\" font-size=\"13\" font-weight=\"var(--_hw)\" text-anchor=\"start\">rule</text><path class=\"pele-edge pele-track\" d=\"\" fill=\"none\" stroke=\"var(--_l)\"/><circle class=\"pele-marker pele-start\" cx=\"-Infinity\" cy=\"-Infinity\" r=\"4\" fill=\"var(--_l)\"/><circle class=\"pele-marker pele-end\" cx=\"-Infinity\" cy=\"-Infinity\" r=\"4\" fill=\"var(--_l)\"/><g class=\"pele-node pele-terminal\"><rect x=\"-Infinity\" y=\"-Infinity\" width=\"32\" height=\"26\" rx=\"13\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text x=\"-Infinity\" y=\"-Infinity\" font-family=\"var(--_fm)\">x</text></g></g></g></svg>",
+        "width": null,
+        "height": null,
+        "links": []
+      },
+      "widthBits": "7ff8000000000000",
+      "heightBits": "fff0000000000000"
+    }
+  ]
+}

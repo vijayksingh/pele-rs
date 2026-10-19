@@ -34,7 +34,16 @@ pub(crate) fn js_num(n: f64) -> String {
     b.format(n).to_string()
 }
 pub(crate) fn num(value: f64) -> String {
-    let n = (value * 100. + 0.5).floor();
+    let scaled = value * 100.;
+    let lower = scaled.floor();
+    // Adding 0.5 first can round a value just below a tie up to the next
+    // integer. Compare the fractional part, matching Math.round's ties toward
+    // positive infinity without that extra floating-point addition.
+    let n = if scaled - lower >= 0.5 {
+        lower + 1.
+    } else {
+        lower
+    };
     if n == 0. {
         return "0".into();
     }
