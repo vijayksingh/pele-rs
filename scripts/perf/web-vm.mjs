@@ -45,7 +45,7 @@ let browser;
 const report={schemaVersion:1,startedAt:new Date().toISOString(),oracleRevision:revision,oracleSHA256,harnessSHA256,casesSHA256,runtimeHashes:before,
   platform:{os:platform(),arch:arch(),cpu:cpus()[0]?.model,logicalCPUs:cpus().length,totalMemory:totalmem()},
   hostBefore:{loadAverage:loadavg(),freeMemory:freemem()},settings:{trials,batchTargetMs:12,maxBatch:128,minimumWarmupOperations:6,minimumWarmupMs:warmupMs,alternatingPairOrder:true,freshRetainedModelPerBatch:true},
-  scope:'Matched browser/hardware/source/options/measurer; full SVG and dimensions exact before/after. Source render, mutable parse/dispose, retained mutable render include JS/WASM ownership and graph publication. Warm CPU work excludes startup/download, DOM/SVG painting and GPU. Shared VM services remain untouched.',rows:[],cases:[]};
+  scope:'Matched browser/hardware/source/options/measurer; source, fresh parse and retained full SVG/dimensions exact before/after. Source render, mutable parse/dispose, retained mutable render include JS/WASM ownership and graph publication. Warm CPU work excludes startup/download, DOM/SVG painting and GPU. Shared VM services remain untouched.',rows:[],cases:[]};
 const deadline=setTimeout(()=>{void browser?.close();},600_000);
 try{
   browser=await chromium.launch({headless:true,timeout:20_000});report.browser=browser.version();
@@ -70,8 +70,13 @@ try{
         if(!measurer)throw Error('Canvas unavailable');
         const options={...workload.options,measurer},wasmModel=engine.parse(workload.source,options),jsModel=oracle.parse(workload.source,options);
         const verify=()=>{
-          const wasm=engine.render(wasmModel,options),js=oracle.render(jsModel,options);
-          if(wasm.svg!==js.svg||!Object.is(wasm.width,js.width)||!Object.is(wasm.height,js.height))throw Error(`${workload.id}/${profile}: full output mismatch`);
+          const js=oracle.render(jsModel,options);
+          const equal=(value,lane)=>{if(value.svg!==js.svg||!Object.is(value.width,js.width)||!Object.is(value.height,js.height))throw Error(`${workload.id}/${profile}/${lane}: full output mismatch`);};
+          const wasm=engine.render(wasmModel,options);equal(wasm,'retained');
+          equal(engine.render(workload.source,options),'source');
+          equal(oracle.render(workload.source,options),'JS-source');
+          const fresh=engine.parse(workload.source,options);
+          try{equal(engine.render(fresh,options),'fresh-parse');}finally{engine.dispose(fresh);}
           return {svgBytes:new TextEncoder().encode(wasm.svg).length,width:wasm.width,height:wasm.height};
         };
         try{
