@@ -175,58 +175,58 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 
 ## Performance
 
-**The WASM performance gate still fails all 126 measured conditions; 0.3 remains unreleased.**
-Latest measured package: native `6c63a71`, JS `fa9f4e8`. Direct comparison of
-acknowledged host state reduces retained mutable render time **11.1%** at the
-median of 42 conditions versus the preceding short-key package. One retained
-condition regressed 6.5%; complete samples and follow-up diagnostics are recorded.
-Source rendering still takes **1.67–5.09×** the Pele JS time. No JS speedup or GPU
-acceleration is claimed.
+**All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
+Latest measured package: native `bfee120`, JS `fa9f4e8`. Per-registration
+schema validation now reuses immutable metadata while preserving graph checks
+and error order. Source render takes **1.70–5.13×** the Pele JS time. Median
+ratios across all sizes/resources are **2.63× source**, **11.37× parse** and
+**4.02× retained mutable render**. These describe this artifact; they are not
+causal speedup percentages against earlier runs.
 
-The latest VM series uses verified 5 µs clock ticks and fresh matched controls.
-Earlier non-isolated reports remain historical; their percentage gains are not
-combined with this series. Native snapshots, lazy projections, acknowledged
-imports, immutable schema reuse, short-key lookup and descriptor publication
-changes remain part of the candidate. Full stage results, regressions, artifact
-hashes and the failed release gate appear in
-[the latest report](docs/benchmarks/2026-10-20-direct-comparison/).
+The prior direct host comparison measured an 11.1% retained-render improvement
+against its own matched control, with regressions disclosed. Reports retain
+raw samples, artifact hashes and failed gates:
+[latest schema checkpoint](docs/benchmarks/2026-10-20-registration-schema/),
+[direct comparison](docs/benchmarks/2026-10-20-direct-comparison/),
+[rejected copying experiments](docs/benchmarks/2026-10-20-copying-candidates/).
+No JS speedup or GPU acceleration is claimed.
 
 Independent Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
-Same browser, inputs and cached Canvas metrics; nine alternating trials after
-at least 500 ms warmup per API. Complete SVG and dimensions match before/after.
+Verified 5 µs clock ticks; nine alternating trials after at least 500 ms warmup.
 Large workloads use 200 units, except Sankey (199 links) and Railroad (60 rules).
-Source-render measurements for that exact artifact:
+Source-render measurements with cached Canvas metrics:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.356 ms | 2.534 ms | 1.87× |
-| sequence | 0.517 ms | 1.066 ms | 2.06× |
-| er | 2.744 ms | 6.742 ms | 2.46× |
-| pie | 0.274 ms | 0.659 ms | 2.40× |
-| sankey | 0.846 ms | 1.588 ms | 1.88× |
-| gantt | 0.765 ms | 2.865 ms | 3.74× |
-| railroad | 0.794 ms | 1.967 ms | 2.48× |
+| flowchart | 1.333 ms | 2.511 ms | 1.88× |
+| sequence | 0.513 ms | 1.077 ms | 2.10× |
+| er | 2.848 ms | 6.745 ms | 2.37× |
+| pie | 0.285 ms | 0.676 ms | 2.37× |
+| sankey | 0.898 ms | 1.625 ms | 1.81× |
+| gantt | 0.780 ms | 2.942 ms | 3.77× |
+| railroad | 0.799 ms | 1.973 ms | 2.47× |
 
-Swift runs locally on Apple M1 Pro. Fresh ARM64 SDK passed seven output-limit and
-all-family numeric integration tests, plus 168 exact output checks through eight
-actual APIs. The latest native change still needs the universal Intel rebuild
-before release. Seven-trial timing medians below use medium workloads (48 units;
-Railroad 15 rules) and passed the compiler/Pele-test quiet guard. Other desktop
-activity remained present and is recorded in the report.
+Swift runs locally on Apple M1 Pro. Fresh source-built ARM64 SDK passed eight
+integration tests, including all 33 numeric families and 31 coordinate-boundary
+cases, plus 168 exact output checks through eight actual APIs. Universal Intel
+rebuild remains required before release. Seven-trial timing medians below use
+medium workloads (48 units; Railroad 15 rules) and passed the compiler/Pele-test
+quiet guard. Other desktop activity is recorded in the report.
 
 | Medium workload | Source render | Retained render | Mutable render |
 | --- | ---: | ---: | ---: |
-| flowchart | 0.605 ms | 0.479 ms | 0.596 ms |
-| sequence | 0.272 ms | 0.230 ms | 0.283 ms |
-| er | 1.622 ms | 1.376 ms | 1.523 ms |
-| pie | 0.294 ms | 0.284 ms | 0.301 ms |
-| sankey | 0.376 ms | 0.339 ms | 0.392 ms |
-| gantt | 0.454 ms | 0.408 ms | 1.144 ms |
-| railroad | 0.477 ms | 0.501 ms | 0.473 ms |
+| flowchart | 0.590 ms | 0.482 ms | 0.596 ms |
+| sequence | 0.270 ms | 0.231 ms | 0.265 ms |
+| er | 1.531 ms | 1.309 ms | 1.452 ms |
+| pie | 0.287 ms | 0.272 ms | 0.284 ms |
+| sankey | 0.351 ms | 0.328 ms | 0.371 ms |
+| gantt | 0.433 ms | 0.366 ms | 1.079 ms |
+| railroad | 0.443 ms | 0.414 ms | 0.464 ms |
 
 Swift and VM figures cannot be compared across machines. Timings include public
-API/ownership costs and exclude startup, downloads and SVG painting. Mixed-result
-packed-publication and disposal-storage experiments remain outside the default.
+API/ownership costs and exclude startup, downloads and SVG painting. Mixed or
+unconfirmed candidates remain outside the default. Earlier non-isolated reports
+remain historical; percentage gains are not combined across timer conditions.
 
 ## Build and verification
 

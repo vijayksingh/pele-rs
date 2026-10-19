@@ -8,7 +8,7 @@ The inline coordinate formatter replaces most temporary coordinate Strings
 with stack bytes and retains an owned large/nonfinite fallback. It passed 15
 browser checks across three engines and the 31-case rounding-boundary native
 integration. Against the independently packed rounding-fixed control, its 18
-Canvas source/retained conditions were mixed: six retained conditions regressed
+Canvas source/retained conditions were mixed: five retained conditions regressed
 by more than 5%. The formatter was rejected and removed from tracked source.
 The separate Math.round tie correction remains in `d29798a`.
 
