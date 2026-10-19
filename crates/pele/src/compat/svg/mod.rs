@@ -42,14 +42,38 @@ pub(crate) fn num(value: f64) -> String {
         let m = n.abs() as u64;
         let q = m / 100;
         let r = m % 100;
-        let fraction = if r == 0 {
-            String::new()
-        } else if r % 10 == 0 {
-            format!(".{}", r / 10)
-        } else {
-            format!(".{r:02}")
-        };
-        format!("{}{q}{fraction}", if n < 0. { "-" } else { "" })
+        // At most nine integer digits here. Write directly into one stack
+        // buffer; format! previously allocated a fraction and a second string
+        // for every SVG coordinate. Keep rounding and the non-finite lane above
+        // and below identical to Pele.
+        let mut bytes = [0u8; 16];
+        let mut at = 10;
+        let mut integer = q;
+        loop {
+            at -= 1;
+            bytes[at] = b'0' + (integer % 10) as u8;
+            integer /= 10;
+            if integer == 0 {
+                break;
+            }
+        }
+        if n < 0. {
+            at -= 1;
+            bytes[at] = b'-';
+        }
+        let mut end = 10;
+        if r != 0 {
+            bytes[end] = b'.';
+            bytes[end + 1] = b'0' + (r / 10) as u8;
+            end += 2;
+            if r % 10 != 0 {
+                bytes[end] = b'0' + (r % 10) as u8;
+                end += 1;
+            }
+        }
+        std::str::from_utf8(&bytes[at..end])
+            .expect("SVG coordinates contain only ASCII digits")
+            .to_owned()
     } else {
         js_num(n / 100.)
     }
