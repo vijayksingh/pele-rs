@@ -226,6 +226,13 @@ is recorded in the timing report.
 | gantt | 0.433 ms | 0.366 ms | 1.079 ms |
 | railroad | 0.443 ms | 0.414 ms | 0.464 ms |
 
+A separate [native-only comparison](docs/benchmarks/2026-10-20-native-core/)
+removes WASM/Swift entirely: typed retained native/JS medians are 0.80× Flowchart,
+0.70× Sequence, 1.04× ER, 0.50× Pie, 0.41× Sankey, 1.15× Gantt and 1.38× Railroad.
+Seven medium workloads on the same Mac; this is not all-33 certification.
+Native compatibility work is still costly: Gantt public parse is 8.38× and mutable
+publication 4.00× its JS reference, with the extra return contract disclosed.
+
 Swift and VM figures cannot be compared across machines. Timings include public
 API/ownership costs and exclude startup, downloads and SVG painting. Mixed or
 unconfirmed candidates remain outside the default. Earlier non-isolated reports
