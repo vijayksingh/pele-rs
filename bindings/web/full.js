@@ -102,6 +102,25 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     if(entry.nativeBusy)throw new TypeError("Public model document is already in use");
     entry.nativeBusy=true;try{return run();}finally{entry.nativeBusy=false;}
   }
+  // bridge.graph tracks observations, including edits rejected by native apply.
+  // Only a completely published native outcome can acknowledge that baseline.
+  function prepareMutableInput(entry, values = []) {
+    const confirmed = entry.confirmedGraph;
+    entry.confirmedGraph = false;
+    const baseline = entry.bridge.graph;
+    const input = entry.bridge.snapshot(values, true), delta = input.delta;
+    const unchanged = confirmed && entry.unchangedApplyIsNoop &&
+      input.graph.root.kind === baseline.root.kind && input.graph.root.value === baseline.root.value &&
+      delta.nodes.length === 0 && delta.strings.length === 0 &&
+      input.graph.nodes.length === baseline.nodes.length && input.graph.strings.length === baseline.strings.length;
+    if (!unchanged) entry.revision = result(entry.handle.apply_binary(encodeGraphBinary(entry.revision, input.graph)));
+    return input;
+  }
+  function publishMutableOutcome(entry, outcome) {
+    entry.revision = outcome.revision;
+    entry.bridge.reconcile(outcome.graph);
+    entry.confirmedGraph = true;
+  }
   function foreignParse(source, options) {
     syncProviders();
     if (!nativeRegistry?.has_foreign()) return null;
@@ -132,20 +151,19 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   function adoptMutable(mutable, preparedType, existingBridge) {
           const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
           const rawType=mutable.entry_type(), live=preparedType===undefined?liveProviders.get(rawType):undefined;
-          const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider};
+          const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider, confirmedGraph: false, unchangedApplyIsNoop: mutable.unchanged_public_graph_is_noop?.() === true};
           const invoke = (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
-            const input = bridge.snapshot([receiver, ...argumentsValue]);
-            entry.revision = result(mutable.apply_binary(encodeGraphBinary(entry.revision,input.graph)));
+            const input = prepareMutableInput(entry, [receiver, ...argumentsValue]);
             const outcome = binaryResult(()=>mutable.invoke_binary_with_functions(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)}),modelHostFunctions(bridge,operationError)));
-            entry.revision = outcome.revision;
-            bridge.reconcile(outcome.graph);
+            publishMutableOutcome(entry, outcome);
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
           });
           const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke);
           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
+          entry.confirmedGraph = true;
           const model = bridge.root;
           documents.set(model, entry);
           ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
@@ -199,9 +217,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       // built-in renderer. Removing them also avoids traversing unused config.
       const numeric=renderNumericOptions({...options,limit:undefined,maxEdges:undefined,config:undefined,outputLimit:undefined,nativeTheme:undefined});
       try {
-        entry.revision=result(entry.handle.apply_binary(encodeGraphBinary(entry.revision,entry.bridge.snapshot().graph)));
+        prepareMutableInput(entry);
         const outcome=binaryResult(()=>entry.handle.render_raw_operation_binary_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,modelHostFunctions(entry.bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;})));
-        entry.revision=outcome.revision;entry.bridge.reconcile(outcome.graph);
+        publishMutableOutcome(entry, outcome);
         if(callbackFailed)throw callbackError;
         if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,entry.bridge);
         return renderedValue(outcome.result.Ok);
@@ -341,9 +359,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           if (document.bridge) {
             bridge=document.bridge;
             operation=nativeModelCall(document,()=>{
-              document.revision = result(document.handle.apply_binary(encodeGraphBinary(document.revision,bridge.snapshot().graph)));
+              prepareMutableInput(document);
               const outcome=binaryResult(()=>document.handle.render_numbers_operation_binary_with_functions(document.revision,...numericArguments,modelHostFunctions(bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;})));
-              document.revision=outcome.revision;bridge.reconcile(outcome.graph);return outcome.result;
+              publishMutableOutcome(document, outcome);return outcome.result;
             });
           } else json = document.handle.render_numbers_with_resources(...numericArguments);
         }

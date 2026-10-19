@@ -36,3 +36,45 @@ test('stateful WASM render outcomes retain graph ownership through failure and r
   });
   expect(report).toEqual({revisions:['1','2','3','3','4'],stale:'Stale public model revision',initial:'info',limit:'limit',host:'host failure',retained:true,recovered:true,failures:[]});
 });
+
+test('mutable imports retry rejected edits and restore callback mutations before reuse',async({page})=>{
+  await page.goto('/examples/web/');
+  const report=await page.evaluate(async()=>{
+    const {loadRenderer,metricsMeasurer}=await import('/dist/package-web/package/full.js');
+    const oracle=await import('/dist/evidence/pele-oracle.js'),engine=await loadRenderer();
+    const wasm=await import('/dist/package-web/package/pkg/pele.js');
+    const source='pie title Confirmed\n"A":2\n"B":3',model=engine.parse(source),expected=oracle.parse(source);
+    const failures=[],options={measurer:metricsMeasurer},original=wasm.MutableDocument.prototype.apply_binary;
+    let rejected=0,uploads=0;
+    const sentinel=new Error('rejected host exchange');
+    wasm.MutableDocument.prototype.apply_binary=function(...args){
+      uploads++;
+      if(rejected<2){rejected++;throw sentinel;}
+      return original.apply(this,args);
+    };
+    try{
+      const extra={text:'new unacknowledged string',value:NaN};extra.self=extra;
+      model.extra=extra;model.title='Accepted after retry';expected.title=model.title;
+      for(let attempt=0;attempt<2;attempt++){
+        try{engine.render(model,options);failures.push('missing rejection');}catch(error){if(error!==sentinel)failures.push('rejection identity');}
+      }
+      if(JSON.stringify(engine.render(model,options))!==JSON.stringify(oracle.render(expected,options)))failures.push('retried SVG');
+      if(uploads!==3||model.extra!==extra||extra.self!==extra||!Number.isNaN(extra.value))failures.push('pending identity');
+      const beforeReuse=uploads;engine.render(model,options);
+      if(wasm.MutableDocument.prototype.unchanged_public_graph_is_noop&&uploads!==beforeReuse)failures.push('redundant confirmed upload');
+      model.extra.scanFailure={text:'interned before scan failure'};
+      Object.defineProperty(model.extra.scanFailure,'accessor',{get(){return 1;},configurable:true});
+      for(let attempt=0;attempt<2;attempt++){
+        try{engine.render(model,options);failures.push('missing accessor rejection');}catch(error){if(!(error instanceof TypeError))failures.push('scan rejection');}
+      }
+      delete model.extra.scanFailure.accessor;
+      if(JSON.stringify(engine.render(model,options))!==JSON.stringify(oracle.render(expected,options)))failures.push('scan recovery');
+      let called=false;
+      engine.render(model,{measurer:{width(...args){called=true;model.title='callback-only mutation';model.extra.transient=true;return metricsMeasurer.width(...args);}}});
+      if(!called||model.title!==expected.title||Object.hasOwn(extra,'transient'))failures.push('callback restoration');
+      if(JSON.stringify(engine.render(model,options))!==JSON.stringify(oracle.render(expected,options)))failures.push('confirmed reuse');
+      return {failures,rejected};
+    }finally{wasm.MutableDocument.prototype.apply_binary=original;engine.dispose(model);}
+  });
+  expect(report).toEqual({failures:[],rejected:2});
+});

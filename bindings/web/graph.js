@@ -130,6 +130,7 @@ export class ModelBridge {
       this.strings = graph.strings.map(stringValue);
       this.stringIds = new Map(this.strings.map((value, index) => [value, index]));
     }
+    const freshStart = this.objects.length;
     while (this.objects.length < graph.nodes.length) {
       const id = this.objects.length, node = graph.nodes[id];
       let value;
@@ -147,27 +148,47 @@ export class ModelBridge {
     }
     for (const id of changed ?? graph.nodes.keys()) {
       const node = graph.nodes[id];
-      const object = this.objects[id], keys = new Set(node.properties.map(property => this.strings[property.key]));
-      for (const key of Object.getOwnPropertyNames(object)) {
-        if (node.kind === 'array' && key === 'length') continue;
-        if (node.kind === 'error' && errorDiagnostics.has(key) && !keys.has(key)) continue;
-        if (!keys.has(key) && !Reflect.deleteProperty(object, key)) throw new TypeError('Native graph removed a non-configurable property');
+      const object = this.objects[id], fresh = id >= freshStart;
+      // Only objects allocated by this publication are unobservable so far.
+      // Existing objects still need full restoration, including callback edits.
+      if (!fresh || node.kind === 'error') {
+        const keys = new Set(node.properties.map(property => this.strings[property.key]));
+        for (const key of Object.getOwnPropertyNames(object)) {
+          if (node.kind === 'array' && key === 'length') continue;
+          if (node.kind === 'error' && errorDiagnostics.has(key) && !keys.has(key)) continue;
+          if (!keys.has(key) && !Reflect.deleteProperty(object, key)) throw new TypeError('Native graph removed a non-configurable property');
+        }
       }
       if (node.kind === 'map') {
-        Map.prototype.clear.call(object);
+        if (!fresh) Map.prototype.clear.call(object);
         for (const [key, value] of node.entries) Map.prototype.set.call(object, this.value(key), this.value(value));
       }
       if (node.kind === 'set') {
-        Set.prototype.clear.call(object);
+        if (!fresh) Set.prototype.clear.call(object);
         for (const value of node.values) Set.prototype.add.call(object, this.value(value));
       }
-      if (node.kind === 'date') Date.prototype.setTime.call(object, numberValue(node.milliseconds));
+      if (node.kind === 'date' && !fresh) Date.prototype.setTime.call(object, numberValue(node.milliseconds));
       // Set length before entries, preserving holes and existing non-index keys.
       if (node.kind === 'array' && object.length !== node.length) object.length = node.length;
-      for (const property of node.properties) Object.defineProperty(object, this.strings[property.key], {
-        value: this.value(property.value), enumerable: !!(property.flags & 1),
-        writable: !!(property.flags & 2), configurable: !!(property.flags & 4)
-      });
+      let assignFresh = fresh && (node.kind === 'object' || node.kind === 'array');
+      for (const property of node.properties) {
+        // A duplicate key may follow a readonly descriptor; keep subsequent
+        // definitions on the descriptor path after the first nondefault flag.
+        if (property.flags !== 7) assignFresh = false;
+        const key = this.strings[property.key], value = this.value(property.value);
+        // Plain fresh objects and arrays have no application-defined setters.
+        // __proto__ must remain an own data property, never invoke its setter.
+        if (assignFresh && key !== '__proto__' && !(node.kind === 'array' && key === 'length')) object[key] = value;
+        else {
+          const current = !fresh && Object.getOwnPropertyDescriptor(object, key);
+          const sameValue = current && Object.hasOwn(current, 'value') && (Object.is(current.value, value) &&
+            (typeof value !== 'number' || !Number.isNaN(value) || numberBits(current.value) === property.value.value));
+          if (!sameValue || current.enumerable !== !!(property.flags & 1) || current.writable !== !!(property.flags & 2) || current.configurable !== !!(property.flags & 4)) Object.defineProperty(object, key, {
+            value, enumerable: !!(property.flags & 1),
+            writable: !!(property.flags & 2), configurable: !!(property.flags & 4)
+          });
+        }
+      }
     }
     this.root = this.value(graph.root);
     return this.root;
@@ -255,7 +276,8 @@ export class ModelBridge {
     for (const object of this.objects) atom(object);
     while (pending.length) {
       const [id, value] = pending.pop(), properties = [];
-      for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
+      for (const key of Object.getOwnPropertyNames(value)) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, key);
         if (Array.isArray(value) && key === 'length') {
           if (descriptor.writable) continue;
         }
