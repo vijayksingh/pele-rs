@@ -533,7 +533,11 @@ impl<'a> Arena<'a> {
         }
     }
     fn property_position(&self, id: u32, key: &str) -> Option<usize> {
-        let canonical = *self.string_ids.get(&JsString::from(key))?;
+        let mut buffer = [0; 64];
+        let canonical = *match JsString::short_utf16(key, &mut buffer) {
+            Some(units) => self.string_ids.get(units),
+            None => self.string_ids.get(&JsString::from(key)),
+        }?;
         let mut cache = self.properties.borrow_mut();
         let index = cache.entry(id).or_insert_with(|| {
             self.g.nodes[id as usize]
@@ -578,6 +582,23 @@ impl<'a> Arena<'a> {
         self.g.strings.push(s);
         Ok(id)
     }
+    fn intern_key(&mut self, key: &str) -> Result<u32, PublicError> {
+        let mut buffer = [0; 64];
+        if let Some(units) = JsString::short_utf16(key, &mut buffer) {
+            if let Some(id) = self.string_ids.get(units).copied() {
+                // A repeated key still consumes the same text-work budget as
+                // intern. Only its temporary owned UTF-16 allocation disappears.
+                self.text_work = self.text_work.checked_add(units.len()).ok_or_else(limit)?;
+                if self.text_work > MAX_TEXT {
+                    return Err(limit().into());
+                }
+                return Ok(id);
+            }
+        }
+        // Misses and long keys use the original admission/order/budget path,
+        // and are charged exactly once there.
+        self.intern(key.into())
+    }
     fn string(&mut self, s: impl Into<JsString>) -> Result<Atom, PublicError> {
         self.intern(s.into()).map(Atom::String)
     }
@@ -605,7 +626,7 @@ impl<'a> Arena<'a> {
             return Err(limit().into());
         }
         self.work += 1;
-        let key = self.intern(key.into())?;
+        let key = self.intern_key(key)?;
         let index = self.g.nodes[id as usize].properties().len();
         self.g.nodes[id as usize].properties_mut().push(Property {
             key,
@@ -667,7 +688,7 @@ impl<'a> Arena<'a> {
             return Err(limit().into());
         }
         self.work += 1;
-        let string_id = self.intern(key.into())?;
+        let string_id = self.intern_key(key)?;
         self.g.nodes[id as usize].properties_mut().push(Property {
             key: string_id,
             value,

@@ -6,12 +6,31 @@ use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct JsString(pub Vec<u16>);
+impl std::borrow::Borrow<[u16]> for JsString {
+    fn borrow(&self) -> &[u16] {
+        &self.0
+    }
+}
 impl From<&str> for JsString {
     fn from(value: &str) -> Self {
         Self(value.encode_utf16().collect())
     }
 }
 impl JsString {
+    /// UTF-8 byte length bounds UTF-16 units. Keep common property lookups on
+    /// the stack; long keys retain the ordinary owned conversion path.
+    pub(crate) fn short_utf16<'a>(value: &str, buffer: &'a mut [u16; 64]) -> Option<&'a [u16]> {
+        if value.len() > buffer.len() {
+            return None;
+        }
+        let mut len = 0;
+        for unit in value.encode_utf16() {
+            buffer[len] = unit;
+            len += 1;
+        }
+        Some(&buffer[..len])
+    }
+
     pub fn well_formed(&self) -> Option<String> {
         String::from_utf16(&self.0).ok()
     }
@@ -311,8 +330,12 @@ impl GraphWriter {
         id
     }
     pub fn property(&mut self, key: &str, value: Atom) -> Property {
+        let mut buffer = [0; 64];
+        let id = JsString::short_utf16(key, &mut buffer)
+            .and_then(|units| self.strings.get(units).copied())
+            .unwrap_or_else(|| self.string(key));
         Property {
-            key: self.string(key),
+            key: id,
             value,
             flags: 7,
         }
