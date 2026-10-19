@@ -564,7 +564,8 @@ pub unsafe extern "C" fn pele_public_snapshot_binary_v5(
         let document = unsafe { document(handle) }?;
         let metadata = serde_json::to_vec(&serde_json::json!({"type":document.diagram_type()}))
             .map_err(|_| invalid("Invalid snapshot metadata"))?;
-        binary_success(document.revision(), &document.snapshot()?, &metadata)
+        let graph = document.snapshot_view()?;
+        binary_success(document.revision(), &graph, &metadata)
     })
 }
 /// # Safety

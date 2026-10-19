@@ -2850,6 +2850,12 @@ impl PublicDiagramModule for Gantt {
             graph: initial(model)?,
         })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, state: &GanttPublicState) -> Result<ModelGraph, PeleError> {
         state.graph.validate_schema(&SCHEMA)?;
         Ok(state.graph.clone())

@@ -241,6 +241,12 @@ impl PublicDiagramModule for Packet {
         let imported = imported(&graph);
         Ok(PacketPublicState { graph, imported })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(state.graph.clone())
     }

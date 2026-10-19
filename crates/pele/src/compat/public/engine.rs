@@ -7,7 +7,7 @@ use crate::compat::{
     ParseContext, ParseLimits, ParseOptions, PeleError, RenderOptions, RenderResources,
     RenderResult, RenderSettings, Rendered, SourceLimit,
 };
-use std::{any::Any, sync::Arc};
+use std::{any::Any, borrow::Cow, sync::Arc};
 /// Typed codec opt-in. Parsing, geometry and rendering remain in the native module.
 pub trait PublicDiagramModule: DiagramModule {
     type PublicState: Send + 'static;
@@ -59,6 +59,19 @@ pub trait PublicDiagramModule: DiagramModule {
         self.create_public_with_edge_limit(model, limit)
     }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError>;
+    /// Optional allocation-free export of the same graph as `export_public`.
+    /// Opt in only when export has no additional observable work or failures;
+    /// document snapshots still validate this graph against the retained schema.
+    fn borrow_public_graph<'a>(&self, _state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        None
+    }
+    /// Whether a host may omit reapplying its exactly acknowledged graph.
+    /// Applying identical data must have no semantic effects beyond refreshing
+    /// graph-derived caches. This never changes `PublicDocument::apply` itself
+    /// or its revision advancement; extensions conservatively remain opted out.
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        false
+    }
     fn apply_public(
         &self,
         state: &mut Self::PublicState,
@@ -217,6 +230,8 @@ trait Erased: Send + Sync {
     fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError>;
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
+    fn borrow_graph<'a>(&self, state: &'a State) -> Option<&'a ModelGraph>;
+    fn unchanged_public_graph_is_noop(&self) -> bool;
     fn apply(&self, state: &mut State, graph: ModelGraph) -> Result<(), PeleError>;
     fn invoke(
         &self,
@@ -276,6 +291,13 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
             .export_public(s.downcast_ref().expect("paired public state"))
+    }
+    fn borrow_graph<'a>(&self, s: &'a State) -> Option<&'a ModelGraph> {
+        self.0
+            .borrow_public_graph(s.downcast_ref().expect("paired public state"))
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        self.0.unchanged_public_graph_is_noop()
     }
     fn apply(&self, s: &mut State, g: ModelGraph) -> Result<(), PeleError> {
         self.0
@@ -701,10 +723,25 @@ impl PublicDocument {
     pub fn revision(&self) -> u64 {
         self.revision
     }
-    pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
-        let graph = self.registration.codec.graph(&self.state)?;
+    pub fn unchanged_public_graph_is_noop(&self) -> bool {
+        self.registration.codec.unchanged_public_graph_is_noop()
+    }
+    fn graph_view(&self) -> Result<Cow<'_, ModelGraph>, PeleError> {
+        match self.registration.codec.borrow_graph(&self.state) {
+            Some(graph) => Ok(Cow::Borrowed(graph)),
+            None => self.registration.codec.graph(&self.state).map(Cow::Owned),
+        }
+    }
+    /// A validated view, borrowed when the retained module supports it.
+    /// The document cannot mutate while this view is retained. Extensions that
+    /// only implement owned export retain that export and its original errors.
+    pub fn snapshot_view(&self) -> Result<Cow<'_, ModelGraph>, PeleError> {
+        let graph = self.graph_view()?;
         graph.validate_schema(self.registration.schema)?;
         Ok(graph)
+    }
+    pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
+        self.snapshot_view().map(Cow::into_owned)
     }
     pub fn apply(&mut self, expected_revision: u64, graph: ModelGraph) -> Result<(), PeleError> {
         if expected_revision != self.revision {
@@ -742,8 +779,10 @@ impl PublicDocument {
             .revision
             .checked_add(1)
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        let before = self.registration.codec.graph(&self.state)?;
-        call.validate(&before, self.registration.schema)?;
+        {
+            let before = self.graph_view()?;
+            call.validate(&before, self.registration.schema)?;
+        }
         let mut result = self
             .registration
             .codec
@@ -798,7 +837,7 @@ impl PublicDocument {
             .revision
             .checked_add(1)
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        self.snapshot()?;
+        self.snapshot_view()?;
         let mut operation_error = None;
         let result = crate::compat::engine::render_raw_registered(
             &self.registration.descriptor,
@@ -873,7 +912,7 @@ impl PublicDocument {
             .revision
             .checked_add(1)
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        self.snapshot()?;
+        self.snapshot_view()?;
         let mut operation_error = None;
         let mut presentation = crate::compat::PresentationCapture::deferred(host);
         let result = crate::compat::engine::render_registered_policy(

@@ -59,6 +59,12 @@ impl PublicDiagramModule for Info {
             graph: out.finish(Atom::Ref(root))?,
         })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, state: &InfoPublicState) -> Result<ModelGraph, PeleError> {
         Ok(state.graph.clone())
     }

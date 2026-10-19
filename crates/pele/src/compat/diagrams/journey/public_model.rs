@@ -715,6 +715,12 @@ impl PublicDiagramModule for Journey {
         let model = imported(&graph);
         Ok(JourneyPublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &JourneyPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }

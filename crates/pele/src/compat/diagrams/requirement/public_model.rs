@@ -494,6 +494,12 @@ impl PublicDiagramModule for RequirementDiagram {
         let model = imported(&graph);
         Ok(RequirementPublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &RequirementPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }

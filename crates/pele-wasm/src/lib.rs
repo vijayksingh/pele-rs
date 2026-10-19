@@ -202,6 +202,9 @@ pub struct MutableDocument {
 }
 #[wasm_bindgen]
 impl MutableDocument {
+    pub fn unchanged_public_graph_is_noop(&self) -> bool {
+        self.inner.unchanged_public_graph_is_noop()
+    }
     pub fn schema(&self) -> String {
         public_result(&self.inner.schema_view())
     }
@@ -327,7 +330,7 @@ impl MutableDocument {
     }
     pub fn snapshot_binary(&self) -> Result<Vec<u8>, JsValue> {
         let run = || -> Result<Vec<u8>, pele::compat::PeleError> {
-            let graph = self.inner.snapshot()?;
+            let graph = self.inner.snapshot_view()?;
             let metadata =
                 serde_json::to_vec(&serde_json::json!({"type":self.inner.diagram_type()}))
                     .expect("snapshot metadata");

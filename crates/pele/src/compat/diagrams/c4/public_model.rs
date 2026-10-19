@@ -2188,6 +2188,12 @@ impl PublicDiagramModule for C4 {
         let model = imported(&graph);
         Ok(C4PublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &C4PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }

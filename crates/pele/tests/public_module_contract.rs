@@ -228,6 +228,11 @@ fn extension_edits_keep_handler_config_and_resources_after_registry_replacement(
         ErrorCode::UnsupportedDiagram
     );
     let mut document = engine.parse_as(&id, source, &parse_options).unwrap();
+    assert!(!document.unchanged_public_graph_is_noop());
+    assert!(matches!(
+        document.snapshot_view().unwrap(),
+        std::borrow::Cow::Owned(_)
+    ));
     assert_eq!(first.parses.load(Ordering::Relaxed), 1);
     assert_eq!(document.diagram_type(), &id);
     let mut graph = document.snapshot().unwrap();

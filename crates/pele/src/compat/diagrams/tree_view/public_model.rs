@@ -391,6 +391,12 @@ impl PublicDiagramModule for TreeView {
         let cache = imported(&graph);
         Ok(TreeViewPublicState { graph, cache })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &TreeViewPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }

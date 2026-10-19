@@ -511,6 +511,12 @@ impl PublicDiagramModule for Railroad {
         let model = imported(&graph);
         Ok(RailroadPublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &RailroadPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }

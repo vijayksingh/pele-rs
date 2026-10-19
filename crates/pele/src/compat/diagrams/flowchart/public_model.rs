@@ -2015,6 +2015,12 @@ impl PublicDiagramModule for Flowchart {
     ) -> Result<Self::PublicState, PeleError> {
         crate::compat::public::create_prepared_edge_public(self, model, limit)
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }

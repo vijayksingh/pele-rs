@@ -32,6 +32,12 @@ impl PublicDiagramModule for Swimlane {
     ) -> Result<Self::PublicState, PeleError> {
         crate::compat::public::create_prepared_edge_public(self, model, limit)
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Flowchart.borrow_public_graph(state)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Flowchart.export_public(state)
     }
