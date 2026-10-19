@@ -68,3 +68,15 @@ and `--stages` can bound an identical-byte A/A check. Node GC runs outside each
 JS batch. Compiler/Pele-test guards and shared-host load records remain active.
 This diagnostic neither measures Swift/WASM nor subtracts local native time from
 Linux browser measurements. It is not the browser release gate.
+
+Native typed documents remain retained across batches; only native public state
+is reset. JS retained models are reparsed and warmed for each batch. Historical
+reports' `freshRetainedStatePerBatch` field was too broad; their implementation
+already had this distinction. Current reports name each setup explicitly and
+verify complete JS retained output before timing and after the measured count.
+
+`--allocations` uses separate instrumented binaries whose hashes are checked
+against each manifest; those binaries refuse timing commands. `--allocation-only`
+collects the same counters and public output checks without reading any operation
+timer. It requires no quiet window and emits no elapsed-time rows. Requested
+allocation traffic and peak logical requested bytes are not RSS or latency.

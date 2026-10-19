@@ -12,9 +12,12 @@ import * as js from 'pele';
 import {cases,now} from './cases.mjs';
 import {guardQuiet,systemProcesses} from './swift/build.mjs';
 const args=process.argv.slice(2),arg=(n,d)=>{const i=args.indexOf(n);return i<0?d:args[i+1]};
-assert(args.includes('--quiet-run'),'Explicit coordinated --quiet-run required');
-assert(global.gc,'Start Node with --expose-gc');
+const allocationOnly=args.includes('--allocation-only');
+assert(args.includes('--quiet-run')||allocationOnly,'Explicit coordinated --quiet-run required for timings');
+assert(global.gc||allocationOnly,'Start timed Node runs with --expose-gc');
 const trials=Number(arg('--trials',15)),warmupMs=Number(arg('--warmup-ms',500));
+const allocations=args.includes('--allocations')||allocationOnly;
+const checkQuiet=()=>{if(!allocationOnly)guardQuiet()};
 assert(trials>=15&&trials<=30&&trials%3===0&&warmupMs>=500&&warmupMs<=1000);
 const names=['js','control','candidate'],stages=arg('--stages','render-source,render-retained').split(',');
 assert(stages.length&&new Set(stages).size===stages.length&&stages.every(s=>['render-source','render-retained'].includes(s)));
@@ -56,21 +59,49 @@ for(const name of names.slice(1)){
   const hash=sha(await readFile(paths[name]));assert.equal(hash,manifest.binaries['pele-perf'],name+' binary differs');
   if(name==='candidate')assert.equal(inputHash,manifest.sourceInputSha256,'Candidate source differs');
   artifacts[name]={binarySHA256:hash,manifest};
+  if(allocations){
+    const allocationBinary=resolve(dirname(paths[name]),'pele-perf-alloc');
+    const allocationSHA256=sha(await readFile(allocationBinary));
+    assert.equal(allocationSHA256,manifest.binaries['pele-perf-alloc'],name+' allocation binary differs');
+    Object.assign(artifacts[name],{allocationBinary,allocationSHA256});
+  }
 }
 const oracleSHA256=sha(await readFile('node_modules/pele/dist/pele.js'));
 assert.equal(oracleSHA256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');
-const report={schemaVersion:1,startedAt:new Date().toISOString(),mode:'native-three-way-diagnostic',artifacts,oracleSHA256,harnessSHA256:sha(await readFile(new URL(import.meta.url))),settings:{trials,warmupMs,matchedNativeBatchCounts:true,balancedCyclicAndReverseOrder:true,freshRetainedStatePerBatch:true,stages,selectedCases:selected.map(c=>c.id)},host:{platform:platform(),arch:arch(),cpu:cpus()[0]?.model,loadBefore:loadavg(),processesBefore:systemProcesses().filter(p=>p.cpuPercent>=10)},cases:[],rows:[]};
-let native={};
+const report={schemaVersion:1,startedAt:new Date().toISOString(),mode:'native-three-way-diagnostic',artifacts,oracleSHA256,harnessSHA256:sha(await readFile(new URL(import.meta.url))),casesSHA256:sha(await readFile(new URL('./cases.mjs',import.meta.url))),settings:{trials,warmupMs,matchedNativeBatchCounts:true,balancedCyclicAndReverseOrder:true,nativeTypedDocumentRetainedAcrossBatches:true,nativePublicStateFreshPerBatch:true,jsRetainedModelFreshPerBatch:true,stages,selectedCases:selected.map(c=>c.id)},host:{platform:platform(),arch:arch(),cpu:cpus()[0]?.model,loadBefore:loadavg(),processesBefore:systemProcesses().filter(p=>p.cpuPercent>=10)},cases:[],rows:[]};
+report.settings.separateAllocationBinaries=allocations;report.allocationRows=[];
+if(allocationOnly){
+  report.mode='native-allocations-only';
+  for(const key of ['trials','warmupMs','matchedNativeBatchCounts','balancedCyclicAndReverseOrder'])delete report.settings[key];
+  Object.assign(report.settings,{operationsPerCondition:1,timingRequested:false});
+}
+let native={},allocationNative={};
 try{
-  guardQuiet();for(const name of names.slice(1))native[name]=new Native(paths[name]);
+  checkQuiet();for(const name of names.slice(1)){
+    native[name]=new Native(paths[name]);
+    if(allocations)allocationNative[name]=new Native(artifacts[name].allocationBinary);
+  }
   for(const c of selected){
     const expected=summary(js.render(c.source,{...c.options,...host()}));
+    const verifyJSRetained=count=>{
+      const options={...c.options,...host()},model=js.parse(c.source,c.options);
+      assert.deepEqual(summary(js.render(model,options)),expected,'JS retained warm '+c.id);
+      let last;for(let i=0;i<count;i++)last=js.render(model,options);
+      assert.deepEqual(summary(last),expected,'JS retained batch '+c.id);
+    };
+    verifyJSRetained(1);
     for(const name of names.slice(1)){
       const prepared=await native[name].send({op:'prepare',case:c});assert.deepEqual(prepared.output,expected,name+' prepare '+c.id);
       for(const output of(await native[name].send({op:'verify',case:c.id})).outputs)assert.deepEqual(output,expected,name+' verify '+c.id);
+      if(allocations){const prepared=await allocationNative[name].send({op:'prepare',case:c});assert.deepEqual(prepared.output,expected,name+' allocation prepare '+c.id);}
     }
-    report.cases.push({id:c.id,sourceSHA256:sha(Buffer.from(c.source)),output:expected});
+    report.cases.push({...c,sourceSHA256:sha(Buffer.from(c.source)),output:expected,jsRetainedBeforeVerified:true});
     for(const stage of stages){
+      if(allocationOnly){
+        const measured={};for(const name of names.slice(1))measured[name]=await allocationNative[name].send({op:'allocations',case:c.id,stage,count:1});
+        report.allocationRows.push({case:c.id,stage,...measured});
+        continue;
+      }
       const batch=async(name,count)=>{
         if(name!=='js')return native[name].send({op:'measure',case:c.id,stage,count});
         global.gc();const options={...c.options,...host()},model=js.parse(c.source,c.options);js.render(model,options);
@@ -79,7 +110,7 @@ try{
       };
       const warmups={},counts={};
       for(const name of names){
-        guardQuiet();let elapsedNs=0,operations=0;
+        checkQuiet();let elapsedNs=0,operations=0;
         for(let i=0;i<6||elapsedNs<warmupMs*1e6;i++){const r=await batch(name,i<6?1:32);elapsedNs+=r.elapsedNs;operations+=r.count;}
         warmups[name]={elapsedNs,operations};const calibrations=[];
         for(let j=0;j<3;j++){let count=1;while(count<128&&(await batch(name,count)).elapsedNs<12e6)count*=2;calibrations.push(count);}
@@ -88,17 +119,28 @@ try{
       counts.control=counts.candidate=Math.min(counts.control,counts.candidate);
       const samples=Object.fromEntries(names.map(n=>[n,[]])),raw=Object.fromEntries(names.map(n=>[n,[]]));
       for(let trial=0;trial<trials;trial++){
-        guardQuiet();let order=names.map((_,i)=>names[(i+trial%3)%3]);if(Math.floor(trial/3)%2)order.reverse();
+        checkQuiet();let order=names.map((_,i)=>names[(i+trial%3)%3]);if(Math.floor(trial/3)%2)order.reverse();
         for(const name of order){const r=await batch(name,counts[name]);raw[name].push(r);samples[name].push(r.elapsedNs/r.count/1e6);}
       }
       const medians=Object.fromEntries(names.map(n=>[n,median(samples[n])]));
-      report.rows.push({case:c.id,stage,counts,warmups,samples,raw,medians,candidateOverControl:medians.candidate/medians.control,candidateOverJS:medians.candidate/medians.js});
+      verifyJSRetained(counts.js);
+      report.rows.push({case:c.id,stage,counts,warmups,samples,raw,medians,candidateOverControl:medians.candidate/medians.control,candidateOverJS:medians.candidate/medians.js,jsRetainedPostBatchVerified:true});
+      if(allocations){
+        const measured={};for(const name of names.slice(1))measured[name]=await allocationNative[name].send({op:'allocations',case:c.id,stage,count:1});
+        report.allocationRows.push({case:c.id,stage,...measured});
+      }
     }
     for(const name of names.slice(1))for(const output of(await native[name].send({op:'verify',case:c.id})).outputs)assert.deepEqual(output,expected,name+' post-run '+c.id);
+    if(allocations)for(const name of names.slice(1))for(const output of(await allocationNative[name].send({op:'verify',case:c.id})).outputs)assert.deepEqual(output,expected,name+' allocation post-run '+c.id);
     console.log('compared '+c.id);
   }
   assert.equal(await hashInputs(),inputHash,'Source changed during run');
-  for(const name of names.slice(1))assert.equal(sha(await readFile(paths[name])),artifacts[name].binarySHA256,'Binary changed');
+  assert.equal(sha(await readFile(new URL(import.meta.url))),report.harnessSHA256,'Harness changed during run');
+  assert.equal(sha(await readFile(new URL('./cases.mjs',import.meta.url))),report.casesSHA256,'Workloads changed during run');
+  for(const name of names.slice(1)){
+    assert.equal(sha(await readFile(paths[name])),artifacts[name].binarySHA256,'Binary changed');
+    if(allocations)assert.equal(sha(await readFile(artifacts[name].allocationBinary)),artifacts[name].allocationSHA256,'Allocation binary changed');
+  }
   report.host.loadAfter=loadavg();report.host.processesAfter=systemProcesses().filter(p=>p.cpuPercent>=10);report.completedAt=new Date().toISOString();report.succeeded=true;
   const output=resolve(arg('--output','dist/evidence/native-three-way.json'));await mkdir(dirname(output),{recursive:true});await writeFile(output,JSON.stringify(report,null,2)+'\n');console.log(output);
-}finally{for(const instance of Object.values(native))instance.close();}
+}finally{for(const instance of [...Object.values(native),...Object.values(allocationNative)])instance.close();}
