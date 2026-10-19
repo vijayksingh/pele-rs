@@ -110,6 +110,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     const confirmed = entry.confirmedGraph;
     entry.confirmedGraph = false;
     const baseline = entry.bridge.graph;
+    if(confirmed&&entry.unchangedApplyIsNoop&&values.length===0&&entry.bridge.matchesPublishedGraph())return {graph:baseline,values:[]};
     const input = entry.bridge.snapshot(values, true), delta = input.delta;
     const unchanged = confirmed && entry.unchangedApplyIsNoop &&
       input.graph.root.kind === baseline.root.kind && input.graph.root.value === baseline.root.value &&

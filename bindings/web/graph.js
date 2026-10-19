@@ -194,6 +194,58 @@ export class ModelBridge {
     this.root = this.value(graph.root);
     return this.root;
   }
+  matchesPublishedGraph() {
+    const graph=this.graph;
+    if(this.objects.length!==graph.nodes.length||this.strings.length!==graph.strings.length)return false;
+    for (const baseline of this.registration.prototypeBaseline) {
+      const descriptors=Object.getOwnPropertyDescriptors(baseline.value),original=baseline.descriptors;
+      if(Object.getPrototypeOf(baseline.value)!==baseline.parent||Reflect.ownKeys(descriptors).length!==Reflect.ownKeys(original).length||Reflect.ownKeys(original).some(key=>{const a=original[key],b=descriptors[key];return !b||a.value!==b.value||a.get!==b.get||a.set!==b.set||a.enumerable!==b.enumerable||a.writable!==b.writable||a.configurable!==b.configurable;}))throw new TypeError('Prototype edits require an explicit native prototype mutation codec');
+    }
+    const matches=(atom,value)=>{
+      switch(atom.kind){
+        case 'undefined':return value===undefined;
+        case 'null':return value===null;
+        case 'bool':return value===atom.value;
+        case 'number':return typeof value==='number'&&numberBits(value)===atom.value;
+        case 'string':return typeof value==='string'&&value===this.strings[atom.value]&&this.stringIds.get(value)===atom.value;
+        case 'ref':return value===this.objects[atom.value]&&this.ids.get(value)===atom.value;
+        case 'builtinFunction':return value===this.registration.functions.get(atom.value)&&this.registration.functionIds.get(value)===atom.value;
+        default:return false;
+      }
+    };
+    if(!matches(graph.root,this.root))return false;
+    for(let id=0;id<graph.nodes.length;id++){
+      const node=graph.nodes[id],object=this.objects[id],prototype=Object.getPrototypeOf(object);
+      switch(node.kind){
+        case 'object':if(prototype!==Object.prototype)return false;break;
+        case 'instance':if(prototype!==this.registration.prototypes.get(node.prototype))return false;break;
+        case 'array':if(prototype!==Array.prototype||object.length!==node.length)return false;break;
+        case 'map':if(prototype!==Map.prototype)return false;break;
+        case 'set':if(prototype!==Set.prototype)return false;break;
+        case 'date':if(prototype!==Date.prototype||numberBits(Date.prototype.getTime.call(object))!==node.milliseconds)return false;break;
+        case 'error':if(prototype!==errorConstructors[node.errorType].prototype)return false;break;
+        default:return false;
+      }
+      let count=0;
+      for(const key of Object.getOwnPropertyNames(object)){
+        const descriptor=Object.getOwnPropertyDescriptor(object,key);
+        if(node.kind==='array'&&key==='length'&&descriptor.writable)continue;
+        if(!Object.hasOwn(descriptor,'value')){if(node.kind==='error'&&errorDiagnostics.has(key))continue;return false;}
+        const property=node.properties[count++];
+        if(!property||key!==this.strings[property.key]||this.stringIds.get(key)!==property.key||descriptor.enumerable!==!!(property.flags&1)||descriptor.writable!==!!(property.flags&2)||descriptor.configurable!==!!(property.flags&4)||!matches(property.value,descriptor.value))return false;
+      }
+      if(count!==node.properties.length)return false;
+      if(node.kind==='map'){
+        if(Object.getOwnPropertyDescriptor(Map.prototype,'size').get.call(object)!==node.entries.length)return false;
+        let i=0;for(const [key,value] of Map.prototype.entries.call(object)){const pair=node.entries[i++];if(!pair||!matches(pair[0],key)||!matches(pair[1],value))return false;}
+      }
+      if(node.kind==='set'){
+        if(Object.getOwnPropertyDescriptor(Set.prototype,'size').get.call(object)!==node.values.length)return false;
+        let i=0;for(const value of Set.prototype.values.call(object))if(!matches(node.values[i++],value))return false;
+      }
+    }
+    return true;
+  }
   reconcileDelta(delta) {
     if (delta.stringsStart !== this.graph.strings.length || delta.nodesStart !== this.graph.nodes.length) throw new TypeError('Stale native model delta');
     const nodes=this.graph.nodes.slice();
