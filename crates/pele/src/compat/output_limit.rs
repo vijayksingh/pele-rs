@@ -33,6 +33,13 @@ impl OutputLimit {
             Self::Undefined | Self::Null => DEFAULT_OUTPUT_LIMIT as f64,
             Self::Number(value) => value,
         };
+        // UTF-8 bytes bound UTF-16 code units from above. Most output is far
+        // below the default threshold; avoid walking every returned SVG there.
+        // JavaScript's comparison against NaN is always false as well. Keep the
+        // independent byte guard above both shortcuts.
+        if svg.len() as f64 <= threshold || threshold.is_nan() {
+            return Ok(());
+        }
         // The independent byte ceiling keeps this length exactly representable.
         if svg.encode_utf16().count() as f64 > threshold {
             let mut error = PeleError::new(
