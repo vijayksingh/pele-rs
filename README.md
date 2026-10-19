@@ -176,17 +176,18 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest measured package: native `bfee120`, JS `fa9f4e8`. Per-registration
-schema validation now reuses immutable metadata while preserving graph checks
-and error order. Source render takes **1.70–5.13×** the Pele JS time. Median
-ratios across all sizes/resources are **2.63× source**, **11.37× parse** and
-**4.02× retained mutable render**. These describe this artifact; they are not
-causal speedup percentages against earlier runs.
+Latest measured package: native `31b4a04`, JS `e8316b2`. The latest changes
+reuse captured schema metadata, release disposed bridge storage, and borrow SVG
+text that needs no escaping. Source render takes **1.63–5.16×** the Pele JS time.
+Median ratios across all sizes/resources are **2.51× source**, **11.02× parse**
+and **4.25× retained mutable render**. These describe this artifact; differences
+from historical runs are not causal speedup percentages.
 
 The prior direct host comparison measured an 11.1% retained-render improvement
 against its own matched control, with regressions disclosed. Reports retain
 raw samples, artifact hashes and failed gates:
-[latest schema checkpoint](docs/benchmarks/2026-10-20-registration-schema/),
+[latest SVG/disposal checkpoint](docs/benchmarks/2026-10-20-svg-disposal/),
+[prior schema checkpoint](docs/benchmarks/2026-10-20-registration-schema/),
 [direct comparison](docs/benchmarks/2026-10-20-direct-comparison/),
 [rejected copying experiments](docs/benchmarks/2026-10-20-copying-candidates/).
 No JS speedup or GPU acceleration is claimed.
@@ -198,20 +199,22 @@ Source-render measurements with cached Canvas metrics:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.333 ms | 2.511 ms | 1.88× |
-| sequence | 0.513 ms | 1.077 ms | 2.10× |
-| er | 2.848 ms | 6.745 ms | 2.37× |
-| pie | 0.285 ms | 0.676 ms | 2.37× |
-| sankey | 0.898 ms | 1.625 ms | 1.81× |
-| gantt | 0.780 ms | 2.942 ms | 3.77× |
-| railroad | 0.799 ms | 1.973 ms | 2.47× |
+| flowchart | 1.307 ms | 2.469 ms | 1.89× |
+| sequence | 0.507 ms | 0.995 ms | 1.96× |
+| er | 3.020 ms | 6.490 ms | 2.15× |
+| pie | 0.276 ms | 0.630 ms | 2.28× |
+| sankey | 0.867 ms | 1.565 ms | 1.81× |
+| gantt | 0.701 ms | 2.625 ms | 3.74× |
+| railroad | 0.810 ms | 2.025 ms | 2.50× |
 
 Swift runs locally on Apple M1 Pro. Fresh source-built ARM64 SDK passed eight
 integration tests, including all 33 numeric families and 31 coordinate-boundary
 cases, plus 168 exact output checks through eight actual APIs. Universal Intel
 rebuild remains required before release. Seven-trial timing medians below use
 medium workloads (48 units; Railroad 15 rules) and passed the compiler/Pele-test
-quiet guard. Other desktop activity is recorded in the report.
+quiet guard. These timing rows are from the prior native `bfee120` checkpoint;
+the latest SVG build has fresh correctness proof above. Other desktop activity
+is recorded in the timing report.
 
 | Medium workload | Source render | Retained render | Mutable render |
 | --- | ---: | ---: | ---: |
