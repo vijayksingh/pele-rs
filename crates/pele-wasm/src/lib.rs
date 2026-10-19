@@ -208,6 +208,21 @@ impl MutableDocument {
     pub fn schema(&self) -> String {
         public_result(&self.inner.schema_view())
     }
+    /// Opaque identity of this document's immutable captured schema view.
+    /// These are WASM linear-memory offsets, never host process addresses.
+    /// Consumers must scope keys to their renderer and initialized WASM module.
+    #[cfg(target_arch = "wasm32")]
+    pub fn schema_cache_key(&self) -> String {
+        let view = self.inner.schema_view();
+        format!(
+            "1:{:x}:{:x}:{}:{:x}:{}",
+            std::ptr::from_ref(view.model) as usize,
+            view.shared_functions.as_ptr() as usize,
+            view.shared_functions.len(),
+            view.function_shapes.as_ptr() as usize,
+            view.function_shapes.len(),
+        )
+    }
     /// Dispatch edits through the retained native module and return post-call
     /// graph even when the operation throws. Revision uses decimal text in JS.
     pub fn invoke(&mut self, revision: &str, call_json: &str) -> String {
