@@ -46,3 +46,25 @@ or a claim of a leak across event-loop jobs. Caller-owned model data and aliases
 remain independently live when the caller retains them. Functional browser
 coverage exercises disposal, borrowed helpers, descriptors, busy callbacks and
 recovery against both old and candidate packages.
+
+`compare-native.mjs` compares two frozen native Rust consumer binaries and pinned
+Pele JS on the same host. Native timing happens inside the Rust consumer, with
+NDJSON control and output verification outside the timer. It validates both
+binaries against their build manifests, requires the candidate source fingerprint
+to match the checkout before/after, and checks complete outputs before/after.
+The control's historical source fingerprint remains explicitly recorded.
+
+```sh
+node --expose-gc scripts/perf/compare-native.mjs --quiet-run \
+  --control frozen/control/pele-perf \
+  --candidate scripts/perf/native/target/release/pele-perf \
+  --output native-controlled.json
+```
+
+Fifteen trials balance cyclic/reverse runtime order; three calibrations choose
+matched control/candidate counts. At least 500ms measured warmup precedes timing.
+Seven medium workloads cover source and typed retained rendering; `--cases`
+and `--stages` can bound an identical-byte A/A check. Node GC runs outside each
+JS batch. Compiler/Pele-test guards and shared-host load records remain active.
+This diagnostic neither measures Swift/WASM nor subtracts local native time from
+Linux browser measurements. It is not the browser release gate.

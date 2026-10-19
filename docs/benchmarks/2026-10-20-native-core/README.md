@@ -66,3 +66,12 @@ Native results do not pass the browser gate: all 126 latest WASM comparisons
 remain slower. The SVG-root rewrite and compact publication prototypes are not
 included here. Swift is independently tested through the actual local adapter;
 these native numbers do not measure Swift performance.
+
+## Controlled native diagnostics
+
+The [identical-byte three-way control](aa.json) compares two independent Rust
+processes and pinned JS with matched Rust batch counts, fifteen balanced trials
+and full output checks. Flowchart source/retained varied +2.2%/-1.2%; ER varied
++0.1%/-0.6%. These observations bound this diagnostic, not future shared-host
+variance. [Comparison method](../../../scripts/perf/COMPARISONS.md) records
+compiler/test guards and binary/source fingerprint requirements.
