@@ -29,6 +29,10 @@ const before=await inputs(),oracle=resolve(root,'node_modules/pele/dist/pele.js'
 assert.equal(oracleSHA256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');
 const server=createServer(async(request,response)=>{
   try{
+    // Same-origin fixtures permit isolated high-resolution timers. Without this,
+    // a 100-us clock tick can dominate tiny JS parse batches capped at 128.
+    response.setHeader('Cross-Origin-Opener-Policy','same-origin');
+    response.setHeader('Cross-Origin-Embedder-Policy','require-corp');
     const path=decodeURIComponent(new URL(request.url,'http://localhost').pathname);
     if(path==='/'){response.setHeader('Content-Type','text/html');response.end('<!doctype html><title>Pele benchmark</title>');return;}
     const file=path==='/oracle.js'?oracle:resolve(packageDir,'.'+path.replace(/^\/package/,''));
@@ -46,11 +50,17 @@ const deadline=setTimeout(()=>{void browser?.close();},600_000);
 try{
   browser=await chromium.launch({headless:true,timeout:20_000});report.browser=browser.version();
   const page=await browser.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/`);
-  await page.evaluate(async fixedNow=>{
+  const clock=await page.evaluate(async fixedNow=>{
     Date.now=()=>fixedNow;
     const api=await import('/package/index.js'),oracle=await import('/oracle.js');
     window.bench={api,oracle,engine:await api.loadRenderer()};
+    let resolution=Infinity,previous=performance.now();
+    for(let i=0;i<4096;i++){const current=performance.now();if(current>previous)resolution=Math.min(resolution,current-previous);previous=current;}
+    return {crossOriginIsolated,observedClockResolutionMs:resolution};
   },now);
+  assert.equal(clock.crossOriginIsolated,true,'Benchmark requires an isolated high-resolution timer');
+  assert(Number.isFinite(clock.observedClockResolutionMs)&&clock.observedClockResolutionMs>0&&clock.observedClockResolutionMs<=0.01,'Timer is too coarse for bounded small batches');
+  Object.assign(report.settings,clock);
   for(const workload of selectedCases){
     const result=await page.evaluate(async({workload,trials,selectedStages,selectedProfiles,warmupMs})=>{
       const {api,oracle,engine}=window.bench,rows=[],checks=[];let checksum=0;

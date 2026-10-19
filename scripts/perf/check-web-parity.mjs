@@ -11,6 +11,8 @@ const hash=b=>createHash('sha256').update(b).digest('hex'),report=JSON.parse(awa
 assert.equal(report.schemaVersion,1);assert.equal(report.succeeded,true,'Benchmark incomplete');
 assert.equal(report.harnessSHA256,hash(await readFile(new URL('./web-vm.mjs',import.meta.url))),'Benchmark harness differs');
 assert.equal(report.casesSHA256,hash(await readFile(new URL('./cases.mjs',import.meta.url))),'Workload definitions differ');
+assert.equal(report.settings.crossOriginIsolated,true,'Benchmark timer was not isolated');
+assert(Number.isFinite(report.settings.observedClockResolutionMs)&&report.settings.observedClockResolutionMs>0&&report.settings.observedClockResolutionMs<=0.01,'Benchmark clock is too coarse');
 assert.equal(report.settings.alternatingPairOrder,true);assert.equal(report.settings.freshRetainedModelPerBatch,true);
 assert(report.settings.trials>=9&&report.settings.minimumWarmupMs>=100&&report.settings.minimumWarmupOperations>=6);
 assert.equal(report.oracleSHA256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');

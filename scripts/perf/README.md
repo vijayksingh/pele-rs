@@ -66,3 +66,23 @@ interface and records parse, snapshot, apply, render and lifetime costs. Its
 [first verified local results](results/2026-10-18-swift-api.md) include all 21
 correctness workloads, bounded three-workload timings, exact SDK provenance and
 explicit ownership/scheduling history. These costs are not isolated FFI overhead.
+
+## Independent browser VM
+
+`web-vm.mjs` measures matched Pele JS and packed WASM public APIs in one
+Chromium browser, including mutable publication and parse/disposal. The server
+uses same-origin isolation headers; the harness records and requires an observed
+clock tick no greater than 10 microseconds. This avoids 100-microsecond timer
+quantization dominating tiny JS parse batches. Batch/memory caps remain intact.
+
+```sh
+PLAYWRIGHT_BROWSERS_PATH="$PWD/browsers" node scripts/perf/web-vm.mjs \
+  --package EXACT_PACKAGE --warmup-ms 500 --output web.json
+node scripts/perf/check-web-parity.mjs web.json EXACT_PACKAGE
+```
+
+Focused `--cases`, `--profiles` and `--stages` runs diagnose changes. The release
+checker requires all 126 conditions, exact runtime/harness hashes, sufficient
+warmup/trials and matching-or-faster medians in every condition. A focused run
+cannot pass. Older non-isolated reports remain historical observations; rerun
+both control and candidate before attributing changes under the new clock.
