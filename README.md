@@ -176,19 +176,20 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **The WASM performance gate still fails all 126 measured conditions; 0.3 remains unreleased.**
-Latest complete artifact: `fd61527`, including fresh native Flowchart records and
-validated immutable schema reuse. Against the coordinate-pass VM control, mutable
-parse time fell **25.8%** and retained mutable render time fell **21.3%** at the
-median of 42 conditions per stage. No parse condition regressed more than 5%;
-two retained conditions did. Source render has no median gain and still takes
-**1.78–5.24×** the JS time. No JS speedup or GPU acceleration is claimed.
+Latest measured package: native `6c63a71`, JS `fa9f4e8`. Direct comparison of
+acknowledged host state reduces retained mutable render time **11.1%** at the
+median of 42 conditions versus the preceding short-key package. One retained
+condition regressed 6.5%; complete samples and follow-up diagnostics are recorded.
+Source rendering still takes **1.67–5.09×** the Pele JS time. No JS speedup or GPU
+acceleration is claimed.
 
-Changes borrow native snapshots, defer typed projections, skip acknowledged
-unchanged imports, reduce property publication and reuse immutable metadata.
-Full samples, regressions and the failed artifact-checked release gate appear in
-[the latest report](docs/benchmarks/2026-10-20-schema-cache/). Earlier
-[mutable transport](docs/benchmarks/2026-10-20-mutable/) and
-[coordinate profiles](docs/benchmarks/2026-10-19-profile/) remain separate checkpoints.
+The latest VM series uses verified 5 µs clock ticks and fresh matched controls.
+Earlier non-isolated reports remain historical; their percentage gains are not
+combined with this series. Native snapshots, lazy projections, acknowledged
+imports, immutable schema reuse, short-key lookup and descriptor publication
+changes remain part of the candidate. Full stage results, regressions, artifact
+hashes and the failed release gate appear in
+[the latest report](docs/benchmarks/2026-10-20-direct-comparison/).
 
 Independent Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
 Same browser, inputs and cached Canvas metrics; nine alternating trials after
@@ -198,35 +199,34 @@ Source-render measurements for that exact artifact:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.350 ms | 2.587 ms | 1.92× |
-| sequence | 0.519 ms | 1.113 ms | 2.14× |
-| er | 2.963 ms | 7.050 ms | 2.38× |
-| pie | 0.278 ms | 0.684 ms | 2.46× |
-| sankey | 1.050 ms | 1.963 ms | 1.87× |
-| gantt | 0.691 ms | 2.750 ms | 3.98× |
-| railroad | 0.813 ms | 2.025 ms | 2.49× |
+| flowchart | 1.356 ms | 2.534 ms | 1.87× |
+| sequence | 0.517 ms | 1.066 ms | 2.06× |
+| er | 2.744 ms | 6.742 ms | 2.46× |
+| pie | 0.274 ms | 0.659 ms | 2.40× |
+| sankey | 0.846 ms | 1.588 ms | 1.88× |
+| gantt | 0.765 ms | 2.865 ms | 3.74× |
+| railroad | 0.794 ms | 1.967 ms | 2.48× |
 
-Swift runs locally on Apple M1 Pro. Fresh ARM64 SDK passed four numeric/all-family
-integration tests and 168 exact output checks through eight actual APIs. The
-latest native change still needs the universal Intel rebuild before release.
-Seven-trial timing medians below use medium workloads (48 units; Railroad 15 rules)
-and passed the compiler/Pele-test quiet guard. Other desktop activity remained
-present and is recorded in the report.
+Swift runs locally on Apple M1 Pro. Fresh ARM64 SDK passed seven output-limit and
+all-family numeric integration tests, plus 168 exact output checks through eight
+actual APIs. The latest native change still needs the universal Intel rebuild
+before release. Seven-trial timing medians below use medium workloads (48 units;
+Railroad 15 rules) and passed the compiler/Pele-test quiet guard. Other desktop
+activity remained present and is recorded in the report.
 
 | Medium workload | Source render | Retained render | Mutable render |
 | --- | ---: | ---: | ---: |
-| flowchart | 0.571 ms | 0.467 ms | 0.587 ms |
-| sequence | 0.261 ms | 0.231 ms | 0.271 ms |
-| er | 1.507 ms | 1.336 ms | 1.471 ms |
-| pie | 0.286 ms | 0.271 ms | 0.283 ms |
-| sankey | 0.354 ms | 0.336 ms | 0.379 ms |
-| gantt | 0.447 ms | 0.372 ms | 1.112 ms |
-| railroad | 0.452 ms | 0.415 ms | 0.477 ms |
+| flowchart | 0.605 ms | 0.479 ms | 0.596 ms |
+| sequence | 0.272 ms | 0.230 ms | 0.283 ms |
+| er | 1.622 ms | 1.376 ms | 1.523 ms |
+| pie | 0.294 ms | 0.284 ms | 0.301 ms |
+| sankey | 0.376 ms | 0.339 ms | 0.392 ms |
+| gantt | 0.454 ms | 0.408 ms | 1.144 ms |
+| railroad | 0.477 ms | 0.501 ms | 0.473 ms |
 
 Swift and VM figures cannot be compared across machines. Timings include public
-API/ownership costs and exclude startup, downloads and SVG painting. Packed
-publication, disposal-storage and larger compiler experiments remain outside the
-default because they showed mixed results.
+API/ownership costs and exclude startup, downloads and SVG painting. Mixed-result
+packed-publication and disposal-storage experiments remain outside the default.
 
 ## Build and verification
 
