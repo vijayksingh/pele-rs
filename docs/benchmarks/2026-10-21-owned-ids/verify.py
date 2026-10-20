@@ -40,4 +40,8 @@ reuse=load('provenance/native-proof-reuse.json');api=load('correctness/swift-api
 assert len(api['rows'])==168 and len(api['cases'])==21 and api['mode']=='swift-api-correctness-only'
 for k,v in [('revision','nativeProofSource'),('sourceInputSha256','nativeInputSHA256'),('binarySha256','consumerSHA256'),('nativeHostArchiveSha256','sdkSHA256')]:assert api['buildManifest'][k]==reuse[v]
 revert=load('provenance/revert-proof.json');assert revert['sourceInputsVerified']==558 and revert['restoredRuntimeSource']==proof['source']['control']
+restored=load('provenance/restoration-complete.json.gz')
+assert restored['sourceCommit']==revert['sourceCommit'] and restored['restoredRuntimeSource']==revert['restoredRuntimeSource']
+assert restored['sourceInputsVerified']==558 and restored['packageFilesVerified']==117 and restored['packageExactlyRestored']
+assert restored['packageHashes']==warm['runtimeHashes']['control'] and restored['wasm']==delta['unchangedWASM']
 print(json.dumps(dict(artifacts=len(items),rejectedCandidate=manifest['sourceCommit'],timedControl=proof['source']['control'],probeOnlyControl=execution['probeOnlyControl'],rows=24,trials=21,probes=36,node=122,browser=117,api=168,nativeInputsReused=370,revertedSource=revert['sourceCommit']),indent=2))

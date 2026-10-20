@@ -16,7 +16,7 @@ Paired deltas and ratios of lane medians differ; neither statistic is substitute
 
 Candidate Node 122, browser 117 across Chromium/Firefox/WebKit, TypeScript and API 168/21 pass. Actual browser/Node reports and logs are preserved. The 370 native inputs and SDK are unchanged from fresh 11f validation: native 57, Swift 16 corpus and C 3 results are reused, not reported as another fresh SDK run. API 168 was rechecked. Source/package before/after maps and the independent source review are bound by hashes.
 
-The original source-revert record explicitly precedes package restoration; it is retained without rewriting history. Package restoration proof, when included separately, establishes that later artifact state. No candidate JS ratio is presented as the restored runtime's current measurement. Accepted 11f evidence remains in the [source-symbols report](../2026-10-21-source-symbols/).
+The original source-revert record explicitly precedes package restoration; it is retained without rewriting history. The supplemental `restoration-complete.json.gz` record verifies that all 117 package files exactly match accepted 11f, alongside the 558 restored runtime inputs. The portable verifier compares its complete package hash map with the timed 11f control. No candidate JS ratio is presented as the restored runtime's current measurement. Accepted 11f evidence remains in the [source-symbols report](../2026-10-21-source-symbols/).
 
 ```sh
 python3 docs/benchmarks/2026-10-21-owned-ids/verify.py
