@@ -5,6 +5,9 @@ mod graph;
 mod host_function;
 pub use host_function::{ActiveModel, HostFunction, ModelDelta};
 mod schema;
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub use engine::HostErEntrySelection;
 pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome};
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 

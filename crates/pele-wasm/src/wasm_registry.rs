@@ -8,6 +8,9 @@ use wasm_bindgen::prelude::*;
 pub struct NativeRegistry {
     pub(super) inner: Option<PublicEngine>,
     foreign: HashMap<DiagramType, JsValue>,
+    // Only raw caller adoption needs an origin token. Ordinary registries do
+    // not allocate one, and replacement never changes an existing token.
+    pub(super) raw_entry_origin: std::cell::OnceCell<std::rc::Rc<()>>,
 }
 fn closed() -> PeleError {
     PeleError::new("Registry is closed", ErrorCode::Semantic)
@@ -36,6 +39,7 @@ impl NativeRegistry {
                 PublicEngine::empty()
             }),
             foreign: HashMap::new(),
+            raw_entry_origin: std::cell::OnceCell::new(),
         }
     }
     pub fn registered(&self, id: &str) -> Result<String, JsValue> {

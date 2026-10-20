@@ -1039,6 +1039,20 @@ impl RenderStore for HostStore {
     }
 }
 
+/// Temporary facade selection: captured policy plus originating registry.
+/// Released after adoption; it never owns the caller root or a graph.
+#[wasm_bindgen(js_name=HostErEntrySelection)]
+pub struct HostErEntrySelection {
+    inner: pele::compat::public::HostErEntrySelection,
+    origin: Rc<()>,
+}
+#[wasm_bindgen]
+impl HostErEntrySelection {
+    pub fn schema(&self) -> String {
+        super::public_result(&self.inner.schema())
+    }
+}
+
 #[wasm_bindgen(js_name=HostErDocument)]
 pub struct HostErDocument {
     policy: pele::compat::host_er::Policy,
@@ -1496,6 +1510,46 @@ fn host_parsed(parsed: pele::compat::host_er::Parsed<()>) -> Array {
 }
 #[wasm_bindgen]
 impl NativeRegistry {
+    /// Raw caller selection does not parse, import or publish any model.
+    pub fn select_prepared_host_er(
+        &self,
+        id: &str,
+    ) -> Result<Option<HostErEntrySelection>, JsValue> {
+        let engine = self.inner.as_ref().ok_or_else(|| {
+            native_failure(PeleError::new("Registry is closed", ErrorCode::Semantic))
+        })?;
+        let id = super::prepared_entries::builtin_id(id).map_err(native_failure)?;
+        let selected = engine.select_host_er_entry(&id).map_err(native_failure)?;
+        Ok(selected.map(|inner| HostErEntrySelection {
+            inner,
+            origin: self.raw_entry_origin.get_or_init(|| Rc::new(())).clone(),
+        }))
+    }
+    /// Recheck open after caller traversal, before decoding config. The
+    /// captured registration survives replacement; it is never selected again.
+    pub fn bind_prepared_host_er(
+        &self,
+        selection: &HostErEntrySelection,
+        config_json: &str,
+    ) -> Result<HostErDocument, JsValue> {
+        self.inner.as_ref().ok_or_else(|| {
+            native_failure(PeleError::new("Registry is closed", ErrorCode::Semantic))
+        })?;
+        if !self
+            .raw_entry_origin
+            .get()
+            .is_some_and(|origin| Rc::ptr_eq(origin, &selection.origin))
+        {
+            return Err(native_failure(PeleError::new(
+                "Raw entry selection belongs to another registry",
+                ErrorCode::Semantic,
+            )));
+        }
+        let config = super::prepared_entries::config(config_json).map_err(native_failure)?;
+        Ok(HostErDocument {
+            policy: selection.inner.bind(config).map_err(native_failure)?,
+        })
+    }
     /// Optional facade-only path. The low-level parse method keeps returning a
     /// MutableDocument with its existing graph, revision and snapshot contract.
     #[allow(clippy::too_many_arguments)]

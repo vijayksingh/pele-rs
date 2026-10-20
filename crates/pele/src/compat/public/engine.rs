@@ -427,6 +427,31 @@ impl Registration {
         graph.validate_compiled(self.compiled_schema()?)
     }
 }
+/// Captured builtin-only raw entry policy. Contains no host values or model.
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub struct HostErEntrySelection {
+    registration: Arc<Registration>,
+}
+#[cfg(feature = "web-host-er")]
+impl HostErEntrySelection {
+    pub fn schema(&self) -> ModelSchemaView {
+        ModelSchemaView {
+            model: self.registration.schema,
+            shared_functions: self.registration.shared_functions,
+            function_shapes: self.registration.function_shapes,
+        }
+    }
+    /// Called after the adapter's structural admission and config decoding.
+    /// No registration lookup or drawable import occurs at this boundary.
+    pub fn bind(&self, config: Object) -> Result<crate::compat::host_er::Policy, PeleError> {
+        self.registration.compiled_schema()?;
+        Ok(crate::compat::host_er::Policy::captured(
+            self.registration.descriptor.clone(),
+            config,
+        ))
+    }
+}
 #[derive(Default)]
 pub struct PublicEngine {
     engine: Engine,
@@ -681,6 +706,19 @@ impl PublicEngine {
             shared_functions: registration.shared_functions,
             function_shapes: registration.function_shapes,
         })
+    }
+    /// Private browser adoption selects by captured concrete codec identity.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn select_host_er_entry(
+        &self,
+        id: &DiagramId,
+    ) -> Result<Option<HostErEntrySelection>, PeleError> {
+        let registration = self.graph_registration(id)?;
+        Ok(registration
+            .codec
+            .is_host_er()
+            .then_some(HostErEntrySelection { registration }))
     }
     fn graph_registration(&self, id: &DiagramId) -> Result<Arc<Registration>, PeleError> {
         self.modules

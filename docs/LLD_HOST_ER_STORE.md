@@ -14,6 +14,22 @@ Facade prepared/standalone ER parsing also publishes host storage. Its hidden
 capability is additive; the exported low-level prepared parser still returns
 the same arena document and binary/revision APIs.
 
+Caller-authored raw ER adoption selects the exact builtin codec before traversal
+and retains its captured registration. It audits the original objects into the
+identity/string accounting ledger, binds policy/config without a native graph,
+and commits ownership only after both admission gates succeed. The initial
+zero-metadata binary-size gate precedes config serialization; the captured
+snapshot-size gate adds the former 13-byte type metadata after binding. Binding
+rechecks the originating registry is open. Replacement cannot reselect policy.
+Non-ER/custom codecs and exported binary APIs retain their existing paths.
+
+Imported caller objects receive no direct helper-owner mapping: successful
+last-live helper routing remains intact. Failed provisional owners are discarded.
+Config serialization writes stay live instead of being overwritten by an older
+snapshot. Those two corrections have explicit public integration coverage;
+object identity, callback reads, arbitrary throws and nested operations use the
+same host operation contract as parsed models.
+
 The browser policy retains captured registration/config, not a JavaScript model
 or a persistent native graph. The JavaScript owner holds public objects, identity
 maps, string/host-reference history and scalar byte/reference accounting per
@@ -151,7 +167,11 @@ browser. Two focused runs cover ER callbacks/construction plus all 33 packed
 entries, normal-render policy, provider/lifecycle and low-level error controls.
 Twelve native integrations, 168 Swift API conditions, eight ER/eager Swift tests,
 seven all-family prepared/caller-model Swift integrations and three C consumers
-pass against the fresh ARM64 SDK. Caller-authored browser raw roots still use
-the arena: six callback comparisons fail in each engine, while ten Array/Map/
-Set/Date/Error root controls pass. That adoption layer needs separate work.
+pass against the fresh ARM64 SDK. Caller-authored raw ER adoption now keeps
+host objects directly. Forty-five focused browser checks pass across all three
+engines, including the six previously failing callback comparisons, ten exotic
+Ref-root controls, config/error ordering and lifecycle checks. Fourteen native
+integrations pass. Consolidated browser and fresh Swift checks are pending for
+this raw layer. The exact near-64-MiB zero-versus-13-byte gate has source review
+but no new large E2E fixture; it remains an explicit validation gap.
 No full API or performance parity claim; no 0.3 release.

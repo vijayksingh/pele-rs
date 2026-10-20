@@ -26,7 +26,7 @@ fn edge(kind: u32, value: f64) -> Result<EdgeLimit, PeleError> {
         _ => Err(invalid("Invalid prepared maxEdges kind")),
     }
 }
-fn builtin_id(id: &str) -> Result<DiagramId, PeleError> {
+pub(super) fn builtin_id(id: &str) -> Result<DiagramId, PeleError> {
     DIAGRAM_TYPES
         .into_iter()
         .find(|kind| kind.as_str() == id)

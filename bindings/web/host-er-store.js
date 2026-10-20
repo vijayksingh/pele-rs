@@ -242,9 +242,9 @@ export class HostErOwner {
     }
   }
   // Same discovery order as ModelBridge.snapshot; accumulates counts, not values.
-  audit(values=[],entry=true){
+  audit(values=[],entry=true,initialSnapshot=false){
     this.assertLive();if(entry)this.prototypeAudit();
-    const pending=[],seen=new Set(),accounting=[];let references=0,nodeBytes=0;
+    const pending=[],seen=new Set(),accounting=[];let references=0,nodeBytes=0,invalidArrayLength=false,invalidErrorBrand=false;
     const visit=value=>{const atom=this.atom(value,true);if(atom[0]===6&&!seen.has(atom[1])){seen.add(atom[1]);pending.push(atom[1]);}return atom;};
     const root=visit(this.root),args=values.map(visit);
     for(const value of this.objects)visit(value);
@@ -260,9 +260,12 @@ export class HostErOwner {
       let bytes=1+4+propertyBytes;
       if(value instanceof Map){bytes+=4;for(const [key,item]of Map.prototype.entries.call(value)){references+=2;if(references>8_000_000)graphBudget();bytes+=atomBytes(visit(key))+atomBytes(visit(item));}}
       else if(value instanceof Set){bytes+=4;for(const item of Set.prototype.values.call(value)){if(++references>8_000_000)graphBudget();bytes+=atomBytes(visit(item));}}
-      else if(value instanceof Date)bytes+=8;
-      else if(errorKind(value))bytes+=1;
-      else if(Array.isArray(value))bytes+=4;
+      else if(value instanceof Date){if(initialSnapshot)Date.prototype.getTime.call(value);bytes+=8;}
+      else if(errorKind(value)){if(initialSnapshot){const brand=errorKind(value);invalidErrorBrand ||= brand===undefined;}bytes+=1;}
+      else if(Array.isArray(value)){
+        if(initialSnapshot){const length=value.length;invalidArrayLength ||= !Number.isInteger(length)||length<0||length>0xffffffff;}
+        bytes+=4;
+      }
       else if(this.registration.prototypeIds.has(Object.getPrototypeOf(value)))bytes+=4;
       nodeBytes+=bytes;accounting.push(id,bytes,references-startReferences);
     }
@@ -272,7 +275,25 @@ export class HostErOwner {
     for(let n=0;n<accounting.length;n+=3){this.nodeBytes[accounting[n]]=accounting[n+1];this.nodeRefs[accounting[n]]=accounting[n+2];}
     this.references=references;
     const graphBytes=8+4+8+4+atomBytes(root)+4+this.strings.length*4+this.units*2+4+nodeBytes;
-    return {root,args,graphBytes,nodes:this.objects.length,strings:this.strings.length,units:this.units,references};
+    return {root,args,graphBytes,nodes:this.objects.length,strings:this.strings.length,units:this.units,references,invalidArrayLength,invalidErrorBrand};
+  }
+  // Caller adoption observes existing objects, never publishes replacements.
+  // Keep captured counts for both old binary gates even if config mutates data.
+  admitCallerRoot(){return this.audit([],true,true);}
+  callerFrameAdmission(audit){
+    this.frameAdmission(audit,0);
+    // Snapshot reads array length and Error brand before config. Invalid
+    // payloads reject only after the encoder's complete frame-size pass.
+    if(audit.invalidArrayLength||audit.invalidErrorBrand)throw new PeleError('Invalid public binary graph transport','semantic');
+  }
+  validateCallerAdmission(audit){
+    if(audit.nodes>1_000_000||audit.strings>1_000_000||audit.units>16_000_000)throw new PeleError('Public model graph exceeds work budget','limit');
+    if(audit.references>8_000_000)throw new PeleError('Public graph exceeds work budget','limit');
+  }
+  abandonCallerRoot(){
+    this.disposed=true;this.phase='disposed';this.root=undefined;
+    this.objects=null;this.ids=null;this.strings=null;this.firstStrings=null;this.lastStrings=null;
+    this.hostValues=null;this.hostIds=null;this.nodeBytes=null;this.nodeRefs=null;this.invoke=undefined;this.temporary=null;
   }
   frameAdmission(audit,metadataBytes){if(audit.graphBytes+metadataBytes>64*1024*1024||audit.references>8_000_000)frameBudget();}
   begin(kind,values=[]){

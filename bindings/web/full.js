@@ -183,13 +183,14 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     if(Object.hasOwn(outcome,'Err'))throw operationError(outcome.Err,owner);
     return outcome.Ok;
   }
-  function adoptHostEr(handle,owner,provider,preparedType) {
+  function adoptHostEr(handle,owner,provider,preparedType,callerRoot=false) {
     const model=owner.root,rawType='er';
     const entry={handle,rawType,provider,preparedType,disposed:false,hostStore:owner};
     owner.invoke=(method,receiver,args)=>hostOperation(entry,'method',[receiver,...args],(primitive,capture,finish,_resource,values)=>handle.invoke_host(method,primitive,capture,finish,values));
     owner.phase='idle';
+    if(callerRoot)documents.set(model,entry); // Preserve native weak-key error before render admission.
     if(owner.registration.documents.length>256)owner.registration.documents=owner.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
-    owner.registration.documents.push(new WeakRef(owner));documents.set(model,entry);
+    owner.registration.documents.push(new WeakRef(owner));if(!callerRoot)documents.set(model,entry);
     ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
     finalizer?.register(model,handle,model);return model;
   }
@@ -270,6 +271,34 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     renderRaw(type, model, config, options = {}) {
       if(rawDisposed.has(model))throw new TypeError('Public model document is disposed');
       let entry=documents.get(model);
+      if(!entry&&nativeRegistry.select_prepared_host_er&&nativeRegistry.bind_prepared_host_er){
+        const selection=registryCall(()=>{try{return nativeRegistry.select_prepared_host_er(type);}catch(error){if(typeof error==='string')return result(error);throw error;}});
+        if(selection){
+          let owner,handle,committed=false;
+          try{
+            const schema=registryCall(()=>result(selection.schema()));
+            const registration=registry.registration(schema);
+            owner=new HostErOwner(registration,registry,model,()=>{throw new TypeError('Public model construction is incomplete');});
+            const admission=owner.admitCallerRoot();
+            handle=registryCall(()=>{
+              // Empty metadata frame precedes config serialization. Bind then
+              // rechecks registry-open before native config decoding.
+              owner.callerFrameAdmission(admission);
+              try{return nativeRegistry.bind_prepared_host_er(selection,finiteConfigJSON(config));}
+              catch(error){if(typeof error==='string')return result(error);throw error;}
+            });
+            owner.validateCallerAdmission(admission);
+            // The old adoptMutable snapshot adds exactly {"type":"er"}.
+            owner.frameAdmission(admission,13);
+            if(registry.registration(result(selection.schema()))!==registration)throw new TypeError('Conflicting native model schema identity');
+            adoptHostEr(handle,owner,undefined,type,true);committed=true;
+            entry=documents.get(model);
+          }finally{
+            selection.free();
+            if(!committed){handle?.free();owner?.abandonCallerRoot();}
+          }
+        }
+      }
       if(!entry){
         const schema=registryCall(()=>nativeValue(()=>nativeRegistry.entry_schema(type)));
         const bridge=new ModelBridge({version:1,root:{kind:'undefined'},strings:[],nodes:[]},schema,registry,()=>{throw new TypeError('Public model construction is incomplete');});
