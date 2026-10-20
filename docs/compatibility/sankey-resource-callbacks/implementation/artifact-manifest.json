@@ -13,48 +13,48 @@
     },
     {
       "source": "dist/evidence/sankey-live-node-3.log",
-      "stored": "final/node.log",
+      "stored": "final/node.log.gz",
       "originalSHA256": "4eca5c2e13dd6019453d985f23668ccb4f5a1e249d8e94cc23ccba62259b3c40",
-      "storedSHA256": "4eca5c2e13dd6019453d985f23668ccb4f5a1e249d8e94cc23ccba62259b3c40",
+      "storedSHA256": "65c24347c2d7e4b53d95ea59bd41ee6770c9010edbd6d546da58ee3e8b60be12",
       "originalBytes": 103,
-      "storedBytes": 103,
-      "gzip": false
+      "storedBytes": 112,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-web-3.log",
-      "stored": "final/browser.log",
+      "stored": "final/browser.log.gz",
       "originalSHA256": "a917380a2ee323d23cedd21a462a62e169ce3a5892f08e269f4530ce4e47d754",
-      "storedSHA256": "a917380a2ee323d23cedd21a462a62e169ce3a5892f08e269f4530ce4e47d754",
+      "storedSHA256": "04e03338d5c456acc7773a9443fd47c0a4c9f05bb9f80d69c76275b428b5a952",
       "originalBytes": 17112,
-      "storedBytes": 17112,
-      "gzip": false
+      "storedBytes": 2496,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-types-3.log",
-      "stored": "final/types.log",
+      "stored": "final/types.log.gz",
       "originalSHA256": "d814ef4c65a231d631817921b27b4bba912641d7ee7328aff44497e984510684",
-      "storedSHA256": "d814ef4c65a231d631817921b27b4bba912641d7ee7328aff44497e984510684",
+      "storedSHA256": "4a67028e517de51834546e860c6bc59b2e044510998e5eaf3e242df15d149a68",
       "originalBytes": 50,
-      "storedBytes": 50,
-      "gzip": false
+      "storedBytes": 61,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-build-wasm-3.log",
-      "stored": "final/build.log",
+      "stored": "final/build.log.gz",
       "originalSHA256": "41dc59dc31589e8cfa310f3df9a8e3790c08e9298444aa4606648d5610595088",
-      "storedSHA256": "41dc59dc31589e8cfa310f3df9a8e3790c08e9298444aa4606648d5610595088",
+      "storedSHA256": "5d5356cf46285864c6d0c411c0920f7ccd2da3fc35a6d4537ff75600a1ad36ad",
       "originalBytes": 266,
-      "storedBytes": 266,
-      "gzip": false
+      "storedBytes": 165,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-generator-3.log",
-      "stored": "final/generator.log",
+      "stored": "final/generator.log.gz",
       "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
       "originalBytes": 0,
-      "storedBytes": 0,
-      "gzip": false
+      "storedBytes": 20,
+      "gzip": true
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/source.json",
@@ -418,12 +418,12 @@
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-1/sankey-live-node.log",
-      "stored": "attempt-1/sankey-live-node.log",
+      "stored": "attempt-1/sankey-live-node.log.gz",
       "originalSHA256": "6141550dcae53218d5fdbbb168e6d06aad98dbea2ba2ac631e37c059cc2f64bc",
-      "storedSHA256": "6141550dcae53218d5fdbbb168e6d06aad98dbea2ba2ac631e37c059cc2f64bc",
+      "storedSHA256": "22467ee4b39c754405d84c270d0f1aefa1f7f4ed4efc5880429cb94a38c1b1b8",
       "originalBytes": 955,
-      "storedBytes": 955,
-      "gzip": false
+      "storedBytes": 443,
+      "gzip": true
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/source.json",
@@ -454,12 +454,12 @@
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/sankey-live-node-2.log",
-      "stored": "attempt-2/sankey-live-node-2.log",
+      "stored": "attempt-2/sankey-live-node-2.log.gz",
       "originalSHA256": "bf3fe705c6656b7c6039c3dd349606907e3d6cbaa1d223c230d49bb201594ca6",
-      "storedSHA256": "bf3fe705c6656b7c6039c3dd349606907e3d6cbaa1d223c230d49bb201594ca6",
+      "storedSHA256": "a510ead1778362070ebe830310d6efa42f8e357e22c6664a042a45f38692e4e8",
       "originalBytes": 103,
-      "storedBytes": 103,
-      "gzip": false
+      "storedBytes": 112,
+      "gzip": true
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/sankey-live-web.log",
@@ -499,21 +499,21 @@
     },
     {
       "source": "dist/evidence/sankey-live-correctness-native-features.log",
-      "stored": "native/native-features.log",
+      "stored": "native/native-features.log.gz",
       "originalSHA256": "cad3e4f47cfe48c0d889eaf9afa4e0e1cd0e98956469866f753e8fa7049e8818",
-      "storedSHA256": "cad3e4f47cfe48c0d889eaf9afa4e0e1cd0e98956469866f753e8fa7049e8818",
+      "storedSHA256": "be519a1805cf47af3a86e676171bdee10589fc48e7e607e369985500db7a3a00",
       "originalBytes": 7301,
-      "storedBytes": 7301,
-      "gzip": false
+      "storedBytes": 2266,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-correctness-swift-corpus.log",
-      "stored": "native/swift-corpus.log",
+      "stored": "native/swift-corpus.log.gz",
       "originalSHA256": "9a1be9e559e71fa3f9f664582ae7d29ff2508707665aa530da9d74d53cda387a",
-      "storedSHA256": "9a1be9e559e71fa3f9f664582ae7d29ff2508707665aa530da9d74d53cda387a",
+      "storedSHA256": "33a876c4b900293ad0802873ce2517215a1ae753dbea72a28ed7b8b421060305",
       "originalBytes": 5718,
-      "storedBytes": 5718,
-      "gzip": false
+      "storedBytes": 1221,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-correctness-swift-api.json",
@@ -526,57 +526,57 @@
     },
     {
       "source": "dist/evidence/sankey-live-correctness-ffi-compile.log",
-      "stored": "native/ffi-compile.log",
+      "stored": "native/ffi-compile.log.gz",
       "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
       "originalBytes": 0,
-      "storedBytes": 0,
-      "gzip": false
+      "storedBytes": 20,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-correctness-ffi-run.log",
-      "stored": "native/ffi-run.log",
+      "stored": "native/ffi-run.log.gz",
       "originalSHA256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
-      "storedSHA256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+      "storedSHA256": "afa68cd1f6234a3566db0c8163d3c4ace62c16a7074ef2a8da5bbbf9a8ce8bb9",
       "originalBytes": 97,
-      "storedBytes": 97,
-      "gzip": false
+      "storedBytes": 107,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-correctness-ffi-public-compile.log",
-      "stored": "native/ffi-public-compile.log",
+      "stored": "native/ffi-public-compile.log.gz",
       "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
       "originalBytes": 0,
-      "storedBytes": 0,
-      "gzip": false
+      "storedBytes": 20,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-correctness-ffi-public-run.log",
-      "stored": "native/ffi-public-run.log",
+      "stored": "native/ffi-public-run.log.gz",
       "originalSHA256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
-      "storedSHA256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+      "storedSHA256": "c5ef1bd2870c3734fc64a40f041f482a5644eab53cf6555fd28a2ca32a75f3e0",
       "originalBytes": 36,
-      "storedBytes": 36,
-      "gzip": false
+      "storedBytes": 56,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-correctness-ffi-parse-limits-compile.log",
-      "stored": "native/ffi-parse-limits-compile.log",
+      "stored": "native/ffi-parse-limits-compile.log.gz",
       "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64",
       "originalBytes": 0,
-      "storedBytes": 0,
-      "gzip": false
+      "storedBytes": 20,
+      "gzip": true
     },
     {
       "source": "dist/evidence/sankey-live-correctness-ffi-parse-limits-run.log",
-      "stored": "native/ffi-parse-limits-run.log",
+      "stored": "native/ffi-parse-limits-run.log.gz",
       "originalSHA256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
-      "storedSHA256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
+      "storedSHA256": "2c85db4a83a9951d01c913f8a590fba1e6781d4d0ced27176900b599d50cd62f",
       "originalBytes": 104,
-      "storedBytes": 104,
-      "gzip": false
+      "storedBytes": 109,
+      "gzip": true
     }
   ]
 }

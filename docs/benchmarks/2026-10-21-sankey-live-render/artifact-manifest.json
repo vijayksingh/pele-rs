@@ -75,21 +75,21 @@
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runner/runtime/preflight-warm.log",
-      "stored": "preflight-warm.log",
+      "stored": "preflight-warm.log.gz",
       "originalSHA256": "a045f8a9f72ec268558c8d9c80cb8be7b4795fb7890078a7ca65a5b0c0e0bacd",
-      "storedSHA256": "a045f8a9f72ec268558c8d9c80cb8be7b4795fb7890078a7ca65a5b0c0e0bacd",
+      "storedSHA256": "cc587cc5c0ff2cf99abfcf05ffc4f3f14b5a9ac362c1cf1aaa61f3571223dd01",
       "originalBytes": 38,
-      "storedBytes": 38,
-      "gzip": false
+      "storedBytes": 58,
+      "gzip": true
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runner/runtime/warm.log",
-      "stored": "warm.log",
+      "stored": "warm.log.gz",
       "originalSHA256": "9219378c712f905a1a033204a4aba5c5fee431a5fcaca5e695244ca96d9b5989",
-      "storedSHA256": "9219378c712f905a1a033204a4aba5c5fee431a5fcaca5e695244ca96d9b5989",
+      "storedSHA256": "fa64f7cae6b563f82bc6aeda804223624b6d96f0e4d9051a850a51ca99306daa",
       "originalBytes": 265,
-      "storedBytes": 265,
-      "gzip": false
+      "storedBytes": 139,
+      "gzip": true
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-runner/files/scripts/perf/cases.mjs",
@@ -282,12 +282,12 @@
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-profiler/runtime/run.log",
-      "stored": "profile/run.log",
+      "stored": "profile/run.log.gz",
       "originalSHA256": "ff058012822871957fcd5685d124efd8cafa80b4164093891607a294068bd31d",
-      "storedSHA256": "ff058012822871957fcd5685d124efd8cafa80b4164093891607a294068bd31d",
+      "storedSHA256": "06e69c0f56e5e0aafa7f732c3936e6f72a298f9e145129392eab267954078d35",
       "originalBytes": 166,
-      "storedBytes": 166,
-      "gzip": false
+      "storedBytes": 83,
+      "gzip": true
     },
     {
       "source": "dist/perf-patches/parse-architecture/sankey-live-profiler/analyze.py",
