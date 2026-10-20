@@ -450,20 +450,24 @@ impl PublicGraphRead for SourceCanonical {
                 .get(start..)
                 .ok_or_else(graph_read::invalid)?);
         }
-        let total = PublicGraphRead::header(self, id)?.properties;
+        if id >= self.node_count {
+            return Err(graph_read::invalid());
+        }
+        let base = self.base_header(id)?.properties;
+        let patch = self.patches.get(&id);
+        let total = base + patch.map_or(0, |p| p.properties.len());
         if start > total {
             return Err(graph_read::invalid());
         }
         let count = (total - start).min(128);
-        let mut batch: [Property; 128] = std::array::from_fn(|_| Property {
-            key: 0,
-            flags: 0,
-            value: Atom::Undefined,
-        });
-        for (i, p) in batch[..count].iter_mut().enumerate() {
-            *p = self.property_at(id, start + i)?;
+        if count == 0 {
+            return v(&[]);
         }
-        v(&batch[..count])
+        if count <= 8 {
+            self.property_batch::<8>(id, base, patch, start, count, v)
+        } else {
+            self.property_batch::<128>(id, base, patch, start, count, v)
+        }
     }
     fn map_entries(
         &self,
@@ -471,19 +475,32 @@ impl PublicGraphRead for SourceCanonical {
         start: usize,
         v: &mut dyn FnMut(&[(Atom, Atom)]) -> Result<(), PeleError>,
     ) -> Result<(), PeleError> {
-        let AdmissionKind::Map(total) = PublicGraphRead::header(self, id)?.kind else {
+        if id >= self.node_count {
+            return Err(graph_read::invalid());
+        }
+        if let Some(node) = self.nodes.get(&id) {
+            let Node::Map { entries, .. } = node else {
+                return Err(graph_read::invalid());
+            };
+            return v(entries.get(start..).ok_or_else(graph_read::invalid)?);
+        }
+        let AdmissionKind::Map(base) = self.base_header(id)?.kind else {
             return Err(graph_read::invalid());
         };
+        let patch = self.patches.get(&id);
+        let total = base + patch.map_or(0, |p| p.entries.len());
         if start > total {
             return Err(graph_read::invalid());
         }
         let count = (total - start).min(128);
-        let mut batch: [(Atom, Atom); 128] =
-            std::array::from_fn(|_| (Atom::Undefined, Atom::Undefined));
-        for (i, p) in batch[..count].iter_mut().enumerate() {
-            *p = self.entry_at(id, start + i)?;
+        if count == 0 {
+            return v(&[]);
         }
-        v(&batch[..count])
+        if count <= 8 {
+            self.map_batch::<8>(base, patch, start, count, v)
+        } else {
+            self.map_batch::<128>(base, patch, start, count, v)
+        }
     }
     fn set_values(
         &self,
@@ -495,6 +512,67 @@ impl PublicGraphRead for SourceCanonical {
             return Err(graph_read::invalid());
         };
         v(values.get(start..).ok_or_else(graph_read::invalid)?)
+    }
+}
+impl SourceCanonical {
+    fn property_batch<const CAPACITY: usize>(
+        &self,
+        id: usize,
+        base: usize,
+        patch: Option<&Patch>,
+        start: usize,
+        count: usize,
+        visit: &mut dyn FnMut(&[Property]) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        let mut batch: [Property; CAPACITY] = std::array::from_fn(|_| Property {
+            key: 0,
+            flags: 0,
+            value: Atom::Undefined,
+        });
+        for (offset, property) in batch[..count].iter_mut().enumerate() {
+            let slot = start + offset;
+            if slot < base {
+                *property = self.base_property(id, slot);
+                if let Some(value) = patch.and_then(|p| p.values.get(&slot)) {
+                    property.value = value.clone();
+                }
+            } else {
+                *property = patch
+                    .and_then(|p| p.properties.get(slot - base))
+                    .cloned()
+                    .ok_or_else(graph_read::invalid)?;
+            }
+        }
+        visit(&batch[..count])
+    }
+    fn map_batch<const CAPACITY: usize>(
+        &self,
+        base: usize,
+        patch: Option<&Patch>,
+        start: usize,
+        count: usize,
+        visit: &mut dyn FnMut(&[(Atom, Atom)]) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        let mut batch: [(Atom, Atom); CAPACITY] =
+            std::array::from_fn(|_| (Atom::Undefined, Atom::Undefined));
+        for (offset, entry) in batch[..count].iter_mut().enumerate() {
+            let slot = start + offset;
+            *entry = if slot < base {
+                (
+                    Atom::String(self.labels[slot]),
+                    patch
+                        .and_then(|p| p.map_values.get(&slot))
+                        .cloned()
+                        .unwrap_or(Atom::Ref(slot as u32)),
+                )
+            } else {
+                patch
+                    .and_then(|p| p.entries.get(slot - base))
+                    .cloned()
+                    .ok_or_else(graph_read::invalid)?
+            };
+        }
+        visit(&batch[..count])
     }
 }
 fn node_header(n: &Node) -> Result<Header, PeleError> {
