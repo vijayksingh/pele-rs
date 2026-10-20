@@ -1,10 +1,12 @@
 //! Source-owned logical graph. Static records and collection slots are derived;
 //! only actual mutations own generic records. No source Property/Node arena.
 use super::indexed::IndexedSankey;
-use crate::compat::public::captured_admission::{self, AdmissionKind, Extent, Header};
+use crate::compat::public::captured_admission::{AdmissionKind, Extent, Header};
 use crate::compat::public::captured_read::{CapturedRead, NodeHeader, NodeKind, PropertyPrefix};
 use crate::compat::public::captured_write::{CapturedWrite, GraphCounts, MapMatch, OwnQuery};
-use crate::compat::public::graph_read::{self, PublicGraphRead, ReadAdapter};
+use crate::compat::public::graph_read::{
+    self, AdmissionState, PublicGraphRead, TrustedGraphOwner, TrustedGraphRead,
+};
 use crate::compat::public::{Atom, JsString, ModelGraph, Node, Property, PrototypeId};
 use crate::compat::PeleError;
 use std::{collections::HashMap, sync::Arc};
@@ -29,6 +31,7 @@ struct Patch {
 }
 pub(super) struct SourceCanonical {
     pub source: Arc<IndexedSankey>,
+    admission: AdmissionState,
     catalog: Vec<Entry>,
     labels: Vec<u32>,
     indices: Vec<u32>,
@@ -46,6 +49,7 @@ impl SourceCanonical {
     pub fn new(source: IndexedSankey) -> Result<Self, PeleError> {
         let mut s = Self {
             source: Arc::new(source),
+            admission: AdmissionState::default(),
             catalog: vec![],
             labels: vec![],
             indices: vec![],
@@ -92,7 +96,7 @@ impl SourceCanonical {
         s.node_count = s.source.nodes.len() + s.source.links.len() + 4;
         s.string_count = s.catalog.len();
         s.root = Atom::Ref((s.node_count - 1) as u32);
-        captured_admission::validate(&mut ReadAdapter(&s))?;
+        graph_read::validate_structure(&s)?;
         Ok(s)
     }
     fn text<'a>(&'a self, t: &'a Text) -> &'a str {
@@ -271,6 +275,7 @@ impl SourceCanonical {
         })
     }
     pub fn adopt(&mut self, graph: ModelGraph) -> Result<(), PeleError> {
+        self.admission.invalidate();
         // Input is already structurally/schema admitted by the document. Compare
         // against immutable source, not the last observed overlay; retain only
         // actual differences and every appended/detached ID.
@@ -352,7 +357,15 @@ fn same_kind(k: AdmissionKind, n: &Node) -> bool {
         _ => false,
     }
 }
+impl TrustedGraphOwner for SourceCanonical {
+    fn admission_state(&self) -> &AdmissionState {
+        &self.admission
+    }
+}
 impl PublicGraphRead for SourceCanonical {
+    fn trusted_read(&self) -> Option<TrustedGraphRead<'_>> {
+        Some(TrustedGraphRead::new(self))
+    }
     fn source_layout(&self, revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
         match self.recipe(revision) {
             Ok(bytes) => Ok(Some(bytes)),
@@ -737,12 +750,14 @@ impl CapturedWrite for SourceCanonical {
             }
         }
         let id = self.string_count;
+        self.admission.invalidate();
         self.strings.insert(id, JsString::from(text));
         self.string_count += 1;
         Ok(id as u32)
     }
     fn append_node(&mut self, node: Node) -> Result<u32, PeleError> {
         let id = self.node_count;
+        self.admission.invalidate();
         self.nodes.insert(id, node);
         self.node_count += 1;
         Ok(id as u32)
@@ -792,6 +807,7 @@ impl CapturedWrite for SourceCanonical {
         Ok(None)
     }
     fn replace_map_value(&mut self, id: u32, slot: u32, value: Atom) -> Result<(), PeleError> {
+        self.admission.invalidate();
         let id = id as usize;
         let slot = slot as usize;
         if let Some(Node::Map { entries, .. }) = self.nodes.get_mut(&id) {
@@ -810,6 +826,7 @@ impl CapturedWrite for SourceCanonical {
         Ok(())
     }
     fn append_map_entry(&mut self, id: u32, key: Atom, value: Atom) -> Result<(), PeleError> {
+        self.admission.invalidate();
         if let Some(Node::Map { entries, .. }) = self.nodes.get_mut(&(id as usize)) {
             entries.push((key, value))
         } else {
@@ -822,6 +839,7 @@ impl CapturedWrite for SourceCanonical {
         Ok(())
     }
     fn replace_property_value(&mut self, id: u32, slot: u32, value: Atom) -> Result<(), PeleError> {
+        self.admission.invalidate();
         let id = id as usize;
         let slot = slot as usize;
         if let Some(n) = self.nodes.get_mut(&id) {
@@ -838,6 +856,7 @@ impl CapturedWrite for SourceCanonical {
         Ok(())
     }
     fn append_property(&mut self, id: u32, p: Property) -> Result<(), PeleError> {
+        self.admission.invalidate();
         if let Some(n) = self.nodes.get_mut(&(id as usize)) {
             n.properties_mut().push(p)
         } else {
@@ -864,6 +883,7 @@ impl CapturedWrite for SourceCanonical {
         Ok(())
     }
     fn set_array_length(&mut self, id: u32, length: u32) -> Result<(), PeleError> {
+        self.admission.invalidate();
         if let Some(Node::Array { length: n, .. }) = self.nodes.get_mut(&(id as usize)) {
             *n = length
         } else {

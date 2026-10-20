@@ -1,4 +1,4 @@
-use super::graph_read::{GraphReadView, PublicGraphRead, ReadAdapter};
+use super::graph_read::{GraphReadView, PublicGraphRead};
 use super::{
     schema::CompiledSchema, Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph,
     ModelSchema, ModelSchemaView, PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
@@ -510,13 +510,7 @@ impl Registration {
             GraphReadView::Arena(g) => self.validate_graph(g),
             GraphReadView::Logical(g) => {
                 let schema = self.compiled_schema()?;
-                let mut read = ReadAdapter(*g);
-                super::captured_admission::validate(&mut read)?;
-                super::captured_admission::validate_schema_ids(
-                    &mut read,
-                    schema.methods(),
-                    schema.prototypes(),
-                )
+                super::graph_read::validate_schema(*g, self.schema, schema)
             }
         }
     }

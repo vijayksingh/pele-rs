@@ -661,6 +661,14 @@ fn sankey_logical_outcomes_preserve_first_use_partial_errors_and_recovery() {
             ),
         }
         assert_eq!(a.revision, b.revision);
+        let canonical =
+            encode_binary_exchange(b.revision, &b.graph, &[], DEFAULT_BINARY_BUDGET).unwrap();
+        for _ in 0..2 {
+            assert_eq!(
+                a.graph.canonical_binary_size(0, canonical.len()).unwrap(),
+                canonical.len()
+            );
+        }
         assert!(
             a.graph
                 .encode_binary(a.revision, &[], DEFAULT_BINARY_BUDGET)
@@ -735,6 +743,10 @@ fn sankey_logical_outcomes_preserve_first_use_partial_errors_and_recovery() {
     for document in [&mut actual, &mut expected] {
         document.apply(3, locked.clone()).unwrap();
     }
+    // Repeated logical exports precede a helper that makes partial writes and
+    // then fails on the readonly array length. Its resulting state must export.
+    assert!(bytes(&actual) == bytes(&expected));
+    assert!(bytes(&actual) == bytes(&expected));
     let call = MethodCall {
         method: MethodId(1),
         receiver: Atom::Ref(root),
@@ -781,6 +793,8 @@ fn sankey_logical_history_and_combined_transport_limits_match_public_graphs() {
         .parse(SOURCE, &Default::default())
         .unwrap();
     let mut expected = legacy_engine().parse(SOURCE, &Default::default()).unwrap();
+    assert!(bytes(&actual) == bytes(&expected));
+    assert!(bytes(&actual) == bytes(&expected));
     let mut graph = expected.snapshot().unwrap();
     let key = graph.strings.len() as u32;
     graph.strings.extend([
@@ -832,4 +846,154 @@ fn sankey_logical_history_and_combined_transport_limits_match_public_graphs() {
             .unwrap_err(),
         encode_binary_exchange(1, &old, metadata, frame.len() - 1).unwrap_err()
     );
+
+    // Reuse a successful count with different metadata/current byte limits.
+    let empty = view
+        .canonical_binary_size(0, DEFAULT_BINARY_BUDGET)
+        .unwrap();
+    assert_eq!(view.canonical_binary_size(31, empty + 31).unwrap(), empty);
+    assert_eq!(
+        view.canonical_binary_size(32, empty + 31).unwrap_err(),
+        encode_binary_exchange(1, &old, &[0; 32], empty + 31).unwrap_err()
+    );
+    drop(view);
+
+    // Accepted root and string-table replacement, including detached history,
+    // must replace every prior export's validation and size facts.
+    let original = graph.clone();
+    graph.root = Atom::Undefined;
+    graph.strings[key as usize] = JsString(vec![0xdc00, 0xd800]);
+    graph.strings.push(JsString::from("new retained history"));
+    for document in [&mut actual, &mut expected] {
+        document.apply(1, graph.clone()).unwrap();
+    }
+    assert!(bytes(&actual) == bytes(&expected));
+    assert_eq!(
+        actual
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err(),
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err()
+    );
+
+    // Invalid incoming references and schema IDs still fail before adoption;
+    // a previously accepted graph cannot authorize replacement data.
+    for root in [
+        Atom::Ref(u32::MAX),
+        Atom::String(u32::MAX),
+        Atom::BuiltinFunction(u32::MAX),
+    ] {
+        let mut invalid = graph.clone();
+        invalid.root = root;
+        let a = actual.apply(2, invalid.clone()).unwrap_err();
+        let b = expected.apply(2, invalid).unwrap_err();
+        assert_eq!(a, b);
+        assert_eq!(actual.revision(), 2);
+        assert!(bytes(&actual) == bytes(&expected));
+    }
+    for document in [&mut actual, &mut expected] {
+        document.apply(2, original.clone()).unwrap();
+    }
+    assert!(bytes(&actual) == bytes(&expected));
+    assert_eq!(
+        actual
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap(),
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap()
+    );
+}
+
+#[test]
+fn public_logical_reader_cannot_borrow_another_documents_admission() {
+    // A public extension may delegate graph reads and even forward an opaque
+    // capability, but different root data still requires independent admission.
+    struct Forwarded {
+        document: PublicDocument,
+        graph: ModelGraph,
+    }
+    impl PublicGraphRead for Forwarded {
+        fn trusted_read(&self) -> Option<TrustedGraphRead<'_>> {
+            match self.document.snapshot_read().unwrap() {
+                GraphReadView::Logical(graph) => graph.trusted_read(),
+                GraphReadView::Arena(_) => None,
+            }
+        }
+        fn extent(&self) -> GraphExtent {
+            PublicGraphRead::extent(&self.graph)
+        }
+        fn root(&self) -> Atom {
+            Atom::Ref(u32::MAX)
+        }
+        fn header(&self, node: usize) -> Result<GraphHeader, PeleError> {
+            PublicGraphRead::header(&self.graph, node)
+        }
+        fn string_length(&self, id: usize) -> Result<usize, PeleError> {
+            PublicGraphRead::string_length(&self.graph, id)
+        }
+        fn string_lengths(
+            &self,
+            visit: &mut dyn FnMut(usize) -> Result<(), PeleError>,
+        ) -> Result<(), PeleError> {
+            PublicGraphRead::string_lengths(&self.graph, visit)
+        }
+        fn string_chunks(
+            &self,
+            id: usize,
+            visit: &mut dyn FnMut(&[u16]) -> Result<(), PeleError>,
+        ) -> Result<(), PeleError> {
+            PublicGraphRead::string_chunks(&self.graph, id, visit)
+        }
+        fn properties(
+            &self,
+            node: usize,
+            start: usize,
+            visit: &mut dyn FnMut(&[Property]) -> Result<(), PeleError>,
+        ) -> Result<(), PeleError> {
+            PublicGraphRead::properties(&self.graph, node, start, visit)
+        }
+        fn map_entries(
+            &self,
+            node: usize,
+            start: usize,
+            visit: &mut dyn FnMut(&[(Atom, Atom)]) -> Result<(), PeleError>,
+        ) -> Result<(), PeleError> {
+            PublicGraphRead::map_entries(&self.graph, node, start, visit)
+        }
+        fn set_values(
+            &self,
+            node: usize,
+            start: usize,
+            visit: &mut dyn FnMut(&[Atom]) -> Result<(), PeleError>,
+        ) -> Result<(), PeleError> {
+            PublicGraphRead::set_values(&self.graph, node, start, visit)
+        }
+    }
+    let document = PublicEngine::with_builtins()
+        .parse(SOURCE, &Default::default())
+        .unwrap();
+    for _ in 0..2 {
+        document
+            .snapshot_read()
+            .unwrap()
+            .canonical_binary_size(0, DEFAULT_BINARY_BUDGET)
+            .unwrap();
+    }
+    let graph = document.snapshot().unwrap();
+    let mut invalid = graph.clone();
+    invalid.root = Atom::Ref(u32::MAX);
+    let expected = invalid.validate().unwrap_err();
+    assert_eq!(expected.code, ErrorCode::Semantic);
+    let forwarded = Forwarded { document, graph };
+    assert!(forwarded.trusted_read().is_some());
+    for _ in 0..2 {
+        assert_eq!(
+            GraphReadView::Logical(&forwarded)
+                .canonical_binary_size(0, DEFAULT_BINARY_BUDGET)
+                .unwrap_err(),
+            expected
+        );
+    }
 }

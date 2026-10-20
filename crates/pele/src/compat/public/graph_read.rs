@@ -7,6 +7,10 @@ use std::borrow::Cow;
 
 #[doc(hidden)]
 pub trait PublicGraphRead: Send {
+    #[doc(hidden)]
+    fn trusted_read(&self) -> Option<TrustedGraphRead<'_>> {
+        None
+    }
     fn source_layout(&self, _revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
         Ok(None)
     }
@@ -44,6 +48,134 @@ pub trait PublicGraphRead: Send {
         visit: &mut dyn FnMut(&[Atom]) -> Result<(), PeleError>,
     ) -> Result<(), PeleError>;
 }
+// Only crate-owned immutable readers can create this opaque capability. Public
+// providers may return it only for its exact reader; forwarding a capability
+// from a different graph never authorizes that graph's admission.
+#[doc(hidden)]
+pub struct TrustedGraphRead<'a> {
+    reader: &'a dyn PublicGraphRead,
+    state: &'a AdmissionState,
+    generation: Option<u64>,
+}
+// Implementors keep graph data immutable under &self. Every graph mutation,
+// including a partial failing operation, invalidates this owner-local state
+// before the first write. Schema objects are immutable static declarations.
+// Only receipt bookkeeping may use interior mutation through a read borrow.
+pub(crate) trait TrustedGraphOwner: PublicGraphRead {
+    fn admission_state(&self) -> &AdmissionState;
+}
+impl<'a> TrustedGraphRead<'a> {
+    pub(crate) fn new<T: TrustedGraphOwner>(owner: &'a T) -> Self {
+        Self {
+            reader: owner,
+            state: owner.admission_state(),
+            generation: owner.admission_state().generation.get(),
+        }
+    }
+    fn receipt(&self) -> Option<AdmissionReceipt> {
+        let generation = self.generation?;
+        if self.state.generation.get() != Some(generation) {
+            return None;
+        }
+        self.state
+            .receipt
+            .get()
+            .filter(|r| r.generation == generation)
+    }
+    fn record_structure(&self) {
+        if let Some(generation) = self.generation {
+            if self.state.generation.get() == Some(generation) && self.receipt().is_none() {
+                self.state.receipt.set(Some(AdmissionReceipt {
+                    generation,
+                    schema: None,
+                    canonical_bytes: None,
+                }));
+            }
+        }
+    }
+    fn record_schema(&self, schema: &'static super::ModelSchema) {
+        if let Some(mut receipt) = self.receipt() {
+            receipt.schema = Some(schema);
+            self.state.receipt.set(Some(receipt));
+        }
+    }
+    fn record_size(&self, bytes: usize) {
+        if let Some(mut receipt) = self.receipt() {
+            receipt.canonical_bytes = Some(bytes);
+            self.state.receipt.set(Some(receipt));
+        }
+    }
+}
+#[derive(Clone, Copy)]
+struct AdmissionReceipt {
+    generation: u64,
+    schema: Option<&'static super::ModelSchema>,
+    canonical_bytes: Option<usize>,
+}
+pub(crate) struct AdmissionState {
+    generation: std::cell::Cell<Option<u64>>,
+    receipt: std::cell::Cell<Option<AdmissionReceipt>>,
+}
+impl Default for AdmissionState {
+    fn default() -> Self {
+        Self {
+            generation: std::cell::Cell::new(Some(0)),
+            receipt: std::cell::Cell::new(None),
+        }
+    }
+}
+impl AdmissionState {
+    /// Call before changing any graph-owned data, including a partial write.
+    /// Exhaustion disables reuse forever rather than changing public errors.
+    pub(crate) fn invalidate(&mut self) {
+        self.receipt.set(None);
+        self.generation
+            .set(self.generation.get().and_then(|n| n.checked_add(1)));
+    }
+}
+fn trusted(reader: &dyn PublicGraphRead) -> Option<TrustedGraphRead<'_>> {
+    reader
+        .trusted_read()
+        .filter(|read| std::ptr::eq(read.reader, reader))
+}
+pub(crate) fn validate_structure(reader: &dyn PublicGraphRead) -> Result<(), PeleError> {
+    let proof = trusted(reader);
+    if proof.as_ref().and_then(TrustedGraphRead::receipt).is_some() {
+        return Ok(());
+    }
+    super::captured_admission::validate(&mut ReadAdapter(reader))?;
+    if let Some(proof) = proof {
+        proof.record_structure();
+    }
+    Ok(())
+}
+pub(crate) fn validate_schema(
+    reader: &dyn PublicGraphRead,
+    schema: &'static super::ModelSchema,
+    compiled: &super::schema::CompiledSchema,
+) -> Result<(), PeleError> {
+    // The caller obtains compiled at the old schema-validation boundary first.
+    validate_structure(reader)?;
+    let proof = trusted(reader);
+    if proof
+        .as_ref()
+        .and_then(TrustedGraphRead::receipt)
+        .and_then(|r| r.schema)
+        .is_some_and(|old| std::ptr::eq(old, schema))
+    {
+        return Ok(());
+    }
+    super::captured_admission::validate_schema_ids(
+        &mut ReadAdapter(reader),
+        compiled.methods(),
+        compiled.prototypes(),
+    )?;
+    if let Some(proof) = proof {
+        proof.record_schema(schema);
+    }
+    Ok(())
+}
+
 pub(crate) fn invalid() -> PeleError {
     PeleError::new("Invalid captured admission storage", ErrorCode::Semantic)
 }
@@ -158,12 +290,33 @@ impl<'a> GraphReadView<'a> {
         metadata_bytes: usize,
         budget: usize,
     ) -> Result<usize, PeleError> {
-        let mut read = ReadAdapter(self.reader());
-        super::captured_admission::validate(&mut read)?;
-        let total =
-            super::captured_transport::canonical_frame_bytes(&mut read, metadata_bytes, budget)?;
-        Ok(total - metadata_bytes)
+        let reader = self.reader();
+        validate_structure(reader)?;
+        let proof = trusted(reader);
+        if let Some(bytes) = proof
+            .as_ref()
+            .and_then(TrustedGraphRead::receipt)
+            .and_then(|r| r.canonical_bytes)
+        {
+            // Same canonical counter's u32 metadata field and combined bound.
+            // No output or host effect can occur between its individual puts.
+            u32::try_from(metadata_bytes).map_err(|_| super::binary::limit())?;
+            super::binary::check_bytes(0, bytes, budget)?;
+            super::binary::check_bytes(bytes, metadata_bytes, budget)?;
+            return Ok(bytes);
+        }
+        let total = super::captured_transport::canonical_frame_bytes(
+            &mut ReadAdapter(reader),
+            metadata_bytes,
+            budget,
+        )?;
+        let bytes = total - metadata_bytes;
+        if let Some(proof) = proof {
+            proof.record_size(bytes);
+        }
+        Ok(bytes)
     }
+
     pub fn reader(&self) -> &dyn PublicGraphRead {
         match self {
             Self::Arena(g) => g.as_ref(),

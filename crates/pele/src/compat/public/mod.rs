@@ -7,7 +7,7 @@ mod engine;
 mod graph;
 pub(crate) mod graph_read;
 #[doc(hidden)]
-pub use graph_read::{GraphReadView, PublicGraphRead};
+pub use graph_read::{GraphReadView, PublicGraphRead, TrustedGraphRead};
 #[doc(hidden)]
 pub use captured_admission::{Extent as GraphExtent, Header as GraphHeader, AdmissionKind as GraphNodeKind};
 mod initial_store;

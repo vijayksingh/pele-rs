@@ -27,6 +27,15 @@ partial failure. Accepted caller graphs retain only differences from the source;
 invalid render projections remain latent errors with the same repair behavior.
 First helper and first render never build a complete `ModelGraph`.
 
+Crate-owned logical readers can retain validator-issued admission receipts.
+The opaque capability identifies the exact reader and its owner generation;
+arbitrary providers keep their existing validation path. Structural admission,
+static schema identity and the authoritative canonical byte count are separate
+facts. Every actual mutation invalidates them before writing, including partial
+failures and graph adoption. Unchanged exports still check the current metadata
+length and combined byte budget. Standalone binary and FFI encoders retain their
+existing validation stages. Generation exhaustion disables reuse.
+
 Explicit APIs returning `ModelGraph` or `Cow<ModelGraph>` still materialize that
 representation at their original export stage. Additive `snapshot_read`,
 `invoke_read` and render read outcomes let binary/JSON adapters avoid that copy.
