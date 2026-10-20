@@ -281,7 +281,7 @@ pub unsafe extern "C" fn pele_public_render_native_v14(
                 let mut images = Resources::new(host, native);
                 let host: &mut dyn compat::RenderResources = &mut images;
                 let mut capture = PresentationCapture::new(host, budget);
-                let outcome = document.render_operation_bounded(
+                let outcome = document.render_operation_bounded_view(
                     expected_revision,
                     &options,
                     limit,

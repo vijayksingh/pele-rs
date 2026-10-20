@@ -936,6 +936,52 @@ pub struct RawRenderOutcome {
     pub graph: ModelGraph,
     pub result: Result<Rendered, PublicError>,
 }
+/// Validated post-render graph view. The graph stays borrowed only when the
+/// captured module supports borrowed export; extension fallback remains owned.
+#[derive(Debug)]
+pub struct RenderOutcomeView<'a> {
+    pub revision: u64,
+    pub graph: Cow<'a, ModelGraph>,
+    pub result: Result<RenderResult, PublicError>,
+}
+impl RenderOutcomeView<'_> {
+    fn into_owned(self) -> RenderOutcome {
+        RenderOutcome {
+            revision: self.revision,
+            graph: self.graph.into_owned(),
+            result: self.result,
+        }
+    }
+}
+/// Raw low-level render equivalent of RenderOutcomeView.
+#[derive(Debug)]
+pub struct RawRenderOutcomeView<'a> {
+    pub revision: u64,
+    pub graph: Cow<'a, ModelGraph>,
+    pub result: Result<Rendered, PublicError>,
+}
+impl RawRenderOutcomeView<'_> {
+    fn into_owned(self) -> RawRenderOutcome {
+        RawRenderOutcome {
+            revision: self.revision,
+            graph: self.graph.into_owned(),
+            result: self.result,
+        }
+    }
+}
+#[derive(Clone, Copy)]
+enum GraphExport {
+    Owned,
+    Borrowed,
+}
+impl GraphExport {
+    fn finish(self, graph: Cow<'_, ModelGraph>) -> Cow<'_, ModelGraph> {
+        match self {
+            Self::Owned => Cow::Owned(graph.into_owned()),
+            Self::Borrowed => graph,
+        }
+    }
+}
 /// One serialized mutable operation stream. This type is deliberately not Sync.
 pub struct PublicDocument {
     registration: Arc<Registration>,
@@ -1132,6 +1178,39 @@ impl PublicDocument {
         settings: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<RawRenderOutcome, PeleError> {
+        self.render_raw_operation_policy(
+            expected_revision,
+            config,
+            settings,
+            host,
+            GraphExport::Owned,
+        )
+        .map(RawRenderOutcomeView::into_owned)
+    }
+    /// Borrow the validated post-state without changing dispatch or revision order.
+    pub fn render_raw_operation_view(
+        &mut self,
+        expected_revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<RawRenderOutcomeView<'_>, PeleError> {
+        self.render_raw_operation_policy(
+            expected_revision,
+            config,
+            settings,
+            host,
+            GraphExport::Borrowed,
+        )
+    }
+    fn render_raw_operation_policy(
+        &mut self,
+        expected_revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+        export: GraphExport,
+    ) -> Result<RawRenderOutcomeView<'_>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
@@ -1160,8 +1239,8 @@ impl PublicDocument {
         )
         .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
         self.revision = next;
-        let graph = self.snapshot()?;
-        Ok(RawRenderOutcome {
+        let graph = export.finish(self.snapshot_view()?);
+        Ok(RawRenderOutcomeView {
             revision: next,
             graph,
             result,
@@ -1175,7 +1254,15 @@ impl PublicDocument {
         options: &RenderOptions,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, None, false)
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            None,
+            false,
+            GraphExport::Owned,
+        )
+        .map(RenderOutcomeView::into_owned)
     }
     /// Exact output comparison after rendering. Dispatched mutations/revision
     /// publish on limit and host errors, under the existing graph export budgets.
@@ -1186,7 +1273,15 @@ impl PublicDocument {
         limit: OutputLimit,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, Some(limit), true)
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            Some(limit),
+            true,
+            GraphExport::Owned,
+        )
+        .map(RenderOutcomeView::into_owned)
     }
     /// Additive native lane: bound returned SVG bytes even when the caller keeps
     /// legacy integer output semantics. Dispatched errors still publish state.
@@ -1197,7 +1292,66 @@ impl PublicDocument {
         output_limit: Option<OutputLimit>,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, output_limit, true)
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            output_limit,
+            true,
+            GraphExport::Owned,
+        )
+        .map(RenderOutcomeView::into_owned)
+    }
+    /// Legacy output policy with a validated borrowed post-state.
+    pub fn render_operation_view(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcomeView<'_>, PeleError> {
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            None,
+            false,
+            GraphExport::Borrowed,
+        )
+    }
+    /// Exact output policy with a validated borrowed post-state.
+    pub fn render_operation_with_output_limit_view(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        limit: OutputLimit,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcomeView<'_>, PeleError> {
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            Some(limit),
+            true,
+            GraphExport::Borrowed,
+        )
+    }
+    /// Bounded rendering with a validated borrowed post-state. Existing owned
+    /// APIs still materialize their graph before publishing presentation.
+    pub fn render_operation_bounded_view(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        output_limit: Option<OutputLimit>,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcomeView<'_>, PeleError> {
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            output_limit,
+            true,
+            GraphExport::Borrowed,
+        )
     }
     fn render_operation_policy(
         &mut self,
@@ -1206,7 +1360,8 @@ impl PublicDocument {
         host: &mut dyn RenderResources,
         limit: Option<OutputLimit>,
         enforce_native_bytes: bool,
-    ) -> Result<RenderOutcome, PeleError> {
+        export: GraphExport,
+    ) -> Result<RenderOutcomeView<'_>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
@@ -1251,9 +1406,11 @@ impl PublicDocument {
         )
         .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
         self.revision = next;
-        let graph = self.snapshot()?;
+        // The owned policy clones here, at the original snapshot stage. Its
+        // wrapper only moves that already owned graph after publication.
+        let graph = export.finish(self.snapshot_view()?);
         presentation.publish();
-        Ok(RenderOutcome {
+        Ok(RenderOutcomeView {
             revision: next,
             graph,
             result,

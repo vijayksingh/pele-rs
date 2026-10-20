@@ -242,4 +242,61 @@ impl MutableDocument {
         };
         run().map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))
     }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_numbers_operation_packet_with_functions(
+        &mut self,
+        revision: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        output_kind: u32,
+        output: f64,
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+        dispatcher: js_sys::Function,
+    ) -> Result<JsValue, JsValue> {
+        let run = || -> Result<JsValue, JsValue> {
+            let (options, limit) =
+                render_numbers::options(json, mask, numbers, output_kind, output)
+                    .map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))?;
+            let revision = revision.parse::<u64>().map_err(|_| {
+                JsValue::from_str(&render_numbers::failure(&invalid(
+                    "Invalid public model revision",
+                )))
+            })?;
+            let mut host = render_numbers::NumericResources {
+                browser: BrowserResources { width, icons },
+                clock,
+            };
+            let outcome = self
+                .inner
+                .render_operation_bounded_view(
+                    revision,
+                    &options,
+                    limit,
+                    &mut Resources {
+                        host: &mut host,
+                        dispatcher,
+                    },
+                )
+                .map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))?;
+            let transport = outcome
+                .result
+                .as_ref()
+                .map(pele::compat::render_result_transport);
+            super::render_packet::arena(
+                outcome.revision,
+                &outcome.graph,
+                false,
+                outcome
+                    .result
+                    .as_ref()
+                    .map_or("", |value| value.diagram_type.as_str()),
+                outcome.result.as_ref().ok().map(|value| &value.rendered),
+                &transport,
+            )
+        };
+        run()
+    }
 }

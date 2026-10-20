@@ -10,6 +10,7 @@ mod schema;
 pub use engine::HostErEntrySelection;
 pub use engine::{
     ParsedPublicModel, PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome,
+    RawRenderOutcomeView, RenderOutcomeView,
 };
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 

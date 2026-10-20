@@ -302,6 +302,68 @@ impl MutableDocument {
         };
         run().map_err(failure)
     }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_raw_operation_packet_with_functions(
+        &mut self,
+        revision: &str,
+        config_json: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+        inline_icons: Option<js_sys::Function>,
+        dispatcher: Option<js_sys::Function>,
+    ) -> Result<JsValue, JsValue> {
+        let run = || -> Result<JsValue, JsValue> {
+            let config = config(config_json).map_err(failure)?;
+            // Raw entries have no core output policy. JS removes parse-only
+            // fields before decoding; numeric render fields retain raw f64.
+            let (options, _) =
+                super::render_numbers::options(json, mask, numbers, 3, 0.).map_err(failure)?;
+            let revision = revision
+                .parse::<u64>()
+                .map_err(|_| failure(invalid("Invalid public model revision")))?;
+            let mut host = RawResources {
+                resources: super::render_numbers::NumericResources {
+                    browser: super::BrowserResources { width, icons },
+                    clock,
+                },
+                inline: super::BrowserResources {
+                    width: None,
+                    icons: inline_icons,
+                },
+            };
+            let outcome = match dispatcher {
+                Some(dispatcher) => self
+                    .inner
+                    .render_raw_operation_view(
+                        revision,
+                        &config,
+                        &options.render,
+                        &mut super::host_functions::Resources {
+                            host: &mut host,
+                            dispatcher,
+                        },
+                    )
+                    .map_err(failure)?,
+                None => self
+                    .inner
+                    .render_raw_operation_view(revision, &config, &options.render, &mut host)
+                    .map_err(failure)?,
+            };
+            super::render_packet::arena(
+                outcome.revision,
+                &outcome.graph,
+                true,
+                "",
+                outcome.result.as_ref().ok(),
+                &outcome.result.as_ref().map(transport),
+            )
+        };
+        run()
+    }
 }
 
 pub(super) struct RawResources {

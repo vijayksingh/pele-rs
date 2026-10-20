@@ -31,3 +31,6 @@ field/property vectors from fresh ER records through a defaulted construction si
 array event while retaining canonical index strings, budgets and native defaults.
 [Source result transport](LLD_SOURCE_RESULT_PACKET.md) shares a borrowed success
 packet across diagram families while preserving legacy envelopes and exports.
+[Arena render outcomes](LLD_ARENA_RENDER_PACKET.md) borrow post-render graphs for
+binary consumers and return browser success results directly while retaining
+full graph publication and exact combined transport limits.

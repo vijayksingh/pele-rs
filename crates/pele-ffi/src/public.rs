@@ -641,7 +641,7 @@ pub unsafe extern "C" fn pele_public_render_operation_binary_v5(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             calendar::with_resources(resources, |host| {
-                document.render_operation(expected_revision, &options, host)
+                document.render_operation_view(expected_revision, &options, host)
             })
         }?;
         let metadata = serde_json::to_vec(
@@ -684,7 +684,7 @@ pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             calendar::with_resources(resources, |host| {
-                document.render_operation_with_output_limit(
+                document.render_operation_with_output_limit_view(
                     expected_revision,
                     &options,
                     limit,
@@ -697,7 +697,7 @@ pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
 }
 
 pub(super) fn render_outcome(
-    outcome: &pele::compat::public::RenderOutcome,
+    outcome: &pele::compat::public::RenderOutcomeView<'_>,
 ) -> Result<PeleResult, PeleError> {
     binary_metadata(
         outcome.revision,
@@ -746,7 +746,7 @@ pub unsafe extern "C" fn pele_public_render_operation_with_numbers_v9(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             super::host_functions::with_resources(handle, resources, |host| {
-                document.render_operation_bounded(expected_revision, &options, limit, host)
+                document.render_operation_bounded_view(expected_revision, &options, limit, host)
             })
         }?;
         render_outcome(&outcome)

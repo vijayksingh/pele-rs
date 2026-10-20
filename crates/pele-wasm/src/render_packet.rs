@@ -60,3 +60,50 @@ pub(super) fn emit(
         prepared.metadata_bytes as u32,
     )
 }
+
+/// Full arena publication with a direct success result. Error outcomes retain
+/// the exact legacy binary metadata format. No operation is replayed.
+pub(super) fn arena(
+    revision: u64,
+    graph: &pele::compat::public::ModelGraph,
+    raw: bool,
+    diagram_type: &str,
+    rendered: Option<&Rendered>,
+    transport: &impl Serialize,
+) -> Result<JsValue, JsValue> {
+    use pele::compat::public::{encode_binary_exchange, DEFAULT_BINARY_BUDGET};
+    let failure = |error: PeleError| JsValue::from_str(&super::render_numbers::failure(&error));
+    let Some(rendered) = rendered else {
+        let metadata = super::render_numbers::encode(transport).map_err(failure)?;
+        let bytes = encode_binary_exchange(revision, graph, &metadata, DEFAULT_BINARY_BUDGET)
+            .map_err(failure)?;
+        return Ok(js_sys::Uint8Array::from(bytes.as_slice()).into());
+    };
+    let prepared = prepare(rendered, transport).map_err(failure)?;
+    let metadata_bytes = prepared.metadata_bytes;
+    // The existing metadata count prefix is always u32: changing its value to
+    // zero leaves the frame header width unchanged. Subtracting the counted
+    // legacy metadata admits exactly the old combined graph+metadata size.
+    // encode_binary_exchange still validates the graph before any byte writes.
+    let bytes =
+        encode_binary_exchange(revision, graph, &[], DEFAULT_BINARY_BUDGET - metadata_bytes)
+            .map_err(failure)?;
+    let graph_bytes = js_sys::Uint8Array::from(bytes.as_slice());
+    let packet = js_sys::Array::new();
+    packet.push(&JsValue::from_f64(1.));
+    packet.push(&JsValue::from_f64(metadata_bytes as f64));
+    packet.push(&graph_bytes);
+    match emit(raw, diagram_type, rendered, prepared) {
+        Ok(value) => {
+            packet.push(&JsValue::from_f64(0.));
+            packet.push(&value);
+        }
+        Err(error) => {
+            // The render committed and the complete graph was admitted. Carry
+            // a factory throw without losing publication or its JS identity.
+            packet.push(&JsValue::from_f64(1.));
+            packet.push(&error);
+        }
+    }
+    Ok(packet.into())
+}

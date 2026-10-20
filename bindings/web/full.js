@@ -57,6 +57,29 @@ function binaryResult(call) {
   try {const exchange=decodeGraphBinary(call());return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
   catch(error){if(typeof error==='string')return result(error);throw error;}
 }
+// Additive retained render packet. Every outcome still carries the full graph.
+// Decode/admit both pieces before publication; original callback errors remain
+// the facade's highest-priority failure after committed graph restoration.
+function arenaRenderResult(call,revision,raw,type) {
+  try {
+    const response=call();
+    if(response instanceof Uint8Array){const exchange=decodeGraphBinary(response);return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
+    const invalid=()=>{throw new TypeError('Invalid arena render packet');};
+    if(!Array.isArray(response)||response.length!==5||response[0]!==1||!Number.isSafeInteger(response[1])||response[1]<0||response[1]>64*1024*1024||!(response[2] instanceof Uint8Array)||(response[3]!==0&&response[3]!==1))invalid();
+    const bytes=response[2],metadataBytes=response[1];
+    if(bytes.length+metadataBytes>64*1024*1024)invalid();
+    const exchange=decodeGraphBinary(bytes);
+    if(new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength).getUint32(20,true)!==0||BigInt(exchange.revision)!==BigInt(revision)+1n)invalid();
+    const outcome={revision:exchange.revision,graph:exchange.graph};
+    if(response[3]===1){outcome.factoryError=response[4];return outcome;}
+    const packet=response[4];
+    if(!Array.isArray(packet)||packet.length!==3||packet[0]!==1||packet[1]!==metadataBytes)invalid();
+    const value=packet[2],keys=raw?['svg','width','height','links']:['type','svg','width','height','links'],actual=value&&Object.keys(value);
+    if(!value||Object.getPrototypeOf(value)!==Object.prototype||actual.length!==keys.length||!keys.every((key,index)=>actual[index]===key)||typeof value.svg!=='string'||typeof value.width!=='number'||typeof value.height!=='number'||!Array.isArray(value.links)||(!raw&&value.type!==type))invalid();
+    for(const link of value.links){const keys=link&&Object.keys(link);if(!link||Object.getPrototypeOf(link)!==Object.prototype||keys.length!==3||keys[0]!=='id'||keys[1]!=='href'||keys[2]!=='internal'||typeof link.id!=='string'||typeof link.href!=='string'||typeof link.internal!=='boolean')invalid();}
+    outcome.result={Ok:value};return outcome;
+  }catch(error){if(typeof error==='string')return result(error);throw error;}
+}
 // Only these pinned renderers pass the mono family into defaultMeasurer.
 function builtinMeasurer(options,type) {
   return defaultMeasurer(options.fontFamily,
@@ -154,6 +177,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     entry.revision = outcome.revision;
     entry.bridge.reconcile(outcome.graph);
     entry.confirmedGraph = true;
+    if(Object.hasOwn(outcome,'factoryError'))throw outcome.factoryError;
   }
   function foreignParse(source, options) {
     syncProviders();
@@ -354,7 +378,11 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       const numeric=renderNumericOptions({...options,limit:undefined,maxEdges:undefined,config:undefined,outputLimit:undefined,nativeTheme:undefined});
       try {
         prepareMutableInput(entry);
-        const outcome=binaryResult(()=>entry.handle.render_raw_operation_binary_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,modelHostFunctions(entry.bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;})));
+        const dispatcher=modelHostFunctions(entry.bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;});
+        const packet=entry.handle.render_raw_operation_packet_with_functions;
+        const outcome=typeof packet==='function'
+          ?arenaRenderResult(()=>packet.call(entry.handle,entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.revision,true,entry.rawType)
+          :binaryResult(()=>entry.handle.render_raw_operation_binary_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher));
         publishMutableOutcome(entry, outcome);
         if(callbackFailed)throw callbackError;
         if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,entry.bridge);
@@ -517,7 +545,11 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             bridge=document.bridge;
             operation=nativeModelCall(document,()=>{
               prepareMutableInput(document);
-              const outcome=binaryResult(()=>document.handle.render_numbers_operation_binary_with_functions(document.revision,...numericArguments,modelHostFunctions(bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;})));
+              const dispatcher=modelHostFunctions(bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;});
+              const packet=document.handle.render_numbers_operation_packet_with_functions;
+              const outcome=typeof packet==='function'
+                ?arenaRenderResult(()=>packet.call(document.handle,document.revision,...numericArguments,dispatcher),document.revision,false,document.rawType)
+                :binaryResult(()=>document.handle.render_numbers_operation_binary_with_functions(document.revision,...numericArguments,dispatcher));
               publishMutableOutcome(document, outcome);return outcome.result;
             });
           } else json = document.handle.render_numbers_with_resources(...numericArguments);
