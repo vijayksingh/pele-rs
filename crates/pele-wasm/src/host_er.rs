@@ -18,6 +18,18 @@ use wasm_bindgen::prelude::*;
 // packed package/pkg resolve the same sibling host-er-store.js.
 #[wasm_bindgen(raw_module = "../host-er-store.js")]
 extern "C" {
+    #[wasm_bindgen(catch, js_name = hostErRenderResult)]
+    fn render_result_packet(
+        raw: bool,
+        diagram_type: &str,
+        svg: &str,
+        width_low: u32,
+        width_high: u32,
+        height_low: u32,
+        height_high: u32,
+        links: &str,
+        metadata_bytes: u32,
+    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(catch, js_name = hostErReadOwn)]
     fn read_own(context: &JsValue, object: u32, key: &JsValue) -> Result<f64, JsValue>;
     #[wasm_bindgen(catch, js_name = hostErReadOwnCount)]
@@ -1109,6 +1121,141 @@ impl HostErDocument {
         icons: Option<Function>,
         clock: Option<Function>,
     ) -> Result<String, JsValue> {
+        let result = self.render_host_body(
+            primitive,
+            capture,
+            finish,
+            json,
+            mask,
+            numbers,
+            output_kind,
+            output,
+            width,
+            icons,
+            clock,
+        )?;
+        metadata(&result.as_ref().map(pele::compat::render_result_transport))
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_host_packet(
+        &self,
+        primitive: Function,
+        capture: Function,
+        finish: Function,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        output_kind: u32,
+        output: f64,
+        width: Option<Function>,
+        icons: Option<Function>,
+        clock: Option<Function>,
+    ) -> Result<JsValue, JsValue> {
+        let result = self.render_host_body(
+            primitive,
+            capture,
+            finish,
+            json,
+            mask,
+            numbers,
+            output_kind,
+            output,
+            width,
+            icons,
+            clock,
+        )?;
+        let transport = result.as_ref().map(pele::compat::render_result_transport);
+        match &result {
+            Ok(value) => successful_packet(
+                false,
+                value.diagram_type.as_str(),
+                &value.rendered,
+                &transport,
+            ),
+            Err(_) => metadata(&transport).map(JsValue::from),
+        }
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_raw_host(
+        &self,
+        primitive: Function,
+        capture: Function,
+        finish: Function,
+        config_json: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        width: Option<Function>,
+        icons: Option<Function>,
+        clock: Option<Function>,
+        inline: Option<Function>,
+    ) -> Result<String, JsValue> {
+        let result = self.render_raw_host_body(
+            primitive,
+            capture,
+            finish,
+            config_json,
+            json,
+            mask,
+            numbers,
+            width,
+            icons,
+            clock,
+            inline,
+        )?;
+        metadata(&result.as_ref().map(super::prepared_entries::transport))
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_raw_host_packet(
+        &self,
+        primitive: Function,
+        capture: Function,
+        finish: Function,
+        config_json: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        width: Option<Function>,
+        icons: Option<Function>,
+        clock: Option<Function>,
+        inline: Option<Function>,
+    ) -> Result<JsValue, JsValue> {
+        let result = self.render_raw_host_body(
+            primitive,
+            capture,
+            finish,
+            config_json,
+            json,
+            mask,
+            numbers,
+            width,
+            icons,
+            clock,
+            inline,
+        )?;
+        let transport = result.as_ref().map(super::prepared_entries::transport);
+        match &result {
+            Ok(value) => successful_packet(true, "", value, &transport),
+            Err(_) => metadata(&transport).map(JsValue::from),
+        }
+    }
+}
+impl HostErDocument {
+    #[allow(clippy::too_many_arguments)]
+    fn render_host_body(
+        &self,
+        primitive: Function,
+        capture: Function,
+        finish: Function,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        output_kind: u32,
+        output: f64,
+        width: Option<Function>,
+        icons: Option<Function>,
+        clock: Option<Function>,
+    ) -> Result<Result<pele::compat::RenderResult, PublicError>, JsValue> {
         let (options, limit) =
             super::render_numbers::options(json, mask, numbers, output_kind, output)
                 .map_err(native_failure)?;
@@ -1127,10 +1274,10 @@ impl HostErDocument {
         })()
         .map_err(PublicError::Pele);
         finish.call0(&JsValue::UNDEFINED)?;
-        metadata(&result.as_ref().map(pele::compat::render_result_transport))
+        Ok(result)
     }
     #[allow(clippy::too_many_arguments)]
-    pub fn render_raw_host(
+    fn render_raw_host_body(
         &self,
         primitive: Function,
         capture: Function,
@@ -1143,7 +1290,7 @@ impl HostErDocument {
         icons: Option<Function>,
         clock: Option<Function>,
         inline: Option<Function>,
-    ) -> Result<String, JsValue> {
+    ) -> Result<Result<pele::compat::Rendered, PublicError>, JsValue> {
         let config = super::prepared_entries::config(config_json).map_err(native_failure)?;
         let (options, _) =
             super::render_numbers::options(json, mask, numbers, 3, 0.).map_err(native_failure)?;
@@ -1159,13 +1306,36 @@ impl HostErDocument {
         })()
         .map_err(PublicError::Pele);
         finish.call0(&JsValue::UNDEFINED)?;
-        metadata(
-            &result
-                .as_ref()
-                .map(|value| super::prepared_entries::transport(value)),
-        )
+        Ok(result)
     }
 }
+fn successful_packet(
+    raw: bool,
+    diagram_type: &str,
+    rendered: &pele::compat::Rendered,
+    transport: &impl serde::Serialize,
+) -> Result<JsValue, JsValue> {
+    // Audit already finished. Count the exact legacy envelope, including any
+    // $numbers fields, before allocating the smaller links payload or JS result.
+    let metadata_bytes =
+        super::render_numbers::encoded_length(transport).map_err(native_failure)?;
+    let links = super::render_numbers::encode(&rendered.links).map_err(native_failure)?;
+    let links = std::str::from_utf8(&links).expect("JSON UTF8");
+    let width = rendered.width.to_bits();
+    let height = rendered.height.to_bits();
+    render_result_packet(
+        raw,
+        diagram_type,
+        &rendered.svg,
+        width as u32,
+        (width >> 32) as u32,
+        height as u32,
+        (height >> 32) as u32,
+        links,
+        metadata_bytes as u32,
+    )
+}
+
 fn native_failure(error: PeleError) -> JsValue {
     JsValue::from_str(&super::render_numbers::failure(&error))
 }

@@ -231,6 +231,25 @@ pub(super) fn encode(value: &impl Serialize) -> Result<Vec<u8>, PeleError> {
     serde_json::to_writer(&mut output, value).map_err(|_| budget())?;
     Ok(output.0)
 }
+// Same serializer and write boundary as encode, without retaining output bytes.
+struct Counted(usize);
+impl Write for Counted {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        if bytes.len() > JSON_BYTES - self.0 {
+            return Err(std::io::Error::other("browser numeric output budget"));
+        }
+        self.0 += bytes.len();
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+pub(super) fn encoded_length(value: &impl Serialize) -> Result<usize, PeleError> {
+    let mut output = Counted(0);
+    serde_json::to_writer(&mut output, value).map_err(|_| budget())?;
+    Ok(output.0)
+}
 pub(super) fn failure(error: &PeleError) -> String {
     #[derive(Serialize)]
     struct Envelope<'a> {

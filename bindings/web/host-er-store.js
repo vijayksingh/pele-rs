@@ -5,6 +5,17 @@ const diagnostics=new Set(['stack','fileName','lineNumber','columnNumber','sourc
 const bits=new DataView(new ArrayBuffer(8));
 const numberBits=n=>{bits.setFloat64(0,n);return bits.getBigUint64(0).toString(16).padStart(16,'0');};
 const numberValue=n=>{bits.setBigUint64(0,BigInt('0x'+n));return bits.getFloat64(0);};
+// Private successful render transport. The byte count is the exact legacy
+// JSON envelope size, validated by Rust before this factory is called.
+export function hostErRenderResult(raw,type,svg,widthLow,widthHigh,heightLow,heightHigh,linksJSON,metadataBytes){
+  const links=JSON.parse(linksJSON);
+  // Match legacy parsed placeholders, then assign reconstructed dimensions.
+  // Keeping dimensions out of a numeric array avoids NaN array canonicalization.
+  const value=raw?{svg,width:null,height:null,links}:{type,svg,width:null,height:null,links};
+  bits.setUint32(0,widthLow,true);bits.setUint32(4,widthHigh,true);value.width=bits.getFloat64(0,true);
+  bits.setUint32(0,heightLow,true);bits.setUint32(4,heightHigh,true);value.height=bits.getFloat64(0,true);
+  return [1,metadataBytes,value];
+}
 const errorKind=value=>{const proto=Object.getPrototypeOf(value);return Object.keys(constructors).find(key=>proto===constructors[key].prototype);};
 const graphBudget=()=>{throw new RangeError('Public model graph exceeds host exchange budget');};
 const frameBudget=()=>{throw new PeleError('Public binary graph exceeds transport budget','limit');};

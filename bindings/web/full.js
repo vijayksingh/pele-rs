@@ -171,12 +171,24 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   }
   function hostOperation(entry,kind,values,call) {
     const owner=entry.hostStore,token=owner.begin(kind,values);
-    let original,failed=false,outcome,error,thrown=false,json;
+    let original,failed=false,outcome,error,thrown=false,json,packetBytes;
     const capture=value=>{if(!failed){failed=true;original=value;}};
     const resource=fn=>fn&&((...args)=>owner.resource(()=>{try{return fn(...args);}catch(value){capture(value);throw value;}}));
-    try {json=call(owner.primitive.bind(owner),capture,()=>owner.structure(token),resource,token.audit.args);outcome=JSON.parse(json);if(kind==='method'&&outcome&&Object.hasOwn(outcome,'Ok'))outcome.Ok=nativeAtomValue(owner,outcome.Ok);}
+    try {
+      const response=call(owner.primitive.bind(owner),capture,()=>owner.structure(token),resource,token.audit.args);
+      if(typeof response==='string'){
+        json=response;outcome=JSON.parse(json);
+        if(kind==='method'&&outcome&&Object.hasOwn(outcome,'Ok'))outcome.Ok=nativeAtomValue(owner,outcome.Ok);
+      }else{
+        if(kind==='method'||!Array.isArray(response)||response.length!==3||response[0]!==1||!Number.isSafeInteger(response[1])||response[1]<0||response[1]>64*1024*1024)throw new TypeError('Invalid host render packet');
+        const value=response[2],keys=kind==='raw'?['svg','width','height','links']:['type','svg','width','height','links'],actualKeys=value&&Object.keys(value);
+        if(!value||Object.getPrototypeOf(value)!==Object.prototype||actualKeys.length!==keys.length||!keys.every((key,index)=>actualKeys[index]===key)||typeof value.svg!=='string'||typeof value.width!=='number'||typeof value.height!=='number'||!Array.isArray(value.links)||(kind!=='raw'&&value.type!=='er'))throw new TypeError('Invalid host render packet');
+        for(const link of value.links)if(!link||Object.getPrototypeOf(link)!==Object.prototype||Object.keys(link).length!==3||typeof link.id!=='string'||typeof link.href!=='string'||typeof link.internal!=='boolean')throw new TypeError('Invalid host render packet');
+        packetBytes=response[1];outcome={Ok:value};
+      }
+    }
     catch(value){thrown=true;error=value;}
-    try {owner.finish(token,json===undefined?0:new TextEncoder().encode(json).length);}catch(value){if(!thrown){thrown=true;error=value;}}
+    try {owner.finish(token,packetBytes??(json===undefined?0:new TextEncoder().encode(json).length));}catch(value){if(!thrown){thrown=true;error=value;}}
     if(failed)throw original;
     if(thrown){if(typeof error==='string')return result(error);throw error;}
     if(!outcome||Object.hasOwn(outcome,'Ok')===Object.hasOwn(outcome,'Err'))throw new TypeError('Invalid host operation outcome');
@@ -312,7 +324,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         if(entry.rawType!==type)throw new TypeError('Raw diagram render requires a model of this diagram');
         const measurer=options.measurer??builtinMeasurer(options,type),inherited=builtinInlineIcons();
         const numeric=renderNumericOptions({...options,limit:undefined,maxEdges:undefined,config:undefined,outputLimit:undefined,nativeTheme:undefined});
-        return renderedValue(hostOperation(entry,'raw',[],(primitive,capture,finish,resource)=>entry.handle.render_raw_host(primitive,capture,finish,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,resource((text,size,style)=>measurer.width(text,size,style)),resource(options.icons),resource(()=>Date.now()),resource(inherited))));
+        return renderedValue(hostOperation(entry,'raw',[],(primitive,capture,finish,resource)=>(entry.handle.render_raw_host_packet??entry.handle.render_raw_host).call(entry.handle,primitive,capture,finish,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,resource((text,size,style)=>measurer.width(text,size,style)),resource(options.icons),resource(()=>Date.now()),resource(inherited))));
       }
       if(!entry?.bridge||entry.rawType!==type)throw new TypeError('Raw diagram render requires a model of this diagram');
       if(entry.disposed)throw new TypeError('Public model document is disposed');
@@ -481,7 +493,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           const document = documents.get(input);
           if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
           if(document.hostStore){
-            const value=hostOperation(document,'render',[],(primitive,capture,finish,resource)=>document.handle.render_host(primitive,capture,finish,numeric.json,numeric.mask,numeric.numbers,numeric.outputKind,numeric.output,resource(width),resource(icons),resource(clock)));
+            const value=hostOperation(document,'render',[],(primitive,capture,finish,resource)=>(document.handle.render_host_packet??document.handle.render_host).call(document.handle,primitive,capture,finish,numeric.json,numeric.mask,numeric.numbers,numeric.outputKind,numeric.output,resource(width),resource(icons),resource(clock)));
             if(callbackFailed)throw callbackError;return renderedValue(value);
           }
           if (document.bridge) {

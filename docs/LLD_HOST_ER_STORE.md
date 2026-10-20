@@ -106,6 +106,28 @@ slot. Temporary observed handles survive until the outer operation ends, even
 when nested admission promotes the underlying object. Active disposal remains
 rejected. The policy contains no permanent JS root and no core Send weakening.
 
+## Successful result transport
+
+Additive browser-only render endpoints transfer successful SVG, dimension bits
+and links directly. The same serde serializer counts the complete legacy JSON
+Result envelope with its original 64 MiB write cutoff, including numeric
+sidecars. Final structural audit still precedes counting; final graph-plus-
+metadata admission still follows the response. Errors and old exported JSON
+methods retain their existing transport. Native and Swift are unchanged.
+
+One host factory reconstructs dimensions from four u32 halves and creates the
+same public key order. The facade uses the exact counted metadata length rather
+than JSON-parsing and UTF8-encoding the complete SVG again. It retains old-WASM
+feature fallback. No model read, callback phase or renderer algorithm changes.
+Counting still scans and escapes output; fewer buffers are not a speed claim.
+
+Differential browser checks cover ordinary/prepared/raw/caller roots, exact
+metadata lengths, public shape, computed numeric bits, Unicode, nested callbacks,
+original throws, audit precedence and repair. Bounded accessibility strings
+exercise both the standalone envelope ceiling and a successful native response
+rejected by combined graph-plus-metadata admission. Nonempty ER links remain
+unreachable through the current renderer and are not claimed as tested here.
+
 ## Live read schedule
 
 - Select the horizontal wrapper before the first drawing callback.
