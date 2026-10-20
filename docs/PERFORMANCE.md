@@ -7,22 +7,22 @@ run locally on macOS because the VM cannot supply the macOS/AppKit SDK.
 No release, language choice or GPU availability implies otherwise. The target of
 matching or beating Pele JS remains open. Measured results, raw samples, artifact
 hashes, reproduction steps and unshipped compiler/schema experiments are in the
-[current direct ER report](benchmarks/2026-10-20-direct-er/README.md).
+[current ER token ownership report](benchmarks/2026-10-20-er-token-ownership/README.md).
 The latest complete gate still fails all 126 measured conditions. Source,
-parse and retained medians across the matrix are 2.40×, 10.94× and 4.03× JS.
+parse and retained medians across the matrix are 2.38×, 11.06× and 4.02× JS.
 Earlier direct Gantt construction improves scoped parse costs; current normalized
 projection improves Swift Gantt parse. VM diagnostics remain mixed, with control
 slowdowns disclosed. No 0.3 release.
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| Flowchart | 1.358 ms | 2.404 ms | 1.77× |
-| Sequence | 0.511 ms | 1.010 ms | 1.98× |
-| Er | 2.811 ms | 6.272 ms | 2.23× |
-| Pie | 0.277 ms | 0.628 ms | 2.27× |
-| Sankey | 0.858 ms | 1.510 ms | 1.76× |
-| Gantt | 0.689 ms | 2.506 ms | 3.64× |
-| Railroad | 0.771 ms | 1.845 ms | 2.39× |
+| Flowchart | 1.386 ms | 2.485 ms | 1.79× |
+| Sequence | 0.523 ms | 1.031 ms | 1.97× |
+| Er | 2.826 ms | 6.177 ms | 2.19× |
+| Pie | 0.279 ms | 0.617 ms | 2.21× |
+| Sankey | 0.864 ms | 1.485 ms | 1.72× |
+| Gantt | 0.713 ms | 2.554 ms | 3.58× |
+| Railroad | 0.765 ms | 1.856 ms | 2.42× |
 
 The [earlier eager Swift checkpoint](benchmarks/2026-10-20-swift-eager/README.md)
 compares frozen Rust-backed Swift executables on this Mac. Sequence-small parse
@@ -67,6 +67,16 @@ parse paired improvements range 0.856–7.354%; first-use results remain mixed,
 including +41.167% ER-medium Canvas first-invoke. All 126 complete gate conditions
 still fail. The resource-callback model mutation mismatch is separately
 reproduced and remains a correctness/release blocker.
+
+The [ER token ownership layer](benchmarks/2026-10-20-er-token-ownership/README.md)
+retains source slices in lexer tokens and owns text only when the grammar needs
+it. Against the direct-ER checkpoint, ER-medium core parse improves 13.180%
+paired (15/15 faster), native public parse 7.567% (13/15), and Swift mutable parse
+7.595% (15/15). Typed/public parse request 810 fewer allocations. Native retained
+and other-family controls include slowdowns. Five VM ER parse conditions improve,
+but large Canvas parse is +45.218% paired (9/21 faster); first use remains mixed.
+The new complete matrix still fails 126/126. Callback state and nested-render
+failures are separately reproduced and remain open. No 0.3 release.
 
 [Rejected parse candidates](benchmarks/2026-10-20-parse-candidates/README.md)
 retain raw first-use and live-heap evidence. Lower map count and alternate string

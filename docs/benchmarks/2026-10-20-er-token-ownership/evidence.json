@@ -1,0 +1,39 @@
+{
+  "kind": "Source-derived arithmetic only; no tokenizer/parser/consumer execution",
+  "baseCommit": "cbd629049b413631c32f2460dcc312b6bf725f70",
+  "sourceHashes": {
+    "crates/pele/src/compat/diagrams/er/lexer.rs": "fd0b5d6930bd4f9376eecb472377c71771125492eec0d1fe26b7c23e45fb2791",
+    "crates/pele/src/compat/diagrams/er/parser.rs": "3d750d91adbef70e83929b391dcaa48d452c255030c63c104085eea090143441",
+    "scripts/perf/cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58"
+  },
+  "counts": [
+    {
+      "entities": 8,
+      "nonemptyEmittedTokens": 129,
+      "ownedTakeTokens": 77,
+      "ownedTakeUTF8Bytes": 232,
+      "removedSkippedPayloadAllocationsSourceCount": 52,
+      "removedSkippedPayloadUTF8Bytes": 73,
+      "emptySentinels": 2
+    },
+    {
+      "entities": 48,
+      "nonemptyEmittedTokens": 809,
+      "ownedTakeTokens": 477,
+      "ownedTakeUTF8Bytes": 1505,
+      "removedSkippedPayloadAllocationsSourceCount": 332,
+      "removedSkippedPayloadUTF8Bytes": 473,
+      "emptySentinels": 2
+    },
+    {
+      "entities": 200,
+      "nonemptyEmittedTokens": 3393,
+      "ownedTakeTokens": 1997,
+      "ownedTakeUTF8Bytes": 6668,
+      "removedSkippedPayloadAllocationsSourceCount": 1396,
+      "removedSkippedPayloadUTF8Bytes": 1993,
+      "emptySentinels": 2
+    }
+  ],
+  "derivation": "n >= 2: header 1; 8 tokens/entity; 7 tokens/relation; 2n-1 NEWLINE tokens. Nonempty total17n-7; take10n-3; skipped7n-4. Skipped payload bytes (2n-1)newlines +2n braces +6(n-1) cardinality/operator bytes =10n-7. EOF and END empty. Unlike clone-to-move, taken token payload allocations remain one each, now at take rather than emit. These are logical nonempty String materializations, not measured allocator calls."
+}

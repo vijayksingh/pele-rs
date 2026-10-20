@@ -1,0 +1,28 @@
+{
+  "baseCommit": "cbd629049b413631c32f2460dcc312b6bf725f70",
+  "scope": "Private two-file ER token representation candidate; no builds/tests/runtime execution",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/er/lexer.rs",
+      "originalSha256": "fd0b5d6930bd4f9376eecb472377c71771125492eec0d1fe26b7c23e45fb2791",
+      "candidateSha256": "674ce8c3b824923285fee3a86bd209e5fb8af69b2b1eba05877f50cb0cc68fa5"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/er/parser.rs",
+      "originalSha256": "3d750d91adbef70e83929b391dcaa48d452c255030c63c104085eea090143441",
+      "candidateSha256": "f371415bfb92a55109551c0b190c3e7cfd736af90721ee1f8c3b78402e059d85"
+    }
+  ],
+  "patchSha256": "90d19b51f6e22092dfbe7d0f6ee966cad9f68ba49872a3f7938749bb541810c1",
+  "evidenceSha256": "52401661723cb5f8f76a9c7a7227b72b4f5a829c612091a9a215e77af0844862",
+  "documentationSha256": {
+    "LLD.md": "936e602b98038d35fa9a3d01ea9b99d777fcb00a0aefffbea1541e861ae97428",
+    "REVIEW.md": "3aaafbb81d10b03654e696f0c44eb42cb2e48d50075107589eee2eb194574e6f"
+  },
+  "validation": {
+    "patchApplyCheck": "passed against current cbd source",
+    "compile": "not run",
+    "tests": "not run",
+    "runtime": "not run"
+  }
+}
