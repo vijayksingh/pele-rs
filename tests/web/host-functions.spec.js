@@ -1,6 +1,42 @@
 import {test,expect} from '@playwright/test';
 const source='gantt\ndateFormat YYYY-MM-DD\nsection S\nA:a,2024-01-01,1d\nB:b,after a,2d';
 
+test('Gantt host-edited task records grow, shrink and recover during native delegation',async({page})=>{
+ await page.goto('/examples/web/');
+ const result=await page.evaluate(async(source)=>{
+  const {loadRenderer}=await import('/dist/package-web/package/full.js');
+  const oracle=await import('/dist/evidence/pele-oracle.js'),native=await loadRenderer();
+  function exercise(api){
+   const model=api.parse(source),original=model.getTasks,checks=[];
+   model.getTasks=function(now){
+    const tasks=original.call(this,now),first=tasks[0];
+    for(let index=0;index<40;index++)first[`extension${index}`]=index;
+    first.task='Expanded task';
+    this.setClass('a','expanded');
+    checks.push(original.call(this,now)===tasks,first.task==='Expanded task');
+    for(let index=0;index<40;index++){
+     checks.push(first[`extension${index}`]===index);
+     delete first[`extension${index}`];
+    }
+    first.task='Restored task';
+    this.setClass('a','restored');
+    checks.push(original.call(this,now)===tasks,first.task==='Restored task');
+    checks.push(first.endTime===tasks[1].startTime);
+    return tasks;
+   };
+   try{
+    const drawings=Array.from({length:2},()=>api.render(model,{
+     now:1704067200000,measurer:{width:(text,size)=>text.length*size*.6},
+    }));
+    return{drawings,checks,keys:Object.keys(model.tasks[0]),classes:[...model.tasks[0].classes]};
+   }finally{api.dispose?.(model);api.close?.();}
+  }
+  return{native:exercise(native),oracle:exercise(oracle)};
+ },source);
+ expect(result.native).toEqual(result.oracle);
+ expect(result.native.checks.every(Boolean)).toBe(true);
+});
+
 test('Gantt live getTasks preserves captured native calls, alternate arrays, Date aliases and mutable state',async({page})=>{
  await page.goto('/examples/web/');
  const result=await page.evaluate(async(source)=>{

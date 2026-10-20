@@ -79,12 +79,67 @@ enum Key {
     Function(u32),
     Host(u32),
 }
+// Small records already provide contiguous canonical-key lookup storage.
+// Keep an operation-local marker so first-touch work charges remain identical.
+const LINEAR_PROPERTY_LIMIT: usize = 32;
+enum PropertyIndex {
+    Linear,
+    Hashed(HashMap<u32, usize>),
+}
+impl PropertyIndex {
+    fn hashed(properties: &[Property], canonical: &[u32]) -> HashMap<u32, usize> {
+        let mut index = HashMap::new();
+        for (position, property) in properties.iter().enumerate() {
+            index
+                .entry(canonical[property.key as usize])
+                .or_insert(position);
+        }
+        index
+    }
+    fn new(properties: &[Property], canonical: &[u32]) -> Self {
+        if properties.len() <= LINEAR_PROPERTY_LIMIT {
+            Self::Linear
+        } else {
+            Self::Hashed(Self::hashed(properties, canonical))
+        }
+    }
+    fn position(&self, key: u32, properties: &[Property], canonical: &[u32]) -> Option<usize> {
+        match self {
+            Self::Linear => properties
+                .iter()
+                .position(|property| canonical[property.key as usize] == key),
+            Self::Hashed(index) => index.get(&key).copied(),
+        }
+    }
+    // Called only for a key already proven absent, before its property is appended.
+    fn insert(&mut self, key: u32, position: usize, properties: &[Property], canonical: &[u32]) {
+        match self {
+            Self::Linear if position < LINEAR_PROPERTY_LIMIT => {}
+            Self::Linear => {
+                let mut index = Self::hashed(properties, canonical);
+                index.insert(key, position);
+                *self = Self::Hashed(index);
+            }
+            Self::Hashed(index) => {
+                index.insert(key, position);
+            }
+        }
+    }
+}
+fn charge_work(work: &mut usize, amount: usize) -> Result<(), PublicError> {
+    *work = work.saturating_add(amount);
+    if *work > 200_000_000 {
+        Err(limit().into())
+    } else {
+        Ok(())
+    }
+}
 struct Context<'a> {
     g: &'a mut ModelGraph,
     strings: HashMap<JsString, u32>,
     canonical: Vec<u32>,
     maps: HashMap<u32, HashMap<Key, usize>>,
-    properties: HashMap<u32, HashMap<u32, usize>>,
+    properties: HashMap<u32, PropertyIndex>,
     sets: HashMap<u32, HashSet<Key>>,
     work: usize,
     refs: usize,
@@ -139,12 +194,7 @@ impl<'a> Context<'a> {
         }
     }
     fn tick(&mut self, n: usize) -> Result<(), PublicError> {
-        self.work = self.work.saturating_add(n);
-        if self.work > 200_000_000 {
-            Err(limit().into())
-        } else {
-            Ok(())
-        }
+        charge_work(&mut self.work, n)
     }
     fn room(&mut self, refs: usize) -> Result<(), PublicError> {
         self.refs = self.refs.saturating_add(refs);
@@ -200,16 +250,18 @@ impl<'a> Context<'a> {
             Atom::HostReference(id) => Key::Host(*id),
         }
     }
-    fn property_index(&mut self, id: u32) -> Result<(), PublicError> {
-        if !self.properties.contains_key(&id) {
-            self.tick(self.g.nodes[id as usize].properties().len())?;
-            let mut index = HashMap::new();
-            for (n, p) in self.g.nodes[id as usize].properties().iter().enumerate() {
-                index.entry(self.canonical[p.key as usize]).or_insert(n);
+    fn property_position(&mut self, id: u32, key: u32) -> Result<Option<usize>, PublicError> {
+        use std::collections::hash_map::Entry;
+        let properties = self.g.nodes[id as usize].properties();
+        let canonical = &self.canonical;
+        let index = match self.properties.entry(id) {
+            Entry::Occupied(entry) => entry.into_mut(),
+            Entry::Vacant(entry) => {
+                charge_work(&mut self.work, properties.len())?;
+                entry.insert(PropertyIndex::new(properties, canonical))
             }
-            self.properties.insert(id, index);
-        }
-        Ok(())
+        };
+        Ok(index.position(key, properties, canonical))
     }
     fn own(&mut self, id: u32, key: &str) -> Result<Option<Atom>, PublicError> {
         self.tick(1)?;
@@ -221,10 +273,11 @@ impl<'a> Context<'a> {
         let Some(key) = key.copied() else {
             return Ok(None);
         };
-        self.property_index(id)?;
-        Ok(self.properties[&id]
-            .get(&key)
-            .map(|n| self.g.nodes[id as usize].properties()[*n].value.clone()))
+        Ok(self.property_position(id, key)?.map(|position| {
+            self.g.nodes[id as usize].properties()[position]
+                .value
+                .clone()
+        }))
     }
     fn read(&mut self, a: &Atom, k: &str) -> Result<Atom, PublicError> {
         match a {
@@ -303,8 +356,7 @@ impl<'a> Context<'a> {
         let Atom::String(key) = self.text(k)? else {
             unreachable!()
         };
-        self.property_index(*id)?;
-        let at = self.properties[id].get(&key).copied();
+        let at = self.property_position(*id, key)?;
         if let Some(at) = at {
             if self.g.nodes[*id as usize].properties()[at].flags & 2 == 0 {
                 let label = if matches!(
@@ -327,7 +379,12 @@ impl<'a> Context<'a> {
         } else {
             self.room(1)?;
             let index = self.g.nodes[*id as usize].properties().len();
-            self.properties.get_mut(id).unwrap().insert(key, index);
+            self.properties.get_mut(id).unwrap().insert(
+                key,
+                index,
+                self.g.nodes[*id as usize].properties(),
+                &self.canonical,
+            );
             self.g.nodes[*id as usize].properties_mut().push(Property {
                 key,
                 value: v,
