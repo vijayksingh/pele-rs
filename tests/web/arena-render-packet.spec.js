@@ -7,17 +7,21 @@ async function save(info,name,report){const path=info.outputPath(name);await wri
 async function legacyArenaComparison(page,run){
   await page.evaluate(async()=>{
     const {MutableDocument}=await import('/dist/package-web/package/pkg/pele.js');
-    const prototype=MutableDocument.prototype,name='snapshot_source_layout',descriptor=Object.getOwnPropertyDescriptor(prototype,name);
-    window.__legacyArenaCapability={MutableDocument,prototype,parent:Object.getPrototypeOf(prototype),keys:Reflect.ownKeys(prototype),name,descriptor};
-    if(descriptor)Object.defineProperty(prototype,name,{...descriptor,value:undefined});
+    const prototype=MutableDocument.prototype,names=['snapshot_source_layout','prepare_detached_render_numbers','prepare_detached_render_raw'];
+    const descriptors=new Map(names.map(name=>[name,Object.getOwnPropertyDescriptor(prototype,name)]));
+    window.__legacyArenaCapability={MutableDocument,prototype,parent:Object.getPrototypeOf(prototype),keys:Reflect.ownKeys(prototype),descriptors};
+    for(const[name,descriptor]of descriptors)if(descriptor)Object.defineProperty(prototype,name,{...descriptor,value:undefined});
   });
   try{return await run();}
   finally{await page.evaluate(()=>{
     const saved=window.__legacyArenaCapability;
     try{
-      if(saved.descriptor)Object.defineProperty(saved.prototype,saved.name,saved.descriptor);else delete saved.prototype[saved.name];
-      const actual=Object.getOwnPropertyDescriptor(saved.prototype,saved.name);
-      const same=saved.descriptor?actual&&Reflect.ownKeys(actual).length===Reflect.ownKeys(saved.descriptor).length&&Reflect.ownKeys(saved.descriptor).every(key=>actual[key]===saved.descriptor[key]):actual===undefined;
+      let same=true;
+      for(const[name,descriptor]of saved.descriptors){
+        if(descriptor)Object.defineProperty(saved.prototype,name,descriptor);else delete saved.prototype[name];
+        const actual=Object.getOwnPropertyDescriptor(saved.prototype,name);
+        same&&=descriptor?actual&&Reflect.ownKeys(actual).length===Reflect.ownKeys(descriptor).length&&Reflect.ownKeys(descriptor).every(key=>actual[key]===descriptor[key]):actual===undefined;
+      }
       if(!same||saved.MutableDocument.prototype!==saved.prototype||Object.getPrototypeOf(saved.prototype)!==saved.parent||Reflect.ownKeys(saved.prototype).length!==saved.keys.length||Reflect.ownKeys(saved.prototype).some((key,index)=>key!==saved.keys[index]))throw Error('Arena comparison did not restore native capability descriptor');
     }finally{delete window.__legacyArenaCapability;}
   });}

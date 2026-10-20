@@ -1,0 +1,55 @@
+# Detached live rendering
+
+Internal builtin capability for Sankey resource callbacks. The [oracle audit](compatibility/sankey-resource-callbacks/AUDIT.md) records the previous restoration, read-order and reentry mismatches. This design is not a claim of complete compatibility or improved performance.
+
+## Boundary
+
+Parsing, geometry, responsive fitting and SVG remain in Rust. Native/C/Swift use the ordinary typed adapter. A private phase-reader interface lets the same Rust renderer consume live browser values without borrowing its mutable document across callbacks. JavaScript supplies generic property, index and string operations; it contains no diagram algorithm.
+
+Only the concrete builtin creator can supply this capability. Hidden public carriers have private constructors; erased dispatch checks creator TypeId for both capability and input. Matching a schema/type name or forwarding a builtin carrier through another provider is insufficient. Other providers and families retain existing render/publication paths.
+
+## Owned lifecycle
+
+```text
+PublicDocument::prepare_detached_render(revision, request)
+    -> Result<Option<DetachedRenderJob>, PeleError>
+DetachedRenderJob::run(self, live, resources)
+    -> DetachedRenderCompletion
+PublicDocument::finish_detached_render(completion)
+    -> Result<DetachedRenderOutcome, PeleError>
+```
+
+Prepare performs the existing options/revision/structure checks before dispatch. It returns no job for an unsupported concrete provider; fallback is allowed only then. A dispatched operation is never replayed. The job owns immutable input, captured registration/config and a one-use lease. Neither document references nor graph borrows escape prepare. Sankey's immutable legacy projection uses Arc ownership so nested helpers can replace document state without invalidating an outer job.
+
+A lazy Arc/Mutex book records checked frame IDs and pending revision reservations. No lock is held through callbacks. Jobs hold weak owner leases, finish in nesting order, and release reservations on drop. Ordinary advancing operations at revision r with k pending frames check r+k+1 at their original overflow stage while advancing only to r+1. Finish advances the current revision after nested operations, never the revision at entry. Owner drop safely invalidates remaining leases.
+
+Normal and raw jobs reuse existing render orchestration, output-limit, resource scope and presentation policy. Errors remain job-owned completions, so resource failure still reaches finish. Native finish validates the current native snapshot and returns only a short-lived graph borrow for transport admission.
+
+## Live read phases
+
+- Every draw obtains current node count and link endpoints/index/value scalars. It does not eagerly acquire node labels. Geometry stays fixed for that draw; responsive retries obtain fresh geometry.
+- Each node acquires its current ID before its width callback and retains that exact value for its rectangle and label. Color lookup remains a separate current ID read at the original phase.
+- After node measurements, links resolve their captured geometry indices against current public nodes. Source/target labels and color reads retain upstream ordering.
+- Title is captured when its label pipeline starts. Accessibility fields are read after title resources, including distinct truthiness and subsequent property reads.
+
+Opaque host values survive callbacks without premature stringification. ToString occurs only at actual coercing expressions; strict string uses retain their first native JavaScript TypeError. A job-local presence/value channel preserves original object, symbol and undefined throws. A caught nested failure cannot poison its parent. Public RangeError conversion remains unchanged.
+
+Accepted input keeps its existing structural, schema, text and transport budgets. Live strings and callback-expanded geometry require bounds before allocation. Finishing does not observe/admit all callback writes: upstream does not validate them on render exit. The next ordinary helper/render observes them through existing ingress.
+
+Rich-label icon scanning also preserves the pinned shared regex cursor across nested resource renders. A thread-local UTF16 cursor uses short Cell accesses; no mutable borrow or lock crosses callbacks. Nested reset, failure and backwards-slice behavior match the JavaScript expression without duplicating layout or SVG code.
+
+## Browser protocol
+
+`MutableDocument.prepare_detached_render_numbers` and `prepare_detached_render_raw` return an optional independent job. `job.run(root, read, width, icons, clock, inlineIcons, dispatcher)` consumes its core job and stores completion. `MutableDocument.finish_detached_render(job)` consumes completion during a short document borrow.
+
+The acknowledgement exposes its decimal revision before a separate `materialize()` invokes the existing result factory. Its private packet is `[1, revisionString, graphBytes, status, payload]`. `graphBytes` counts the canonical frame with a zero metadata length. Error status0 carries the exact serialized public Result error; success status1 carries the existing `[1, metadataBytes, renderedValue]` packet. Exact legacy combined graph-plus-metadata byte admission remains required even though no graph is transferred. Success packet admission checks `graphBytes + metadataBytes` against the unchanged limit.
+
+The facade releases its native busy guard only during job execution and result materialization. Active detached frames prevent disposal. Every dispatched frame finishes or is dropped safely. Revision acknowledgement precedes materialization because a factory can itself call a helper; that newer revision must survive.
+
+The facade never reconciles an outer render snapshot over callback mutations. It retains the latest bridge baseline, acknowledges the current revision and marks observation unconfirmed. Nested helpers continue their ordinary apply/invoke/publication, including partial writes on failure. Writes after an inner helper remain visible after the outer render.
+
+## Verification boundary
+
+Integration controls cover owner/lifetime/revision behavior and default typed rendering. Browser comparisons use actual pinned Pele in the same engine and compare complete SVG, dimension bits, callback traces, ordered descriptors, aliases, retained references, partial helper effects and original arbitrary throws. Existing native frame/provider tests remain independent controls.
+
+Custom coercion, getter/Proxy behavior, sparse/malformed arrays and callback-created lone UTF16 surrogates require additional proof before a blanket compatibility claim. Rust SVG remains UTF8; replacing lone surrogates silently is not acceptable. Correctness and performance gates remain separate, and 0.3 stays blocked until both pass.

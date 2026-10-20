@@ -198,8 +198,9 @@ enum Canonical {
     Arena(ModelGraph),
     Source(super::source_store::SourceCanonical),
 }
-enum Projection {
-    Legacy(SankeyModel),
+#[derive(Clone)]
+pub(super) enum Projection {
+    Legacy(std::sync::Arc<SankeyModel>),
     Indexed(std::sync::Arc<IndexedSankey>),
 }
 fn invalid(message: &str) -> PeleError {
@@ -648,12 +649,12 @@ impl PublicDiagramModule for Sankey {
             Canonical::Arena(graph) => imported(graph),
             Canonical::Source(graph) => imported_from(graph),
         }
-        .map(Projection::Legacy);
+        .map(|model| Projection::Legacy(std::sync::Arc::new(model)));
         result
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
-        let model = imported(&graph).map(Projection::Legacy);
+        let model = imported(&graph).map(|model| Projection::Legacy(std::sync::Arc::new(model)));
         Ok(SankeyPublicState {
             graph: Canonical::Arena(graph),
             model,
@@ -661,7 +662,7 @@ impl PublicDiagramModule for Sankey {
     }
     fn create_public(&self, model: &SankeyModel) -> Result<Self::PublicState, PeleError> {
         let graph = initial_graph(model)?;
-        let model = imported(&graph).map(Projection::Legacy);
+        let model = imported(&graph).map(|model| Projection::Legacy(std::sync::Arc::new(model)));
         Ok(SankeyPublicState {
             graph: Canonical::Arena(graph),
             model,
@@ -676,7 +677,8 @@ impl PublicDiagramModule for Sankey {
         }
         let model = parsed.into_model();
         let graph = initial_graph(&model)?;
-        let model = normalized_source(model).map(Projection::Legacy);
+        let model =
+            normalized_source(model).map(|model| Projection::Legacy(std::sync::Arc::new(model)));
         Ok(SankeyPublicState {
             graph: Canonical::Arena(graph),
             model,
@@ -724,13 +726,26 @@ impl PublicDiagramModule for Sankey {
         graph: ModelGraph,
     ) -> Result<(), PeleError> {
         graph.validate()?;
-        let model = imported(&graph).map(Projection::Legacy);
+        let model = imported(&graph).map(|model| Projection::Legacy(std::sync::Arc::new(model)));
         match &mut state.graph {
             Canonical::Arena(old) => *old = graph,
             Canonical::Source(old) => old.adopt(graph)?,
         };
         state.model = model;
         Ok(())
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::sankey())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::sankey(
+            super::live_phase::SankeyDetachedInput::new(state.model.clone()),
+        ))
     }
     fn render_public(
         &self,
@@ -1044,7 +1059,8 @@ impl crate::compat::public::source_input::SourceIngressOwner for SankeyPublicSta
             unreachable!("paired source ingress");
         };
         let candidate = graph.candidate(&input).expect("admitted source identity");
-        let model = imported_source(&candidate).map(Projection::Legacy);
+        let model =
+            imported_source(&candidate).map(|model| Projection::Legacy(std::sync::Arc::new(model)));
         graph.adopt_overlay(input);
         self.model = model;
     }

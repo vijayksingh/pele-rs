@@ -35,3 +35,8 @@ impl DiagramModule for Sankey {
 }
 
 mod source_store;
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, SankeyDetachedInput};
+#[doc(hidden)]
+pub use live_phase::{LiveRenderRead, LiveStringUse, LiveValueKind};

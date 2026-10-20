@@ -1,3 +1,7 @@
+use super::detached_render::{
+    self, DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion,
+    DetachedRenderJob, DetachedRenderOutcome, DetachedRenderRequest, RenderBook,
+};
 use super::graph_read::{GraphReadView, PublicGraphRead};
 use super::{
     schema::CompiledSchema, Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph,
@@ -12,7 +16,7 @@ use crate::compat::{
 use std::{
     any::{Any, TypeId},
     borrow::Cow,
-    sync::{Arc, OnceLock},
+    sync::{Arc, Mutex, OnceLock},
 };
 /// Owned output of a captured parser, with its exact public-construction policy.
 /// The engine alone creates this carrier. Model type or schema identity does not
@@ -157,6 +161,16 @@ pub trait PublicDiagramModule: DiagramModule {
         &self,
         _state: &'a mut Self::PublicState,
     ) -> Option<super::SourceIngress<'a>> {
+        None
+    }
+    /// Sealed metadata-only builtin capability. Discovery cannot evaluate state.
+    #[doc(hidden)]
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        None
+    }
+    /// Owned render input; creator provenance is checked by the captured codec.
+    #[doc(hidden)]
+    fn detached_public_render(&self, _state: &Self::PublicState) -> Option<DetachedPublicRender> {
         None
     }
     fn apply_public(
@@ -334,6 +348,12 @@ trait Erased: Send + Sync {
     fn borrow_read<'a>(&self, state: &'a State) -> Option<&'a dyn PublicGraphRead>;
     fn unchanged_public_graph_is_noop(&self) -> bool;
     fn source_ingress<'a>(&self, state: &'a mut State) -> Option<super::SourceIngress<'a>>;
+    fn detached_capability(&self) -> Option<DetachedRenderCapability>;
+    fn detached_input(
+        &self,
+        state: &State,
+        capability: &DetachedRenderCapability,
+    ) -> Option<DetachedPublicRender>;
     fn apply(&self, state: &mut State, graph: ModelGraph) -> Result<(), PeleError>;
     fn invoke(
         &self,
@@ -434,6 +454,20 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .source_ingress(s.downcast_mut().expect("paired public state"))?
             .for_creator::<D>()
     }
+    fn detached_capability(&self) -> Option<DetachedRenderCapability> {
+        self.0
+            .detached_public_render_capability()?
+            .for_creator::<D>()
+    }
+    fn detached_input(
+        &self,
+        state: &State,
+        capability: &DetachedRenderCapability,
+    ) -> Option<DetachedPublicRender> {
+        self.0
+            .detached_public_render(state.downcast_ref().expect("paired public state"))?
+            .for_creator::<D>(capability)
+    }
     fn apply(&self, s: &mut State, g: ModelGraph) -> Result<(), PeleError> {
         self.0
             .apply_public(s.downcast_mut().expect("paired public state"), g)
@@ -503,8 +537,8 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .render_public(s.downcast_mut().expect("paired public state"), c, o, h)
     }
 }
-struct Registration {
-    descriptor: ModuleDescriptor,
+pub(super) struct Registration {
+    pub(super) descriptor: ModuleDescriptor,
     schema: &'static ModelSchema,
     compiled_schema: OnceLock<Result<CompiledSchema, PeleError>>,
     shared_functions: &'static [SharedFunction],
@@ -856,6 +890,7 @@ impl PublicEngine {
             state,
             config,
             revision: 0,
+            render_book: None,
         })
     }
     /// Captured builtin-only browser construction; fallback consumes the same
@@ -954,6 +989,7 @@ impl PublicEngine {
                     state,
                     config: plan.into_config(),
                     revision: 0,
+                    render_book: None,
                 })
             }
             None => self.create_document(plan.parse()?),
@@ -987,6 +1023,7 @@ impl PublicEngine {
             state,
             config,
             revision: 0,
+            render_book: None,
         })
     }
 }
@@ -1077,8 +1114,82 @@ pub struct PublicDocument {
     state: State,
     config: Object,
     revision: u64,
+    render_book: Option<Arc<Mutex<RenderBook>>>,
 }
 impl PublicDocument {
+    fn next_revision(&self) -> Result<u64, PeleError> {
+        detached_render::next_revision(self.revision, self.render_book.as_ref())
+    }
+    /// Metadata-only discovery; arbitrary forwarded provider capabilities fail.
+    #[doc(hidden)]
+    pub fn has_detached_public_render(&self) -> bool {
+        self.registration.codec.detached_capability().is_some()
+    }
+    #[doc(hidden)]
+    pub fn has_active_detached_render(&self) -> bool {
+        detached_render::has_active(self.render_book.as_ref())
+    }
+    /// Create an owned job, ending this document borrow before host callbacks.
+    #[doc(hidden)]
+    pub fn prepare_detached_render(
+        &mut self,
+        expected_revision: u64,
+        request: DetachedRenderRequest,
+    ) -> Result<Option<DetachedRenderJob>, PeleError> {
+        let Some(capability) = self.registration.codec.detached_capability() else {
+            return Ok(None);
+        };
+        if expected_revision != self.revision {
+            return Err(PeleError::new(
+                "Stale public model revision",
+                ErrorCode::Semantic,
+            ));
+        }
+        self.next_revision()?;
+        self.snapshot_read()?;
+        let Some(input) = self
+            .registration
+            .codec
+            .detached_input(&self.state, &capability)
+        else {
+            return Ok(None);
+        };
+        let owner = self
+            .render_book
+            .get_or_insert_with(|| Arc::new(Mutex::new(RenderBook::new())));
+        DetachedRenderJob::new(
+            owner,
+            self.revision,
+            self.registration.clone(),
+            self.config.clone(),
+            request,
+            input,
+        )
+        .map(Some)
+    }
+    /// Finish against the latest revision after any nested operations. This
+    /// readonly outcome does not authorize replacing live callback mutations.
+    #[doc(hidden)]
+    pub fn finish_detached_render(
+        &mut self,
+        completion: DetachedRenderCompletion,
+    ) -> Result<DetachedRenderOutcome<'_>, PeleError> {
+        let owner = self.render_book.as_ref().ok_or_else(|| {
+            PeleError::new(
+                "Public render job belongs to another document",
+                ErrorCode::Semantic,
+            )
+        })?;
+        let (next, result, presentation) = completion.finish(owner, self.revision)?;
+        self.revision = next;
+        let graph = self.snapshot_read()?;
+        Ok(DetachedRenderOutcome {
+            revision: next,
+            graph,
+            result,
+            presentation,
+        })
+    }
     /// Adapt an existing typed model without parsing its source again.
     /// The document owns the exact module and effective config supplied here.
     pub fn from_module<D: PublicDiagramModule>(
@@ -1109,6 +1220,7 @@ impl PublicDocument {
             state,
             config,
             revision: 0,
+            render_book: None,
         })
     }
     /// Construct a concrete provider directly from an arena, without parsing.
@@ -1141,6 +1253,7 @@ impl PublicDocument {
             state,
             config,
             revision: 0,
+            render_book: None,
         })
     }
     /// Effective parse configuration owned by this retained document.
@@ -1208,6 +1321,7 @@ impl PublicDocument {
     pub fn apply_source_input(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
         let input = super::source_input::BorrowedOverlay::decode(bytes)?;
         let revision = self.revision;
+        let render_book = self.render_book.as_ref();
         let registration = &self.registration;
         let ingress = registration
             .codec
@@ -1229,9 +1343,7 @@ impl PublicDocument {
                     ErrorCode::Semantic,
                 ));
             }
-            next = revision.checked_add(1).ok_or_else(|| {
-                PeleError::new("Public model revision exhausted", ErrorCode::Limit)
-            })?;
+            next = detached_render::next_revision(revision, render_book)?;
             let compiled = registration.compiled_schema()?;
             // The exact candidate already passed structure before revision.
             // Reuse that scoped proof for registration and module structure;
@@ -1249,10 +1361,7 @@ impl PublicDocument {
                 ErrorCode::Semantic,
             ));
         }
-        let next_revision = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
+        let next_revision = self.next_revision()?;
         self.registration.validate_graph(&graph)?;
         self.registration.codec.apply(&mut self.state, graph)?;
         self.revision = next_revision;
@@ -1296,10 +1405,7 @@ impl PublicDocument {
                 ErrorCode::Semantic,
             ));
         }
-        let next = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
+        let next = self.next_revision()?;
         {
             let before = self.read_view()?;
             match &before {
@@ -1411,10 +1517,7 @@ impl PublicDocument {
                 ErrorCode::Semantic,
             ));
         }
-        let next = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
+        let next = self.next_revision()?;
         self.snapshot_read()?;
         let mut operation_error = None;
         let result = crate::compat::engine::render_raw_registered(
@@ -1601,10 +1704,7 @@ impl PublicDocument {
                 ErrorCode::Semantic,
             ));
         }
-        let next = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
+        let next = self.next_revision()?;
         self.snapshot_read()?;
         let mut operation_error = None;
         let mut presentation = crate::compat::PresentationCapture::deferred(host);

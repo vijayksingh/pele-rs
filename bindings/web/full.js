@@ -4,6 +4,7 @@ import {CapturedOwner,capturedSankeyAvailable,rememberCapturedModel,capturedObse
 import {HostErOwner} from './host-er-store.js';
 import initialize from './initialize.js';
 import {modelHostFunctions} from "./host-functions.js";
+import {liveRenderRead,detachedRenderResult} from './live-render.js';
 import {builtinDiagramType,builtinDiagramOrigin,ownRawModel,withBuiltinIcons,builtinInlineIcons} from './builtin-entries.js';
 import {parseLimitOptions, parseLimitValues} from './parse-limits.js';
 export {loadRegistry} from './registry.js';
@@ -174,6 +175,46 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   function nativeModelCall(entry, run) {
     if(entry.nativeBusy)throw new TypeError("Public model document is already in use");
     entry.nativeBusy=true;try{return run();}finally{entry.nativeBusy=false;}
+  }
+  function nativeDetachedCall(run) {
+    try { return run(); }
+    catch (error) { if (typeof error === 'string') return result(error); throw error; }
+  }
+  function runDetachedRender(entry, job, raw, width, icons, clock, inline, dispatcher) {
+    let original, originalFailed = false, error, failed = false, ack, outcome;
+    const capture = value => { if (!originalFailed) { originalFailed = true; original = value; } };
+    const resource = callable => callable && ((...args) => {
+      try { return callable(...args); } catch (value) { capture(value); throw value; }
+    });
+    const unlocked = run => {
+      entry.nativeBusy = false;
+      try { return run(); } finally { entry.nativeBusy = true; }
+    };
+    const fail = value => { if (!failed) { failed = true; error = value; } };
+    entry.detachedDepth = (entry.detachedDepth ?? 0) + 1;
+    try {
+      try {
+        unlocked(() => job.run(entry.bridge.root, liveRenderRead(capture), resource(width),
+          resource(icons), resource(clock), resource(inline), dispatcher));
+      } catch (value) { fail(value); }
+      // Every dispatched frame finishes, including resource/read failures. This
+      // short call has no user callback and acknowledges the latest revision.
+      try {
+        ack = nativeDetachedCall(() => entry.handle.finish_detached_render(job));
+        const revision = ack.revision;
+        entry.revision = revision;
+        // The result factory can itself call helpers. Publish its predecessor
+        // revision first, then never overwrite a newer nested revision.
+        outcome = detachedRenderResult(unlocked(() => ack.materialize()), revision, raw, entry.rawType);
+      } catch (value) { fail(value); }
+      if (originalFailed) throw original;
+      if (failed) throw error;
+      return outcome;
+    } finally {
+      entry.confirmedGraph = false;
+      entry.detachedDepth--;
+      try { ack?.free(); } finally { job.free(); }
+    }
   }
   // bridge.graph tracks observations, including edits rejected by native apply.
   // Only a completely published native outcome can acknowledge that baseline.
@@ -470,12 +511,20 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         }
         prepareMutableInput(entry);
         const dispatcher=modelHostFunctions(entry.bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;});
+        const configJSON=finiteConfigJSON(config);
+        const job=typeof entry.handle.prepare_detached_render_raw==='function'
+          ?nativeDetachedCall(()=>entry.handle.prepare_detached_render_raw(entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers)):undefined;
+        if(job){
+          const outcome=runDetachedRender(entry,job,true,width,icons,clock,inline,dispatcher);
+          if(Object.hasOwn(outcome,'Err'))throw operationError(outcome.Err,entry.bridge);
+          return renderedValue(outcome.Ok);
+        }
         const packet=entry.handle.render_raw_operation_packet_with_functions;
         const outcome=entry.bridge.graph instanceof LayoutGraph
-          ?layoutResult(()=>entry.handle.render_raw_operation_source_layout_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.bridge.graph,entry.revision,true,entry.rawType)
+          ?layoutResult(()=>entry.handle.render_raw_operation_source_layout_with_functions(entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.bridge.graph,entry.revision,true,entry.rawType)
           :typeof packet==='function'
-          ?arenaRenderResult(()=>packet.call(entry.handle,entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.revision,true,entry.rawType)
-          :binaryResult(()=>entry.handle.render_raw_operation_binary_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher));
+          ?arenaRenderResult(()=>packet.call(entry.handle,entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.revision,true,entry.rawType)
+          :binaryResult(()=>entry.handle.render_raw_operation_binary_with_functions(entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher));
         publishMutableOutcome(entry, outcome);
         if(callbackFailed)throw callbackError;
         if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,entry.bridge);
@@ -650,6 +699,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             operation=nativeModelCall(document,()=>{
               prepareMutableInput(document);
               const dispatcher=modelHostFunctions(bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;});
+              const job=typeof document.handle.prepare_detached_render_numbers==='function'
+                ?nativeDetachedCall(()=>document.handle.prepare_detached_render_numbers(document.revision,numeric.json,numeric.mask,numeric.numbers,numeric.outputKind,numeric.output)):undefined;
+              if(job)return runDetachedRender(document,job,false,width,icons,clock,undefined,dispatcher);
               const packet=document.handle.render_numbers_operation_packet_with_functions;
               const outcome=bridge.graph instanceof LayoutGraph
                 ?layoutResult(()=>document.handle.render_numbers_operation_source_layout_with_functions(document.revision,...numericArguments,dispatcher),bridge.graph,document.revision,false,document.rawType)
@@ -683,7 +735,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     },
     dispose(model) {
       const document = documents.get(model);
-      if (document?.busy || document?.nativeBusy) throw new TypeError('Public model document is already in use');
+      if (document?.busy || document?.nativeBusy || document?.detachedDepth) throw new TypeError('Public model document is already in use');
       if(document?.hostStore){document.hostStore.dispose();rawDisposed.add(model);documents.delete(model);document.disposed=true;finalizer?.unregister(model);document.handle.free();document.policy?.free();return;}
       if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free();if(document.capturedOwner)document.capturedOwner.release();else if(document.bridge)releaseDisposedBridge(document.bridge); }
     }

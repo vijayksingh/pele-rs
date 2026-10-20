@@ -68,10 +68,13 @@ test('fresh source publication preserves first helpers, bits, aliases and callba
             const first=model.nodes[0],found=model.findOrCreateNode(first.id);
             row.firstAlias=found===first&&found===model.lookup.get(first.id);
             row.firstRender=output(engine.render(model,options));row.oracle=output(oracle.render(reference,options));
-            const added=model.findOrCreateNode('fresh extension 漢');reference.findOrCreateNode('fresh extension 漢');
+            const added=model.findOrCreateNode('fresh extension 漢'),referenceAdded=reference.findOrCreateNode('fresh extension 漢');
             row.addedAlias=added===model.nodes.at(-1)&&added===model.lookup.get('fresh extension 漢');
             const extension={value:-0};extension.self=extension;Object.defineProperty(extension,'hidden',{value:'\ud800',writable:false,enumerable:false,configurable:true});
             model.extension={extension,map:new Map([[first,extension],[added,added]])};
+            const referenceExtension={value:-0};referenceExtension.self=referenceExtension;
+            Object.defineProperty(referenceExtension,'hidden',{value:'\ud800',writable:false,enumerable:false,configurable:true});
+            reference.extension={extension:referenceExtension,map:new Map([[reference.nodes[0],referenceExtension],[referenceAdded,referenceAdded]])};
             row.accepted=output(engine.render(model,options));row.acceptedOracle=output(oracle.render(reference,options));
             const baseline=snapshot(model),sentinel={first:'callback throw'};let changed=false;
             try{engine.render(model,{measurer:{width(){if(!changed){changed=true;first.id='callback edit';extension.value=99;extension.extra=true;model.links[0].value=17;}throw sentinel;}}});row.callbackThrew=false;}
@@ -79,7 +82,12 @@ test('fresh source publication preserves first helpers, bits, aliases and callba
             const restored=snapshot(model);row.restored=restored.data;row.beforeThrow=baseline.data;
             row.identities=baseline.objects.length===restored.objects.length&&baseline.objects.every((value,i)=>value===restored.objects[i]);
             row.prototypeStable=Object.getPrototypeOf(model)===prototype;
-            row.recovery=output(engine.render(model,options));
+            let referenceChanged=false;
+            try{oracle.render(reference,{measurer:{width(){if(!referenceChanged){referenceChanged=true;reference.nodes[0].id='callback edit';referenceExtension.value=99;referenceExtension.extra=true;reference.links[0].value=17;}throw sentinel;}}});row.oracleCallbackThrew=false;}
+            catch(value){row.oracleCallbackThrew=true;row.oracleOriginalThrow=value===sentinel;}
+            row.callbackReached=changed;row.oracleCallbackReached=referenceChanged;
+            row.oracleAfterThrow=snapshot(reference).data;
+            row.recovery=output(engine.render(model,options));row.oracleRecovery=output(oracle.render(reference,options));
           }catch(error){row.fatal=failure(error);}
           finally{if(model)engine.dispose(model);if(sibling)engine.dispose(sibling);}
           rows.push(row);
@@ -106,9 +114,11 @@ test('fresh source publication preserves first helpers, bits, aliases and callba
     if(fallback)expect(row.numericKind,row.name).toContain(fallback);
     expect(row.activation,row.name).toEqual([[!fallback],[!fallback]]);
     expect(reports.generic.rows.find(other=>other.name===row.name).activation,row.name).toEqual([[false],[false]]);
-    expect(row,row.name).toMatchObject({sharedPrototype:true,firstAlias:true,addedAlias:true,callbackThrew:true,originalThrow:true,identities:true,prototypeStable:true});
+    expect(row,row.name).toMatchObject({sharedPrototype:true,firstAlias:true,addedAlias:true,callbackThrew:true,originalThrow:true,oracleCallbackThrew:true,oracleOriginalThrow:true,callbackReached:true,oracleCallbackReached:true,identities:true,prototypeStable:true});
     expect(row.firstRender,row.name).toEqual(row.oracle);expect(row.accepted,row.name).toEqual(row.acceptedOracle);
-    expect(row.restored,row.name).toEqual(row.beforeThrow);expect(row.recovery,row.name).toEqual(row.accepted);
+    // Pele retains callback edits even when the original thrown value escapes.
+    expect(row.restored,row.name).toEqual(row.oracleAfterThrow);expect(row.restored,row.name).not.toEqual(row.beforeThrow);
+    expect(row.recovery,row.name).toEqual(row.oracleRecovery);
   }
 });
 

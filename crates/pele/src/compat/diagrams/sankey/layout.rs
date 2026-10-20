@@ -159,9 +159,12 @@ impl Work {
         }
     }
 }
+pub(super) enum Failure {
+    Cycle(usize),
+}
 pub(super) fn layout(model: &impl Input, o: Options) -> Result<Layout, PeleError> {
     let n = model.nodes().len();
-    let mut links: Vec<Link> = (0..model.link_count())
+    let links: Vec<Link> = (0..model.link_count())
         .map(|i| {
             let (source, target, value) = model.link(i);
             Link {
@@ -178,6 +181,19 @@ pub(super) fn layout(model: &impl Input, o: Options) -> Result<Layout, PeleError
             }
         })
         .collect();
+    layout_values(n, links, o).map_err(|failure| {
+        let message = match failure {
+            Failure::Cycle(stuck) => format!(
+                "Sankey diagrams cannot have circular links, and \"{}\" is part of one.",
+                model.nodes()[stuck].id
+            ),
+        };
+        let mut error = PeleError::new(message, ErrorCode::Semantic);
+        error.diagram_type = Some("sankey".into());
+        error
+    })
+}
+pub(super) fn layout_values(n: usize, mut links: Vec<Link>, o: Options) -> Result<Layout, Failure> {
     let mut outgoing = vec![vec![]; n];
     let mut incoming = vec![vec![]; n];
     for (k, l) in links.iter().enumerate() {
@@ -214,15 +230,7 @@ pub(super) fn layout(model: &impl Input, o: Options) -> Result<Layout, PeleError
                 }
             }
         }
-        let mut error = PeleError::new(
-            format!(
-                "Sankey diagrams cannot have circular links, and \"{}\" is part of one.",
-                model.nodes()[stuck].id
-            ),
-            ErrorCode::Semantic,
-        );
-        error.diagram_type = Some("sankey".into());
-        return Err(error);
+        return Err(Failure::Cycle(stuck));
     }
     let layers = depth.iter().map(|d| d + 1).max().unwrap_or(1);
     let mut reach = vec![0; n];

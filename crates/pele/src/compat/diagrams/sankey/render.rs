@@ -44,12 +44,59 @@ fn fill(v: Option<&Value>) -> String {
         _ => String::new(),
     }
 }
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Label;
+    type Text: AsRef<str>;
+    fn layout(&mut self, options: Options) -> Result<layout::Layout, Self::Error>;
+    fn label(&mut self, index: usize) -> Result<Self::Label, Self::Error>;
+    fn text(&mut self, label: &Self::Label) -> Result<Self::Text, Self::Error>;
+    fn color_key(&mut self, index: usize) -> Result<Self::Text, Self::Error>;
+    fn title(&mut self) -> Result<Option<Self::Text>, Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<Self::Text>, Self::Error>;
+}
+struct Typed<'a, M>(&'a M);
+impl<'a, M: Input> PhaseInput for Typed<'a, M> {
+    type Error = PeleError;
+    type Label = &'a str;
+    type Text = &'a str;
+    fn layout(&mut self, options: Options) -> Result<layout::Layout, PeleError> {
+        layout::layout(self.0, options)
+    }
+    fn label(&mut self, index: usize) -> Result<Self::Label, PeleError> {
+        Ok(&self.0.nodes()[index].id)
+    }
+    fn text(&mut self, label: &Self::Label) -> Result<Self::Text, PeleError> {
+        Ok(*label)
+    }
+    fn color_key(&mut self, index: usize) -> Result<Self::Text, PeleError> {
+        self.label(index)
+    }
+    fn title(&mut self) -> Result<Option<Self::Text>, PeleError> {
+        Ok(self.0.title())
+    }
+    fn accessibility(&mut self, description: bool) -> Result<Option<Self::Text>, PeleError> {
+        Ok(if description {
+            self.0.acc_descr()
+        } else {
+            self.0.acc_title()
+        })
+    }
+}
 pub(super) fn render(
     m: &impl Input,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(m), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let empty = Object::default();
     let conf = match c.get("sankey") {
         Some(Value::Object(c)) => c,
@@ -75,13 +122,13 @@ pub(super) fn render(
     }
     Ok(result)
 }
-fn draw(
-    m: &impl Input,
+fn draw<P: PhaseInput>(
+    m: &mut P,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     chart_width: f64,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
@@ -98,24 +145,30 @@ fn draw(
         _ => Alignment::Justify,
     };
     let color = c.get("linkColor").and_then(as_text).unwrap_or("gradient");
-    let placed = layout::layout(
-        m,
-        Options {
-            width: chart_width,
-            height: chart_height,
-            node_width,
-            node_padding: number(c, "nodePadding", 12., 0., 200.) + if show { 15. } else { 0. },
-            label_height: small * 1.15,
-            alignment,
-        },
-    )?;
+    let placed = m.layout(Options {
+        width: chart_width,
+        height: chart_height,
+        node_width,
+        node_padding: number(c, "nodePadding", 12., 0., 200.) + if show { 15. } else { 0. },
+        label_height: small * 1.15,
+        alignment,
+    })?;
     let nodes = placed.nodes;
     let links = placed.links;
     let custom = match c.get("nodeColors") {
         Some(Value::Object(v)) => Some(v),
         _ => None,
     };
-    let node_style = |i: usize| fill(custom.and_then(|v| v.get(&m.nodes()[i].id)));
+    fn node_style<P: PhaseInput>(
+        m: &mut P,
+        custom: Option<&Object>,
+        i: usize,
+    ) -> Result<String, P::Error> {
+        Ok(match custom {
+            Some(custom) => fill(custom.get(m.color_key(i)?.as_ref())),
+            None => String::new(),
+        })
+    }
     let (mut central, mut most) = (0, 0.);
     for n in &nodes {
         if n.value > most {
@@ -126,7 +179,9 @@ fn draw(
     let (mut min_x, mut max_x, mut min_y, mut max_y) = (0., chart_width, 0., chart_height);
     let (mut labels_out, mut nodes_out) = (String::new(), String::new());
     for (i, n) in nodes.iter().enumerate() {
-        let id = &m.nodes()[i].id;
+        let captured_label = m.label(i)?;
+        let id = m.text(&captured_label)?;
+        let id = id.as_ref();
         let height = max(n.height, 1.);
         let mut node = SvgSink::new(&mut nodes_out);
         node.raw("<rect class=\"pele-sankey-node\" data-id=\"");
@@ -144,7 +199,7 @@ fn draw(
         node.raw("\" fill=\"");
         node.raw(&series_color(i));
         node.raw("\"");
-        node.raw(&node_style(i));
+        node.raw(&node_style(m, custom, i)?);
         node.raw("/>");
         let mut value = String::new();
         if show {
@@ -162,7 +217,7 @@ fn draw(
             r,
             o,
             &if value.is_empty() {
-                id.clone()
+                id.to_owned()
             } else {
                 format!("{id} {value}")
             },
@@ -179,6 +234,8 @@ fn draw(
         max_x = max(max_x, if after { x + text_width } else { x });
         min_y = min(min_y, y - small * 0.75);
         max_y = max(max_y, y + small * 0.75);
+        let id_after_width = m.text(&captured_label)?;
+        let id = id_after_width.as_ref();
         let mut label = SvgSink::new(&mut labels_out);
         label.raw("<g class=\"pele-label\" data-id=\"");
         label.decoded_text(id)?;
@@ -224,8 +281,10 @@ fn draw(
         let mid = num((x0 + x1) / 2.);
         // These escaped fragments occur in both the attribute and title.
         // Decode in the original order before appending the element.
-        let from = esc_text(&m.nodes()[link.source].id)?;
-        let to = esc_text(&m.nodes()[link.target].id)?;
+        let source_label = m.label(link.source)?;
+        let from = esc_text(m.text(&source_label)?.as_ref())?;
+        let target_label = m.label(link.target)?;
+        let to = esc_text(m.text(&target_label)?.as_ref())?;
         let mut path = SvgSink::new(&mut links_out);
         path.raw("<path class=\"pele-sankey-link\" data-id=\"");
         path.raw(&from);
@@ -267,7 +326,7 @@ fn draw(
         path.raw(&series_color(end));
         path.raw("\"");
         if fixed.is_empty() {
-            path.raw(&node_style(end));
+            path.raw(&node_style(m, custom, end)?);
         } else {
             path.raw(&fixed);
         }
@@ -285,7 +344,16 @@ fn draw(
         .max_width
         .filter(|v| *v > 0.)
         .map_or(4000., |v| max(80., v - 2. * pad));
-    let title = layout_label(m.title(), false, r, o, size, room, 1)?;
+    let title_value = m.title()?;
+    let title = layout_label(
+        title_value.as_ref().map(AsRef::as_ref),
+        false,
+        r,
+        o,
+        size,
+        room,
+        1,
+    )?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
@@ -323,14 +391,16 @@ fn draw(
     output.raw("\">");
     output.raw(&labels_out);
     output.raw("</g></g>");
+    let acc_title = m.accessibility(false)?;
+    let acc_descr = m.accessibility(true)?;
     let svg = svg::document(
         "sankey",
         width,
         height,
         size,
         o,
-        m.acc_title(),
-        m.acc_descr(),
+        acc_title.as_ref().map(AsRef::as_ref),
+        acc_descr.as_ref().map(AsRef::as_ref),
         &body,
     )?;
     Ok(Rendered {

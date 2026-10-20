@@ -3,7 +3,14 @@
 pub(crate) mod captured_admission;
 pub(crate) mod captured_read;
 pub(crate) mod captured_write;
+mod detached_render;
 mod engine;
+#[doc(hidden)]
+pub use detached_render::{
+    DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion, DetachedRenderJob,
+    DetachedRenderOutcome, DetachedRenderRequest, DetachedRenderValue, LiveRenderRead,
+    LiveStringUse, LiveValueKind,
+};
 mod graph;
 pub(crate) mod graph_read;
 #[doc(hidden)]

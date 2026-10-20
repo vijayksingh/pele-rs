@@ -1,4 +1,5 @@
 //! Shared rich labels translated from Pele text/label.ts (458322a5, MIT, kepano).
+mod icon_cursor;
 mod metrics;
 use crate::compat::{
     source::{decode_entities, space, word},
@@ -66,13 +67,18 @@ fn push_icons(
     style: u8,
     resources: &mut dyn RenderResources,
 ) -> Result<(), PeleError> {
-    static ICON: OnceLock<Regex> = OnceLock::new();
-    let re = ICON.get_or_init(|| Regex::new(r"(fa[bklrs]?):fa-([A-Za-z0-9_-]+)").unwrap());
+    // The pinned JS fast path does not touch the shared expression cursor.
+    if !text.contains(":fa-") {
+        return push_text(line, text, style);
+    }
+    let mut cursor = icon_cursor::IconCursor::new();
     let mut last = 0;
-    for m in re.find_iter(text) {
-        let name = m.as_str();
-        push_text(line, &text[last..m.start()], style)?;
-        last = m.end();
+    while let Some(found) = cursor.next(text) {
+        let name = &text[found.clone()];
+        // JS slice(start, end) is empty when a nested scan rewinds the next
+        // match before our previous end; it must not become a Rust range panic.
+        push_text(line, &text[last.min(found.start)..found.start], style)?;
+        last = found.end;
         if resources
             .icon(name)?
             .is_some_and(|svg| !svg.markup().is_empty())

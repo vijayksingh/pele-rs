@@ -63,3 +63,7 @@ packet across diagram families while preserving legacy envelopes and exports.
 [Arena render outcomes](LLD_ARENA_RENDER_PACKET.md) borrow post-render graphs for
 binary consumers and return browser success results directly while retaining
 full graph publication and exact combined transport limits.
+
+[Detached live rendering](LLD_DETACHED_RENDER.md) ends the mutable document borrow
+before builtin Sankey resource callbacks, keeps Rust geometry shared with native
+consumers, and acknowledges completion without restoring caller-owned objects.
