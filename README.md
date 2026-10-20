@@ -177,6 +177,18 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 
 **0.3 remains unreleased. The latest full performance release gate still fails all 126 conditions.**
 
+The latest measured [arena render transport](docs/benchmarks/2026-10-20-er-host-storage/arena-render-packet/),
+source `9ae8142`, borrows native post-render graphs and returns browser results
+without complete result-JSON buffers. All **36 affected retained-render rows**
+have lower paired medians, **1.20–24.16%** lower (median **−15.30%**), but still
+take **1.65–18.49× JS time**. All 12 affected first-unchanged-render conditions
+improve; one edited Flowchart condition is slightly slower. Parse/source controls
+remain mixed: a longer follow-up retains **+2.70%** for Sequence/small fixed
+parse. Full browser correctness passes **417/417**, alongside 41 native
+integrations, 16 Swift integrations, three C consumers and 168 Swift API
+conditions. Local Swift latency is unmeasured: unrelated compiler processes
+blocked the guarded attempt. These diagnostics do not satisfy the release gate.
+
 The [source-result packet](docs/benchmarks/2026-10-20-er-host-storage/source-result-packet/),
 source `640deee`, removes the complete result JSON round trip while preserving
 exact byte limits, dimension bits and callback errors. Its new **126-condition
