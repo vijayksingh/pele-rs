@@ -156,7 +156,7 @@ test('ER packet preserves both envelope and combined graph-plus-metadata byte ga
         };
         draw();const first=observed.bytes;model.accDescr='""';draw();const step=observed.bytes-first;
         if(!Number.isSafeInteger(step)||step<2||step>16)throw new Error('Unexpected escaped accessibility JSON growth');
-        const count=1+Math.floor((maximum-1-first)/step)+(raw?0:1);
+        const count=raw?1+Math.floor((maximum-1-first)/step):2+Math.floor((maximum-first)/step);
         if(count<1||count>12*1024*1024)throw new Error('Invalid bounded accessibility fixture');
         model.accDescr='"'.repeat(count);observed=undefined;calls=0;
         try{draw();}catch(value){error={name:value?.name,message:value?.message,code:value?.code,type:value?.type};}
@@ -179,6 +179,6 @@ test('ER packet preserves both envelope and combined graph-plus-metadata byte ga
       expect(packet.attempted).toEqual({success:true,bytes:packet.expectedBytes});
       expect(packet.attempted.bytes).toBeLessThanOrEqual(64*1024*1024);
       expect(packet.attempted.bytes).toBeGreaterThan(64*1024*1024-17);
-    }else expect(packet.attempted).toBeUndefined();
+    }else {expect(packet.expectedBytes).toBeGreaterThan(64*1024*1024);expect(packet.attempted).toBeUndefined();}
   }
 });
