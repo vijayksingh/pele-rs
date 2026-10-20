@@ -227,3 +227,52 @@ test('source layout restoration keeps scalar bits and nested publication cursors
   for(const stage of ['afterMatch','restored','afterHelper'])expect(report[stage],stage).toEqual(report.initial);
   for(const stage of ['acceptedOutput','matched','recovery'])expect(report[stage],stage).toEqual(report.expected);
 });
+
+test('source ingress preserves edited lifecycle, rejected observation repair and helper partial history',async({page},info)=>{
+  test.setTimeout(120000);await prepare(page);
+  const report=await page.evaluate(async()=>{
+    const {loadRenderer}=await import('/dist/package-web/package/full.js'),wasm=await import('/dist/package-web/package/pkg/pele.js');
+    const {snapshot,output,error,source}=window.__sourceLayoutFeature,p=wasm.MutableDocument.prototype;
+    const names=['source_ingress_identity','apply_source_input','apply_binary'],saved=new Map(names.map(n=>[n,Object.getOwnPropertyDescriptor(p,n)]));
+    if([...saved.values()].some(d=>typeof d?.value!=='function'))throw Error('Expected source ingress capabilities');
+    const restore=()=>{for(const[n,d]of saved)Object.defineProperty(p,n,d);};const rows=[];
+    try{
+      for(const mode of ['sparse','canonical']){
+        restore();const counts={sparse:0,canonical:0};
+        if(mode==='canonical')Object.defineProperty(p,'source_ingress_identity',{...saved.get('source_ingress_identity'),value(){return undefined;}});
+        for(const name of ['apply_source_input','apply_binary']){const d=saved.get(name);Object.defineProperty(p,name,{...d,value:function(...args){counts[name==='apply_source_input'?'sparse':'canonical']++;return Reflect.apply(d.value,this,args);}});}
+        const engine=await loadRenderer();let model;const row={mode,steps:[],counts};
+        try{
+          model=engine.parse(source);const first=model.nodes[0],lookup=model.lookup,detached=[];
+          const draw=mutate=>{const trace=[];let fired=false;let value;try{value=output(engine.render(model,{measurer:{width(text,size,style){trace.push([text,size,style]);if(mutate&&!fired){fired=true;mutate();}return text.length*size*.6;}}}));return{value,trace};}catch(e){return{error:error(e),trace,thrown:e};}};
+          const record=name=>{const rendered=draw();row.steps.push({name,graph:snapshot([model,detached]).signature,...(rendered.error?{error:rendered.error}:{value:rendered.value}),trace:rendered.trace,aliases:model.links[0].source===first&&lookup.get('A')===first&&model.lookup===lookup});};
+          const extra={label:'\ud800\u0000\udc00',negativeZero:-0,infinity:Infinity};extra.self=extra;model.extension=extra;detached.push(extra);record('edited');
+          const returned=model.findOrCreateNode('A');row.helperAlias=returned===first&&lookup.get('A')===first;
+          // Accessor failure follows retained-history additions. Repair must not
+          // replay an observed-baseline delta against stale accepted native data.
+          model.pending={label:'history before rejected accessor'};Object.defineProperty(model.pending,'bad',{get(){return 1;},configurable:true});
+          const callsBefore=counts.sparse+counts.canonical;const rejected=draw();row.rejected={error:rejected.error,noApply:counts.sparse+counts.canonical===callsBefore};delete model.pending.bad;delete model.pending;record('repaired-observation');
+          first.id=123;const invalid=draw();row.latent=invalid.error;first.id='A';record('repaired-import');
+          const before=snapshot([model,detached]),sentinel={sourceIngress:'callback'};
+          const thrown=draw(()=>{extra.label='unaccepted';first.id='callback';lookup.clear();delete model.extension;throw sentinel;});
+          row.originalThrow=thrown.thrown===sentinel;row.callbackRestored=JSON.stringify(snapshot([model,detached]).signature)===JSON.stringify(before.signature);record('callback-recovery');
+          // Scalar format rejection stays before native ingress; the Proxy also
+          // remains in detached observation history after removing its root edge.
+          let invalidLength=true;const proxy=new Proxy([],{get(target,key,receiver){return key==='length'&&invalidLength ? .5 : Reflect.get(target,key,receiver);}});
+          model.invalidArray=proxy;const beforeScalar=counts.sparse+counts.canonical;const scalar=draw();row.scalar={error:scalar.error,noApply:counts.sparse+counts.canonical===beforeScalar};invalidLength=false;delete model.invalidArray;record('scalar-recovery');
+          const locked=model.nodes;Object.defineProperty(locked,'length',{writable:false});record('locked');
+          try{model.findOrCreateNode('partial-node');row.partial={missingThrow:true};}catch(e){row.partial=error(e);}
+          detached.push(locked);model.nodes=[...locked];record('partial-helper-repair');
+          row.finalAliases=extra.self===extra&&model.extension===extra&&model.links[0].source===first;
+        }catch(e){row.fatal=error(e);}finally{if(model)engine.dispose(model);engine.close();}
+        rows.push(row);
+      }
+    }finally{restore();}
+    return{rows,restored:names.every(n=>{const a=Object.getOwnPropertyDescriptor(p,n),b=saved.get(n);return a.value===b.value&&a.writable===b.writable&&a.configurable===b.configurable&&a.enumerable===b.enumerable;})};
+  });
+  await save(info,'source-ingress-edited-lifecycle.json',report);
+  expect(report.restored).toBe(true);expect(report.rows).toHaveLength(2);
+  const [actual,control]=report.rows;for(const row of report.rows){expect(row.fatal).toBeUndefined();expect(row.helperAlias).toBe(true);expect(row.originalThrow).toBe(true);expect(row.callbackRestored).toBe(true);expect(row.finalAliases).toBe(true);expect(row.rejected.noApply).toBe(true);expect(row.scalar.noApply).toBe(true);expect(row.rejected.error).toBeDefined();expect(row.scalar.error).toBeDefined();expect(row.latent).toBeDefined();expect(row.partial.missingThrow).toBeUndefined();}
+  expect(actual.counts.sparse).toBeGreaterThan(0);expect(actual.counts.canonical).toBe(0);expect(control.counts.sparse).toBe(0);expect(control.counts.canonical).toBeGreaterThan(0);
+  expect(actual.steps).toEqual(control.steps);expect(actual.rejected).toEqual(control.rejected);expect(actual.scalar).toEqual(control.scalar);expect(actual.latent).toEqual(control.latent);expect(actual.partial).toEqual(control.partial);
+});

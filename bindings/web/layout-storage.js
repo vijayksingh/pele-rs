@@ -90,8 +90,16 @@ class LayoutNodeCursor{
     else{selectItem(this.record,index,this);evaluate(this.template,this.local,this.itemRow,this.graph.base.columns,this);}
   }
   writeAtom(out,at){if(this.tag===4&&!this.raw)setAtom(out,at,4,this.payload);else{out[at]=this.tag;out[at+1]=this.lo;out[at+2]=this.hi;}}
-  propertyWords(index,out){this.property(index);out[0]=this.keyId;out[1]=this.flags;this.writeAtom(out,2);}
-  itemWords(index,out){this.item(index);this.writeAtom(out,0);}
+  propertyWords(index,out){
+    if(this.override){if(index>=this.propertyCount)invalid();for(let k=0;k<5;k++)out[k]=this.record.properties[index*5+k];return;}
+    selectProperty(this.record,index,this);const p=this.template,row=this.itemRow;
+    evaluate(p.key,this.local,row,this.graph.base.columns,out,2);if(out[2]!==5)invalid();out[0]=out[3];out[1]=p.flags;
+    evaluate(p.value,this.local,row,this.graph.base.columns,out,2);
+  }
+  itemWords(index,out){
+    if(this.override){if(index>=this.itemAtoms)invalid();for(let k=0;k<3;k++)out[k]=this.record.items[index*3+k];return;}
+    selectItem(this.record,index,this);evaluate(this.template,this.local,this.itemRow,this.graph.base.columns,out,0);
+  }
 }
 function missing(){const node=undefined;return node.properties;}
 export class LayoutGraph{
@@ -260,7 +268,7 @@ class LayoutCapture{
     if(!same){const record={kind:code,lo,hi,...(hi&&(code===2||code===6)?{invalidAux:aux}:{}),properties:n.properties??this.copyProperties(n.propertyAt),items:n.items??this.copyItems(n.itemAt)};this.overrides.set(id,record);this.changes.push([id,record]);}
     this.nodeCount=Math.max(this.nodeCount,id+1);this.node=null;
   }
-  finish(strings){if(this.node)invalid();const graph=new LayoutGraph(this.baseline.base,strings.slice(),this.overrides,this.nodeCount,this.rootWords);const result={graph,values:this.values};if(this.delta)result.delta={stringsStart:this.baseline.strings.length,strings:graph.strings.slice(this.baseline.strings.length).map(stringUnits),nodesStart:this.baseline.nodeCount,nodes:this.changes.sort((a,b)=>a[0]-b[0]).map(([id,record])=>[id,canonicalRecord(record)])};return result;}
+  finish(strings){if(this.node)invalid();const graph=new LayoutGraph(this.baseline.base,strings.slice(),this.overrides,this.nodeCount,this.rootWords);const result={graph,values:this.values};if(this.delta)result.delta={stringsStart:this.baseline.strings.length,strings:graph.strings.slice(this.baseline.strings.length).map(stringUnits),nodesStart:this.baseline.nodeCount,nodes:this.delta==='packed'?this.changes:this.changes.sort((a,b)=>a[0]-b[0]).map(([id,record])=>[id,canonicalRecord(record)])};return result;}
   abort(){this.overrides=null;this.node=null;this.values=null;}
 }
 const atomScratch=new Uint32Array(3);
@@ -298,8 +306,8 @@ function decodeCanonicalLayout(bytes,baseline){
   if(r.at!==bytes.length)invalid();return{revision,graph};
 }
 const atomSize=tag=>tag===4?9:tag>=5?5:1;
-export function encodeLayoutBinary(revision,graph,metadataBytes=new Uint8Array()){
-  let size=32+atomSize(graph.rootWords[0])+metadataBytes.length;
+function layoutBinarySize(graph,metadataLength){
+  let size=32+atomSize(graph.rootWords[0])+metadataLength;
   for(const text of graph.strings)size+=4+2*text.length;
   const words=new Uint32Array(5);
   for(let id=0;id<graph.nodeCount;id++){
@@ -310,19 +318,56 @@ export function encodeLayoutBinary(revision,graph,metadataBytes=new Uint8Array()
     else if(kind!==0)invalid();
   }
   if(!Number.isSafeInteger(size)||size>BUDGET)limit();
-  const bytes=new Uint8Array(size),view=new DataView(bytes.buffer);let at=0;
-  const byte=value=>view.setUint8(at++,value),word=value=>{if(!u32(value))invalid();view.setUint32(at,value,true);at+=4;};
+  return size;
+}
+// One canonical field writer serves full transport, dry scalar preflight and
+// sparse replacement records. A dry writer keeps error order without allocating
+// or filling the full graph byte buffer.
+function layoutWriter(bytes,graph){
+  const view=bytes?new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength):null,words=new Uint32Array(5);let at=0;
+  const byte=value=>{if(view)view.setUint8(at,value);at++;};
+  const word=value=>{if(!u32(value))invalid();if(view)view.setUint32(at,value,true);at+=4;};
+  const wide=value=>{const n=BigInt(value);if(view)view.setBigUint64(at,n,true);at+=8;};
   const atom=(tag,lo,hi)=>{if(tag>8)invalid();byte(tag);if(tag>=4)word(lo);if(tag===4)word(hi);};
-  for(const b of [80,69,76,71,66,73,78,49])byte(b);word(1);view.setBigUint64(at,BigInt(revision),true);at+=8;word(metadataBytes.length);
-  atom(...graph.rootWords);word(graph.strings.length);for(const text of graph.strings){word(text.length);for(let i=0;i<text.length;i++){view.setUint16(at,text.charCodeAt(i),true);at+=2;}}
-  word(graph.nodeCount);
-  for(let id=0;id<graph.nodeCount;id++){
-    const kind=graph.kind(id),aux=graph.aux(id);byte(kind);
+  const text=value=>{word(value.length);if(view)for(let i=0;i<value.length;i++)view.setUint16(at+i*2,value.charCodeAt(i),true);at+=value.length*2;};
+  const node=(id,packed)=>{
+    const kind=packed?packed.kind:graph.kind(id),aux=packed??graph.aux(id);byte(kind);
     if(kind===1||kind===2){if(kind===2&&aux.hi)invalid();word(aux.lo);}
     else if(kind===6){if(aux.hi||aux.lo>=errors.length)invalid();byte(aux.lo);}
     else if(kind===5){word(aux.lo);word(aux.hi);}
-    else if(kind===3||kind===4){word(graph.itemAtoms(id)/(kind===3?2:1));for(let i=0;i<graph.itemAtoms(id);i++){graph.item(id,i,words);atom(words[0],words[1],words[2]);}}
-    word(graph.propertyCount(id));for(let i=0;i<graph.propertyCount(id);i++){graph.property(id,i,words);word(words[0]);byte(words[1]);atom(words[2],words[3],words[4]);}
+    else if(kind===3||kind===4){const n=packed?packed.items.length/3:graph.itemAtoms(id);word(n/(kind===3?2:1));for(let i=0;i<n;i++){if(packed){for(let k=0;k<3;k++)words[k]=packed.items[i*3+k];}else graph.item(id,i,words);atom(words[0],words[1],words[2]);}}
+    const n=packed?packed.properties.length/5:graph.propertyCount(id);word(n);
+    for(let i=0;i<n;i++){if(packed){for(let k=0;k<5;k++)words[k]=packed.properties[i*5+k];}else graph.property(id,i,words);word(words[0]);byte(words[1]);atom(words[2],words[3],words[4]);}
+  };
+  return{byte,word,wide,atom,text,node,offset:()=>at};
+}
+function writeLayoutBinary(revision,graph,metadataBytes,size,dry=false){
+  const bytes=dry?null:new Uint8Array(size),w=layoutWriter(bytes,graph);
+  for(const b of [80,69,76,71,66,73,78,49])w.byte(b);w.word(1);w.wide(revision);w.word(metadataBytes.length);
+  w.atom(...graph.rootWords);w.word(graph.strings.length);for(const text of graph.strings)w.text(text);
+  w.word(graph.nodeCount);for(let id=0;id<graph.nodeCount;id++)w.node(id);
+  if(bytes)bytes.set(metadataBytes,w.offset());if(w.offset()+metadataBytes.length!==size)invalid();return bytes;
+}
+export function encodeLayoutBinary(revision,graph,metadataBytes=new Uint8Array()){
+  return writeLayoutBinary(revision,graph,metadataBytes,layoutBinarySize(graph,metadataBytes.length));
+}
+// Null chooses full canonical ingress BEFORE any native call. The effective
+// FULL graph pays its old count/missing-slot and scalar-format gates first.
+export function encodeSourceInput(revision,graph,identity){
+  if(!(graph instanceof LayoutGraph)||!identity||graph.base.layoutId!==identity||!graph.base.originalStrings)return null;
+  const size=layoutBinarySize(graph,0);writeLayoutBinary(revision,graph,new Uint8Array(),size,true);
+  const strings=[];let physical=44+atomSize(graph.rootWords[0]);
+  for(let id=0;id<graph.strings.length;id++)if(id>=graph.base.originalStrings.length||graph.strings[id]!==graph.base.originalStrings[id]){strings.push(id);physical+=8+graph.strings[id].length*2;}
+  const nodes=[...graph.overrides.keys()].filter(id=>id<graph.nodeCount).sort((a,b)=>a-b);
+  for(const id of nodes){const n=graph.overrides.get(id);physical+=9;
+    if(n.kind===1||n.kind===2)physical+=4;else if(n.kind===5)physical+=8;else if(n.kind===6)physical+=1;
+    else if(n.kind===3||n.kind===4){physical+=4;for(let i=0;i<n.items.length;i+=3)physical+=atomSize(n.items[i]);}
+    for(let i=0;i<n.properties.length;i+=5)physical+=5+atomSize(n.properties[i+2]);
   }
-  bytes.set(metadataBytes,at);at+=metadataBytes.length;if(at!==size)invalid();return bytes;
+  if(!Number.isSafeInteger(physical)||physical>BUDGET)return null;
+  const bytes=new Uint8Array(physical),w=layoutWriter(bytes,graph);
+  for(const b of [80,76,67,83,82,73,48,49])w.byte(b);w.wide(identity);w.wide(revision);w.word(graph.version);w.atom(...graph.rootWords);w.word(graph.strings.length);w.word(graph.nodeCount);
+  w.word(strings.length);for(const id of strings){w.word(id);w.text(graph.strings[id]);}
+  w.word(nodes.length);for(const id of nodes){w.word(id);w.node(id,graph.overrides.get(id));}
+  if(w.offset()!==physical)invalid();return bytes;
 }

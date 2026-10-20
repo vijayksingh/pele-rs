@@ -1,4 +1,4 @@
-import {LayoutGraph} from './layout-storage.js';
+import {LayoutGraph,encodeSourceInput} from './layout-storage.js';
 import {decodeLayoutOutcome} from './layout-packet.js';
 import {CapturedOwner,capturedSankeyAvailable,rememberCapturedModel,capturedObservedFrame} from './captured-owner.js';
 import {HostErOwner} from './host-er-store.js';
@@ -182,12 +182,15 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     entry.confirmedGraph = false;
     const baseline = entry.bridge.graph;
     if(confirmed&&entry.unchangedApplyIsNoop&&values.length===0&&entry.bridge.matchesPublishedGraph())return {graph:baseline,values:[]};
-    const input = entry.bridge.snapshot(values, true), delta = input.delta;
+    const input = entry.bridge.snapshot(values, entry.sourceIngressIdentity ? 'packed' : true), delta = input.delta;
     const unchanged = confirmed && entry.unchangedApplyIsNoop &&
       input.graph.root.kind === baseline.root.kind && input.graph.root.value === baseline.root.value &&
       delta.nodes.length === 0 && delta.strings.length === 0 &&
       (input.graph instanceof LayoutGraph ? input.graph.nodeCount === baseline.nodeCount : input.graph.nodes.length === baseline.nodes.length) && input.graph.strings.length === baseline.strings.length;
-    if (!unchanged) entry.revision = result(entry.handle.apply_binary(encodeGraphBinary(entry.revision, input.graph)));
+    if (!unchanged) {
+      const sparse=entry.sourceIngressIdentity?encodeSourceInput(entry.revision,input.graph,entry.sourceIngressIdentity):null;
+      entry.revision=result(sparse===null?entry.handle.apply_binary(encodeGraphBinary(entry.revision,input.graph)):entry.handle.apply_source_input(sparse));
+    }
     return input;
   }
   function publishMutableOutcome(entry, outcome) {
@@ -281,6 +284,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           const schema = registration.schema;
           const rawType=mutable.entry_type(), live=preparedType===undefined?liveProviders.get(rawType):undefined;
           const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider, confirmedGraph: false, unchangedApplyIsNoop: mutable.unchanged_public_graph_is_noop?.() === true};
+          // Captured concrete provider capability, never selected by schema.
+          entry.sourceIngressIdentity=snapshot.graph instanceof LayoutGraph&&typeof mutable.apply_source_input==='function'
+            ?mutable.source_ingress_identity?.():undefined;
           const invoke = (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             const input = prepareMutableInput(entry, [receiver, ...argumentsValue]);

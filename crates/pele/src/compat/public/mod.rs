@@ -7,9 +7,11 @@ mod engine;
 mod graph;
 pub(crate) mod graph_read;
 #[doc(hidden)]
-pub use graph_read::{GraphReadView, PublicGraphRead, TrustedGraphRead};
+pub use captured_admission::{
+    AdmissionKind as GraphNodeKind, Extent as GraphExtent, Header as GraphHeader,
+};
 #[doc(hidden)]
-pub use captured_admission::{Extent as GraphExtent, Header as GraphHeader, AdmissionKind as GraphNodeKind};
+pub use graph_read::{GraphReadView, PublicGraphRead, TrustedGraphRead};
 mod initial_store;
 #[doc(hidden)]
 pub use initial_store::InitialWriter;
@@ -20,9 +22,8 @@ mod schema;
 #[doc(hidden)]
 pub use engine::HostErEntrySelection;
 pub use engine::{
-    ReadOutcome,
     ParsedPublicModel, PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome,
-    RawRenderOutcomeView, RenderOutcomeView,
+    RawRenderOutcomeView, ReadOutcome, RenderOutcomeView,
 };
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 
@@ -49,3 +50,7 @@ pub use engine::HostSankeyEntrySelection;
 
 #[cfg(feature = "web-host-sankey")]
 pub(crate) mod flat_store;
+
+pub(crate) mod source_input;
+#[doc(hidden)]
+pub use source_input::SourceIngress;

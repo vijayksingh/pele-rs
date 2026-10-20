@@ -372,6 +372,17 @@ impl MutableDocument {
         };
         run().map_err(|error| JsValue::from_str(&pele::compat::error_envelope(&error)))
     }
+    pub fn source_ingress_identity(&mut self) -> Option<String> {
+        self.inner
+            .source_ingress_identity()
+            .map(|id| id.to_string())
+    }
+    pub fn apply_source_input(&mut self, bytes: &[u8]) -> String {
+        match self.inner.apply_source_input(bytes) {
+            Ok(()) => public_result(&self.inner.revision().to_string()),
+            Err(error) => pele::compat::error_envelope(&error),
+        }
+    }
     pub fn apply_binary(&mut self, bytes: &[u8]) -> String {
         let mut run = || -> Result<(), pele::compat::PeleError> {
             let exchange = pele::compat::public::decode_binary_exchange(

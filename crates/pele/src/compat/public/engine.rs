@@ -150,6 +150,15 @@ pub trait PublicDiagramModule: DiagramModule {
     fn unchanged_public_graph_is_noop(&self) -> bool {
         false
     }
+    /// Optional sealed source ingress. The captured codec verifies concrete
+    /// creator provenance; default providers keep their existing apply hook.
+    #[doc(hidden)]
+    fn source_ingress<'a>(
+        &self,
+        _state: &'a mut Self::PublicState,
+    ) -> Option<super::SourceIngress<'a>> {
+        None
+    }
     fn apply_public(
         &self,
         state: &mut Self::PublicState,
@@ -324,6 +333,7 @@ trait Erased: Send + Sync {
     fn has_source_layout(&self, state: &State) -> bool;
     fn borrow_read<'a>(&self, state: &'a State) -> Option<&'a dyn PublicGraphRead>;
     fn unchanged_public_graph_is_noop(&self) -> bool;
+    fn source_ingress<'a>(&self, state: &'a mut State) -> Option<super::SourceIngress<'a>>;
     fn apply(&self, state: &mut State, graph: ModelGraph) -> Result<(), PeleError>;
     fn invoke(
         &self,
@@ -418,6 +428,11 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     }
     fn unchanged_public_graph_is_noop(&self) -> bool {
         self.0.unchanged_public_graph_is_noop()
+    }
+    fn source_ingress<'a>(&self, s: &'a mut State) -> Option<super::SourceIngress<'a>> {
+        self.0
+            .source_ingress(s.downcast_mut().expect("paired public state"))?
+            .for_creator::<D>()
     }
     fn apply(&self, s: &mut State, g: ModelGraph) -> Result<(), PeleError> {
         self.0
@@ -1179,6 +1194,59 @@ impl PublicDocument {
     }
     pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
         self.snapshot_view().map(Cow::into_owned)
+    }
+    /// Discovery is state-specific and provenance checked, never schema based.
+    #[doc(hidden)]
+    pub fn source_ingress_identity(&mut self) -> Option<u64> {
+        self.registration
+            .codec
+            .source_ingress(&mut self.state)?
+            .layout_id()
+    }
+    /// Internal complete source overlay. Legacy binary apply remains unchanged.
+    #[doc(hidden)]
+    pub fn apply_source_input(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
+        let input = super::source_input::BorrowedOverlay::decode(bytes)?;
+        let revision = self.revision;
+        let registration = &self.registration;
+        let mut ingress = registration
+            .codec
+            .source_ingress(&mut self.state)
+            .ok_or_else(|| {
+                PeleError::new("Source model ingress is unavailable", ErrorCode::Semantic)
+            })?;
+        if ingress.layout_id() != Some(input.layout_id) {
+            return Err(super::binary::invalid());
+        }
+        // No replacement maps, UTF16 vectors, or Node/Atom vectors are
+        // allocated until complete virtual decoder allocation gates pass.
+        let input = ingress.prepare(input)?;
+        let mut next = revision;
+        ingress.with_candidate(&input, &mut |candidate| {
+            // Full virtual decode precedes stale revision/schema, just as the
+            // complete binary decoder does. No receipt skips these predicates.
+            super::captured_transport::admit_observed(
+                &mut super::graph_read::ReadAdapter(candidate),
+                0,
+                super::DEFAULT_BINARY_BUDGET,
+            )?;
+            if input.revision != revision {
+                return Err(PeleError::new(
+                    "Stale public model revision",
+                    ErrorCode::Semantic,
+                ));
+            }
+            next = revision.checked_add(1).ok_or_else(|| {
+                PeleError::new("Public model revision exhausted", ErrorCode::Limit)
+            })?;
+            let compiled = registration.compiled_schema()?;
+            super::graph_read::validate_schema(candidate, registration.schema, compiled)?;
+            // Preserve the module's apply-time structural admission as well.
+            super::captured_admission::validate(&mut super::graph_read::ReadAdapter(candidate))
+        })?;
+        ingress.commit(input);
+        self.revision = next;
+        Ok(())
     }
     pub fn apply(&mut self, expected_revision: u64, graph: ModelGraph) -> Result<(), PeleError> {
         if expected_revision != self.revision {

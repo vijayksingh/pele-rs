@@ -679,6 +679,15 @@ impl PublicDiagramModule for Sankey {
             Canonical::Source(graph) => crate::compat::public::graph_read::materialize(graph),
         }
     }
+    fn source_ingress<'a>(
+        &self,
+        state: &'a mut Self::PublicState,
+    ) -> Option<crate::compat::public::SourceIngress<'a>> {
+        if !matches!(&state.graph, Canonical::Source(graph) if graph.ingress_id().is_some()) {
+            return None;
+        }
+        Some(crate::compat::public::SourceIngress::new::<Self>(state))
+    }
     fn apply_public(
         &self,
         state: &mut Self::PublicState,
@@ -972,4 +981,44 @@ fn source_text_budget(nodes: &[SankeyNode]) -> Result<(), PeleError> {
         }
     }
     Ok(())
+}
+
+impl crate::compat::public::source_input::SourceIngressOwner for SankeyPublicState {
+    fn layout_id(&self) -> Option<u64> {
+        match &self.graph {
+            Canonical::Source(graph) => graph.ingress_id(),
+            _ => None,
+        }
+    }
+    fn prepare(
+        &self,
+        input: crate::compat::public::source_input::BorrowedOverlay<'_>,
+    ) -> Result<crate::compat::public::source_input::SourceOverlay, PeleError> {
+        let Canonical::Source(graph) = &self.graph else {
+            return Err(crate::compat::public::graph_read::invalid());
+        };
+        graph.prepare_overlay(input)
+    }
+    fn with_candidate(
+        &mut self,
+        input: &crate::compat::public::source_input::SourceOverlay,
+        visit: &mut dyn FnMut(&dyn crate::compat::public::PublicGraphRead) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        let Canonical::Source(graph) = &mut self.graph else {
+            return Err(crate::compat::public::graph_read::invalid());
+        };
+        visit(&graph.candidate(input)?)
+    }
+    fn commit_admitted(&mut self, input: crate::compat::public::source_input::SourceOverlay) {
+        let Canonical::Source(graph) = &mut self.graph else {
+            unreachable!("paired source ingress");
+        };
+        let candidate = graph.candidate(&input).expect("admitted source identity");
+        let model = imported_from(&mut crate::compat::public::source_input::CapturedLogical(
+            &candidate,
+        ))
+        .map(Projection::Legacy);
+        graph.adopt_overlay(input);
+        self.model = model;
+    }
 }

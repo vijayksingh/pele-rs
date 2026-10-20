@@ -71,7 +71,9 @@ IDs permanently select that format for new owners without adding an error.
 
 The existing `ModelBridge` retains registry identities, busy/disposed state and
 callback dispatch. Its storage binding selects logical traversal once. Capture
-stores changed records and uses existing native apply/ModelDelta ingress. Every
+stores complete current replacements against the original source. A sealed,
+creator-checked capability can accept these replacements directly; generic
+providers retain existing full graph apply/ModelDelta ingress. Every
 final outcome restores the complete accepted graph, including historical
 objects. A failed observation or publication never confirms a new baseline.
 An accepted revision is not rolled back because transport or a result factory
@@ -97,6 +99,24 @@ generic publication. The accepted layout remains the original bridge baseline;
 helpers, capture and recovery keep the shared path. No grammar, helper policy,
 layout algorithm or native pointer lifetime moves into this initializer. The
 checked-in output must reproduce exactly from the built native schema/recipe.
+
+Edited source ingress uses a separate bounded PLCSRI01 envelope: exact immutable
+layout identity, expected revision, current root/extents and complete original-base
+string/record replacements. It does not send the delta from the last JS observation,
+which may have been rejected natively. Missing overrides restore original data.
+Before dispatch, JS preserves the old full-frame count/missing-slot pass and scalar
+format error order. Sparse physical overflow selects full ingress before mutation;
+there is no failure retry or operation replay.
+
+Native physical scanning borrows byte slices without table-sized allocations. A
+shared wire decoder serves both scanning and legacy materialization. Two streaming
+original-base merges first check full canonical width, then version, table, UTF16
+and aggregate work limits in existing order. Only admitted replacements allocate.
+Existing structural/schema validation, revision checks and eager imported Result
+retain their stages. Commit invalidates receipts, replaces sparse state, clears
+helper patches and advances revision atomically. Custom modules cannot forward a
+builtin ingress token to bypass their captured apply hook; creator TypeId must
+match the captured module. Existing binary and C/Swift entry points stay intact.
 
 ## Bounds and compatibility
 

@@ -1316,3 +1316,286 @@ fn key_slot(key: &str) -> usize {
         _ => unreachable!("static Sankey field"),
     }
 }
+
+/// Incoming replacements shadow the ORIGINAL source, not current accepted
+/// patches. A rejected observation can therefore be repaired without replaying
+/// an observed-baseline delta against a different native state.
+pub(super) struct SourceCandidate<'a> {
+    base: &'a mut SourceCanonical,
+    input: &'a crate::compat::public::source_input::SourceOverlay,
+}
+impl SourceCanonical {
+    pub(super) fn ingress_id(&self) -> Option<u64> {
+        self.layout_id
+    }
+    pub(super) fn candidate<'a>(
+        &'a mut self,
+        input: &'a crate::compat::public::source_input::SourceOverlay,
+    ) -> Result<SourceCandidate<'a>, PeleError> {
+        if self.layout_id != Some(input.layout_id) {
+            return Err(graph_read::invalid());
+        }
+        Ok(SourceCandidate { base: self, input })
+    }
+    /// Scan borrowed replacements twice without any count-proportional
+    /// allocation: complete canonical width first, then the decoder's ordered
+    /// table/UTF16/work gates. Only bounded, admitted payloads are expanded.
+    pub(super) fn prepare_overlay(
+        &self,
+        input: crate::compat::public::source_input::BorrowedOverlay<'_>,
+    ) -> Result<crate::compat::public::source_input::SourceOverlay, PeleError> {
+        use crate::compat::public::{
+            binary,
+            captured_transport::{Counter, DecoderBudget},
+        };
+        if self.layout_id != Some(input.layout_id) {
+            return Err(graph_read::invalid());
+        }
+        let mut size = Counter::new(binary::DEFAULT_BINARY_BUDGET);
+        size.prefix(0)?;
+        size.atom(&input.root)?;
+        size.count(input.string_count)?;
+        self.overlay_string_lengths(&input, |units| size.string(units))?;
+        size.count(input.node_count)?;
+        self.overlay_node_headers(&input, |id, header, raw| {
+            if let Some(raw) = raw {
+                // This is the already-scanned canonical body, with no metadata
+                // or sparse directory wrapper. Counting it never expands atoms.
+                return size.put(raw.len());
+            }
+            size.node_prefix(header.kind)?;
+            if let AdmissionKind::Map(count) = header.kind {
+                for slot in 0..count {
+                    let (key, value) = self.base_entry(slot);
+                    size.atom(&key)?;
+                    size.atom(&value)?;
+                }
+            }
+            size.count(header.properties)?;
+            for slot in 0..header.properties {
+                size.property(&self.base_property(id, slot).value)?;
+            }
+            Ok(())
+        })?;
+        let mut limits = DecoderBudget::new(Extent {
+            version: input.version,
+            strings: input.string_count,
+            nodes: input.node_count,
+        })?;
+        self.overlay_string_lengths(&input, |units| limits.string(units))?;
+        limits.begin_nodes()?;
+        self.overlay_node_headers(&input, |_, header, _| limits.node(header))?;
+        input.materialize()
+    }
+    fn overlay_string_lengths(
+        &self,
+        input: &crate::compat::public::source_input::BorrowedOverlay<'_>,
+        mut visit: impl FnMut(usize) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        let mut entries = input.string_entries();
+        let mut next = entries.next().transpose()?;
+        for id in 0..input.string_count {
+            let units = if next.as_ref().is_some_and(|(key, _)| *key == id) {
+                let (_, raw) = next.take().expect("matched replacement");
+                next = entries.next().transpose()?;
+                raw.len() / 2
+            } else {
+                self.catalog.get(id).ok_or_else(graph_read::invalid)?.units
+            };
+            visit(units)?;
+        }
+        if next.is_some() {
+            return Err(graph_read::invalid());
+        }
+        Ok(())
+    }
+    fn overlay_node_headers(
+        &self,
+        input: &crate::compat::public::source_input::BorrowedOverlay<'_>,
+        mut visit: impl FnMut(usize, Header, Option<&[u8]>) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        let mut entries = input.node_entries();
+        let mut next = entries.next().transpose()?;
+        for id in 0..input.node_count {
+            if next.as_ref().is_some_and(|(key, _)| *key == id) {
+                let (_, node) = next.take().expect("matched replacement");
+                visit(id, node.header, Some(node.raw))?;
+                next = entries.next().transpose()?;
+            } else {
+                visit(id, self.base_header(id)?, None)?;
+            }
+        }
+        if next.is_some() {
+            return Err(graph_read::invalid());
+        }
+        Ok(())
+    }
+    pub(super) fn adopt_overlay(
+        &mut self,
+        input: crate::compat::public::source_input::SourceOverlay,
+    ) {
+        self.admission.invalidate();
+        self.version = input.version;
+        self.root = input.root;
+        self.string_count = input.string_count;
+        self.node_count = input.node_count;
+        self.strings = input.strings;
+        self.nodes = input.nodes;
+        self.patches.clear();
+    }
+}
+impl PublicGraphRead for SourceCandidate<'_> {
+    fn extent(&self) -> Extent {
+        Extent {
+            version: self.input.version,
+            strings: self.input.string_count,
+            nodes: self.input.node_count,
+        }
+    }
+    fn root(&self) -> Atom {
+        self.input.root.clone()
+    }
+    fn header(&self, id: usize) -> Result<Header, PeleError> {
+        if id >= self.input.node_count {
+            return Err(graph_read::invalid());
+        }
+        match self.input.nodes.get(&id) {
+            Some(node) => node_header(node),
+            None => self.base.base_header(id),
+        }
+    }
+    fn string_length(&self, id: usize) -> Result<usize, PeleError> {
+        if id >= self.input.string_count {
+            return Err(graph_read::invalid());
+        }
+        self.input
+            .strings
+            .get(&id)
+            .map(|s| s.0.len())
+            .or_else(|| self.base.catalog.get(id).map(|e| e.units))
+            .ok_or_else(graph_read::invalid)
+    }
+    fn string_lengths(
+        &self,
+        visit: &mut dyn FnMut(usize) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        for id in 0..self.input.string_count {
+            visit(self.string_length(id)?)?;
+        }
+        Ok(())
+    }
+    fn string_chunks(
+        &self,
+        id: usize,
+        visit: &mut dyn FnMut(&[u16]) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        if id >= self.input.string_count {
+            return Err(graph_read::invalid());
+        }
+        if let Some(text) = self.input.strings.get(&id) {
+            for chunk in text.0.chunks(1024) {
+                visit(chunk)?;
+            }
+            return Ok(());
+        }
+        let text = self.base.text(
+            &self
+                .base
+                .catalog
+                .get(id)
+                .ok_or_else(graph_read::invalid)?
+                .text,
+        );
+        let mut chunk = [0u16; 1024];
+        let mut used = 0;
+        for unit in text.encode_utf16() {
+            chunk[used] = unit;
+            used += 1;
+            if used == chunk.len() {
+                visit(&chunk)?;
+                used = 0;
+            }
+        }
+        if used != 0 {
+            visit(&chunk[..used])?;
+        }
+        Ok(())
+    }
+    fn properties(
+        &self,
+        id: usize,
+        start: usize,
+        visit: &mut dyn FnMut(&[Property]) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        if id >= self.input.node_count {
+            return Err(graph_read::invalid());
+        }
+        if let Some(node) = self.input.nodes.get(&id) {
+            return visit(
+                node.properties()
+                    .get(start..)
+                    .ok_or_else(graph_read::invalid)?,
+            );
+        }
+        let total = self.base.base_header(id)?.properties;
+        if start > total {
+            return Err(graph_read::invalid());
+        }
+        let count = (total - start).min(128);
+        if count == 0 {
+            return visit(&[]);
+        }
+        if count <= 8 {
+            self.base
+                .property_batch::<8>(id, total, None, start, count, visit)
+        } else {
+            self.base
+                .property_batch::<128>(id, total, None, start, count, visit)
+        }
+    }
+    fn map_entries(
+        &self,
+        id: usize,
+        start: usize,
+        visit: &mut dyn FnMut(&[(Atom, Atom)]) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        if id >= self.input.node_count {
+            return Err(graph_read::invalid());
+        }
+        if let Some(node) = self.input.nodes.get(&id) {
+            let Node::Map { entries, .. } = node else {
+                return Err(graph_read::invalid());
+            };
+            return visit(entries.get(start..).ok_or_else(graph_read::invalid)?);
+        }
+        let AdmissionKind::Map(total) = self.base.base_header(id)?.kind else {
+            return Err(graph_read::invalid());
+        };
+        if start > total {
+            return Err(graph_read::invalid());
+        }
+        let count = (total - start).min(128);
+        if count == 0 {
+            return visit(&[]);
+        }
+        if count <= 8 {
+            self.base.map_batch::<8>(total, None, start, count, visit)
+        } else {
+            self.base.map_batch::<128>(total, None, start, count, visit)
+        }
+    }
+    fn set_values(
+        &self,
+        id: usize,
+        start: usize,
+        visit: &mut dyn FnMut(&[Atom]) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        if id >= self.input.node_count {
+            return Err(graph_read::invalid());
+        }
+        let Some(Node::Set { values, .. }) = self.input.nodes.get(&id) else {
+            return Err(graph_read::invalid());
+        };
+        visit(values.get(start..).ok_or_else(graph_read::invalid)?)
+    }
+}
