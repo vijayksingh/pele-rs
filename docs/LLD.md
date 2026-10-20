@@ -10,6 +10,12 @@ Parsing, layout and SVG stay in Rust; host resources and presentation stay in
 thin Swift and WebAssembly adapters. Registries and diagram module interfaces
 support extension without changing the built-ins.
 
+SVG paint layers can use a borrowed append sink for coordinates, numbers and
+escaped text. It shares the same formatting core as the existing owned-string
+helpers; Sankey uses it without temporary element strings. The sink owns no
+callbacks or budget policy. Measurement order, separate paint layers and final
+document admission remain the renderer's responsibility.
+
 [Direct public parsing](LLD_DIRECT_PUBLIC_PARSE.md) shares source preparation and
 lets modules construct canonical public state without a temporary typed model. The [ER target](LLD_DIRECT_ER_PARSE.md)
 shares the same grammar and preserves exact arena bytes through conservative fallback.

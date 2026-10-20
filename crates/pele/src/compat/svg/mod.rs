@@ -1,4 +1,6 @@
 //! Pele svg/{builder,root,theme}.ts rendering primitives, 458322a5 (MIT, kepano).
+mod append;
+pub(crate) use append::SvgSink;
 pub(crate) mod edges;
 mod native;
 pub(crate) mod shapes;
@@ -14,23 +16,11 @@ use regex::Regex;
 use std::sync::OnceLock;
 pub(crate) fn esc(text: &str) -> std::borrow::Cow<'_, str> {
     use std::borrow::Cow;
-    if !text
-        .bytes()
-        .any(|byte| matches!(byte, b'&' | b'<' | b'>' | b'"' | 0..=8 | 11 | 12 | 14..=31 | 127))
-    {
+    if !append::needs_escape(text) {
         return Cow::Borrowed(text);
     }
     let mut out = String::with_capacity(text.len());
-    for c in text.chars() {
-        match c {
-            '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
-            '"' => out.push_str("&quot;"),
-            '\0'..='\x08' | '\x0b' | '\x0c' | '\x0e'..='\x1f' | '\x7f' => {}
-            _ => out.push(c),
-        }
-    }
+    append::escaped_slow(&mut out, text);
     Cow::Owned(out)
 }
 pub(crate) fn esc_text(text: &str) -> Result<String, PeleError> {
@@ -41,62 +31,10 @@ pub(crate) fn esc_text(text: &str) -> Result<String, PeleError> {
     }
 }
 pub(crate) fn js_num(n: f64) -> String {
-    let mut b = ryu_js::Buffer::new();
-    b.format(n).to_string()
+    append::js_number(n, str::to_owned)
 }
 pub(crate) fn num(value: f64) -> String {
-    let scaled = value * 100.;
-    let lower = scaled.floor();
-    // Adding 0.5 first can round a value just below a tie up to the next
-    // integer. Compare the fractional part, matching Math.round's ties toward
-    // positive infinity without that extra floating-point addition.
-    let n = if scaled - lower >= 0.5 {
-        lower + 1.
-    } else {
-        lower
-    };
-    if n == 0. {
-        return "0".into();
-    }
-    if n.abs() < 1e11 {
-        let m = n.abs() as u64;
-        let q = m / 100;
-        let r = m % 100;
-        // At most nine integer digits here. Write directly into one stack
-        // buffer; format! previously allocated a fraction and a second string
-        // for every SVG coordinate. Keep rounding and the non-finite lane above
-        // and below identical to Pele.
-        let mut bytes = [0u8; 16];
-        let mut at = 10;
-        let mut integer = q;
-        loop {
-            at -= 1;
-            bytes[at] = b'0' + (integer % 10) as u8;
-            integer /= 10;
-            if integer == 0 {
-                break;
-            }
-        }
-        if n < 0. {
-            at -= 1;
-            bytes[at] = b'-';
-        }
-        let mut end = 10;
-        if r != 0 {
-            bytes[end] = b'.';
-            bytes[end + 1] = b'0' + (r / 10) as u8;
-            end += 2;
-            if r % 10 != 0 {
-                bytes[end] = b'0' + (r % 10) as u8;
-                end += 1;
-            }
-        }
-        std::str::from_utf8(&bytes[at..end])
-            .expect("SVG coordinates contain only ASCII digits")
-            .to_owned()
-    } else {
-        js_num(n / 100.)
-    }
+    append::coordinate(value, str::to_owned)
 }
 fn span_style(style: u8) -> String {
     format!(

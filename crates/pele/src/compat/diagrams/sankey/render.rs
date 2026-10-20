@@ -6,7 +6,9 @@ use super::{
 };
 use crate::compat::number_math::round;
 use crate::compat::{
-    svg::{self, edges::theme::resolve_style, esc, esc_text, js_num, label_svg, num, series_color},
+    svg::{
+        self, edges::theme::resolve_style, esc_text, js_num, label_svg, num, series_color, SvgSink,
+    },
     text::{layout_label, measure},
     Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
@@ -126,12 +128,31 @@ fn draw(
     for (i, n) in nodes.iter().enumerate() {
         let id = &m.nodes()[i].id;
         let height = max(n.height, 1.);
-        nodes_out.push_str(&format!("<rect class=\"pele-sankey-node\" data-id=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{}\" fill=\"{}\"{}/>",esc_text(id)?,num(n.x),num(n.y),num(node_width),num(height),num(min(2.,height/2.)),series_color(i),node_style(i)));
-        let value = if show {
-            format!("{prefix}{}{suffix}", js_num(rounded(n.value)))
-        } else {
-            String::new()
-        };
+        let mut node = SvgSink::new(&mut nodes_out);
+        node.raw("<rect class=\"pele-sankey-node\" data-id=\"");
+        node.decoded_text(id)?;
+        node.raw("\" x=\"");
+        node.coordinate(n.x);
+        node.raw("\" y=\"");
+        node.coordinate(n.y);
+        node.raw("\" width=\"");
+        node.coordinate(node_width);
+        node.raw("\" height=\"");
+        node.coordinate(height);
+        node.raw("\" rx=\"");
+        node.coordinate(min(2., height / 2.));
+        node.raw("\" fill=\"");
+        node.raw(&series_color(i));
+        node.raw("\"");
+        node.raw(&node_style(i));
+        node.raw("/>");
+        let mut value = String::new();
+        if show {
+            let mut text = SvgSink::new(&mut value);
+            text.raw(&prefix);
+            text.js_number(rounded(n.value));
+            text.raw(&suffix);
+        }
         let after = if outlined {
             n.layer >= central
         } else {
@@ -158,32 +179,31 @@ fn draw(
         max_x = max(max_x, if after { x + text_width } else { x });
         min_y = min(min_y, y - small * 0.75);
         max_y = max(max_y, y + small * 0.75);
-        let position = format!(
-            " x=\"{}\" y=\"{}\" text-anchor=\"{}\"",
-            num(x),
-            num(y + small * 0.35),
-            if after { "start" } else { "end" }
-        );
-        let text = format!(
-            "{}{}",
-            esc(id),
-            if value.is_empty() {
-                String::new()
-            } else {
-                format!(
-                    " <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">{}</tspan>",
-                    esc(&value)
-                )
-            }
-        );
-        labels_out.push_str(&format!(
-            "<g class=\"pele-label\" data-id=\"{}\">",
-            esc_text(id)?
-        ));
+        let mut label = SvgSink::new(&mut labels_out);
+        label.raw("<g class=\"pele-label\" data-id=\"");
+        label.decoded_text(id)?;
+        label.raw("\">");
         if outlined {
-            labels_out.push_str(&format!("<text{position} fill=\"none\" stroke=\"var(--_bg)\" stroke-width=\"3\" stroke-linejoin=\"round\">{}{}</text>",esc(id),if value.is_empty(){String::new()}else{format!(" {}",esc(&value))}));
+            label.raw("<text");
+            position(&mut label, x, y + small * 0.35, after);
+            label.raw(" fill=\"none\" stroke=\"var(--_bg)\" stroke-width=\"3\" stroke-linejoin=\"round\">");
+            label.escaped(id);
+            if !value.is_empty() {
+                label.raw(" ");
+                label.escaped(&value);
+            }
+            label.raw("</text>");
         }
-        labels_out.push_str(&format!("<text{position}>{text}</text></g>"));
+        label.raw("<text");
+        position(&mut label, x, y + small * 0.35, after);
+        label.raw(">");
+        label.escaped(id);
+        if !value.is_empty() {
+            label.raw(" <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">");
+            label.escaped(&value);
+            label.raw("</tspan>");
+        }
+        label.raw("</text></g>");
     }
     let fixed = if matches!(color, "gradient" | "source" | "target") {
         String::new()
@@ -200,10 +220,66 @@ fn draw(
         let half = max(link.thickness, 1.) / 2.;
         let x0 = nodes[link.source].x + node_width;
         let x1 = nodes[link.target].x;
+        // Reuse this four-times-emitted coordinate rather than reformatting it.
         let mid = num((x0 + x1) / 2.);
+        // These escaped fragments occur in both the attribute and title.
+        // Decode in the original order before appending the element.
         let from = esc_text(&m.nodes()[link.source].id)?;
         let to = esc_text(&m.nodes()[link.target].id)?;
-        links_out.push_str(&format!("<path class=\"pele-sankey-link\" data-id=\"{from}-&gt;{to}\" d=\"M{},{}C{mid},{} {mid},{} {},{}L{},{}C{mid},{} {mid},{} {},{}Z\" fill=\"{}\"{}><title>{from} → {to}: {}{}{}</title></path>",num(x0),num(link.source_y-half),num(link.source_y-half),num(link.target_y-half),num(x1),num(link.target_y-half),num(x1),num(link.target_y+half),num(link.target_y+half),num(link.source_y+half),num(x0),num(link.source_y+half),series_color(end),if fixed.is_empty(){node_style(end)}else{fixed.clone()},esc_text(&prefix)?,js_num(rounded(link.value)),esc_text(&suffix)?));
+        let mut path = SvgSink::new(&mut links_out);
+        path.raw("<path class=\"pele-sankey-link\" data-id=\"");
+        path.raw(&from);
+        path.raw("-&gt;");
+        path.raw(&to);
+        path.raw("\" d=\"M");
+        path.coordinate(x0);
+        path.raw(",");
+        path.coordinate(link.source_y - half);
+        path.raw("C");
+        path.raw(&mid);
+        path.raw(",");
+        path.coordinate(link.source_y - half);
+        path.raw(" ");
+        path.raw(&mid);
+        path.raw(",");
+        path.coordinate(link.target_y - half);
+        path.raw(" ");
+        path.coordinate(x1);
+        path.raw(",");
+        path.coordinate(link.target_y - half);
+        path.raw("L");
+        path.coordinate(x1);
+        path.raw(",");
+        path.coordinate(link.target_y + half);
+        path.raw("C");
+        path.raw(&mid);
+        path.raw(",");
+        path.coordinate(link.target_y + half);
+        path.raw(" ");
+        path.raw(&mid);
+        path.raw(",");
+        path.coordinate(link.source_y + half);
+        path.raw(" ");
+        path.coordinate(x0);
+        path.raw(",");
+        path.coordinate(link.source_y + half);
+        path.raw("Z\" fill=\"");
+        path.raw(&series_color(end));
+        path.raw("\"");
+        if fixed.is_empty() {
+            path.raw(&node_style(end));
+        } else {
+            path.raw(&fixed);
+        }
+        path.raw("><title>");
+        path.raw(&from);
+        path.raw(" → ");
+        path.raw(&to);
+        path.raw(": ");
+        path.decoded_text(&prefix)?;
+        path.js_number(rounded(link.value));
+        path.decoded_text(&suffix)?;
+        path.raw("</title></path>");
     }
     let room = o
         .max_width
@@ -220,7 +296,33 @@ fn draw(
     let oy = pad + title_height - min_y;
     let width = (inner + 2. * pad).ceil();
     let height = (max_y - min_y + title_height + 2. * pad).ceil();
-    let body=format!("{}<g transform=\"translate({},{})\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\">{links_out}</g><g class=\"pele-sankey-nodes\">{nodes_out}</g><g class=\"pele-labels\" font-size=\"{}\">{labels_out}</g></g>",label_svg(&title,width/2.,pad+title.height/2.," class=\"pele-title\" font-weight=\"var(--_tw)\""),num(ox),num(oy),js_num(small));
+    // Paint order differs from measurement order; retain all three layers.
+    let mut body = label_svg(
+        &title,
+        width / 2.,
+        pad + title.height / 2.,
+        " class=\"pele-title\" font-weight=\"var(--_tw)\"",
+    );
+    body.reserve(
+        links_out
+            .len()
+            .saturating_add(nodes_out.len())
+            .saturating_add(labels_out.len()),
+    );
+    let mut output = SvgSink::new(&mut body);
+    output.raw("<g transform=\"translate(");
+    output.coordinate(ox);
+    output.raw(",");
+    output.coordinate(oy);
+    output.raw(")\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\">");
+    output.raw(&links_out);
+    output.raw("</g><g class=\"pele-sankey-nodes\">");
+    output.raw(&nodes_out);
+    output.raw("</g><g class=\"pele-labels\" font-size=\"");
+    output.js_number(small);
+    output.raw("\">");
+    output.raw(&labels_out);
+    output.raw("</g></g>");
     let svg = svg::document(
         "sankey",
         width,
@@ -237,4 +339,14 @@ fn draw(
         height,
         links: vec![],
     })
+}
+
+fn position(output: &mut SvgSink<'_>, x: f64, y: f64, after: bool) {
+    output.raw(" x=\"");
+    output.coordinate(x);
+    output.raw("\" y=\"");
+    output.coordinate(y);
+    output.raw("\" text-anchor=\"");
+    output.raw(if after { "start" } else { "end" });
+    output.raw("\"");
 }
