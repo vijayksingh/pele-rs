@@ -13,3 +13,5 @@ The initial browser run had one failed comparison because independently created 
 A separate nine-window [CPU diagnostic](profile/FINDINGS.md) retains raw profiles and exact inputs. Derived native batch synthesis occupies 25.51% of candidate parse self samples; `properties` alone 16.91%. Native validation overlaps that synthesis and must not be added to it. JS layout reads/decoding add cost; retained GC is 14.50% versus control 0.70%, without a causal allocation attribution. Sampling percentages do not establish latency improvements.
 
 The physical canonical-fallback decoder is exercised. The actual native 64 MiB recipe-overflow branch is not yet triggered by a test. No 0.3 release, Intel SDK or AppKit activation claim.
+
+Some raw verification logs are gzip-compressed to preserve their exact bytes, including tool-emitted trailing whitespace.

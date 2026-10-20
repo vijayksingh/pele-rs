@@ -9,3 +9,5 @@ Sankey parse is 18.78–28.91% slower paired than e148 and 7.03–17.82×JS. Ret
 Correctness from this exact source: 24 native integrations including the complete 11,616-case Sankey source corpus; 69 focused browser checks across Chromium/Firefox/WebKit; fresh local arm64 SDK Swift 16, strict C 3, API 168. Swift exercised 12,481 drawings and 16,572 expected errors, with zero explicit budget differences. The broader 426 enabled browser checks belong to the preceding d35 runtime/test-only6d302d5, not this rebuild. All 366 Swift inputs and 597 web build/test inputs were verified unchanged through their checks. No new Swift timing or allocation measurement.
 
 Generation-bound validation receipts are being developed separately; they are absent from these measured artifacts. No 0.3 release or all 33-family performance parity claim.
+
+Some raw verification logs are gzip-compressed to preserve their exact bytes, including tool-emitted trailing whitespace.
