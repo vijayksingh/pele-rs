@@ -1623,5 +1623,20 @@
     "Swift adverse ER mutable/lifetime results retained; no native speedup claim.",
     "VM medians are paired ratios, not confidence intervals or general causal estimates. Shared browser/page and serial warmup differ from release-gate scheduling.",
     "No new full performance release gate, no0.3 or JS parity claim."
-  ]
+  ],
+  "rejectedIndex": {
+    "status": "Rejected and reverted; separate experiment, excluded from accepted dense runtime",
+    "reportSha256": "55ea32159eeb10a006932df710da7b137173f00eef684c292b35e830ba48ef34",
+    "browserChecks": 84,
+    "controlMatchesDense": true,
+    "changedPackageFiles": [
+      "host-er-store.js"
+    ],
+    "wasmUnchanged": true,
+    "nativeInputSha256": "439fe2e6a023eebcafb980508b447162cdd5cd9c07519200df47f5ab3fcaea28",
+    "firstUseRun": false,
+    "nativeSourceChange": false,
+    "rows": 24,
+    "summary": "rejected-index/summary.json"
+  }
 }

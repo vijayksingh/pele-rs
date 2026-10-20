@@ -46,6 +46,24 @@ api=load('swift/swift-api.json.gz');assert len(api['rows'])==168 and len(api['ca
 assert len(load('swift/c-consumers.json'))==6 and all(x['exitCode']==0 for x in load('swift/c-consumers.json'))
 assert 'Executed 15 tests, with 0 failures' in data('logs/swift-corpus.log.gz').decode();assert '84 passed (48.6s)' in data('logs/web.log.gz').decode();assert sum(map(int,re.findall(r'test result: ok\. (\d+) passed; 0 failed',data('logs/native.log.gz').decode())))==27
 out=dict(sourceCommit=proof['sourceCommit'],ordinary=web['ordinary'],firstUse=web['firstUse'],swift=sw,swiftPairs=90,swiftOrderCounts=dict(orders),swiftMeasuredGuardSnapshots=guards,allocations=alloc['rows'],allTenAllocationRowsIdentical=True,validation=dict(nativeIntegrations=27,browserChecks=84,swiftIntegrationCases=15,swiftApiConditions=168,strictCConsumers=3,typescript='Retained passing parent log',prior390BrowserSuite='Prior bd7df0d only, not rerun here'),limitations=['The default native sink preserves exact graphs but retains caller Vec through node publication. Identical measured medium counters do not guarantee universal peak memory.','Swift adverse ER mutable/lifetime results retained; no native speedup claim.','VM medians are paired ratios, not confidence intervals or general causal estimates. Shared browser/page and serial warmup differ from release-gate scheduling.','No new full performance release gate, no0.3 or JS parity claim.'])
+rejected=load('rejected-index/comparison.json.gz');rf=load('rejected-index/package-freeze.json.gz');rm=load('rejected-index/manifest.json')
+assert rejected['succeeded'] and len(rejected['rows'])==24 and rejected['settings']['trials']==21
+assert rejected['runtimeHashes']['control']==w['runtimeHashes']['candidate']==rf['control'];assert rejected['runtimeHashes']['candidate']==rf['candidate']
+assert [k for k,v in rf['candidate'].items() if v!=rf['control'][k]]==rf['changed']==['host-er-store.js'];assert rf['wasmUnchanged'] and rf['nativeSDKUnchanged'];assert rf['nativeInputSHA256']==m['sourceInputSha256']
+assert rm['files'][0]['originalSha256']==rf['control']['host-er-store.js'];assert rm['files'][0]['candidateSha256']==rf['candidate']['host-er-store.js'];assert sha(data('rejected-index/candidate.patch'))==rm['patchSha256']
+assert '84 passed (46.6s)' in data('rejected-index/browser.log.gz').decode()
+rr=[]
+for r in rejected['rows']:
+ assert r['counts']['candidate']==r['counts']['control']
+ for side,values in r['samples'].items():
+  assert len(values)==21 and r['warmups'][side]['elapsedMs']>=1000 and all(math.isfinite(v) and v>0 for v in values);close(statistics.median(values),r['medianMs'][side]);close(sorted(values)[math.ceil(len(values)*.95)-1],r['p95BatchMeanMs'][side])
+ for k,a,c in [('candidateOverControl','candidate','control'),('candidateOverJS','candidate','js'),('controlOverJS','control','js')]:close(r[k],r['medianMs'][a]/r['medianMs'][c])
+ rr.append(dict(case=r['case'],profile=r['profile'],stage=r['stage'],trials=21,candidateOverJS=r['candidateOverJS'],**paired(r['samples']['candidate'],r['samples']['control'])))
+rs=dict(status='Rejected and reverted; separate experiment, excluded from accepted dense runtime',rows=rr,reportSha256=sha(data('rejected-index/comparison.json.gz')),browserChecks=84,controlMatchesDense=True,changedPackageFiles=rf['changed'],wasmUnchanged=True,nativeInputSha256=rf['nativeInputSHA256'],firstUseRun=False,nativeSourceChange=False)
+(B/'rejected-index/summary.json').write_text(json.dumps(rs,indent=2)+'\n');out['rejectedIndex']={k:v for k,v in rs.items() if k!='rows'};out['rejectedIndex']['rows']=24;out['rejectedIndex']['summary']='rejected-index/summary.json'
+rmtext=['# Rejected canonical-string-index results','','All24 rows retained. Positive paired change means slower.','', '| Case | Profile | Stage | Paired change | Faster pairs | Candidate / JS |','|---|---|---|---:|---:|---:|']
+for r in rr:rmtext.append(f"| {r['case']} | {r['profile']} | {r['stage']} | {r['pairedPercent']:+.3f}% | {r['candidateFasterPairs']}/21 | {r['candidateOverJS']:.3f}× |")
+(B/'rejected-index/RESULTS.md').write_text('\n'.join(rmtext)+'\n')
 (B/'summary.json').write_text(json.dumps(out,indent=2)+'\n')
 md=['# Complete dense-array paired results','','Positive change means slower. All rows retained; no control subtraction or adverse-result dismissal.','']
 for title,rows in [('Ordinary VM —21 trials',web['ordinary']),('First-use VM —15 trials',web['firstUse']),('Swift —15 pairs against frozen d25',sw)]:

@@ -30,6 +30,13 @@ Sequence Canvas first render is **+2.25% (4/15)** and source **+0.70% (5/15)**; 
 
 [RESULTS.md](RESULTS.md) and [summary.json](summary.json) retain all 24 ordinary, 36 first-use, six Swift and ten allocation rows. Raw reports are compressed as [comparison.json.gz](comparison.json.gz) and [first-use.json.gz](first-use.json.gz). Changes are medians of paired trial ratios; JS comparisons are ratios of separate medians. Neither is a confidence interval. Both VM diagnostics share one browser/page across independent WASM instances and pinned JS, with shared heap/GC/cache pressure, serial warmup and no per-row process quiet guard. Exact outputs and package hashes were checked before and after by the hash-identified harnesses. These diagnostics do not replace the release gate.
 
+The subsequent [single-string-index experiment](rejected-index/README.md) is
+rejected. It passes 84 browser checks and removes duplicate metadata, but three
+ER parse rows regress, including small Canvas +5.25%. Its isolated package,
+24-row comparison and unchanged native-input proof remain archived. Production
+retains the preceding two-index implementation; no first-use run was performed
+for the rejected experiment.
+
 ## Native and Swift controls
 
 One complete guarded Swift window compares the frozen d25 consumer with dense-array: six conditions ×15 pairs, **90 pairs with 45/45 first order**, matched 1000 ms warmup and batch cap 128. Native source inputs differ only in `er/public_model.rs` plus the rebuilt SDK archive. All results are retained:

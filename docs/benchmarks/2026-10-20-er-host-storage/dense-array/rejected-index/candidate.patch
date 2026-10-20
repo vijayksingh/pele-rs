@@ -1,0 +1,83 @@
+--- a/bindings/web/host-er-store.js
++++ b/bindings/web/host-er-store.js
+@@ -239,7 +239,7 @@
+ export class HostErOwner {
+   constructor(registration,registry,root,invoke) {
+     this.registration=registration;this.registry=registry;this.root=root;
+-    this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();
++    this.objects=[];this.ids=new WeakMap();this.strings=[];this.canonicalStringIds=new Map();
+     this.hostValues=[];this.hostIds=new Map();this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];
+     this.disposed=false;this.phase='constructing';this.epoch=0n;this.resourceDepth=0;this.methodDepth=0;this.depth=0;
+     this.invoke=invoke;this.temporary=null;this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];
+@@ -250,10 +250,10 @@
+     if(id===undefined){id=this.hostValues.length;if(id>=1_000_000)throw new RangeError('Host reference budget exceeded');this.hostValues.push(value);this.hostIds.set(value,id);}
+     return [8,id];
+   }
+-  intern(text,first=false){
+-    const known=(first?this.firstStrings:this.lastStrings).get(text);if(known!==undefined)return known;
++  intern(text){
++    const known=this.canonicalStringIds.get(text);if(known!==undefined)return known;
+     const id=this.strings.length;if(id>=1_000_000||this.units+text.length>16_000_000)graphBudget();
+-    this.units+=text.length;this.strings.push(text);this.firstStrings.set(text,id);this.lastStrings.set(text,id);return id;
++    this.units+=text.length;this.strings.push(text);this.canonicalStringIds.set(text,id);return id;
+   }
+   temporaryId(kind,value){
+     const t=this.temporary;if(!t)throw new TypeError('Host value observed outside operation');
+@@ -263,7 +263,7 @@
+     if(kind==='strings'){t.units+=value.length;if(t.units>16_000_000)graphBudget();}
+     id=TEMP+values.length;values.push(value);map.set(value,id);return id;
+   }
+-  observedString(value){return this.temporary?.stringsIds.get(value)??this.lastStrings.get(value)??this.temporaryId('strings',value);}
++  observedString(value){return this.temporary?.stringsIds.get(value)??this.canonicalStringIds.get(value)??this.temporaryId('strings',value);}
+   object(id){return id>=TEMP?this.temporary.objects[id-TEMP]:this.objects[id];}
+   string(id){return id>=TEMP?this.temporary.strings[id-TEMP]:this.strings[id];}
+   atom(value,admit=false){
+@@ -351,7 +351,7 @@
+   }
+   abandonCallerRoot(){
+     this.disposed=true;this.phase='disposed';this.root=undefined;
+-    this.objects=null;this.ids=null;this.strings=null;this.firstStrings=null;this.lastStrings=null;
++    this.objects=null;this.ids=null;this.strings=null;this.canonicalStringIds=null;
+     this.hostValues=null;this.hostIds=null;this.nodeBytes=null;this.nodeRefs=null;this.invoke=undefined;this.temporary=null;
+   }
+   frameAdmission(audit,metadataBytes){if(audit.graphBytes+metadataBytes>64*1024*1024||audit.references>8_000_000)frameBudget();}
+@@ -375,7 +375,7 @@
+   dispose(){
+     if(this.phase!=='idle'&&this.phase!=='needsAudit')throw new TypeError('Public model document is already in use');
+     this.disposed=true;this.phase='disposed';this.root=undefined;this.objects=null;this.ids=null;this.strings=null;
+-    this.nodeBytes=null;this.nodeRefs=null;this.firstStrings=null;this.lastStrings=null;this.temporary=null;this.hostValues=null;this.hostIds=null;this.invoke=undefined;
++    this.nodeBytes=null;this.nodeRefs=null;this.canonicalStringIds=null;this.temporary=null;this.hostValues=null;this.hostIds=null;this.invoke=undefined;
+   }
+   ownInfo(id,key){
+     const value=this.object(id);let count=0;
+@@ -419,7 +419,7 @@
+       if(id!==this.strings.length)bad();
+       if(id>=1_000_000||units>16_000_000-this.units)graphBudget();
+     };
+-    const addString=(id,value)=>{if(this.intern(value,true)!==id)bad();};
++    const addString=(id,value)=>{if(this.intern(value)!==id)bad();};
+     const valueBytes=value=>value===null||value===undefined||typeof value==='boolean'?1:typeof value==='number'?9:5;
+     const atom=()=>{
+       const tag=u8();
+@@ -581,7 +581,7 @@
+     if(offset!==bytes.byteLength)bad();
+     return 0;
+   }
+-  disposeConstruction(){this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();this.hostValues=[];this.hostIds=new Map();this.root=undefined;this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];}
++  disposeConstruction(){this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];this.objects=[];this.ids=new WeakMap();this.strings=[];this.canonicalStringIds=new Map();this.hostValues=[];this.hostIds=new Map();this.root=undefined;this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];}
+   // Generic adapter ABI; no ER method/field decisions occur in this switch.
+   primitive(op,args){
+     this.assertLive();
+@@ -599,9 +599,9 @@
+       }
+       case 'string':return this.string(args[0]);
+       case 'units':{const text=this.string(args[0]),out=new Uint16Array(text.length);for(let i=0;i<text.length;i++)out[i]=text.charCodeAt(i);return out;}
+-      case 'intern':return this.intern(decodeUnits(args[0]),true);
+-      case 'findString':return this.firstStrings.get(decodeUnits(args[0]));
+-      case 'internText':return this.intern(args[0],true);
++      case 'intern':return this.intern(decodeUnits(args[0]));
++      case 'findString':return this.canonicalStringIds.get(decodeUnits(args[0]));
++      case 'internText':return this.intern(args[0]);
+       case 'discard':this.disposeConstruction();return undefined;
+       case 'setRoot':this.root=this.value(args[0]);return undefined;
+       case 'constructed':{

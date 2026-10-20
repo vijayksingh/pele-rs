@@ -1,0 +1,21 @@
+{
+  "status": "private-static-candidate",
+  "baselineHead": "be7b206afab2214a27147129443596cbdf854c05",
+  "baselineNote": "Current uncommitted dense-array host-er-store.js; dense source itself not part of this focused patch.",
+  "patchSha256": "b170104c3f3958f813ae0eadd07b3d8f7880dbb291c9e4e170ad7ad7a880e1a5",
+  "files": [
+    {
+      "path": "bindings/web/host-er-store.js",
+      "originalSha256": "a9c749d8a762326eaf75d4b07be4b6cdec7494be7180c5f4392b20d56f6836a2",
+      "candidateSha256": "68ae99cc6f25b28abb0a6aef102f47945f56b85541a7fccdd259776156f9659b",
+      "originalMatchesProduction": true
+    }
+  ],
+  "validation": {
+    "nodeSyntax": "passed",
+    "gitApplyCheck": "passed",
+    "builds": "not run",
+    "browser": "not run",
+    "measurements": "not run"
+  }
+}
