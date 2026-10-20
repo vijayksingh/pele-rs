@@ -5,6 +5,9 @@
 //! renumber nodes. The existing Sankey renderer consumes a concrete typed
 //! projection imported at the edit boundary; rendering never reparses source.
 use super::{Sankey, SankeyLink, SankeyModel, SankeyNode};
+use crate::compat::public::captured_read::{
+    ArenaRead, CapturedRead, NodeKind, PropertyPrefix, PROPERTY_CHUNK, STRING_CHUNK,
+};
 use crate::compat::{
     public::{
         Atom, FieldKind, FieldSchema, GraphWriter, InitialWriter, JavaScriptErrorKind, JsString,
@@ -15,7 +18,7 @@ use crate::compat::{
     DiagramModule, DiagramType, ErrorCode, Object, PeleError, RenderResources, RenderSettings,
     Rendered,
 };
-use std::collections::HashMap;
+use std::{borrow::Borrow, collections::HashMap};
 
 const SANKEY_PROTO: PrototypeId = PrototypeId(1);
 // Constructor call/construction is an explicit separate capability. These are
@@ -206,56 +209,151 @@ fn field<'a>(graph: &'a ModelGraph, id: u32, name: &str) -> Option<&'a Atom> {
         .iter()
         .find_map(|p| graph.strings[p.key as usize].is(name).then_some(&p.value))
 }
-fn string(graph: &ModelGraph, atom: &Atom) -> Result<String, PeleError> {
-    graph
-        .text(atom)?
-        .well_formed()
-        .ok_or_else(|| invalid("Sankey rendering of lone UTF-16 surrogates is not implemented"))
+fn captured_error(message: &str) -> PeleError {
+    PeleError::new(message, ErrorCode::Semantic)
 }
-fn optional_text(graph: &ModelGraph, key: &str) -> Result<Option<String>, PeleError> {
-    match graph.field(key)? {
-        None | Some(Atom::Undefined | Atom::Null) => Ok(None),
-        Some(value) => string(graph, value).map(Some),
+fn stored_field<R: CapturedRead>(
+    reader: &mut R,
+    id: u32,
+    name: &str,
+) -> Result<Option<R::Value>, PeleError> {
+    let mut out = [None];
+    reader.own_fields(id, &[name], &mut out)?;
+    Ok(out[0].take())
+}
+fn root_field<R: CapturedRead>(reader: &mut R, name: &str) -> Result<Option<R::Value>, PeleError> {
+    let Atom::Ref(id) = reader.root() else {
+        return Err(captured_error("Public model root must be an object"));
+    };
+    let header = reader.header(id)?;
+    if !matches!(
+        header.map(|header| header.kind),
+        Some(NodeKind::Object | NodeKind::Instance)
+    ) {
+        return Err(captured_error("Public model root must be an object"));
     }
+    stored_field(reader, id, name)
 }
-// Canonical own array indexes only. Holes are retained in the arena, but a
-// renderer read of a missing node/link record fails instead of allocating from
-// an untrusted sparse length or silently shortening the array.
-fn array<'a>(graph: &'a ModelGraph, name: &str) -> Result<Vec<&'a Atom>, PeleError> {
-    let Some(Atom::Ref(id)) = graph.field(name)? else {
-        return Err(invalid(&format!("Sankey {name} must be an Array")));
+fn string<R: CapturedRead>(reader: &mut R, atom: &Atom) -> Result<String, PeleError> {
+    let Atom::String(id) = atom else {
+        return Err(captured_error("Expected a public string"));
     };
-    let Some(Node::Array { length, properties }) = graph.nodes.get(*id as usize) else {
-        return Err(invalid(&format!("Sankey {name} must be an Array")));
-    };
-    let mut indexed = HashMap::new();
-    for p in properties {
-        let key = &graph.strings[p.key as usize].0;
-        if key.is_empty() || key.len() > 10 || (key.len() > 1 && key[0] == 48) {
-            continue;
+    let length = reader.string_length(*id)? as usize;
+    let mut text = String::with_capacity(length);
+    let mut seen = 0usize;
+    let mut high = None;
+    let surrogate = || invalid("Sankey rendering of lone UTF-16 surrogates is not implemented");
+    reader.with_string_chunks(*id, |units| {
+        if units.is_empty() || units.len() > STRING_CHUNK {
+            return Err(captured_error("Invalid captured string chunk"));
         }
-        let mut index = 0u64;
-        let mut canonical = true;
-        for &unit in key {
-            if !(48..=57).contains(&unit) {
-                canonical = false;
-                break;
+        seen = seen
+            .checked_add(units.len())
+            .filter(|n| *n <= length)
+            .ok_or_else(|| captured_error("Invalid captured string length"))?;
+        for &unit in units {
+            if let Some(leading) = high.take() {
+                if !(0xdc00..=0xdfff).contains(&unit) {
+                    return Err(surrogate());
+                }
+                let scalar = 0x10000 + (((leading - 0xd800) as u32) << 10) + (unit - 0xdc00) as u32;
+                text.push(char::from_u32(scalar).expect("paired UTF16 scalar"));
+            } else if (0xd800..=0xdbff).contains(&unit) {
+                high = Some(unit);
+            } else if (0xdc00..=0xdfff).contains(&unit) {
+                return Err(surrogate());
+            } else {
+                text.push(char::from_u32(unit as u32).expect("non-surrogate UTF16 scalar"));
             }
-            index = index * 10 + u64::from(unit - 48);
         }
-        if canonical && index < u64::from(*length) {
-            indexed.entry(index as u32).or_insert(&p.value);
-        }
+        Ok(())
+    })?;
+    if seen != length {
+        return Err(captured_error("Invalid captured string length"));
     }
-    if indexed.len() != *length as usize {
+    if high.is_some() {
+        return Err(surrogate());
+    }
+    Ok(text)
+}
+fn optional_text<R: CapturedRead>(reader: &mut R, key: &str) -> Result<Option<String>, PeleError> {
+    match root_field(reader, key)? {
+        None => Ok(None),
+        Some(value) => match value.borrow() {
+            Atom::Undefined | Atom::Null => Ok(None),
+            atom => string(reader, atom).map(Some),
+        },
+    }
+}
+// Canonical indexes are interpreted here, never by the host storage adapter.
+// Both array memberships are admitted before any label or endpoint projection.
+fn array<R: CapturedRead>(
+    reader: &mut R,
+    name: &str,
+    scratch: &mut [PropertyPrefix<R::Value>],
+) -> Result<Vec<R::Value>, PeleError> {
+    let value = root_field(reader, name)?;
+    let id = match value.as_ref().map(|value| value.borrow()) {
+        Some(Atom::Ref(id)) => *id,
+        _ => return Err(invalid(&format!("Sankey {name} must be an Array"))),
+    };
+    let Some(header) = reader.header(id)? else {
+        return Err(invalid(&format!("Sankey {name} must be an Array")));
+    };
+    if header.kind != NodeKind::Array {
+        return Err(invalid(&format!("Sankey {name} must be an Array")));
+    }
+    let length = header
+        .array_length
+        .ok_or_else(|| captured_error("Invalid captured array header"))?;
+    let mut indexed = HashMap::new();
+    let mut cursor = 0u32;
+    while cursor < header.property_count {
+        let capacity = scratch
+            .len()
+            .min(PROPERTY_CHUNK)
+            .min((header.property_count - cursor) as usize);
+        let count = reader.property_prefixes(id, cursor, &mut scratch[..capacity])?;
+        if count == 0 || count > capacity {
+            return Err(captured_error("Invalid captured property batch"));
+        }
+        for property in &mut scratch[..count] {
+            let value = property
+                .value
+                .take()
+                .ok_or_else(|| captured_error("Invalid captured property value"))?;
+            let size = property.key_units as usize;
+            let key = &property.prefix;
+            if size == 0 || size > key.len() || (size > 1 && key[0] == 48) {
+                continue;
+            }
+            let mut index = 0u64;
+            let mut canonical = true;
+            for &unit in &key[..size] {
+                if !(48..=57).contains(&unit) {
+                    canonical = false;
+                    break;
+                }
+                index = index * 10 + u64::from(unit - 48);
+            }
+            if canonical && index < u64::from(length) {
+                indexed.entry(index as u32).or_insert(value);
+            }
+        }
+        cursor = cursor
+            .checked_add(count as u32)
+            .ok_or_else(|| captured_error("Invalid captured property cursor"))?;
+    }
+    if indexed.len() != length as usize {
         return Err(invalid(&format!(
             "Sankey {name} contains a missing array record"
         )));
     }
-    Ok((0..*length).map(|i| indexed[&i]).collect())
+    Ok((0..length).map(|i| indexed[&i].clone()).collect())
 }
-fn index(graph: &ModelGraph, id: u32, length: usize) -> Result<usize, PeleError> {
-    match field(graph, id, "index") {
+fn index<R: CapturedRead>(reader: &mut R, id: u32, length: usize) -> Result<usize, PeleError> {
+    let value = stored_field(reader, id, "index")?;
+    match value.as_ref().map(|value| value.borrow()) {
         Some(Atom::Number(n)) if n.is_finite() && *n >= 0. && n.fract() == 0. => {
             if *n < length as f64 {
                 Ok(*n as usize)
@@ -271,13 +369,16 @@ fn index(graph: &ModelGraph, id: u32, length: usize) -> Result<usize, PeleError>
     }
 }
 fn imported(graph: &ModelGraph) -> Result<SankeyModel, PeleError> {
-    let array_nodes = array(graph, "nodes")?;
-    let array_links = array(graph, "links")?;
+    imported_from(&mut ArenaRead::new(graph))
+}
+fn imported_from<R: CapturedRead>(reader: &mut R) -> Result<SankeyModel, PeleError> {
+    let mut scratch: [PropertyPrefix<R::Value>; PROPERTY_CHUNK] =
+        std::array::from_fn(|_| PropertyPrefix::default());
+    let array_nodes = array(reader, "nodes", &mut scratch)?;
+    let array_links = array(reader, "links", &mut scratch)?;
     let mut nodes = Vec::with_capacity(array_nodes.len());
     let mut labels: HashMap<u32, String> = HashMap::new();
     let mut indexes: HashMap<u32, usize> = HashMap::new();
-    // A compact graph can repeat one long label in arbitrarily many array
-    // slots. Bound concrete owned-string expansion before cloning it.
     let mut text_bytes = 0usize;
     let reserve_text = |used: &mut usize, bytes: usize| -> Result<(), PeleError> {
         *used = used.saturating_add(bytes);
@@ -290,22 +391,23 @@ fn imported(graph: &ModelGraph) -> Result<SankeyModel, PeleError> {
         Ok(())
     };
     for value in array_nodes {
-        let id = object_id(value)?;
+        let id = object_id(value.borrow())?;
+        let mut fields = [None, None];
+        reader.own_fields(id, &["id", "index"], &mut fields)?;
         let label = if let Some(label) = labels.get(&id) {
             reserve_text(&mut text_bytes, label.len())?;
             label.clone()
         } else {
-            let value =
-                field(graph, id, "id").ok_or_else(|| invalid("Sankey node ID must be a string"))?;
-            let label = string(graph, value)?;
+            let value = fields[0]
+                .as_ref()
+                .ok_or_else(|| invalid("Sankey node ID must be a string"))?;
+            let label = string(reader, value.borrow())?;
             reserve_text(&mut text_bytes, label.len().saturating_mul(2))?;
             labels.insert(id, label.clone());
             label
         };
-        // Array node.index is not read by Pele's layout or labels. It may be
-        // stale, absent or nonfinite until that record is used as an endpoint.
-        // Keep the original value in the arena; this unused typed slot is inert.
-        let unused_index = match field(graph, id, "index") {
+        // This unused index remains independent of endpoint validation.
+        let unused_index = match fields[1].as_ref().map(|value| value.borrow()) {
             Some(Atom::Number(n))
                 if n.is_finite() && *n >= 0. && n.fract() == 0. && *n <= usize::MAX as f64 =>
             {
@@ -320,31 +422,30 @@ fn imported(graph: &ModelGraph) -> Result<SankeyModel, PeleError> {
     }
     let mut links = Vec::with_capacity(array_links.len());
     for value in array_links {
-        let id = object_id(value)?;
-        let mut endpoint = |name| -> Result<SankeyNode, PeleError> {
-            let value = field(graph, id, name)
-                .ok_or_else(|| invalid("Sankey links require source and target objects"))?;
-            let object = object_id(value)?;
+        let id = object_id(value.borrow())?;
+        let mut fields = [None, None, None];
+        reader.own_fields(id, &["source", "target", "value"], &mut fields)?;
+        let [source, target, value] = fields;
+        let mut endpoint = |value: Option<R::Value>| -> Result<SankeyNode, PeleError> {
+            let value =
+                value.ok_or_else(|| invalid("Sankey links require source and target objects"))?;
+            let object = object_id(value.borrow())?;
             let index = if let Some(index) = indexes.get(&object) {
                 *index
             } else {
-                let index = index(graph, object, nodes.len())?;
+                let index = index(reader, object, nodes.len())?;
                 indexes.insert(object, index);
                 index
             };
-            // The link's endpoint.id is not read by the renderer. An endpoint
-            // may remain detached after nodes[i] is replaced; its own index
-            // still selects the current array slot, exactly as in Pele.
             Ok(SankeyNode {
                 id: String::new(),
                 index,
             })
         };
-        let source = endpoint("source")?;
-        let target = endpoint("target")?;
-        let value = match field(graph, id, "value") {
+        let source = endpoint(source)?;
+        let target = endpoint(target)?;
+        let value = match value.as_ref().map(|value| value.borrow()) {
             Some(Atom::Number(n)) => *n,
-            // Number.isFinite rejects these before layout ever adds them.
             _ => f64::NAN,
         };
         links.push(SankeyLink {
@@ -357,9 +458,9 @@ fn imported(graph: &ModelGraph) -> Result<SankeyModel, PeleError> {
         diagram_type: DiagramType::Sankey,
         nodes,
         links,
-        title: optional_text(graph, "title")?,
-        acc_title: optional_text(graph, "accTitle")?,
-        acc_descr: optional_text(graph, "accDescr")?,
+        title: optional_text(reader, "title")?,
+        acc_title: optional_text(reader, "accTitle")?,
+        acc_descr: optional_text(reader, "accDescr")?,
     })
 }
 fn node(out: &mut impl InitialWriter, node: &SankeyNode) -> Result<u32, PeleError> {

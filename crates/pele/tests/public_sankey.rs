@@ -1258,6 +1258,127 @@ fn sankey_real_methods_and_authored_edits_match_pinned_complete_svg_vectors() {
 }
 
 #[test]
+fn sankey_projection_keeps_unicode_across_capture_chunks_and_raw_adoption() {
+    let engine = PublicEngine::with_builtins();
+    for prefix in [0, 1, 1023, 1024, 1025, 2047] {
+        let label = format!("{}🦀β", "x".repeat(prefix));
+        let mut edited = engine
+            .parse("sankey-beta\nA,B,2", &Default::default())
+            .unwrap();
+        let mut graph = edited.snapshot().unwrap();
+        let nodes = reference(graph.field("nodes").unwrap().unwrap());
+        let first = reference(&array(&graph, nodes)[0]);
+        let text = string(&mut graph, &label);
+        property(&mut graph, first, "id", text);
+        let mut adopted =
+            PublicDocument::from_graph(Sankey, graph.clone(), edited.retained_config().clone())
+                .unwrap();
+        apply_graph(&mut edited, graph.clone());
+        let expected = direct(&typed(&[(&label, 0), ("B", 1)], &[(0, 1, 2.)], None));
+        for document in [&mut edited, &mut adopted] {
+            assert_eq!(
+                document
+                    .render(&Default::default(), &mut MetricsResources)
+                    .unwrap()
+                    .rendered,
+                expected,
+                "UTF16 prefix {prefix}"
+            );
+            assert_eq!(
+                fingerprint(&document.snapshot().unwrap()),
+                fingerprint(&graph)
+            );
+        }
+    }
+
+    for mut units in [
+        vec![0xdc00],
+        vec![0xd800],
+        vec![0xd800, 0x78],
+        vec![0xdc00, 0xd800],
+    ] {
+        let mut document = engine.parse(SOURCE, &Default::default()).unwrap();
+        let original = document.snapshot().unwrap();
+        let mut graph = original.clone();
+        let nodes = reference(graph.field("nodes").unwrap().unwrap());
+        let first = reference(&array(&graph, nodes)[0]);
+        let mut boundary = vec![0x78; 1023];
+        boundary.append(&mut units);
+        let id = graph.strings.len() as u32;
+        graph.strings.push(JsString(boundary));
+        property(&mut graph, first, "id", Atom::String(id));
+        apply_graph(&mut document, graph.clone());
+        let error = document
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err();
+        assert_eq!(error.code, ErrorCode::Semantic);
+        assert_eq!(
+            error.message,
+            "Sankey rendering of lone UTF-16 surrogates is not implemented"
+        );
+        assert_eq!(
+            fingerprint(&document.snapshot().unwrap()),
+            fingerprint(&graph)
+        );
+        apply_graph(&mut document, original);
+        same_source(&mut document, SOURCE);
+    }
+}
+
+#[test]
+fn sankey_projection_validates_both_arrays_before_labels_and_repairs_latent_errors() {
+    let engine = PublicEngine::with_builtins();
+    let mut document = engine.parse(SOURCE, &Default::default()).unwrap();
+    let original = document.snapshot().unwrap();
+    let mut graph = original.clone();
+    let root = root(&graph);
+    let nodes = reference(graph.field("nodes").unwrap().unwrap());
+    let first = reference(&array(&graph, nodes)[0]);
+    property(&mut graph, first, "id", Atom::Number(42.));
+    property(&mut graph, root, "links", Atom::Undefined);
+    apply_graph(&mut document, graph.clone());
+    let error = document
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err();
+    assert_eq!(error.message, "Sankey links must be an Array");
+    assert_eq!(error.diagram_type.as_deref(), Some("sankey"));
+
+    let sparse = graph.nodes.len() as u32;
+    graph.nodes.push(Node::Array {
+        length: 1,
+        properties: vec![],
+    });
+    property(&mut graph, root, "links", Atom::Ref(sparse));
+    apply_graph(&mut document, graph.clone());
+    let error = document
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err();
+    assert_eq!(
+        error.message,
+        "Sankey links contains a missing array record"
+    );
+
+    property(
+        &mut graph,
+        root,
+        "links",
+        original.field("links").unwrap().unwrap().clone(),
+    );
+    apply_graph(&mut document, graph.clone());
+    let error = document
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err();
+    assert_eq!(error.message, "Expected a public string");
+    assert_eq!(error.diagram_type, None);
+    assert_eq!(
+        fingerprint(&document.snapshot().unwrap()),
+        fingerprint(&graph)
+    );
+    apply_graph(&mut document, original);
+    same_source(&mut document, SOURCE);
+}
+
+#[test]
 fn sankey_mutable_repeated_long_labels_reject_native_expansion_and_recover() {
     let mut engine = PublicEngine::empty();
     engine.register(Sankey);

@@ -2,6 +2,7 @@
 //! Public codecs are opt-in; an unimplemented codec never silently ignores edits.
 mod engine;
 mod graph;
+pub(crate) mod captured_read;
 mod initial_store;
 #[doc(hidden)]
 pub use initial_store::InitialWriter;
