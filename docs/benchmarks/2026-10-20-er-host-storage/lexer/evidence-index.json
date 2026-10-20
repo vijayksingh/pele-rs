@@ -1,0 +1,180 @@
+{
+  "sourceCommit": "df3597c",
+  "scope": "Shared ER lexical dispatch, unreleased; scoped VM and local Swift diagnostics",
+  "records": [
+    {
+      "path": "comparison.json",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch-first/comparison.json",
+      "sourceSha256": "37cd95c286e2cefc2c87e5757e9452ebe70e0e7d7465bd4cef41b59f0fa03e7f",
+      "archiveSha256": "37cd95c286e2cefc2c87e5757e9452ebe70e0e7d7465bd4cef41b59f0fa03e7f"
+    },
+    {
+      "path": "independent-vm-rehash.json",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch-first/independent-vm-rehash.json",
+      "sourceSha256": "7f77a25eeff9c38805c5cc8936508c6f42668de09e49bfa17da2d10e4be28bd5",
+      "archiveSha256": "7f77a25eeff9c38805c5cc8936508c6f42668de09e49bfa17da2d10e4be28bd5"
+    },
+    {
+      "path": "source-freeze.json",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/runtime/source-freeze.json",
+      "sourceSha256": "40971688b07594c2eaf0c9dcba57d4f404a3752c852e29eed4d66c71832a0185",
+      "archiveSha256": "40971688b07594c2eaf0c9dcba57d4f404a3752c852e29eed4d66c71832a0185"
+    },
+    {
+      "path": "swift-build-manifest.json",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/runtime/swift-build-manifest.json",
+      "sourceSha256": "c421f03e8aa32048fe3e0e3e8b3c8d123c555cce7f46bcb595986be49e918286",
+      "archiveSha256": "c421f03e8aa32048fe3e0e3e8b3c8d123c555cce7f46bcb595986be49e918286"
+    },
+    {
+      "path": "swift-comparison.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/runtime/swift-comparison-attempt1.json",
+      "sourceSha256": "9f55e6d4d8e7c3e27bd2f06d01583e05c49d2e8b3e884871c177b30275cbddf4",
+      "archiveSha256": "ee30a813b21999b645d2358e6cf0c519f7258e77ed745ab762926594ac02c8bf"
+    },
+    {
+      "path": "swift-api.json",
+      "source": "dist/evidence/er-lexical-dispatch-swift-api.json",
+      "sourceSha256": "65ce3c5cdc709ff9962344afd966ae11c99dbc597455da6da6faec24acd02efe",
+      "archiveSha256": "65ce3c5cdc709ff9962344afd966ae11c99dbc597455da6da6faec24acd02efe"
+    },
+    {
+      "path": "AUDIT.md",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/AUDIT.md",
+      "sourceSha256": "74c76cac867d1cc90c250989429f04c0f8d7c2dfc9fe5293eff948e944cfac15",
+      "archiveSha256": "74c76cac867d1cc90c250989429f04c0f8d7c2dfc9fe5293eff948e944cfac15"
+    },
+    {
+      "path": "audit.json",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/audit.json",
+      "sourceSha256": "4480bb38e2f5defcd552bb6722def13d246d770c77744e4b8863d0557d889601",
+      "archiveSha256": "4480bb38e2f5defcd552bb6722def13d246d770c77744e4b8863d0557d889601"
+    },
+    {
+      "path": "audit.py.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/audit.py",
+      "sourceSha256": "a0ffb393105f82f95604c2f51f505512ea5af388010feae8fa28e0c4f71671f6",
+      "archiveSha256": "1a0bc14280ac1700c08dfde8d009b39a9b42f7a52bf2749c67ae3965210e7157"
+    },
+    {
+      "path": "REVIEW.md",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/REVIEW.md",
+      "sourceSha256": "a2df03b3c71e133a44811063c8230196d5032e5274a291dcf2f8755f86a3112b",
+      "archiveSha256": "a2df03b3c71e133a44811063c8230196d5032e5274a291dcf2f8755f86a3112b"
+    },
+    {
+      "path": "attribution.json",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/attribution.json",
+      "sourceSha256": "7baf17f95c39955354f273f229078e1e878dd14d4f75386c2157d0649eb17e9a",
+      "archiveSha256": "7baf17f95c39955354f273f229078e1e878dd14d4f75386c2157d0649eb17e9a"
+    },
+    {
+      "path": "wasm-build.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-wasm-build.log",
+      "sourceSha256": "df91df01b8f185211639b742db6832075986b16380d8538c8dbbdfcfb302d880",
+      "archiveSha256": "683f70f645cef7a14139826f17399125a33eb273f707e65d68ea64678da49d85"
+    },
+    {
+      "path": "native.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-native.log",
+      "sourceSha256": "f7189881af198117a9dcc6e67857bc9bb5a330093762e743db29bc6343302ad3",
+      "archiveSha256": "7b41f96903be07712d0c4f3b20b0e1920559b4b7e0e07ccf0c3b94f77ddf09c5"
+    },
+    {
+      "path": "baseline-web.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-baseline-web.log",
+      "sourceSha256": "00808f33dd176bae713a7a9f96e2ed18c69effafe42ab936239fd6e8b0fe523c",
+      "archiveSha256": "de387267b614d6f2af8727455ba640f11aed4e126ae2094a4fb9d97ee742bed8"
+    },
+    {
+      "path": "baseline-fixed-web.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-baseline-fixed-web.log",
+      "sourceSha256": "528b36b10c99ea85ed0d5c1ca39b87bad894a1abecc286c9b103e505c23c9fda",
+      "archiveSha256": "962764e7995f7032736883f9e19c20a1598148d548be9d813574ce1187ae9651"
+    },
+    {
+      "path": "web.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-web.log",
+      "sourceSha256": "be4f7b4b66806fdb173b88fa1790e049418763dda2f7b32b3b0c705cc3e28ac5",
+      "archiveSha256": "ed314ca55dab0e8c58d766d1eb9d2d913eb38a4ca1893a280df7af6c5ed4970f"
+    },
+    {
+      "path": "sdk-build.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-sdk-build.log",
+      "sourceSha256": "296947f65fb5687520de242e16ea872f8e94625ce76c2ead1943a0fe15e9946f",
+      "archiveSha256": "17f0fed847def6aad6b2cf57520a5ee594dd7abb2babfd1640facc1b18b6957a"
+    },
+    {
+      "path": "swift-build.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-swift-build.log",
+      "sourceSha256": "187b6876dbe7e4461f24f4da57e1f795cb5a916c774481f5c979fe3b0d2eea8a",
+      "archiveSha256": "9cfcf50051ef9db11d8b1025da2ec4ce32b5cf138153313e64c57884228231af"
+    },
+    {
+      "path": "swift-api.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-swift-api.log",
+      "sourceSha256": "f404f5ecf8caafe326bf3cd2c56cf5aaa49428d7b5c532bf460f06e3b4b2eca6",
+      "archiveSha256": "df0d0319f519d175fa66ff8d9c25e3cb291a52b3eb85f93c9aca204ada1e0331"
+    },
+    {
+      "path": "swift-corpus.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-swift-corpus.log",
+      "sourceSha256": "bb895ec61de6035326581bd3aef8bca1323d0c39b2fb8e6787694398dbf6e47f",
+      "archiveSha256": "ed4c2ad006ae30a740ae08238b930f858a67717521c0c13db50142410c68211f"
+    },
+    {
+      "path": "c.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-c.log",
+      "sourceSha256": "0ebce44969f19be31a6a6a19f694cad83ea8612d93d44b474aaae5c9c0761db7",
+      "archiveSha256": "facb4484aa617697db68d437445172f99170b7395028b8b071e0869b42a5c69c"
+    },
+    {
+      "path": "vm.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-vm.log",
+      "sourceSha256": "5fbe6e28f57d61227c2291dcbe3608a6d14499aa8485b4a3f7dfaf4d652fafd8",
+      "archiveSha256": "02165f2c3e47faedf8e085291088978194156e0a84043ea0e98d710887410932"
+    },
+    {
+      "path": "swift-timing-attempt1.log.gz",
+      "source": "dist/evidence/er-lexical-dispatch-swift-timing-attempt1.log",
+      "sourceSha256": "4e0622f8bbddff7845a2873f76cbaf5c9182b1b3d8abf49417cb4a0b45889da3",
+      "archiveSha256": "1435f9752eb7842e1f02ea5aed891f5f768dcd6de4334ec59e172808978f74b0"
+    },
+    {
+      "path": "initial-baseline/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-firefox/er-lexical-dispatch.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/baseline-results/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-firefox/er-lexical-dispatch.json",
+      "sourceSha256": "33d7de96df05df0e05328d477b983d72627fc57f12de285eed047bdefe1d0f1b",
+      "archiveSha256": "b857817896c4aad5c9cef20dbac564fa86bf48238495807ecafc47e096cc12cd"
+    },
+    {
+      "path": "initial-baseline/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-chromium/er-lexical-dispatch.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/baseline-results/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-chromium/er-lexical-dispatch.json",
+      "sourceSha256": "33d7de96df05df0e05328d477b983d72627fc57f12de285eed047bdefe1d0f1b",
+      "archiveSha256": "b857817896c4aad5c9cef20dbac564fa86bf48238495807ecafc47e096cc12cd"
+    },
+    {
+      "path": "initial-baseline/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-webkit/er-lexical-dispatch.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/baseline-results/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-webkit/er-lexical-dispatch.json",
+      "sourceSha256": "33d7de96df05df0e05328d477b983d72627fc57f12de285eed047bdefe1d0f1b",
+      "archiveSha256": "b857817896c4aad5c9cef20dbac564fa86bf48238495807ecafc47e096cc12cd"
+    },
+    {
+      "path": "corrected-baseline/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-firefox/er-lexical-dispatch.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/results/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-firefox/er-lexical-dispatch.json",
+      "sourceSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011",
+      "archiveSha256": "acc15f2bed28f099df500ff43a9f15cf51a4fbabe97414e29482343f7621df29"
+    },
+    {
+      "path": "corrected-baseline/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-chromium/er-lexical-dispatch.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/results/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-chromium/er-lexical-dispatch.json",
+      "sourceSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011",
+      "archiveSha256": "acc15f2bed28f099df500ff43a9f15cf51a4fbabe97414e29482343f7621df29"
+    },
+    {
+      "path": "corrected-baseline/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-webkit/er-lexical-dispatch.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-lexical-dispatch/results/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-webkit/er-lexical-dispatch.json",
+      "sourceSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011",
+      "archiveSha256": "acc15f2bed28f099df500ff43a9f15cf51a4fbabe97414e29482343f7621df29"
+    }
+  ]
+}

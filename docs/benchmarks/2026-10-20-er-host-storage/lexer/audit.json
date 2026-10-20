@@ -1,0 +1,720 @@
+{
+  "scope": "Existing evidence audit only; no benchmark/build/browser/consumer execution. Runtime source checked from frozen Git objects, not current worktree.",
+  "reportHashes": {
+    "dist/perf-patches/parse-architecture/er-lexical-dispatch/runtime/swift-comparison-attempt1.json": "9f55e6d4d8e7c3e27bd2f06d01583e05c49d2e8b3e884871c177b30275cbddf4",
+    "dist/perf-patches/parse-architecture/er-lexical-dispatch/runtime/source-freeze.json": "40971688b07594c2eaf0c9dcba57d4f404a3752c852e29eed4d66c71832a0185",
+    "dist/perf-patches/parse-architecture/er-lexical-dispatch/runtime/swift-build-manifest.json": "c421f03e8aa32048fe3e0e3e8b3c8d123c555cce7f46bcb595986be49e918286",
+    "dist/perf-patches/parse-architecture/er-lexical-dispatch-first/comparison.json": "37cd95c286e2cefc2c87e5757e9452ebe70e0e7d7465bd4cef41b59f0fa03e7f"
+  },
+  "artifactIdentities": {
+    "control": {
+      "revision": "0b32797d5e5f6ded562c61de7acbd35ca4643839",
+      "manifestSha256": "0a8b3246b0fcfd9f74d50fe35c07273014cb9cabad4f87a99c5a2c016a7d5f17",
+      "binarySha256": "75258a9666006497d1bc2fe871dea2c511599e4ee8f3058f70528c6ddcb1687c",
+      "inputAggregate": "93afe7645305e79a41af781be27456c694b38a1e1ee55404f1dd2ddabc737bed",
+      "inputCount": 348,
+      "historicalSourceVerification": {
+        "verifiedGitBlobs": 335,
+        "notTrackedAtRevision": [],
+        "nonGitInputs": [
+          "CPele/FDLIBM-LICENSE",
+          "CPele/FONT-OFL.txt",
+          "CPele/Info.plist",
+          "CPele/LICENSE",
+          "CPele/MERMAID-LICENSE",
+          "CPele/NOTICE",
+          "CPele/PELE-LICENSE",
+          "CPele/RUST-DEPENDENCY-LICENSES.txt",
+          "CPele/RUST-STDLIB-LICENSES.txt",
+          "CPele/V8-LICENSE",
+          "CPele/macos-arm64/Headers/module.modulemap",
+          "CPele/macos-arm64/Headers/pele.h",
+          "CPele/macos-arm64/libpele_ffi.a"
+        ]
+      }
+    },
+    "candidate": {
+      "revision": "df3597c9d584a9edd26e3c3975743e0dcb95d386",
+      "manifestSha256": "c421f03e8aa32048fe3e0e3e8b3c8d123c555cce7f46bcb595986be49e918286",
+      "binarySha256": "0cdf86d1573f95dca88d0c5e103e2e08533f4ed0bba01054fd2128b98955cb45",
+      "inputAggregate": "8f4fbc262e2ce2b1784823f4dd635cb6e725b0084a7a75a507c36690763b6bea",
+      "inputCount": 351,
+      "historicalSourceVerification": {
+        "verifiedGitBlobs": 338,
+        "notTrackedAtRevision": [],
+        "nonGitInputs": [
+          "CPele/FDLIBM-LICENSE",
+          "CPele/FONT-OFL.txt",
+          "CPele/Info.plist",
+          "CPele/LICENSE",
+          "CPele/MERMAID-LICENSE",
+          "CPele/NOTICE",
+          "CPele/PELE-LICENSE",
+          "CPele/RUST-DEPENDENCY-LICENSES.txt",
+          "CPele/RUST-STDLIB-LICENSES.txt",
+          "CPele/V8-LICENSE",
+          "CPele/macos-arm64/Headers/module.modulemap",
+          "CPele/macos-arm64/Headers/pele.h",
+          "CPele/macos-arm64/libpele_ffi.a"
+        ]
+      },
+      "actualSdkAndTargetArchiveSha256": "c18d9b1df64003ae0c2f947e437e0a93c7a9311267a550c96ac8e5ba34808b5b",
+      "actualSdkFilesVerified": 13
+    }
+  },
+  "harnessIdentities": {
+    "swiftComparator": {
+      "path": "scripts/perf/swift/compare.mjs",
+      "sha256": "3f6853435e45703c2aa3b94f36026444666a963a71c03e8e04e21fb46bab4549"
+    },
+    "webComparator": {
+      "path": "scripts/perf/compare-web-vm.mjs",
+      "sha256": "7d632fa69ddfbd18fe716388f6e277e6b48ed267fa378b9f73d4ff74f7e1a808"
+    },
+    "cases": {
+      "path": "scripts/perf/cases.mjs",
+      "sha256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58"
+    },
+    "oracle": {
+      "path": "node_modules/pele/dist/pele.js",
+      "sha256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d"
+    },
+    "guardBuild": {
+      "path": "scripts/perf/swift/build.mjs",
+      "sha256": "c6d23dc6f051bb181e25a7290c958970a2b1e2d67b24f3550ed928c355ea0cb5"
+    }
+  },
+  "changedSwiftInputs": [
+    {
+      "path": "CPele/macos-arm64/libpele_ffi.a",
+      "control": "56447aa9699a85f1e36d526b7b81bd594171f6852d090d9da69a553bdf0885f2",
+      "candidate": "c18d9b1df64003ae0c2f947e437e0a93c7a9311267a550c96ac8e5ba34808b5b"
+    },
+    {
+      "path": "root/crates/pele/Cargo.toml",
+      "control": "e4d8c0bd93a25f758b7820002f06f89ef19129beb10680374cc6924fe125a2d1",
+      "candidate": "341e1dbede29a242c7ea93e955d97a1e5b537118972ca136403e69b9c2c25dda"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/direct_parse.rs",
+      "control": "e11adad951fb5d64c3601ec2d5bcd18dd932a99b8624678a2b8fdcc71a2321df",
+      "candidate": "d4d5383922074d696c6309190c9c3d83b0ea7e29fdbafd982be681da12a83f55"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/graph.rs",
+      "control": "b4107c46d6a8b1c6d0e2bab3b64551b6bfc8a7dc01d3afa4240b98126e5f0546",
+      "candidate": "893f866f91f80b92a994af1b2de76be39cacc5677c2f31497168558829e8953b"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/host_initial.rs",
+      "control": null,
+      "candidate": "06ecd9c73c91e1884996caf4ce6d8165eeceb51d9d598b99999d39811cbc467a"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/lexer.rs",
+      "control": "674ce8c3b824923285fee3a86bd209e5fb8af69b2b1eba05877f50cb0cc68fa5",
+      "candidate": "9776d9d2b8de5740837abe7b469a4c18d839dbe4186d0f130ae30b04e7f81027"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/live_read.rs",
+      "control": null,
+      "candidate": "bc8cf87aab30c752c918e60c006e85d07be04cbb3bf0354ef9efb5cace27f3fa"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/mod.rs",
+      "control": "dccbe8ded875081985cb3e10a7adcb41bfc9e8fac9f8f013eb4659d174eacc60",
+      "candidate": "a1d3db6284146d4f98a5bb59915047f32b6e74d5e480c67304adc09e6a0a1337"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/public_model.rs",
+      "control": "4a01f198f33cda52b1a57a5ffd99efda36c8882f5f58bbf98a0f06fe81e7593c",
+      "candidate": "35df4daec30169b3c6cab1be5a818420f32ee9ceb7c2ee37632281d701bda7bc"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/render.rs",
+      "control": "2c917eb75960b75b5157042699f3a92e24fffd12b51f5aae011f458a2a61c60a",
+      "candidate": "d6f926e1e946ebf50337d59b66f80380475db11cfcc95d81d37541cdc3cdc5a9"
+    },
+    {
+      "path": "root/crates/pele/src/compat/engine.rs",
+      "control": "d0d02bd0d3b772e1447854e63914aed21a9919ee48d4a74af121f9622bbd4c85",
+      "candidate": "a8c393bdb8fc44c09dcd854331ebf38535c3bd836d88e98f8afd86b24be49b76"
+    },
+    {
+      "path": "root/crates/pele/src/compat/host_er.rs",
+      "control": null,
+      "candidate": "08b6d215b539c4adcf8cf4a92205e5e72cc7eaf35c902852e2dd3c97e0df1216"
+    },
+    {
+      "path": "root/crates/pele/src/compat/mod.rs",
+      "control": "cea799f3cbec5a74e4b139d70a3bd1263961027dd270de53d77a8e53f083c8c2",
+      "candidate": "a49a7045f16601354392cb9889b2c333cc5e85c931645e2b264e1297f32b44b2"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/engine.rs",
+      "control": "f5d13520f0089ecf4b6886cc8aebf616d1fbe0e85ef809b6c003ace160d70f9c",
+      "candidate": "100b3c55f912d62962b94088b8821173df0ecbd8bdac1c0b815ad3d76fb68dc9"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/mod.rs",
+      "control": "e09af282cda1d5a184deab297b6a4f80bf49ba71b2a8c046a65b0a90c5cf5437",
+      "candidate": "633f4b872e6af272f8ecd8a82f6028d4cdd9d4bd6c8bb7b86ff90450ce768bee"
+    }
+  ],
+  "swift": {
+    "rows": [
+      {
+        "case": "sequence/small",
+        "stage": "parseMutable",
+        "count": 128,
+        "controlMedianMs": 0.06651009375,
+        "candidateMedianMs": 0.0672939453125,
+        "pairedPercent": 0.7916605837759105,
+        "ratioOfMediansPercent": 1.1785452678000574,
+        "wins": 4,
+        "warmup": {
+          "control": {
+            "operations": 14982,
+            "elapsedNs": 1003223500
+          },
+          "candidate": {
+            "operations": 14982,
+            "elapsedNs": 1002651920
+          },
+          "pairs": 123
+        }
+      },
+      {
+        "case": "sequence/small",
+        "stage": "lifetime",
+        "count": 64,
+        "controlMedianMs": 0.217420578125,
+        "candidateMedianMs": 0.219482421875,
+        "pairedPercent": 1.2094180615929373,
+        "ratioOfMediansPercent": 0.9483204247642929,
+        "wins": 3,
+        "warmup": {
+          "control": {
+            "operations": 4486,
+            "elapsedNs": 1007449834
+          },
+          "candidate": {
+            "operations": 4486,
+            "elapsedNs": 1276185666
+          },
+          "pairs": 41
+        }
+      },
+      {
+        "case": "sequence/small",
+        "stage": "parse",
+        "count": 128,
+        "controlMedianMs": 0.0600393828125,
+        "candidateMedianMs": 0.060313796875,
+        "pairedPercent": 0.7100302677616632,
+        "ratioOfMediansPercent": 0.45705676781684357,
+        "wins": 5,
+        "warmup": {
+          "control": {
+            "operations": 16902,
+            "elapsedNs": 1006497464
+          },
+          "candidate": {
+            "operations": 16902,
+            "elapsedNs": 1009855623
+          },
+          "pairs": 138
+        }
+      },
+      {
+        "case": "er/medium",
+        "stage": "parseMutable",
+        "count": 64,
+        "controlMedianMs": 0.261893234375,
+        "candidateMedianMs": 0.206864578125,
+        "pairedPercent": -20.765042344994665,
+        "ratioOfMediansPercent": -21.011866297853842,
+        "wins": 15,
+        "warmup": {
+          "control": {
+            "operations": 4742,
+            "elapsedNs": 1236018170
+          },
+          "candidate": {
+            "operations": 4742,
+            "elapsedNs": 1005308204
+          },
+          "pairs": 43
+        }
+      },
+      {
+        "case": "er/medium",
+        "stage": "lifetime",
+        "count": 8,
+        "controlMedianMs": 2.245823,
+        "candidateMedianMs": 2.16085425,
+        "pairedPercent": -3.6501098108607133,
+        "ratioOfMediansPercent": -3.783412584161805,
+        "wins": 12,
+        "warmup": {
+          "control": {
+            "operations": 518,
+            "elapsedNs": 1139252085
+          },
+          "candidate": {
+            "operations": 518,
+            "elapsedNs": 1096857081
+          },
+          "pairs": 10
+        }
+      },
+      {
+        "case": "er/medium",
+        "stage": "parse",
+        "count": 32,
+        "controlMedianMs": 0.57942315625,
+        "candidateMedianMs": 0.5210065,
+        "pairedPercent": -9.99368805565255,
+        "ratioOfMediansPercent": -10.081864285174557,
+        "wins": 15,
+        "warmup": {
+          "control": {
+            "operations": 2054,
+            "elapsedNs": 1187162416
+          },
+          "candidate": {
+            "operations": 2054,
+            "elapsedNs": 1065910167
+          },
+          "pairs": 22
+        }
+      }
+    ],
+    "pairs": 90,
+    "firstOrderCounts": {
+      "control": 45,
+      "candidate": 45
+    },
+    "storedTimedRequestGuards": 260,
+    "calibrationRequests": 80,
+    "maximumRecordedCpuByProcessName": {
+      "Google Chrome Helper (Renderer)": 45.1,
+      "PeleSwiftPerf": 57.7,
+      "WindowServer": 18.7,
+      "Codex (Renderer)": 16.7,
+      "replicatord": 13.4,
+      "launchd": 42.3
+    },
+    "guardLimitation": "Rejects build/Pele test processes, allows other recorded desktop load; warmup has aggregate counts/durations but no saved individual guard records."
+  },
+  "web": {
+    "rows": [
+      {
+        "case": "sequence/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": -1.0030450326730556,
+        "ratioOfMediansPercent": 0.7381163504101895,
+        "wins": 12,
+        "candidateOverJS": 17.059999465942383,
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        }
+      },
+      {
+        "case": "sequence/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": -1.661681613374788,
+        "ratioOfMediansPercent": 2.889250519744846,
+        "wins": 12,
+        "candidateOverJS": 6.967390975339228,
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        }
+      },
+      {
+        "case": "sequence/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": -1.6218844140901356,
+        "ratioOfMediansPercent": -0.4534012637697815,
+        "wins": 11,
+        "candidateOverJS": 3.016793400982561,
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        }
+      },
+      {
+        "case": "sequence/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": 3.575998587149143,
+        "ratioOfMediansPercent": 3.9489650952863276,
+        "wins": 8,
+        "candidateOverJS": 16.373203305097274,
+        "counts": {
+          "js": 128,
+          "control": 64,
+          "candidate": 64
+        }
+      },
+      {
+        "case": "sequence/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": -4.393443123238983,
+        "ratioOfMediansPercent": -8.258522786452572,
+        "wins": 13,
+        "candidateOverJS": 5.964981594454588,
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        }
+      },
+      {
+        "case": "sequence/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": -0.5290924663461483,
+        "ratioOfMediansPercent": -0.9900919244701822,
+        "wins": 14,
+        "candidateOverJS": 2.613479890459952,
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        }
+      },
+      {
+        "case": "er/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": -6.061427415083809,
+        "ratioOfMediansPercent": -4.841665600095524,
+        "wins": 17,
+        "candidateOverJS": 12.160535614156737,
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        }
+      },
+      {
+        "case": "er/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": -1.133575180157964,
+        "ratioOfMediansPercent": -2.1528171447164124,
+        "wins": 14,
+        "candidateOverJS": 6.071495787459999,
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        }
+      },
+      {
+        "case": "er/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": -6.144732178159917,
+        "ratioOfMediansPercent": -6.666671768627785,
+        "wins": 18,
+        "candidateOverJS": 2.4807217757399345,
+        "counts": {
+          "js": 128,
+          "control": 64,
+          "candidate": 64
+        }
+      },
+      {
+        "case": "er/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": -7.304253332385169,
+        "ratioOfMediansPercent": -7.785337010590132,
+        "wins": 18,
+        "candidateOverJS": 10.608698728931392,
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        }
+      },
+      {
+        "case": "er/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": 0.7862117668012258,
+        "ratioOfMediansPercent": 1.2187990622664069,
+        "wins": 10,
+        "candidateOverJS": 5.612228637253037,
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        }
+      },
+      {
+        "case": "er/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": -4.3032766976603405,
+        "ratioOfMediansPercent": -5.111176445770771,
+        "wins": 16,
+        "candidateOverJS": 2.1668315656452113,
+        "counts": {
+          "js": 128,
+          "control": 64,
+          "candidate": 64
+        }
+      },
+      {
+        "case": "er/medium",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": -7.690605399292982,
+        "ratioOfMediansPercent": -6.75342214379997,
+        "wins": 15,
+        "candidateOverJS": 9.494003180511973,
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        }
+      },
+      {
+        "case": "er/medium",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": 1.0446996586374269,
+        "ratioOfMediansPercent": 1.392552209144693,
+        "wins": 9,
+        "candidateOverJS": 5.208757217988244,
+        "counts": {
+          "js": 32,
+          "control": 8,
+          "candidate": 8
+        }
+      },
+      {
+        "case": "er/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": -3.2054135291211705,
+        "ratioOfMediansPercent": -4.2148169915592115,
+        "wins": 18,
+        "candidateOverJS": 2.2171519217475817,
+        "counts": {
+          "js": 32,
+          "control": 16,
+          "candidate": 16
+        }
+      },
+      {
+        "case": "er/medium",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": -6.941222501984356,
+        "ratioOfMediansPercent": -7.938594414513389,
+        "wins": 17,
+        "candidateOverJS": 9.155943117331475,
+        "counts": {
+          "js": 128,
+          "control": 16,
+          "candidate": 16
+        }
+      },
+      {
+        "case": "er/medium",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": 0.5234400078307999,
+        "ratioOfMediansPercent": 0.654777426104225,
+        "wins": 10,
+        "candidateOverJS": 4.672955985530941,
+        "counts": {
+          "js": 32,
+          "control": 8,
+          "candidate": 8
+        }
+      },
+      {
+        "case": "er/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": -3.729099591640994,
+        "ratioOfMediansPercent": -3.6355955944653906,
+        "wins": 15,
+        "candidateOverJS": 2.061299007341111,
+        "counts": {
+          "js": 16,
+          "control": 8,
+          "candidate": 8
+        }
+      },
+      {
+        "case": "er/large",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": -8.05709049412362,
+        "ratioOfMediansPercent": -7.639207926284531,
+        "wins": 21,
+        "candidateOverJS": 8.499735455077849,
+        "counts": {
+          "js": 32,
+          "control": 4,
+          "candidate": 4
+        }
+      },
+      {
+        "case": "er/large",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": 1.067962441528425,
+        "ratioOfMediansPercent": 1.4765440405166474,
+        "wins": 7,
+        "candidateOverJS": 5.030696772825708,
+        "counts": {
+          "js": 8,
+          "control": 2,
+          "candidate": 2
+        }
+      },
+      {
+        "case": "er/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": -3.791259494100019,
+        "ratioOfMediansPercent": -3.7210381994153385,
+        "wins": 19,
+        "candidateOverJS": 2.2790083859459593,
+        "counts": {
+          "js": 8,
+          "control": 4,
+          "candidate": 4
+        }
+      },
+      {
+        "case": "er/large",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": -8.565555286797622,
+        "ratioOfMediansPercent": -9.33182922806255,
+        "wins": 17,
+        "candidateOverJS": 6.025211308384424,
+        "counts": {
+          "js": 64,
+          "control": 8,
+          "candidate": 8
+        }
+      },
+      {
+        "case": "er/large",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": 0.30092397794150294,
+        "ratioOfMediansPercent": 0.6360804252945718,
+        "wins": 10,
+        "candidateOverJS": 4.482671426755136,
+        "counts": {
+          "js": 8,
+          "control": 2,
+          "candidate": 2
+        }
+      },
+      {
+        "case": "er/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": -2.327546578900108,
+        "ratioOfMediansPercent": -3.8907228172423647,
+        "wins": 18,
+        "candidateOverJS": 2.071364954655381,
+        "counts": {
+          "js": 8,
+          "control": 2,
+          "candidate": 2
+        }
+      }
+    ],
+    "triples": 504,
+    "settings": {
+      "trials": 21,
+      "warmupMs": 1000,
+      "batchTargetMs": 12,
+      "maxBatch": 128,
+      "balancedThreeWayOrder": true,
+      "matchedWasmBatchCounts": true,
+      "calibrationMedianOfThree": true,
+      "freshRetainedModelPerBatch": true,
+      "crossOriginIsolated": true,
+      "observedClockResolutionMs": 0.0049991607666015625
+    },
+    "perRowFirstCountsDerivedFromHashVerifiedHarness": {
+      "js": 7,
+      "control": 7,
+      "candidate": 7
+    },
+    "perRowControlCandidatePrecedenceDerived": {
+      "control": 11,
+      "candidate": 10
+    },
+    "orderLimitation": "Report saves samples per lane but no observed raw order or timer start/end; ordering derived from immutable verified harness.",
+    "guardLimitation": "No per-row quiet process guard in this comparator. Load/memory only before/after; ten-minute deadline and package before/after identity assertions.",
+    "correctness": "Harness checks complete SVG and Object.is dimensions for retained/source/fresh parse before and after; report stores case/profile SVG byte counts, not full outputs.",
+    "packages": {
+      "controlRecordedFiles": 106,
+      "candidateRecordedFiles": 106,
+      "controlMatchesResultPacketFreeze": true,
+      "candidateMatchesLexicalFreeze": true,
+      "changedFiles": [
+        "pkg/pele_bg.wasm"
+      ],
+      "physicalHistoricalPackageVerification": {
+        "status": "all 106 files per side match fresh post-timing remote byte rehash",
+        "verifiedAt": "2026-10-20T07:37:13.972Z",
+        "roots": {
+          "control": "parse-architecture/er-result-packet-first/package",
+          "candidate": "parse-architecture/er-lexical-dispatch-first/package"
+        },
+        "evidencePath": "dist/perf-patches/parse-architecture/er-lexical-dispatch-first/independent-vm-rehash.json",
+        "evidenceSha256": "7f77a25eeff9c38805c5cc8936508c6f42668de09e49bfa17da2d10e4be28bd5",
+        "method": "Parent independently walked both frozen VM directories with a fresh Node SHA reader over SSH, separate from benchmark scripts. Reviewer compared every resulting path/hash to report and frozen manifests.",
+        "limit": "File bodies were not downloaded; this verifies the supplied independent remote byte-reading record, not a second local rehash or uninterrupted monitoring."
+      },
+      "frozenSourceVerification": {
+        "verifiedGitBlobs": 444,
+        "notTrackedAtRevision": [],
+        "nonGitInputs": [
+          "CPele/FDLIBM-LICENSE",
+          "CPele/FONT-OFL.txt",
+          "CPele/Info.plist",
+          "CPele/LICENSE",
+          "CPele/MERMAID-LICENSE",
+          "CPele/NOTICE",
+          "CPele/PELE-LICENSE",
+          "CPele/RUST-DEPENDENCY-LICENSES.txt",
+          "CPele/RUST-STDLIB-LICENSES.txt",
+          "CPele/V8-LICENSE",
+          "CPele/macos-arm64/Headers/module.modulemap",
+          "CPele/macos-arm64/Headers/pele.h",
+          "CPele/macos-arm64/libpele_ffi.a"
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Swift is a combined df3597c versus 0b32797 binary comparison, not isolated lexer causality.",
+    "Shared desktop load and one-page VM heap/GC remain; no confidence interval or regression absence inferred.",
+    "These diagnostic results are not the complete release gate or JS parity."
+  ]
+}

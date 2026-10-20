@@ -18,6 +18,11 @@ The [result-transport follow-up](result-packet/README.md), source `7339f38`,
 subsequently improves retained ER by 9.4–14.9% paired against the raw host
 artifact, while remaining 4.4–6.3× JS. It does not replace the complete gate.
 
+The [shared lexer follow-up](lexer/README.md), source `df3597c`, records
+6.1–8.6% lower paired ER parse VM medians against the packet artifact. Local
+Swift parse improves against the older native baseline; those comparisons
+are separately scoped and do not establish JS parity.
+
 **This is not a performance solution or release candidate.** Retained rendering
 regresses consistently. The latest complete release gate remains the preceding
 [126-condition failure](../2026-10-20-er-token-ownership/README.md). No 0.3 release.

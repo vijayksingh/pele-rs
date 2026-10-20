@@ -1,0 +1,211 @@
+{
+  "source": "dist/perf-patches/parse-architecture/er-raw-host-first/profile/er-medium-parse-wasm.cpuprofile",
+  "sha256": "33ee37c99b9bf9460f477480cf21691c5db0602af7ccad375d109f4dc2869b50",
+  "samples": 4401,
+  "weighted_us": 1631572,
+  "method": "timeDeltas weights; ancestor union counts at most once per sample; exclusive groups disjoint, overlap groups must not be summed. GC has no retained origin stack.",
+  "metrics": {
+    "allocator_phase/lexer": {
+      "us": 3559,
+      "percent": 0.21813318688969902
+    },
+    "allocator_phase/node_without_flush": {
+      "us": 1062,
+      "percent": 0.06509059974061825
+    },
+    "allocator_phase/other": {
+      "us": 29907,
+      "percent": 1.8330174825260546
+    },
+    "allocator_phase/string_without_flush": {
+      "us": 2442,
+      "percent": 0.14967160505328603
+    },
+    "exclusive/flush": {
+      "us": 706748,
+      "percent": 43.316997349795166
+    },
+    "exclusive/gc": {
+      "us": 173141,
+      "percent": 10.61191292814537
+    },
+    "exclusive/lexer": {
+      "us": 170125,
+      "percent": 10.4270605281287
+    },
+    "exclusive/node_without_flush": {
+      "us": 76013,
+      "percent": 4.658881128138997
+    },
+    "exclusive/other": {
+      "us": 348676,
+      "percent": 21.370555513333155
+    },
+    "exclusive/string_without_flush": {
+      "us": 156869,
+      "percent": 9.61459255245861
+    },
+    "overlap/HostConstruction_node": {
+      "us": 548880,
+      "percent": 33.64117550436021
+    },
+    "overlap/HostConstruction_string": {
+      "us": 285323,
+      "percent": 17.48761317306254
+    },
+    "overlap/dlmalloc": {
+      "us": 36970,
+      "percent": 2.265912874209658
+    },
+    "overlap/flush": {
+      "us": 706748,
+      "percent": 43.316997349795166
+    },
+    "overlap/lexer": {
+      "us": 170125,
+      "percent": 10.4270605281287
+    }
+  },
+  "self_top": [
+    {
+      "name": "allocate",
+      "percent": 18.96128396417688
+    },
+    {
+      "name": "(garbage collector)",
+      "percent": 10.61191292814537
+    },
+    {
+      "name": "(program)",
+      "percent": 6.730380271296639
+    },
+    {
+      "name": "property",
+      "percent": 6.180910189682098
+    },
+    {
+      "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::lexer::tokenize",
+      "percent": 6.121274451878311
+    },
+    {
+      "name": "__wbg_new_from_slice_4ee02165f9de919e",
+      "percent": 3.986768588821088
+    },
+    {
+      "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction as pele[37270552ffd5eb7c]::compat::diagrams::er::public_model::InitialWriter>::string",
+      "percent": 3.635512254439277
+    },
+    {
+      "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&str>",
+      "percent": 3.131213332908385
+    },
+    {
+      "name": "need",
+      "percent": 3.0914970347615673
+    },
+    {
+      "name": "intern",
+      "percent": 2.9936159728164005
+    },
+    {
+      "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction as pele[37270552ffd5eb7c]::compat::diagrams::er::public_model::InitialWriter>::node",
+      "percent": 2.3723746178532115
+    },
+    {
+      "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+      "percent": 2.2353901635968256
+    },
+    {
+      "name": "publishBatch",
+      "percent": 2.092644394485809
+    },
+    {
+      "name": "text",
+      "percent": 2.0155408403674495
+    },
+    {
+      "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+      "percent": 2.001811749650031
+    },
+    {
+      "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+      "percent": 1.299911986722008
+    },
+    {
+      "name": "endNode",
+      "percent": 1.1666662580627762
+    },
+    {
+      "name": "pele_wasm[e6e81f4f4d17d0e2]::host_er::construction_atom",
+      "percent": 1.1069692296754297
+    },
+    {
+      "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+      "percent": 0.8550036406606635
+    },
+    {
+      "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::direct_parse::parse_into::<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction>",
+      "percent": 0.7895452974186857
+    },
+    {
+      "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&alloc[508e33bd5656020b]::string::String>",
+      "percent": 0.7886259386652872
+    },
+    {
+      "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+      "percent": 0.7204095191631139
+    },
+    {
+      "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::ReverseSearcher>::next_match_back",
+      "percent": 0.7014707288431035
+    },
+    {
+      "name": "<pele[37270552ffd5eb7c]::compat::diagrams::er::direct_parse::Direct<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction>>::ensure_entity",
+      "percent": 0.6479027588117472
+    },
+    {
+      "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+      "percent": 0.6067154866594916
+    },
+    {
+      "name": "passStringToWasm0",
+      "percent": 0.5788895617232951
+    },
+    {
+      "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::public_model::rec::<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction>",
+      "percent": 0.5187022086674692
+    },
+    {
+      "name": "beginNode",
+      "percent": 0.4884859509724364
+    },
+    {
+      "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[3]",
+      "percent": 0.47702461184673434
+    },
+    {
+      "name": "<pele[37270552ffd5eb7c]::compat::diagrams::c4::lexer::Scanner>::ch",
+      "percent": 0.4705278099893845
+    },
+    {
+      "name": "primitive",
+      "percent": 0.4678310243127487
+    },
+    {
+      "name": "u8",
+      "percent": 0.4589438896965626
+    },
+    {
+      "name": "atom",
+      "percent": 0.3566499057350825
+    },
+    {
+      "name": "core[ed718c3d60ebd546]::ptr::drop_glue::<pele[37270552ffd5eb7c]::compat::public::graph::Node>",
+      "percent": 0.352482146053009
+    },
+    {
+      "name": "<pele[37270552ffd5eb7c]::compat::engine::Engine>::inspect_with_source_limit",
+      "percent": 0.3522369837187694
+    }
+  ]
+}

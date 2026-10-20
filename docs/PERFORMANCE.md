@@ -5,6 +5,12 @@ run locally on macOS because the VM cannot supply the macOS/AppKit SDK.
 
 **The Rust/WASM API is currently slower than Pele JS on the measured workloads.**
 
+The [shared ER lexer report](benchmarks/2026-10-20-er-host-storage/lexer/README.md)
+records 6.1–8.6% lower paired VM ER parse medians against the packet artifact,
+still 6.0–12.2× JS. Local Swift ER mutable/immutable parse improves 20.8%/10.0%
+against frozen `0b32797` across combined native changes; all adverse controls,
+shared desktop load and exact SDK identities are retained.
+
 The [result-transport follow-up](benchmarks/2026-10-20-er-host-storage/result-packet/README.md)
 removes the successful SVG JSON round trip. Retained ER improves 9.4–14.9% in
 paired VM medians against the preceding host artifact, with 19–21 faster trials
