@@ -1,0 +1,25 @@
+[WebServer] (node:60886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 12 tests using 1 worker
+
+(node:60887) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/web/additional-diagrams.spec.js:4:3 › sankey pinned corpus through WASM source and owned model APIs (4.6s)
+  ✓   2 [chromium] › tests/web/sankey-first-render.spec.js:4:1 › fresh public Sankey first render preserves thrown values, recovery and helper aliases (364ms)
+  ✓   3 [chromium] › tests/web/svg-number-boundaries.spec.js:3:1 › railroad complete SVG preserves coordinate rounding boundaries (308ms)
+  ✓   4 [chromium] › tests/web/svg-root.spec.js:3:1 › SVG root output preserves pinned icons, radius, aliases, fonts and accessibility (337ms)
+(node:60972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [firefox] › tests/web/additional-diagrams.spec.js:4:3 › sankey pinned corpus through WASM source and owned model APIs (6.2s)
+  ✓   6 [firefox] › tests/web/sankey-first-render.spec.js:4:1 › fresh public Sankey first render preserves thrown values, recovery and helper aliases (459ms)
+  ✓   7 [firefox] › tests/web/svg-number-boundaries.spec.js:3:1 › railroad complete SVG preserves coordinate rounding boundaries (301ms)
+  ✓   8 [firefox] › tests/web/svg-root.spec.js:3:1 › SVG root output preserves pinned icons, radius, aliases, fonts and accessibility (451ms)
+(node:61038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [webkit] › tests/web/additional-diagrams.spec.js:4:3 › sankey pinned corpus through WASM source and owned model APIs (4.6s)
+  ✓  10 [webkit] › tests/web/sankey-first-render.spec.js:4:1 › fresh public Sankey first render preserves thrown values, recovery and helper aliases (478ms)
+  ✓  11 [webkit] › tests/web/svg-number-boundaries.spec.js:3:1 › railroad complete SVG preserves coordinate rounding boundaries (307ms)
+  ✓  12 [webkit] › tests/web/svg-root.spec.js:3:1 › SVG root output preserves pinned icons, radius, aliases, fonts and accessibility (334ms)
+
+  12 passed (26.2s)

@@ -1,0 +1,55 @@
+   Compiling pele-rs v0.3.0 (/Users/vijaysingh/unlocalhosted/pele-rs/crates/pele)
+    Finished `release` profile [optimized] target(s) in 4m 53s
+     Running tests/public_sankey.rs (target/release/deps/public_sankey-0a863fdf5dd55885)
+
+running 12 tests
+test sankey_native_lookup_returns_raw_values_same_value_zero_keys_and_utf16_storage ... ok
+test sankey_projection_validates_both_arrays_before_labels_and_repairs_latent_errors ... ok
+test mutable_sankey_aliases_order_lookup_and_object_replacement ... ok
+test mutable_sankey_render_errors_preserve_edits_and_recover_without_parsing ... ok
+test sankey_native_methods_keep_real_prototype_aliases_live_cache_and_borrowed_receivers ... ok
+test sankey_raw_helpers_preserve_first_equivalent_map_slot_and_original_number_bits ... ok
+test sankey_native_partial_failure_keeps_lookup_node_and_never_repairs_arrays_implicitly ... ok
+test sankey_raw_helpers_keep_duplicate_descriptor_checks_partial_state_and_repair ... ok
+test sankey_projection_keeps_unicode_across_capture_chunks_and_raw_adoption ... ok
+test sankey_real_methods_and_authored_edits_match_pinned_complete_svg_vectors ... ok
+test sankey_mutable_repeated_long_labels_reject_native_expansion_and_recover ... ok
+test mutable_sankey_retains_unknown_deep_cycles_utf16_and_ieee_fields ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/public_sankey_owned_parse.rs (target/release/deps/public_sankey_owned_parse-0a84cb81dd22c894)
+
+running 7 tests
+test public_owned_default_hook_preserves_legacy_policy_dispatch_and_errors ... ok
+test sankey_owned_parse_keeps_source_limits_and_prepared_publication ... ok
+test sankey_indexed_source_keeps_first_helper_latent_errors_and_raw_recovery ... ok
+test sankey_indexed_source_preserves_resource_order_and_public_typed_projection ... ok
+test sankey_custom_delegation_cannot_forge_canonical_parser_provenance ... ok
+test sankey_owned_retained_methods_edits_and_replacement_match_legacy ... ok
+test sankey_owned_and_legacy_match_complete_frozen_source_corpus ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.96s
+
+     Running tests/public_svg_number.rs (target/release/deps/public_svg_number-7fea7822e092c953)
+
+running 1 test
+test railroad_coordinate_boundaries_preserve_all_public_render_lanes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/public_svg_root.rs (target/release/deps/public_svg_root-db064c74fa27e042)
+
+running 1 test
+test complete_svg_root_output_matches_pinned_pele_through_public_render_lanes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/sankey_compat.rs (target/release/deps/sankey_compat-85206b5985e12ca7)
+
+running 3 tests
+test retained_sankey_reflow_colors_native_pixels_and_cycle_recovery ... ok
+test pinned_sankey_complete_svg_corpus ... ok
+test pinned_sankey_parser_corpus ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.31s

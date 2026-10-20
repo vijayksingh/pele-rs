@@ -179,31 +179,33 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 complete release-gate run, historical source `0b32797`, fails all 126 conditions.
 New scoped diagnostics do not replace that gate.
 
-The default backend now retains indexed Sankey source nodes and links, avoiding
-cloned endpoint records while preserving public models and helper behavior.
-[Matched VM and local evidence](docs/benchmarks/2026-10-20-er-host-storage/indexed-sankey/)
-for runtime `31dab0b`, recovery tests `88b87ec`:
+The default Sankey renderer now appends SVG directly into existing paint buffers,
+sharing exact numeric/escaping rules with the other renderers. [Matched VM and
+local evidence](docs/benchmarks/2026-10-20-er-host-storage/svg-append/), `e148605`:
 
-| Default Sankey path | Paired change versus previous default | Candidate / Pele JS |
+| Default Sankey path | Paired change versus indexed-source default | Candidate / Pele JS |
 | --- | --- | --- |
-| Warm parse, six conditions | 3.64–6.69% lower | 7.93–14.31× |
-| First edited render, six conditions | 0.67–4.08% lower | 3.52–8.14× |
+| Warm source render, six conditions | 18.74–26.04% lower | 0.993–1.578× |
+| Warm retained render, six conditions | 14.43–18.14% lower | 1.78–2.79× |
+| First unchanged render | 5.51–12.79% lower | 2.20–5.11× |
+| First edited render | 5.69–8.98% lower | 3.77–7.49× |
 
-First unchanged render is mixed: five conditions lower, **large/canvas 6.50%
-slower**. Source/Flowchart controls are also mixed; all 48 rows and adverse
-samples are retained. The edit adds a cyclic extension property, not diagram
-content. These scoped diagnostics do not establish general speedup.
+The edit adds a cyclic extension property, not diagram content. All48 diagnostic
+rows and adverse controls remain visible: five warm Sankey parse rows increase
+1.81–4.69%, and Flowchart retained rows increase2.06–2.63% paired. This does not
+establish overall parity or neutrality. Parse still measures6.44–15.06×JS in
+this window; percentages are not compounded with earlier measurements.
 
-Fresh native checks pass 22 feature integrations; focused browser checks pass
-45 across Chromium, Firefox and WebKit. Fresh arm64 SDK passes Swift 16, strict
-C3 and API168, including 12,481 drawings and 16,572 expected errors. Native
-parse allocations fall from 834 to 734 for medium Sankey; no new Swift latency
+Current correctness:24native feature integrations;12focused browser checks
+across Chromium, Firefox and WebKit; fresh arm64 SDK Swift16, strict C3 and
+API168, covering12,481drawings and16,572expected errors. No new Swift timing
 claim. Intel SDK and AppKit activation remain release checks.
 
-Work now targets direct SVG appending and the remaining mutable-parse
-publication cost. Neither Rust nor GPU availability guarantees faster execution.
-VM and Swift use different machines; their timings cannot be subtracted to
-estimate bridge cost.
+The preceding [indexed source ownership](docs/benchmarks/2026-10-20-er-host-storage/indexed-sankey/)
+reduced cloned endpoint records while preserving public models and helpers.
+Work now targets source-backed canonical storage and publication to address the
+larger mutable-parse cost. No GPU or all33diagram speedup is claimed. VM and Swift
+use different machines; their timings cannot be subtracted to estimate bridge cost.
 
 <details>
 <summary>Earlier measurements and rejected experimental backends</summary>
