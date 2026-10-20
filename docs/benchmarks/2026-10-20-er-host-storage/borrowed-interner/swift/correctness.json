@@ -1,0 +1,34 @@
+{
+  "recordedAt": "2026-10-20T08:42:15.879Z",
+  "sourceCommit": "d25bb26089e597b9de8985edbfced5a3955a6bbd",
+  "swiftSelectedIntegrationCases": 15,
+  "erMutableDrawings": 7535,
+  "erErrors": 9902,
+  "erExplicitBudgetDifferences": 0,
+  "strictCConsumers": 3,
+  "consumerBuilds": 1,
+  "swiftApiConditions": 168,
+  "swiftWorkloads": 21,
+  "timingStatus": "held until separate parent local-browser-finished signal",
+  "nativeSourceInputSha256": "e9be1b27738482738b6c9f08fa98d4e637da73f70f31ee2ed4026b0636fefc73",
+  "sourceInputCount": 351,
+  "consumerBinarySha256": "2131d6fd1090d375e71d938d7b1dd799a03b319b84f9c45ea50651916593de3c",
+  "controlBinarySha256": "f85a25d8cfbebad2419cf42a1cdba2d603cda74ea2a254a728551d8a2c0a1f42",
+  "changedInputsFromRecord": [
+    "root/crates/pele/src/compat/diagrams/er/public_model.rs",
+    "root/crates/pele/src/compat/public/graph.rs",
+    "CPele/macos-arm64/libpele_ffi.a"
+  ],
+  "evidence": {
+    "dist/evidence/er-borrowed-interner-swift-corpus.log": "9383202d11f6272c34989f493bdde24875b945935e98478ccc9fc7d05e8423b5",
+    "dist/evidence/er-borrowed-interner-swift-build.log": "a097b56e0a05bb88af0a5d008dd315909d5ac38bc812c9ffacce66d9ab2b9260",
+    "dist/evidence/er-borrowed-interner-swift-api.log": "c980ecc8c2f94103d13caae9185ebb2dc5fb380b6559fbfa9f68bfe55ab15bcb",
+    "dist/evidence/er-borrowed-interner-swift-api.json": "8c314c6e7758bfa479e9da83470f85dcea4d118e509ad3b068bcac544213546f",
+    "dist/evidence/er-borrowed-interner-ffi-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dist/evidence/er-borrowed-interner-ffi-run.log": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+    "dist/evidence/er-borrowed-interner-ffi-public-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dist/evidence/er-borrowed-interner-ffi-public-run.log": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+    "dist/evidence/er-borrowed-interner-ffi-parse-limits-compile.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "dist/evidence/er-borrowed-interner-ffi-parse-limits-run.log": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92"
+  }
+}

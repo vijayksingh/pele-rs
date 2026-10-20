@@ -1,0 +1,3419 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T08:35:28.433Z",
+  "mode": "native-three-way-diagnostic",
+  "artifacts": {
+    "control": {
+      "binarySHA256": "eddb9c45cd44ea3070e2478b6a103b8f8a451ba065a5bdde628acf4d9c9731b5",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "241300cb6a032946ae90ce741eaf1baa260277fbd589fd30bfa0c9776a26bfa9",
+        "revision": "31edd859f0bcaf84d0bcfc1ab4ada33490dcaa71",
+        "builtAt": "2026-10-20T08:29:26.468Z",
+        "binaries": {
+          "pele-perf": "eddb9c45cd44ea3070e2478b6a103b8f8a451ba065a5bdde628acf4d9c9731b5",
+          "pele-perf-alloc": "29127215517ccb37dfa0953db2fdbf602a7217ffd729bc7e684f06d335afe201"
+        }
+      }
+    },
+    "candidate": {
+      "binarySHA256": "5bec94bb9ad9be68ca8a424be5434bfe65f3dec478d98cc2815a7a3b0a58c742",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "832c7a8c1de3a1ac252f5b997f7028c9f352100e3a22548e161a07528ad8c84d",
+        "revision": "31edd859f0bcaf84d0bcfc1ab4ada33490dcaa71",
+        "builtAt": "2026-10-20T08:34:08.893Z",
+        "binaries": {
+          "pele-perf": "5bec94bb9ad9be68ca8a424be5434bfe65f3dec478d98cc2815a7a3b0a58c742",
+          "pele-perf-alloc": "1ba837079b9feb0835d22581c5c62e1e780fbb0ddb100169f9e840a5d55b4c49"
+        }
+      }
+    }
+  },
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "settings": {
+    "trials": 15,
+    "warmupMs": 1000,
+    "matchedNativeBatchCounts": true,
+    "balancedCyclicAndReverseOrder": true,
+    "nativeTypedDocumentRetainedAcrossBatches": true,
+    "nativePublicStateFreshPerBatch": true,
+    "jsRetainedModelFreshPerBatch": true,
+    "stages": [
+      "parse-public",
+      "parse",
+      "render-source",
+      "render-retained"
+    ],
+    "selectedCases": [
+      "flowchart/medium",
+      "er/medium"
+    ],
+    "separateAllocationBinaries": false,
+    "fixedBatchCount": 16
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "loadBefore": [
+      2.353515625,
+      3.48583984375,
+      3.81982421875
+    ],
+    "processesBefore": [
+      {
+        "pid": 69848,
+        "cpuPercent": 107.5,
+        "name": "Google Chrome Helper (Renderer)"
+      },
+      {
+        "pid": 95934,
+        "cpuPercent": 21.1,
+        "name": "node"
+      }
+    ],
+    "loadAfter": [
+      2.2705078125,
+      3.31494140625,
+      3.740234375
+    ],
+    "processesAfter": [
+      {
+        "pid": 69848,
+        "cpuPercent": 42.6,
+        "name": "Google Chrome Helper (Renderer)"
+      },
+      {
+        "pid": 95934,
+        "cpuPercent": 45.1,
+        "name": "node"
+      },
+      {
+        "pid": 95968,
+        "cpuPercent": 16.4,
+        "name": "pele-perf"
+      },
+      {
+        "pid": 95969,
+        "cpuPercent": 19.6,
+        "name": "pele-perf"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "flowchart/medium",
+      "family": "flowchart",
+      "scale": "medium",
+      "units": 48,
+      "source": "flowchart TB\nn0[Node 0]\nn1[Node 1]\nn2[Node 2]\nn3[Node 3]\nn4[Node 4]\nn5[Node 5]\nn6[Node 6]\nn7[Node 7]\nn8[Node 8]\nn9[Node 9]\nn10[Node 10]\nn11[Node 11]\nn12[Node 12]\nn13[Node 13]\nn14[Node 14]\nn15[Node 15]\nn16[Node 16]\nn17[Node 17]\nn18[Node 18]\nn19[Node 19]\nn20[Node 20]\nn21[Node 21]\nn22[Node 22]\nn23[Node 23]\nn24[Node 24]\nn25[Node 25]\nn26[Node 26]\nn27[Node 27]\nn28[Node 28]\nn29[Node 29]\nn30[Node 30]\nn31[Node 31]\nn32[Node 32]\nn33[Node 33]\nn34[Node 34]\nn35[Node 35]\nn36[Node 36]\nn37[Node 37]\nn38[Node 38]\nn39[Node 39]\nn40[Node 40]\nn41[Node 41]\nn42[Node 42]\nn43[Node 43]\nn44[Node 44]\nn45[Node 45]\nn46[Node 46]\nn47[Node 47]\nn0 --> n1\nn1 --> n2\nn2 --> n3\nn3 --> n4\nn4 --> n5\nn5 --> n6\nn6 --> n7\nn7 --> n8\nn8 --> n9\nn9 --> n10\nn10 --> n11\nn11 --> n12\nn12 --> n13\nn13 --> n14\nn14 --> n15\nn15 --> n16\nn16 --> n17\nn17 --> n18\nn18 --> n19\nn19 --> n20\nn20 --> n21\nn21 --> n22\nn22 --> n23\nn23 --> n24\nn24 --> n25\nn25 --> n26\nn26 --> n27\nn27 --> n28\nn28 --> n29\nn29 --> n30\nn30 --> n31\nn31 --> n32\nn32 --> n33\nn33 --> n34\nn34 --> n35\nn35 --> n36\nn36 --> n37\nn37 --> n38\nn38 --> n39\nn39 --> n40\nn40 --> n41\nn41 --> n42\nn42 --> n43\nn43 --> n44\nn44 --> n45\nn45 --> n46\nn46 --> n47",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405e000000000000",
+        "heightBits": "40b1e00000000000",
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "svgBytes": 21889
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "er/medium",
+      "family": "er",
+      "scale": "medium",
+      "units": 48,
+      "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "jsRetainedBeforeVerified": true
+    }
+  ],
+  "rows": [
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1003706043,
+          "operations": 4902
+        },
+        "control": {
+          "elapsedNs": 1000372834,
+          "operations": 3846
+        },
+        "candidate": {
+          "elapsedNs": 1002805427,
+          "operations": 3878
+        }
+      },
+      "samples": {
+        "js": [
+          0.217565125,
+          0.219390625,
+          0.2265833125,
+          0.222453125,
+          0.23134375,
+          0.235859375,
+          0.2338984375,
+          0.600528625,
+          0.243151,
+          0.236638,
+          0.2336926875,
+          0.2339609375,
+          0.2259583125,
+          0.2460676875,
+          0.240278625
+        ],
+        "control": [
+          0.2655,
+          0.25596875,
+          0.25615625,
+          0.2571145625,
+          0.26090625,
+          0.2748229375,
+          0.3820911875,
+          0.2731145625,
+          0.2692890625,
+          0.264487,
+          0.2709426875,
+          0.27375525,
+          0.257270875,
+          0.2707109375,
+          0.27375
+        ],
+        "candidate": [
+          0.257546875,
+          0.268484375,
+          0.2568073125,
+          0.26698175,
+          0.2538046875,
+          0.2641823125,
+          0.3053229375,
+          0.327734375,
+          0.266283875,
+          0.2652551875,
+          0.258609375,
+          0.2602083125,
+          0.27208075,
+          0.2677265625,
+          0.2794895625
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 3481042,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3510250,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3625333,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3559250,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3701500,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3773750,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3742375,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 9608458,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3890416,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3786208,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3739083,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3743375,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3615333,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3937083,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3844458,
+            "count": 16,
+            "checksum": 144
+          }
+        ],
+        "control": [
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4248000,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4095500,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4098500,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4113833,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4174500,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4397167,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 6113459,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4369833,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4308625,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4231792,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4335083,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4380084,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4116334,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4331375,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4380000,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4120750,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4295750,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4108917,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4271708,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4060875,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4226917,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4885167,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 5243750,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4260542,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4244083,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4137750,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4163333,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4353292,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4283625,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 4471833,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.2338984375,
+        "control": 0.2692890625,
+        "candidate": 0.266283875
+      },
+      "candidateOverControl": 0.9888402912762192,
+      "candidateOverJS": 1.1384594007815891,
+      "jsRetainedPostBatchVerified": true
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1005736085,
+          "operations": 5030
+        },
+        "control": {
+          "elapsedNs": 1002730792,
+          "operations": 10534
+        },
+        "candidate": {
+          "elapsedNs": 1000157657,
+          "operations": 10662
+        }
+      },
+      "samples": {
+        "js": [
+          0.235171875,
+          0.2133203125,
+          0.222013,
+          0.2265755,
+          0.1824739375,
+          0.2387421875,
+          0.2230130625,
+          0.1913568125,
+          0.235901,
+          0.2374739375,
+          0.2059193125,
+          0.233716125,
+          0.228697875,
+          0.1925546875,
+          0.2331640625
+        ],
+        "control": [
+          0.0939115,
+          0.09351825,
+          0.0997291875,
+          0.100190125,
+          0.0931745,
+          0.100020875,
+          0.1006900625,
+          0.102388,
+          0.0979296875,
+          0.0931328125,
+          0.0942681875,
+          0.095203125,
+          0.0935208125,
+          0.0948880625,
+          0.1003984375
+        ],
+        "candidate": [
+          0.0925963125,
+          0.0921041875,
+          0.09984375,
+          0.101841125,
+          0.097453125,
+          0.09213025,
+          0.092372375,
+          0.093658875,
+          0.0981588125,
+          0.0943333125,
+          0.0977395625,
+          0.092890625,
+          0.0993125,
+          0.0967395625,
+          0.0923359375
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 3762750,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3413125,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3552208,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3625208,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 2919583,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3819875,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3568209,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3061709,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3774416,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3799583,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3294709,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3739458,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3659166,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3080875,
+            "count": 16,
+            "checksum": 144
+          },
+          {
+            "elapsedNs": 3730625,
+            "count": 16,
+            "checksum": 144
+          }
+        ],
+        "control": [
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1502584,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1496292,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1595667,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1603042,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1490792,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1600334,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1611041,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1638208,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1566875,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1490125,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1508291,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1523250,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1496333,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1518209,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1606375,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1481541,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1473667,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1597500,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1629458,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1559250,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1474084,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1477958,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1498542,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1570541,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1509333,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1563833,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1486250,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1589000,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1547833,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 144,
+            "count": 16,
+            "elapsedNs": 1477375,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 0
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.2265755,
+        "control": 0.095203125,
+        "candidate": 0.0943333125
+      },
+      "candidateOverControl": 0.9908636139832595,
+      "candidateOverJS": 0.41634383461583446,
+      "jsRetainedPostBatchVerified": true
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-source",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1007452077,
+          "operations": 1734
+        },
+        "control": {
+          "elapsedNs": 1001206538,
+          "operations": 2566
+        },
+        "candidate": {
+          "elapsedNs": 1001882210,
+          "operations": 2566
+        }
+      },
+      "samples": {
+        "js": [
+          0.593403625,
+          0.533010375,
+          0.60990625,
+          0.6105963125,
+          0.5807994375,
+          0.5909453125,
+          0.5829661875,
+          0.546453125,
+          0.576013,
+          0.59499475,
+          0.54958075,
+          0.5725051875,
+          0.5989245,
+          0.551987,
+          0.5504140625
+        ],
+        "control": [
+          0.3770755,
+          0.4204609375,
+          0.39544275,
+          0.37585675,
+          0.376697875,
+          0.411783875,
+          0.401278625,
+          0.4069921875,
+          0.38690625,
+          0.38975,
+          0.39601825,
+          0.391703125,
+          0.4073931875,
+          0.393872375,
+          0.395614625
+        ],
+        "candidate": [
+          0.3956275625,
+          0.3938255625,
+          0.3823203125,
+          0.4086171875,
+          0.407002625,
+          0.40229425,
+          0.39403125,
+          0.3913176875,
+          0.3925911875,
+          0.4086926875,
+          0.411734375,
+          0.4001849375,
+          0.4047421875,
+          0.392388,
+          0.38486975
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 9494458,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 8528166,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9758500,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9769541,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9292791,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9455125,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9327459,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 8743250,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9216208,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9519916,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 8793292,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9160083,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 9582792,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 8831792,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 8806625,
+            "count": 16,
+            "checksum": 425360
+          }
+        ],
+        "control": [
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6033208,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6727375,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6327084,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6013708,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6027166,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6588542,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6420458,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6511875,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6190500,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6236000,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6336292,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6267250,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6518291,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6301958,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6329834,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6330041,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6301209,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6117125,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6537875,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6512042,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6436708,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6304500,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6261083,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6281459,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6539083,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6587750,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6402959,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6475875,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6278208,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 6157916,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.5807994375,
+        "control": 0.39544275,
+        "candidate": 0.3956275625
+      },
+      "candidateOverControl": 1.000467355894121,
+      "candidateOverJS": 0.681177592393932,
+      "jsRetainedPostBatchVerified": true
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-retained",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1007564786,
+          "operations": 2854
+        },
+        "control": {
+          "elapsedNs": 1000352547,
+          "operations": 3462
+        },
+        "candidate": {
+          "elapsedNs": 1000182627,
+          "operations": 3462
+        }
+      },
+      "samples": {
+        "js": [
+          0.4098958125,
+          0.39748175,
+          0.4154869375,
+          0.3925546875,
+          0.381091125,
+          0.375690125,
+          0.3783645625,
+          0.37258075,
+          0.3765963125,
+          0.3760755,
+          0.3832421875,
+          0.3631458125,
+          0.38748175,
+          0.36918225,
+          0.3645234375
+        ],
+        "control": [
+          0.3042838125,
+          0.2807239375,
+          0.3010390625,
+          0.28266925,
+          0.2824114375,
+          0.2820234375,
+          0.2879505,
+          0.3012395625,
+          0.31360675,
+          0.2839505625,
+          0.2811328125,
+          0.2907760625,
+          0.2954244375,
+          0.2921171875,
+          0.30054425
+        ],
+        "candidate": [
+          0.28379425,
+          0.289752625,
+          0.2925676875,
+          0.280421875,
+          0.2853306875,
+          0.2988541875,
+          0.2938568125,
+          0.3035546875,
+          0.28133075,
+          0.283901,
+          0.2802005625,
+          0.2916693125,
+          0.309474,
+          0.3064974375,
+          0.2973541875
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 6558333,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6359708,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6647791,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6280875,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6097458,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6011042,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6053833,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 5961292,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6025541,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6017208,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6131875,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 5810333,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 6199708,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 5906916,
+            "count": 16,
+            "checksum": 425360
+          },
+          {
+            "elapsedNs": 5832375,
+            "count": 16,
+            "checksum": 425360
+          }
+        ],
+        "control": [
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4868541,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4491583,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4816625,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4522708,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4518583,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4512375,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4607208,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4819833,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 5017708,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4543209,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4498125,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4652417,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4726791,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4673875,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4808708,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4540708,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4636042,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4681083,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4486750,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4565291,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4781667,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4701709,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4856875,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4501292,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4542416,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4483209,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4666709,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4951584,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4903959,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          },
+          {
+            "checksum": 1080300960615848000,
+            "count": 16,
+            "elapsedNs": 4757667,
+            "graphNodesAfter": 297,
+            "graphNodesBefore": 297,
+            "textMeasurements": 768
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.3783645625,
+        "control": 0.2907760625,
+        "candidate": 0.2916693125
+      },
+      "candidateOverControl": 1.0030719516328825,
+      "candidateOverJS": 0.7708684729162499,
+      "jsRetainedPostBatchVerified": true
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1005304052,
+          "operations": 5894
+        },
+        "control": {
+          "elapsedNs": 1004960827,
+          "operations": 5574
+        },
+        "candidate": {
+          "elapsedNs": 1000303875,
+          "operations": 6278
+        }
+      },
+      "samples": {
+        "js": [
+          0.208533875,
+          0.209627625,
+          0.1941796875,
+          0.21761975,
+          0.1845,
+          0.207109375,
+          0.176783875,
+          0.2082890625,
+          0.172015625,
+          0.21911975,
+          0.156987,
+          0.212104125,
+          0.2116431875,
+          0.2038385,
+          0.216783875
+        ],
+        "control": [
+          0.1756849375,
+          0.183362,
+          0.1790546875,
+          0.1920885625,
+          0.1877291875,
+          0.18553125,
+          0.17964325,
+          0.1830755,
+          0.181783875,
+          0.1887916875,
+          0.177635375,
+          0.1768359375,
+          0.191349,
+          0.179109375,
+          0.1828645625
+        ],
+        "candidate": [
+          0.1566119375,
+          0.1700338125,
+          0.1601015625,
+          0.156815125,
+          0.163520875,
+          0.1619453125,
+          0.1619635,
+          0.1651796875,
+          0.1651640625,
+          0.15426825,
+          0.161224,
+          0.156572875,
+          0.1602708125,
+          0.1686693125,
+          0.16441925
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 3336542,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3354042,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3106875,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3481916,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2952000,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3313750,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2828542,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3332625,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2752250,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3505916,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2511792,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3393666,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3386291,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3261416,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3468542,
+            "count": 16,
+            "checksum": 32
+          }
+        ],
+        "control": [
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2810959,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2933792,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2864875,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 3073417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 3003667,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2968500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2874292,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2929208,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2908542,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 3020667,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2842166,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2829375,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 3061584,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2865750,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2925833,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2505791,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2720541,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2561625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2509042,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2616334,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2591125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2591416,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2642875,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2642625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2468292,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2579584,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2505166,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2564333,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2698709,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 2630708,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.2082890625,
+        "control": 0.1828645625,
+        "candidate": 0.1619453125
+      },
+      "candidateOverControl": 0.8856024933753909,
+      "candidateOverJS": 0.7775027193278571,
+      "jsRetainedPostBatchVerified": true
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1005368661,
+          "operations": 6086
+        },
+        "control": {
+          "elapsedNs": 1000235824,
+          "operations": 10790
+        },
+        "candidate": {
+          "elapsedNs": 1000190051,
+          "operations": 10598
+        }
+      },
+      "samples": {
+        "js": [
+          0.229934875,
+          0.187091125,
+          0.218046875,
+          0.1607239375,
+          0.2002265625,
+          0.17045575,
+          0.204677125,
+          0.16750525,
+          0.22398175,
+          0.14396875,
+          0.231559875,
+          0.216190125,
+          0.208908875,
+          0.2145546875,
+          0.18956775
+        ],
+        "control": [
+          0.0950104375,
+          0.0964974375,
+          0.0943359375,
+          0.094390625,
+          0.09048175,
+          0.0958385625,
+          0.0978203125,
+          0.0985520625,
+          0.094041625,
+          0.0924739375,
+          0.093908875,
+          0.090546875,
+          0.093625,
+          0.090734375,
+          0.093346375
+        ],
+        "candidate": [
+          0.0918385,
+          0.0945208125,
+          0.090609375,
+          0.096309875,
+          0.0949375,
+          0.108466125,
+          0.0984505,
+          0.09088025,
+          0.0934765625,
+          0.091908875,
+          0.0937995,
+          0.0941328125,
+          0.0909088125,
+          0.0905755,
+          0.101737
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 3678958,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2993458,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3488750,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2571583,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3203625,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2727292,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3274834,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2680084,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3583708,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 2303500,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3704958,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3459042,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3342542,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3432875,
+            "count": 16,
+            "checksum": 32
+          },
+          {
+            "elapsedNs": 3033084,
+            "count": 16,
+            "checksum": 32
+          }
+        ],
+        "control": [
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1520167,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1543959,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1509375,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1510250,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1447708,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1533417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1565125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1576833,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1504666,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1479583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1502542,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1448750,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1498000,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1451750,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1493542,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1469416,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1512333,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1449750,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1540958,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1519000,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1735458,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1575208,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1454084,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1495625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1470542,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1500792,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1506125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1454541,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1449208,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          },
+          {
+            "checksum": 32,
+            "count": 16,
+            "elapsedNs": 1627792,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 0
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.204677125,
+        "control": 0.094041625,
+        "candidate": 0.0937995
+      },
+      "candidateOverControl": 0.9974253422354196,
+      "candidateOverJS": 0.4582803281021267,
+      "jsRetainedPostBatchVerified": true
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1011082338,
+          "operations": 1126
+        },
+        "control": {
+          "elapsedNs": 1012475000,
+          "operations": 1286
+        },
+        "candidate": {
+          "elapsedNs": 1018191708,
+          "operations": 1286
+        }
+      },
+      "samples": {
+        "js": [
+          0.8730859375,
+          0.8746041875,
+          0.8114088125,
+          0.8831301875,
+          0.8951953125,
+          0.891690125,
+          0.9050911875,
+          0.84858075,
+          0.9078541875,
+          0.807833375,
+          0.847984375,
+          0.886453125,
+          0.858127625,
+          0.878122375,
+          0.81421875
+        ],
+        "control": [
+          0.7928150625,
+          0.786127625,
+          0.7849010625,
+          0.816716125,
+          0.79896875,
+          0.812375,
+          0.7999115,
+          0.7887551875,
+          0.7946926875,
+          0.7703046875,
+          0.7875911875,
+          0.818002625,
+          0.7985078125,
+          0.79335675,
+          0.8056458125
+        ],
+        "candidate": [
+          0.80621875,
+          0.776934875,
+          0.8011354375,
+          0.789322875,
+          0.779953125,
+          0.790283875,
+          0.7833020625,
+          0.79315625,
+          0.7729739375,
+          0.79415625,
+          0.7987239375,
+          0.76135675,
+          0.77880725,
+          0.7906015625,
+          0.795315125
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 13969375,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 13993667,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 12982541,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 14130083,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 14323125,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 14267042,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 14481459,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 13577292,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 14525667,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 12925334,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 13567750,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 14183250,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 13730042,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 14049958,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 13027500,
+            "count": 16,
+            "checksum": 1274848
+          }
+        ],
+        "control": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12685041,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12578042,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12558417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 13067458,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12783500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12998000,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12798584,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12620083,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12715083,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12324875,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12601459,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 13088042,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12776125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12693708,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12890333,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12899500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12430958,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12818167,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12629166,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12479250,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12644542,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12532833,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12690500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12367583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12706500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12779583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12181708,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12460916,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12649625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12725042,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.8746041875,
+        "control": 0.7946926875,
+        "candidate": 0.790283875
+      },
+      "candidateOverControl": 0.9944521793526633,
+      "candidateOverJS": 0.903590316962666,
+      "jsRetainedPostBatchVerified": true
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1004154251,
+          "operations": 1510
+        },
+        "control": {
+          "elapsedNs": 1013463504,
+          "operations": 1446
+        },
+        "candidate": {
+          "elapsedNs": 1019604042,
+          "operations": 1478
+        }
+      },
+      "samples": {
+        "js": [
+          0.799434875,
+          0.7663931875,
+          0.7532421875,
+          0.703104125,
+          0.7098359375,
+          0.7244244375,
+          0.7273671875,
+          0.733890625,
+          0.726684875,
+          0.7225260625,
+          0.7664921875,
+          0.6723854375,
+          0.699390625,
+          0.6932734375,
+          0.6818229375
+        ],
+        "control": [
+          0.7026744375,
+          0.6884921875,
+          0.69483075,
+          0.6909010625,
+          0.7126224375,
+          0.6912239375,
+          0.69700525,
+          0.6845885625,
+          0.6779948125,
+          0.6930911875,
+          0.6927995,
+          0.6898411875,
+          0.7136380625,
+          0.6731640625,
+          0.7061900625
+        ],
+        "candidate": [
+          0.7001614375,
+          0.693015625,
+          0.6971640625,
+          0.6825676875,
+          0.68795575,
+          0.694729125,
+          0.674546875,
+          0.686864625,
+          0.6986510625,
+          0.7004244375,
+          0.6940703125,
+          0.682971375,
+          0.700263,
+          0.67175,
+          0.689377625
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 12790958,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 12262291,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 12051875,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11249666,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11357375,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11590791,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11637875,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11742250,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11626958,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11560417,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 12263875,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10758167,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11190250,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11092375,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10909167,
+            "count": 16,
+            "checksum": 1274848
+          }
+        ],
+        "control": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11242791,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11015875,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11117292,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11054417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11401959,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11059583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11152084,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10953417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10847917,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11089459,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11084792,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11037459,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11418209,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10770625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11299041,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11202583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11088250,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11154625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10921083,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11007292,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11115666,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10792750,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10989834,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11178417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11206791,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11105125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10927542,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11204208,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 10748000,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11030042,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.7244244375,
+        "control": 0.6927995,
+        "candidate": 0.693015625
+      },
+      "candidateOverControl": 1.0003119589433884,
+      "candidateOverJS": 0.9566430798381232,
+      "jsRetainedPostBatchVerified": true
+    }
+  ],
+  "allocationRows": [],
+  "completedAt": "2026-10-20T08:36:07.182Z",
+  "succeeded": true
+}

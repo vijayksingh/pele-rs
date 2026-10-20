@@ -183,6 +183,13 @@ Median ratios across all sizes/resources are **2.38× source**, **11.06× parse*
 and **4.02× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
+The [borrowed ER arena interner](docs/benchmarks/2026-10-20-er-host-storage/borrowed-interner/)
+removes repeated owned UTF16 allocations during native public construction.
+Matched native public parse improves 10.59%, Swift mutable parse 12.00%, and
+native allocation count falls 20.55% for the medium ER fixture. Fresh native,
+Swift/C and targeted browser checks pass. Ordinary web parse uses a different
+interner; its VM controls remain adverse at +2.80%/+2.74%. No web gain is claimed.
+
 The [ordered ER record publisher](docs/benchmarks/2026-10-20-er-host-storage/record-layout/)
 improves VM parse by 7.67–17.15% paired against the preceding artifact, while all
 six source-render controls are slower. Full browser correctness passes 390 checks;
