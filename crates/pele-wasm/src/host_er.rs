@@ -1091,6 +1091,14 @@ struct FrameResources<R> {
     inner: R,
 }
 impl<R: pele::compat::RenderResources> pele::compat::RenderResources for FrameResources<R> {
+    fn javascript_failure(
+        &mut self,
+        operation: pele::compat::JavaScriptFailure,
+    ) -> pele::compat::public::PublicError {
+        discard_frame(&self.frame);
+        self.inner.javascript_failure(operation)
+    }
+
     fn host_function(
         &mut self,
         reference: u32,

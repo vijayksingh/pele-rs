@@ -27,9 +27,18 @@ export const groups = [...new Set(cases.map(row => row.group))];
 
 const view = new DataView(new ArrayBuffer(8));
 function bits(value) { view.setFloat64(0, value); return view.getBigUint64(0).toString(16).padStart(16, '0'); }
-function error(value) {
+function describeError(value, engineErrors) {
+  // Generic Error.line/column describe engine implementation stack locations,
+  // not Pele source diagnostics. Preserve them raw per lane, outside semantic
+  // comparison. PeleError line/column/snippet remain part of the strict result.
+  const engineError = value instanceof Error && value.name !== 'PeleError';
+  if (engineError) engineErrors.push({name: value.name, message: value.message,
+    sourceURL: value.sourceURL, fileName: value.fileName, line: value.line,
+    column: value.column, lineNumber: value.lineNumber, columnNumber: value.columnNumber,
+    stack: value.stack});
   return {kind: typeof value, name: value?.name, message: value?.message, code: value?.code,
-    type: value?.type, line: value?.line, column: value?.column, snippet: value?.snippet,
+    type: value?.type, line: engineError ? undefined : value?.line,
+    column: engineError ? undefined : value?.column, snippet: value?.snippet,
     symbol: typeof value === 'symbol' ? value.description : undefined};
 }
 function snapshot(roots, retained) {
@@ -65,7 +74,8 @@ function output(value) { return snapshot([value]); }
 
 export function runCase(api, spec, dispose = () => {}) {
   let model, other;
-  const result = {cleanup: []};
+  const result = {cleanup: [], engineErrors: []};
+  const error = value => describeError(value, result.engineErrors);
   try {
     model = api.parse(SOURCE);
     if (spec.mutation === 'otherCreate' || spec.mutation === 'nestedOther') other = api.parse(SOURCE);
@@ -194,6 +204,9 @@ export function compareCase(spec, oracle, candidate) {
     if (!nested || nested[1].threw || !nested[1].output) problems.push('oracle nested render did not succeed');
   }
   if (oracle.cleanup.length || candidate.cleanup.length) problems.push('cleanup failed');
-  if (JSON.stringify(candidate) !== JSON.stringify(oracle)) problems.push('public result differs from pinned Pele');
+  // Exclude only our top-level diagnostic recorder, never caller graph fields.
+  const {engineErrors: candidateEngineErrors, ...candidateSemantic} = candidate;
+  const {engineErrors: oracleEngineErrors, ...oracleSemantic} = oracle;
+  if (JSON.stringify(candidateSemantic) !== JSON.stringify(oracleSemantic)) problems.push('public result differs from pinned Pele');
   return problems;
 }

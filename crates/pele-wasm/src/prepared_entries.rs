@@ -434,6 +434,13 @@ pub(super) struct RawResources {
     inline: super::BrowserResources,
 }
 impl RenderResources for RawResources {
+    fn javascript_failure(
+        &mut self,
+        operation: pele::compat::JavaScriptFailure,
+    ) -> pele::compat::public::PublicError {
+        self.resources.javascript_failure(operation)
+    }
+
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
         self.resources.text_width(request)
     }

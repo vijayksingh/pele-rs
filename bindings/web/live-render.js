@@ -11,8 +11,8 @@ export function liveRenderRead(capture) {
           // Run the pinned first string operation in this engine. In particular,
           // do not stringify a missing or numeric label and hide its TypeError.
           if (key !== 'includes') throw new TypeError('Unknown live string operation');
-          if (expression === 't') { const t = value; t.includes(''); }
-          else { const e = value; e.includes(''); }
+          if (expression === 't') { const t = value; t.includes("&"); }
+          else { const e = value, vx = "¶ß"; e.includes(vx); }
           return value;
         }
         default: throw new TypeError('Unknown live render operation');

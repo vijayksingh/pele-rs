@@ -77,7 +77,7 @@ test('Sankey readonly completion retains callback state through original result-
   });
   await prepare(page);
   const report=await page.evaluate(async()=>{
-    const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),oracle=await import('/dist/evidence/pele-oracle.js');
+    const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),oracle=await import('/dist/evidence/pele-oracle.js'),rawOracle=(await import('/dist/evidence/pele-esm/diagrams/sankey.js')).default;
     const {bits,snapshot,output,stable,error,source}=window.__sourceLayoutFeature,rows=[];
     try{
       for(const raw of [false,true])for(const kind of ['object','symbol','undefined']){
@@ -97,7 +97,7 @@ test('Sankey readonly completion retains callback state through original result-
           const failedTrace=lastTrace,accepted=snapshot([model,detached,extra]),recovery=draw(),after=snapshot([model,detached,extra]);
           const reference=oracle.parse(source),referenceFirst=reference.nodes[0],referenceExtra={n:1};referenceExtra.self=referenceExtra;
           reference.extra=referenceExtra;reference.detached=[referenceExtra,referenceFirst];const referenceDetached=reference.detached;delete reference.detached;
-          let oracleFired=false;const oracleDraw=mutate=>{const trace=[];const value=oracle.render(reference,{measurer:{width(text,size,style){trace.push([text,bits(size),style]);if(mutate&&!oracleFired){oracleFired=true;referenceExtra.n=99;referenceExtra.added={};delete reference.extra;referenceFirst.id='callback edit';reference.lookup.clear();referenceDetached[0]={unaccepted:true};}return text.length*size*.6;}}});return{value:output(value),trace};};
+          let oracleFired=false;const oracleDraw=mutate=>{const trace=[];const options={measurer:{width(text,size,style){trace.push([text,bits(size),style]);if(mutate&&!oracleFired){oracleFired=true;referenceExtra.n=99;referenceExtra.added={};delete reference.extra;referenceFirst.id='callback edit';reference.lookup.clear();referenceDetached[0]={unaccepted:true};}return text.length*size*.6;}}};const value=raw?rawOracle.render(reference,{},options):oracle.render(reference,options);return{value:output(value),trace};};
           const oracleFirst=oracleDraw(true);const oracleAccepted=snapshot([reference,referenceDetached,referenceExtra]).signature,oracleRecovery=oracleDraw(false);
           row.result={fired,threw,original,failedTrace,oracleFirstTrace:oracleFirst.trace,oracleFired,oracleAccepted,oracleRecovery,before:before.signature,accepted:accepted.signature,after:after.signature,expected,recovery,stable:[model.nodes===nodes,model.links===links,model.lookup===lookup],aliases:model.nodes===nodes&&model.links===links&&model.lookup===lookup&&links[0].source===first&&lookup.size===0&&!Object.hasOwn(model,'extra')&&extra.self===extra&&detached[0].unaccepted===true&&detached[1]===first};
         }catch(value){row.fatal=error(value);}finally{globalThis.__sourceLayoutFactoryThrow=false;delete globalThis.__sourceLayoutFactoryValue;if(model)engine.dispose(model);}
@@ -111,6 +111,7 @@ test('Sankey readonly completion retains callback state through original result-
   for(const row of report){
     expect(row.fatal,`${row.raw}/${row.kind}`).toBeUndefined();
     expect(row.result).toMatchObject({fired:true,threw:true,original:true,oracleFired:true,stable:[true,true,true],aliases:true});
+    expect(Object.hasOwn(row.result.recovery.value,'type')).toBe(!row.raw);expect(Object.hasOwn(row.result.oracleRecovery.value,'type')).toBe(!row.raw);
     expect(row.result.accepted).toEqual(row.result.oracleAccepted);expect(row.result.after).toEqual(row.result.oracleAccepted);
     expect(row.result.failedTrace).toEqual(row.result.oracleFirstTrace);expect(row.result.recovery).toEqual(row.result.oracleRecovery);expect(row.result.expected.trace.length).toBeGreaterThan(0);
   }
@@ -254,7 +255,7 @@ test('source layout callbacks retain edits while helper publication isolates nes
     const model=engine.parse(source),nested=engine.parse(source),reference=oracle.parse(source);
     const width=(text,size)=>text.length*size*.6,options={measurer:{width}};
     const expected=output(oracle.render(reference,options)),nestedExpected=expected;
-    let observeArmed=false,publishArmed=false,inside=false;const events=[],nestedResults=[];
+    let observeArmed=false,publishArmed=false,inside=false,helperIndex=-1;const events=[],nestedResults=[];
     const nestedRead=phase=>{
       if(inside)return;inside=true;
       try{events.push(phase);const alias=nested.findOrCreateNode('A');nestedResults.push({alias:alias===nested.nodes[0]&&alias===nested.lookup.get('A'),value:output(engine.render(nested,options))});}
@@ -264,8 +265,9 @@ test('source layout callbacks retain edits while helper publication isolates nes
     Object.defineProperty(target,'__proto__',{value:model.nodes[0],enumerable:true,writable:false,configurable:false});
     const proxy=new Proxy(target,{
       getOwnPropertyDescriptor(object,key){if(observeArmed){observeArmed=false;nestedRead('descriptor');}return Reflect.getOwnPropertyDescriptor(object,key);},
-      defineProperty(object,key,descriptor){if(publishArmed){publishArmed=false;nestedRead('define');}return Reflect.defineProperty(object,key,descriptor);}
+      defineProperty(object,key,descriptor){return Reflect.defineProperty(object,key,descriptor);}
     });
+    const nodeArray=model.nodes;model.nodes=new Proxy(nodeArray,{defineProperty(object,key,descriptor){if(publishArmed&&key===String(helperIndex)){publishArmed=false;nestedRead('define');}return Reflect.defineProperty(object,key,descriptor);}});
     const list=[proxy,model.nodes[0],-0];list.length=5;
     const map=new Map([[proxy,model.nodes[0]],[-0,proxy],[NaN,list]]),set=new Set([proxy,list,-0,NaN]);
     target.self=proxy;model.extension={proxy,list,map,set,date:new Date(1234)};
@@ -293,19 +295,29 @@ test('source layout callbacks retain edits while helper publication isolates nes
       target.scalar=number(originalBits);target.zero=-0;target.text='cursor \ud800 title';delete target.extra;list[0]=proxy;
       map.clear();map.set(proxy,model.nodes[0]);map.set(-0,proxy);map.set(NaN,list);
       set.clear();set.add(proxy);set.add(list);set.add(-0);set.add(NaN);
-      // Keep the real retained-publication reentry gate: NaN property publication
-      // defines the proxy descriptor during a helper outcome, not render exit.
-      publishArmed=true;let alias;try{alias=model.findOrCreateNode('A');}finally{publishArmed=false;}
+      // A real helper appends a new array slot. Exact-equal NaN descriptors
+      // correctly avoid defineProperty and cannot establish this reentry gate.
+      helperIndex=model.nodes.length;publishArmed=true;let alias;try{alias=model.findOrCreateNode('D');}finally{publishArmed=false;}
+      const helperPublished=snapshot([model,proxy,list,map,set]),helperAlias=alias===model.nodes[helperIndex]&&alias===model.lookup.get('D');
+      referenceTarget.scalar=number(originalBits);referenceTarget.zero=-0;referenceTarget.text='cursor \ud800 title';delete referenceTarget.extra;referenceList[0]=referenceProxy;
+      referenceMap.clear();referenceMap.set(referenceProxy,reference.nodes[0]);referenceMap.set(-0,referenceProxy);referenceMap.set(NaN,referenceList);
+      referenceSet.clear();referenceSet.add(referenceProxy);referenceSet.add(referenceList);referenceSet.add(-0);referenceSet.add(NaN);
+      const oracleAdded=reference.findOrCreateNode('D'),oracleHelperPublished=snapshot([reference,referenceProxy,referenceList,referenceMap,referenceSet]);
+      const oracleHelperAlias=oracleAdded===reference.nodes[helperIndex]&&oracleAdded===reference.lookup.get('D');
+      // Explicit user removal returns the fixture to its original graph; the
+      // complete just-published helper graph is compared to Pele separately.
+      model.nodes.pop();model.lookup.delete('D');reference.nodes.pop();reference.lookup.delete('D');
       const afterHelper=snapshot([model,proxy,list,map,set]);
-      row={acceptedOutput,expected,matched,recovery,oracleRecovery,initial:initial.signature,afterMatch:afterMatch.signature,retained:retained.signature,oracleRetained:oracleRetained.signature,afterHelper:afterHelper.signature,originalBits,retainedBits,repairedBits:bits(target.scalar),mutated,threw,original,oracleOriginal,oracleMutated,renderEvents,events,nestedResults,nestedExpected,stable:[afterMatch,afterHelper].map(value=>stable(initial.objects,value.objects)),helperAlias:alias===model.nodes[0]&&alias===model.lookup.get('A'),prototypeStable:Object.getPrototypeOf(target)===initialProto,fixedDescriptor:Object.getOwnPropertyDescriptor(target,'__proto__').value===fixed.value&&Object.getOwnPropertyDescriptor(target,'__proto__').writable===false&&Object.getOwnPropertyDescriptor(target,'__proto__').configurable===false};
+      row={acceptedOutput,expected,matched,recovery,oracleRecovery,initial:initial.signature,afterMatch:afterMatch.signature,retained:retained.signature,oracleRetained:oracleRetained.signature,afterHelper:afterHelper.signature,originalBits,retainedBits,repairedBits:bits(target.scalar),mutated,threw,original,oracleOriginal,oracleMutated,renderEvents,events,nestedResults,nestedExpected,stable:[afterMatch,afterHelper].map(value=>stable(initial.objects,value.objects)),helperAlias,oracleHelperAlias,helperPublished:helperPublished.signature,oracleHelperPublished:oracleHelperPublished.signature,prototypeStable:Object.getPrototypeOf(target)===initialProto,fixedDescriptor:Object.getOwnPropertyDescriptor(target,'__proto__').value===fixed.value&&Object.getOwnPropertyDescriptor(target,'__proto__').writable===false&&Object.getOwnPropertyDescriptor(target,'__proto__').configurable===false};
     }catch(value){row.fatal=error(value);row.events=events;}
     finally{observeArmed=false;publishArmed=false;engine.dispose(model);engine.dispose(nested);engine.close();}
     return row;
   });
   await save(info,'source-layout-cursor-reentry.json',report);
-  expect(report.fatal).toBeUndefined();expect(report).toMatchObject({mutated:true,threw:true,original:true,oracleMutated:true,oracleOriginal:true,helperAlias:true,prototypeStable:true,fixedDescriptor:true,stable:[true,true]});
+  expect(report.fatal).toBeUndefined();expect(report).toMatchObject({mutated:true,threw:true,original:true,oracleMutated:true,oracleOriginal:true,helperAlias:true,oracleHelperAlias:true,prototypeStable:true,fixedDescriptor:true,stable:[true,true]});
   expect(report.renderEvents).toEqual(['descriptor']);expect(report.events).toEqual(['descriptor','define']);expect(report.nestedResults).toHaveLength(2);
   for(const nested of report.nestedResults){expect(nested.alias).toBe(true);expect(nested.value).toEqual(report.nestedExpected);}
+  expect(report.helperPublished).toEqual(report.oracleHelperPublished);
   expect(report.retained).toEqual(report.oracleRetained);expect(report.retained).not.toEqual(report.initial);expect(report.retainedBits).toBe('401c000000000000');
   expect(report.repairedBits).toBe(report.originalBits);
   for(const stage of ['afterMatch','afterHelper'])expect(report[stage],stage).toEqual(report.initial);

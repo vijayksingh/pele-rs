@@ -515,7 +515,71 @@ fn callback_error(error: JsValue) -> pele::compat::PeleError {
         .unwrap_or_else(|| "Host callback failed".into());
     pele::compat::PeleError::new(message, pele::compat::ErrorCode::Semantic)
 }
+#[wasm_bindgen(raw_module = "../errors.js")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = primitiveJavaScriptFailure)]
+    fn primitive_javascript_failure(operation: &str, index: u32) -> Result<JsValue, JsValue>;
+}
 impl pele::compat::RenderResources for BrowserResources {
+    fn javascript_failure(
+        &mut self,
+        operation: pele::compat::JavaScriptFailure,
+    ) -> pele::compat::public::PublicError {
+        use pele::compat::{
+            public::{JavaScriptErrorKind, JsString, PublicError},
+            JavaScriptFailure,
+        };
+        let (kind, index) = match operation {
+            JavaScriptFailure::ReadonlyArrayPushLength => ("readonlyArrayPushLength", 0),
+            JavaScriptFailure::ReadonlyArrayPushIndex(index) => ("readonlyArrayPushIndex", index),
+        };
+        let reply = match primitive_javascript_failure(kind, index) {
+            Ok(value) => value,
+            Err(_) => {
+                return pele::compat::PeleError::new(
+                    "Invalid JavaScript failure response",
+                    pele::compat::ErrorCode::Semantic,
+                )
+                .into()
+            }
+        };
+        if !js_sys::Array::is_array(&reply) {
+            return pele::compat::PeleError::new(
+                "Invalid JavaScript failure response",
+                pele::compat::ErrorCode::Semantic,
+            )
+            .into();
+        }
+        let values: js_sys::Array = reply.unchecked_into();
+        let message = values.get(1);
+        if values.length() != 2
+            || values.get(0).as_string().as_deref() != Some("TypeError")
+            || !message.is_string()
+        {
+            return pele::compat::PeleError::new(
+                "Invalid JavaScript failure response",
+                pele::compat::ErrorCode::Semantic,
+            )
+            .into();
+        }
+        let text: &js_sys::JsString = message.unchecked_ref();
+        if text.length() > 4096 {
+            return pele::compat::PeleError::new(
+                "JavaScript failure response exceeds byte budget",
+                pele::compat::ErrorCode::Limit,
+            )
+            .into();
+        }
+        PublicError::JavaScript {
+            name: JavaScriptErrorKind::TypeError,
+            message: JsString(
+                (0..text.length())
+                    .map(|i| text.char_code_at(i) as u16)
+                    .collect(),
+            ),
+        }
+    }
+
     fn text_width(
         &mut self,
         r: pele::compat::TextRequest<'_>,

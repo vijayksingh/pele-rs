@@ -131,8 +131,37 @@ impl TrustedSvg {
         &self.0
     }
 }
+/// A failed generic JavaScript operation, independent of diagram policy.
+/// Browser hosts derive engine-native messages; portable hosts retain the
+/// established error wire and message without executing any JavaScript.
+#[doc(hidden)]
+#[derive(Clone, Copy, Debug)]
+pub enum JavaScriptFailure {
+    ReadonlyArrayPushLength,
+    ReadonlyArrayPushIndex(u32),
+}
+impl JavaScriptFailure {
+    pub fn native_error(self) -> super::public::PublicError {
+        let key = match self {
+            Self::ReadonlyArrayPushLength => "length".to_owned(),
+            Self::ReadonlyArrayPushIndex(index) => index.to_string(),
+        };
+        super::public::PublicError::JavaScript {
+            name: super::public::JavaScriptErrorKind::TypeError,
+            message: super::public::JsString::from(
+                format!("Cannot assign to read only property '{key}' of object '[object Array]'")
+                    .as_str(),
+            ),
+        }
+    }
+}
 /// Per-render host resources. No global resolver, filesystem, network or clock in the core.
 pub trait RenderResources {
+    /// Resolve a failed intrinsic operation, never replay a caller mutation.
+    fn javascript_failure(&mut self, operation: JavaScriptFailure) -> super::public::PublicError {
+        operation.native_error()
+    }
+
     /// Resolve an owner-retained callable before borrowing the active arena.
     fn host_function(
         &mut self,

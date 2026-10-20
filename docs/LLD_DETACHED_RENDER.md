@@ -48,8 +48,10 @@ The facade releases its native busy guard only during job execution and result m
 
 The facade never reconciles an outer render snapshot over callback mutations. It retains the latest bridge baseline, acknowledges the current revision and marks observation unconfirmed. Nested helpers continue their ordinary apply/invoke/publication, including partial writes on failure. Writes after an inner helper remain visible after the outer render.
 
+Failed native JavaScript primitives use a typed `JavaScriptFailure` resource operation. Portable hosts retain the existing PublicError wire and message. Browser hosts derive the current engine's name/message by running the intrinsic on an isolated descriptor-equivalent array; caller mutations and callbacks are never replayed. Resource decorators forward this operation. Strict string failures execute the pinned expression form because WebKit includes that expression in its TypeError message.
+
 ## Verification boundary
 
-Integration controls cover owner/lifetime/revision behavior and default typed rendering. Browser comparisons use actual pinned Pele in the same engine and compare complete SVG, dimension bits, callback traces, ordered descriptors, aliases, retained references, partial helper effects and original arbitrary throws. Existing native frame/provider tests remain independent controls.
+Integration controls cover owner/lifetime/revision behavior and default typed rendering. Browser comparisons use actual pinned Pele in the same engine and compare complete SVG, dimension bits, callback traces, ordered descriptors, aliases, retained references, partial helper effects and original arbitrary throws. Existing native frame/provider tests remain independent controls. Generic JavaScript Error stack locations remain host implementation details and are retained separately in reports; PeleError source line, column and snippet remain strict comparison fields.
 
 Custom coercion, getter/Proxy behavior, sparse/malformed arrays and callback-created lone UTF16 surrogates require additional proof before a blanket compatibility claim. Rust SVG remains UTF8; replacing lone surrogates silently is not acceptable. Correctness and performance gates remain separate, and 0.3 stays blocked until both pass.

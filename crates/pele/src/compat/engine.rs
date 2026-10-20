@@ -986,6 +986,13 @@ struct RawRenderSession<'a> {
     session: RenderSession<'a>,
 }
 impl RenderResources for RawRenderSession<'_> {
+    fn javascript_failure(
+        &mut self,
+        operation: crate::compat::JavaScriptFailure,
+    ) -> crate::compat::public::PublicError {
+        self.session.javascript_failure(operation)
+    }
+
     fn host_function(
         &mut self,
         reference: u32,
@@ -1030,6 +1037,13 @@ struct RenderSession<'a> {
     clock: Option<Result<f64, PeleError>>,
 }
 impl RenderResources for RenderSession<'_> {
+    fn javascript_failure(
+        &mut self,
+        operation: crate::compat::JavaScriptFailure,
+    ) -> crate::compat::public::PublicError {
+        self.host.javascript_failure(operation)
+    }
+
     fn host_function(
         &mut self,
         reference: u32,

@@ -19,8 +19,8 @@ use crate::compat::{
         Node, Property, PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule,
         PublicError, RecordId, RecordKind, RecordSchema,
     },
-    DiagramModule, DiagramType, EdgeLimit, ErrorCode, Object, ParseContext, PeleError,
-    RenderResources, RenderSettings, Rendered,
+    DiagramModule, DiagramType, EdgeLimit, ErrorCode, JavaScriptFailure, Object, ParseContext,
+    PeleError, RenderResources, RenderSettings, Rendered,
 };
 use std::{borrow::Borrow, collections::HashMap};
 
@@ -637,11 +637,14 @@ impl PublicDiagramModule for Sankey {
         s: &mut Self::PublicState,
         call: MethodCall,
         _: &Object,
-        _: &mut dyn RenderResources,
+        host: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
+        let mut failure = |operation| host.javascript_failure(operation);
         let result = match &mut s.graph {
-            Canonical::Arena(graph) => invoke_graph(graph, call),
-            Canonical::Source(graph) => invoke_store(graph, call),
+            Canonical::Arena(graph) => {
+                invoke_store_with_failure(&mut ArenaWrite::new(graph), call, &mut failure)
+            }
+            Canonical::Source(graph) => invoke_store_with_failure(graph, call, &mut failure),
         };
         // lookup.set precedes nodes.push: a throwing call can leave a cached
         // node absent from the array. Never rebuild that cache or roll it back.
@@ -861,7 +864,11 @@ struct PushPosition {
     key: String,
     existing: Option<u32>,
 }
-fn push_index<W: CapturedWrite>(store: &mut W, id: u32) -> Result<PushPosition, PublicError> {
+fn push_index<W: CapturedWrite>(
+    store: &mut W,
+    id: u32,
+    failure: &mut dyn FnMut(JavaScriptFailure) -> PublicError,
+) -> Result<PushPosition, PublicError> {
     let header = store.header(id)?.expect("validated array");
     assert!(header.kind == NodeKind::Array);
     let length = header.array_length.expect("array header");
@@ -869,14 +876,10 @@ fn push_index<W: CapturedWrite>(store: &mut W, id: u32) -> Result<PushPosition, 
     let mut descriptors = [OwnQuery::default(), OwnQuery::default()];
     store.own_descriptors(id, &["length", &key], &mut descriptors)?;
     if descriptors[0].any_nonwritable {
-        return Err(type_error(
-            "Cannot assign to read only property 'length' of object '[object Array]'",
-        ));
+        return Err(failure(JavaScriptFailure::ReadonlyArrayPushLength));
     }
     if descriptors[1].any_nonwritable {
-        return Err(type_error(&format!(
-            "Cannot assign to read only property '{key}' of object '[object Array]'"
-        )));
+        return Err(failure(JavaScriptFailure::ReadonlyArrayPushIndex(length)));
     }
     if length >= 1_000_000 {
         return Err(
@@ -932,12 +935,17 @@ fn record<W: CapturedWrite>(store: &mut W, fields: Vec<(&str, Atom)>) -> Result<
         .collect::<Result<_, PeleError>>()?;
     Ok(Atom::Ref(store.append_node(Node::Object { properties })?))
 }
-fn invoke_graph(graph: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
-    invoke_store(&mut ArenaWrite::new(graph), call)
-}
+#[cfg(feature = "web-host-sankey")]
 pub(crate) fn invoke_store<W: CapturedWrite>(
     store: &mut W,
     call: MethodCall,
+) -> Result<Atom, PublicError> {
+    invoke_store_with_failure(store, call, &mut JavaScriptFailure::native_error)
+}
+fn invoke_store_with_failure<W: CapturedWrite>(
+    store: &mut W,
+    call: MethodCall,
+    failure: &mut dyn FnMut(JavaScriptFailure) -> PublicError,
 ) -> Result<Atom, PublicError> {
     let arg = |i| call.arguments.get(i).cloned().unwrap_or(Atom::Undefined);
     match call.method.0 {
@@ -978,7 +986,7 @@ pub(crate) fn invoke_store<W: CapturedWrite>(
             // Deliberately after Map publication, including every throwing path.
             let nodes = read(store, &call.receiver, "nodes")?;
             let id = collection(store, &nodes, "push", "this.nodes.push", false)?;
-            let position = push_index(store, id)?;
+            let position = push_index(store, id, failure)?;
             room(store, 0, &[&position.key], 1)?;
             push(store, id, position, node.clone())?;
             Ok(node)
@@ -986,7 +994,7 @@ pub(crate) fn invoke_store<W: CapturedWrite>(
         2 => {
             let links = read(store, &call.receiver, "links")?;
             let id = collection(store, &links, "push", "this.links.push", false)?;
-            let position = push_index(store, id)?;
+            let position = push_index(store, id, failure)?;
             room(store, 1, &["source", "target", "value", &position.key], 4)?;
             let link = record(
                 store,

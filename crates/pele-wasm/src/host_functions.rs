@@ -109,6 +109,13 @@ pub(super) struct Resources<'a> {
     pub(super) dispatcher: js_sys::Function,
 }
 impl RenderResources for Resources<'_> {
+    fn javascript_failure(
+        &mut self,
+        operation: pele::compat::JavaScriptFailure,
+    ) -> pele::compat::public::PublicError {
+        self.host.javascript_failure(operation)
+    }
+
     fn host_function(&mut self, reference: u32) -> Result<Rc<dyn HostFunction>, PublicError> {
         Ok(Rc::new(Function {
             reference,

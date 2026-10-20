@@ -315,6 +315,13 @@ pub(super) struct NumericResources {
     pub(super) clock: Option<js_sys::Function>,
 }
 impl RenderResources for NumericResources {
+    fn javascript_failure(
+        &mut self,
+        operation: pele::compat::JavaScriptFailure,
+    ) -> pele::compat::public::PublicError {
+        self.browser.javascript_failure(operation)
+    }
+
     fn text_width(&mut self, request: pele::compat::TextRequest<'_>) -> Result<f64, PeleError> {
         self.browser.text_width(request)
     }
