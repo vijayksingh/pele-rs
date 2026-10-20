@@ -16,7 +16,19 @@ export function hostErRenderResult(raw,type,svg,widthLow,widthHigh,heightLow,hei
   bits.setUint32(0,heightLow,true);bits.setUint32(4,heightHigh,true);value.height=bits.getFloat64(0,true);
   return [1,metadataBytes,value];
 }
-const errorKind=value=>{const proto=Object.getPrototypeOf(value);return Object.keys(constructors).find(key=>proto===constructors[key].prototype);};
+function errorKind(value){
+  // Classification runs for every candidate graph object. Keep the original
+  // brand order and single prototype read without allocating keys or a closure.
+  const proto=Object.getPrototypeOf(value);
+  if(proto===constructors.error.prototype)return 'error';
+  if(proto===constructors.pele.prototype)return 'pele';
+  if(proto===constructors.type.prototype)return 'type';
+  if(proto===constructors.range.prototype)return 'range';
+  if(proto===constructors.syntax.prototype)return 'syntax';
+  if(proto===constructors.reference.prototype)return 'reference';
+  if(proto===constructors.eval.prototype)return 'eval';
+  if(proto===constructors.uri.prototype)return 'uri';
+}
 const graphBudget=()=>{throw new RangeError('Public model graph exceeds host exchange budget');};
 const frameBudget=()=>{throw new PeleError('Public binary graph exceeds transport budget','limit');};
 const accessorError=()=>{throw new TypeError('Accessor properties require an explicit public model codec');};
