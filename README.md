@@ -175,13 +175,27 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 
 ## Performance
 
-**All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest complete matrix: [ER token ownership checkpoint](docs/benchmarks/2026-10-20-er-token-ownership/),
-source `0b32797`.
-Source render takes **1.58–5.12×** the Pele JS time.
-Median ratios across all sizes/resources are **2.38× source**, **11.06× parse**
-and **4.02× retained mutable render**. These describe this artifact; differences
-from historical runs are not causal speedup percentages.
+**0.3 remains unreleased. The latest full performance release gate still fails all 126 conditions.**
+
+The [source-result packet](docs/benchmarks/2026-10-20-er-host-storage/source-result-packet/),
+source `640deee`, removes the complete result JSON round trip while preserving
+exact byte limits, dimension bits and callback errors. Its new **126-condition
+diagnostic** has lower paired medians in **all 42 source-render rows**, from
+0.89% to 20.78% lower; the conventional median of those row changes is
+**−13.89%**. Source rendering still takes **1.35–4.63× pinned JS time**.
+Parse and retained controls remain mixed: their median row changes are −0.04%
+and −0.30%, with adverse rows up to +6.83% and +3.85%. Full browser correctness
+passes **405/405**; fresh Swift integration/API checks use the unchanged native
+SDK. Nine trials and 500 ms warmup per row make this a scoped diagnostic,
+not a replacement release gate or a regression-free claim.
+
+The latest full release-gate matrix remains the historical
+[ER token ownership checkpoint](docs/benchmarks/2026-10-20-er-token-ownership/),
+source `0b32797`, where all 126 conditions fail. That artifact's source render
+takes **1.58–5.12×** JS time; median ratios across sizes/resources are
+**2.38× source**, **11.06× parse** and **4.02× retained mutable render**.
+These describe that artifact; differences between historical runs are not
+causal speedup percentages.
 
 The [dense ER array publisher](docs/benchmarks/2026-10-20-er-host-storage/dense-array/)
 removes generic property records from fresh arrays while preserving canonical

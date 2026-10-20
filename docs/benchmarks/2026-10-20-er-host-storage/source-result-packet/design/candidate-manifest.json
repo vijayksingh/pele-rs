@@ -1,0 +1,57 @@
+{
+  "baseHead": "6dfa9cac0ed7cf92ee4e5e7cacec0c1e1aa9268e",
+  "baseRuntime": "770113546dd302a60b52707194bbda40bb9e070c",
+  "scope": "private additive source result packet; no production writes/build/tests",
+  "files": [
+    {
+      "path": "bindings/web/full.js",
+      "originalSha256": "55f8e877f0fed9b22793f080cd8ef0c9d37e9b57067e38c71c78a5f48d65a879",
+      "candidateSha256": "0adb1435b6323f2db54144a06378d9d95cec2d0702705d572047480706db6702",
+      "originalMatchesCurrent": true
+    },
+    {
+      "path": "crates/pele-wasm/src/host_er.rs",
+      "originalSha256": "eb3306bcc461eb27a659e42c7f7d48ee8932bd591f4291bd03e3c7f5c5af0bfb",
+      "candidateSha256": "0a9378c727aa4a48de5eeb283708db462ff3125b35324bd88bc3853d54838e23",
+      "originalMatchesCurrent": true
+    },
+    {
+      "path": "crates/pele-wasm/src/lib.rs",
+      "originalSha256": "fdd3abaf9f25dd865cc44c1e4558833513847cf2665991df3baaa6e3f799454a",
+      "candidateSha256": "eb91b433b5068c79dd1c2787c1b8c292c9f9e48b1703a79dca6f5dfee8cebd94",
+      "originalMatchesCurrent": true
+    },
+    {
+      "path": "crates/pele-wasm/src/render_numbers.rs",
+      "originalSha256": "dd650a815e7195a59d6fb7bc6baec27e9265fce6e83a1b48353b1edfc2f089ca",
+      "candidateSha256": "53b195089900160dc360bd24d80c1ce7171767af9a3f56b69316e793d6e882b5",
+      "originalMatchesCurrent": true
+    },
+    {
+      "path": "crates/pele-wasm/src/render_packet.rs",
+      "originalSha256": null,
+      "candidateSha256": "64d3c0dd288ae7065223ad432de20fa6dafab96312919e9339a4bd529ba14be0",
+      "originalMatchesCurrent": true
+    },
+    {
+      "path": "crates/pele-wasm/src/wasm_registry.rs",
+      "originalSha256": "3d73730752fd8081f5a024305624d2ec4925eae0e15fc9c29ddcce75455e0bca",
+      "candidateSha256": "5111f419c5918542aebed8f2a1356056550a37e74678450b579347173552c8bd",
+      "originalMatchesCurrent": true
+    },
+    {
+      "path": "tests/web/source-result-packet.spec.js",
+      "originalSha256": null,
+      "candidateSha256": "f9e212e22de9891dc95acded114d53d82567c1d6945ec7cba70d914e5bc218c8",
+      "originalMatchesCurrent": true
+    }
+  ],
+  "patchSha256": "54bb4387ac4cc78e7a8e7fd0dfecbef66ae4a05e0c4db261f2bc4d75723d15f3",
+  "checks": {
+    "rustfmt": "passed pinned1.98.1, skip_children=true",
+    "jsSyntax": "passed full.js and public E2E",
+    "gitApplyCheck": "passed"
+  },
+  "runtimeValidation": "not run; parent owns fresh build and public E2E",
+  "profileAttributionSha256": "c8a95d5334a721c5286393689a3b8674c1cf4301ebdbfa5d92d9efeb14e41d20"
+}

@@ -1,0 +1,30 @@
+{
+  "recordedAt": "2026-10-20T09:47:21.554130+00:00",
+  "scope": "Current source-packet WASM/web changes; identical dense native SDK/Swift binary reused. Fresh local correctness, no performance timing, no SDK or standalone consumer rebuild. Swift test incremental planning completed without Rust rebuild.",
+  "swiftSelectedIntegrationCases": 15,
+  "erMutableDrawings": 7535,
+  "erErrors": 9902,
+  "erExplicitBudgetDifferences": 0,
+  "swiftApiConditions": 168,
+  "swiftWorkloads": 21,
+  "nativeInputCount": 351,
+  "nativeSourceInputSha256": "439fe2e6a023eebcafb980508b447162cdd5cd9c07519200df47f5ab3fcaea28",
+  "consumerBinarySha256": "554ef37b648587962511c5e9eaa7ef639c469d87be601996817a1c9d762957fa",
+  "sdkAndTargetHostArchiveSha256": "d87e97d356dae4b4aee43cde0d821d09150a214e84d144c4f101e8d0dbe7c5f7",
+  "beforeAfterEqual": true,
+  "strictCConsumers": {
+    "status": "prior dense 7701135 validation reused, not rerun for this WASM-only layer",
+    "count": 3,
+    "reference": "dist/perf-patches/parse-architecture/er-dense-array/runtime/c-consumers.json",
+    "referenceSha256": "4411c39c0c798f9ffbd82162610d31f64c947fd156b789155b07b29efba4ef8b",
+    "nativeCommitBinding": "dist/perf-patches/parse-architecture/er-dense-array/runtime/commit-binding.json",
+    "nativeCommitBindingSha256": "5ac92cd5ae2909f895735057bc5a2549c0a240709a225516748db654a2e7d4cf"
+  },
+  "evidence": {
+    "dist/perf-patches/parse-architecture/source-result-packet/runtime/source-result-packet-swift-corpus.log": "b7137e9425a95d984e6341f0e17fd6b2c779248080b3dcd0b2db617d927eb898",
+    "dist/perf-patches/parse-architecture/source-result-packet/runtime/source-result-packet-swift-api.log": "64a3d24d4fb72b65cc0c6660992090d3bc1a2de334f3538b114cde61ccc43e2a",
+    "dist/perf-patches/parse-architecture/source-result-packet/runtime/source-result-packet-swift-api.json": "da3fc1054e6bd0c59d548120c05e6eaf57be1b5b5ed0c089f6d8d0ce743f2ec7",
+    "dist/perf-patches/parse-architecture/source-result-packet/runtime/swift-reuse-before.json": "6b232ab4b43ac253d56c220845d0d45c2d8934da06605e5664c4b0c6cdaa7af3",
+    "dist/perf-patches/parse-architecture/source-result-packet/runtime/swift-reuse-after.json": "fb747d954e7e00dac8aaf753e49a7a4b7f9f313f87f4692ed9b2f3b389b533de"
+  }
+}

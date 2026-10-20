@@ -1,0 +1,17 @@
+{
+  "candidateSourceCommit": "640deeed9ac8ba76359dca189487d13d1310ed55",
+  "sourceBaseCommit": "6dfa9cac0ed7cf92ee4e5e7cacec0c1e1aa9268e",
+  "acceptedControlRuntime": "770113546dd302a60b52707194bbda40bb9e070c",
+  "fullBrowser": {
+    "status": "passed",
+    "checks": 405,
+    "duration": "13.1m",
+    "log": "logs/full-web.log.gz"
+  },
+  "focusedBrowser": {
+    "status": "passed",
+    "checks": 33
+  },
+  "strictC": "Three prior identical-native consumers reused from dense 7701135; no rerun in this WASM-only layer",
+  "performanceReleaseGate": "Not run for this layer; diagnostic comparison is not a release gate"
+}
