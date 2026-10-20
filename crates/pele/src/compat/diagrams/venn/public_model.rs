@@ -1093,10 +1093,26 @@ fn strings_out(out: &mut GraphWriter, values: &[String]) -> u32 {
         .collect();
     array_out(out, values)
 }
+fn construct_default() -> Result<VennPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    Venn.create_public(&VennModel::new(None))
+}
+
 impl PublicDiagramModule for Venn {
     type PublicState = VennPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;

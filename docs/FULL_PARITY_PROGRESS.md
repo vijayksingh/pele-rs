@@ -1,6 +1,17 @@
 # Current functional parity — incomplete (2026-10-21)
 
-Latest functional slice adds captured Sankey construction through Rust, C v16,
+Eight class-root factories are now implemented: Sankey, Venn, Ishikawa,
+Requirement, Railroad, C4, XYChart and ER. The seven-family extension passes four
+consolidated native features, a strict C client exercising all eight factories,
+and ten Swift features including all 33 prepared entries. Six browser executions
+cover 21 construction scenarios and seven retained-registry lifetimes. A broader
+browser run passed 62 checks but failed one constructor reflection-order observer;
+the subsequent scoped feature run passes with that difference retained as an
+explicit metadata gap. Full API parity remains unfinished: 14 class-root
+factories, argument-taking/nested constructors, shared identities and callback
+mutation behavior remain work. See [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
+
+The preceding functional slice adds captured Sankey construction through Rust, C v16,
 Swift and WebAssembly. Fresh factories own exact native defaults, helpers and
 raw rendering without parsing; captured registration and subclass receivers
 survive the relevant lifecycle operations. Two native Rust features, two strict

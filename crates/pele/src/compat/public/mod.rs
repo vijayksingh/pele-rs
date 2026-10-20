@@ -10,10 +10,9 @@ mod detached_render;
 mod engine;
 #[doc(hidden)]
 pub use detached_render::{
-    live_number_string,
-    DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion, DetachedRenderJob,
-    DetachedRenderOutcome, DetachedRenderRequest, DetachedRenderValue, LiveRenderRead,
-    LiveStringUse, LiveValueKind,
+    live_number_string, DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion,
+    DetachedRenderJob, DetachedRenderOutcome, DetachedRenderRequest, DetachedRenderValue,
+    LiveRenderRead, LiveStringUse, LiveValueKind,
 };
 mod graph;
 pub(crate) mod graph_read;
@@ -30,11 +29,13 @@ mod host_function;
 pub use host_function::{ActiveModel, HostFunction, ModelDelta};
 mod schema;
 #[cfg(feature = "web-host-er")]
+pub(crate) use engine::HostErConstructorRegistration;
+#[cfg(feature = "web-host-er")]
 #[doc(hidden)]
 pub use engine::HostErEntrySelection;
 pub use engine::{
-    CapturedPublicConstructor, ParsedPublicModel, PublicDiagramModule, PublicDocument, PublicEngine,
-    RawRenderOutcome, RawRenderOutcomeView, ReadOutcome, RenderOutcomeView,
+    CapturedPublicConstructor, ParsedPublicModel, PublicDiagramModule, PublicDocument,
+    PublicEngine, RawRenderOutcome, RawRenderOutcomeView, ReadOutcome, RenderOutcomeView,
 };
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 

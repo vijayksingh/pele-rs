@@ -1,7 +1,10 @@
 # Captured public class constructors
 
-This first implementation supports only the authentic builtin Sankey root class
-(`PrototypeId(1)`). It complements [caller-authored graph construction](DECLARED_MODEL_CONSTRUCTION.md): construction supplies the class's real defaults; graph adoption never invents defaults. Other root classes and nested `ClassMember` remain incomplete.
+Native factories support eight authentic builtin root classes: Sankey, Venn,
+Ishikawa, Requirement, Railroad, C4, XYChart and ER (`PrototypeId(1)`). They
+complement [caller-authored graph construction](DECLARED_MODEL_CONSTRUCTION.md):
+construction supplies real class defaults; graph adoption never invents defaults.
+Other root classes and nested `ClassMember` remain incomplete.
 
 `PublicEngine::capture_constructor(&DiagramId, PrototypeId)` returns an optional
 `CapturedPublicConstructor`. `PublicDocument::capture_constructor(PrototypeId)`
@@ -62,6 +65,15 @@ provider capabilities. The fixture generator is
 `scripts/parity/capture-public-sankey-constructor.mjs`; the input is the pinned
 Pele ESM Sankey entry, not another Rust construction path.
 
+`public_direct_constructors` covers the seven additional classes against
+`public-direct-constructors.json`: ordered defaults, 19 helper calls, seven
+repeated aliases and 14 raw outcomes. XYChart's empty constructor correctly
+throws the upstream no-plot error. ER's host policy retains its original native
+registration and exposes the same captured factory protocol as ordinary owned
+documents. It performs no schema-based certification or registry lookup after
+closure. Native feature tests cover source, typed fallback, prepared and raw
+policy lifetimes; web and Swift consumers exercise the actual adapters.
+
 Cross-family and cross-renderer constructor/prototype unification is not claimed
 by this slice. In pinned Pele Flowchart and Swimlane share FlowDb; option-taking
 classes also have ordered getter, reference-retention and callback requirements.
@@ -81,13 +93,21 @@ Core-bundle and ESM minification may name the same source class differently.
 
 `tests/web/sankey-constructor.spec.js` records native, core-oracle and ESM-oracle
 names and complete non-new errors without rewriting them. It separately asserts
-the matching intrinsic contract: arity zero; own key order `length`, `name`,
-`prototype`; data-descriptor flags for each; prototype member order;
+the matching intrinsic contract: arity zero; own key order against the same live
+browser oracle; data-descriptor flags for each; prototype member order;
 `prototype.constructor` writable/non-enumerable/configurable flags and exact
 backlink identity; and ordinary Function/Object prototype parents. These metadata
 assertions do not compare the known differing name values or error messages.
 Earlier all-family model tests exclude the prototype's `constructor` from method
 comparisons, so their success is not evidence for this missing metadata parity.
+
+The seven-family test also retains complete ordered intrinsic observations.
+Firefox exposes a further key-order difference among these classes: some pinned
+constructors expose `prototype,length,name`, while the shell exposes
+`prototype,name,length`. Those observations remain diagnostic rather than a
+passing reflection-parity claim. The feature asserts the three intrinsic keys'
+presence and descriptor flags, and compares model fields, aliases, helpers and
+render outcomes exactly. Initial stricter observer failures are retained.
 
 A future native-authenticated constructor identity catalog must distinguish the
 pinned runtime name from the descriptive schema name and define the shared

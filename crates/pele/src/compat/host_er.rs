@@ -6,7 +6,10 @@ pub enum Parsed<T> {
 }
 use super::{
     diagrams::er,
-    public::{Atom, JsString, PublicError},
+    public::{
+        Atom, CapturedPublicConstructor, HostErConstructorRegistration, JsString, PrototypeId,
+        PublicError,
+    },
     ErrorCode, ModuleDescriptor, Object, OutputLimit, PeleError, RenderOptions, RenderResources,
     RenderResult, RenderSettings, Rendered,
 };
@@ -18,10 +21,22 @@ pub fn number_string(value: f64) -> String {
 pub struct Policy {
     descriptor: ModuleDescriptor,
     config: Object,
+    constructors: HostErConstructorRegistration,
 }
 impl Policy {
-    pub(crate) fn captured(descriptor: ModuleDescriptor, config: Object) -> Self {
-        Self { descriptor, config }
+    pub(crate) fn captured(
+        descriptor: ModuleDescriptor,
+        config: Object,
+        constructors: HostErConstructorRegistration,
+    ) -> Self {
+        Self {
+            descriptor,
+            config,
+            constructors,
+        }
+    }
+    pub fn capture_constructor(&self, prototype: PrototypeId) -> Option<CapturedPublicConstructor> {
+        self.constructors.capture_constructor(prototype)
     }
     pub fn config(&self) -> &Object {
         &self.config

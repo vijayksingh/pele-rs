@@ -36,6 +36,46 @@ static PeleResult *capture(PeleRegistry *registry, const char *name, uint32_t pr
                            PelePublicConstructorV16 **out) {
     return pele_registry_capture_constructor_v16(registry, (const uint8_t *)name, strlen(name), prototype, out);
 }
+static void additional_constructors(void) {
+    const char *families[] = {"venn", "ishikawa", "requirement", "railroad", "c4", "xychart", "er"};
+    PelePublicConstructorV16 *factories[7] = {0};
+    PeleRegistry *registry = NULL;
+    success(pele_registry_create_v8(1, &registry), NULL);
+    for (size_t i = 0; i < 7; ++i) {
+        success(capture(registry, families[i], 1, &factories[i]), "\"selected\":true");
+        assert(factories[i]);
+    }
+    pele_registry_free_v8(registry);
+    for (size_t i = 0; i < 7; ++i) {
+        PelePublicDocument *document = NULL;
+        char expected[64];
+        int length = snprintf(expected, sizeof expected, "\"type\":\"%s\"", families[i]);
+        assert(length > 0 && (size_t)length < sizeof expected);
+        success(pele_public_constructor_construct_v16(factories[i], &document), expected);
+        assert(document);
+        pele_public_constructor_free_v16(factories[i]);
+        success(pele_public_snapshot_v4(document), "\"revision\":\"0\"");
+        PeleResult *result = pele_render_prepared_v13(document, 0, NULL, 0, NULL, 0, NULL, NULL);
+        assert(result && pele_result_status(result) == 0);
+        const uint8_t *bytes = pele_result_data(result);
+        size_t size = pele_result_len(result);
+        assert(size >= 24 && !memcmp(bytes, "PELGBIN1", 8) && le64(bytes + 12) == 1);
+        size_t metadata_size = (size_t)bytes[20] | (size_t)bytes[21] << 8 |
+            (size_t)bytes[22] << 16 | (size_t)bytes[23] << 24;
+        assert(metadata_size <= size - 24);
+        char *metadata = malloc(metadata_size + 1); assert(metadata);
+        memcpy(metadata, bytes + size - metadata_size, metadata_size); metadata[metadata_size] = 0;
+        if (!strcmp(families[i], "xychart")) {
+            assert(strstr(metadata, "\"Err\":"));
+            assert(strstr(metadata, "No Plot to render, please provide a plot with some data"));
+        } else {
+            assert(strstr(metadata, "\"Ok\":"));
+            assert(strstr(metadata, "<svg"));
+        }
+        free(metadata); pele_result_free(result);
+        pele_public_document_free_v4(document);
+    }
+}
 int main(void) {
     PeleRegistry *registry = NULL;
     success(pele_registry_create_v8(1, &registry), NULL); assert(registry);
@@ -80,6 +120,7 @@ int main(void) {
     pele_result_free(unchanged); pele_result_free(right);
     pele_public_document_free_v4(a); pele_public_document_free_v4(b);
     pele_public_constructor_free_v16(NULL);
+    additional_constructors();
     puts("C16 constructor lifecycle passed: capture, independent defaults, helper, raw/normal render, disposal");
     return 0;
 }

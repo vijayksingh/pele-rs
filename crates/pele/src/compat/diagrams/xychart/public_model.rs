@@ -840,10 +840,26 @@ fn invoke(g: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
     }
     Err(invalid("XYChart public method is unavailable").into())
 }
+fn construct_default() -> Result<XyChartPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    XyChart.create_public(&XyChartModel::new(None))
+}
+
 impl PublicDiagramModule for XyChart {
     type PublicState = XyChartPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTOTYPE,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;

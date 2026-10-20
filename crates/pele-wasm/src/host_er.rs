@@ -1184,6 +1184,14 @@ pub struct HostErDocument {
 }
 #[wasm_bindgen]
 impl HostErDocument {
+    pub fn capture_constructor(
+        &self,
+        prototype: u32,
+    ) -> Option<super::public_constructor::PublicConstructor> {
+        self.policy
+            .capture_constructor(pele::compat::public::PrototypeId(prototype))
+            .map(super::public_constructor::PublicConstructor::captured)
+    }
     pub fn invoke_host(
         &self,
         method: u32,
@@ -1527,7 +1535,9 @@ impl ConstructionBatchTransport for ErConstructionTransport {
 impl ConstructionTransport for ErConstructionTransport {
     type Output = ();
     fn finish(self, root: Atom) -> Result<(), PeleError> {
-        self.store.call("setRoot", &[atom_js(&root)]).map_err(pele)?;
+        self.store
+            .call("setRoot", &[atom_js(&root)])
+            .map_err(pele)?;
         self.store.call("constructed", &[]).map_err(pele)?;
         Ok(())
     }

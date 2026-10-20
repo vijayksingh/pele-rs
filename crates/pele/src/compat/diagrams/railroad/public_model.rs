@@ -496,10 +496,26 @@ fn initial(m: &RailroadModel) -> Result<ModelGraph, PeleError> {
     g.validate()?;
     Ok(g)
 }
+fn construct_default() -> Result<RailroadPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    Railroad.create_public(&RailroadModel::new("railroad", None))
+}
+
 impl PublicDiagramModule for Railroad {
     type PublicState = RailroadPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;

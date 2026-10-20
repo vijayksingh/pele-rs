@@ -2024,10 +2024,26 @@ fn operation_budget(g: &ModelGraph, c: &MethodCall) -> Result<(), PublicError> {
     }
     Ok(())
 }
+fn construct_default() -> Result<C4PublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    C4.create_public(&super::model::Db::new(None).finish())
+}
+
 impl PublicDiagramModule for C4 {
     type PublicState = C4PublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;

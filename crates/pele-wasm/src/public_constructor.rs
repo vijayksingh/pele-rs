@@ -9,12 +9,18 @@ pub struct PublicConstructor {
     inner: CapturedPublicConstructor,
 }
 
+impl PublicConstructor {
+    pub(super) fn captured(inner: CapturedPublicConstructor) -> Self {
+        Self { inner }
+    }
+}
+
 #[wasm_bindgen]
 impl MutableDocument {
     pub fn capture_constructor(&self, prototype: u32) -> Option<PublicConstructor> {
         self.inner
             .capture_constructor(PrototypeId(prototype))
-            .map(|inner| PublicConstructor { inner })
+            .map(PublicConstructor::captured)
     }
 }
 

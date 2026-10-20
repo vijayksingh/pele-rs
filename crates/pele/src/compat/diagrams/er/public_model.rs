@@ -704,10 +704,26 @@ pub(super) fn finish_initial<W: InitialWriter>(
     })?;
     w.finish(Atom::Ref(root))
 }
+fn construct_default() -> Result<ErPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    Er.create_public(&ErModel::new(None))
+}
+
 impl PublicDiagramModule for Er {
     type PublicState = ErPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;

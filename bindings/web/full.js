@@ -344,8 +344,10 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     if(callerRoot)documents.set(model,entry); // Preserve native weak-key error before render admission.
     if(owner.registration.documents.length>256)owner.registration.documents=owner.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
     owner.registration.documents.push(new WeakRef(owner));if(!callerRoot)documents.set(model,entry);
-    ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
-    finalizer?.register(model,handle,model);return model;
+    ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options),()=>renderer.dispose(model));
+    finalizer?.register(model,handle,model);
+    installConstructors(handle,owner.registration,rawType);
+    return model;
   }
   function nativeAtomValue(owner,atom) {
     if(atom.kind==='undefined')return undefined;if(atom.kind==='null')return null;

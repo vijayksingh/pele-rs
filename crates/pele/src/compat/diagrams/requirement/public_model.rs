@@ -1,9 +1,9 @@
 //! Authoritative flat arena preserves Maps, record/array aliases, UTF-16 and IEEE values.
 //! Source provenance retains the real builder counter and pending fields. Typed factory
 //! reconstruction has no erased JS mutation history. Array scalar length's default
-//! flags2 descriptor is implicit; nondefault own length is explicit. Constructor,
-//! host callbacks/accessors, arbitrary primitive conversion and active lone-surrogate
-//! SVG text remain explicit capabilities rather than a JavaScript interpreter.
+//! flags2 descriptor is implicit; nondefault own length is explicit. Host callbacks,
+//! accessors, arbitrary primitive conversion and active lone-surrogate SVG text
+//! remain explicit capabilities rather than a JavaScript interpreter.
 use super::*;
 use crate::compat::public::{
     Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString, MemberKind,
@@ -479,10 +479,26 @@ fn initial(m: &RequirementModel) -> Result<ModelGraph, PeleError> {
     });
     w.finish(Atom::Ref(root))
 }
+fn construct_default() -> Result<RequirementPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    RequirementDiagram.create_public(&super::model::Db::new(None).finish())
+}
+
 impl PublicDiagramModule for RequirementDiagram {
     type PublicState = RequirementPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;

@@ -644,6 +644,19 @@ impl Registration {
         graph.validate_compiled(self.compiled_schema()?)
     }
 }
+// Retains the authentic selected registration, without retaining a model or
+// consulting the current registry when a host-created class is later captured.
+#[cfg(feature = "web-host-er")]
+pub(crate) struct HostErConstructorRegistration(Arc<Registration>);
+#[cfg(feature = "web-host-er")]
+impl HostErConstructorRegistration {
+    pub(crate) fn capture_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<CapturedPublicConstructor> {
+        self.0.capture_constructor(prototype)
+    }
+}
 /// Captured builtin-only raw entry policy. Contains no host values or model.
 #[cfg(feature = "web-host-er")]
 #[doc(hidden)]
@@ -666,6 +679,7 @@ impl HostErEntrySelection {
         Ok(crate::compat::host_er::Policy::captured(
             self.registration.descriptor.clone(),
             config,
+            HostErConstructorRegistration(self.registration.clone()),
         ))
     }
 }
@@ -851,6 +865,7 @@ impl PublicEngine {
         let policy = crate::compat::host_er::Policy::captured(
             registration.descriptor.clone(),
             document.config().clone(),
+            HostErConstructorRegistration(registration.clone()),
         );
         Ok(crate::compat::host_er::Parsed::Host { policy, output })
     }
@@ -1027,6 +1042,7 @@ impl PublicEngine {
                 let policy = crate::compat::host_er::Policy::captured(
                     registration.descriptor.clone(),
                     plan.into_config(),
+                    HostErConstructorRegistration(registration.clone()),
                 );
                 Ok(crate::compat::host_er::Parsed::Host { policy, output })
             }
@@ -1046,6 +1062,7 @@ impl PublicEngine {
                 let policy = crate::compat::host_er::Policy::captured(
                     registration.descriptor.clone(),
                     document.config().clone(),
+                    HostErConstructorRegistration(registration.clone()),
                 );
                 // The typed model is transient; neither the policy nor output
                 // retains it, a public graph, or a later conversion obligation.
