@@ -1007,3 +1007,231 @@ fn frozen_source_corpus_has_identical_complete_columns_or_parse_errors() {
         }
     }
 }
+
+#[cfg(feature = "web-host-er")]
+mod combined_source_routing {
+    use super::*;
+    use std::{cell::RefCell, rc::Rc};
+    type Trace = Rc<RefCell<Vec<&'static str>>>;
+    struct Sink {
+        columns: Columns,
+        trace: Trace,
+    }
+    impl InitialWriter for Sink {
+        type Output = Columns;
+        fn string(&mut self, text: &str) -> Result<u32, PeleError> {
+            InitialWriter::string(&mut self.columns, text)
+        }
+        fn node(&mut self, node: Node) -> Result<u32, PeleError> {
+            InitialWriter::node(&mut self.columns, node)
+        }
+        fn finish(self, root: Atom) -> Result<Columns, PeleError> {
+            self.trace.borrow_mut().push("finish");
+            self.columns.finish(root)
+        }
+        fn abort(self) -> Result<(), PeleError> {
+            self.trace.borrow_mut().push("abort");
+            Ok(())
+        }
+    }
+    fn sink(trace: &Trace, family: &'static str) -> Sink {
+        trace.borrow_mut().push(family);
+        Sink {
+            columns: Columns::default(),
+            trace: trace.clone(),
+        }
+    }
+    #[test]
+    fn combined_source_preserves_er_direct_and_fallback_factories_and_exact_tables() {
+        use pele::compat::host_er;
+        let engine = PublicEngine::with_builtins();
+        for (source, expected_trace) in [
+            ("erDiagram\nA ||--o{ B : label", vec!["er", "finish"]),
+            (
+                "erDiagram\nA\nstyle A fill:red",
+                vec!["er", "abort", "er", "finish"],
+            ),
+        ] {
+            let old_trace = Trace::default();
+            let new_trace = Trace::default();
+            let old = engine
+                .parse_host_er_with_limits(
+                    source,
+                    &ParseOptions::default(),
+                    ParseLimits::default(),
+                    |_| Ok(sink(&old_trace, "er")),
+                )
+                .unwrap();
+            let new = engine
+                .parse_host_storage_with_limits(
+                    source,
+                    &ParseOptions::default(),
+                    ParseLimits::default(),
+                    |_| Ok(sink(&new_trace, "er")),
+                    |_| -> Result<Sink, PeleError> { panic!("ER must not enter Sankey factory") },
+                )
+                .unwrap();
+            let host_er::Parsed::Host {
+                policy: a,
+                output: a_graph,
+            } = old
+            else {
+                panic!("old ER route")
+            };
+            let CombinedParsed::Er {
+                policy: b,
+                output: b_graph,
+            } = new
+            else {
+                panic!("combined ER route")
+            };
+            assert_eq!(*old_trace.borrow(), expected_trace);
+            assert_eq!(*new_trace.borrow(), expected_trace);
+            assert_eq!(a.config(), b.config());
+            assert_eq!(bytes(&a_graph.graph()), bytes(&b_graph.graph()));
+        }
+    }
+    #[test]
+    fn combined_source_keeps_family_specific_parser_factory_and_limit_error_order() {
+        let engine = PublicEngine::with_builtins();
+        let trace = Trace::default();
+        let sentinel = PeleError::new("factory sentinel", ErrorCode::Semantic);
+        // Existing ER creates its first unpublished owner before its grammar;
+        // Sankey parses successfully before calling its schema/publication factory.
+        for source in ["erDiagram\nA { int }", "sankey\nnot csv", "pie\nnot a row"] {
+            let old = if source.starts_with("er") {
+                engine
+                    .parse_host_er_with_limits(
+                        source,
+                        &ParseOptions::default(),
+                        ParseLimits::default(),
+                        |_| -> Result<Sink, PeleError> { Err(sentinel.clone()) },
+                    )
+                    .err()
+                    .unwrap()
+            } else {
+                engine
+                    .parse_host_sankey_with_limits(
+                        source,
+                        &ParseOptions::default(),
+                        ParseLimits::default(),
+                        |_| -> Result<Sink, PeleError> { Err(sentinel.clone()) },
+                    )
+                    .err()
+                    .unwrap()
+            };
+            trace.borrow_mut().clear();
+            let new = engine
+                .parse_host_storage_with_limits(
+                    source,
+                    &ParseOptions::default(),
+                    ParseLimits::default(),
+                    |_| -> Result<Sink, PeleError> {
+                        trace.borrow_mut().push("er");
+                        Err(sentinel.clone())
+                    },
+                    |_| -> Result<Sink, PeleError> {
+                        trace.borrow_mut().push("sankey");
+                        Err(sentinel.clone())
+                    },
+                )
+                .err()
+                .unwrap();
+            assert_eq!(new, old);
+            if source.starts_with("er") {
+                assert_eq!(*trace.borrow(), vec!["er"]);
+            } else {
+                assert!(trace.borrow().is_empty());
+            }
+        }
+        for source in ["erDiagram\nA", "sankey\nA,B,5", "pie\n\"A\":1"] {
+            let limits = ParseLimits {
+                source: Some(SourceLimit::Null),
+                max_edges: None,
+            };
+            let old = engine
+                .parse_with_limits(source, &ParseOptions::default(), limits)
+                .err()
+                .unwrap();
+            let new = engine
+                .parse_host_storage_with_limits(
+                    source,
+                    &ParseOptions::default(),
+                    limits,
+                    |_| -> Result<Sink, PeleError> {
+                        panic!("source admission must precede ER factory")
+                    },
+                    |_| -> Result<Sink, PeleError> {
+                        panic!("source admission must precede Sankey factory")
+                    },
+                )
+                .err()
+                .unwrap();
+            assert_eq!(new, old);
+        }
+    }
+    #[test]
+    fn combined_source_keeps_ready_sankey_and_captured_provider_routing() {
+        let mut engine = PublicEngine::with_builtins();
+        let source = "---\ntitle: captured title\n---\nsankey\nA,B,5";
+        let trace = Trace::default();
+        let combined = engine
+            .parse_host_storage_with_limits(
+                source,
+                &ParseOptions::default(),
+                ParseLimits::default(),
+                |_| -> Result<Sink, PeleError> { panic!("Sankey must not construct ER owner") },
+                |_| Ok(sink(&trace, "sankey")),
+            )
+            .unwrap();
+        let CombinedParsed::Sankey {
+            mut document,
+            mut storage,
+        } = combined
+        else {
+            panic!("Sankey route")
+        };
+        assert_eq!(*trace.borrow(), vec!["sankey", "finish"]);
+        let mut arena = engine.parse(source, &ParseOptions::default()).unwrap();
+        same_state(&storage, &arena);
+        // Replacement changes subsequent source selection; the already returned
+        // document retains its concrete captured builtin and effective config.
+        engine.register(Delegated);
+        let actual = document
+            .render(
+                0,
+                &mut storage,
+                &RenderOptions::default(),
+                &mut MetricsResources,
+                None,
+                true,
+            )
+            .unwrap();
+        let expected = arena
+            .render_operation(0, &RenderOptions::default(), &mut MetricsResources)
+            .unwrap();
+        assert_eq!(
+            serde_json::to_value(actual.result).unwrap(),
+            serde_json::to_value(expected.result).unwrap()
+        );
+        for source in ["sankey\nA,B,5", "pie\n\"A\":1"] {
+            let actual = engine
+                .parse_host_storage_with_limits(
+                    source,
+                    &ParseOptions::default(),
+                    ParseLimits::default(),
+                    |_| -> Result<Sink, PeleError> { panic!("unselected ER factory") },
+                    |_| -> Result<Sink, PeleError> { panic!("delegated codec must not opt in") },
+                )
+                .unwrap();
+            let CombinedParsed::Arena(actual) = actual else {
+                panic!("arena route")
+            };
+            let expected = engine.parse(source, &ParseOptions::default()).unwrap();
+            assert_eq!(
+                bytes(&actual.snapshot().unwrap()),
+                bytes(&expected.snapshot().unwrap())
+            );
+        }
+    }
+}

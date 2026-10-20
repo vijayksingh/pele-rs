@@ -22,6 +22,20 @@ pub enum Parsed<T> {
     Captured { document: Document, storage: T },
     Arena(PublicDocument),
 }
+/// Ordinary source routing with one captured preparation plan. Existing
+/// single-family entrypoints and arena APIs keep their original return types.
+#[cfg(feature = "web-host-er")]
+pub enum CombinedParsed<E, S> {
+    Er {
+        policy: super::host_er::Policy,
+        output: E,
+    },
+    Sankey {
+        document: Document,
+        storage: S,
+    },
+    Arena(PublicDocument),
+}
 pub struct Outcome<T> {
     pub revision: u64,
     pub result: Result<T, PublicError>,

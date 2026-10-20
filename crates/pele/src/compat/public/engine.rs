@@ -822,7 +822,7 @@ impl PublicEngine {
         source: &str,
         options: &ParseOptions,
         limits: ParseLimits,
-        mut make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
+        make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
     ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
         let plan =
             self.engine
@@ -838,6 +838,14 @@ impl PublicEngine {
                 .parse_plan(plan)
                 .map(crate::compat::host_er::Parsed::Arena);
         }
+        Self::parse_host_er_plan(plan, registration, make)
+    }
+    #[cfg(feature = "web-host-er")]
+    fn parse_host_er_plan<W: super::InitialWriter>(
+        plan: ParsePlan,
+        registration: Arc<Registration>,
+        mut make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
         let schema = ModelSchemaView {
             model: registration.schema,
             shared_functions: registration.shared_functions,
@@ -1585,6 +1593,60 @@ impl PublicEngine {
             storage,
         })
     }
+    /// One source preparation selects the captured ER, captured Sankey, or
+    /// ordinary arena route. A declined family never triggers a second parse.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_host_storage_with_limits<E, S>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        make_er: impl FnMut(ModelSchemaView) -> Result<E, PeleError>,
+        make_sankey: impl FnOnce(ModelSchemaView) -> Result<S, PeleError>,
+    ) -> Result<crate::compat::host_sankey::CombinedParsed<E::Output, S::Output>, PeleError>
+    where
+        E: super::InitialWriter,
+        S: super::InitialWriter,
+        S::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        use crate::compat::{host_er, host_sankey};
+        let plan =
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Limits(limits))?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        if registration.codec.is_host_er() {
+            return Self::parse_host_er_plan(plan, registration, make_er).map(
+                |parsed| match parsed {
+                    host_er::Parsed::Host { policy, output } => {
+                        host_sankey::CombinedParsed::Er { policy, output }
+                    }
+                    host_er::Parsed::Arena(document) => {
+                        host_sankey::CombinedParsed::Arena(document)
+                    }
+                },
+            );
+        }
+        if registration.codec.is_host_sankey() {
+            return Self::parse_host_sankey_plan(plan, registration, make_sankey).map(|parsed| {
+                match parsed {
+                    host_sankey::Parsed::Captured { document, storage } => {
+                        host_sankey::CombinedParsed::Sankey { document, storage }
+                    }
+                    host_sankey::Parsed::Arena(document) => {
+                        host_sankey::CombinedParsed::Arena(document)
+                    }
+                }
+            });
+        }
+        self.parse_plan(plan)
+            .map(host_sankey::CombinedParsed::Arena)
+    }
     #[doc(hidden)]
     pub fn parse_host_sankey_with_limits<W>(
         &self,
@@ -1611,6 +1673,17 @@ impl PublicEngine {
                 .parse_plan(plan)
                 .map(crate::compat::host_sankey::Parsed::Arena);
         }
+        Self::parse_host_sankey_plan(plan, registration, make)
+    }
+    fn parse_host_sankey_plan<W>(
+        plan: ParsePlan,
+        registration: Arc<Registration>,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
         Self::create_host_sankey(plan.parse()?, registration, make)
     }
     #[doc(hidden)]

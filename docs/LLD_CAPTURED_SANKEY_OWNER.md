@@ -18,6 +18,14 @@ the existing importer. Parsing, import, helper policy and rendering each retain 
 single implementation shared with the arena route. The default adapters do not
 enable this feature or select this document yet.
 
+`parse_host_storage_with_limits` prepares source once and chooses the captured ER
+owner first, captured Sankey second, then the arena. It reuses each family's
+existing plan consumer. In particular, ER retains its direct-parser abort and
+fresh-factory fallback sequence; opting into Sankey cannot route ER through the
+arena or repeat source preparation in JavaScript. Prepared/raw selection remains
+explicitly typed. Three added public routing cases and the affected ER/method
+consumers pass together: 22 integration checks across four targets.
+
 ## Failure and publication order
 
 Apply rejects stale/exhausted revisions before admission, validates captured and
