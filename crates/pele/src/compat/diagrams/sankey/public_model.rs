@@ -7,10 +7,10 @@
 use super::{Sankey, SankeyLink, SankeyModel, SankeyNode};
 use crate::compat::{
     public::{
-        Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString, MemberKind,
-        MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property,
-        PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId,
-        RecordKind, RecordSchema,
+        Atom, FieldKind, FieldSchema, GraphWriter, InitialWriter, JavaScriptErrorKind, JsString,
+        MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema,
+        Node, Property, PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule,
+        PublicError, RecordId, RecordKind, RecordSchema,
     },
     DiagramModule, DiagramType, ErrorCode, Object, PeleError, RenderResources, RenderSettings,
     Rendered,
@@ -362,34 +362,43 @@ fn imported(graph: &ModelGraph) -> Result<SankeyModel, PeleError> {
         acc_descr: optional_text(graph, "accDescr")?,
     })
 }
-fn node(out: &mut GraphWriter, node: &SankeyNode) -> u32 {
-    let label = out.string(node.id.as_str());
+fn node(out: &mut impl InitialWriter, node: &SankeyNode) -> Result<u32, PeleError> {
+    let label = out.string(node.id.as_str())?;
     let properties = vec![
-        out.property("id", Atom::String(label)),
-        out.property("index", Atom::Number(node.index as f64)),
+        out.property("id", Atom::String(label))?,
+        out.property("index", Atom::Number(node.index as f64))?,
     ];
     out.node(Node::Object { properties })
 }
-fn array_node(out: &mut GraphWriter, entries: impl Iterator<Item = Atom>) -> u32 {
+fn array_node(
+    out: &mut impl InitialWriter,
+    entries: impl Iterator<Item = Atom>,
+) -> Result<u32, PeleError> {
     let properties: Vec<_> = entries
         .enumerate()
         .map(|(i, value)| out.property(&i.to_string(), value))
-        .collect();
+        .collect::<Result<_, _>>()?;
     out.node(Node::Array {
         length: properties.len() as u32,
         properties,
     })
 }
 fn initial_graph(model: &SankeyModel) -> Result<ModelGraph, PeleError> {
-    let mut out = GraphWriter::default();
-    let node_objects: Vec<_> = model.nodes.iter().map(|n| node(&mut out, n)).collect();
+    initial_into(GraphWriter::default(), model)
+}
+fn initial_into<W: InitialWriter>(mut out: W, model: &SankeyModel) -> Result<W::Output, PeleError> {
+    let node_objects: Vec<_> = model
+        .nodes
+        .iter()
+        .map(|n| node(&mut out, n))
+        .collect::<Result<_, _>>()?;
     let mut original_nodes = HashMap::new();
     for (record, object) in model.nodes.iter().zip(&node_objects) {
         original_nodes
             .entry((record.index, record.id.as_str()))
             .or_insert(*object);
     }
-    let nodes = array_node(&mut out, node_objects.iter().copied().map(Atom::Ref));
+    let nodes = array_node(&mut out, node_objects.iter().copied().map(Atom::Ref))?;
     let mut link_objects = Vec::with_capacity(model.links.len());
     for link in &model.links {
         let mut endpoint = |endpoint: &SankeyNode| {
@@ -399,49 +408,51 @@ fn initial_graph(model: &SankeyModel) -> Result<ModelGraph, PeleError> {
             original_nodes
                 .get(&(endpoint.index, endpoint.id.as_str()))
                 .copied()
+                .map(Ok)
                 .unwrap_or_else(|| node(&mut out, endpoint))
         };
-        let source = endpoint(&link.source);
-        let target = endpoint(&link.target);
+        let source = endpoint(&link.source)?;
+        let target = endpoint(&link.target)?;
         let properties = vec![
-            out.property("source", Atom::Ref(source)),
-            out.property("target", Atom::Ref(target)),
-            out.property("value", Atom::Number(link.value)),
+            out.property("source", Atom::Ref(source))?,
+            out.property("target", Atom::Ref(target))?,
+            out.property("value", Atom::Number(link.value))?,
         ];
-        link_objects.push(out.node(Node::Object { properties }));
+        link_objects.push(out.node(Node::Object { properties })?);
     }
-    let links = array_node(&mut out, link_objects.into_iter().map(Atom::Ref));
+    let links = array_node(&mut out, link_objects.into_iter().map(Atom::Ref))?;
     let entries = model
         .nodes
         .iter()
         .zip(&node_objects)
-        .map(|(n, id)| (Atom::String(out.string(n.id.as_str())), Atom::Ref(*id)))
-        .collect();
+        .map(|(n, id)| Ok((Atom::String(out.string(n.id.as_str())?), Atom::Ref(*id))))
+        .collect::<Result<_, PeleError>>()?;
     let lookup = out.node(Node::Map {
         entries,
         properties: vec![],
-    });
-    let kind = out.string("sankey");
+    })?;
+    let kind = out.string("sankey")?;
     let mut properties = vec![
-        out.property("type", Atom::String(kind)),
-        out.property("nodes", Atom::Ref(nodes)),
-        out.property("links", Atom::Ref(links)),
+        out.property("type", Atom::String(kind))?,
+        out.property("nodes", Atom::Ref(nodes))?,
+        out.property("links", Atom::Ref(links))?,
     ];
     for (key, text) in [
         ("title", &model.title),
         ("accTitle", &model.acc_title),
         ("accDescr", &model.acc_descr),
     ] {
-        let value = text.as_ref().map_or(Atom::Undefined, |text| {
-            Atom::String(out.string(text.as_str()))
-        });
-        properties.push(out.property(key, value));
+        let value = match text {
+            Some(text) => Atom::String(out.string(text.as_str())?),
+            None => Atom::Undefined,
+        };
+        properties.push(out.property(key, value)?);
     }
-    properties.push(out.property("lookup", Atom::Ref(lookup)));
+    properties.push(out.property("lookup", Atom::Ref(lookup))?);
     let root = out.node(Node::Instance {
         prototype: SANKEY_PROTO,
         properties,
-    });
+    })?;
     out.finish(Atom::Ref(root))
 }
 impl PublicDiagramModule for Sankey {

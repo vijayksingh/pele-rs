@@ -2,6 +2,9 @@
 //! Public codecs are opt-in; an unimplemented codec never silently ignores edits.
 mod engine;
 mod graph;
+mod initial_store;
+#[doc(hidden)]
+pub use initial_store::InitialWriter;
 mod host_function;
 pub use host_function::{ActiveModel, HostFunction, ModelDelta};
 mod schema;

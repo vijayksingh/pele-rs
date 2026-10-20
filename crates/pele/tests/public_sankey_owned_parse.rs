@@ -228,6 +228,7 @@ fn legacy_engine() -> PublicEngine {
 }
 #[test]
 fn sankey_owned_and_legacy_match_complete_frozen_source_corpus() {
+    use sha2::{Digest, Sha256};
     use std::io::Read;
     let file = std::fs::File::open(concat!(
         env!("CARGO_MANIFEST_DIR"),
@@ -243,15 +244,39 @@ fn sankey_owned_and_legacy_match_complete_frozen_source_corpus() {
     assert_eq!(cases.len(), 11_616);
     let native = PublicEngine::with_builtins();
     let legacy = legacy_engine();
+    let mut digest = Sha256::new();
+    let (mut accepted, mut rejected) = (0usize, 0usize);
     for case in cases {
         let source = case["source"].as_str().unwrap();
         let options: ParseOptions = serde_json::from_value(case["options"].clone()).unwrap();
-        same(
-            native.parse(source, &options),
-            legacy.parse(source, &options),
-            case["id"].as_str().unwrap(),
-        );
+        let actual = native.parse(source, &options);
+        let id = case["id"].as_str().unwrap();
+        digest.update((id.len() as u64).to_le_bytes());
+        digest.update(id.as_bytes());
+        let value = match &actual {
+            Ok(document) => {
+                accepted += 1;
+                digest.update([1]);
+                bytes(document)
+            }
+            Err(error) => {
+                rejected += 1;
+                digest.update([0]);
+                serde_json::to_vec(error).unwrap()
+            }
+        };
+        digest.update((value.len() as u64).to_le_bytes());
+        digest.update(value);
+        same(actual, legacy.parse(source, &options), id);
     }
+    // Frozen public graph frames and errors captured at 9ae8142, before the
+    // shared construction sink refactor. This independently fixes string/node
+    // order even when both current codec routes share the same builder.
+    assert_eq!((accepted, rejected), (5_047, 6_569));
+    assert_eq!(
+        format!("{:x}", digest.finalize()),
+        "de51448521928799f26cf2e4fe02c4804a323e7ec5bd7a623ca5932f79e8fe4c"
+    );
 }
 #[test]
 fn sankey_owned_retained_methods_edits_and_replacement_match_legacy() {

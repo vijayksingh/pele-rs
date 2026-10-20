@@ -19,6 +19,8 @@ legacy projection for public providers and other diagram registrations.
 [Owned public construction](LLD_OWNED_PUBLIC_CONSTRUCTION.md) transfers captured
 parser storage through an additive codec hook; Sankey normalizes its owned model
 without reconstructing a second render model from the fresh graph.
+[Shared construction storage](LLD_SHARED_CONSTRUCTION.md) gives ER and Sankey
+one ordered sink while preserving arena construction and existing host exports.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.
