@@ -179,7 +179,13 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 complete release-gate run, historical source `0b32797`, fails all 126 conditions.
 New scoped diagnostics do not replace that gate.
 
-The latest measured [storage preparation](docs/benchmarks/2026-10-20-er-host-storage/shared-public-primitives/),
+The first [shared traversal attempt](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-rejected/)
+was rejected: its same-WASM 42-condition VM comparison showed Flowchart/medium
+fixed retained render **9.16% slower** (4/21 lower pairs). The separate 40-condition
+first-use run does not cancel that regression. A revised abstraction is being
+evaluated; this rejected experiment is not an accepted performance improvement.
+
+An earlier [storage preparation](docs/benchmarks/2026-10-20-er-host-storage/shared-public-primitives/),
 source `1906d68`, separates construction and projection from native graph storage.
 It still retains the arena and initial snapshot/decode. Its 30-condition VM run
 shows **all six Sankey parse rows slower by 0.51–6.22%**, and all six retained
@@ -202,11 +208,12 @@ latency and RSS. [Earlier checkpoints](docs/PERFORMANCE_CHECKPOINTS.md) retain t
 full measurement history, native-core comparisons, compiler tradeoffs and rejected
 experiments.
 
-Fresh local Swift timing at `1906d68` completed two Sankey/medium conditions:
-render **−0.48%**, lifetime **+0.004%**, each with 15 pairs and recorded shared-host
-load. External compiler activity interrupted mutable parse; its entire incomplete
-condition is excluded, and immutable parse remains unmeasured. No parse speedup
-is established by that attempt.
+Latest local Swift timing, core `365ec6d` versus `1906d68`, completed three
+Sankey/medium conditions: mutable parse **−0.92%**, immutable parse **+0.05%**,
+render **+1.02%**, each with 15 pairs and recorded shared-host load. External
+compiler activity interrupted lifetime; its entire incomplete condition is
+excluded. This measures the native helper-storage change, independently of the
+rejected JS traversal experiment. It establishes no substantial speedup.
 
 Correctness is pinned separately from performance:
 
@@ -217,7 +224,11 @@ Correctness is pinned separately from performance:
   unchanged. The preceding construction slice passed 18 overlapping integrations.
 - Subsequent helper-storage source `243580c`: **22 native integrations** pass,
   including raw duplicate keys/descriptors, exact number bits, partial failures
-  and repair. The SDK/browser evidence above remains pinned to its measured source.
+  and repair. Fresh SDK at `365ec6d` passes Swift 16, strict C3 and API168 with all
+  354 source/SDK inputs unchanged. The traversal experiment stopped at 147 browser
+  passes, one interruption and 269 unrun checks; it is not a full-suite pass.
+- Captured admission `3818fc7`: **42 native integrations** pass. SDK and browser
+  artifacts above remain pinned to their earlier sources.
 
 Work now targets complete captured Sankey storage, preserving an eager render
 projection and full callback restoration while removing the persistent native

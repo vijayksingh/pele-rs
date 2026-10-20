@@ -1,0 +1,33 @@
+{
+  "baseCommit": "365ec6d0df050199f9efb93d23d9ce7d352c60fa",
+  "scope": "Shared graph traversal with default nested storage only; no flat backend or selector",
+  "patchSha256": "4ce4d35f82f294bfb84fc8e1a801e7064caec9757d680ba9d3e2d67c6f53dae4",
+  "files": [
+    {
+      "path": "bindings/web/graph.js",
+      "originalSha256": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+      "candidateSha256": "701c99ffd7a096ca85f15f23fdfe48a40b269902bf734ec542e9c8ea73c62c8f",
+      "newFile": false
+    },
+    {
+      "path": "bindings/web/graph-storage.js",
+      "originalSha256": null,
+      "candidateSha256": "cdcffd672b0fa81e19784fa424f4d2048a182383e4e707da98402360dea9d009",
+      "newFile": true
+    },
+    {
+      "path": "bindings/web/package.json",
+      "originalSha256": "42b3141f8f64a819fb957d7c00900cc7201069f8119940da1019742e3ef64a0c",
+      "candidateSha256": "2acd242ecd5a478eb8f154cde806de2f6358d8ffad36b51e0dda41658c845ef2",
+      "newFile": false
+    }
+  ],
+  "validation": {
+    "nodeSyntax": "passed for graph.js and graph-storage.js",
+    "builds": "not run",
+    "tests": "not run",
+    "productionEdits": "none",
+    "packedRuntime": "parent gate; manifest inclusion added",
+    "gitApplyCheck": "passed against current production"
+  }
+}
