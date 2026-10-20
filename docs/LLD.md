@@ -26,3 +26,5 @@ method and live-render boundary, its bounded transfers and its verification gate
 field/property vectors from fresh ER records through a defaulted construction sink.
 [Dense-array publication](LLD_ER_DENSE_ARRAY_PUBLICATION.md) adds a bounded generic
 array event while retaining canonical index strings, budgets and native defaults.
+[Source result transport](LLD_SOURCE_RESULT_PACKET.md) shares a borrowed success
+packet across diagram families while preserving legacy envelopes and exports.

@@ -7,6 +7,7 @@ export {loadRegistry} from './registry.js';
 import {mountWith} from './mount.js';
 export {enableZoom} from './zoom.js';
 import { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry, foreign_decode_entities } from './pkg/pele.js';
+import * as nativeCapabilities from './pkg/pele.js';
 import {renderNumericOptions} from './render-numbers.js';
 import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';
@@ -19,6 +20,18 @@ function result(json) {
   if (envelope.version !== 2) throw new Error('Unsupported compatibility contract');
   if (!envelope.ok) throw fromNativeError(envelope.error);
   return renderedValue(envelope.result);
+}
+// Success-only additive capability. Errors retain the exact v2 JSON boundary.
+function sourceResult(response) {
+  if(typeof response==='string')return result(response);
+  if(!Array.isArray(response)||response.length!==3||response[0]!==1||!Number.isSafeInteger(response[1])||response[1]<0||response[1]>64*1024*1024)throw new TypeError('Invalid source render packet');
+  const value=response[2],keys=['type','svg','width','height','links'],actual=value&&Object.keys(value);
+  if(!value||Object.getPrototypeOf(value)!==Object.prototype||actual.length!==keys.length||!keys.every((key,index)=>actual[index]===key)||typeof value.type!=='string'||typeof value.svg!=='string'||typeof value.width!=='number'||typeof value.height!=='number'||!Array.isArray(value.links))throw new TypeError('Invalid source render packet');
+  for(const link of value.links){
+    const keys=link&&Object.keys(link);
+    if(!link||Object.getPrototypeOf(link)!==Object.prototype||keys.length!==3||keys[0]!=='id'||keys[1]!=='href'||keys[2]!=='internal'||typeof link.id!=='string'||typeof link.href!=='string'||typeof link.internal!=='boolean')throw new TypeError('Invalid source render packet');
+  }
+  return value;
 }
 function nativeValue(call) {
   try { return result(call()); }
@@ -485,9 +498,13 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         if (typeof input === 'string') {
           if (nativeRegistry) {
             const limits = parseLimitValues(options);
-            json = nativeRegistry.render_numbers_with_resources(input, numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output,
+            const render=typeof nativeRegistry.render_numbers_packet_with_resources==='function'?nativeRegistry.render_numbers_packet_with_resources:nativeRegistry.render_numbers_with_resources;
+            json = render.call(nativeRegistry,input, numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output,
               limits.sourceKind, limits.sourceValue, limits.edgeKind, limits.edgeValue, width, icons, clock);
-          } else json = render_numbers_with_resources(input, ...numericArguments);
+          } else {
+            const render=typeof nativeCapabilities.render_numbers_packet_with_resources==='function'?nativeCapabilities.render_numbers_packet_with_resources:render_numbers_with_resources;
+            json = render(input, ...numericArguments);
+          }
         }
         else {
           const document = documents.get(input);
@@ -511,7 +528,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           if(Object.hasOwn(operation,'Err'))throw operationError(operation.Err,bridge);
           return renderedValue(operation.Ok);
         }
-        return result(json);
+        return typeof input==='string'?sourceResult(json):result(json);
       } catch(error) { if (callbackFailed) throw renderError(callbackError); throw renderError(error); }
     },
     mount(element, source, options = {}) { return mountWith(renderer, element, source, options); },

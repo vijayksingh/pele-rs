@@ -21,18 +21,6 @@ use wasm_bindgen::prelude::*;
 // packed package/pkg resolve the same sibling host-er-store.js.
 #[wasm_bindgen(raw_module = "../host-er-store.js")]
 extern "C" {
-    #[wasm_bindgen(catch, js_name = hostErRenderResult)]
-    fn render_result_packet(
-        raw: bool,
-        diagram_type: &str,
-        svg: &str,
-        width_low: u32,
-        width_high: u32,
-        height_low: u32,
-        height_high: u32,
-        links: &str,
-        metadata_bytes: u32,
-    ) -> Result<JsValue, JsValue>;
     #[wasm_bindgen(catch, js_name = hostErReadOwn)]
     fn read_own(context: &JsValue, object: u32, key: &JsValue) -> Result<f64, JsValue>;
     #[wasm_bindgen(catch, js_name = hostErReadOwnCount)]
@@ -1477,25 +1465,10 @@ fn successful_packet(
     rendered: &pele::compat::Rendered,
     transport: &impl serde::Serialize,
 ) -> Result<JsValue, JsValue> {
-    // Audit already finished. Count the exact legacy envelope, including any
-    // $numbers fields, before allocating the smaller links payload or JS result.
-    let metadata_bytes =
-        super::render_numbers::encoded_length(transport).map_err(native_failure)?;
-    let links = super::render_numbers::encode(&rendered.links).map_err(native_failure)?;
-    let links = std::str::from_utf8(&links).expect("JSON UTF8");
-    let width = rendered.width.to_bits();
-    let height = rendered.height.to_bits();
-    render_result_packet(
-        raw,
-        diagram_type,
-        &rendered.svg,
-        width as u32,
-        (width >> 32) as u32,
-        height as u32,
-        (height >> 32) as u32,
-        links,
-        metadata_bytes as u32,
-    )
+    // Audit already finished. Preserve the exact host Result envelope and the
+    // existing thrown native failure before publishing a successful packet.
+    let prepared = super::render_packet::prepare(rendered, transport).map_err(native_failure)?;
+    super::render_packet::emit(raw, diagram_type, rendered, prepared)
 }
 
 fn native_failure(error: PeleError) -> JsValue {

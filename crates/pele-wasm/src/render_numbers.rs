@@ -267,15 +267,15 @@ pub(super) fn failure(error: &PeleError) -> String {
         Err(_) => r#"{"version":2,"ok":false,"error":{"name":"PeleError","message":"Browser numeric transport exceeds byte budget","code":"limit","type":null,"line":0,"column":0,"snippet":""}}"#.into(),
     }
 }
+#[derive(Serialize)]
+struct RenderEnvelope<T> {
+    version: u8,
+    ok: bool,
+    result: T,
+}
 pub(super) fn rendered(result: Result<pele::compat::RenderResult, PeleError>) -> String {
-    #[derive(Serialize)]
-    struct Envelope<T> {
-        version: u8,
-        ok: bool,
-        result: T,
-    }
     match result.and_then(|value| {
-        encode(&Envelope {
+        encode(&RenderEnvelope {
             version: 2,
             ok: true,
             result: pele::compat::render_result_transport(&value),
@@ -284,6 +284,31 @@ pub(super) fn rendered(result: Result<pele::compat::RenderResult, PeleError>) ->
         Ok(bytes) => String::from_utf8(bytes).expect("JSON UTF8"),
         Err(error) => failure(&error),
     }
+}
+// Keep failures as the legacy v2 JSON string. Only successful results use the
+// additive packet capability; factory exceptions remain ordinary host throws.
+pub(super) fn rendered_packet(
+    result: Result<pele::compat::RenderResult, PeleError>,
+) -> Result<JsValue, JsValue> {
+    let value = match result {
+        Ok(value) => value,
+        Err(error) => return Ok(JsValue::from_str(&failure(&error))),
+    };
+    let envelope = RenderEnvelope {
+        version: 2,
+        ok: true,
+        result: pele::compat::render_result_transport(&value),
+    };
+    let prepared = match super::render_packet::prepare(&value.rendered, &envelope) {
+        Ok(prepared) => prepared,
+        Err(error) => return Ok(JsValue::from_str(&failure(&error))),
+    };
+    super::render_packet::emit(
+        false,
+        value.diagram_type.as_str(),
+        &value.rendered,
+        prepared,
+    )
 }
 pub(super) struct NumericResources {
     pub(super) browser: BrowserResources,
@@ -337,22 +362,69 @@ pub fn render_numbers_with_resources(
     icons: Option<js_sys::Function>,
     clock: Option<js_sys::Function>,
 ) -> String {
-    rendered((|| {
-        if json.len() > OPTIONS_BYTES || source.len() > pele::compat::MAX_PUBLIC_SOURCE_BYTES {
-            return Err(budget());
-        }
-        let (options, limit) = options(json, mask, numbers, output_kind, output)?;
-        pele::compat::Engine::with_builtins().render_source_bounded(
-            source,
-            &options,
-            limit,
-            &mut NumericResources {
-                browser: BrowserResources { width, icons },
-                clock,
-            },
-        )
-    })())
+    rendered(render_source(
+        source,
+        json,
+        mask,
+        numbers,
+        output_kind,
+        output,
+        width,
+        icons,
+        clock,
+    ))
 }
+/// Additive successful source-result transport. Legacy JSON export is retained.
+#[wasm_bindgen]
+pub fn render_numbers_packet_with_resources(
+    source: &str,
+    json: &str,
+    mask: u32,
+    numbers: &[f64],
+    output_kind: u32,
+    output: f64,
+    width: Option<js_sys::Function>,
+    icons: Option<js_sys::Function>,
+    clock: Option<js_sys::Function>,
+) -> Result<JsValue, JsValue> {
+    rendered_packet(render_source(
+        source,
+        json,
+        mask,
+        numbers,
+        output_kind,
+        output,
+        width,
+        icons,
+        clock,
+    ))
+}
+fn render_source(
+    source: &str,
+    json: &str,
+    mask: u32,
+    numbers: &[f64],
+    output_kind: u32,
+    output: f64,
+    width: Option<js_sys::Function>,
+    icons: Option<js_sys::Function>,
+    clock: Option<js_sys::Function>,
+) -> Result<pele::compat::RenderResult, PeleError> {
+    if json.len() > OPTIONS_BYTES || source.len() > pele::compat::MAX_PUBLIC_SOURCE_BYTES {
+        return Err(budget());
+    }
+    let (options, limit) = options(json, mask, numbers, output_kind, output)?;
+    pele::compat::Engine::with_builtins().render_source_bounded(
+        source,
+        &options,
+        limit,
+        &mut NumericResources {
+            browser: BrowserResources { width, icons },
+            clock,
+        },
+    )
+}
+
 #[wasm_bindgen]
 impl ParsedDocument {
     pub fn render_numbers_with_resources(
