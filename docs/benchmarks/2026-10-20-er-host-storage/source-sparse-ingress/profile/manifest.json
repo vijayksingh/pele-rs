@@ -1,0 +1,59 @@
+{
+  "status": "prepared-not-executed-awaiting-parent-review-GO",
+  "originalHarness": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0",
+  "extraction": {
+    "startByte": 10454,
+    "endByte": 15345,
+    "sha256": "29715587d908d5d722dbab29f2c2a3ac630e26aa0fa3f6b23ecb31357eb77849",
+    "includes": [
+      "taskSignature",
+      "scenario",
+      "verify"
+    ],
+    "unchangedBytes": 4891,
+    "source": "compare-first-use-web-vm.mjs"
+  },
+  "workExtraction": {
+    "startByte": 15404,
+    "endByte": 15582,
+    "sha256": "547b2ef043fe61f4ab3b2b4215a78ef22ba95ad31f61031733239ea410dc4e90",
+    "unchangedBytes": 178
+  },
+  "source": {
+    "control": {
+      "commit": "e1486055d596d4e0ac25e4c78f1d5d95a73f781a",
+      "freezeManifestSHA256": "f5756e08f99b31b7e9381e420510611d0fbb743f3414122383d53d0406972354",
+      "packageFiles": 113
+    },
+    "candidate": {
+      "commit": "ef9c9a77428c35ac69753caad3178527fbd97864",
+      "freezeManifestSHA256": "a12babf23d19b42a9f2877a2a81084c8764216ed98f92ecb495e812dee64eb54",
+      "packageFiles": 116
+    }
+  },
+  "files": {
+    "files/scripts/perf/profile-source-first-edit.mjs": "e704ec2e47dbb53b3fa27d4e09e3af69efec04d0fb6b6631862618431502264d",
+    "files/scripts/perf/probe-layout-continuity.mjs": "5930f4d8a395f59fc7ed5ebf69bbfd4964a363d40fa59018244ac44528719c3f",
+    "files/scripts/perf/source-layout-pins.json": "166035b3afed35c061da911b4f4c0695e4bc65b7a981af228ed68a108d7d0fc7",
+    "files/scripts/perf/run-source-first-edit.mjs": "5505818cd8c0c70b03f90c1cd333ec650bcd42ddc08d0f3da70fb55a1cc6388e",
+    "files/scripts/perf/cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "files/scripts/perf/probe-source-layout.mjs": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+    "files/scripts/perf/source-canonical-inputs.json": "2e5f5e8da3b17fdfedcb1613bc914ee25fe8748722144fa34b6bb4d63fc21836",
+    "files/scripts/perf/compare-first-use-web-vm.mjs": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0",
+    "files/scripts/perf/probe-source-ingress.mjs": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67"
+  },
+  "profile": {
+    "windows": 3,
+    "durationMs": 2000,
+    "warmupMs": 500,
+    "intervalUs": 250,
+    "case": "sankey/medium",
+    "profile": "fixed",
+    "stage": "parse-first-edited-render"
+  },
+  "probes": [
+    8,
+    16,
+    12
+  ]
+}

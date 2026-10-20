@@ -1,0 +1,43 @@
+{
+  "status": "complete-single-authorized-session",
+  "transferSession": 60278,
+  "profileSession": 16592,
+  "fetchSession": 62797,
+  "allExitCodes": 0,
+  "windows": 3,
+  "probeChecks": [
+    8,
+    16,
+    12
+  ],
+  "runtimeSource": "ef9c9a77428c35ac69753caad3178527fbd97864",
+  "harnessSHA256": "e704ec2e47dbb53b3fa27d4e09e3af69efec04d0fb6b6631862618431502264d",
+  "rawSummarySHA256": "46cac7fc8ebf49aa8f123f80ccecebe2c6bf726efd00e0cb1fa10f50851800c4",
+  "classifier": "analyze.py is offline correction only; frozen runtime classifier retained unmodified",
+  "artifacts": {
+    "runtime/evidence/cpu-profiles/sankey-medium-fixed-parse-first-edited-render-candidate.cpuprofile": "031d6fc5036834cb576c8f5ca7f6c26af0fea010f5942cc530cea99f94169ef2",
+    "runtime/evidence/cpu-profiles/sankey-medium-fixed-parse-first-edited-render-control.cpuprofile": "f660389dca0d782efc5e3575454c415f068495c55a7cfa34dd0a946db90997ca",
+    "runtime/evidence/cpu-profiles/sankey-medium-fixed-parse-first-edited-render-js.cpuprofile": "a854cbd7516d3a55f33a4aea74b30c114a89604bb3e6258ba6b37716217f6444",
+    "runtime/evidence/cpu-profiles/summary.json": "46cac7fc8ebf49aa8f123f80ccecebe2c6bf726efd00e0cb1fa10f50851800c4",
+    "runtime/evidence/cpu-profiles/summary.partial.json": "f0e19045c8d9c24bc24c29547b3783948cab567f54f64d378383f7e4d15ba9b5",
+    "runtime/evidence/first-edit-profile-activation.json": "357d0841920352902e45f38d7e6327645321f3d21a75c3c917a29da7c1c589e6",
+    "runtime/evidence/first-edit-profile-ingress-activation.json": "f5fb093a707fbc4f7bd862ae802fe95c048073867388686144d81b45b5d6284a",
+    "runtime/evidence/first-edit-profile-layout-continuity.json": "1269dc13cbe2ab63862a884ebe171c3ce1057d1680fe968322e7a61e926c045d",
+    "runtime/evidence/first-edit-profile-provenance.json": "820e5b1f90843faa69c76a344584f4eba268bb80c7b66eacd4c225ebf542fe71",
+    "runtime/files/scripts/perf/cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "runtime/files/scripts/perf/compare-first-use-web-vm.mjs": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0",
+    "runtime/files/scripts/perf/probe-layout-continuity.mjs": "5930f4d8a395f59fc7ed5ebf69bbfd4964a363d40fa59018244ac44528719c3f",
+    "runtime/files/scripts/perf/probe-source-ingress.mjs": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67",
+    "runtime/files/scripts/perf/probe-source-layout.mjs": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+    "runtime/files/scripts/perf/profile-source-first-edit.mjs": "e704ec2e47dbb53b3fa27d4e09e3af69efec04d0fb6b6631862618431502264d",
+    "runtime/files/scripts/perf/run-source-first-edit.mjs": "5505818cd8c0c70b03f90c1cd333ec650bcd42ddc08d0f3da70fb55a1cc6388e",
+    "runtime/files/scripts/perf/source-canonical-inputs.json": "2e5f5e8da3b17fdfedcb1613bc914ee25fe8748722144fa34b6bb4d63fc21836",
+    "runtime/files/scripts/perf/source-layout-pins.json": "166035b3afed35c061da911b4f4c0695e4bc65b7a981af228ed68a108d7d0fc7",
+    "analyze.py": "2e0dba987413155d481a0f5cb4397562baec6d23f47a2e192f2b8f04e5305a27",
+    "attribution.json": "3a4d63fb63183393415427762e4cbfb5d8b5125f841823671e69a4c1cebd14d7",
+    "manifest.json": "9e6a7d7e872e390107a9600211dafd473c1c3b75a62443f19b32792e5aa28dce",
+    "prepare.py": "edc3fe521deae0b016f9edd4a9c6d2bfff524154824229f375eadb897e537dd6",
+    "REVIEW.md": "4b5b6e82b2db2ba35ac70beb9a4a71961fa1b081385100bf59693a11164ae931",
+    "RESULTS.md": "9f3a6c28f07b6859acae585613023940791386093bc2d1267d84d26697fa1e41"
+  }
+}
