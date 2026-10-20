@@ -17,5 +17,5 @@ test('Gantt parse preserves complete native identity tables',async({page})=>{
   }}finally{registry.free();}
   return{count:fixture.cases.length,failures};
  });
- expect(report).toEqual({count:9,failures:[]});
+ expect(report).toEqual({count:10,failures:[]});
 });

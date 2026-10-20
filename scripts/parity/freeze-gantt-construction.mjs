@@ -25,6 +25,9 @@ for(const [id,source]of Object.entries({
  dates:'gantt\ndateFormat YYYY-MM-DD\nA:a,2024-01-01,2024-01-03\nB:b,after a,2d\nC:c,after b,1d',
  internedKeys:'gantt\ntitle push\ndateFormat YYYY-MM-DD\nsection length\n0:push,2024-01-01,1d\nlength:0,after push,2d\npush:length,after 0,1d\nclick push call callback() href "https://example.com"',
 }))selected.push({id,source,options:{}});
+selected.push({id:'utf8-boundaries',options:{},source:'gantt\ndateFormat YYYY-MM-DD\nsection length\n'+
+ ['a'.repeat(64),'a'.repeat(65),'é'.repeat(32),'é'.repeat(33),'🦀'.repeat(16),'🦀'.repeat(17)]
+ .flatMap((label,i)=>[`${label}:id${i},2024-01-01,1d`,`${label}:again${i},2024-01-02,1d`]).join('\n')});
 const rows=[];
 try{for(const c of selected){
  const document=registry.parse(c.source,JSON.stringify(c.options),0,0,0,0);

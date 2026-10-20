@@ -169,6 +169,17 @@ impl<'a> Context<'a> {
         Ok(Atom::String(id))
     }
     fn text(&mut self, s: &str) -> Result<Atom, PublicError> {
+        let mut buffer = [0; 64];
+        if let Some(units) = JsString::short_utf16(s, &mut buffer) {
+            if let Some(id) = self.strings.get(units).copied() {
+                // intern charges graph/string capacity only on insertion. An
+                // existing ID needs no temporary owned UTF-16 string or charge.
+                return Ok(Atom::String(id));
+            }
+            // Reuse the already encoded units on a miss; intern still owns
+            // canonical insertion, its duplicate check and admission budgets.
+            return self.intern(JsString(units.to_vec()));
+        }
         self.intern(JsString::from(s))
     }
     fn key(&self, a: &Atom) -> Key {
@@ -202,7 +213,12 @@ impl<'a> Context<'a> {
     }
     fn own(&mut self, id: u32, key: &str) -> Result<Option<Atom>, PublicError> {
         self.tick(1)?;
-        let Some(key) = self.strings.get(&JsString::from(key)).copied() else {
+        let mut buffer = [0; 64];
+        let key = match JsString::short_utf16(key, &mut buffer) {
+            Some(units) => self.strings.get(units),
+            None => self.strings.get(&JsString::from(key)),
+        };
+        let Some(key) = key.copied() else {
             return Ok(None);
         };
         self.property_index(id)?;
