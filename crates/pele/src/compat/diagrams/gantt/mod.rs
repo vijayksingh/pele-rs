@@ -21,20 +21,7 @@ impl DiagramModule for Gantt {
         ModuleDescriptor::new(DiagramType::Gantt)
     }
     fn parse(&self, c: ParseContext<'_>) -> Result<GanttModel, PeleError> {
-        let mode = c
-            .config
-            .get("gantt")
-            .and_then(Value::as_object)
-            .and_then(|c| c.get("displayMode"))
-            .and_then(|v| {
-                if let Value::String(s) = v {
-                    Some(s.clone())
-                } else {
-                    None
-                }
-            })
-            .unwrap_or_default();
-        let mut m = GanttModel::new(c.title, mode);
+        let mut m = parse_header(&c);
         parser::parse(c.source, &mut m)?;
         Ok(m)
     }
@@ -51,3 +38,20 @@ impl DiagramModule for Gantt {
 
 mod public_model;
 pub use public_model::GanttPublicState;
+
+fn parse_header(c: &ParseContext<'_>) -> GanttModel {
+    let mode = c
+        .config
+        .get("gantt")
+        .and_then(Value::as_object)
+        .and_then(|c| c.get("displayMode"))
+        .and_then(|v| {
+            if let Value::String(s) = v {
+                Some(s.clone())
+            } else {
+                None
+            }
+        })
+        .unwrap_or_default();
+    GanttModel::new(c.title, mode)
+}

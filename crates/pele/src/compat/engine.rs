@@ -169,6 +169,58 @@ struct Registration {
     descriptor: ModuleDescriptor,
     module: Box<dyn ErasedModule>,
 }
+/// Shared source preparation. The chosen registration and policy are captured
+/// before either the typed parser or an opted-in public parser consumes input.
+pub(crate) enum ParseAdmission {
+    Legacy,
+    Source(SourceLimit),
+    Limits(ParseLimits),
+}
+pub(crate) struct ParsePlan {
+    registration: Arc<Registration>,
+    source: String,
+    config: Object,
+    title: Option<String>,
+    line_offset: usize,
+    max_edges: usize,
+    edge_limit: Option<EdgeLimit>,
+}
+impl ParsePlan {
+    pub(crate) fn diagram_type(&self) -> &DiagramId {
+        &self.registration.descriptor.id
+    }
+    pub(crate) fn context(&self) -> ParseContext<'_> {
+        ParseContext {
+            source: &self.source,
+            config: &self.config,
+            title: self.title.as_deref(),
+            line_offset: self.line_offset,
+            max_edges: self.max_edges,
+        }
+    }
+    pub(crate) fn edge_limit(&self) -> Option<EdgeLimit> {
+        self.edge_limit
+    }
+    pub(crate) fn into_config(self) -> Object {
+        self.config
+    }
+    pub(crate) fn parse(self) -> Result<ParsedDocument, PeleError> {
+        let model = match self.edge_limit {
+            Some(limit) => self
+                .registration
+                .module
+                .parse_with_edge_limit(self.context(), limit),
+            None => self.registration.module.parse(self.context()),
+        }?;
+        Ok(ParsedDocument {
+            registration: self.registration,
+            model,
+            config: self.config,
+            edge_limit: self.edge_limit,
+            prepared: false,
+        })
+    }
+}
 /// Immutable document with exact registration/config. Cannot be fabricated from JSON.
 pub struct ParsedDocument {
     registration: Arc<Registration>,
@@ -485,10 +537,54 @@ impl Engine {
         max_edges: usize,
         edge_limit: Option<EdgeLimit>,
     ) -> Result<ParsedDocument, PeleError> {
+        self.prepare_inspected(inspection, Some(id), max_edges, edge_limit)?
+            .parse()
+    }
+    /// Internal preparation seam shared by native typed/public entry points.
+    /// Raw prepared parsing retains its existing borrowed-input path.
+    pub(crate) fn prepare_parse(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        selected: Option<&DiagramId>,
+        admission: ParseAdmission,
+    ) -> Result<ParsePlan, PeleError> {
+        let (inspection, edge_limit) = match admission {
+            ParseAdmission::Legacy => (self.inspect(source, &options.preparation)?, None),
+            ParseAdmission::Source(limit) => (
+                self.inspect_with_source_limit(source, &options.preparation, limit)?,
+                None,
+            ),
+            ParseAdmission::Limits(limits) => (
+                self.inspect_with_limits(source, options, limits)?,
+                limits.max_edges,
+            ),
+        };
+        self.prepare_inspected(inspection, selected, options.max_edges, edge_limit)
+    }
+    fn prepare_inspected(
+        &self,
+        inspection: Inspection,
+        selected: Option<&DiagramId>,
+        max_edges: usize,
+        edge_limit: Option<EdgeLimit>,
+    ) -> Result<ParsePlan, PeleError> {
+        let id = match selected {
+            Some(id) => id.clone(),
+            None => inspection
+                .diagram_type
+                .ok_or_else(|| {
+                    PeleError::new(
+                        "No diagram type detected for the given text.",
+                        ErrorCode::UnsupportedDiagram,
+                    )
+                })?
+                .into(),
+        };
         let registration = self
             .modules
             .iter()
-            .find(|m| &m.descriptor.id == id)
+            .find(|m| m.descriptor.id == id)
             .ok_or_else(|| {
                 let mut error = PeleError::new(
                     format!("Diagram type \"{id}\" is not supported yet."),
@@ -505,23 +601,14 @@ impl Engine {
             inspection.encoded_text
         };
         source.push('\n');
-        let context = ParseContext {
-            source: &source,
-            config: &pre.config,
-            title: pre.title.as_deref(),
+        Ok(ParsePlan {
+            registration,
+            source,
+            config: pre.config,
+            title: pre.title,
             line_offset: pre.line_offset,
             max_edges,
-        };
-        let model = match edge_limit {
-            Some(limit) => registration.module.parse_with_edge_limit(context, limit),
-            None => registration.module.parse(context),
-        }?;
-        Ok(ParsedDocument {
-            registration,
-            model,
-            config: pre.config,
             edge_limit,
-            prepared: false,
         })
     }
     /// Parse an already-prepared diagram source verbatim. No source limit,

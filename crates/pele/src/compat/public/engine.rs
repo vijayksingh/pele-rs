@@ -2,6 +2,7 @@ use super::{
     schema::CompiledSchema, Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph,
     ModelSchema, ModelSchemaView, PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
+use crate::compat::engine::{ParseAdmission, ParsePlan};
 use crate::compat::{
     DiagramId, DiagramModule, EdgeLimit, Engine, ErrorCode, ModuleDescriptor, Object, OutputLimit,
     ParseContext, ParseLimits, ParseOptions, PeleError, RenderOptions, RenderResources,
@@ -34,6 +35,19 @@ pub trait PublicDiagramModule: DiagramModule {
         _host: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
         Err(PeleError::new("Public model methods are unavailable", ErrorCode::Semantic).into())
+    }
+    /// Optional eager parser for fresh public state. Returning None leaves the
+    /// established typed-parse/create sequence intact. An implementation must
+    /// preserve all parse errors, admission limits and final public behavior;
+    /// it may not publish state or invoke host code before returning None.
+    /// Only ordinary textual parse calls use this hook; raw prepared input and
+    /// adaptation of existing typed models retain their existing interfaces.
+    fn try_parse_public(
+        &self,
+        _context: ParseContext<'_>,
+        _edge_limit: Option<EdgeLimit>,
+    ) -> Option<Result<Self::PublicState, PeleError>> {
+        None
     }
     fn create_public(&self, model: &Self::Model) -> Result<Self::PublicState, PeleError>;
     /// Construct this module's real mutable state directly from a caller arena.
@@ -231,6 +245,11 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
 }
 type State = Box<dyn Any + Send>;
 trait Erased: Send + Sync {
+    fn try_parse_public(
+        &self,
+        context: ParseContext<'_>,
+        edge_limit: Option<EdgeLimit>,
+    ) -> Option<Result<State, PeleError>>;
     fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError>;
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
@@ -276,6 +295,15 @@ trait Erased: Send + Sync {
 }
 struct Codec<D>(Arc<D>);
 impl<D: PublicDiagramModule> Erased for Codec<D> {
+    fn try_parse_public(
+        &self,
+        context: ParseContext<'_>,
+        edge_limit: Option<EdgeLimit>,
+    ) -> Option<Result<State, PeleError>> {
+        self.0
+            .try_parse_public(context, edge_limit)
+            .map(|result| result.map(|state| Box::new(state) as State))
+    }
     fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError> {
         let model = doc.model::<D::Model>().expect("paired public codec");
         if doc.is_prepared() {
@@ -497,7 +525,10 @@ impl PublicEngine {
         }
     }
     pub fn parse(&self, source: &str, options: &ParseOptions) -> Result<PublicDocument, PeleError> {
-        self.create_document(self.engine.parse(source, options)?)
+        self.parse_plan(
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Legacy)?,
+        )
     }
     /// Parse through the retained native codec with an exact number-valued
     /// source limit. Only the legacy source limit is overridden.
@@ -507,10 +538,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limit: SourceLimit,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(
-            self.engine
-                .parse_with_source_limit(source, options, limit)?,
-        )
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            None,
+            ParseAdmission::Source(limit),
+        )?)
     }
     pub fn parse_with_limits(
         &self,
@@ -518,7 +551,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limits: ParseLimits,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(self.engine.parse_with_limits(source, options, limits)?)
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            None,
+            ParseAdmission::Limits(limits),
+        )?)
     }
     pub fn parse_prepared_as(
         &self,
@@ -552,10 +590,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limits: ParseLimits,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(
-            self.engine
-                .parse_as_with_limits(id, source, options, limits)?,
-        )
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            Some(id),
+            ParseAdmission::Limits(limits),
+        )?)
     }
     /// Select an extension language without changing the built-in source detector.
     pub fn parse_as(
@@ -564,7 +604,12 @@ impl PublicEngine {
         source: &str,
         options: &ParseOptions,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(self.engine.parse_as(id, source, options)?)
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            Some(id),
+            ParseAdmission::Legacy,
+        )?)
     }
     /// Select an extension while keeping the public byte budget and exact
     /// source comparison, without changing the extension's ParseContext shape.
@@ -575,10 +620,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limit: SourceLimit,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(
-            self.engine
-                .parse_as_with_source_limit(id, source, options, limit)?,
-        )
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            Some(id),
+            ParseAdmission::Source(limit),
+        )?)
     }
     /// Schema for an explicitly selected registered provider, without parsing.
     pub fn schema_for(&self, id: &DiagramId) -> Result<ModelSchemaView, PeleError> {
@@ -620,6 +667,35 @@ impl PublicEngine {
             config,
             revision: 0,
         })
+    }
+    fn parse_plan(&self, plan: ParsePlan) -> Result<PublicDocument, PeleError> {
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        match registration
+            .codec
+            .try_parse_public(plan.context(), plan.edge_limit())
+        {
+            Some(result) => {
+                let state = result?;
+                ModelSchemaView {
+                    model: registration.schema,
+                    shared_functions: registration.shared_functions,
+                    function_shapes: registration.function_shapes,
+                }
+                .validate()?;
+                Ok(PublicDocument {
+                    registration,
+                    state,
+                    config: plan.into_config(),
+                    revision: 0,
+                })
+            }
+            None => self.create_document(plan.parse()?),
+        }
     }
     fn create_document(
         &self,

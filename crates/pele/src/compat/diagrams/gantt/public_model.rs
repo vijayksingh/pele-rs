@@ -1894,31 +1894,8 @@ impl Context<'_> {
             properties: vec![],
         })?;
         let Atom::Ref(id) = array else { unreachable!() };
-        for (index, value) in values.into_iter().enumerate() {
-            // Preserve push's read("push"), own("push"), own("length") and
-            // set(index) charges, including the length check between 3 and 4.
-            // The original first property index is empty and charges zero.
-            self.tick(1)?;
-            self.tick(1)?;
-            self.tick(1)?;
-            if index >= 1_000_000 {
-                return Err(limit().into());
-            }
-            self.tick(1)?;
-            let Atom::String(key) = self.text(&index.to_string())? else {
-                unreachable!()
-            };
-            self.room(1)?;
-            let Node::Array { length, properties } = &mut self.g.nodes[id as usize] else {
-                unreachable!()
-            };
-            properties.push(Property {
-                key,
-                value,
-                flags: 7,
-            });
-            *length = (index + 1) as u32;
-            self.changed(id);
+        for value in values {
+            self.initial_push(id, value)?;
         }
         Ok(Atom::Ref(id))
     }
@@ -2013,62 +1990,73 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
             entries: links,
             properties: vec![],
         })?;
-        let root = c.initial_object(Some(PROTO))?;
-        let mut fields = Vec::with_capacity(ROOT_FIELDS.len());
-        fields.push(("type", c.text("gantt")?));
-        for (k, v) in [
-            ("title", m.title.as_deref()),
-            ("accTitle", m.acc_title.as_deref()),
-            ("accDescr", m.acc_descr.as_deref()),
-        ] {
-            fields.push((k, c.optional_text(v)?));
-        }
-        fields.extend([
-            ("dateFormat", c.text(&m.date_format)?),
-            ("axisFormat", c.text(&m.axis_format)?),
-            ("tickInterval", c.optional_text(m.tick_interval.as_deref())?),
-            ("todayMarker", c.text(&m.today_marker)?),
-            ("includes", c.initial_strings_array(&m.includes)?),
-            ("excludes", c.initial_strings_array(&m.excludes)?),
-            ("inclusiveEndDates", Atom::Bool(m.inclusive_end_dates)),
-            ("topAxis", Atom::Bool(m.top_axis)),
-            ("displayMode", c.text(&m.display_mode)?),
-            ("weekday", c.optional_text(m.weekday.as_deref())?),
-            ("weekend", c.text(&m.weekend)?),
-            ("sections", c.initial_strings_array(&m.sections)?),
-            ("links", links),
-            ("tasks", tasks),
-            ("byId", by_id),
-        ]);
-        let (section, count, order, last) = m.public_builder_state();
-        let options = c.initial_record([].into_iter())?;
-        fields.extend([
-            ("currentSection", c.text(section)?),
-            ("taskCount", Atom::Number(count as f64)),
-            ("lastOrder", Atom::Number(order as f64)),
-            ("lastTaskId", c.optional_text(last)?),
-            ("options", options),
-            ("now", Atom::Number(m.now)),
-            ("work", Atom::Number(m.work)),
-        ]);
-        let (includes, excludes, days, dated) = m.public_schedule_cache();
-        for (k, values) in [("includeSet", includes), ("excludeSet", excludes)] {
-            let values = values.iter().map(|s| c.text(s)).collect::<Result<_, _>>()?;
-            let set = c.node(Node::Set {
-                values,
-                properties: vec![],
-            })?;
-            fields.push((k, set));
-        }
-        let days = c.initial_array(days.into_iter().map(Atom::Bool).collect())?;
-        fields.extend([("excludedDays", days), ("datedTokens", Atom::Bool(dated))]);
-        let root = c.finish_initial_object(root, fields.into_iter())?;
-        c.g.root = root;
+        finish_initial_root(&mut c, m, tasks, by_id, links, m.public_builder_state())?;
         Ok(())
     })();
     result.map_err(legacy_error)?;
     graph.validate_schema(&SCHEMA)?;
     Ok(graph)
+}
+fn finish_initial_root(
+    c: &mut Context<'_>,
+    m: &GanttModel,
+    tasks: Atom,
+    by_id: Atom,
+    links: Atom,
+    builder: (&str, usize, usize, Option<&str>),
+) -> Result<(), PublicError> {
+    let root = c.initial_object(Some(PROTO))?;
+    let mut fields = Vec::with_capacity(ROOT_FIELDS.len());
+    fields.push(("type", c.text("gantt")?));
+    for (k, v) in [
+        ("title", m.title.as_deref()),
+        ("accTitle", m.acc_title.as_deref()),
+        ("accDescr", m.acc_descr.as_deref()),
+    ] {
+        fields.push((k, c.optional_text(v)?));
+    }
+    fields.extend([
+        ("dateFormat", c.text(&m.date_format)?),
+        ("axisFormat", c.text(&m.axis_format)?),
+        ("tickInterval", c.optional_text(m.tick_interval.as_deref())?),
+        ("todayMarker", c.text(&m.today_marker)?),
+        ("includes", c.initial_strings_array(&m.includes)?),
+        ("excludes", c.initial_strings_array(&m.excludes)?),
+        ("inclusiveEndDates", Atom::Bool(m.inclusive_end_dates)),
+        ("topAxis", Atom::Bool(m.top_axis)),
+        ("displayMode", c.text(&m.display_mode)?),
+        ("weekday", c.optional_text(m.weekday.as_deref())?),
+        ("weekend", c.text(&m.weekend)?),
+        ("sections", c.initial_strings_array(&m.sections)?),
+        ("links", links),
+        ("tasks", tasks),
+        ("byId", by_id),
+    ]);
+    let (section, count, order, last) = builder;
+    let options = c.initial_record([].into_iter())?;
+    fields.extend([
+        ("currentSection", c.text(section)?),
+        ("taskCount", Atom::Number(count as f64)),
+        ("lastOrder", Atom::Number(order as f64)),
+        ("lastTaskId", c.optional_text(last)?),
+        ("options", options),
+        ("now", Atom::Number(m.now)),
+        ("work", Atom::Number(m.work)),
+    ]);
+    let (includes, excludes, days, dated) = m.public_schedule_cache();
+    for (k, values) in [("includeSet", includes), ("excludeSet", excludes)] {
+        let values = values.iter().map(|s| c.text(s)).collect::<Result<_, _>>()?;
+        let set = c.node(Node::Set {
+            values,
+            properties: vec![],
+        })?;
+        fields.push((k, set));
+    }
+    let days = c.initial_array(days.into_iter().map(Atom::Bool).collect())?;
+    fields.extend([("excludedDays", days), ("datedTokens", Atom::Bool(dated))]);
+    let root = c.finish_initial_object(root, fields.into_iter())?;
+    c.g.root = root;
+    Ok(())
 }
 fn legacy_error(error: PublicError) -> PeleError {
     match error {
@@ -3008,6 +2996,14 @@ fn imported(
 }
 impl PublicDiagramModule for Gantt {
     type PublicState = GanttPublicState;
+    fn try_parse_public(
+        &self,
+        context: ParseContext<'_>,
+        _edge_limit: Option<crate::compat::EdgeLimit>,
+    ) -> Option<Result<Self::PublicState, PeleError>> {
+        try_parse_public_direct(context)
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
@@ -3161,4 +3157,253 @@ fn decode_link(link: &str) -> Result<String, PublicError> {
             Err(error.into())
         }
     }
+}
+
+// Ordinary source parsing can construct its final public records without an
+// owned Vec<GanttTask>. Imported/typed/prepared documents keep their old paths.
+struct DirectParse<'a> {
+    c: Context<'a>,
+    header: GanttModel,
+    tasks: Vec<Atom>,
+    by_id: Vec<(Atom, Atom)>,
+    latest: HashMap<u32, (usize, u32)>,
+    links: Vec<(u32, String)>,
+    generated: usize,
+    order: usize,
+    previous: Option<u32>,
+    storage_failed: bool,
+}
+impl Context<'_> {
+    fn initial_push(&mut self, id: u32, value: Atom) -> Result<(), PublicError> {
+        let index = match &self.g.nodes[id as usize] {
+            Node::Array { length, .. } => *length as usize,
+            _ => unreachable!("private fresh array handle"),
+        };
+        self.tick(1)?;
+        self.tick(1)?;
+        self.tick(1)?;
+        if index >= 1_000_000 {
+            return Err(limit().into());
+        }
+        self.tick(1)?;
+        let Atom::String(key) = self.text(&index.to_string())? else {
+            unreachable!()
+        };
+        self.room(1)?;
+        let Node::Array { length, properties } = &mut self.g.nodes[id as usize] else {
+            unreachable!()
+        };
+        properties.push(Property {
+            key,
+            value,
+            flags: 7,
+        });
+        *length = (index + 1) as u32;
+        self.changed(id);
+        Ok(())
+    }
+    fn initial_text_id(&self, value: &str) -> Option<u32> {
+        let mut buffer = [0; 64];
+        match JsString::short_utf16(value, &mut buffer) {
+            Some(units) => self.strings.get(units).copied(),
+            None => self.strings.get(&JsString::from(value)).copied(),
+        }
+    }
+}
+impl parser::Target for DirectParse<'_> {
+    fn header(&mut self) -> &mut GanttModel {
+        &mut self.header
+    }
+    fn add_task(&mut self, text: String, data: String) -> Result<(), PeleError> {
+        let declaration = model::task_declaration(&text, &data)?;
+        let generated;
+        let id_text = match declaration.id {
+            Some(id) => id,
+            None => {
+                self.generated += 1;
+                generated = format!("task{}", self.generated);
+                &generated
+            }
+        };
+        let order = if declaration.vert {
+            -1
+        } else {
+            let order = self.order as isize;
+            self.order += 1;
+            order
+        };
+        let result = (|| -> Result<(), PublicError> {
+            let raw_data = self.c.text(&data)?;
+            let raw_start = self.c.optional_text(declaration.start)?;
+            let raw_end = self.c.text(declaration.end)?;
+            let raw = self.c.initial_record(
+                [("data", raw_data), ("start", raw_start), ("end", raw_end)].into_iter(),
+            )?;
+            let id = self.c.text(id_text)?;
+            let Atom::String(string_id) = id else {
+                unreachable!()
+            };
+            let task = self.c.text(&text)?;
+            let section = self.c.text(self.header.public_builder_state().0)?;
+            let classes = self.c.initial_array(vec![])?;
+            let Atom::Ref(classes_id) = classes else {
+                unreachable!()
+            };
+            let record = self.c.initial_record(
+                [
+                    ("id", id.clone()),
+                    ("task", task),
+                    ("section", section),
+                    ("startTime", Atom::Undefined),
+                    ("endTime", Atom::Undefined),
+                    ("renderEndTime", Atom::Null),
+                    ("manualEndTime", Atom::Bool(false)),
+                    ("processed", Atom::Bool(false)),
+                    ("active", Atom::Bool(declaration.active)),
+                    ("done", Atom::Bool(declaration.done)),
+                    ("crit", Atom::Bool(declaration.crit)),
+                    ("milestone", Atom::Bool(declaration.milestone)),
+                    ("vert", Atom::Bool(declaration.vert)),
+                    ("order", Atom::Number(order as f64)),
+                    ("classes", classes),
+                    (
+                        "prevTaskId",
+                        self.previous.map_or(Atom::Undefined, Atom::String),
+                    ),
+                    ("raw", raw),
+                ]
+                .into_iter(),
+            )?;
+            if let Some((position, _)) = self.latest.get(&string_id).copied() {
+                self.by_id[position].1 = record.clone();
+                self.latest.insert(string_id, (position, classes_id));
+            } else {
+                self.latest
+                    .insert(string_id, (self.by_id.len(), classes_id));
+                self.by_id.push((id, record.clone()));
+            }
+            self.tasks.push(record);
+            self.previous = Some(string_id);
+            Ok(())
+        })();
+        result.map_err(|error| {
+            self.storage_failed = true;
+            legacy_error(error)
+        })
+    }
+    fn class(&mut self, ids: &str) -> Result<(), PeleError> {
+        let result = (|| -> Result<(), PublicError> {
+            for name in ids.split(',') {
+                let Some(id) = self.c.initial_text_id(name) else {
+                    continue;
+                };
+                if let Some((_, classes)) = self.latest.get(&id).copied() {
+                    let clickable = self.c.text("clickable")?;
+                    self.c.initial_push(classes, clickable)?;
+                }
+            }
+            Ok(())
+        })();
+        result.map_err(|error| {
+            self.storage_failed = true;
+            legacy_error(error)
+        })
+    }
+    fn link(&mut self, ids: &str, url: &str) -> Result<(), PeleError> {
+        // Sanitize before checking task existence, exactly as the typed model.
+        let href = crate::compat::source::url::safe_url(url)?;
+        for name in ids.split(',') {
+            let Some(id) = self.c.initial_text_id(name) else {
+                continue;
+            };
+            if self.latest.contains_key(&id) {
+                if let Some((_, value)) = self.links.iter_mut().find(|(key, _)| *key == id) {
+                    *value = href.clone();
+                } else {
+                    self.links.push((id, href.clone()));
+                }
+            }
+        }
+        self.class(ids)
+    }
+}
+impl DirectParse<'_> {
+    fn finish(mut self) -> Result<(), PublicError> {
+        let by_id = self.c.node(Node::Map {
+            entries: self.by_id,
+            properties: vec![],
+        })?;
+        let tasks = self.c.initial_array(self.tasks)?;
+        let links = self
+            .links
+            .iter()
+            .map(|(id, value)| Ok((Atom::String(*id), self.c.text(value)?)))
+            .collect::<Result<Vec<_>, PublicError>>()?;
+        let links = self.c.node(Node::Map {
+            entries: links,
+            properties: vec![],
+        })?;
+        // Source strings are UTF8; this only recovers one last-task scalar for
+        // the shared root layout. No per-task UTF16->UTF8 reconstruction.
+        let last = self.previous.map(|id| {
+            String::from_utf16(&self.c.g.strings[id as usize].0).expect("source text is UTF8")
+        });
+        let section = self.header.public_builder_state().0;
+        finish_initial_root(
+            &mut self.c,
+            &self.header,
+            tasks,
+            by_id,
+            links,
+            (section, self.generated, self.order, last.as_deref()),
+        )?;
+        // Conservative interior of every historical construction budget. Close
+        // to a boundary, the caller executes the exact legacy constructor.
+        if self.c.g.nodes.len() > 100_000
+            || self.c.g.strings.len() > 100_000
+            || self.c.refs > 1_000_000
+            || self.c.units > 4_000_000
+            || self.c.work > 10_000_000
+        {
+            return Err(limit().into());
+        }
+        Ok(())
+    }
+}
+fn try_parse_public_direct(
+    context: ParseContext<'_>,
+) -> Option<Result<GanttPublicState, PeleError>> {
+    let mut graph = ModelGraph {
+        version: 1,
+        root: Atom::Undefined,
+        strings: vec![],
+        nodes: vec![],
+    };
+    let mut target = DirectParse {
+        c: Context::new(&mut graph),
+        header: parse_header(&context),
+        tasks: vec![],
+        by_id: vec![],
+        latest: HashMap::new(),
+        links: vec![],
+        generated: 0,
+        order: 0,
+        previous: None,
+        storage_failed: false,
+    };
+    if let Err(error) = parser::parse_into(context.source, &mut target) {
+        return if target.storage_failed {
+            None
+        } else {
+            Some(Err(error))
+        };
+    }
+    if target.finish().is_err() {
+        return None;
+    }
+    Some(
+        graph
+            .validate_schema(&SCHEMA)
+            .map(|()| GanttPublicState { graph }),
+    )
 }

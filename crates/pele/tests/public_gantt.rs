@@ -44,38 +44,48 @@ fn reference(value: &Atom) -> u32 {
 
 #[test]
 fn gantt_construction_preserves_complete_native_arena_representation() {
-    // Pin even unreachable nodes, intern order and bit patterns. The historical
-    // Pele corpus below separately checks observable methods and rendering.
+    // Typed adaptation retains its original storage layout. Direct parsing may
+    // choose fresh opaque IDs; freeze that layout separately, never renumber a
+    // live/imported graph. The independent corpus checks Pele behavior.
     let fixture: Json = serde_json::from_str(include_str!(
         "../../../fixtures/pele/gantt-construction.json"
     ))
     .unwrap();
-    let engine = PublicEngine::with_builtins();
+    let typed_engine = Engine::with_builtins();
+    let public_engine = PublicEngine::with_builtins();
     for case in fixture["cases"].as_array().unwrap() {
         let options: RenderOptions = serde_json::from_value(case["options"].clone()).unwrap();
-        let document = engine
-            .parse(case["source"].as_str().unwrap(), &options.parse)
-            .unwrap();
-        let graph = document.snapshot().unwrap();
-        let binary = pele::compat::public::encode_binary_exchange(
-            0,
-            &graph,
-            b"",
-            pele::compat::public::DEFAULT_BINARY_BUDGET,
+        let source = case["source"].as_str().unwrap();
+        let typed = typed_engine.parse(source, &options.parse).unwrap();
+        let adapted = PublicDocument::from_module(
+            Gantt,
+            typed.model::<GanttModel>().unwrap(),
+            typed.config().clone(),
         )
         .unwrap();
-        assert_eq!(graph.nodes.len(), case["nodes"].as_u64().unwrap() as usize);
-        assert_eq!(
-            graph.strings.len(),
-            case["strings"].as_u64().unwrap() as usize
-        );
-        assert_eq!(binary.len(), case["binaryBytes"].as_u64().unwrap() as usize);
-        assert_eq!(
-            format!("{:x}", Sha256::digest(&binary)),
-            case["graphSHA256"].as_str().unwrap(),
-            "complete arena differs for {}",
-            case["id"]
-        );
+        let direct = public_engine.parse(source, &options.parse).unwrap();
+        for (document, expected) in [(adapted, "graphSHA256"), (direct, "directGraphSHA256")] {
+            let graph = document.snapshot().unwrap();
+            let binary = pele::compat::public::encode_binary_exchange(
+                0,
+                &graph,
+                b"",
+                pele::compat::public::DEFAULT_BINARY_BUDGET,
+            )
+            .unwrap();
+            assert_eq!(graph.nodes.len(), case["nodes"].as_u64().unwrap() as usize);
+            assert_eq!(
+                graph.strings.len(),
+                case["strings"].as_u64().unwrap() as usize
+            );
+            assert_eq!(binary.len(), case["binaryBytes"].as_u64().unwrap() as usize);
+            assert_eq!(
+                format!("{:x}", Sha256::digest(&binary)),
+                case[expected].as_str().unwrap(),
+                "complete arena differs for {} {expected}",
+                case["id"]
+            );
+        }
     }
 }
 #[test]

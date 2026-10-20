@@ -37,6 +37,30 @@ fn starts(t: T) -> bool {
             | T::weekend_saturday
     )
 }
+pub(super) trait Target {
+    fn header(&mut self) -> &mut GanttModel;
+    fn add_task(&mut self, text: String, data: String) -> Result<(), PeleError>;
+    fn class(&mut self, ids: &str) -> Result<(), PeleError>;
+    fn link(&mut self, ids: &str, url: &str) -> Result<(), PeleError>;
+}
+impl Target for GanttModel {
+    fn header(&mut self) -> &mut GanttModel {
+        self
+    }
+    fn add_task(&mut self, text: String, data: String) -> Result<(), PeleError> {
+        GanttModel::add_task(self, text, data)
+    }
+    fn class(&mut self, ids: &str) -> Result<(), PeleError> {
+        GanttModel::class(self, ids);
+        Ok(())
+    }
+    fn link(&mut self, ids: &str, url: &str) -> Result<(), PeleError> {
+        GanttModel::link(self, ids, url)
+    }
+}
+pub fn parse(source: &str, db: &mut GanttModel) -> Result<(), PeleError> {
+    parse_into(source, db)
+}
 struct Reader<'a> {
     source: &'a str,
     tokens: Vec<Token>,
@@ -85,7 +109,7 @@ impl Reader<'_> {
         Ok(self.take())
     }
 }
-pub fn parse(source: &str, db: &mut GanttModel) -> Result<(), PeleError> {
+pub(super) fn parse_into(source: &str, db: &mut impl Target) -> Result<(), PeleError> {
     let mut r = Reader {
         source,
         tokens: tokenize(source),
@@ -114,14 +138,14 @@ pub fn parse(source: &str, db: &mut GanttModel) -> Result<(), PeleError> {
                 })?;
                 r.end("")?;
                 if t == T::acc_title {
-                    db.acc_title = Some(value.trim_matches(space).into())
+                    db.header().acc_title = Some(value.trim_matches(space).into())
                 } else {
-                    db.acc_descr = Some(description(value.trim_matches(space)))
+                    db.header().acc_descr = Some(description(value.trim_matches(space)))
                 }
             }
             T::acc_descr_multiline_value => {
                 r.end("")?;
-                db.acc_descr = Some(description(text.trim_matches(space)))
+                db.header().acc_descr = Some(description(text.trim_matches(space)))
             }
             T::taskTxt => {
                 let data = r.expect(T::taskData)?;
@@ -167,7 +191,7 @@ pub fn parse(source: &str, db: &mut GanttModel) -> Result<(), PeleError> {
                     return Err(r.fail("'callbackname', 'href'"));
                 }
                 if name {
-                    db.class(&text)
+                    db.class(&text)?
                 }
                 if let Some(href) = href {
                     db.link(&text, &href)?
@@ -176,20 +200,20 @@ pub fn parse(source: &str, db: &mut GanttModel) -> Result<(), PeleError> {
             _ => {
                 r.end("")?;
                 match t {
-                    T::dateFormat => db.date_format = cut(&text, 11),
-                    T::inclusiveEndDates => db.inclusive_end_dates = true,
-                    T::topAxis => db.top_axis = true,
-                    T::axisFormat => db.axis_format = cut(&text, 11),
-                    T::tickInterval => db.tick_interval = Some(cut(&text, 13)),
-                    T::excludes => GanttModel::tokens(&mut db.excludes, &cut(&text, 9)),
-                    T::includes => GanttModel::tokens(&mut db.includes, &cut(&text, 9)),
-                    T::todayMarker => db.today_marker = cut(&text, 12),
-                    T::weekend_friday => db.weekend = "friday".into(),
-                    T::weekend_saturday => db.weekend = "saturday".into(),
-                    T::title => db.title = Some(cut(&text, 6)),
-                    T::section => db.add_section(cut(&text, 8)),
+                    T::dateFormat => db.header().date_format = cut(&text, 11),
+                    T::inclusiveEndDates => db.header().inclusive_end_dates = true,
+                    T::topAxis => db.header().top_axis = true,
+                    T::axisFormat => db.header().axis_format = cut(&text, 11),
+                    T::tickInterval => db.header().tick_interval = Some(cut(&text, 13)),
+                    T::excludes => GanttModel::tokens(&mut db.header().excludes, &cut(&text, 9)),
+                    T::includes => GanttModel::tokens(&mut db.header().includes, &cut(&text, 9)),
+                    T::todayMarker => db.header().today_marker = cut(&text, 12),
+                    T::weekend_friday => db.header().weekend = "friday".into(),
+                    T::weekend_saturday => db.header().weekend = "saturday".into(),
+                    T::title => db.header().title = Some(cut(&text, 6)),
+                    T::section => db.header().add_section(cut(&text, 8)),
                     _ => {
-                        db.weekday = Some(
+                        db.header().weekday = Some(
                             [
                                 "monday",
                                 "tuesday",
