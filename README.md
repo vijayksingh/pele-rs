@@ -179,7 +179,7 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 complete release-gate run, historical source `0b32797`, fails all 126 conditions.
 New scoped diagnostics do not replace that gate.
 
-The latest source-backed mutable-model candidate, [`ee114c0`](docs/benchmarks/2026-10-20-er-host-storage/source-logical-batching/), is **rejected for performance**: Sankey parse is 18.78–28.91% slower than the preceding best checkpoint and 7.03–17.82× JS; retained rendering is 36.39–46.87% slower. All 24 rows, adverse controls and fresh Swift/C/API checks are recorded. The [initial source-backed candidate](docs/benchmarks/2026-10-20-er-host-storage/source-canonical-rejected/) and its CPU profiles are preserved too. Work continues on repeated native validation and publication costs.
+The latest measured candidate, [`b7aa24d`](docs/benchmarks/2026-10-20-er-host-storage/source-admission-receipts/), is **rejected for performance**: Sankey parse is 4.92–20.09% slower than the preceding best checkpoint and 11.18–17.49× JS; retained rendering is 18.33–24.70% slower. All 24 rows, adverse controls and fresh Swift/C/API checks are recorded. The [initial source-backed candidate](docs/benchmarks/2026-10-20-er-host-storage/source-canonical-rejected/), its CPU profiles and [bounded batching candidate](docs/benchmarks/2026-10-20-er-host-storage/source-logical-batching/) remain preserved. Work continues on immutable-layout transfer and publication costs.
 
 The preceding default checkpoint appends Sankey SVG directly into existing paint buffers,
 sharing exact numeric/escaping rules with the other renderers. [Matched VM and
