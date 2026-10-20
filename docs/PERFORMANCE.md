@@ -5,6 +5,11 @@ run locally on macOS because the VM cannot supply the macOS/AppKit SDK.
 
 **The Rust/WASM API is currently slower than Pele JS on the measured workloads.**
 
+The [result-transport follow-up](benchmarks/2026-10-20-er-host-storage/result-packet/README.md)
+removes the successful SVG JSON round trip. Retained ER improves 9.4–14.9% in
+paired VM medians against the preceding host artifact, with 19–21 faster trials
+per condition, but remains 4.4–6.3× JS. Parse/source controls are mixed.
+
 The [caller-owned ER follow-up](benchmarks/2026-10-20-er-host-storage/raw/README.md)
 removes its redundant graph conversions and passes focused callback checks, but
 independent VM repeated raw rendering regresses 71–88% against the preceding

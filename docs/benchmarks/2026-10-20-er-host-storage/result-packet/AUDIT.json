@@ -1,0 +1,408 @@
+{
+  "status": "passed frozen evidence audit; no new execution",
+  "evidenceRoot": "docs/benchmarks/2026-10-20-er-host-storage/result-packet",
+  "inputSHA256": {
+    "comparison.json": "7c63eaaf3fd32fd76a715a270230845f20d0a470437d6fedf7f44fc29a2e623d",
+    "source-freeze.json": "bd2f06579e8e007cd06a1c69bcf15c614340e80ad85eeb3c3712fb502a5ef95a",
+    "evidence-index.json": "115c20660b92c10c025a6e392fae0b29236f0f8ce18e3470d540eb653dfb43d2",
+    "paired-summary.json": "4ae377e59a840db8e88ae77ee75df67b8a707e15caa5a7f2b02b69db3b1c2d6f"
+  },
+  "archiveRecordsVerified": 41,
+  "sourceCommit": "7339f38ceb282f242bc851b2570c586bdea541ca",
+  "gitBackedInputsVerified": 444,
+  "nativeSwiftSDKInputsVerified": 351,
+  "completePackageFilesPerLane": 106,
+  "changedPackagePaths": [
+    "full.js",
+    "host-er-store.js",
+    "pkg/pele.d.ts",
+    "pkg/pele.js",
+    "pkg/pele_bg.wasm",
+    "pkg/pele_bg.wasm.d.ts"
+  ],
+  "conditions": 24,
+  "trialsPerLanePerCondition": 21,
+  "timedBatchSamples": 1512,
+  "retainedER": [
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.08406249433755875,
+        "control": 0.5974999964237213,
+        "candidate": 0.5287500023841858
+      },
+      "candidateOverControl": 0.8849372477806996,
+      "candidateOverJS": 6.289963277332144,
+      "pairedMedianPercentChange": -12.746906084050435,
+      "candidateWins": 20,
+      "trials": 21
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.10374999791383743,
+        "control": 0.5995312333106995,
+        "candidate": 0.5349999964237213
+      },
+      "candidateOverControl": 0.892363844781485,
+      "candidateOverJS": 5.156626575241279,
+      "pairedMedianPercentChange": -10.823527816074341,
+      "candidateWins": 20,
+      "trials": 21
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.4962499737739563,
+        "control": 2.9331250190734863,
+        "candidate": 2.59250009059906
+      },
+      "candidateOverControl": 0.8838696181514886,
+      "candidateOverJS": 5.224181818858803,
+      "pairedMedianPercentChange": -11.11351641621422,
+      "candidateWins": 21,
+      "trials": 21
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.5982812345027924,
+        "control": 3.0349998474121094,
+        "candidate": 2.879999876022339
+      },
+      "candidateOverControl": 0.9489291666614296,
+      "candidateOverJS": 4.81378941864321,
+      "pairedMedianPercentChange": -9.406354485048162,
+      "candidateWins": 20,
+      "trials": 21
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 2.0637500286102295,
+        "control": 11.737500190734863,
+        "candidate": 10.549999713897705
+      },
+      "candidateOverControl": 0.898828502020002,
+      "candidateOverJS": 5.112053091527895,
+      "pairedMedianPercentChange": -10.280777778029526,
+      "candidateWins": 21,
+      "trials": 21
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 2.5356249809265137,
+        "control": 12.880000114440918,
+        "candidate": 11.1899995803833
+      },
+      "candidateOverControl": 0.868788779577509,
+      "candidateOverJS": 4.413113005494405,
+      "pairedMedianPercentChange": -14.89109001537361,
+      "candidateWins": 19,
+      "trials": 21
+    }
+  ],
+  "adversePairedControls": [
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.028593748807907104,
+        "control": 0.07535155862569809,
+        "candidate": 0.07730469107627869
+      },
+      "candidateOverControl": 1.025920266099373,
+      "candidateOverJS": 2.7035521503532762,
+      "pairedMedianPercentChange": 2.1155922214421974,
+      "candidateWins": 10,
+      "trials": 21
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.011953122913837433,
+        "control": 0.15816406160593033,
+        "candidate": 0.1551171913743019
+      },
+      "candidateOverControl": 0.9807360142329945,
+      "candidateOverJS": 12.977126772011337,
+      "pairedMedianPercentChange": 0.8357315499133433,
+      "candidateWins": 9,
+      "trials": 21
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.11683593690395355,
+        "control": 0.2810937464237213,
+        "candidate": 0.2835937589406967
+      },
+      "candidateOverControl": 1.0088938745481975,
+      "candidateOverJS": 2.427281934443069,
+      "pairedMedianPercentChange": 1.4429207389287546,
+      "candidateWins": 9,
+      "trials": 21
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.06777343899011612,
+        "control": 0.7143750190734863,
+        "candidate": 0.7318750023841858
+      },
+      "candidateOverControl": 1.0244969138666078,
+      "candidateOverJS": 10.798847059995293,
+      "pairedMedianPercentChange": 3.062116319227748,
+      "candidateWins": 7,
+      "trials": 21
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.07179687917232513,
+        "control": 0.7240625023841858,
+        "candidate": 0.7259375154972076
+      },
+      "candidateOverControl": 1.0025895735614645,
+      "candidateOverJS": 10.11098983501539,
+      "pairedMedianPercentChange": 0.39796239676839207,
+      "candidateWins": 9,
+      "trials": 21
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.6704687476158142,
+        "control": 1.4524999856948853,
+        "candidate": 1.4581249952316284
+      },
+      "candidateOverControl": 1.0038726399945899,
+      "candidateOverJS": 2.174784433154742,
+      "pairedMedianPercentChange": 0.2600757119032071,
+      "candidateWins": 8,
+      "trials": 21
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.29624998569488525,
+        "control": 2.818750023841858,
+        "candidate": 2.816249966621399
+      },
+      "candidateOverControl": 0.9991130617474722,
+      "candidateOverJS": 9.506329460288718,
+      "pairedMedianPercentChange": 1.8725685552219984,
+      "candidateWins": 6,
+      "trials": 21
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.31562498211860657,
+        "control": 2.921875,
+        "candidate": 2.8350000381469727
+      },
+      "candidateOverControl": 0.9702673927347928,
+      "candidateOverJS": 8.982178847559117,
+      "pairedMedianPercentChange": 1.7496650694939442,
+      "candidateWins": 8,
+      "trials": 21
+    }
+  ],
+  "oppositeSignMedianVsPaired": [
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.024882815778255463,
+        "control": 0.07566405832767487,
+        "candidate": 0.07613281160593033
+      },
+      "candidateOverControl": 1.0061951908028175,
+      "candidateOverJS": 3.0596541920493214,
+      "pairedMedianPercentChange": -1.4529103262378218,
+      "candidateWins": 12,
+      "trials": 21
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.011953122913837433,
+        "control": 0.15816406160593033,
+        "candidate": 0.1551171913743019
+      },
+      "candidateOverControl": 0.9807360142329945,
+      "candidateOverJS": 12.977126772011337,
+      "pairedMedianPercentChange": 0.8357315499133433,
+      "candidateWins": 9,
+      "trials": 21
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.29624998569488525,
+        "control": 2.818750023841858,
+        "candidate": 2.816249966621399
+      },
+      "candidateOverControl": 0.9991130617474722,
+      "candidateOverJS": 9.506329460288718,
+      "pairedMedianPercentChange": 1.8725685552219984,
+      "candidateWins": 6,
+      "trials": 21
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.31562498211860657,
+        "control": 2.921875,
+        "candidate": 2.8350000381469727
+      },
+      "candidateOverControl": 0.9702673927347928,
+      "candidateOverJS": 8.982178847559117,
+      "pairedMedianPercentChange": 1.7496650694939442,
+      "candidateWins": 8,
+      "trials": 21
+    }
+  ],
+  "engines": [
+    {
+      "engine": "chromium",
+      "differentialPairs": 48,
+      "successPairs": 42,
+      "nanPackets": [
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        }
+      ],
+      "transportCountRecords": 96,
+      "errorLifecyclePairs": 14,
+      "byteGates": {
+        "envelopeRejectedBytes": 67108869,
+        "nativeSuccessBeforeGraphRejectionBytes": 67108863,
+        "ceiling": 67108864
+      }
+    },
+    {
+      "engine": "firefox",
+      "differentialPairs": 48,
+      "successPairs": 42,
+      "nanPackets": [
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        }
+      ],
+      "transportCountRecords": 96,
+      "byteGates": {
+        "envelopeRejectedBytes": 67108869,
+        "nativeSuccessBeforeGraphRejectionBytes": 67108863,
+        "ceiling": 67108864
+      },
+      "errorLifecyclePairs": 14
+    },
+    {
+      "engine": "webkit",
+      "errorLifecyclePairs": 14,
+      "byteGates": {
+        "envelopeRejectedBytes": 67108869,
+        "nativeSuccessBeforeGraphRejectionBytes": 67108863,
+        "ceiling": 67108864
+      },
+      "differentialPairs": 48,
+      "successPairs": 42,
+      "nanPackets": [
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        },
+        {
+          "width": "7ff8000000000000",
+          "height": "7ff8000000000000"
+        }
+      ],
+      "transportCountRecords": 96
+    }
+  ],
+  "fixtureVersions": {
+    "frozenAt7339": "c61f3987745fe148c917766c32cc36af07b49dffdacc64579b64c8c350124d1c",
+    "later4031": "bda1071b1724c228b79b8affa62ac1b4dadfb5f9c50f06db35f3ce7f85cc53d3",
+    "note": "Final9 artifacts prove strict overflow already. Freeze identifies7339 test;4031 is later test-only strict-overflow arithmetic, not claimed re-executed by this audit."
+  },
+  "limitations": [
+    "Ordinary shared-page VM diagnostic; no per-row quiet guard or individual trial-order records.",
+    "Paired improvements scoped to retainedER; controls mixed; not JS parity/release gate.",
+    "No new native/Swift timings; exact prior351-input equality only.",
+    "Initial raw zero-vs13 graph admission threshold remains unexecuted; result-envelope gates do not close it.",
+    "Nonempty ER links unreachable.",
+    "Full369 suite belongs to precedingraw source; packet has45 existing+9 final focused checks.",
+    "Current lexer/frame package intentionally not used as identity source."
+  ]
+}

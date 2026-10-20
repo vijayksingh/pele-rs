@@ -1,0 +1,271 @@
+{
+  "sourceCommit": "7339f38",
+  "testFollowupCommit": "4031a94",
+  "scope": "Successful ER output transport only; unreleased, no performance parity",
+  "records": [
+    {
+      "path": "comparison.json",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/comparison.json",
+      "sourceSha256": "7c63eaaf3fd32fd76a715a270230845f20d0a470437d6fedf7f44fc29a2e623d",
+      "archiveSha256": "7c63eaaf3fd32fd76a715a270230845f20d0a470437d6fedf7f44fc29a2e623d"
+    },
+    {
+      "path": "source-freeze.json",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/source-freeze.json",
+      "sourceSha256": "bd2f06579e8e007cd06a1c69bcf15c614340e80ad85eeb3c3712fb502a5ef95a",
+      "archiveSha256": "bd2f06579e8e007cd06a1c69bcf15c614340e80ad85eeb3c3712fb502a5ef95a"
+    },
+    {
+      "path": "REVIEW.md",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/REVIEW.md",
+      "sourceSha256": "ab9357b07c05c188a5ec3caa03fc48c3d6e26ae114b4bc8202fd6bd6f30d64df",
+      "archiveSha256": "ab9357b07c05c188a5ec3caa03fc48c3d6e26ae114b4bc8202fd6bd6f30d64df"
+    },
+    {
+      "path": "review-manifest.json",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/review-manifest.json",
+      "sourceSha256": "008f832b4eeae94d3ce3bedcf3850b835d160e1c587a48cf45407ed4a31d6fa9",
+      "archiveSha256": "008f832b4eeae94d3ce3bedcf3850b835d160e1c587a48cf45407ed4a31d6fa9"
+    },
+    {
+      "path": "DESIGN.md",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/LLD.md",
+      "sourceSha256": "2671bb1f891f68a8336e31278a7959f05d4b37c0984691dc6fd3340559c9d0ad",
+      "archiveSha256": "2671bb1f891f68a8336e31278a7959f05d4b37c0984691dc6fd3340559c9d0ad"
+    },
+    {
+      "path": "wasm-build.log.gz",
+      "source": "dist/evidence/er-result-packet-wasm-build.log",
+      "sourceSha256": "81fbb6ec83c5c428b5b421330affb9e78bfe696cd2a6213cd0332e79221ef5be",
+      "archiveSha256": "290a961df781b069ef7cb6bf67273a466f4dd402e5bf6a3fb78e02b3dfda62bb"
+    },
+    {
+      "path": "types.log.gz",
+      "source": "dist/evidence/er-result-packet-types.log",
+      "sourceSha256": "d814ef4c65a231d631817921b27b4bba912641d7ee7328aff44497e984510684",
+      "archiveSha256": "4a67028e517de51834546e860c6bc59b2e044510998e5eaf3e242df15d149a68"
+    },
+    {
+      "path": "web.log.gz",
+      "source": "dist/evidence/er-result-packet-web.log",
+      "sourceSha256": "559f4d8e0cd29f9d6168fdeebb3cf1a5066f44c339b780a487788abdf4467dfe",
+      "archiveSha256": "3599c3370dc2db9deff1704cc306664e6e12ff4f069d2bfa88e906a44e012826"
+    },
+    {
+      "path": "web-attempt2.log.gz",
+      "source": "dist/evidence/er-result-packet-web-attempt2.log",
+      "sourceSha256": "f5f5e4bbcb3f774c2bf6d9411da4fcb94e4850cadf1bd99d63027d06f75302c6",
+      "archiveSha256": "33cdb932de533db4ae631a65ceec053f4a23f4b90ebd431910986200d6c68538"
+    },
+    {
+      "path": "web-attempt3-chromium.log.gz",
+      "source": "dist/evidence/er-result-packet-web-attempt3-chromium.log",
+      "sourceSha256": "e622f86e24e484ff96d4d87ab07bc1111bf565653db20d7821549efdd14e8655",
+      "archiveSha256": "782ef0304cac44819ec829a5026eeace7953b5e95c25f3150c0023aba6633f15"
+    },
+    {
+      "path": "web-final.log.gz",
+      "source": "dist/evidence/er-result-packet-web-final.log",
+      "sourceSha256": "26378f2ff1d8a227848ea46c460672b1518e52ec7d6f22d38fece0ab20d03f10",
+      "archiveSha256": "ee0a5c5804e7ed7cd1af52326ee01be036468dfa7b60416810f31960f6ef97dd"
+    },
+    {
+      "path": "vm.log.gz",
+      "source": "dist/evidence/er-result-packet-vm.log",
+      "sourceSha256": "51a1cf20de520d721a0d5c499228dfac799e010b91e61d2dcb28324a8c25b0f4",
+      "archiveSha256": "fc4211e04a4b3d35aa167f307c701f4b782033f42f329ab9a77787a185956c9f"
+    },
+    {
+      "path": "profile.log.gz",
+      "source": "dist/evidence/er-result-packet-profile.log",
+      "sourceSha256": "d7b5c2ab48ebbadc9c72f9d6b9c833333beba161862878084b262291c1c96185",
+      "archiveSha256": "be988629d8226a6f954b0152a69f3e8729429bc523f55104645ebe2a2db01117"
+    },
+    {
+      "path": "final/er-result-packet-ER-succes-695ed--legacy-capability-fallback-firefox/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-succes-695ed--legacy-capability-fallback-firefox/er-result-packet-differential.json",
+      "sourceSha256": "9dd8dbfa598e75c99779b3a82f8ca4492ef54bd44964d73deef0e384adf501dc",
+      "archiveSha256": "7addcaf70ec6056b8f26ccc06ab38f6f7c9aca70c964bffc8f8a46a5e0b93e58"
+    },
+    {
+      "path": "final/er-result-packet-ER-succes-695ed--legacy-capability-fallback-chromium/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-succes-695ed--legacy-capability-fallback-chromium/er-result-packet-differential.json",
+      "sourceSha256": "9dd8dbfa598e75c99779b3a82f8ca4492ef54bd44964d73deef0e384adf501dc",
+      "archiveSha256": "7addcaf70ec6056b8f26ccc06ab38f6f7c9aca70c964bffc8f8a46a5e0b93e58"
+    },
+    {
+      "path": "final/er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-firefox/er-result-packet-budget.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-firefox/er-result-packet-budget.json",
+      "sourceSha256": "b0fd7bb4cfeac4f7c5de3657987fe3962c8ed5ac91cf74ee25062d7ab29ceab5",
+      "archiveSha256": "feec35551d5763a7c25ae668258ec6f491ecf76da69a1ac418c01a5c13cc4b80"
+    },
+    {
+      "path": "final/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-chromium/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-chromium/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "final/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-webkit/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-webkit/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "final/er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-webkit/er-result-packet-budget.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-webkit/er-result-packet-budget.json",
+      "sourceSha256": "b0fd7bb4cfeac4f7c5de3657987fe3962c8ed5ac91cf74ee25062d7ab29ceab5",
+      "archiveSha256": "feec35551d5763a7c25ae668258ec6f491ecf76da69a1ac418c01a5c13cc4b80"
+    },
+    {
+      "path": "final/er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-chromium/er-result-packet-budget.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-chromium/er-result-packet-budget.json",
+      "sourceSha256": "b0fd7bb4cfeac4f7c5de3657987fe3962c8ed5ac91cf74ee25062d7ab29ceab5",
+      "archiveSha256": "feec35551d5763a7c25ae668258ec6f491ecf76da69a1ac418c01a5c13cc4b80"
+    },
+    {
+      "path": "final/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-firefox/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-firefox/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "final/er-result-packet-ER-succes-695ed--legacy-capability-fallback-webkit/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/final-results/er-result-packet-ER-succes-695ed--legacy-capability-fallback-webkit/er-result-packet-differential.json",
+      "sourceSha256": "9dd8dbfa598e75c99779b3a82f8ca4492ef54bd44964d73deef0e384adf501dc",
+      "archiveSha256": "7addcaf70ec6056b8f26ccc06ab38f6f7c9aca70c964bffc8f8a46a5e0b93e58"
+    },
+    {
+      "path": "attempt1/er-result-packet-ER-succes-695ed--legacy-capability-fallback-firefox/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt1/er-result-packet-ER-succes-695ed--legacy-capability-fallback-firefox/er-result-packet-differential.json",
+      "sourceSha256": "fe1b2d0fe6f0c0a9e596b22017039f067c5687d2ba1d5a311de1dfd091c2fa22",
+      "archiveSha256": "c805b57642f3a3c375a5f50b0c2b632f8fba19879b2b6acb51142e168186c984"
+    },
+    {
+      "path": "attempt1/er-result-packet-ER-succes-695ed--legacy-capability-fallback-chromium/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt1/er-result-packet-ER-succes-695ed--legacy-capability-fallback-chromium/er-result-packet-differential.json",
+      "sourceSha256": "fe1b2d0fe6f0c0a9e596b22017039f067c5687d2ba1d5a311de1dfd091c2fa22",
+      "archiveSha256": "c805b57642f3a3c375a5f50b0c2b632f8fba19879b2b6acb51142e168186c984"
+    },
+    {
+      "path": "attempt1/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-chromium/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt1/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-chromium/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "attempt1/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-webkit/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt1/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-webkit/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "attempt1/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-firefox/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt1/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-firefox/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "attempt1/er-result-packet-ER-succes-695ed--legacy-capability-fallback-webkit/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt1/er-result-packet-ER-succes-695ed--legacy-capability-fallback-webkit/er-result-packet-differential.json",
+      "sourceSha256": "fe1b2d0fe6f0c0a9e596b22017039f067c5687d2ba1d5a311de1dfd091c2fa22",
+      "archiveSha256": "c805b57642f3a3c375a5f50b0c2b632f8fba19879b2b6acb51142e168186c984"
+    },
+    {
+      "path": "attempt2/er-result-packet-ER-succes-695ed--legacy-capability-fallback-firefox/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt2/er-result-packet-ER-succes-695ed--legacy-capability-fallback-firefox/er-result-packet-differential.json",
+      "sourceSha256": "fe1b2d0fe6f0c0a9e596b22017039f067c5687d2ba1d5a311de1dfd091c2fa22",
+      "archiveSha256": "c805b57642f3a3c375a5f50b0c2b632f8fba19879b2b6acb51142e168186c984"
+    },
+    {
+      "path": "attempt2/er-result-packet-ER-succes-695ed--legacy-capability-fallback-chromium/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt2/er-result-packet-ER-succes-695ed--legacy-capability-fallback-chromium/er-result-packet-differential.json",
+      "sourceSha256": "fe1b2d0fe6f0c0a9e596b22017039f067c5687d2ba1d5a311de1dfd091c2fa22",
+      "archiveSha256": "c805b57642f3a3c375a5f50b0c2b632f8fba19879b2b6acb51142e168186c984"
+    },
+    {
+      "path": "attempt2/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-chromium/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt2/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-chromium/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "attempt2/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-webkit/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt2/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-webkit/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "attempt2/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-firefox/er-result-packet-errors.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt2/er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-firefox/er-result-packet-errors.json",
+      "sourceSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566",
+      "archiveSha256": "a7b03f9f8a1351db472fe140b0e5dcb36b58b07fb99e28f3812621a5bb1008ae"
+    },
+    {
+      "path": "attempt2/er-result-packet-ER-succes-695ed--legacy-capability-fallback-webkit/er-result-packet-differential.json.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/runtime/attempt2/er-result-packet-ER-succes-695ed--legacy-capability-fallback-webkit/er-result-packet-differential.json",
+      "sourceSha256": "fe1b2d0fe6f0c0a9e596b22017039f067c5687d2ba1d5a311de1dfd091c2fa22",
+      "archiveSha256": "c805b57642f3a3c375a5f50b0c2b632f8fba19879b2b6acb51142e168186c984"
+    },
+    {
+      "path": "profile/summary.json",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/profile/summary.json",
+      "sourceSha256": "f6656984f5647794f6ca8c839aefba2a9a226c5edd54d2984aaec8af69f9a7ab",
+      "archiveSha256": "f6656984f5647794f6ca8c839aefba2a9a226c5edd54d2984aaec8af69f9a7ab"
+    },
+    {
+      "path": "profile/er-medium-render-model-wasm.cpuprofile.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/profile/er-medium-render-model-wasm.cpuprofile",
+      "sourceSha256": "1321861d3885b8f4453738966350bc8901ee1360f824fe36e37366b4b8fb07d5",
+      "archiveSha256": "52df5c03512e98ed475a4815cdae38da4c7cb9a64b9223d4ca9fdf65958e032f"
+    },
+    {
+      "path": "profile/er-medium-render-source-wasm.cpuprofile.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/profile/er-medium-render-source-wasm.cpuprofile",
+      "sourceSha256": "6243079d02fcc3d2e77a31f8fa6fd1727777dcb5b09d12632c15f5d26ca088af",
+      "archiveSha256": "3d99141ba60ff8c5eb056d94e3dc5bdc0ab1febb88bda054b1927ac53428a2ee"
+    },
+    {
+      "path": "profile/er-medium-parse-js.cpuprofile.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/profile/er-medium-parse-js.cpuprofile",
+      "sourceSha256": "272faa885d04418f8888c3dda845b38290562a53bc7b0b578634a6eacc3cde77",
+      "archiveSha256": "ea2be9ed9869b18f7f857357e83cd368ff56b904eeaf05f1cfc571fccb371055"
+    },
+    {
+      "path": "profile/er-medium-parse-wasm.cpuprofile.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/profile/er-medium-parse-wasm.cpuprofile",
+      "sourceSha256": "7421bc18700f13ba6e4675ee9751aa3e21844dd41795787f1850c1008635171f",
+      "archiveSha256": "011fa9c1859add561bac4df7b12b4021bc44ba0cadfd1632b127ba7b039692c4"
+    },
+    {
+      "path": "profile/er-medium-render-model-js.cpuprofile.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/profile/er-medium-render-model-js.cpuprofile",
+      "sourceSha256": "8e171f23c522685296292acf7369eeda05ae09c631a49908712ac3c3e44c326e",
+      "archiveSha256": "6aa81fef01e7701b4b24cd8c4c44a6854700970b8ba007b88cb72f6ea1c0c9bb"
+    },
+    {
+      "path": "profile/er-medium-render-source-js.cpuprofile.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet-first/profile/er-medium-render-source-js.cpuprofile",
+      "sourceSha256": "518d7da9940c791009aaf9975cae73bdece299e508e61fc4f1f1a6b37cc373ee",
+      "archiveSha256": "0b834cf3cacd88e8b92885452949c48aa60bce1a45077ba918fa85ef0e487080"
+    },
+    {
+      "path": "AUDIT.md",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/AUDIT.md",
+      "sourceSha256": "31234eae277a1b9744a1777d1a6dfbdf6a5dc0570511237de2aebbe011fa2706",
+      "archiveSha256": "31234eae277a1b9744a1777d1a6dfbdf6a5dc0570511237de2aebbe011fa2706"
+    },
+    {
+      "path": "AUDIT.json",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/AUDIT.json",
+      "sourceSha256": "fba075eb5d2f6c9d526a310210c1e3f71337e553762ef26b4c7dbb5b1f0f6e4b",
+      "archiveSha256": "fba075eb5d2f6c9d526a310210c1e3f71337e553762ef26b4c7dbb5b1f0f6e4b"
+    },
+    {
+      "path": "audit_evidence.py.gz",
+      "source": "dist/perf-patches/parse-architecture/er-result-packet/audit_evidence.py",
+      "sourceSha256": "63f28d2c956ed9d21861ce092bd8e3ccec3969fd1217572277c825b516b1c958",
+      "archiveSha256": "e583ab8d3b31fc2a637d5391381677ac8ba83c75ece9b21ab657cc30661aa680"
+    }
+  ]
+}

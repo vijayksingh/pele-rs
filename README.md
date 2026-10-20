@@ -183,6 +183,10 @@ Median ratios across all sizes/resources are **2.38× source**, **11.06× parse*
 and **4.02× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
+The [result-transport follow-up](docs/benchmarks/2026-10-20-er-host-storage/result-packet/)
+improves retained ER rendering by 9.4–14.9% in paired VM medians against the
+preceding host artifact. It still takes 4.4–6.3× JS; no 0.3 release.
+
 The newer [live ER storage checkpoint](docs/benchmarks/2026-10-20-er-host-storage/)
 removes persistent model copies and fixes ordinary ER callback state. Its
 30-condition VM comparison still shows mixed parse results and 75.7–91.9%
