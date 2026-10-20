@@ -3,6 +3,7 @@
 mod engine;
 mod graph;
 pub(crate) mod captured_read;
+pub(crate) mod captured_write;
 mod initial_store;
 #[doc(hidden)]
 pub use initial_store::InitialWriter;

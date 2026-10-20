@@ -1379,6 +1379,167 @@ fn sankey_projection_validates_both_arrays_before_labels_and_repairs_latent_erro
 }
 
 #[test]
+fn sankey_raw_helpers_preserve_first_equivalent_map_slot_and_original_number_bits() {
+    let engine = PublicEngine::with_builtins();
+    for (existing, argument) in [
+        (-0.0, 0.0),
+        (
+            f64::from_bits(0x7ff8_0000_0000_0042),
+            f64::from_bits(0x7ff8_0000_0000_0099),
+        ),
+    ] {
+        let original = engine.parse(SOURCE, &Default::default()).unwrap();
+        let mut graph = original.snapshot().unwrap();
+        let lookup = reference(graph.field("lookup").unwrap().unwrap());
+        let nodes = reference(graph.field("nodes").unwrap().unwrap());
+        let second = array(&graph, nodes)[1].clone();
+        let first_index_key = graph.strings.iter().position(|s| s.is("index")).unwrap() as u32;
+        graph.strings.push(JsString::from("index"));
+        let Node::Map { entries, .. } = &mut graph.nodes[lookup as usize] else {
+            panic!()
+        };
+        *entries = vec![
+            (Atom::Number(existing), Atom::Undefined),
+            (Atom::Number(argument), second.clone()),
+        ];
+        let mut document =
+            PublicDocument::from_graph(Sankey, graph, original.retained_config().clone()).unwrap();
+        let (created, graph) = found(invoke(
+            &mut document,
+            "findOrCreateNode",
+            None,
+            vec![Atom::Number(argument)],
+        ));
+        let Node::Map { entries, .. } = &graph.nodes[lookup as usize] else {
+            panic!()
+        };
+        assert_eq!(entries.len(), 2);
+        assert!(matches!(entries[0].0, Atom::Number(n) if n.to_bits() == existing.to_bits()));
+        assert_eq!(reference(&entries[0].1), created);
+        assert!(matches!(entries[1].0, Atom::Number(n) if n.to_bits() == argument.to_bits()));
+        assert_eq!(reference(&entries[1].1), reference(&second));
+        assert!(
+            matches!(field(&graph, created, "id"), Atom::Number(n) if n.to_bits() == argument.to_bits())
+        );
+        let index_property = graph.nodes[created as usize]
+            .properties()
+            .iter()
+            .find(|p| graph.strings[p.key as usize].is("index"))
+            .unwrap();
+        assert_eq!(index_property.key, first_index_key);
+        assert_eq!(array(&graph, nodes).len(), 4);
+        let (cached, again) = found(invoke(
+            &mut document,
+            "findOrCreateNode",
+            None,
+            vec![Atom::Number(argument)],
+        ));
+        assert_eq!(cached, created);
+        assert_eq!(fingerprint(&again), fingerprint(&graph));
+        assert_eq!(
+            document
+                .render(&Default::default(), &mut MetricsResources)
+                .unwrap_err()
+                .message,
+            "Expected a public string"
+        );
+    }
+}
+
+#[test]
+fn sankey_raw_helpers_keep_duplicate_descriptor_checks_partial_state_and_repair() {
+    let engine = PublicEngine::with_builtins();
+    for readonly in ["length", "index", "none"] {
+        let original = engine.parse(SOURCE, &Default::default()).unwrap();
+        let mut graph = original.snapshot().unwrap();
+        let nodes = reference(graph.field("nodes").unwrap().unwrap());
+        let lookup = reference(graph.field("lookup").unwrap().unwrap());
+        let Atom::String(length_key) = string(&mut graph, "length") else {
+            panic!()
+        };
+        let Atom::String(index_key) = string(&mut graph, "3") else {
+            panic!()
+        };
+        let label = string(&mut graph, "D");
+        graph.nodes[nodes as usize].properties_mut().extend([
+            Property {
+                key: length_key,
+                value: Atom::Number(3.),
+                flags: 2,
+            },
+            Property {
+                key: length_key,
+                value: Atom::Number(3.),
+                flags: if readonly == "length" { 0 } else { 2 },
+            },
+            Property {
+                key: index_key,
+                value: Atom::Null,
+                flags: 7,
+            },
+            Property {
+                key: index_key,
+                value: Atom::Undefined,
+                flags: if readonly == "none" { 7 } else { 0 },
+            },
+        ]);
+        let mut document =
+            PublicDocument::from_graph(Sankey, graph, original.retained_config().clone()).unwrap();
+        let outcome = invoke(&mut document, "findOrCreateNode", None, vec![label]);
+        let mut graph = outcome.graph;
+        let created = if readonly == "none" {
+            reference(outcome.result.as_ref().unwrap())
+        } else {
+            let property = if readonly == "length" { "length" } else { "3" };
+            assert!(
+                matches!(outcome.result, Err(PublicError::JavaScript { name: JavaScriptErrorKind::TypeError, message }) if message.is(&format!("Cannot assign to read only property '{property}' of object '[object Array]'")))
+            );
+            let Node::Map { entries, .. } = &graph.nodes[lookup as usize] else {
+                panic!()
+            };
+            let detached = reference(&entries.last().unwrap().1);
+            assert_eq!(array(&graph, nodes).len(), 3);
+            assert!(matches!(field(&graph, detached, "index"), Atom::Number(n) if *n == 3.));
+            for property in graph.nodes[nodes as usize].properties_mut() {
+                if property.key == length_key {
+                    property.flags = 2;
+                }
+                if property.key == index_key {
+                    property.flags = 7;
+                }
+            }
+            let next_label = string(&mut graph, "E");
+            apply_graph(&mut document, graph);
+            let (id, after) = found(invoke(
+                &mut document,
+                "findOrCreateNode",
+                None,
+                vec![next_label],
+            ));
+            graph = after;
+            id
+        };
+        let Node::Array { length, properties } = &graph.nodes[nodes as usize] else {
+            panic!()
+        };
+        assert_eq!(*length, 4);
+        let lengths: Vec<_> = properties.iter().filter(|p| p.key == length_key).collect();
+        assert_eq!(lengths.len(), 2);
+        assert!(lengths
+            .iter()
+            .all(|p| p.flags == 2 && matches!(p.value, Atom::Number(n) if n == 4.)));
+        let indexes: Vec<_> = properties.iter().filter(|p| p.key == index_key).collect();
+        assert_eq!(indexes.len(), 2);
+        assert_eq!(reference(&indexes[0].value), created);
+        assert!(matches!(indexes[1].value, Atom::Undefined));
+        assert_eq!(
+            fingerprint(&document.snapshot().unwrap()),
+            fingerprint(&graph)
+        );
+    }
+}
+
+#[test]
 fn sankey_mutable_repeated_long_labels_reject_native_expansion_and_recover() {
     let mut engine = PublicEngine::empty();
     engine.register(Sankey);

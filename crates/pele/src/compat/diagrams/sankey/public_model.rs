@@ -8,6 +8,7 @@ use super::{Sankey, SankeyLink, SankeyModel, SankeyNode};
 use crate::compat::public::captured_read::{
     ArenaRead, CapturedRead, NodeKind, PropertyPrefix, PROPERTY_CHUNK, STRING_CHUNK,
 };
+use crate::compat::public::captured_write::{ArenaWrite, CapturedWrite, OwnQuery};
 use crate::compat::{
     public::{
         Atom, FieldKind, FieldSchema, GraphWriter, InitialWriter, JavaScriptErrorKind, JsString,
@@ -200,14 +201,6 @@ fn object_id(atom: &Atom) -> Result<u32, PeleError> {
         Atom::Ref(id) => Ok(*id),
         _ => Err(invalid("Sankey node and link records must be objects")),
     }
-}
-fn field<'a>(graph: &'a ModelGraph, id: u32, name: &str) -> Option<&'a Atom> {
-    graph
-        .nodes
-        .get(id as usize)?
-        .properties()
-        .iter()
-        .find_map(|p| graph.strings[p.key as usize].is(name).then_some(&p.value))
 }
 fn captured_error(message: &str) -> PeleError {
     PeleError::new(message, ErrorCode::Semantic)
@@ -665,15 +658,7 @@ fn type_error(message: &str) -> PublicError {
         message: JsString::from(message),
     }
 }
-fn intern(g: &mut ModelGraph, s: &str) -> u32 {
-    if let Some(id) = g.strings.iter().position(|x| x.is(s)) {
-        return id as u32;
-    }
-    let id = g.strings.len() as u32;
-    g.strings.push(JsString::from(s));
-    id
-}
-fn read(g: &ModelGraph, receiver: &Atom, key: &str) -> Result<Atom, PublicError> {
+fn read<W: CapturedWrite>(store: &mut W, receiver: &Atom, key: &str) -> Result<Atom, PublicError> {
     match receiver {
         Atom::Null | Atom::Undefined => Err(type_error(&format!(
             "Cannot read properties of {} (reading '{key}')",
@@ -685,40 +670,32 @@ fn read(g: &ModelGraph, receiver: &Atom, key: &str) -> Result<Atom, PublicError>
         ))),
         Atom::Ref(id) => {
             if key == "length" {
-                if let Node::Array { length, .. } = &g.nodes[*id as usize] {
-                    return Ok(Atom::Number(f64::from(*length)));
+                if let Some(header) = store.header(*id)? {
+                    if header.kind == NodeKind::Array {
+                        return Ok(Atom::Number(f64::from(
+                            header.array_length.expect("array header"),
+                        )));
+                    }
                 }
             }
-            Ok(field(g, *id, key).cloned().unwrap_or(Atom::Undefined))
+            Ok(stored_field(store, *id, key)?.unwrap_or(Atom::Undefined))
         }
         Atom::String(id) if key == "length" => {
-            Ok(Atom::Number(g.strings[*id as usize].0.len() as f64))
+            Ok(Atom::Number(f64::from(store.string_length(*id)?)))
         }
         _ => Ok(Atom::Undefined),
     }
 }
-fn same_key(g: &ModelGraph, a: &Atom, b: &Atom) -> bool {
-    match (a, b) {
-        (Atom::Undefined, Atom::Undefined) | (Atom::Null, Atom::Null) => true,
-        (Atom::Bool(a), Atom::Bool(b)) => a == b,
-        (Atom::Number(a), Atom::Number(b)) => a == b || (a.is_nan() && b.is_nan()),
-        (Atom::String(a), Atom::String(b)) => g.strings[*a as usize] == g.strings[*b as usize],
-        (Atom::Ref(a), Atom::Ref(b))
-        | (Atom::BuiltinFunction(a), Atom::BuiltinFunction(b))
-        | (Atom::HostReference(a), Atom::HostReference(b)) => a == b,
-        _ => false,
-    }
-}
 /// Only the real native Map/Array prototype operation is implicit. A supplied
 /// function needs an explicit host/native callback dispatch capability.
-fn collection(
-    g: &ModelGraph,
+fn collection<W: CapturedWrite>(
+    store: &mut W,
     value: &Atom,
     property: &str,
     expression: &str,
     map: bool,
 ) -> Result<u32, PublicError> {
-    let callable = read(g, value, property)?;
+    let callable = read(store, value, property)?;
     if matches!(callable, Atom::HostReference(_) | Atom::BuiltinFunction(_)) {
         return Err(invalid(&format!(
             "Sankey overridden {expression} callback dispatch is unavailable"
@@ -729,38 +706,34 @@ fn collection(
         Atom::Ref(id) => *id,
         _ => return Err(type_error(&format!("{expression} is not a function"))),
     };
-    let native = if map {
-        matches!(g.nodes[id as usize], Node::Map { .. })
-    } else {
-        matches!(g.nodes[id as usize], Node::Array { .. })
-    };
-    if !native || field(g, id, property).is_some() {
+    let native = store
+        .header(id)?
+        .is_some_and(|header| header.kind == if map { NodeKind::Map } else { NodeKind::Array });
+    if !native || stored_field(store, id, property)?.is_some() {
         return Err(type_error(&format!("{expression} is not a function")));
     }
     Ok(id)
 }
-fn room(g: &ModelGraph, nodes: usize, keys: &[&str], references: usize) -> Result<(), PublicError> {
-    let missing = keys
-        .iter()
-        .filter(|key| !g.strings.iter().any(|s| s.is(key)))
-        .collect::<Vec<_>>();
-    let units = g
-        .strings
-        .iter()
-        .fold(0usize, |n, s| n.saturating_add(s.0.len()))
-        .saturating_add(missing.iter().map(|s| s.len()).sum::<usize>());
-    let work = g.nodes.iter().fold(0usize, |n, node| {
-        n.saturating_add(node.properties().len())
-            .saturating_add(match node {
-                Node::Map { entries, .. } => entries.len().saturating_mul(2),
-                Node::Set { values, .. } => values.len(),
-                _ => 0,
-            })
-    });
-    if g.nodes.len().saturating_add(nodes) > 1_000_000
-        || g.strings.len().saturating_add(missing.len()) > 1_000_000
+fn room<W: CapturedWrite>(
+    store: &mut W,
+    nodes: usize,
+    keys: &[&str],
+    references: usize,
+) -> Result<(), PublicError> {
+    // Current helper policies request at most four keys. Keep absent duplicate
+    // requests distinct, exactly as the original missing-key vector did.
+    let mut present = [None; 4];
+    assert!(keys.len() <= present.len());
+    store.find_strings(keys, &mut present[..keys.len()])?;
+    let missing = keys.iter().zip(&present).filter(|(_, id)| id.is_none());
+    let missing_count = missing.clone().count();
+    let missing_units = missing.map(|(key, _)| key.len()).sum::<usize>();
+    let counts = store.counts()?;
+    let units = counts.units.saturating_add(missing_units);
+    if counts.nodes.saturating_add(nodes) > 1_000_000
+        || counts.strings.saturating_add(missing_count) > 1_000_000
         || units > 16_000_000
-        || work.saturating_add(references) > 8_000_000
+        || counts.work.saturating_add(references) > 8_000_000
     {
         return Err(PeleError::new(
             "Sankey method exceeds native graph work budget",
@@ -771,137 +744,141 @@ fn room(g: &ModelGraph, nodes: usize, keys: &[&str], references: usize) -> Resul
     Ok(())
 }
 // Nondefault own Array length descriptors live in properties alongside the
-// scalar Node::Array.length. Default flags2 is implicit; readonly flags0 is not.
-fn push_index(g: &ModelGraph, id: u32) -> Result<(u32, String), PublicError> {
-    let Node::Array { length, properties } = &g.nodes[id as usize] else {
-        unreachable!()
-    };
-    if properties
-        .iter()
-        .any(|p| g.strings[p.key as usize].is("length") && p.flags & 2 == 0)
-    {
+// scalar length. Every matching readonly descriptor participates in rejection.
+struct PushPosition {
+    length: u32,
+    key: String,
+    existing: Option<u32>,
+}
+fn push_index<W: CapturedWrite>(store: &mut W, id: u32) -> Result<PushPosition, PublicError> {
+    let header = store.header(id)?.expect("validated array");
+    assert!(header.kind == NodeKind::Array);
+    let length = header.array_length.expect("array header");
+    let key = length.to_string();
+    let mut descriptors = [OwnQuery::default(), OwnQuery::default()];
+    store.own_descriptors(id, &["length", &key], &mut descriptors)?;
+    if descriptors[0].any_nonwritable {
         return Err(type_error(
             "Cannot assign to read only property 'length' of object '[object Array]'",
         ));
     }
-    let key = length.to_string();
-    if properties
-        .iter()
-        .any(|p| g.strings[p.key as usize].is(&key) && p.flags & 2 == 0)
-    {
+    if descriptors[1].any_nonwritable {
         return Err(type_error(&format!(
             "Cannot assign to read only property '{key}' of object '[object Array]'"
         )));
     }
-    if *length >= 1_000_000 {
+    if length >= 1_000_000 {
         return Err(
             PeleError::new("Sankey array exceeds native work budget", ErrorCode::Limit).into(),
         );
     }
-    Ok((*length, key))
+    Ok(PushPosition {
+        length,
+        key,
+        existing: descriptors[1].first_slot,
+    })
 }
-fn push(g: &mut ModelGraph, id: u32, length: u32, key: &str, value: Atom) {
-    let existing = g.nodes[id as usize]
-        .properties()
-        .iter()
-        .position(|p| g.strings[p.key as usize].is(key));
-    if let Some(at) = existing {
-        g.nodes[id as usize].properties_mut()[at].value = value
+fn push<W: CapturedWrite>(
+    store: &mut W,
+    id: u32,
+    position: PushPosition,
+    value: Atom,
+) -> Result<(), PublicError> {
+    // Since push_index, only read-only room checks and distinct new-record/
+    // string appends may run. No callback or target-array edit intervenes.
+    let PushPosition {
+        length,
+        key,
+        existing,
+    } = position;
+    if let Some(slot) = existing {
+        store.replace_property_value(id, slot, value)?;
     } else {
-        let key = intern(g, key);
-        g.nodes[id as usize].properties_mut().push(Property {
-            key,
-            value,
-            flags: 7,
-        })
+        let key = store.intern(&key)?;
+        store.append_property(
+            id,
+            Property {
+                key,
+                value,
+                flags: 7,
+            },
+        )?;
     }
-    if let Node::Array {
-        length: len,
-        properties,
-    } = &mut g.nodes[id as usize]
-    {
-        *len = length + 1;
-        for p in properties {
-            if g.strings[p.key as usize].is("length") {
-                p.value = Atom::Number(f64::from(*len))
-            }
-        }
-    }
+    store.set_array_length(id, length + 1)?;
+    store.replace_matching_property_values(id, "length", Atom::Number(f64::from(length + 1)))?;
+    Ok(())
 }
-fn record(g: &mut ModelGraph, fields: Vec<(&str, Atom)>) -> Atom {
+fn record<W: CapturedWrite>(store: &mut W, fields: Vec<(&str, Atom)>) -> Result<Atom, PublicError> {
     let properties = fields
         .into_iter()
-        .map(|(key, value)| Property {
-            key: intern(g, key),
-            value,
-            flags: 7,
+        .map(|(key, value)| {
+            Ok(Property {
+                key: store.intern(key)?,
+                value,
+                flags: 7,
+            })
         })
-        .collect();
-    let id = g.nodes.len() as u32;
-    g.nodes.push(Node::Object { properties });
-    Atom::Ref(id)
+        .collect::<Result<_, PeleError>>()?;
+    Ok(Atom::Ref(store.append_node(Node::Object { properties })?))
 }
-fn invoke_graph(g: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
+fn invoke_graph(graph: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
+    invoke_store(&mut ArenaWrite::new(graph), call)
+}
+fn invoke_store<W: CapturedWrite>(store: &mut W, call: MethodCall) -> Result<Atom, PublicError> {
     let arg = |i| call.arguments.get(i).cloned().unwrap_or(Atom::Undefined);
     match call.method.0 {
         1 => {
             let key = arg(0);
-            let lookup = read(g, &call.receiver, "lookup")?;
-            let lookup_id = collection(g, &lookup, "get", "this.lookup.get", true)?;
-            let found = if let Node::Map { entries, .. } = &g.nodes[lookup_id as usize] {
-                entries
-                    .iter()
-                    .find(|(k, _)| same_key(g, k, &key))
-                    .map(|(_, v)| v.clone())
-                    .unwrap_or(Atom::Undefined)
-            } else {
-                unreachable!()
-            };
+            let lookup = read(store, &call.receiver, "lookup")?;
+            let lookup_id = collection(store, &lookup, "get", "this.lookup.get", true)?;
+            let found = store
+                .map_find(lookup_id, &key)?
+                .map(|entry| entry.value)
+                .unwrap_or(Atom::Undefined);
             if !matches!(found, Atom::Undefined) {
                 return Ok(found);
             }
-            let nodes = read(g, &call.receiver, "nodes")?;
-            let index = read(g, &nodes, "length")?;
-            let lookup = read(g, &call.receiver, "lookup")?;
-            let lookup_id = collection(g, &lookup, "set", "this.lookup.set", true)?;
-            let at = if let Node::Map { entries, .. } = &g.nodes[lookup_id as usize] {
-                entries.iter().position(|(k, _)| same_key(g, k, &key))
+            let nodes = read(store, &call.receiver, "nodes")?;
+            let index = read(store, &nodes, "length")?;
+            let lookup = read(store, &call.receiver, "lookup")?;
+            let lookup_id = collection(store, &lookup, "set", "this.lookup.set", true)?;
+            let at = store.map_find(lookup_id, &key)?.map(|entry| entry.slot);
+            room(
+                store,
+                1,
+                &["id", "index"],
+                2 + if at.is_none() { 2 } else { 0 },
+            )?;
+            let node = record(store, vec![("id", key.clone()), ("index", index)])?;
+            if let Some(at) = at {
+                store.replace_map_value(lookup_id, at, node.clone())?;
             } else {
-                unreachable!()
-            };
-            room(g, 1, &["id", "index"], 2 + if at.is_none() { 2 } else { 0 })?;
-            let node = record(g, vec![("id", key.clone()), ("index", index)]);
-            if let Node::Map { entries, .. } = &mut g.nodes[lookup_id as usize] {
-                if let Some(at) = at {
-                    entries[at].1 = node.clone()
-                } else {
-                    // SameValueZero key storage canonicalizes -0, while node.id
-                    // retains the exact argument, including signed zero/NaN bits.
-                    let key = match key {
-                        Atom::Number(n) if n == 0. => Atom::Number(0.),
-                        key => key,
-                    };
-                    entries.push((key, node.clone()))
-                }
+                // Only newly appended zero keys canonicalize; record ID and
+                // existing matching key retain their exact IEEE bits.
+                let key = match key {
+                    Atom::Number(n) if n == 0. => Atom::Number(0.),
+                    key => key,
+                };
+                store.append_map_entry(lookup_id, key, node.clone())?;
             }
             // Deliberately after Map publication, including every throwing path.
-            let nodes = read(g, &call.receiver, "nodes")?;
-            let id = collection(g, &nodes, "push", "this.nodes.push", false)?;
-            let (length, key) = push_index(g, id)?;
-            room(g, 0, &[&key], 1)?;
-            push(g, id, length, &key, node.clone());
+            let nodes = read(store, &call.receiver, "nodes")?;
+            let id = collection(store, &nodes, "push", "this.nodes.push", false)?;
+            let position = push_index(store, id)?;
+            room(store, 0, &[&position.key], 1)?;
+            push(store, id, position, node.clone())?;
             Ok(node)
         }
         2 => {
-            let links = read(g, &call.receiver, "links")?;
-            let id = collection(g, &links, "push", "this.links.push", false)?;
-            let (length, key) = push_index(g, id)?;
-            room(g, 1, &["source", "target", "value", &key], 4)?;
+            let links = read(store, &call.receiver, "links")?;
+            let id = collection(store, &links, "push", "this.links.push", false)?;
+            let position = push_index(store, id)?;
+            room(store, 1, &["source", "target", "value", &position.key], 4)?;
             let link = record(
-                g,
+                store,
                 vec![("source", arg(0)), ("target", arg(1)), ("value", arg(2))],
-            );
-            push(g, id, length, &key, link);
+            )?;
+            push(store, id, position, link)?;
             Ok(Atom::Undefined)
         }
         _ => Err(invalid("Sankey public method is unavailable").into()),
