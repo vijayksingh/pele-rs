@@ -7,22 +7,22 @@ run locally on macOS because the VM cannot supply the macOS/AppKit SDK.
 No release, language choice or GPU availability implies otherwise. The target of
 matching or beating Pele JS remains open. Measured results, raw samples, artifact
 hashes, reproduction steps and unshipped compiler/schema experiments are in the
-[current normalized-projection report](benchmarks/2026-10-20-normalized-projection/README.md).
+[current static-policy report](benchmarks/2026-10-20-projection-policy/README.md).
 The latest complete gate still fails all 126 measured conditions. Source,
-parse and retained medians across the matrix are 2.46×, 11.67× and 4.11× JS.
+parse and retained medians across the matrix are 2.39×, 11.34× and 4.19× JS.
 Earlier direct Gantt construction improves scoped parse costs; current normalized
 projection improves Swift Gantt parse. VM diagnostics remain mixed, with control
 slowdowns disclosed. No 0.3 release.
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| Flowchart | 1.392 ms | 2.467 ms | 1.77× |
-| Sequence | 0.513 ms | 1.020 ms | 1.99× |
-| ER | 2.731 ms | 6.305 ms | 2.31× |
-| Pie | 0.278 ms | 0.630 ms | 2.27× |
-| Sankey | 0.853 ms | 1.455 ms | 1.71× |
-| Gantt | 0.688 ms | 2.524 ms | 3.67× |
-| Railroad | 0.787 ms | 1.910 ms | 2.43× |
+| Flowchart | 1.377 ms | 2.476 ms | 1.80× |
+| Sequence | 0.502 ms | 0.977 ms | 1.95× |
+| ER | 2.815 ms | 6.197 ms | 2.20× |
+| Pie | 0.278 ms | 0.626 ms | 2.25× |
+| Sankey | 0.865 ms | 1.450 ms | 1.68× |
+| Gantt | 0.686 ms | 2.579 ms | 3.76× |
+| Railroad | 0.815 ms | 1.924 ms | 2.36× |
 
 The [earlier eager Swift checkpoint](benchmarks/2026-10-20-swift-eager/README.md)
 compares frozen Rust-backed Swift executables on this Mac. Sequence-small parse
@@ -33,13 +33,22 @@ medians stay near flat. This includes the combined source changes since
 The 33-family Swift model corpus and 168 consumer API conditions pass; native UI
 activation/focus assertions and current Intel validation remain open.
 
-The [current direct normalization](benchmarks/2026-10-20-normalized-projection/README.md)
+The [direct normalization checkpoint](benchmarks/2026-10-20-normalized-projection/README.md)
 removes the first JSON buffer/reparse for captured builtin Gantt. Against the
 preceding eager binary, Gantt-medium Swift parse falls from 0.8582 to 0.6292 ms
 (26.69% paired, 15/15 faster). Negative-control medians remain near flat. Six
 separate windows have an aggregate 48/42 first-side order imbalance. Current
 Gantt corpus, eager checks, native contracts and three browser engines pass;
 current VM diagnostics remain mixed and do not establish a web improvement.
+
+The [current static-policy correction](benchmarks/2026-10-20-projection-policy/README.md)
+removes 33 handler-box allocation requests per registry construction (69 to 36).
+Gantt/Sequence Swift parse paired medians fall 0.86%/2.16% against the preceding
+normalized binary, each 13/15 faster; all six windows balance first-side order
+45/45. Outliers remain disclosed. Full current 33-family Swift corpus passes,
+including 167,473 mutable drawings and 270,358 error cases with five existing
+explicit budget differences. VM source medians return near the earlier control;
+parse remains mixed and the complete gate still fails all 126 conditions.
 
 [Rejected parse candidates](benchmarks/2026-10-20-parse-candidates/README.md)
 retain raw first-use and live-heap evidence. Lower map count and alternate string

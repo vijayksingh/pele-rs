@@ -1,0 +1,56 @@
+[
+  {
+    "stage": "parse",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/projection-policy/swift-single-parse-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/projection-policy/swift-single-parse-sequence-small-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "parse",
+    "workload": "gantt/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/projection-policy/swift-single-parse-gantt-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/projection-policy/swift-single-parse-gantt-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-source",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-source-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-source-sequence-small-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-source",
+    "workload": "gantt/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-source-gantt-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-source-gantt-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-retained",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-retained-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-retained-sequence-small-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-retained",
+    "workload": "gantt/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-retained-gantt-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/projection-policy/swift-single-render-retained-gantt-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  }
+]

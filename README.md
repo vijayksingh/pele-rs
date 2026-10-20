@@ -176,11 +176,11 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest complete matrix: [normalized projection checkpoint](docs/benchmarks/2026-10-20-normalized-projection/),
-source-equivalent `6b2d593`.
-Source render takes **1.61–5.11×** the Pele JS time.
-Median ratios across all sizes/resources are **2.46× source**, **11.67× parse**
-and **4.11× retained mutable render**. These describe this artifact; differences
+Latest complete matrix: [static policy checkpoint](docs/benchmarks/2026-10-20-projection-policy/),
+source `ce559f1`.
+Source render takes **1.64–5.11×** the Pele JS time.
+Median ratios across all sizes/resources are **2.39× source**, **11.34× parse**
+and **4.19× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
 The [direct-parse architecture checkpoint](docs/benchmarks/2026-10-20-direct-parse/)
@@ -208,9 +208,9 @@ source/SDK hashes, profiles and interrupted-build exclusions remain linked.
 The ARM64 Swift corpus passes all 33 families, including 167,473 mutable drawings
 and 270,358 error cases, with five existing explicit transport-budget differences.
 Seven new projection integrations and 168 eight-API output conditions pass.
-Native UI activation remains unverified: 19 full-suite test cases fail 53
-assertions when the host cannot become active/key; a bare AppKit probe reproduces
-this without Pele. Universal Intel validation remains required before release.
+Native UI activation remains unverified: the earlier full suite failed 19 cases
+and 53 assertions when the host could not become active/key; a bare AppKit probe
+reproduced this without Pele. Universal Intel validation remains required before release.
 
 The [next Gantt projection layer](docs/benchmarks/2026-10-20-normalized-projection/)
 removes its first full JSON buffer/reparse: matched Swift parse falls from
@@ -220,6 +220,14 @@ near flat. Gains from separate runs are not multiplied. VM results are mixed,
 including a Gantt fixed-source slowdown; no browser gain is established.
 Current Gantt corpus, eager integrations, 168 consumer API conditions and all
 three browser engines pass. The full release gates remain open.
+
+The [static-policy correction](docs/benchmarks/2026-10-20-projection-policy/)
+removes 33 unnecessary handler-box allocation requests per builtin registry
+construction (69 to 36). Same-Mac parse paired medians improve 0.86% for Gantt
+and 2.16% for Sequence, each 13/15 faster; control medians remain near flat with
+outliers. VM source medians return near the earlier control, while parse remains
+mixed. Full current 33-family Swift corpus and 168 consumer API conditions pass;
+this remains a performance checkpoint, not release acceptance.
 
 [Earlier checkpoints](docs/PERFORMANCE.md) preserve their own matched controls,
 raw samples and tradeoffs; gains are not combined. Recent
@@ -234,13 +242,13 @@ Source-render measurements with cached Canvas metrics:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.392 ms | 2.467 ms | 1.77× |
-| sequence | 0.513 ms | 1.020 ms | 1.99× |
-| er | 2.731 ms | 6.305 ms | 2.31× |
-| pie | 0.278 ms | 0.630 ms | 2.27× |
-| sankey | 0.853 ms | 1.455 ms | 1.71× |
-| gantt | 0.688 ms | 2.524 ms | 3.67× |
-| railroad | 0.787 ms | 1.910 ms | 2.43× |
+| flowchart | 1.377 ms | 2.476 ms | 1.80× |
+| sequence | 0.502 ms | 0.977 ms | 1.95× |
+| er | 2.815 ms | 6.197 ms | 2.20× |
+| pie | 0.278 ms | 0.626 ms | 2.25× |
+| sankey | 0.865 ms | 1.450 ms | 1.68× |
+| gantt | 0.686 ms | 2.579 ms | 3.76× |
+| railroad | 0.815 ms | 1.924 ms | 2.36× |
 
 A separate [native-only comparison](docs/benchmarks/2026-10-20-native-core/)
 before the latest root rewrite removes WASM/Swift entirely: typed retained native/JS medians are 0.80× Flowchart,
@@ -274,11 +282,11 @@ scripts/build-wasm.sh
 npm run test:types
 ```
 
-The previous eager parse checkpoint passed 42 native public integrations,
-the full 33-family Swift model corpus and all 324 browser checks. Current Gantt
-projection adds 24 passing native integrations, three strict ARM64 C programs,
-eight Swift integrations including the complete Gantt corpus, 168 consumer API
-conditions and six full-corpus/identity checks across Chromium/Firefox/WebKit. Full Swift UI activation checks remain failing
+The previous eager checkpoint passed 42 native public integrations and all 324
+browser checks. Current static-policy validation passes 20 native integrations,
+three strict ARM64 C programs, the complete 33-family Swift corpus plus seven
+eager integrations, all 168 consumer API conditions and 12 corpus/identity checks
+for ER/Gantt/Sequence across Chromium/Firefox/WebKit. Full Swift UI activation checks remain failing
 as disclosed above; the new ARM64 SDK is not universal Intel release proof.
 Earlier cross-platform release evidence and the broader pinned corpus history
 remain in [verification evidence](docs/FULL_PARITY_PROGRESS.md) and

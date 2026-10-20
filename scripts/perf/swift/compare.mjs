@@ -23,6 +23,8 @@ const controlManifestPath = join(controlDirectory, 'swift-build-manifest.json');
 const knownStages = ['parse', 'render-source', 'render-retained', 'parseMutable', 'snapshot', 'apply', 'render', 'lifetime'];
 const stages = arg('--stages', knownStages.join(',')).split(',');
 assert(stages.length && new Set(stages).size === stages.length && stages.every(stage => knownStages.includes(stage)), 'Unknown or duplicate stage');
+const orderOffset = Number(arg('--order-offset', '0'));
+assert(orderOffset === 0 || orderOffset === 1, 'Order offset must be 0 or 1');
 const trials = 15, warmupMs = 1000, targetBatchMs = 12;
 const ids = arg('--cases', 'gantt/medium,sequence/small').split(',').filter(Boolean);
 assert(ids.length && new Set(ids).size === ids.length, 'Cases must be a nonempty unique list');
@@ -134,7 +136,7 @@ const report = {
     worktree: execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean),
     comparatorSha256, builds, changedInputs, oracleRevision, oracleSha256,
     node: process.version, platform: platform(), arch: arch(), cpu: cpus()[0]?.model, logicalCPUs: cpus().length, totalMemory: totalmem(),
-    settings: { trials, warmupMsPerBinaryPerStage: warmupMs, warmupMaximumBatch: 128, targetBatchMs, stages, selectedCases: selected.map(workload => workload.id), fixedClock: now, timeZone: 'UTC', resources: 'UTF16 length × size × (bold?.71:.6)', matchedCounts: true, order: 'Alternate control/candidate first by stage row and trial; 15 pairs give 8/7 per row, opposite imbalance next row', sequentialTiming: true, freshRetainedStatePerBatch: true },
+    settings: { trials, orderOffset, warmupMsPerBinaryPerStage: warmupMs, warmupMaximumBatch: 128, targetBatchMs, stages, selectedCases: selected.map(workload => workload.id), fixedClock: now, timeZone: 'UTC', resources: 'UTF16 length × size × (bold?.71:.6)', matchedCounts: true, order: 'Alternate control/candidate first by stage row and trial; 15 pairs give 8/7 per row, opposite imbalance next row', sequentialTiming: true, freshRetainedStatePerBatch: true },
     limitations: [
         `Frozen control source ${builds.control.manifest.revision}; candidate build source ${builds.candidate.manifest.revision}. This measures the combined binary differences listed below, not isolated eager-projection causality.`,
         'Candidate complete source/SDK aggregate is verified against current files. Historical control uses frozen binary and original manifest hashes; historical source tree is not reconstructed or claimed current.',
@@ -177,7 +179,7 @@ async function exercisePair(workload, expected, stage, count, timing, order) {
 }
 try {
     for (const side of ['control', 'candidate']) consumers[side] = new SwiftConsumer(side, builds[side].binary);
-    let rowIndex = 0;
+    let rowIndex = orderOffset;
     for (const workload of selected) {
         const expected = summary(upstream.render(workload.source, { ...workload.options, ...resources() }));
         const before = {};
