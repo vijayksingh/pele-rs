@@ -1,0 +1,70 @@
+{
+  "scope": "48-task Gantt medium, one operation per stage; allocator counters only, no timing requested",
+  "reportSHA256": "ac0fd0a1d9198352b8cb1a8d184326d088b3b25f0e660d45559d3966561990db",
+  "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+  "verifiedAllocationBinaries": {
+    "control": {
+      "allocationSHA256": "121345cd78165aadff00ea10c5b7193b3556274ddb7c01fd82520eda1401cc30",
+      "sourceInputSha256": "bc196da8df086f9f348d79335f90ad5181f073ad614747adbf7bc72be08f9d90",
+      "manifestRevision": "d8ba90bb6c90c5ca2b43630a4d74fd1f4011327f"
+    },
+    "candidate": {
+      "allocationSHA256": "045ea91e1a16ee61a0848d37521ca5bc6d07cc099660405cc4c5c97a9d94de59",
+      "sourceInputSha256": "5f3eb388e501c61712ce49be0995f514fe8430b93f118f2423587a387d143cf9",
+      "manifestRevision": "7e9a72af70b3968fb3e7a94da73fcd45bb762d79"
+    }
+  },
+  "candidateProductionFileSHA256": "0628796030be17123e9b78ab445cee9154e46c54c0348ef384660d051881ed4d",
+  "metrics": {
+    "allocations": {
+      "control": 1971,
+      "candidate": 1875,
+      "difference": -96,
+      "percent": -4.87062404870624
+    },
+    "reallocations": {
+      "control": 195,
+      "candidate": 48,
+      "difference": -147,
+      "percent": -75.38461538461539
+    },
+    "requestedBytes": {
+      "control": 339525,
+      "candidate": 241733,
+      "difference": -97792,
+      "percent": -28.80259185626979
+    },
+    "peakAdditionalRequestedBytes": {
+      "control": 109626,
+      "candidate": 109370,
+      "difference": -256,
+      "percent": -0.23352124496013316
+    },
+    "liveBytesDelta": {
+      "control": 0,
+      "candidate": 0,
+      "difference": 0,
+      "percent": null
+    }
+  },
+  "negativeControlsExactlyEqual": [
+    "parse",
+    "render-source",
+    "render-retained",
+    "render-mutable-publish"
+  ],
+  "matchesPriorConditionalPrediction": {
+    "allocationCount": true,
+    "reallocationCount": true,
+    "requestedBytes": true
+  },
+  "interpretation": [
+    "Requested byte volume is cumulative allocator request traffic, including the full new allocation size of each realloc. It is not resident memory or simultaneous live storage.",
+    "The exact96 allocation /147 reallocation /97792 requested-byte reductions match removal of two per-task scratch Vecs and root growth for48tasks under the estimated layout. This supports the intended allocation mechanism; it does not attribute elapsed CPU time.",
+    "Peak additional requested live bytes fall only256 bytes (about0.234%), not28.8%. A transient scratch allocation can disappear without changing the operation peak materially.",
+    "liveBytesDelta remains0 because public parse result is released inside this measured stage. It does not prove zero memory while a document is retained. Canonical graph representation remains identical by separate graph tests.",
+    "All four negative control stages match every recorded counter/checksum exactly, including mutable render publication. That supports construction-only scope at this workload.",
+    "Host load and concurrent compiler/browser processes are recorded; no elapsed timing is present or inferred. Separate quiet release timing and browser measurements remain required.",
+    "This is one workload/count allocation observation, not a memory scaling measurement or universal speed claim."
+  ]
+}

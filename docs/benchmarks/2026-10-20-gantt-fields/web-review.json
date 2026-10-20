@@ -1,0 +1,1436 @@
+{
+  "schemaVersion": 1,
+  "kind": "Independent descriptive paired review; no benchmark executed",
+  "input": "dist/perf-patches/gantt-native/fixed-construction-fields/web-comparison.json",
+  "inputSHA256": "1420e59d18d04086af686ba03429b83a65c38cc1a598539372cc24911feeab4b",
+  "priorControlReference": "docs/benchmarks/2026-10-20-gantt-properties/web-comparison.json",
+  "priorControlReferenceSHA256": "d30c05386195d60512300d74ee70080e81733e618d3c1f7d30a065cc70e162dc",
+  "runtimeScope": {
+    "normalFileDefinition": "Exclude only AppleDouble path components beginning ._; raw report retains every hashed entry.",
+    "normalControlFiles": 105,
+    "normalCandidateFiles": 105,
+    "candidateVsControlDifferences": [
+      {
+        "path": "pkg/pele_bg.wasm",
+        "left": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+        "right": "236ae39f222878551aed11fc44426eba0c091ca4aae206f16d53964646be5413"
+      }
+    ],
+    "controlVsPriorGanttPropertiesCandidateDifferences": [],
+    "normalJSFilesIdentical": true,
+    "appleDoubleDifferences": [
+      {
+        "path": "._FDLIBM-LICENSE",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._FONT-OFL.txt",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._LICENSE",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._MERMAID-LICENSE",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._NOTICE",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._PELE-LICENSE",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._README.md",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._REGISTRY.md",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._V8-LICENSE",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._all-diagram-entries.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._builtin-entries.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._core.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._core.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._diagram-entries.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._diagram-entries.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._diagrams",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._errors.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._full.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._full.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._graph-binary.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._graph.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._host-functions.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._index.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._index.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._initialize.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._lazy.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._lazy.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._mount.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._package.json",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._parse-limits.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._pkg",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._registry.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._registry.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._render-numbers.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._resources.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._window.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "._zoom.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._agentflow.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._agentflow.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._architecture.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._architecture.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._block.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._block.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._c4.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._c4.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._class.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._class.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._cynefin.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._cynefin.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._er.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._er.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._eventmodeling.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._eventmodeling.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._flowchart.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._flowchart.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._gantt.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._gantt.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._gitGraph.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._gitGraph.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._info.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._info.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._ishikawa.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._ishikawa.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._journey.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._journey.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._kanban.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._kanban.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._mindmap.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._mindmap.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._packet.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._packet.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._pie.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._pie.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._quadrantChart.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._quadrantChart.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._radar.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._radar.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._railroad.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._railroad.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._requirement.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._requirement.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._sankey.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._sankey.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._sequence.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._sequence.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._state.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._state.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._swimlane.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._swimlane.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._timeline.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._timeline.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._treeView.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._treeView.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._treemap.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._treemap.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._usecase.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._usecase.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._venn.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._venn.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._wardley.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._wardley.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._xychart.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "diagrams/._xychart.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "pkg/._pele.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "pkg/._pele.js",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "pkg/._pele_bg.wasm",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      },
+      {
+        "path": "pkg/._pele_bg.wasm.d.ts",
+        "left": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+        "right": null
+      }
+    ]
+  },
+  "method": {
+    "trials": 15,
+    "warmupMs": 1000,
+    "pairing": "Same trial index; each includes all three lanes in balanced cyclic/reverse order. Samples are batch means per operation, not individual-operation latencies.",
+    "checks": "All reported medians recomputed exactly; matched control/candidate batch counts checked in every row; no samples excluded. Whole SVG and dimensions checked before/after by harness.",
+    "bootstrap": "10000 resamples of 15 paired percentage changes, Python Random(20261020), row order as raw file; sorted positions 249 and 9749.",
+    "interpretation": "Descriptive intervals only: serial shared-browser samples, 24 comparisons, no multiplicity correction or claim of independent trials. No subtraction of control shifts, no native-to-web extrapolation.",
+    "hostScope": "One browser/page holds independent control and candidate WASM instances and pinned JS. Balanced cyclic/reverse order; whole SVG and exact dimensions before/after. Shared heaps/GC/cache pressure differ from the release harness. Diagnostic, never a replacement release gate.",
+    "clockResolutionMs": 0.0049991607666015625,
+    "browser": "156.0.8078.4",
+    "hostBefore": {
+      "loadAverage": [
+        0.17,
+        0.29,
+        0.38
+      ],
+      "freeMemory": 12363374592
+    },
+    "hostAfter": {
+      "loadAverage": [
+        1.03,
+        0.58,
+        0.48
+      ],
+      "freeMemory": 11926265856
+    }
+  },
+  "findings": {
+    "parse": "Gantt medium/fixed is the only changed-path row with its descriptive interval wholly below zero: ratio-of-medians -4.61%, paired median -4.17%, 12/15 faster. Other five Gantt parse intervals cross zero. Small/fixed +1.29% ratio and large/canvas +3.38% ratio do not establish regressions; neither may be dismissed as proven noise. Large/canvas paired median is -4.06% and 10/15 pairs faster, with wide -29.79%..+42.87% interval. No general parse latency gain is supported.",
+    "unchangedPaths": "Source/retained and Flowchart are unchanged algorithm paths. Source shifts show both signs: FC/fixed -1.73% ratio (-1.78% paired), FC/canvas +3.15% (+2.55% paired), Gantt medium/canvas -1.70% (-1.09% paired), Gantt large/fixed +0.25% (+1.92% paired), and large/canvas +2.21% (+1.88% paired) have descriptive intervals excluding zero. These observations preclude calling the run uniformly noise or regression-free; binary layout/JIT/GC/shared-state causes remain unprofiled.",
+    "retained": "All eight retained rows have intervals crossing zero (one upper endpoint rounds to zero); medians range -2.28% to +1.62%. This construction-only change has no demonstrated retained speed gain.",
+    "tails": "Several parse rows have very wide paired ranges: small/fixed -19.0%..+82.9%, medium/canvas -31.2%..+41.1%, large/canvas -33.8%..+60.5%. Flowchart parse controls also have large tails. Preserve raw samples; do not present batch-mean p95 as individual-operation latency.",
+    "recommendation": "Acceptable as a bounded allocation reduction if the owner accepts the disclosed modest source shifts and unresolved parse tradeoff. Native allocation counters provide deterministic mechanism evidence; this web run does not establish a broad material parse regression or a broad speedup. Do not label the slice regression-free. If zero latency regression is an adoption requirement, this evidence does not satisfy it. No rerun requested by this review.",
+    "releaseScope": "This 24-row diagnostic is not the 126-condition release gate and says nothing new about parity or a 0.3 release."
+  },
+  "rows": [
+    {
+      "case": "gantt/small",
+      "resource": "fixed",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.03539062291383743,
+        "control": 0.18042968958616257,
+        "candidate": 0.1771875023841858
+      },
+      "ratioOfMediansChangePct": -1.7969255555519315,
+      "pairedMedianChangePct": -0.796990501978101,
+      "pairedMedianShiftMs": -0.001406252384185791,
+      "pairedMedianBootstrap95Pct": [
+        -2.4369034270314893,
+        0.6749389590303245
+      ],
+      "candidateFasterPairs": 9,
+      "pairedChangeRangePct": [
+        -6.217183267957605,
+        16.68797934990225
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.17644531279802322,
+          0.1859765648841858
+        ],
+        "candidate": [
+          0.17421875149011612,
+          0.2138671875
+        ]
+      },
+      "matchedCount": 128,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/small",
+      "resource": "fixed",
+      "stage": "parse",
+      "changedConstructionPath": true,
+      "medianMs": {
+        "js": 0.00503905862569809,
+        "control": 0.16914062947034836,
+        "candidate": 0.1713281199336052
+      },
+      "ratioOfMediansChangePct": 1.293296867882554,
+      "pairedMedianChangePct": 0.16528853410553435,
+      "pairedMedianShiftMs": 0.0002734363079071045,
+      "pairedMedianBootstrap95Pct": [
+        -3.292655526427346,
+        13.649921408835342
+      ],
+      "candidateFasterPairs": 7,
+      "pairedChangeRangePct": [
+        -18.956594770295652,
+        82.88965892529883
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.16164062917232513,
+          0.2717968747019768
+        ],
+        "candidate": [
+          0.15953125059604645,
+          0.37035156041383743
+        ]
+      },
+      "matchedCount": 128,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/small",
+      "resource": "fixed",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.02886718511581421,
+        "control": 0.6039062440395355,
+        "candidate": 0.5901562571525574
+      },
+      "ratioOfMediansChangePct": -2.2768413181165847,
+      "pairedMedianChangePct": -0.02587381366244701,
+      "pairedMedianShiftMs": -0.00015625357627868652,
+      "pairedMedianBootstrap95Pct": [
+        -6.819367084931372,
+        2.6282233292642676
+      ],
+      "candidateFasterPairs": 8,
+      "pairedChangeRangePct": [
+        -8.737864630857295,
+        7.906374527980797
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.5648437440395355,
+          0.6609375178813934
+        ],
+        "candidate": [
+          0.559374988079071,
+          0.6482812464237213
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/small",
+      "resource": "canvas",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.04359374940395355,
+        "control": 0.20476563274860382,
+        "candidate": 0.19984374940395355
+      },
+      "ratioOfMediansChangePct": -2.403666708413421,
+      "pairedMedianChangePct": -2.229911259523998,
+      "pairedMedianShiftMs": -0.004531249403953552,
+      "pairedMedianBootstrap95Pct": [
+        -4.137937989539109,
+        1.2668314466991237
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -11.524289749065131,
+        8.07600550156058
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.1944531351327896,
+          0.23320312798023224
+        ],
+        "candidate": [
+          0.1954687386751175,
+          0.21757812798023224
+        ]
+      },
+      "matchedCount": 64,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/small",
+      "resource": "canvas",
+      "stage": "parse",
+      "changedConstructionPath": true,
+      "medianMs": {
+        "js": 0.005195312201976776,
+        "control": 0.1655859425663948,
+        "candidate": 0.1593359410762787
+      },
+      "ratioOfMediansChangePct": -3.774475896472951,
+      "pairedMedianChangePct": -2.1859232903125303,
+      "pairedMedianShiftMs": -0.0035546869039535522,
+      "pairedMedianBootstrap95Pct": [
+        -16.900836980766965,
+        0.9696653314435588
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -29.621104245451455,
+        29.384349785934383
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.15710937231779099,
+          0.22691406309604645
+        ],
+        "candidate": [
+          0.1552734375,
+          0.2847265601158142
+        ]
+      },
+      "matchedCount": 128,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/small",
+      "resource": "canvas",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.03847656399011612,
+        "control": 0.6240625083446503,
+        "candidate": 0.6118749976158142
+      },
+      "ratioOfMediansChangePct": -1.9529310871700845,
+      "pairedMedianChangePct": -0.6495193595391857,
+      "pairedMedianShiftMs": -0.00390625,
+      "pairedMedianBootstrap95Pct": [
+        -2.2024236402105157,
+        2.1796216527546486
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -10.745419546657143,
+        6.833418183622775
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.5949999988079071,
+          0.7168749868869781
+        ],
+        "candidate": [
+          0.5974999964237213,
+          0.6534374952316284
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "flowchart/medium",
+      "resource": "fixed",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.3073437511920929,
+        "control": 0.6335937678813934,
+        "candidate": 0.6226562559604645
+      },
+      "ratioOfMediansChangePct": -1.7262657045225893,
+      "pairedMedianChangePct": -1.7755886569250978,
+      "pairedMedianShiftMs": -0.011250019073486328,
+      "pairedMedianBootstrap95Pct": [
+        -4.769608828942329,
+        -1.1656729090075535
+      ],
+      "candidateFasterPairs": 13,
+      "pairedChangeRangePct": [
+        -6.341349668127183,
+        4.643570449386458
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.6220312416553497,
+          0.773125022649765
+        ],
+        "candidate": [
+          0.6165624856948853,
+          0.7362499833106995
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "lower"
+    },
+    {
+      "case": "flowchart/medium",
+      "resource": "fixed",
+      "stage": "parse",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.06855469197034836,
+        "control": 0.7834374904632568,
+        "candidate": 0.7749999761581421
+      },
+      "ratioOfMediansChangePct": -1.0769862826101817,
+      "pairedMedianChangePct": -0.648823391736153,
+      "pairedMedianShiftMs": -0.004999995231628418,
+      "pairedMedianBootstrap95Pct": [
+        -2.7048541037585583,
+        0.4862193290151584
+      ],
+      "candidateFasterPairs": 11,
+      "pairedChangeRangePct": [
+        -71.90855370145584,
+        4.046952425736894
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.75718754529953,
+          4.278437495231628
+        ],
+        "candidate": [
+          0.7603124976158142,
+          1.2018749713897705
+        ]
+      },
+      "matchedCount": 16,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "flowchart/medium",
+      "resource": "fixed",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.25828126072883606,
+        "control": 0.9293749928474426,
+        "candidate": 0.9165624976158142
+      },
+      "ratioOfMediansChangePct": -1.3786141579270605,
+      "pairedMedianChangePct": -1.3474497121139684,
+      "pairedMedianShiftMs": -0.013125002384185791,
+      "pairedMedianBootstrap95Pct": [
+        -3.5571798455390047,
+        1.518221228764971
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -6.204031038240543,
+        6.909457813124242
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.8943749666213989,
+          0.9771875143051147
+        ],
+        "candidate": [
+          0.8934375047683716,
+          0.9815624952316284
+        ]
+      },
+      "matchedCount": 16,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "flowchart/medium",
+      "resource": "canvas",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.3341406285762787,
+        "control": 0.6389062702655792,
+        "candidate": 0.6590625047683716
+      },
+      "ratioOfMediansChangePct": 3.1548030502837054,
+      "pairedMedianChangePct": 2.5527759483804147,
+      "pairedMedianShiftMs": 0.016250014305114746,
+      "pairedMedianBootstrap95Pct": [
+        0.7872135570263783,
+        4.634145411049451
+      ],
+      "candidateFasterPairs": 3,
+      "pairedChangeRangePct": [
+        -13.908232250837216,
+        9.415823819470127
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.6225000023841858,
+          0.8751562535762787
+        ],
+        "candidate": [
+          0.6507812440395355,
+          0.7534374892711639
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "higher"
+    },
+    {
+      "case": "flowchart/medium",
+      "resource": "canvas",
+      "stage": "parse",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.05996093153953552,
+        "control": 0.7934374809265137,
+        "candidate": 0.79749995470047
+      },
+      "ratioOfMediansChangePct": 0.5120093103255563,
+      "pairedMedianChangePct": 0.7689293745285708,
+      "pairedMedianShiftMs": 0.0059375762939453125,
+      "pairedMedianBootstrap95Pct": [
+        -36.674263716846546,
+        3.2220493646404114
+      ],
+      "candidateFasterPairs": 7,
+      "pairedChangeRangePct": [
+        -64.96710647138337,
+        78.85148454420636
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.7646875381469727,
+          2.2800000309944153
+        ],
+        "candidate": [
+          0.7603124976158142,
+          1.4112499952316284
+        ]
+      },
+      "matchedCount": 16,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "flowchart/medium",
+      "resource": "canvas",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.265625,
+        "control": 0.9359375238418579,
+        "candidate": 0.9331250190734863
+      },
+      "ratioOfMediansChangePct": -0.30050133654506705,
+      "pairedMedianChangePct": -0.6688925021486325,
+      "pairedMedianShiftMs": -0.006249964237213135,
+      "pairedMedianBootstrap95Pct": [
+        -4.27576733482452,
+        1.6271235579151222
+      ],
+      "candidateFasterPairs": 9,
+      "pairedChangeRangePct": [
+        -26.133469610461212,
+        10.734073654964194
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.9024999737739563,
+          1.5125000476837158
+        ],
+        "candidate": [
+          0.8931249976158142,
+          1.3206250071525574
+        ]
+      },
+      "matchedCount": 16,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/medium",
+      "resource": "fixed",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.1528906226158142,
+        "control": 0.653124988079071,
+        "candidate": 0.6607812643051147
+      },
+      "ratioOfMediansChangePct": 1.1722528406946875,
+      "pairedMedianChangePct": 0.7280445604661123,
+      "pairedMedianShiftMs": 0.004843771457672119,
+      "pairedMedianBootstrap95Pct": [
+        -4.279700453485969,
+        3.144804958027625
+      ],
+      "candidateFasterPairs": 6,
+      "pairedChangeRangePct": [
+        -13.63028270107396,
+        5.556906009226736
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.6362499892711639,
+          0.8173437714576721
+        ],
+        "candidate": [
+          0.6395312547683716,
+          0.7059375047683716
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/medium",
+      "resource": "fixed",
+      "stage": "parse",
+      "changedConstructionPath": true,
+      "medianMs": {
+        "js": 0.02328125387430191,
+        "control": 0.5867187678813934,
+        "candidate": 0.5596874952316284
+      },
+      "ratioOfMediansChangePct": -4.607194132782444,
+      "pairedMedianChangePct": -4.171071242087754,
+      "pairedMedianShiftMs": -0.023906230926513672,
+      "pairedMedianBootstrap95Pct": [
+        -6.976134030837022,
+        -1.132283506706644
+      ],
+      "candidateFasterPairs": 12,
+      "pairedChangeRangePct": [
+        -12.831644506274564,
+        34.987728107478965
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.5610937476158142,
+          0.6478124856948853
+        ],
+        "candidate": [
+          0.5371875166893005,
+          0.7734375
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "lower"
+    },
+    {
+      "case": "gantt/medium",
+      "resource": "fixed",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.1342187523841858,
+        "control": 1.7581249475479126,
+        "candidate": 1.7393749952316284
+      },
+      "ratioOfMediansChangePct": -1.0664743903688434,
+      "pairedMedianChangePct": -1.4466532515327923,
+      "pairedMedianShiftMs": -0.02499997615814209,
+      "pairedMedianBootstrap95Pct": [
+        -2.2066521106900883,
+        0.0
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -9.24967236722506,
+        3.718550999150283
+      ],
+      "sampleRangeMs": {
+        "control": [
+          1.6881250143051147,
+          1.9325000047683716
+        ],
+        "candidate": [
+          1.703125,
+          1.8799999952316284
+        ]
+      },
+      "matchedCount": 8,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/medium",
+      "resource": "canvas",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.1706249937415123,
+        "control": 0.6790625154972076,
+        "candidate": 0.6675000190734863
+      },
+      "ratioOfMediansChangePct": -1.702714574851083,
+      "pairedMedianChangePct": -1.092259648356353,
+      "pairedMedianShiftMs": -0.00734373927116394,
+      "pairedMedianBootstrap95Pct": [
+        -1.4726214505091928,
+        -0.20935136791593312
+      ],
+      "candidateFasterPairs": 12,
+      "pairedChangeRangePct": [
+        -9.725743395141617,
+        3.1494272166284976
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.6587499976158142,
+          0.7406250238418579
+        ],
+        "candidate": [
+          0.6615625023841858,
+          0.7010937631130219
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "lower"
+    },
+    {
+      "case": "gantt/medium",
+      "resource": "canvas",
+      "stage": "parse",
+      "changedConstructionPath": true,
+      "medianMs": {
+        "js": 0.02304687350988388,
+        "control": 0.5881249904632568,
+        "candidate": 0.56640625
+      },
+      "ratioOfMediansChangePct": -3.692878353315565,
+      "pairedMedianChangePct": -4.499463926354408,
+      "pairedMedianShiftMs": -0.02640622854232788,
+      "pairedMedianBootstrap95Pct": [
+        -5.111229590776234,
+        30.961729068615362
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -31.223626716284556,
+        41.07433298684376
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.5678125023841858,
+          0.8146874904632568
+        ],
+        "candidate": [
+          0.5492187440395355,
+          0.8340625166893005
+        ]
+      },
+      "matchedCount": 32,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/medium",
+      "resource": "canvas",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.15027343481779099,
+        "control": 1.7450000047683716,
+        "candidate": 1.7443749904632568
+      },
+      "ratioOfMediansChangePct": -0.03581743859064623,
+      "pairedMedianChangePct": 0.07247234137008896,
+      "pairedMedianShiftMs": 0.001250147819519043,
+      "pairedMedianBootstrap95Pct": [
+        -2.906776225958263,
+        1.6274892193411716
+      ],
+      "candidateFasterPairs": 7,
+      "pairedChangeRangePct": [
+        -14.77272587480728,
+        18.591135663318205
+      ],
+      "sampleRangeMs": {
+        "control": [
+          1.716249942779541,
+          2.034999966621399
+        ],
+        "candidate": [
+          1.7118749618530273,
+          2.041249990463257
+        ]
+      },
+      "matchedCount": 8,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/large",
+      "resource": "fixed",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.621874988079071,
+        "control": 2.46875,
+        "candidate": 2.4749999046325684
+      },
+      "ratioOfMediansChangePct": 0.25316069397745,
+      "pairedMedianChangePct": 1.915118245744707,
+      "pairedMedianShiftMs": 0.046250104904174805,
+      "pairedMedianBootstrap95Pct": [
+        0.10110490253187887,
+        2.1840878122304064
+      ],
+      "candidateFasterPairs": 4,
+      "pairedChangeRangePct": [
+        -7.6382340633157515,
+        5.136275961759051
+      ],
+      "sampleRangeMs": {
+        "control": [
+          2.382499933242798,
+          2.6675000190734863
+        ],
+        "candidate": [
+          2.4437501430511475,
+          2.648750066757202
+        ]
+      },
+      "matchedCount": 4,
+      "descriptiveDirection": "higher"
+    },
+    {
+      "case": "gantt/large",
+      "resource": "fixed",
+      "stage": "parse",
+      "changedConstructionPath": true,
+      "medianMs": {
+        "js": 0.09476563334465027,
+        "control": 1.98562490940094,
+        "candidate": 1.9431250095367432
+      },
+      "ratioOfMediansChangePct": -2.140379064695508,
+      "pairedMedianChangePct": -1.825757783106241,
+      "pairedMedianShiftMs": -0.03562510013580322,
+      "pairedMedianBootstrap95Pct": [
+        -3.7245712226647743,
+        2.351045137941221
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -37.52035586031715,
+        44.45847770693694
+      ],
+      "sampleRangeMs": {
+        "control": [
+          1.9406250715255737,
+          3.069999933242798
+        ],
+        "candidate": [
+          1.8893749713897705,
+          2.859375
+        ]
+      },
+      "matchedCount": 8,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/large",
+      "resource": "fixed",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.5575000047683716,
+        "control": 6,
+        "candidate": 6.097499847412109
+      },
+      "ratioOfMediansChangePct": 1.6249974568684822,
+      "pairedMedianChangePct": 1.8290020997060674,
+      "pairedMedianShiftMs": 0.10749959945678711,
+      "pairedMedianBootstrap95Pct": [
+        -1.8953480970130832,
+        16.343728329920214
+      ],
+      "candidateFasterPairs": 6,
+      "pairedChangeRangePct": [
+        -20.10957019992492,
+        28.850245112571482
+      ],
+      "sampleRangeMs": {
+        "control": [
+          5.877499580383301,
+          7.757500171661377
+        ],
+        "candidate": [
+          5.882500171661377,
+          9.077499866485596
+        ]
+      },
+      "matchedCount": 2,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/large",
+      "resource": "canvas",
+      "stage": "render-source",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.7109375,
+        "control": 2.5149999856948853,
+        "candidate": 2.5706249475479126
+      },
+      "ratioOfMediansChangePct": 2.21172811806829,
+      "pairedMedianChangePct": 1.8750000000000044,
+      "pairedMedianShiftMs": 0.046875,
+      "pairedMedianBootstrap95Pct": [
+        1.1258414857334031,
+        4.077520444947491
+      ],
+      "candidateFasterPairs": 2,
+      "pairedChangeRangePct": [
+        -8.013622235952056,
+        4.568403387397346
+      ],
+      "sampleRangeMs": {
+        "control": [
+          2.474375009536743,
+          2.7531250715255737
+        ],
+        "candidate": [
+          2.5262500047683716,
+          2.648124933242798
+        ]
+      },
+      "matchedCount": 8,
+      "descriptiveDirection": "higher"
+    },
+    {
+      "case": "gantt/large",
+      "resource": "canvas",
+      "stage": "parse",
+      "changedConstructionPath": true,
+      "medianMs": {
+        "js": 0.09433593600988388,
+        "control": 2.0362499952316284,
+        "candidate": 2.1050000190734863
+      },
+      "ratioOfMediansChangePct": 3.3763056600541574,
+      "pairedMedianChangePct": -4.057425959122851,
+      "pairedMedianShiftMs": -0.08437490463256836,
+      "pairedMedianBootstrap95Pct": [
+        -29.789450099492665,
+        42.866456825173984
+      ],
+      "candidateFasterPairs": 10,
+      "pairedChangeRangePct": [
+        -33.756451766854035,
+        60.46440945734266
+      ],
+      "sampleRangeMs": {
+        "control": [
+          1.9037500619888306,
+          3.2799999713897705
+        ],
+        "candidate": [
+          1.915624976158142,
+          3.3256250619888306
+        ]
+      },
+      "matchedCount": 8,
+      "descriptiveDirection": "uncertain"
+    },
+    {
+      "case": "gantt/large",
+      "resource": "canvas",
+      "stage": "render-model",
+      "changedConstructionPath": false,
+      "medianMs": {
+        "js": 0.6237500011920929,
+        "control": 6.197499990463257,
+        "candidate": 6.240000009536743
+      },
+      "ratioOfMediansChangePct": 0.6857606960691598,
+      "pairedMedianChangePct": 0.9219437981216272,
+      "pairedMedianShiftMs": 0.05625009536743164,
+      "pairedMedianBootstrap95Pct": [
+        -2.269534138053886,
+        8.773358290522904
+      ],
+      "candidateFasterPairs": 5,
+      "pairedChangeRangePct": [
+        -10.435739061441318,
+        27.652277340802065
+      ],
+      "sampleRangeMs": {
+        "control": [
+          6.022500038146973,
+          7.601249933242798
+        ],
+        "candidate": [
+          6.066249847412109,
+          8.545000076293945
+        ]
+      },
+      "matchedCount": 4,
+      "descriptiveDirection": "uncertain"
+    }
+  ]
+}

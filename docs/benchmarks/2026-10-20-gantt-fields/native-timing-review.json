@@ -1,0 +1,400 @@
+{
+  "input": "native-comparison-1.json",
+  "reportSHA256": "750d6270334b48cf3996c50ed77c41b19210d4afcce012994ed18f4462da9177",
+  "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+  "artifacts": {
+    "control": {
+      "binarySHA256": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "bc196da8df086f9f348d79335f90ad5181f073ad614747adbf7bc72be08f9d90",
+        "revision": "d8ba90bb6c90c5ca2b43630a4d74fd1f4011327f",
+        "builtAt": "2026-10-20T00:36:34.609Z",
+        "binaries": {
+          "pele-perf": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+          "pele-perf-alloc": "121345cd78165aadff00ea10c5b7193b3556274ddb7c01fd82520eda1401cc30"
+        }
+      }
+    },
+    "candidate": {
+      "binarySHA256": "fac68f3aefc18b5382a7a25c57ad52b716188dfdfbc04046f8673822b1a7109e",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "5f3eb388e501c61712ce49be0995f514fe8430b93f118f2423587a387d143cf9",
+        "revision": "7e9a72af70b3968fb3e7a94da73fcd45bb762d79",
+        "builtAt": "2026-10-20T01:13:35.625Z",
+        "binaries": {
+          "pele-perf": "fac68f3aefc18b5382a7a25c57ad52b716188dfdfbc04046f8673822b1a7109e",
+          "pele-perf-alloc": "045ea91e1a16ee61a0848d37521ca5bc6d07cc099660405cc4c5c97a9d94de59"
+        }
+      }
+    }
+  },
+  "settings": {
+    "trials": 15,
+    "warmupMs": 1000,
+    "matchedNativeBatchCounts": true,
+    "balancedCyclicAndReverseOrder": true,
+    "nativeTypedDocumentRetainedAcrossBatches": true,
+    "nativePublicStateFreshPerBatch": true,
+    "jsRetainedModelFreshPerBatch": true,
+    "stages": [
+      "parse",
+      "parse-public",
+      "render-source",
+      "render-retained",
+      "render-mutable-publish"
+    ],
+    "selectedCases": [
+      "gantt/medium"
+    ],
+    "separateAllocationBinaries": false,
+    "fixedBatchCount": 1
+  },
+  "succeeded": true,
+  "method": "Pair by trial index; report ratio of medians separately from median paired ratios. Fixed-seed10000 paired bootstrap replicates give descriptive percentile95% intervals. No subtraction of control shifts, no sample deletion, no inference of independent serial observations.",
+  "rows": [
+    {
+      "stage": "parse",
+      "counts": {
+        "js": 1,
+        "control": 1,
+        "candidate": 1
+      },
+      "medianMs": {
+        "js": 0.102625,
+        "control": 0.068666,
+        "candidate": 0.062791
+      },
+      "ratioOfMediansPercent": -8.555908309789418,
+      "medianPairedPercent": -11.404102533918014,
+      "pairedMedianDescriptive95Percent": [
+        -13.29803220035779,
+        0.9371784979423925
+      ],
+      "medianPairedMicroseconds": -7.750000000000007,
+      "candidateFasterPairs": 11,
+      "pairs": 15,
+      "sampleRangesMs": {
+        "js": [
+          0.091167,
+          4.46775
+        ],
+        "control": [
+          0.059875,
+          1.02725
+        ],
+        "candidate": [
+          0.059042,
+          0.775416
+        ]
+      },
+      "pairedRangePercent": [
+        -38.34945977282756,
+        9.394572025052206
+      ],
+      "pairedPercent": [
+        -13.121146573669428,
+        -15.012953538222796,
+        0.9371784979423925,
+        -13.29803220035779,
+        1.2228327327865829,
+        -13.050316673454198,
+        3.696098562628336,
+        -38.34945977282756,
+        -13.530713890426128,
+        9.394572025052206,
+        -7.940612700897153,
+        -11.404102533918014,
+        -3.711369918645935,
+        -24.515356534436606,
+        -3.445678501801852
+      ],
+      "firstFivePairedMedianPercent": -13.121146573669428,
+      "lastFivePairedMedianPercent": -7.940612700897153,
+      "samplesOverTwiceLaneMedian": {
+        "js": [
+          11,
+          13,
+          14
+        ],
+        "control": [
+          14
+        ],
+        "candidate": [
+          14
+        ]
+      },
+      "rawCountsChecksumsNodeCountsAndMeasurementsMatch": true
+    },
+    {
+      "stage": "parse-public",
+      "counts": {
+        "js": 1,
+        "control": 1,
+        "candidate": 1
+      },
+      "medianMs": {
+        "js": 0.100208,
+        "control": 0.194875,
+        "candidate": 0.178917
+      },
+      "ratioOfMediansPercent": -8.18883899935856,
+      "medianPairedPercent": -11.139961513790897,
+      "pairedMedianDescriptive95Percent": [
+        -20.772037138175858,
+        -2.3863692161644634
+      ],
+      "medianPairedMicroseconds": -21.709000000000007,
+      "candidateFasterPairs": 13,
+      "pairs": 15,
+      "sampleRangesMs": {
+        "js": [
+          0.091292,
+          0.125292
+        ],
+        "control": [
+          0.1805,
+          0.252083
+        ],
+        "candidate": [
+          0.173166,
+          0.23
+        ]
+      },
+      "pairedRangePercent": [
+        -25.851009389764478,
+        23.961819759514057
+      ],
+      "pairedPercent": [
+        -11.139961513790897,
+        -21.524504980406377,
+        -17.282140955002433,
+        -2.3863692161644634,
+        -7.605946994182289,
+        -1.7902117682896956,
+        0.6000000000000005,
+        -22.783417059402357,
+        -13.766519823788547,
+        -5.404285545163967,
+        -20.772037138175858,
+        -25.851009389764478,
+        23.961819759514057,
+        -19.61701149425288,
+        -3.518836414691806
+      ],
+      "firstFivePairedMedianPercent": -11.139961513790897,
+      "lastFivePairedMedianPercent": -19.61701149425288,
+      "samplesOverTwiceLaneMedian": {
+        "js": [],
+        "control": [],
+        "candidate": []
+      },
+      "rawCountsChecksumsNodeCountsAndMeasurementsMatch": true
+    },
+    {
+      "stage": "render-source",
+      "counts": {
+        "js": 1,
+        "control": 1,
+        "candidate": 1
+      },
+      "medianMs": {
+        "js": 0.335834,
+        "control": 0.302291,
+        "candidate": 0.298667
+      },
+      "ratioOfMediansPercent": -1.19884482171152,
+      "medianPairedPercent": 0.3230315789473748,
+      "pairedMedianDescriptive95Percent": [
+        -3.723407687493152,
+        5.78988195615513
+      ],
+      "medianPairedMicroseconds": 0.9589999999999876,
+      "candidateFasterPairs": 7,
+      "pairs": 15,
+      "sampleRangesMs": {
+        "js": [
+          0.306375,
+          0.456208
+        ],
+        "control": [
+          0.29375,
+          0.4545
+        ],
+        "candidate": [
+          0.295166,
+          0.38525
+        ]
+      },
+      "pairedRangePercent": [
+        -25.791074795725965,
+        10.154975530179456
+      ],
+      "pairedPercent": [
+        8.291136946903377,
+        5.78988195615513,
+        -21.17224058162591,
+        1.2197446808510648,
+        10.154975530179456,
+        -0.4884352329524666,
+        -1.7175585206459343,
+        1.7709286153908987,
+        -3.723407687493152,
+        -25.791074795725965,
+        -7.289316379326327,
+        0.4344682639764619,
+        0.3230315789473748,
+        -15.236523652365241,
+        9.124982219119993
+      ],
+      "firstFivePairedMedianPercent": 5.78988195615513,
+      "lastFivePairedMedianPercent": 0.3230315789473748,
+      "samplesOverTwiceLaneMedian": {
+        "js": [],
+        "control": [],
+        "candidate": []
+      },
+      "rawCountsChecksumsNodeCountsAndMeasurementsMatch": true
+    },
+    {
+      "stage": "render-retained",
+      "counts": {
+        "js": 1,
+        "control": 1,
+        "candidate": 1
+      },
+      "medianMs": {
+        "js": 0.235875,
+        "control": 0.242834,
+        "candidate": 0.24575
+      },
+      "ratioOfMediansPercent": 1.2008203134651563,
+      "medianPairedPercent": 0.9139240506329083,
+      "pairedMedianDescriptive95Percent": [
+        -3.1164935054318943,
+        1.9560687547872213
+      ],
+      "medianPairedMicroseconds": 2.1660000000000013,
+      "candidateFasterPairs": 7,
+      "pairs": 15,
+      "sampleRangesMs": {
+        "js": [
+          0.210875,
+          0.275209
+        ],
+        "control": [
+          0.2355,
+          0.286167
+        ],
+        "candidate": [
+          0.234416,
+          0.314584
+        ]
+      },
+      "pairedRangePercent": [
+        -13.857234726688095,
+        18.666242038216563
+      ],
+      "pairedPercent": [
+        -0.3816014764144504,
+        18.666242038216563,
+        1.0068195697903182,
+        -4.093766540745525,
+        1.799904443382716,
+        1.9560687547872213,
+        -3.1164935054318943,
+        9.930215573423906,
+        9.664522930943598,
+        -0.10561535731787863,
+        -12.997522648248893,
+        -13.857234726688095,
+        0.9139240506329083,
+        6.651677210097984,
+        -5.827757723465088
+      ],
+      "firstFivePairedMedianPercent": 1.0068195697903182,
+      "lastFivePairedMedianPercent": -5.827757723465088,
+      "samplesOverTwiceLaneMedian": {
+        "js": [],
+        "control": [],
+        "candidate": []
+      },
+      "rawCountsChecksumsNodeCountsAndMeasurementsMatch": true
+    },
+    {
+      "stage": "render-mutable-publish",
+      "counts": {
+        "js": 1,
+        "control": 1,
+        "candidate": 1
+      },
+      "medianMs": {
+        "js": 0.239167,
+        "control": 0.514375,
+        "candidate": 0.520417
+      },
+      "ratioOfMediansPercent": 1.1746294046172556,
+      "medianPairedPercent": 0.8486238532110058,
+      "pairedMedianDescriptive95Percent": [
+        -6.049595254302487,
+        3.8530784378785654
+      ],
+      "medianPairedMicroseconds": 4.62499999999999,
+      "candidateFasterPairs": 6,
+      "pairs": 15,
+      "sampleRangesMs": {
+        "js": [
+          0.233291,
+          0.268791
+        ],
+        "control": [
+          0.498375,
+          0.946125
+        ],
+        "candidate": [
+          0.49825,
+          0.620833
+        ]
+      },
+      "pairedRangePercent": [
+        -45.37370854802484,
+        24.342918258089963
+      ],
+      "pairedPercent": [
+        -45.37370854802484,
+        -0.4212091179385369,
+        0.804747718905996,
+        15.829878933900021,
+        -1.8378384194123298,
+        2.0199561937211064,
+        -30.64239231355328,
+        24.342918258089963,
+        -6.049595254302487,
+        4.547980938048646,
+        3.052796361467114,
+        0.8486238532110058,
+        -20.97584377914582,
+        3.8530784378785654,
+        1.1746294046172556
+      ],
+      "firstFivePairedMedianPercent": -0.4212091179385369,
+      "lastFivePairedMedianPercent": 1.1746294046172556,
+      "samplesOverTwiceLaneMedian": {
+        "js": [],
+        "control": [],
+        "candidate": []
+      },
+      "rawCountsChecksumsNodeCountsAndMeasurementsMatch": true
+    }
+  ],
+  "interpretation": [
+    "Public parse ratio of medians is8.19% lower, with13/15 pairs faster. This observed difference is not the isolated causal benefit of fixed field arrays.",
+    "Unchanged typed parse is8.56% lower by ratio of medians, with11/15 faster pairs. Its allocation counters are exactly unchanged. Similar movement on this negative control prevents attributing the full public-parse shift to allocation removal. Do not subtract the two median percentages to estimate an adjusted effect.",
+    "All stages use single-operation count1 batches. Native parse durations near60-70 microseconds are vulnerable to scheduling, cache state and process communication cadence, even though elapsed time excludes transport. Raw long-tail observations remain included.",
+    "The typed parse14th trial has JS4.46775ms/control1.02725ms/candidate0.775416ms, substantially above respective medians. Public-parse ranges are much tighter: control0.180500-0.252083ms and candidate0.173166-0.230000ms. The severe typed-parse outlier is evidence of instability, not proof of a particular OS mechanism or a shared outlier in every stage.",
+    "One-second warmups and cyclic/reversed15-trial ordering limit simple position bias but do not remove shared-host or serial dependence. Host snapshots show mobileassetd/WindowServer/other apps; no compiler bypass is alleged.",
+    "Other negative controls move approximately-1.2% source,+1.2% typed retained,+1.17% mutable. No demonstrated general runtime benefit. Consult paired intervals and ranges instead of declaring every control shift random.",
+    "Allocator reduction is independently established by native-allocations-1.json and exact predicted counters. This timing report adds observed latency context but does not establish an allocation-attributable speedup magnitude or cross-platform effect."
+  ]
+}

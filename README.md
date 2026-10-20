@@ -176,13 +176,14 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest measured package: native `129ad96`, JS `e8316b2`. The latest changes
+Latest complete matrix package: native `129ad96`, JS `e8316b2`. The latest changes
 reuse captured schema metadata, release disposed bridge storage, and borrow SVG
 text that needs no escaping. SVG root assembly now writes borrowed spans directly
 into the final output. Fresh Gantt arenas now use private Rust builders instead
 of general mutable property assignment. Gantt string lookups borrow stack UTF-16
 instead of creating temporary owned strings. Small Gantt records now search
-their existing arena property slices; larger records retain hashing.
+their existing arena property slices; larger records retain hashing. The newer
+focused `02ee639` checkpoint also removes temporary fresh-record field vectors.
 Source render takes **1.61–4.86×** the Pele JS time.
 Median ratios across all sizes/resources are **2.43× source**, **11.30× parse**
 and **4.04× retained mutable render**. These describe this artifact; differences
@@ -205,10 +206,20 @@ control, with unchanged required retained storage. VM retained medians are
 follow-up; parse costs remain unresolved. This is a native/retained improvement
 with a measured web tradeoff, not a regression-free result.
 
+The [fixed-field checkpoint](docs/benchmarks/2026-10-20-gantt-fields/)
+reduces cumulative requested native public-parse allocation bytes by 28.8%.
+A matched sixteen-operation comparison measures a 7.7% lower public-parse
+median; unchanged controls and the initial count-one run remain disclosed.
+VM parse results are mixed, with source regressions in some unchanged paths;
+this is not a general browser speedup. Fresh ARM64 Swift passes 14 integrations
+and 168 exact API output conditions. The complete matrix above predates this
+focused change; 0.3 remains blocked.
+
 The prior direct host comparison measured an 11.1% retained-render improvement
 against its own matched control, with regressions disclosed. Reports retain
 raw samples, artifact hashes and failed gates:
 [latest adaptive-property checkpoint](docs/benchmarks/2026-10-20-gantt-properties/),
+[fixed-field checkpoint](docs/benchmarks/2026-10-20-gantt-fields/),
 [Gantt lookup checkpoint](docs/benchmarks/2026-10-20-gantt-lookup/),
 [Gantt construction checkpoint](docs/benchmarks/2026-10-20-gantt-builder/),
 [borrowed-root checkpoint](docs/benchmarks/2026-10-20-svg-root/),
@@ -261,8 +272,11 @@ A separate [native-only comparison](docs/benchmarks/2026-10-20-native-core/)
 before the latest root rewrite removes WASM/Swift entirely: typed retained native/JS medians are 0.80× Flowchart,
 0.70× Sequence, 1.04× ER, 0.50× Pie, 0.41× Sankey, 1.15× Gantt and 1.38× Railroad.
 Seven medium workloads on the same Mac; this is not all-33 certification.
-Native compatibility work is still costly: the pre-lookup Gantt public parse
-comparison took 3.82× JS time. Current matched-history diagnostics show 22–25%
+Native compatibility work is still costly: the latest matched Gantt medium
+comparison takes 0.166 ms for native public parse versus 0.082 ms for JS.
+Typed native parse takes 0.055 ms in that run; public graph construction adds
+work before any WASM crossing. These are stage medians, not subtractable phase
+measurements or all-diagram guarantees. Current matched-history diagnostics show 22–25%
 lower mutable publication medians against matched native control; the extra
 graph/revision return contract and growing arena remain disclosed.
 
