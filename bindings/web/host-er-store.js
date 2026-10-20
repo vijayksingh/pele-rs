@@ -96,6 +96,12 @@ function readOwn(context,id,key){
   return readAtom(context,descriptor.value)+flags*READ_FLAGS;
 }
 export function hostErReadOwn(context,id,key){return readOwn(context,id,key);}
+export function hostErReadOwnCount(context,id){
+  const owner=context.owner;owner.assertLive();
+  // Retain enumeration and empty-key classification, including their errors
+  // and ID/string side effects. Only the count crosses the admission ABI.
+  return owner.ownInfo(id,'')[0];
+}
 export function hostErReadIndex(context,id,index){return readOwn(context,id,index);}
 export function hostErReadNumberBits(context){
   context.owner.assertLive();

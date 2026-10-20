@@ -20,6 +20,8 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     #[wasm_bindgen(catch, js_name = hostErReadOwn)]
     fn read_own(context: &JsValue, object: u32, key: &JsValue) -> Result<f64, JsValue>;
+    #[wasm_bindgen(catch, js_name = hostErReadOwnCount)]
+    fn read_own_count(context: &JsValue, object: u32) -> Result<f64, JsValue>;
     #[wasm_bindgen(catch, js_name = hostErReadIndex)]
     fn read_index(context: &JsValue, object: u32, index: u32) -> Result<f64, JsValue>;
     #[wasm_bindgen(catch, js_name = hostErReadKind)]
@@ -313,6 +315,15 @@ impl HostStore {
             },
             flags: unsigned(&a.get(2))? as u8,
         })
+    }
+    fn own_count(&self, id: u32) -> Result<usize, PublicError> {
+        let count = self.captured(read_own_count(&self.context, id))?;
+        // Match unsigned() validation without another JsValue conversion.
+        if count.is_finite() && count >= 0.0 && count <= u32::MAX as f64 && count.fract() == 0.0 {
+            Ok(count as u32 as usize)
+        } else {
+            Err(invalid("Invalid host storage number"))
+        }
     }
     fn peek_own(&self, id: u32, key: &str) -> Result<Option<Atom>, PublicError> {
         let key = self.key(key);
@@ -765,7 +776,7 @@ impl pele::compat::host_er::AdmissionStore for HostStore {
         if kind != 1 {
             return Err(draw_invalid("ER drawable list must be an Array"));
         }
-        let count = self.own_info(*id, "").map_err(pele)?.count;
+        let count = self.own_count(*id).map_err(pele)?;
         Ok((length as usize, count))
     }
     fn index(&self, value: &Atom, index: usize) -> Result<Atom, PeleError> {
