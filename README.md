@@ -179,6 +179,20 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 complete release-gate run, historical source `0b32797`, fails all 126 conditions.
 New scoped diagnostics do not replace that gate.
 
+The opt-in [captured Sankey experiment](docs/benchmarks/2026-10-20-er-host-storage/captured-backend-rejected/)
+is **rejected for activation**: identical-package VM tests measure parse at
+5.3–6.5× current arena latency and retained render at 3.7–4.0×. Six CPU profiles
+locate the dominant boundary in repeated native admission through JS column
+imports; raw parsing is a small share. All 18 rows, negative controls and raw
+profiles are retained. The selector stays disabled. Work now moves canonical
+storage into Rust/WASM memory with bulk observation and direct native reads;
+that replacement has no measured speedup yet.
+
+The separate [correctness checkpoint](docs/benchmarks/2026-10-20-er-host-storage/captured-web-validation/)
+at `00d2411` passes **450/450 browser tests**, including 33 selected-backend
+checks. All 408 source inputs and 112 packed files are pinned and unchanged.
+That correctness result does not approve the rejected backend's performance.
+
 The first [shared traversal attempt](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-rejected/)
 was rejected after Flowchart/medium fixed retained render measured **9.16% slower**
 (4/21 lower pairs). The revised [shared traversal](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-v2/),

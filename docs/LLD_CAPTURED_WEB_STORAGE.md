@@ -46,8 +46,8 @@ Fresh source still constructs columns and then walks them through the shared
 shell publisher. It has not eliminated that initial publication walk. Unchanged
 apply checks, complete restoration, native admission and frame counting still
 scan storage. Bounded per-node imports and typed-array scratch copies are a
-profiling target; a canonical native store with bulk host access is a possible
-replacement, not a measured result.
+profiling target confirmed by the recorded CPU profiles; a canonical native store
+with bulk host access is being implemented, without a measured result yet.
 
 Build the experiment with
 `PELE_WASM_CAPTURED_SANKEY=1 scripts/build-wasm.sh`. Tests opt in through the
@@ -57,7 +57,8 @@ feature tests. The warm and first-use VM comparators accept
 `--candidate-captured-sankey` and verify selected backends outside timed work.
 No public loader option or default capability enables the experiment.
 
-Initial source/prepared/raw, helper, callback, disposal and ER-routing checks pass
-across Chromium, Firefox and WebKit. Complete combined-boundary, provider,
+Source `00d2411` passes all 450 browser checks, including 33 selected-backend
+source/prepared/raw, helper, callback, disposal, error/recovery and ER-routing
+checks across Chromium, Firefox and WebKit. Complete combined-boundary, provider,
 first-use and final release verification remain separate gates. No v0.3 release
 can proceed while the Pele JavaScript performance gate remains unmet.
