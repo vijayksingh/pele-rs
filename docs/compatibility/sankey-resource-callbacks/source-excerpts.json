@@ -1,0 +1,38 @@
+[
+  {
+    "title": "sankey render captures each label before width, reads later node labels after earlier callbacks",
+    "path": "node_modules/pele/dist/esm/chunks/CTRBU7NA.js",
+    "characterOffset": 7486,
+    "source": "U.forEach((i,x)=>{let b=t.nodes[x].id,T=Math.max(i.height,1);H+=`<rect class=\"pele-sankey-node\" data-id=\"${F(b)}\" x=\"${k(i.x)}\" y=\"${k(i.y)}\" width=\"${k(E)}\" height=\"${k(T)}\" rx=\"${k(Math.min(2,T/2))}\" fill=\"${J(x)}\"${C(x)}/>`;let v=h?`${$}${Ee(i.value)}${d}`:\"\",S=u?i.layer>=I:i.x<o/2,Y=m.width(v?`${b} ${v}`:b,c,0),P=S?i.x+E+ke:i.x-ke,Z=i.y+i.height/2;A=Math.min(A,S?P:P-Y),M=Math.max(M,S?P+Y:P),w=Math.min(w,Z-c*.75),L=Math.max(L,Z+c*.75);let te=` x=\"${k(P)}\" y=\"${k(Z+c*.35)}\" text-anchor=\"${S?\"start\":\"end\"}\"`,Ae=Q(b)+(v?` <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">${Q(v)}</tspan>`:\"\");z+=`<g class=\"pele-label\" data-id=\"${F(b)}\">`+(u?`<text${te} fill=\"none\" stroke=\"var(--_bg)\" stroke-width=\"3\" stroke-linejoin=\"round\">${Q(b)}${v?\" \"+Q(v):\"\"}</text>`:\"\")+`<text${te}>${Ae}</text></g>`});let G=N===\"gradient\"||N===\"source\"||N===\"target\"?\"\":xe(N),K=\"\";for(let i of X){let x=N===\"target\"?i.target:i.source,b=Math.max(i.thickness,1)/2,T=U[i.source].x+E,v=U[i.target].x,S=k((T+v)/2),Y=F(t.nodes[i.source].id),P=F(t.nodes[i.target].id);K+=`<path class=\"pele-sankey-link\" data-id=\"${Y}-&gt;${P}\" d=\"M${k(T)},${k(i.sourceY-b)}C${S},${k(i.sourceY-b)} ${S},${k(i.targetY-b)} ${k(v)},${k(i.targetY-b)}L${k(v)},${k(i.targetY+b)}C${S},${k(i.targetY+b)} ${S},${k(i.sourceY+b)} ${k(T)},${k(i.sourceY+b)}Z\" fill=\"${J(x)}\"${G||C(x)}><title>${Y} \u2192 ${P}: ${F($)}${Ee(i.value)}${F(d)}</title></path>`}let _=ce(t.title,!1,m,f,fe(n),1),W=_.height>0?_.height+12:0,R=Math.max(M-A,_.width),e=l-A+(R-(M-A))/2,s=l+W-w,a=Math.ceil(R+2*l),g=Math.ceil(L-w+W+2*l);return{svg:le(\"sankey\",a,g,f,n,t,ie(_,a/2,l+_.height/2,' class=\"pele-title\" font-weight=\"var(--_tw)\"')+`<g transform=\"translate(${k(e)},${k(s)})\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\">${K}</g><g class=\"pele-sankey-nodes\">${H}</g><g class=\"pele"
+  },
+  {
+    "title": "links read public node labels after node measurements",
+    "path": "node_modules/pele/dist/esm/chunks/CTRBU7NA.js",
+    "characterOffset": 8350,
+    "source": "for(let i of X){let x=N===\"target\"?i.target:i.source,b=Math.max(i.thickness,1)/2,T=U[i.source].x+E,v=U[i.target].x,S=k((T+v)/2),Y=F(t.nodes[i.source].id),P=F(t.nodes[i.target].id);K+=`<path class=\"pele-sankey-link\" data-id=\"${Y}-&gt;${P}\" d=\"M${k(T)},${k(i.sourceY-b)}C${S},${k(i.sourceY-b)} ${S},${k(i.targetY-b)} ${k(v)},${k(i.targetY-b)}L${k(v)},${k(i.targetY+b)}C${S},${k(i.targetY+b)} ${S},${k(i.sourceY+b)} ${k(T)},${k(i.sourceY+b)}Z\" fill=\"${J(x)}\"${G||C(x)}><title>${Y} \u2192 ${P}: ${F($)}${Ee(i.value)}${F(d)}</title></path>`}let _=ce(t.title,!1,m,f,fe(n),1),W=_.height>0?_.height+12:0,R=Math.max(M-A,_.width),e=l-A+(R-(M-A))/2,s=l+W-w,a=Math.ce"
+  },
+  {
+    "title": "partial helper writes Map before Array.push",
+    "path": "node_modules/pele/dist/esm/chunks/CTRBU7NA.js",
+    "characterOffset": 299,
+    "source": "findOrCreateNode(r){let n=this.lookup.get(r);return n===void 0&&(n={id:r,index:this.nodes.length},this.lookup.set(r,n),this.nodes.push(n)),n}addLink(r,n,o){this.links.push({source:r,target:n,value:o})}};var q=[\"$end\",\"STUCK\",\"SANKEY\",\"NEWLINE\",\"COMMA"
+  },
+  {
+    "title": "public render calls same original model directly",
+    "path": "node_modules/pele/dist/esm/chunks/ESCH476E.js",
+    "characterOffset": 16820,
+    "source": "function bt(e,t={}){return Se(()=>{let{type:o,diagram:r,model:m,config:a}=gt(e,t),i=a[r.section??o],p=typeof i==\"object\"&&i!==null&&!Array.isArray(i)&&i.useMaxWidth===!1,u=t.responsive??!p,l=t.icons,s=l&&(h=>l(ue(h))),f=Ce(s,()=>r.render(m,a,{...t,responsive:u,icons:s})),R=t.outputLimit??mt;if(f.svg.length>R)throw new j(`Diagram output is longer than the limit of ${R} characters.`,\"limit\",{type:o});for(let h of f.links)h.id=ue(h.id);return{type:o,...f}})}function $t(e,t,o={}){return ze({parse:yt,render:bt},e,t,o)}export{nt as a,Pt as b,_t as c,ht as d,jt as e,yt as f,bt as g,$t as h};\n"
+  },
+  {
+    "title": "guarded only wraps RangeError",
+    "path": "node_modules/pele/dist/esm/chunks/ESCH476E.js",
+    "characterOffset": 15680,
+    "source": "function Se(e){try{return e()}catch(t){throw t instanceof RangeError?new j(\"Diagram is nested too deeply.\",\"limit\"):t}}var Ae=new WeakMap;function Fe(e,t=ut,o=pt,r){if(e.length>t)t"
+  },
+  {
+    "title": "resource scope finally restores icon globals, not model",
+    "path": "node_modules/pele/dist/esm/chunks/ND66TM4A.js",
+    "characterOffset": 3117,
+    "source": "function G(e,n){let t=l,r=g;l=e,g=new Map;try{return n()}finally{l=t,g=r}}function W(e){if(l===void 0)return\"\";let n=g.get(e);return n===void 0&&(n=l(e)??\"\",g.set(e,n)),n}var k=\"7q7q9vfgfgopij5b9999atg87q997q7qfgfgfgfgfg"
+  }
+]

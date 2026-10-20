@@ -1,0 +1,392 @@
+{
+  "node": "v25.9.0",
+  "package": "1.6.0",
+  "source": "sankey\nA,B,5\nB,C,3\nA,C,1",
+  "files": {
+    "node_modules/pele/package.json": "f90c66c898398b6698be6382a22d13683d5ee79e7ec63d2eb5b6c2b52698ca05",
+    "node_modules/pele/dist/pele.js": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+    "dist/evidence/pele-oracle.js": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+    "node_modules/pele/dist/esm/chunks/CTRBU7NA.js": "fa44381e7d03daf103a5ad063b0237356c40e673bc87a0ca715bb135cbc56851",
+    "node_modules/pele/dist/esm/chunks/ESCH476E.js": "938cd3cf3cfa8b6823d4105db780ba40111b32cb4a88b8194c7a21396125308c",
+    "node_modules/pele/dist/esm/chunks/ND66TM4A.js": "6aa03ec643b5d64291ca77d77a0cd09291287935da46da5267322e6074936035"
+  },
+  "rows": [
+    {
+      "resource": "width",
+      "kind": "success",
+      "calls": 3,
+      "threw": false,
+      "original": false,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ],
+        [
+          "width",
+          "Changed B 5",
+          14,
+          0
+        ],
+        [
+          "width",
+          "C 4",
+          14,
+          0
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": {
+        "width": 616,
+        "height": 416,
+        "svgSha256": "0d852f32bc2c6d6804c7970863fea8e2c358b6560ea054a0e0af88991a1d7ee1",
+        "changedA": true,
+        "changedB": true
+      }
+    },
+    {
+      "resource": "width",
+      "kind": "object",
+      "calls": 1,
+      "threw": true,
+      "original": true,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": null
+    },
+    {
+      "resource": "width",
+      "kind": "symbol",
+      "calls": 1,
+      "threw": true,
+      "original": true,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": null
+    },
+    {
+      "resource": "width",
+      "kind": "undefined",
+      "calls": 1,
+      "threw": true,
+      "original": true,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": null
+    },
+    {
+      "resource": "icon",
+      "kind": "success",
+      "calls": 1,
+      "threw": false,
+      "original": false,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ],
+        [
+          "width",
+          "B 5",
+          14,
+          0
+        ],
+        [
+          "width",
+          "C 4",
+          14,
+          0
+        ],
+        [
+          "icon",
+          "fa:fa-user"
+        ],
+        [
+          "width",
+          " Energy",
+          16,
+          1
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": {
+        "width": 616,
+        "height": 452,
+        "svgSha256": "0bcbe983c25702ed349f7b501cf32b9d2cfc65ed9dff0ddcb1b5729e53465ee0",
+        "changedA": false,
+        "changedB": false
+      }
+    },
+    {
+      "resource": "icon",
+      "kind": "object",
+      "calls": 1,
+      "threw": true,
+      "original": true,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ],
+        [
+          "width",
+          "B 5",
+          14,
+          0
+        ],
+        [
+          "width",
+          "C 4",
+          14,
+          0
+        ],
+        [
+          "icon",
+          "fa:fa-user"
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": null
+    },
+    {
+      "resource": "icon",
+      "kind": "symbol",
+      "calls": 1,
+      "threw": true,
+      "original": true,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ],
+        [
+          "width",
+          "B 5",
+          14,
+          0
+        ],
+        [
+          "width",
+          "C 4",
+          14,
+          0
+        ],
+        [
+          "icon",
+          "fa:fa-user"
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": null
+    },
+    {
+      "resource": "icon",
+      "kind": "undefined",
+      "calls": 1,
+      "threw": true,
+      "original": true,
+      "trace": [
+        [
+          "width",
+          "A 6",
+          14,
+          0
+        ],
+        [
+          "width",
+          "B 5",
+          14,
+          0
+        ],
+        [
+          "width",
+          "C 4",
+          14,
+          0
+        ],
+        [
+          "icon",
+          "fa:fa-user"
+        ]
+      ],
+      "state": {
+        "firstId": "Changed A",
+        "secondId": "Changed B",
+        "lookupSize": 0,
+        "extraAbsent": true,
+        "detachedAbsent": true,
+        "extraValue": 99,
+        "extraAlias": true,
+        "detachedAlias": true,
+        "cycle": true,
+        "modelAliases": true,
+        "descriptor": {
+          "writable": false,
+          "enumerable": false,
+          "configurable": true,
+          "valueAlias": true
+        }
+      },
+      "output": null
+    }
+  ],
+  "helper": {
+    "error": {
+      "name": "TypeError",
+      "message": "Cannot assign to read only property 'length' of object '[object Array]'"
+    },
+    "lookupHasX": true,
+    "index": 3,
+    "nodeCount": 3,
+    "absentFromArray": true,
+    "retrySameAlias": true
+  }
+}

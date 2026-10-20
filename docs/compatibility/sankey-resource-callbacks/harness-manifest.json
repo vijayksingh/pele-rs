@@ -1,0 +1,54 @@
+{
+  "status": "private; source reviewed; one standalone Node RED proof, browser unexecuted",
+  "files": {
+    "scripts/verify-sankey-resource-callbacks.mjs": {
+      "original": null,
+      "sha256": "3e2ac70e5bbabc37a20979f29cf8a6f3272934d0ec6c5faa02d54a619f5d35d8"
+    },
+    "tests/web/sankey-resource-callbacks.spec.js": {
+      "original": null,
+      "sha256": "7d5d1e41e36f592c62e94627ee8c7185c556afb680926a2302a1aaf1f09e2e99"
+    },
+    "tests/web/support/sankey-callback-scenarios.js": {
+      "original": null,
+      "sha256": "9560722810fbbcd98c73821dac679b859725e7391a21c5f9c144027cb0959c1e"
+    }
+  },
+  "patchSha256": "1c358458a08ab8bcfe816af6d3d62db8ae003bd712ecc4092fe79f918f8848f2",
+  "counts": {
+    "cases": 122,
+    "groups": 8,
+    "browserEngines": 3
+  },
+  "sourceEvidence": {
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/NEXT_CALLBACK_SLICE.md": "07963ef63d6e678a5efa480736bc769d3ff8cdc3ec87b33085b84bbc3d44aaca",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/README.md": "20bc1e498e755929d31318794b3a708ad601ea18b140a6b2c62189993c7967f8",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/differential-summary.json": "a0f0120a7eef40b3379184e702e4c880627a3b77391ebad9a1f5636f1be77886",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/differential.json": "2913fb130269d0e3fc1e9216d64210a9ee436a4d4c36cb5cc505bdf46e2884d2",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/differential.mjs": "d99656e3539950ce32dc75d5f621c6f02b9ac2fa4384cca21df355fa8741b9e1",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/extended-manifest.json": "e99e447b99c8f295a5469007cfaae249d877ad9fc366bb729fb1808197009608",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/helper-reentry.json": "e44cfb52f43d009274e86b9eec0a4ecad8c2db6082efc06bd4fffe83b90b0bae",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/helper-reentry.mjs": "c4d1ee9edae5b596063d48ef1695c31c8d9e31d52f827b32afaaae7a0f9ee438",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/manifest.json": "113b2ee4f28426ddcb26e5c6a51c4dce2cf4a9341692487b0366b9568c62cec8",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/package-after.json": "fb654118514bba541f3e020cc1ded73356b12acceff6099ee576303d17471de8",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/probe.mjs": "8d4cb2342f54f52acd608770d70ab3cc2a64ad6dba77d4a24bb05fca307d427f",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/report.json": "fb61f924721ba550e9f9e0db2df14638dceec2599e4c1d9b9e1081d57196c80c",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/responsive-summary.json": "372a61689b8ecb28b3f35718fe317a9959c274769bb303a00694134a05496c7e",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/responsive.json": "e7f377fb38c6c291293b46b4038285713af57b73072e1cd5dab484b57a7b2750",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/responsive.mjs": "ec64aa99fc5bc12fee8769e2396873c9b3ca7b85c36d476dec533bfae4cf0d3d",
+    "dist/perf-patches/parse-architecture/callback-mutation-oracle/source-excerpts.json": "55286a5d3d7cb7de39740690700437449a78c922cdf5d13c482b0e854c228d8f"
+  },
+  "validation": {
+    "nodeSyntax": "passed for all three files",
+    "featureExecution": "one standalone Node run: 122 oracle cases pass, 113 native parity mismatches; expected exit1",
+    "builds": "not run",
+    "rootChanges": false,
+    "gitApplyCheck": "passed"
+  },
+  "redProof": {
+    "report": "node-red.json",
+    "sha256": "e15bc94c8fc26b43428e77ade7abf84dc64caf2e2d08a361194bf31b3291412a",
+    "summary": "node-red-summary.json",
+    "summarySha256": "fb1cbb99dc679c06106f6b2de68a840d0d215bd58a48df675a52d482b9ac48f4"
+  }
+}
