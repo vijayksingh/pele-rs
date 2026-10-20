@@ -18,6 +18,12 @@ v1-only engine and wrappers are removed. A new release remains on hold while the
 web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
+**The full API port is unfinished.** The current functional audit confirms
+callback mutation gaps in 31 families and missing model constructors in 22.
+Passing tests include checks that explicitly expect unsupported behavior;
+they do not establish complete Pele parity. See the
+[remaining-work audit](docs/parity/2026-10-21-runtime-audit/README.md).
+
 ![Packed Rust WASM demo: five diagram families, mutable pie, error recovery and dark palette](docs/images/full-demo.gif)
 
 Recorded from the actual packed-library playground with

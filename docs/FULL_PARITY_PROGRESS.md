@@ -1,3 +1,29 @@
+# Current functional parity — incomplete (2026-10-21)
+
+All 33 diagram parsers/renderers and mutable family adapters exist. This is not
+full public API parity. The current functional audit against pinned Pele 1.6.0
+records these concrete gaps at runtime `d7caf8c`:
+
+- **31 of 33 prepared per-type entries lose callback mutations:** the first
+  width callback changes `model.title`, then throws an original object. Pele
+  retains the edit; native restores the previous title. All 33 preserve throw
+  identity and call width once. Sankey and ER retain the edit in this case.
+- **22 exposed model constructors are stubs:** pinned constructors succeed;
+  native constructor functions throw. Plain-object families are separate.
+- Native codecs still explicitly reject active lone UTF-16, sparse collection,
+  dynamic coercion and overridden-dispatch cases. Some integration tests
+  deliberately assert these gaps and recovery; their passing totals must not be
+  reported as complete behavioral parity.
+- C/Swift Sankey same-document callback reentry is being implemented. No passing
+  result is claimed here while that implementation and its proof are underway.
+
+See the [33-family checklist and reproducible evidence](parity/2026-10-21-runtime-audit/README.md).
+Runtime behavior, fresh platform artifacts and release publication are separate
+acceptance gates. The dated checkpoints below are preserved as historical
+evidence, not current full-parity certification.
+
+---
+
 # 0.3 source checkpoint — 2026-10-19
 
 The v1-only renderer, wrappers and playground are removed. The package root now
