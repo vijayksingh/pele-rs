@@ -131,3 +131,41 @@ pinned runtime name from the descriptive schema name and define the shared
 constructor/prototype identities across core, raw entries and registries. This
 slice neither infers authority from a name nor introduces a global schema-name
 cache. FlowDb sharing and the other constructor factories remain separate work.
+
+## Retained options and owned method phases — native layer
+
+Flowchart, Swimlane and Gantt now have native first-value factories in addition
+to the sixteen ignored-argument families (including Class). This native layer
+is independently tested; its new web and C/Swift host adapters still require
+platform verification. It does not establish full cross-platform API parity.
+
+`ConstructorArgument`/`PublicHostValue` preserve undefined, null, Boolean,
+number bits, owned UTF16 and an owner-local opaque identity. Undefined defaulting
+belongs to the family initializer. Retained options are neither copied nor
+inspected during construction. Authenticated `live_fields()` metadata identifies
+fields the adapter must protect from eager observation, including native-created
+default objects retained in detached history.
+
+`prepare_detached_invocation`, `resume_detached_invocation` and
+`finish_detached_invocation` expose an owned, creator-checked continuation.
+Native code selects Get, Call, Truthy, StrictEqual, GreaterEqual and ToString at
+the actual statement. Hosts perform only those ordinary value operations, with
+no diagram decisions. Every accepted resume advances the current revision
+before mutation; finish releases its LIFO reservation without another increment.
+Dropping a suspended job therefore leaves partial state at its published revision.
+Same-owner helpers may run between phases; completion uses the latest state.
+
+Call result transfer is explicit: `PublicHostResult::Discard` never examines a
+callback return, `Retain` forwards its original host value without scalar copies,
+and `Value` imports an owned scalar. Native code also supplies the call-site
+noncallable error. Gantt captures its second warning function and receiver before
+calling the message producer, then forwards the untouched producer result.
+
+Flowchart/Swimlane reuse the existing helper algorithms around live reads for
+addVertex, addSingleLink, addLink and addSubGraph. Gantt adds the explicit warning
+helper continuation; scheduler-driven warning callbacks remain separate work.
+Four native features pass in the combined source: Class defaults/helpers/raw
+render, two Flow features covering forty pinned cases and lifecycle/scalar
+behavior, and nineteen Gantt warning cases plus defaults/raw rendering. Existing
+Flow methods/SVG regression also passed in the private candidate. This is scoped
+feature evidence, not an all-library or platform acceptance result.

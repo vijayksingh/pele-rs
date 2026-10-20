@@ -8,6 +8,9 @@ use super::{
     ModelSchema, ModelSchemaView, PrototypeId, PublicConstructorFactory, PublicError,
     RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
+use super::{
+    ConstructorArgument, DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation,
+};
 use crate::compat::engine::{ParseAdmission, ParsePlan};
 use crate::compat::{
     DiagramId, DiagramModule, EdgeLimit, Engine, ErrorCode, ModuleDescriptor, Object, OutputLimit,
@@ -78,6 +81,11 @@ pub trait PublicDiagramModule: DiagramModule {
         &self,
         _prototype: PrototypeId,
     ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        None
+    }
+    /// Owned builtin method phases; no mutable document borrow reaches the host.
+    #[doc(hidden)]
+    fn detached_public_invocation(&self, _call: MethodCall) -> Option<DetachedPublicInvocation> {
         None
     }
     /// Method IDs, receiver identity and arguments come from this document's
@@ -353,6 +361,7 @@ trait Erased: Send + Sync {
     ) -> Result<(State, Object), PeleError>;
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn constructor(&self, prototype: PrototypeId) -> Option<Constructor>;
+    fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation>;
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
     fn borrow_graph<'a>(&self, state: &'a State) -> Option<&'a ModelGraph>;
     fn has_source_layout(&self, state: &State) -> bool;
@@ -448,8 +457,16 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .for_creator::<D>(prototype)?;
         Some(Constructor {
             ignores_arguments: factory.ignores_arguments(),
-            construct: Box::new(move || factory.construct().map(|state| Box::new(state) as State)),
+            live_fields: factory.live_fields(),
+            construct: Box::new(move |argument| {
+                factory
+                    .construct(argument)
+                    .map(|state| Box::new(state) as State)
+            }),
         })
+    }
+    fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        self.0.detached_public_invocation(call)?.for_creator::<D>()
     }
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
@@ -560,7 +577,8 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
 }
 struct Constructor {
     ignores_arguments: bool,
-    construct: Box<dyn Fn() -> Result<State, PeleError> + Send + Sync>,
+    live_fields: &'static [super::LiveConstructorField],
+    construct: Box<dyn Fn(ConstructorArgument) -> Result<State, PeleError> + Send + Sync>,
 }
 /// An authentic class factory retaining its original module registration.
 /// Registry replacement or destruction does not invalidate a captured factory.
@@ -581,16 +599,26 @@ impl CapturedPublicConstructor {
             function_shapes: self.registration.function_shapes,
         }
     }
-    /// Sankey's implicit constructor ignores all arguments, including opaque
-    /// host objects. Adapters must not pre-observe these ignored values.
+    /// Creator-authenticated fields evaluated only by native-requested host reads.
+    pub fn live_fields(&self) -> &'static [super::LiveConstructorField] {
+        self.constructor.live_fields
+    }
     pub fn ignores_arguments(&self) -> bool {
         self.constructor.ignores_arguments
     }
     pub fn construct(&self) -> Result<PublicDocument, PeleError> {
+        self.construct_with(ConstructorArgument::Undefined)
+    }
+    /// A foreign token belongs to the caller's retained owner ledger. It is not
+    /// an instruction to traverse or serialize the referenced object.
+    pub fn construct_with(
+        &self,
+        argument: ConstructorArgument,
+    ) -> Result<PublicDocument, PeleError> {
         self.schema_view().validate()?;
         let document = PublicDocument {
             registration: self.registration.clone(),
-            state: (self.constructor.construct)()?,
+            state: (self.constructor.construct)(argument)?,
             config: Object::default(),
             revision: 0,
             render_book: None,
@@ -1490,6 +1518,92 @@ impl PublicDocument {
     /// even if the operation returns a native, JavaScript or host exception.
     /// Stale/malformed calls never reach module code. A codec that exports an
     /// invalid graph is a protocol error; its state and advanced revision remain.
+    #[doc(hidden)]
+    pub fn prepare_detached_invocation(
+        &mut self,
+        expected_revision: u64,
+        call: MethodCall,
+    ) -> Result<Option<DetachedInvocationJob>, PeleError> {
+        // Discovery is nonmutating; unsupported modules use their original lane.
+        let Some(program) = self.registration.codec.detached_invocation(call.clone()) else {
+            return Ok(None);
+        };
+        if expected_revision != self.revision {
+            return Err(PeleError::new(
+                "Stale public model revision",
+                ErrorCode::Semantic,
+            ));
+        }
+        self.next_revision()?;
+        call.validate_compiled(
+            self.snapshot_view()?.as_ref(),
+            self.registration.compiled_schema()?,
+        )?;
+        let book = self
+            .render_book
+            .get_or_insert_with(|| Arc::new(Mutex::new(RenderBook::new())));
+        DetachedInvocationJob::new(book, self.revision, program).map(Some)
+    }
+    #[doc(hidden)]
+    pub fn resume_detached_invocation(
+        &mut self,
+        job: &mut DetachedInvocationJob,
+        reply: Option<Result<super::PublicHostValue, PublicError>>,
+    ) -> Result<DetachedInvocationStep, PeleError> {
+        let book = self.render_book.as_ref().ok_or_else(|| {
+            PeleError::new(
+                "Public invocation belongs to another document",
+                ErrorCode::Semantic,
+            )
+        })?;
+        job.check_resume(book, reply.is_some())?;
+        // Every dispatched phase owns its mutations, including partial failure
+        // and cancellation. Nested operations use this current revision.
+        self.revision = self.next_revision()?;
+        job.advance(book, self.state.as_mut(), reply)
+    }
+    #[doc(hidden)]
+    pub fn finish_detached_invocation(
+        &mut self,
+        job: &mut DetachedInvocationJob,
+    ) -> Result<ReadOutcome<'_, Atom>, PeleError> {
+        let book = self.render_book.as_ref().ok_or_else(|| {
+            PeleError::new(
+                "Public invocation belongs to another document",
+                ErrorCode::Semantic,
+            )
+        })?;
+        let (revision, mut result) = job.finish(book, self.revision)?;
+        self.revision = revision;
+        let graph = self.snapshot_read()?;
+        if let Ok(atom) = &result {
+            let checked =
+                super::captured_admission::atom(graph.reader().extent(), atom).and_then(|_| {
+                    if let Atom::BuiltinFunction(id) = atom {
+                        if self
+                            .registration
+                            .schema
+                            .method(super::MethodId(*id))
+                            .is_none()
+                        {
+                            return Err(PeleError::new(
+                                "Unknown public builtin function",
+                                ErrorCode::Semantic,
+                            ));
+                        }
+                    }
+                    Ok(())
+                });
+            if let Err(error) = checked {
+                result = Err(error.into());
+            }
+        }
+        Ok(ReadOutcome {
+            revision,
+            graph,
+            result,
+        })
+    }
     pub fn invoke(
         &mut self,
         expected_revision: u64,

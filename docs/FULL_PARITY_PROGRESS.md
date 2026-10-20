@@ -1,5 +1,10 @@
 # Current functional parity — incomplete (2026-10-21)
 
+The next native-only layer adds Class, Flowchart, Swimlane and Gantt construction.
+Four native integration features pass, including forty Flow/Swimlane cases and
+nineteen Gantt warning cases. Fresh browser and C/Swift host-carrier verification
+remains pending; the cross-platform checkpoint below stays separate.
+
 Fifteen class-root factories are implemented: Sankey, Venn, Ishikawa,
 Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
 Journey, QuadrantChart and State. The latest seven-family extension passes nine

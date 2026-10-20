@@ -8,6 +8,22 @@ use crate::compat::{
 };
 pub type SwimlanePublicState = FlowchartPublicState;
 impl PublicDiagramModule for Swimlane {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PrototypeId(1)).then(|| {
+            PublicConstructorFactory::first_value::<Self>(
+                prototype,
+                crate::compat::diagrams::flowchart::construct_flow_with,
+                crate::compat::diagrams::flowchart::FLOW_LIVE_FIELDS,
+            )
+        })
+    }
+    fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        crate::compat::diagrams::flowchart::detached_flow_method::<Self>(call)
+    }
+
     type PublicState = SwimlanePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         Flowchart.model_schema()

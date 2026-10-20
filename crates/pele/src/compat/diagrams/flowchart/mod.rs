@@ -69,3 +69,8 @@ impl DiagramModule for Flowchart {
 
 mod public_model;
 pub use public_model::{FlowchartPublicOrigin, FlowchartPublicState};
+
+pub(crate) use public_model::{
+    construct_with as construct_flow_with, detached_method as detached_flow_method,
+    LIVE_FIELDS as FLOW_LIVE_FIELDS,
+};

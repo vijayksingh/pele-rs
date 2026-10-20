@@ -66,3 +66,12 @@ pub(crate) mod flat_store;
 pub(crate) mod source_input;
 #[doc(hidden)]
 pub use source_input::SourceIngress;
+
+mod detached_invocation;
+#[doc(hidden)]
+pub use constructor::{ConstructorArgument, LiveConstructorField, PublicHostValue};
+#[doc(hidden)]
+pub use detached_invocation::{
+    DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation, PublicHostOperation,
+    PublicHostResult, PublicInvocationPhase,
+};

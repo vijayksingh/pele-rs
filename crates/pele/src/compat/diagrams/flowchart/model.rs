@@ -230,32 +230,39 @@ fn err(message: String, code: ErrorCode) -> PeleError {
     e.diagram_type = Some("flowchart".into());
     e
 }
+impl FlowchartModel {
+    pub(super) fn empty() -> Self {
+        Self {
+            diagram_type: DiagramType::Flowchart,
+            public_origin: Default::default(),
+            direction: None,
+            nodes: Vec::new(),
+            edges: Vec::new(),
+            subgraphs: Vec::new(),
+            classes: Vec::new(),
+            tooltips: Vec::new(),
+            default_edge_style: None,
+            default_interpolate: None,
+            title: None,
+            acc_title: None,
+            acc_descr: None,
+        }
+    }
+}
 impl FlowDb {
     pub fn new(context: &ParseContext<'_>) -> Self {
         Self {
-            model: FlowchartModel {
-                diagram_type: DiagramType::Flowchart,
-                public_origin: super::public_model::FlowchartPublicOrigin {
-                    max_edges: context.max_edges,
-                    inherit_dir: context
-                        .config
-                        .get("flowchart")
-                        .and_then(Value::as_object)
-                        .and_then(|o| o.get("inheritDir"))
-                        == Some(&Value::Bool(true)),
-                    ..Default::default()
-                },
-                direction: None,
-                nodes: Vec::new(),
-                edges: Vec::new(),
-                subgraphs: Vec::new(),
-                classes: Vec::new(),
-                tooltips: Vec::new(),
-                default_edge_style: None,
-                default_interpolate: None,
-                title: context.title.filter(|t| !t.is_empty()).map(str::to_string),
-                acc_title: None,
-                acc_descr: None,
+            model: {
+                let mut model = FlowchartModel::empty();
+                model.public_origin.max_edges = context.max_edges;
+                model.public_origin.inherit_dir = context
+                    .config
+                    .get("flowchart")
+                    .and_then(Value::as_object)
+                    .and_then(|o| o.get("inheritDir"))
+                    == Some(&Value::Bool(true));
+                model.title = context.title.filter(|t| !t.is_empty()).map(str::to_string);
+                model
             },
             nodes: HashMap::new(),
             classes: HashMap::new(),

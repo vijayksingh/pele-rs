@@ -146,13 +146,16 @@ pub(super) fn has_active(book: Option<&Arc<Mutex<RenderBook>>>) -> bool {
     book.is_some_and(|book| book_lock(book).active())
 }
 
-struct RenderLease {
+pub(super) struct RenderLease {
     owner: Weak<Mutex<RenderBook>>,
     id: u64,
     active: bool,
 }
 impl RenderLease {
-    fn reserve(owner: &Arc<Mutex<RenderBook>>, revision: u64) -> Result<Self, PeleError> {
+    pub(super) fn reserve(
+        owner: &Arc<Mutex<RenderBook>>,
+        revision: u64,
+    ) -> Result<Self, PeleError> {
         let mut book = book_lock(owner);
         revision
             .checked_add(book.outstanding)
@@ -170,6 +173,16 @@ impl RenderLease {
             active: true,
         })
     }
+    pub(super) fn check_owner(&self, expected: &Arc<Mutex<RenderBook>>) -> Result<(), PeleError> {
+        let owner = self
+            .owner
+            .upgrade()
+            .ok_or_else(|| invalid("Public render document is disposed"))?;
+        if !Arc::ptr_eq(&owner, expected) {
+            return Err(invalid("Public render job belongs to another document"));
+        }
+        self.check_top()
+    }
     fn check_top(&self) -> Result<(), PeleError> {
         let owner = self
             .owner
@@ -186,11 +199,20 @@ impl RenderLease {
         }
         Ok(())
     }
-    fn finish(
+    pub(super) fn finish(
         &mut self,
-        expected_owner: &Arc<Mutex<RenderBook>>,
+        owner: &Arc<Mutex<RenderBook>>,
         revision: u64,
     ) -> Result<u64, PeleError> {
+        self.check_owner(owner)?;
+        let next = revision.checked_add(1).ok_or_else(exhausted)?;
+        self.release(owner)?;
+        Ok(next)
+    }
+    pub(super) fn release(
+        &mut self,
+        expected_owner: &Arc<Mutex<RenderBook>>,
+    ) -> Result<(), PeleError> {
         let owner = self
             .owner
             .upgrade()
@@ -207,12 +229,11 @@ impl RenderLease {
         {
             return Err(invalid("Public render jobs must finish in nesting order"));
         }
-        let next = revision.checked_add(1).ok_or_else(exhausted)?;
         book.frames.pop();
         book.outstanding -= 1;
         book.trim();
         self.active = false;
-        Ok(next)
+        Ok(())
     }
 }
 impl Drop for RenderLease {

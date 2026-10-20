@@ -15,10 +15,12 @@ use super::{
 };
 use crate::compat::{
     public::{
-        ActiveModel, Atom, FieldKind, FieldSchema, JavaScriptErrorKind, JsString, MemberKind,
-        MemberSchema, MethodCall, MethodId, MethodSchema, ModelDelta, ModelGraph, ModelSchema,
-        Node, Property, PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule,
-        PublicError, RecordId, RecordKind, RecordSchema,
+        ActiveModel, Atom, ConstructorArgument, DetachedPublicInvocation, FieldKind, FieldSchema,
+        JavaScriptErrorKind, JsString, LiveConstructorField, MemberKind, MemberSchema, MethodCall,
+        MethodId, MethodSchema, ModelDelta, ModelGraph, ModelSchema, Node, Property, PrototypeId,
+        PrototypeParent, PrototypeSchema, PublicConstructorFactory, PublicDiagramModule,
+        PublicError, PublicHostOperation, PublicHostResult, PublicHostValue, PublicInvocationPhase,
+        RecordId, RecordKind, RecordSchema,
     },
     ErrorCode,
 };
@@ -1560,10 +1562,10 @@ const ROOT_FIELDS: &[FieldSchema] = &[
     },
     FieldSchema {
         name: "options",
-        kind: FieldKind::Object,
+        kind: FieldKind::Any,
         optional: false,
-        undefined: false,
-        nullable: false,
+        undefined: true,
+        nullable: true,
         flags: 7,
     },
     FieldSchema {
@@ -2994,7 +2996,147 @@ fn imported(
     );
     Ok(m)
 }
+// Retain options without inspecting them. Undefined uses the fresh empty object
+// already supplied by the shared field initializer.
+fn construct_with(argument: ConstructorArgument) -> Result<GanttPublicState, PeleError> {
+    let mut graph = initial(&GanttModel::new(None, String::new()))?;
+    if !matches!(argument, ConstructorArgument::Undefined) {
+        let root = graph.root.clone();
+        let mut context = Context::new(&mut graph);
+        let value = argument
+            .into_atom(|value| context.intern(value))
+            .map_err(legacy_error)?;
+        context.set(&root, "options", value).map_err(legacy_error)?;
+    }
+    Ok(GanttPublicState { graph })
+}
+const LIVE_FIELDS: &[LiveConstructorField] = &[LiveConstructorField {
+    key: "options",
+    methods: &[MethodId(24)],
+}];
+// Preserve this.options.warn && this.options.warn(producer()) evaluation.
+// Each request owns values and runs after the graph borrow has ended.
+enum WarningPhase {
+    Start { receiver: Atom, producer: Atom },
+    FirstOptions { receiver: Atom, producer: Atom },
+    FirstWarn { receiver: Atom, producer: Atom },
+    FirstTest { receiver: Atom, producer: Atom },
+    SecondOptions { producer: Atom },
+    SecondWarn { receiver: Atom, producer: Atom },
+    Producer { receiver: Atom, function: Atom },
+    Callback,
+    Done,
+}
+struct WarningInvocation {
+    phase: WarningPhase,
+}
+impl WarningInvocation {
+    fn step(&mut self, _graph: &ModelGraph, reply: Option<Atom>) -> PublicInvocationPhase {
+        use WarningPhase::*;
+        let get =
+            |receiver, key| PublicInvocationPhase::Host(PublicHostOperation::Get { receiver, key });
+        match std::mem::replace(&mut self.phase, Done) {
+            Start { receiver, producer } => {
+                self.phase = FirstOptions {
+                    receiver: receiver.clone(),
+                    producer,
+                };
+                get(receiver, "options")
+            }
+            FirstOptions { receiver, producer } => {
+                self.phase = FirstWarn { receiver, producer };
+                get(reply.expect("awaited options"), "warn")
+            }
+            FirstWarn { receiver, producer } => {
+                self.phase = FirstTest { receiver, producer };
+                PublicInvocationPhase::Host(PublicHostOperation::Truthy {
+                    value: reply.expect("awaited first warn"),
+                })
+            }
+            FirstTest { receiver, producer } => {
+                if !matches!(reply, Some(Atom::Bool(true))) {
+                    return PublicInvocationPhase::Complete(Ok(Atom::Undefined));
+                }
+                self.phase = SecondOptions { producer };
+                get(receiver, "options")
+            }
+            SecondOptions { producer } => {
+                let receiver = reply.expect("awaited second options");
+                self.phase = SecondWarn {
+                    receiver: receiver.clone(),
+                    producer,
+                };
+                get(receiver, "warn")
+            }
+            SecondWarn { receiver, producer } => {
+                self.phase = Producer {
+                    receiver,
+                    function: reply.expect("awaited second warn"),
+                };
+                PublicInvocationPhase::Host(PublicHostOperation::Call {
+                    function: producer,
+                    result: PublicHostResult::Retain,
+                    not_callable_error: "e is not a function",
+                    receiver: Atom::Undefined,
+                    arguments: vec![],
+                })
+            }
+            Producer { receiver, function } => {
+                self.phase = Callback;
+                PublicInvocationPhase::Host(PublicHostOperation::Call {
+                    function,
+                    result: PublicHostResult::Discard,
+                    not_callable_error: "this.options.warn is not a function",
+                    receiver,
+                    arguments: vec![reply.expect("awaited message producer")],
+                })
+            }
+            Callback => PublicInvocationPhase::Complete(Ok(Atom::Undefined)),
+            Done => PublicInvocationPhase::Complete(Err(invalid(
+                "Gantt warning invocation already finished",
+            )
+            .into())),
+        }
+    }
+}
+fn resume_warning(
+    state: &mut GanttPublicState,
+    invocation: &mut WarningInvocation,
+    reply: Option<PublicHostValue>,
+) -> PublicInvocationPhase {
+    let reply = reply
+        .map(|value| value.into_atom(|value| Context::new(&mut state.graph).intern(value)))
+        .transpose();
+    match reply {
+        Ok(reply) => invocation.step(&state.graph, reply),
+        Err(error) => PublicInvocationPhase::Complete(Err(error)),
+    }
+}
+
 impl PublicDiagramModule for Gantt {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            PublicConstructorFactory::first_value::<Self>(PROTO, construct_with, LIVE_FIELDS)
+        })
+    }
+    fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        (call.method == MethodId(24)).then(|| {
+            let producer = call.arguments.first().cloned().unwrap_or(Atom::Undefined);
+            DetachedPublicInvocation::new::<Self, GanttPublicState, _>(
+                WarningInvocation {
+                    phase: WarningPhase::Start {
+                        receiver: call.receiver,
+                        producer,
+                    },
+                },
+                resume_warning,
+            )
+        })
+    }
+
     type PublicState = GanttPublicState;
     fn try_parse_public(
         &self,
