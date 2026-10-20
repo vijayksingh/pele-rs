@@ -50,6 +50,13 @@ including 167,473 mutable drawings and 270,358 error cases with five existing
 explicit budget differences. VM source medians return near the earlier control;
 parse remains mixed and the complete gate still fails all 126 conditions.
 
+The [ER immutable normalization](benchmarks/2026-10-20-normalized-er/README.md)
+reduces matched ER-medium Swift parse by 25.67% paired (0.8484 to 0.6219 ms),
+faster in all 15 pairs. Controls are 0.2–2.1% slower by paired medians. Native,
+ER Swift corpus, 168 API conditions and nine browser corpus checks pass.
+Independent VM results stay mixed; mutable web parse does not use this path.
+No new complete gate or release acceptance follows.
+
 [Rejected parse candidates](benchmarks/2026-10-20-parse-candidates/README.md)
 retain raw first-use and live-heap evidence. Lower map count and alternate string
 storage did not establish a broad improvement and remain outside production.

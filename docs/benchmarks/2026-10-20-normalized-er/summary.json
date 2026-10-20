@@ -1,0 +1,64 @@
+{
+  "swift": [
+    {
+      "case": "sequence/small",
+      "stage": "parse",
+      "controlMs": 0.0612093125,
+      "candidateMs": 0.061271484375,
+      "pairedPercent": 1.697819565286518,
+      "fasterPairs": 5,
+      "report": "swift-single-parse-sequence-small-attempt1.json"
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "controlMs": 0.8484453125,
+      "candidateMs": 0.621890625,
+      "pairedPercent": -25.66919273303192,
+      "fasterPairs": 15,
+      "report": "swift-single-parse-er-medium-attempt1.json"
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-source",
+      "controlMs": 0.0847936171875,
+      "candidateMs": 0.0857005234375,
+      "pairedPercent": 1.3156362358133444,
+      "fasterPairs": 5,
+      "report": "swift-single-render-source-sequence-small-attempt4.json"
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "controlMs": 1.550229125,
+      "candidateMs": 1.5654375,
+      "pairedPercent": 0.23331796837495755,
+      "fasterPairs": 7,
+      "report": "swift-single-render-source-er-medium-attempt1.json"
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-retained",
+      "controlMs": 0.069115234375,
+      "candidateMs": 0.0698528671875,
+      "pairedPercent": 2.0712604717437744,
+      "fasterPairs": 5,
+      "report": "swift-single-render-retained-sequence-small-attempt2.json"
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "controlMs": 1.4027421875,
+      "candidateMs": 1.4214296875,
+      "pairedPercent": 0.9462375839031978,
+      "fasterPairs": 6,
+      "report": "swift-single-render-retained-er-medium-attempt1.json"
+    }
+  ],
+  "acceptedWindows": 6,
+  "compilerInterruptedExcluded": 4,
+  "firstSideOrder": {
+    "control": 45,
+    "candidate": 45
+  }
+}

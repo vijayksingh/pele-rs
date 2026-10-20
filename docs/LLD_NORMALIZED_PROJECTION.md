@@ -1,7 +1,7 @@
 # Direct normalized model projection
 
-The immutable parse pipeline needs an eager, normalized public model. Gantt's and ER's
-captured builtin registrations constructs that model from the existing JSON
+The immutable parse pipeline needs an eager, normalized public model. Captured
+Gantt and ER builtin registrations construct it from the existing JSON
 serializer's formatter events, removing the complete intermediate model JSON
 buffer and its recursive parse. It retains the typed model, owned normalized
 Value, exact envelope-size pass and eager Swift copy. Mutable public graph

@@ -229,6 +229,12 @@ outliers. VM source medians return near the earlier control, while parse remains
 mixed. Full current 33-family Swift corpus and 168 consumer API conditions pass;
 this remains a performance checkpoint, not release acceptance.
 
+The [ER immutable projection layer](docs/benchmarks/2026-10-20-normalized-er/)
+removes the same JSON buffer/reparse for captured ER. Matched Swift ER-medium
+parse falls from 0.8484 to 0.6219 ms (25.67% paired, 15/15 faster). Local control
+medians are slightly slower and VM results remain mixed; this change does not
+remove mutable web graph construction. ER corpus and current API checks pass.
+
 [Earlier checkpoints](docs/PERFORMANCE.md) preserve their own matched controls,
 raw samples and tradeoffs; gains are not combined. Recent
 [rejected text/identity experiments](docs/benchmarks/2026-10-20-parse-candidates/)
