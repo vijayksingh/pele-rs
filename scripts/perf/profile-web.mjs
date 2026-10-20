@@ -1,7 +1,7 @@
 // CPU profiles diagnose hot paths; web-vm.mjs remains the latency acceptance gate.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,readdir} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import {createHash} from 'node:crypto';
 import {cpus,platform,arch,loadavg} from 'node:os';
@@ -13,7 +13,9 @@ const packageDir=resolve(arg('--package','dist/package-web/package')),output=res
 const selected=arg('--cases','flowchart/large,er/large,gantt/large').split(','),duration=Number(arg('--duration-ms','1500'));
 assert(duration>=500&&duration<=10000);assert(selected.every(id=>cases().some(c=>c.id===id)));
 const oracle=resolve('node_modules/pele/dist/pele.js'),hash=b=>createHash('sha256').update(b).digest('hex');
-const hashes=async()=>Object.fromEntries(await Promise.all(['index.js','full.js','initialize.js','graph.js','graph-binary.js','resources.js','pkg/pele.js','pkg/pele_bg.wasm'].map(async name=>[name,hash(await readFile(resolve(packageDir,name)))])));
+async function hashes(prefix=''){
+ const files={};for(const entry of (await readdir(resolve(packageDir,prefix),{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){const name=prefix+entry.name;if(entry.isDirectory())Object.assign(files,await hashes(name+'/'));else if(entry.isFile())files[name]=hash(await readFile(resolve(packageDir,name)));else throw Error('Package contains a non-regular file');}return files;
+}
 const before=await hashes();
 assert.equal(hash(await readFile(oracle)),'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');
 const server=createServer(async(req,res)=>{try{
