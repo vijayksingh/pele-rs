@@ -1,7 +1,7 @@
 # Direct normalized model projection
 
-The immutable parse pipeline needs an eager, normalized public model. Gantt's
-captured builtin registration constructs that model from the existing JSON
+The immutable parse pipeline needs an eager, normalized public model. Gantt's and ER's
+captured builtin registrations constructs that model from the existing JSON
 serializer's formatter events, removing the complete intermediate model JSON
 buffer and its recursive parse. It retains the typed model, owned normalized
 Value, exact envelope-size pass and eager Swift copy. Mutable public graph
@@ -12,9 +12,9 @@ construction uses its separate direct-parse path.
 The concrete erased `Module<D, P>` type captures a private projection policy
 through `PhantomData<P>`. Both policies are zero-sized; there is no stored tag
 or runtime policy branch. Unit builtin handlers remain zero-sized when boxed.
-Only the audited Gantt instance installed by `Engine::with_builtins` opts in.
+Only the audited Gantt and ER instances installed by `Engine::with_builtins` opt in.
 Public `register` always selects the original projection, even when a replacement
-uses the Gantt descriptor or model type. Retained documents keep their captured
+uses either builtin descriptor or model type. Retained documents keep their captured
 registration after replacement or engine destruction. Public traits, signatures,
 C ABI and Swift/Web APIs do not change.
 
@@ -52,6 +52,14 @@ Serialize implementations. Public immutable documents expose shared model
 references. Expanding opt-in requires auditing that concrete serializer and its
 publicly reachable model states again.
 
+ER's serializer tree contains derived records, string enums, optional strings,
+vectors and ordered pairs. Its private parser HashMap/HashSet bookkeeping is
+skipped; groups contain string references rather than recursive model values.
+No raw fragments, custom framing, floats or callbacks are reachable through this
+model. Its opt-in is one captured registration change, with the common formatter
+unchanged. Sequence and Usecase remain legacy because their models forward
+RawValue fragments; other families require their own audit and measurement.
+
 ## Verification and measurement
 
 Public integration tests compare captured Gantt against ordinary public Gantt
@@ -61,6 +69,14 @@ admission. Replacement-provider controls cover single serialization, custom/raw
 number handling, dates, malformed keys, depth and error precedence. These controls
 prove provider isolation; they do not inject unreachable cases into the optimized
 formatter. No public test-only opt-in exists.
+
+ER additionally compares all 17,437 frozen source/options cases through both
+actual model_view policies, including complete error and document envelopes.
+Its integration slice checks ordered numeric-looking IDs, duplicate attributes
+and classes, BOM/control/Unicode content, retained rendering, exact model-byte
+admission and late syntax errors. Captured provider replacement must serialize
+once; failing validation must precede serialization. These tests add no public
+opt-in and do not inject unreachable float/raw/depth cases into builtin ER.
 
 Frozen source-matched Swift executables establish end-to-end eager parse cost.
 Source and typed retained rendering remain controls. Rebuild the WASM package and

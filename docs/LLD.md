@@ -13,7 +13,7 @@ support extension without changing the built-ins.
 [Direct public parsing](LLD_DIRECT_PUBLIC_PARSE.md) shares source preparation and
 lets modules construct canonical public state without a temporary typed model.
 [Direct normalized projection](LLD_NORMALIZED_PROJECTION.md) removes the first
-model JSON buffer and reparse for the captured Gantt builtin, while preserving
+model JSON buffer and reparse for the captured Gantt and ER builtins, while preserving
 legacy projection for public providers and other diagram registrations.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized

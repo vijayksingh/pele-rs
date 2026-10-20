@@ -323,7 +323,7 @@ impl Engine {
         engine.register(super::diagrams::sequence::Sequence);
         engine.register(super::diagrams::xychart::XyChart);
         engine.register(super::diagrams::class_diagram::Class);
-        engine.register(super::diagrams::er::Er);
+        engine.register_projected::<_, NormalizedBuiltin>(super::diagrams::er::Er);
         engine.register(super::diagrams::flowchart::Flowchart);
         engine.register(super::diagrams::kanban::Kanban);
         engine.register(super::diagrams::mindmap::Mindmap);
