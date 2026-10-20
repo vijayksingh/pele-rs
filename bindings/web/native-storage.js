@@ -14,7 +14,7 @@ export class NativeGraphView {
   #epoch;#memory;#descriptor;#buffer;#view;#refs=1;#strings=null;#prefix=0;#owner;
   // Four row IDs followed by copied Header7/Property5/Item3/StringDesc2 words.
   // These are immutable scalar values, never retained views of native pages.
-  #rows=new Uint32Array(21);#units=null;
+  #rows=new Uint32Array(21);#units=null;#session=null;#availableRows=0;
   constructor(epoch,memory,owner){
     this.#epoch=epoch;this.#memory=memory;this.#owner=owner;this.#rows.fill(ABSENT,0,4);
     try {
@@ -42,12 +42,14 @@ export class NativeGraphView {
     if(!directory)invalid();this.#range(directory,DIRECTORY*8,4);
     const entry=directory+(page%DIRECTORY)*8,pointer=view.getUint32(entry,true),length=view.getUint32(entry+4,true),offset=row%PAGE;
     if(!pointer||length>PAGE*width||(offset+count)*width>length)invalid();this.#range(pointer,length*unitBytes,unitBytes);
+    this.#availableRows=Math.floor(length/width)-offset;
     return pointer+offset*width*unitBytes;
   }
   #word(table,row,width,column){
     if(!this.#epoch||!u32(row)||row>=2**26||!Number.isInteger(column)||column<0||column>=width)invalid();
     const cursor=table-9,start=table===9?4:table===10?11:table===11?16:19;
     if(cursor<0||cursor>3||width!==(table===9?7:table===10?5:table===11?3:2))invalid();
+    if(this.#session)return this.#windowWord(table,row,width,column,cursor);
     if(this.#rows[cursor]!==row){
       const view=this.#refresh(),address=this.#address(view,table,row,width);
       this.#rows[cursor]=ABSENT;
@@ -56,10 +58,43 @@ export class NativeGraphView {
     }
     return this.#rows[start+column];
   }
+  // A read session retains only bounded copied words; never a native page view.
+  beginRead(){
+    if(!this.#epoch)invalid();
+    const session={previous:this.#session,banks:[null,null,null,null],starts:[-1,-1,-1,-1],counts:[0,0,0,0],units:null};
+    this.retain();this.#session=session;return session;
+  }
+  endRead(session){
+    if(!this.#epoch||this.#session!==session)invalid();
+    this.#session=session.previous;session.previous=null;session.banks=null;session.units=null;this.release();
+  }
+  #windowWord(table,row,width,column,cursor){
+    const session=this.#session;
+    let start=session.starts[cursor],count=session.counts[cursor],bank=session.banks[cursor];
+    if(row<start||row>=start+count){
+      start=Math.floor(row/128)*128;
+      const view=this.#refresh(),address=this.#address(view,table,start,width);
+      count=Math.min(128,this.#availableRows);
+      if(row>=start+count)invalid();
+      if(!bank||bank.length<count*width)bank=new Uint32Array(count*width);
+      session.starts[cursor]=-1;session.counts[cursor]=0;
+      for(let i=0;i<count*width;i++)bank[i]=view.getUint32(address+i*4,true);
+      session.banks[cursor]=bank;session.starts[cursor]=start;session.counts[cursor]=count;
+    }
+    return bank[(row-start)*width+column];
+  }
+  propertyRecord(address,record){
+    // Trigger one guarded row/window load, then copy the remaining raw words.
+    record[0]=this.#word(10,address,5,0);
+    if(this.#session){
+      const session=this.#session,start=(address-session.starts[1])*5,bank=session.banks[1];
+      for(let i=1;i<5;i++)record[i]=bank[start+i];
+    }else for(let i=1;i<5;i++)record[i]=this.#rows[11+i];
+  }
   #copyUnits(row,count){
     if(!this.#epoch||!u32(row)||row>=2**26||!u32(count)||count===0||count>PAGE-row%PAGE||row+count>2**26)invalid();
     const view=this.#refresh(),address=this.#address(view,13,row,1,count,2);
-    const units=this.#units??(this.#units=[]);units.length=count;
+    const units=this.#session?(this.#session.units??(this.#session.units=[])):(this.#units??(this.#units=[]));units.length=count;
     for(let i=0;i<count;i++)units[i]=view.getUint16(address+i*2,true);
     return units;
   }
@@ -170,6 +205,8 @@ class NativeCapture {
 }
 
 export const NativeStorage=Object.freeze({
+  beginRead:graph=>graph.beginRead(),endRead:(graph,session)=>graph.endRead(session),
+  readProperty:(graph,address,record)=>graph.propertyRecord(address,record),
   stringCount:graph=>graph.stringCount,stringValueAt:(graph,id)=>graph.stringValueAt(id),nodeCount:graph=>graph.nodeCount,
   *nodeIds(graph){for(let id=0;id<graph.nodeCount;id++)yield id;},rootSlot:()=>0,
   nodeKind(graph,id){const code=graph.kindCode(id);return code===ABSENT?missingKind():kinds[code];},

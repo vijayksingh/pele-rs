@@ -38,6 +38,9 @@ export const NestedStorage = Object.freeze({});
 function flatValue(bridge, storage, graph, slot) {
   const tag = storage.atomTag(graph, slot);
   const value = storage.atomPayload(graph, slot);
+  return flatScalarValue(bridge,tag,value);
+}
+function flatScalarValue(bridge,tag,value){
   switch (tag) {
     case 0: return undefined;
     case 1: return null;
@@ -52,13 +55,30 @@ function flatValue(bridge, storage, graph, slot) {
   }
 }
 
+// Raw POD operands are copied before caller descriptor/proxy actions.
+function wordBits(lo,hi){return hi.toString(16).padStart(8,'0')+lo.toString(16).padStart(8,'0');}
+function wordNumber(lo,hi){bits.setUint32(0,lo,true);bits.setUint32(4,hi,true);return bits.getFloat64(0,true);}
+function matchesFlatScalar(bridge,tag,payload,value,numberHex){
+  switch(tag){
+    case 0:return value===undefined;case 1:return value===null;
+    case 2:return value===false;case 3:return value===true;
+    case 4:return typeof value==='number'&&numberBits(value)===numberHex;
+    case 5:return typeof value==='string'&&value===bridge.strings[payload]&&bridge.stringIds.get(value)===payload;
+    case 6:return value===bridge.objects[payload]&&bridge.ids.get(value)===payload;
+    case 7:return value===bridge.registration.functions.get(payload)&&bridge.registration.functionIds.get(value)===payload;
+    default:return false;
+  }
+}
+
 // One closure set per backend. The hot operations do not receive or select a
 // backend; the nested/flat choice is an immutable factory binding. Whether an
 // engine folds inner branches is an empirical optimization, not a guarantee.
 export function createGraphTraversal(storage = NestedStorage) {
   const nested = storage === NestedStorage;
+  const readProperty = !nested && typeof storage.readProperty==='function' ? storage.readProperty : null;
 
 function reconcileGraph(bridge, graph, changed) {
+  const propertyWords=readProperty?new Uint32Array(5):null;
   bridge.graph = graph;
   if (nested) {
     if(changed) {
@@ -135,16 +155,19 @@ function reconcileGraph(bridge, graph, changed) {
     if (kind === 'array' && object.length !== (nested?node.length:storage.nodeAux(graph,id))) object.length=nested?node.length:storage.nodeAux(graph,id);
     let assignFresh = fresh && (kind === 'object' || kind === 'array');
     for(const property of nested?node.properties:storage.propertySlots(graph,id)) {
-      const flags=nested?property.flags:storage.propertyFlags(graph,property);
+      if(propertyWords)readProperty(graph,property,propertyWords);
+      const flags=propertyWords?propertyWords[1]:nested?property.flags:storage.propertyFlags(graph,property);
+      const keyId=propertyWords?propertyWords[0]:nested?property.key:storage.propertyKey(graph,property);
+      const tag=propertyWords?propertyWords[2]:0,lo=propertyWords?propertyWords[3]:0,hi=propertyWords?propertyWords[4]:0;
       if(flags!==7)assignFresh=false;
-      const key=bridge.strings[nested?property.key:storage.propertyKey(graph,property)];
-      const atom=nested?property.value:storage.propertyAtomSlot(graph,property);
-      const value=nested?bridge.value(atom):flatValue(bridge,storage,graph,atom);
+      const key=bridge.strings[keyId];
+      const atom=propertyWords?undefined:nested?property.value:storage.propertyAtomSlot(graph,property);
+      const value=propertyWords?flatScalarValue(bridge,tag,tag===4?wordNumber(lo,hi):lo):nested?bridge.value(atom):flatValue(bridge,storage,graph,atom);
       if(assignFresh&&key!=='__proto__'&&!(kind==='array'&&key==='length'))object[key]=value;
       else {
         const current=!fresh&&Object.getOwnPropertyDescriptor(object,key);
         const sameValue=current&&Object.hasOwn(current,'value')&&(Object.is(current.value,value)&&
-          (typeof value!=='number'||!Number.isNaN(value)||numberBits(current.value)===(nested?property.value.value:(storage.atomTag(graph,atom)===4?storage.atomNumberBits(graph,atom):undefined))));
+          (typeof value!=='number'||!Number.isNaN(value)||numberBits(current.value)===(nested?property.value.value:(propertyWords?(tag===4?wordBits(lo,hi):undefined):(storage.atomTag(graph,atom)===4?storage.atomNumberBits(graph,atom):undefined)))));
         if(!sameValue||current.enumerable!==!!((nested?property.flags:flags)&1)||current.writable!==!!((nested?property.flags:flags)&2)||current.configurable!==!!((nested?property.flags:flags)&4))Object.defineProperty(object,key,{
           value,enumerable:!!((nested?property.flags:flags)&1),writable:!!((nested?property.flags:flags)&2),configurable:!!((nested?property.flags:flags)&4)
         });
@@ -156,6 +179,7 @@ function reconcileGraph(bridge, graph, changed) {
 }
 
 function matchesGraph(bridge) {
+  const propertyWords=readProperty?new Uint32Array(5):null;
   const graph=bridge.graph;
   if(bridge.objects.length!==(nested?graph.nodes.length:storage.nodeCount(graph))||bridge.strings.length!==(nested?graph.strings.length:storage.stringCount(graph)))return false;
   for (const baseline of bridge.registration.prototypeBaseline) {
@@ -175,17 +199,7 @@ function matchesGraph(bridge) {
     }
   }:(slot,value)=>{
     const tag=storage.atomTag(graph,slot),payload=storage.atomPayload(graph,slot);
-    switch(tag){
-      case 0:return value===undefined;
-      case 1:return value===null;
-      case 2:return value===false;
-      case 3:return value===true;
-      case 4:return typeof value==='number'&&numberBits(value)===storage.atomNumberBits(graph,slot);
-      case 5:return typeof value==='string'&&value===bridge.strings[payload]&&bridge.stringIds.get(value)===payload;
-      case 6:return value===bridge.objects[payload]&&bridge.ids.get(value)===payload;
-      case 7:return value===bridge.registration.functions.get(payload)&&bridge.registration.functionIds.get(value)===payload;
-      default:return false;
-    }
+    return matchesFlatScalar(bridge,tag,payload,value,tag===4&&typeof value==='number'?storage.atomNumberBits(graph,slot):undefined);
   };
   if(!matches(nested?graph.root:storage.rootSlot(graph),bridge.root))return false;
   for(let id=0;id<(nested?graph.nodes.length:storage.nodeCount(graph));id++){
@@ -211,8 +225,12 @@ function matchesGraph(bridge) {
         if(!property||key!==bridge.strings[property.key]||bridge.stringIds.get(key)!==property.key||descriptor.enumerable!==!!(property.flags&1)||descriptor.writable!==!!(property.flags&2)||descriptor.configurable!==!!(property.flags&4)||!matches(property.value,descriptor.value))return false;
       }else{
         if(count>=storage.propertyCount(graph,id))return false;
-        const property=storage.propertySlot(graph,id,count++),keyId=storage.propertyKey(graph,property),flags=storage.propertyFlags(graph,property);
-        if(key!==bridge.strings[keyId]||bridge.stringIds.get(key)!==keyId||descriptor.enumerable!==!!(flags&1)||descriptor.writable!==!!(flags&2)||descriptor.configurable!==!!(flags&4)||!matches(storage.propertyAtomSlot(graph,property),descriptor.value))return false;
+        const property=storage.propertySlot(graph,id,count++);
+        if(propertyWords)readProperty(graph,property,propertyWords);
+        const keyId=propertyWords?propertyWords[0]:storage.propertyKey(graph,property),flags=propertyWords?propertyWords[1]:storage.propertyFlags(graph,property);
+        const tag=propertyWords?propertyWords[2]:0,lo=propertyWords?propertyWords[3]:0,hi=propertyWords?propertyWords[4]:0;
+        if(key!==bridge.strings[keyId]||bridge.stringIds.get(key)!==keyId||descriptor.enumerable!==!!(flags&1)||descriptor.writable!==!!(flags&2)||descriptor.configurable!==!!(flags&4))return false;
+        if(propertyWords?!matchesFlatScalar(bridge,tag,lo,descriptor.value,tag===4&&typeof descriptor.value==='number'?wordBits(lo,hi):undefined):!matches(storage.propertyAtomSlot(graph,property),descriptor.value))return false;
       }
     }
     if(count!==(nested?node.properties.length:storage.propertyCount(graph,id)))return false;
@@ -360,6 +378,16 @@ function snapshotGraph(bridge, values = [], delta = false) {
   }
 }
 
+  // Bind the optional native read lifetime once. NestedStorage returns the
+  // original functions and allocates no session or property registers.
+  if(!nested&&typeof storage.beginRead==='function'&&typeof storage.endRead==='function'){
+    const begin=storage.beginRead,end=storage.endRead;
+    return Object.freeze({
+      reconcileGraph(bridge,graph,changed){const session=begin(graph);try{return reconcileGraph(bridge,graph,changed);}finally{end(graph,session);}},
+      matchesGraph(bridge){const graph=bridge.graph,session=begin(graph);try{return matchesGraph(bridge);}finally{end(graph,session);}},
+      snapshotGraph
+    });
+  }
   return Object.freeze({reconcileGraph, matchesGraph, snapshotGraph});
 }
 

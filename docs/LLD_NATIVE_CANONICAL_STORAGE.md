@@ -78,6 +78,20 @@ construction can reenter. Shared publication/matching loops, full restoration,
 native admission and the WASM binary remain unchanged. This is an access-boundary
 change, not an assumption that resource callbacks are pure.
 
+The next reader layer binds optional read-session hooks when creating a native
+traversal. NestedStorage retains its original function references and allocates
+neither sessions nor property registers. Each native session pins the immutable
+view and copies at most 128 initialized rows per table into bounded scratch;
+windows stay within a native page. Logical POD scratch across the four tables is
+at most 8,704 bytes, excluding objects and bounded UTF16 scratch. It is released
+in `finally`, never retained as another canonical model. A miss refreshes and
+validates the source range before synchronous copying; cache hits read independent
+copied words across callbacks. Publication/matching copy each property's five
+operands to scalar locals before any descriptor or Proxy action. Slot and record
+paths share one scalar resolver. Native admission, source construction, complete
+restoration and the WASM artifact remain unchanged. Performance and default-path
+controls must be measured separately before selecting this layer.
+
 ## Verification gates
 
 Public native integrations compare exact canonical bytes and errors with the
