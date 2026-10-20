@@ -1,13 +1,14 @@
 import {test, expect} from '@playwright/test';
+import {writeFile} from 'node:fs/promises';
 
-test('ER oversized public collections preserve complete models and retained helper identity', async ({page}) => {
-  test.setTimeout(60_000);
+test('ER oversized public collections preserve complete models and retained helper identity', async ({page}, testInfo) => {
+  test.setTimeout(120_000);
   await page.goto('/examples/web/');
   const report = await page.evaluate(async () => {
     const {loadRenderer} = await import('/dist/package-web/package/full.js');
     const oracle = await import('/dist/evidence/pele-oracle.js');
     const engine = await loadRenderer(), count = 7000, rows = [];
-    const options = {maxEdges: 10_000, limit: 1_000_000};
+    const options = {maxEdges: 20_000, limit: 1_000_000};
     const fixtures = [
       {
         name: 'many-bare-entities',
@@ -18,6 +19,13 @@ test('ER oversized public collections preserve complete models and retained help
         name: 'many-repeated-relationships',
         source: 'erDiagram\n' + 'A ||--o{ B : owns\n'.repeat(count),
         firstKey: 'A', lastKey: 'B', entities: 2, relationships: count,
+      },
+      {
+        // One relationship Ref costs five compact bytes. This crosses the
+        // bounded dense-array event while the preceding 7,000 case fits it.
+        name: 'many-repeated-relationships-beyond-dense-frame',
+        source: 'erDiagram\n' + 'A ||--o{ B : owns\n'.repeat(13_106),
+        firstKey: 'A', lastKey: 'B', entities: 2, relationships: 13_106,
       },
     ];
 
@@ -178,11 +186,17 @@ test('ER oversized public collections preserve complete models and retained help
     return rows;
   });
 
-  expect(report).toHaveLength(2);
+  const path = testInfo.outputPath('er-oversized-public-construction.json');
+  await writeFile(path, JSON.stringify(report, null, 2));
+  await testInfo.attach('er-oversized-public-construction.json', {path, contentType: 'application/json'});
+  expect(report).toHaveLength(3);
   expect(report[0].sourceBytes).toBeLessThan(64 * 1024);
   expect(report[1].sourceBytes).toBeGreaterThan(64 * 1024);
+  expect(report[2].sourceBytes).toBeGreaterThan(64 * 1024);
+  expect(report[2].sourceBytes).toBeLessThan(1_000_000);
   expect(report.map(({name, failures}) => ({name, failures})), JSON.stringify(report)).toEqual([
     {name: 'many-bare-entities', failures: []},
     {name: 'many-repeated-relationships', failures: []},
+    {name: 'many-repeated-relationships-beyond-dense-frame', failures: []},
   ]);
 });

@@ -1756,6 +1756,47 @@ impl pele::compat::host_er::InitialWriter for HostConstruction {
         self.nodes += 1;
         Ok(id)
     }
+    fn dense_array(&mut self, values: &[Atom]) -> Result<u32, PeleError> {
+        // Eligibility examines only existing Atom tags. Oversized arrays keep
+        // the original property/node path without an extra value collection.
+        let bytes = values.iter().try_fold(9usize, |bytes, value| {
+            bytes
+                .checked_add(construction_atom_len(value))
+                .filter(|bytes| *bytes <= CONSTRUCTION_BATCH_BYTES - 2)
+        });
+        let Some(bytes) = bytes else {
+            let mut properties = Vec::with_capacity(values.len());
+            for (index, value) in values.iter().enumerate() {
+                properties.push(self.property(&index.to_string(), value.clone())?);
+            }
+            return self.node(pele::compat::public::Node::Array {
+                length: properties.len() as u32,
+                properties,
+            });
+        };
+        // These keys remain part of the canonical string table even though
+        // this event reconstructs their names. Preserve all IDs and budgets.
+        for index in 0..values.len() {
+            self.string(&index.to_string())?;
+        }
+        if self.nodes >= 1_000_000 {
+            return Err(PeleError::new(
+                "Public model graph exceeds work budget",
+                ErrorCode::Limit,
+            ));
+        }
+        let id = self.nodes;
+        self.event(12, bytes)?;
+        self.frame.extend_from_slice(&id.to_le_bytes());
+        // Event fit bounds the number of atoms below u32::MAX.
+        self.frame
+            .extend_from_slice(&(values.len() as u32).to_le_bytes());
+        for value in values {
+            construction_atom(&mut self.frame, value);
+        }
+        self.nodes += 1;
+        Ok(id)
+    }
     fn node(&mut self, node: pele::compat::public::Node) -> Result<u32, PeleError> {
         use pele::compat::public::Node;
         let (kind, length) = match &node {

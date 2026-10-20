@@ -466,6 +466,19 @@ pub trait InitialWriter {
             .collect::<Result<_, _>>()?;
         self.node(Node::Object { properties })
     }
+    /// A fresh array with consecutive own indices and ordinary descriptors.
+    /// Values are already materialized so every value string precedes index
+    /// strings. The default preserves property overrides and native budgets.
+    fn dense_array(&mut self, values: &[Atom]) -> Result<u32, PeleError> {
+        let mut properties = Vec::with_capacity(values.len());
+        for (index, value) in values.iter().enumerate() {
+            properties.push(self.property(&index.to_string(), value.clone())?);
+        }
+        self.node(Node::Array {
+            length: properties.len() as u32,
+            properties,
+        })
+    }
     fn finish(self, root: Atom) -> Result<Self::Output, PeleError>;
     fn abort(self) -> Result<(), PeleError>
     where
@@ -528,17 +541,9 @@ pub(super) fn rec(w: &mut impl InitialWriter, fields: Vec<(&str, Atom)>) -> Resu
 }
 pub(super) fn arr(
     w: &mut impl InitialWriter,
-    values: impl IntoIterator<Item = Atom>,
+    values: impl AsRef<[Atom]>,
 ) -> Result<u32, PeleError> {
-    let values = values.into_iter();
-    let mut properties = Vec::with_capacity(values.size_hint().0);
-    for (n, value) in values.enumerate() {
-        properties.push(w.property(&n.to_string(), value)?);
-    }
-    w.node(Node::Array {
-        length: properties.len() as u32,
-        properties,
-    })
+    w.dense_array(values.as_ref())
 }
 fn texts(w: &mut impl InitialWriter, values: &[String]) -> Result<u32, PeleError> {
     let mut atoms = Vec::with_capacity(values.len());

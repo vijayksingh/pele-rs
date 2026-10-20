@@ -552,6 +552,29 @@ export class HostErOwner {
           this.constructionBytes+=bytes;this.references+=keys.length;
           break;
         }
+        case 12:{
+          if(this.constructionNode||this.constructionString)bad();
+          const id=u32(),length=u32();
+          if(id!==this.objects.length)bad();
+          // At least one byte per atom; bound the loop before allocating.
+          need(length);
+          if(this.allocate(1)!==id)bad();
+          const object=this.object(id);let bytes=9+5*length;
+          for(let index=0;index<length;index++){
+            const value=atom();
+            // Same fresh-array assignment and raw-NaN descriptor path as the
+            // generic publisher; index strings were already interned in Rust.
+            if(typeof value==='number'&&Number.isNaN(value)){
+              if(!Reflect.defineProperty(object,index,{value,enumerable:true,writable:true,configurable:true}))return -1;
+            }else object[index]=value;
+            bytes+=valueBytes(value);
+          }
+          if(object.length>length)this.constructionNeedsAudit=true;
+          if(!Reflect.set(object,'length',length))return -2;
+          this.nodeBytes[id]=bytes;this.nodeRefs[id]=length;
+          this.constructionBytes+=bytes;this.references+=length;
+          break;
+        }
         default:bad();
       }
     }

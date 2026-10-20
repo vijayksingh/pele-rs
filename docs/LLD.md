@@ -24,3 +24,5 @@ immutable model events without a second full model JSON decode in Foundation.
 method and live-render boundary, its bounded transfers and its verification gates.
 [Ordered record publication](LLD_ER_RECORD_PUBLICATION.md) removes intermediate
 field/property vectors from fresh ER records through a defaulted construction sink.
+[Dense-array publication](LLD_ER_DENSE_ARRAY_PUBLICATION.md) adds a bounded generic
+array event while retaining canonical index strings, budgets and native defaults.
