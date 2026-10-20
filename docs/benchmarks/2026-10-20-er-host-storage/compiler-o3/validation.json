@@ -1,0 +1,94 @@
+{
+  "build": "release WASM completed per archived build.log",
+  "browser": "18 Playwright tests passed across Chromium/Firefox/WebKit per archived web.log; not the entire369-test suite",
+  "vm": "126 unique rows,21workloads\u00d72resources\u00d73stages; exact SVG/dimensions before and after; succeeded=true",
+  "newExecutionByAudit": "none",
+  "startup": "not measured; loading/compilation occurred before timed warmed operations",
+  "decision": "keep opt-level3 opt-in; do not switch default",
+  "artifacts": [
+    {
+      "source": "dist/evidence/er-frame-o3-build.log",
+      "path": "build.log.gz",
+      "sourceSha256": "c84ac5998814ab693bfb326d6a8036ed5a23e1423f96885325445b6d700a1b6b",
+      "gzipSha256": "aaabc047c0f2d1b55e03c6cd8173108dd9dd71faf473c8cfb807fb05125c6516",
+      "uncompressedBytes": 1702
+    },
+    {
+      "source": "dist/evidence/er-frame-o3-web.log",
+      "path": "web.log.gz",
+      "sourceSha256": "d2e1266fa677e917d779ea21d04db8d38dae3780ae2eb73861d1e2a9cdb2eb07",
+      "gzipSha256": "f866b0c9384d57ff27b06f3ff804c6e1539bb52dcd409f708de3b1a8c60f4b33",
+      "uncompressedBytes": 3762
+    },
+    {
+      "source": "dist/evidence/er-frame-o3-vm.log",
+      "path": "vm.log.gz",
+      "sourceSha256": "39f6321c6057c3278bb831ed3d71c3a0e5a5ec46205a615205cb2973f710ac5d",
+      "gzipSha256": "79c32e1c2f9306504dcd2e30d52ef159a6da0099ff4ed2d0da64e8b9bed17faf",
+      "uncompressedBytes": 548
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-chromium/er-entry-read-frame.json",
+      "path": "web/er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-chromium/er-entry-read-frame.json.gz",
+      "sourceSha256": "bdfce42ea5ad37b76e5c6e2ab351f1cc3b61fffe105114ee5b501eea19705d51",
+      "gzipSha256": "05527faaadf7fcf6a28ce53644d73f056252ee1253e6ee7ae17c191fc6a25b98",
+      "uncompressedBytes": 191331
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-firefox/er-entry-read-frame.json",
+      "path": "web/er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-firefox/er-entry-read-frame.json.gz",
+      "sourceSha256": "a64d2b5b8d970559556f429240dac37b1eaaf2375fbf6886e7be782a64940d72",
+      "gzipSha256": "98617a94b00bc9a5b44fa7671f2e8e8f932f0b673d5fc55bbd6e6516ca1b80d4",
+      "uncompressedBytes": 191331
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-webkit/er-entry-read-frame.json",
+      "path": "web/er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-webkit/er-entry-read-frame.json.gz",
+      "sourceSha256": "a64d2b5b8d970559556f429240dac37b1eaaf2375fbf6886e7be782a64940d72",
+      "gzipSha256": "98617a94b00bc9a5b44fa7671f2e8e8f932f0b673d5fc55bbd6e6516ca1b80d4",
+      "uncompressedBytes": 191331
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-chromium/er-error-brands.json",
+      "path": "web/er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-chromium/er-error-brands.json.gz",
+      "sourceSha256": "6026cd39b683bd3dc9f4d3f7ebdbfd5ccfa58d7213ac7d0d1486719bed29fe37",
+      "gzipSha256": "d47951d809c2869c714ba09c57c156aa384d106f635e1ee97a6ebb9a0d4a3148",
+      "uncompressedBytes": 236474
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-firefox/er-error-brands.json",
+      "path": "web/er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-firefox/er-error-brands.json.gz",
+      "sourceSha256": "6026cd39b683bd3dc9f4d3f7ebdbfd5ccfa58d7213ac7d0d1486719bed29fe37",
+      "gzipSha256": "d47951d809c2869c714ba09c57c156aa384d106f635e1ee97a6ebb9a0d4a3148",
+      "uncompressedBytes": 236474
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-webkit/er-error-brands.json",
+      "path": "web/er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-webkit/er-error-brands.json.gz",
+      "sourceSha256": "6026cd39b683bd3dc9f4d3f7ebdbfd5ccfa58d7213ac7d0d1486719bed29fe37",
+      "gzipSha256": "d47951d809c2869c714ba09c57c156aa384d106f635e1ee97a6ebb9a0d4a3148",
+      "uncompressedBytes": 236474
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-chromium/er-lexical-dispatch.json",
+      "path": "web/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-chromium/er-lexical-dispatch.json.gz",
+      "sourceSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011",
+      "gzipSha256": "acc15f2bed28f099df500ff43a9f15cf51a4fbabe97414e29482343f7621df29",
+      "uncompressedBytes": 1129705
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-firefox/er-lexical-dispatch.json",
+      "path": "web/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-firefox/er-lexical-dispatch.json.gz",
+      "sourceSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011",
+      "gzipSha256": "acc15f2bed28f099df500ff43a9f15cf51a4fbabe97414e29482343f7621df29",
+      "uncompressedBytes": 1129705
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/er-frame-o3/web/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-webkit/er-lexical-dispatch.json",
+      "path": "web/er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-webkit/er-lexical-dispatch.json.gz",
+      "sourceSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011",
+      "gzipSha256": "acc15f2bed28f099df500ff43a9f15cf51a4fbabe97414e29482343f7621df29",
+      "uncompressedBytes": 1129705
+    }
+  ]
+}

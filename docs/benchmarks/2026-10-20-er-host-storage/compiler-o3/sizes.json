@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "a472853",
+  "controlOptLevel": "s",
+  "candidateOptLevel": "3",
+  "lto": true,
+  "codegenUnits": 1,
+  "files": {
+    "control": {
+      "path": "dist/perf-patches/parse-architecture/er-error-brand/candidate-package/pkg/pele_bg.wasm",
+      "sha256": "1036593e94ae9113a848aaf1a0cbb118e05991d6abdc3c6e977fec17bb4d66f2",
+      "bytes": 8125488,
+      "gzipBytes": 2475982,
+      "brotliBytes": 1709000
+    },
+    "candidate": {
+      "path": "dist/package-web/package/pkg/pele_bg.wasm",
+      "sha256": "56772d28acc25c58785e79ac3824d965bb12c36bf20f8efc7fc8a445851f1f1a",
+      "bytes": 11663447,
+      "gzipBytes": 3355687,
+      "brotliBytes": 2166917
+    }
+  }
+}

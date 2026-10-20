@@ -190,6 +190,11 @@ improves it another 7.44–10.01% against the frame artifact, while parse contro
 are mixed. Retained ER still takes 3.35–4.30× JS time in that latest scoped run.
 These separate measurement windows must not be compounded into a single gain.
 
+The [compiler experiment](docs/benchmarks/2026-10-20-er-host-storage/compiler-o3/)
+keeps `PELE_WASM_OPT_LEVEL=3` opt-in: median paired parse time improves 5.71%
+across 42 conditions, but WASM grows 43.54% raw / 26.79% Brotli. Startup remains
+unmeasured; the default stays `s`.
+
 The [shared ER lexer follow-up](docs/benchmarks/2026-10-20-er-host-storage/lexer/)
 improves VM ER parse by 6.1–8.6% paired against the preceding packet artifact.
 Local Swift ER mutable/immutable parse improves 20.8%/10.0% against frozen
