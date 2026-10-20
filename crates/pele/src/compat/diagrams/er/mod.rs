@@ -1,4 +1,5 @@
 //! Complete ER diagram module, Pele er/* 458322a5 (MIT, kepano).
+mod direct_parse;
 mod graph;
 mod lexer;
 mod markers;

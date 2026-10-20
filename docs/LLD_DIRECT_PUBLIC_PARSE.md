@@ -122,3 +122,13 @@ work; it does not establish a whole-family or whole-adapter speedup. Allocation
 requests, peak requested live bytes, RSS and elapsed time are separate measures.
 VM and Swift verification remain separate delivery checks. The complete Pele JS
 performance gate still governs a future 0.3 release.
+
+## ER construction target
+
+[Direct ER construction](LLD_DIRECT_ER_PARSE.md) uses this same captured plan
+and optional hook. One shared grammar targets either the original typed model
+or the final canonical arena. A conservative declaration-first subset avoids a
+complete temporary model and conversion pass; remaining syntax and larger input
+use the existing typed path once, preserving all established limits and errors.
+Public graph bytes, eager publication and existing render/import behavior stay
+identical. The separate resource-callback parity failure remains open.

@@ -11,7 +11,8 @@ thin Swift and WebAssembly adapters. Registries and diagram module interfaces
 support extension without changing the built-ins.
 
 [Direct public parsing](LLD_DIRECT_PUBLIC_PARSE.md) shares source preparation and
-lets modules construct canonical public state without a temporary typed model.
+lets modules construct canonical public state without a temporary typed model. The [ER target](LLD_DIRECT_ER_PARSE.md)
+shares the same grammar and preserves exact arena bytes through conservative fallback.
 [Direct normalized projection](LLD_NORMALIZED_PROJECTION.md) removes the first
 model JSON buffer and reparse for the captured Gantt and ER builtins, while preserving
 legacy projection for public providers and other diagram registrations.

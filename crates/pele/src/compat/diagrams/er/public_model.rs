@@ -442,11 +442,11 @@ fn imported(g: &ModelGraph) -> Result<ErModel, PeleError> {
     }
     Ok(m)
 }
-fn rec(w: &mut GraphWriter, fields: Vec<(&str, Atom)>) -> u32 {
+pub(super) fn rec(w: &mut GraphWriter, fields: Vec<(&str, Atom)>) -> u32 {
     let properties = fields.into_iter().map(|(k, v)| w.property(k, v)).collect();
     w.node(Node::Object { properties })
 }
-fn arr(w: &mut GraphWriter, values: impl IntoIterator<Item = Atom>) -> u32 {
+pub(super) fn arr(w: &mut GraphWriter, values: impl IntoIterator<Item = Atom>) -> u32 {
     let properties: Vec<_> = values
         .into_iter()
         .enumerate()
@@ -467,37 +467,73 @@ fn texts(w: &mut GraphWriter, values: &[String]) -> u32 {
 fn text(w: &mut GraphWriter, s: &str) -> Atom {
     Atom::String(w.string(s))
 }
+pub(super) struct EntityPublication<'a> {
+    pub name: &'a str,
+    pub id: &'a str,
+    pub label: &'a str,
+    pub alias: &'a str,
+    pub attributes: &'a [ErAttribute],
+    pub classes: &'a str,
+    pub styles: &'a [String],
+}
+pub(super) fn publish_entity(
+    w: &mut GraphWriter,
+    entity: EntityPublication<'_>,
+    comment_first: impl Fn(usize) -> bool,
+) -> (Atom, Atom, Atom) {
+    let mut attrs = vec![];
+    for (index, a) in entity.attributes.iter().enumerate() {
+        let keys = texts(w, &a.keys);
+        let comment = text(w, &a.comment);
+        let mut fields = vec![("type", text(w, &a.r#type)), ("name", text(w, &a.name))];
+        if comment_first(index) {
+            fields.extend([("comment", comment), ("keys", Atom::Ref(keys))])
+        } else {
+            fields.extend([("keys", Atom::Ref(keys)), ("comment", comment)])
+        }
+        attrs.push(Atom::Ref(rec(w, fields)));
+    }
+    let attributes = arr(w, attrs);
+    let styles = texts(w, entity.styles);
+    let id = text(w, entity.id);
+    let fields = vec![
+        ("id", id.clone()),
+        ("label", text(w, entity.label)),
+        ("alias", text(w, entity.alias)),
+        ("attributes", Atom::Ref(attributes)),
+        ("cssClasses", text(w, entity.classes)),
+        ("cssStyles", Atom::Ref(styles)),
+    ];
+    let node = rec(w, fields);
+    let key = text(w, entity.name);
+    (key, Atom::Ref(node), id)
+}
+pub(super) fn publish_spec(w: &mut GraphWriter, spec: &RelSpec) -> u32 {
+    let fields = vec![
+        ("cardA", text(w, &format!("{:?}", spec.card_a))),
+        ("relType", text(w, &format!("{:?}", spec.rel_type))),
+        ("cardB", text(w, &format!("{:?}", spec.card_b))),
+    ];
+    rec(w, fields)
+}
 fn initial(m: &ErModel) -> Result<ModelGraph, PeleError> {
     let mut w = GraphWriter::default();
     let mut entities = vec![];
     for (name, e) in &m.entities {
-        let mut attrs = vec![];
-        for (index, a) in e.attributes.iter().enumerate() {
-            let keys = texts(&mut w, &a.keys);
-            let comment = text(&mut w, &a.comment);
-            let mut fields = vec![
-                ("type", text(&mut w, &a.r#type)),
-                ("name", text(&mut w, &a.name)),
-            ];
-            if m.public_attribute_comment_first(name, index) {
-                fields.extend([("comment", comment), ("keys", Atom::Ref(keys))])
-            } else {
-                fields.extend([("keys", Atom::Ref(keys)), ("comment", comment)])
-            }
-            attrs.push(Atom::Ref(rec(&mut w, fields)));
-        }
-        let attributes = arr(&mut w, attrs);
-        let styles = texts(&mut w, &e.css_styles);
-        let fields = vec![
-            ("id", text(&mut w, &e.id)),
-            ("label", text(&mut w, &e.label)),
-            ("alias", text(&mut w, &e.alias)),
-            ("attributes", Atom::Ref(attributes)),
-            ("cssClasses", text(&mut w, &e.css_classes)),
-            ("cssStyles", Atom::Ref(styles)),
-        ];
-        let entity = rec(&mut w, fields);
-        entities.push((text(&mut w, name), Atom::Ref(entity)));
+        let (key, value, _) = publish_entity(
+            &mut w,
+            EntityPublication {
+                name,
+                id: &e.id,
+                label: &e.label,
+                alias: &e.alias,
+                attributes: &e.attributes,
+                classes: &e.css_classes,
+                styles: &e.css_styles,
+            },
+            |index| m.public_attribute_comment_first(name, index),
+        );
+        entities.push((key, value));
     }
     let entities = w.node(Node::Map {
         entries: entities,
@@ -505,15 +541,7 @@ fn initial(m: &ErModel) -> Result<ModelGraph, PeleError> {
     });
     let mut relationships = vec![];
     for r in &m.relationships {
-        let fields = vec![
-            ("cardA", text(&mut w, &format!("{:?}", r.rel_spec.card_a))),
-            (
-                "relType",
-                text(&mut w, &format!("{:?}", r.rel_spec.rel_type)),
-            ),
-            ("cardB", text(&mut w, &format!("{:?}", r.rel_spec.card_b))),
-        ];
-        let spec = rec(&mut w, fields);
+        let spec = publish_spec(&mut w, &r.rel_spec);
         let fields = vec![
             ("entityA", text(&mut w, &r.entity_a)),
             ("roleA", text(&mut w, &r.role_a)),
@@ -579,6 +607,40 @@ fn initial(m: &ErModel) -> Result<ModelGraph, PeleError> {
         values: claimed,
         properties: vec![],
     });
+    finish_initial(
+        w,
+        m,
+        InitialRoots {
+            entities,
+            relationships,
+            classes,
+            subgraphs,
+            lookup,
+            claimed,
+        },
+    )
+}
+pub(super) struct InitialRoots {
+    pub entities: u32,
+    pub relationships: u32,
+    pub classes: u32,
+    pub subgraphs: u32,
+    pub lookup: u32,
+    pub claimed: u32,
+}
+pub(super) fn finish_initial(
+    mut w: GraphWriter,
+    m: &ErModel,
+    roots: InitialRoots,
+) -> Result<ModelGraph, PeleError> {
+    let InitialRoots {
+        entities,
+        relationships,
+        classes,
+        subgraphs,
+        lookup,
+        claimed,
+    } = roots;
     let mut properties = vec![];
     for (k, v) in [
         ("type", text(&mut w, "er")),
@@ -615,6 +677,18 @@ impl PublicDiagramModule for Er {
         graph.validate_schema(self.model_schema())?;
         let model = std::cell::OnceCell::new();
         Ok(ErPublicState { graph, model })
+    }
+    fn try_parse_public(
+        &self,
+        context: crate::compat::ParseContext<'_>,
+        _edge_limit: Option<crate::compat::EdgeLimit>,
+    ) -> Option<Result<Self::PublicState, PeleError>> {
+        super::direct_parse::parse(context).map(|result| {
+            result.map(|graph| ErPublicState {
+                graph,
+                model: std::cell::OnceCell::new(),
+            })
+        })
     }
     fn create_public(&self, m: &ErModel) -> Result<ErPublicState, PeleError> {
         let graph = initial(m)?;
