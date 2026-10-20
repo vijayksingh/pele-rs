@@ -10,10 +10,11 @@ entry points retain their existing transports.
 
 Both `pele_parse_v2` and `pele_parse_eager_v1` call the same private input parser.
 They retain the 16 MiB source and 1 MiB options byte ceilings, UTF-8 validation,
-option decoding and captured typed document. The new entry calls the existing
-`model_view()` once, preserving module projection validation, bounded model JSON
-serialization, normalization and depth admission. This first JSON round trip
-remains; this change does not claim to remove its CPU or allocation cost.
+option decoding and captured typed document. The new entry calls public `model_view()` once, preserving module projection
+validation, normalized values and depth/byte admission. The captured Gantt
+builtin uses [direct normalized projection](LLD_NORMALIZED_PROJECTION.md),
+removing its first model JSON buffer and reparse. Other builtin registrations
+and arbitrary public providers retain their original bounded JSON normalization.
 
 A borrowed projection has the same fields as the existing document envelope.
 The generic `success_envelope_len` counts the exact existing serializer without

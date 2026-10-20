@@ -42,7 +42,14 @@ trait ErasedModule: Send + Sync {
     fn model_view(&self, model: &Model) -> Result<Value, PeleError>;
     fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError>;
 }
-struct Module<D>(D);
+#[derive(Clone, Copy)]
+enum Projection {
+    Legacy,
+    // Selected only by our private builtin registration. Public providers never
+    // inherit it from a matching descriptor, model type or registration name.
+    NormalizedBuiltin,
+}
+struct Module<D>(D, Projection);
 struct ModelWriter {
     bytes: Vec<u8>,
     exceeded: bool,
@@ -139,7 +146,10 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
             .downcast_ref::<D::Model>()
             .expect("private module/model pairing");
         self.0.validate_model_projection(model)?;
-        project_model(model)
+        match self.1 {
+            Projection::Legacy => project_model(model),
+            Projection::NormalizedBuiltin => super::normalized_projection::project(model),
+        }
     }
     fn render_with_output_limit(
         &self,
@@ -300,7 +310,7 @@ impl Engine {
         engine.register(super::diagrams::architecture::Architecture);
         engine.register(super::diagrams::sankey::Sankey);
         engine.register(super::diagrams::state::State);
-        engine.register(super::diagrams::gantt::Gantt);
+        engine.register_projected(super::diagrams::gantt::Gantt, Projection::NormalizedBuiltin);
         engine.register(super::diagrams::sequence::Sequence);
         engine.register(super::diagrams::xychart::XyChart);
         engine.register(super::diagrams::class_diagram::Class);
@@ -320,10 +330,13 @@ impl Engine {
         Self::default()
     }
     pub fn register<D: DiagramModule>(&mut self, module: D) {
+        self.register_projected(module, Projection::Legacy);
+    }
+    fn register_projected<D: DiagramModule>(&mut self, module: D, projection: Projection) {
         let descriptor = module.descriptor();
         let registration = Arc::new(Registration {
             descriptor,
-            module: Box::new(Module(module)),
+            module: Box::new(Module(module, projection)),
         });
         if let Some(i) = self
             .modules

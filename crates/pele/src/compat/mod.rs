@@ -5,6 +5,7 @@ pub use calendar::{fields_at_offset, instant_in_zone, CalendarFields, CivilDateT
 pub mod diagrams;
 mod edge_limit;
 mod engine;
+mod normalized_projection;
 pub use edge_limit::{EdgeLimit, ParseLimits, MAX_PUBLIC_EDGES};
 mod error;
 mod id;
