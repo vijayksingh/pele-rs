@@ -9,6 +9,9 @@ publish = false
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+captured-sankey = ["pele/web-host-sankey"]
+
 [dependencies]
 pele = { workspace = true, features = ["web-host-er"] }
 serde.workspace = true

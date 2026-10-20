@@ -1,4 +1,9 @@
+#[cfg(feature = "captured-sankey")]
+mod captured_store;
+#[cfg(feature = "captured-sankey")]
+mod captured_sankey;
 mod foreign_provider;
+mod host_construction;
 mod host_er;
 mod host_functions;
 mod parse_limits;

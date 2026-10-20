@@ -9,6 +9,8 @@ import {fileURLToPath} from 'node:url';
 import {chromium} from '@playwright/test';
 import {cases,revision,now} from './cases.mjs';
 const arg=(name,fallback)=>{const i=process.argv.indexOf(name);return i<0?fallback:process.argv[i+1]};
+const candidateCapturedSankey=process.argv.includes('--candidate-captured-sankey');
+const capturedModule='captured-owner.js';
 const roots={control:resolve(arg('--control','dist/package-web/package')),candidate:resolve(arg('--candidate','dist/package-web/package'))};
 assert.notEqual(roots.control,roots.candidate,'Use independent immutable packages');
 const trials=Number(arg('--trials','15')),warmupMs=Number(arg('--warmup-ms','500'));
@@ -24,7 +26,9 @@ async function hashes(root,prefix=''){
 }
 const inputs=async()=>Object.fromEntries(await Promise.all(Object.entries(roots).map(async([key,root])=>[key,await hashes(root)])));
 const before=await inputs(),oracleSHA256=sha(await readFile(oracle));assert.equal(oracleSHA256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');
-const report={schemaVersion:1,diagnostic:true,startedAt:new Date().toISOString(),oracleRevision:revision,oracleSHA256,harnessSHA256:sha(await readFile(fileURLToPath(import.meta.url))),casesSHA256:sha(await readFile(new URL('./cases.mjs',import.meta.url))),runtimeHashes:before,platform:{os:platform(),arch:arch(),cpu:cpus()[0]?.model,logicalCPUs:cpus().length,totalMemory:totalmem()},hostBefore:{loadAverage:loadavg(),freeMemory:freemem()},settings:{trials,warmupMs,batchTargetMs:12,maxBatch:128,balancedThreeWayOrder:true,matchedWasmBatchCounts:true,calibrationMedianOfThree:true,freshRetainedModelPerBatch:true},scope:'One browser/page holds independent control and candidate WASM instances and pinned JS. Balanced cyclic/reverse order; whole SVG and exact dimensions before/after. Shared heaps/GC/cache pressure differ from the release harness. Diagnostic, never a replacement release gate.',rows:[],cases:[]};
+if(candidateCapturedSankey)assert(before.candidate[capturedModule],'Candidate package lacks captured-owner.js');
+const capturedBackend={candidateEnabled:candidateCapturedSankey,controlEnabled:false,moduleSHA256:{control:before.control[capturedModule]??null,candidate:before.candidate[capturedModule]??null},probeInsideTimer:false};
+const report={schemaVersion:1,diagnostic:true,startedAt:new Date().toISOString(),oracleRevision:revision,oracleSHA256,harnessSHA256:sha(await readFile(fileURLToPath(import.meta.url))),casesSHA256:sha(await readFile(new URL('./cases.mjs',import.meta.url))),runtimeHashes:before,capturedBackend,platform:{os:platform(),arch:arch(),cpu:cpus()[0]?.model,logicalCPUs:cpus().length,totalMemory:totalmem()},hostBefore:{loadAverage:loadavg(),freeMemory:freemem()},settings:{trials,warmupMs,batchTargetMs:12,maxBatch:128,balancedThreeWayOrder:true,matchedWasmBatchCounts:true,calibrationMedianOfThree:true,freshRetainedModelPerBatch:true},scope:'One browser/page holds independent control and candidate WASM instances and pinned JS. Balanced cyclic/reverse order; whole SVG and exact dimensions before/after. Shared heaps/GC/cache pressure differ from the release harness. Diagnostic, never a replacement release gate.',rows:[],cases:[]};
 const server=createServer(async(req,res)=>{try{
  res.setHeader('Cross-Origin-Opener-Policy','same-origin');res.setHeader('Cross-Origin-Embedder-Policy','require-corp');
  const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
@@ -35,21 +39,39 @@ const server=createServer(async(req,res)=>{try{
 await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;const deadline=setTimeout(()=>void browser?.close(),600000);
 try{
  browser=await chromium.launch({headless:true,timeout:20000});report.browser=browser.version();const page=await browser.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/`);
- const clock=await page.evaluate(async now=>{
+ const clock=await page.evaluate(async({now,candidateCapturedSankey,controlHasCapturedModule})=>{
  Date.now=()=>now;const js=await import('/oracle.js'),controlAPI=await import('/control/index.js'),candidateAPI=await import('/candidate/index.js');
- window.comparison={runtimes:{js,control:await controlAPI.loadRenderer(),candidate:await candidateAPI.loadRenderer()},controlAPI};
- let resolution=Infinity,last=performance.now();for(let i=0;i<4096;i++){const n=performance.now();if(n>last)resolution=Math.min(resolution,n-last);last=n;}return{crossOriginIsolated,observedClockResolutionMs:resolution};},now);
+ let candidateOwner,controlOwner;
+ if(candidateCapturedSankey){
+  candidateOwner=await import('/candidate/captured-owner.js');
+  if(controlHasCapturedModule){controlOwner=await import('/control/captured-owner.js');controlOwner.enableCapturedSankeyForTesting(false);}
+ }
+ const control=await controlAPI.loadRenderer();
+ if(candidateCapturedSankey)candidateOwner.enableCapturedSankeyForTesting(true);
+ const candidate=await candidateAPI.loadRenderer();
+ const probeBackend=candidateCapturedSankey?(name,model,family,lane)=>{
+  if(name==='js')return undefined;
+  const actual=(name==='candidate'?candidateOwner:controlOwner)?.capturedSankeyBackend(model);
+  const expected=name==='candidate'&&family==='sankey'?'source':undefined;
+  if(actual!==expected)throw Error(name+'/'+family+'/'+lane+': expected backend '+String(expected)+', got '+String(actual));
+  return {runtime:name,lane,expected:expected??null,actual:actual??null};
+ }:undefined;
+ window.comparison={runtimes:{js,control,candidate},controlAPI,probeBackend};
+ let resolution=Infinity,last=performance.now();for(let i=0;i<4096;i++){const n=performance.now();if(n>last)resolution=Math.min(resolution,n-last);last=n;}return{crossOriginIsolated,observedClockResolutionMs:resolution};},{now,candidateCapturedSankey,controlHasCapturedModule:!!before.control[capturedModule]});
  assert(clock.crossOriginIsolated&&clock.observedClockResolutionMs>0&&clock.observedClockResolutionMs<=.01,'High-resolution isolated timer required');Object.assign(report.settings,clock);
  for(const workload of workloads){
  const result=await page.evaluate(({workload,stages,profiles,trials,warmupMs})=>{
- const {runtimes,controlAPI}=window.comparison,names=['js','control','candidate'],rows=[],checks=[];let checksum=0;
+ const {runtimes,controlAPI,probeBackend}=window.comparison,names=['js','control','candidate'],rows=[],checks=[],backendChecks=[];let checksum=0;
  const quantile=(samples,p)=>[...samples].sort((a,b)=>a-b)[Math.max(0,Math.ceil(samples.length*p)-1)];
  for(const profile of profiles){
  const measurer=profile==='fixed'?{width:(text,size,style)=>text.length*size*((style&1)?.71:.6)}:controlAPI.canvasMeasurer('sans-serif','monospace');if(!measurer)throw Error('Canvas unavailable');
  const options={...workload.options,measurer},models=Object.fromEntries(names.map(name=>[name,runtimes[name].parse(workload.source,options)]));
  const verify=()=>{const expected=runtimes.js.render(models.js,options);
  const equal=(actual,lane)=>{if(actual.svg!==expected.svg||!Object.is(actual.width,expected.width)||!Object.is(actual.height,expected.height))throw Error(workload.id+': '+lane+' output mismatch')};
- for(const name of names){const renderer=runtimes[name];equal(renderer.render(models[name],options),name+'/retained');equal(renderer.render(workload.source,options),name+'/source');const fresh=renderer.parse(workload.source,options);try{equal(renderer.render(fresh,options),name+'/fresh-parse')}finally{if(name!=='js')renderer.dispose(fresh)}}
+ for(const name of names){const renderer=runtimes[name];
+ if(probeBackend&&name!=='js')backendChecks.push({profile,...probeBackend(name,models[name],workload.family,'retained')});
+ equal(renderer.render(models[name],options),name+'/retained');equal(renderer.render(workload.source,options),name+'/source');const fresh=renderer.parse(workload.source,options);
+ try{if(probeBackend&&name!=='js')backendChecks.push({profile,...probeBackend(name,fresh,workload.family,'fresh-parse')});equal(renderer.render(fresh,options),name+'/fresh-parse')}finally{if(name!=='js')renderer.dispose(fresh)}}
  return{svg:expected.svg,width:expected.width,height:expected.height}};
  try{
  const baseline=verify();
@@ -66,8 +88,8 @@ try{
  const after=verify();if(after.svg!==baseline.svg||!Object.is(after.width,baseline.width)||!Object.is(after.height,baseline.height))throw Error('Output changed after timing');checks.push({profile,svgBytes:new TextEncoder().encode(after.svg).length});
  }finally{for(const name of ['control','candidate'])runtimes[name].dispose(models[name]);}
  }
- return{rows,checks,checksum};},{workload,stages,profiles,trials,warmupMs});
- report.rows.push(...result.rows);report.cases.push({id:workload.id,sourceSHA256:sha(Buffer.from(workload.source)),sourceBytes:Buffer.byteLength(workload.source),checks:result.checks,checksum:result.checksum});
+ return{rows,checks,backendChecks,checksum};},{workload,stages,profiles,trials,warmupMs});
+ report.rows.push(...result.rows);report.cases.push({id:workload.id,sourceSHA256:sha(Buffer.from(workload.source)),sourceBytes:Buffer.byteLength(workload.source),checks:result.checks,backendChecks:result.backendChecks,checksum:result.checksum});
  await mkdir(dirname(output),{recursive:true});await writeFile(output+'.partial',JSON.stringify(report,null,2)+'\n');console.log('compared '+workload.id);
  }
  assert.deepEqual(await inputs(),before,'Package changed during comparison');report.completedAt=new Date().toISOString();report.hostAfter={loadAverage:loadavg(),freeMemory:freemem()};report.succeeded=true;await writeFile(output,JSON.stringify(report,null,2)+'\n');console.log(output);

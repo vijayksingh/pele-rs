@@ -33,6 +33,9 @@ document backend.
 [Captured Sankey ownership](LLD_CAPTURED_SANKEY_OWNER.md) retains native render
 state without a generic graph and preserves shared admission, helper and render
 policy behind an opt-in feature.
+[Experimental captured web storage](LLD_CAPTURED_WEB_STORAGE.md) implements that
+boundary with shared traversal and bounded column imports. Its initial VM result
+rejects default activation; profiling and a coarser boundary remain necessary.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.

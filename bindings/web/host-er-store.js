@@ -1,5 +1,6 @@
 // Private host storage primitives. ER grammar, methods and rendering remain Rust.
 import {PeleError} from './errors.js';
+import {createConstructorDecoder,invalidConstructorBatch} from './constructor-storage.js';
 const constructors={error:Error,pele:PeleError,type:TypeError,range:RangeError,syntax:SyntaxError,reference:ReferenceError,eval:EvalError,uri:URIError};
 const diagnostics=new Set(['stack','fileName','lineNumber','columnNumber','sourceURL']);
 const bits=new DataView(new ArrayBuffer(8));
@@ -396,191 +397,7 @@ export class HostErOwner {
   }
   // Bounded constructor events. State spans batches only while unpublished:
   // one final object under construction, or fragments of one large string.
-  publishBatch(bytes){
-    const bad=()=>{throw new TypeError('Invalid host constructor batch');};
-    if(!(bytes instanceof Uint8Array)||bytes.byteLength<2||bytes.byteLength>65536)bad();
-    const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
-    const count=view.getUint16(0,true);if(count<1||count>128)bad();
-    let offset=2;
-    const need=n=>{if(n>bytes.byteLength-offset)bad();};
-    const u8=()=>{need(1);return view.getUint8(offset++);};
-    const u32=()=>{need(4);const value=view.getUint32(offset,true);offset+=4;return value;};
-    const scratch=[];
-    const text=units=>{
-      need(units*2);const parts=[];
-      for(let left=units;left>0;){
-        const size=Math.min(left,8192);scratch.length=size;
-        for(let i=0;i<size;i++){scratch[i]=view.getUint16(offset,true);offset+=2;}
-        parts.push(String.fromCharCode(...scratch));left-=size;
-      }
-      return parts.join('');
-    };
-    const stringRoom=(id,units)=>{
-      if(id!==this.strings.length)bad();
-      if(id>=1_000_000||units>16_000_000-this.units)graphBudget();
-    };
-    const addString=(id,value)=>{if(this.intern(value,true)!==id)bad();};
-    const valueBytes=value=>value===null||value===undefined||typeof value==='boolean'?1:typeof value==='number'?9:5;
-    const atom=()=>{
-      const tag=u8();
-      switch(tag){
-        case 0:return undefined;case 1:return null;case 2:return false;case 3:return true;
-        case 4:{need(8);bits.setBigUint64(0,view.getBigUint64(offset,true));offset+=8;return bits.getFloat64(0);}
-        case 5:return this.string(u32());case 6:return this.object(u32());
-        case 7:return this.registration.functions.get(u32());
-        case 8:{const id=u32();return id>=TEMP?this.temporary.hosts[id-TEMP]:this.hostValues[id];}
-        default:bad();
-      }
-    };
-    // Inline and fragmented nodes share publication and accounting rules.
-    const beginNode=(id,kind,length)=>{
-      if(this.constructionNode||this.constructionString||kind>4||id!==this.objects.length)bad();
-      if(this.allocate(kind)!==id)bad();
-      this.constructionNode={id,object:this.object(id),kind,length,properties:false,assignFresh:kind===0||kind===1,bytes:kind===0?5:9,refs:0};
-    };
-    const mapEntry=()=>{
-      const node=this.constructionNode;if(!node||node.kind!==2||node.properties||this.constructionString)bad();
-      const key=atom(),value=atom(),had=Map.prototype.has.call(node.object,key);
-      if(had)node.bytes+=valueBytes(value)-valueBytes(Map.prototype.get.call(node.object,key));
-      else{node.refs+=2;node.bytes+=valueBytes(key)+valueBytes(value);}
-      Map.prototype.set.call(node.object,key,value);
-    };
-    const setValue=()=>{
-      const node=this.constructionNode;if(!node||node.kind!==3||node.properties||this.constructionString)bad();
-      const value=atom();if(!Set.prototype.has.call(node.object,value)){node.refs++;node.bytes+=valueBytes(value);}
-      Set.prototype.add.call(node.object,value);
-    };
-    const property=()=>{
-      const node=this.constructionNode;if(!node||this.constructionString)bad();
-      const key=u32(),flags=u8(),name=this.string(key),value=atom();node.properties=true;
-      if(flags!==7)node.assignFresh=false;
-      const previous=Object.getOwnPropertyDescriptor(node.object,name),length=node.kind===1&&name==='length';
-      // Keep raw NaN publication on the descriptor path. Once a nondefault
-      // descriptor appears, later duplicate keys must use strict redefinition.
-      if(node.assignFresh&&name!=='__proto__'&&name!=='length'&&!(typeof value==='number'&&Number.isNaN(value)))node.object[name]=value;
-      else if(!Reflect.defineProperty(node.object,name,{value,enumerable:!!(flags&1),writable:!!(flags&2),configurable:!!(flags&4)}))return false;
-      if(previous&&!(length&&previous.writable)){node.refs--;node.bytes-=5+valueBytes(previous.value);}
-      if(!(length&&(flags&2))){node.refs++;node.bytes+=5+valueBytes(value);}
-      if(length)this.constructionNeedsAudit=true;
-      return true;
-    };
-    const endNode=()=>{
-      const node=this.constructionNode;if(!node||this.constructionString)bad();
-      if(node.kind===1){
-        if(node.object.length>node.length)this.constructionNeedsAudit=true;
-        if(!Reflect.set(node.object,'length',node.length))return false;
-      }
-      this.nodeBytes[node.id]=node.bytes;this.nodeRefs[node.id]=node.refs;
-      this.constructionBytes+=node.bytes;this.references+=node.refs;
-      this.constructionNode=null;return true;
-    };
-    for(let event=0;event<count;event++){
-      const tag=u8();
-      switch(tag){
-        case 0:{
-          if(this.constructionNode||this.constructionString)bad();
-          const id=u32(),units=u32();stringRoom(id,units);
-          addString(id,text(units));break;
-        }
-        case 1:{
-          if(this.constructionNode||this.constructionString)bad();
-          const id=u32(),units=u32();stringRoom(id,units);
-          this.constructionString={id,units,read:0,parts:[]};break;
-        }
-        case 2:{
-          const pending=this.constructionString;if(!pending||this.constructionNode)bad();
-          const units=u32();if(units===0||units>pending.units-pending.read)bad();
-          pending.parts.push(text(units));pending.read+=units;break;
-        }
-        case 3:{
-          const pending=this.constructionString;
-          if(!pending||pending.read!==pending.units||this.constructionNode)bad();
-          addString(pending.id,pending.parts.join(''));this.constructionString=null;break;
-        }
-        case 4:{
-          if(this.constructionNode||this.constructionString)bad();
-          const id=u32(),kind=u8(),length=u32();beginNode(id,kind,length);break;
-        }
-        case 5:mapEntry();break;
-        case 6:setValue();break;
-        case 7:if(!property())return -1;break;
-        case 8:if(!endNode())return -2;break;
-        case 9:{
-          if(this.constructionNode||this.constructionString)bad();
-          const id=u32(),kind=u8(),length=u32(),payloadCount=u32(),propertyCount=u32();
-          if(kind>4||(kind!==2&&kind!==3&&payloadCount!==0))bad();
-          // Reject impossible counts before allocation or iteration. Every map
-          // pair uses at least two bytes; every property uses at least six.
-          need(payloadCount*(kind===2?2:1)+propertyCount*6);
-          beginNode(id,kind,length);
-          if(kind===2)for(let i=0;i<payloadCount;i++)mapEntry();
-          else if(kind===3)for(let i=0;i<payloadCount;i++)setValue();
-          for(let i=0;i<propertyCount;i++)if(!property())return -1;
-          if(!endNode())return -2;break;
-        }
-        case 10:{
-          if(this.constructionNode||this.constructionString)bad();
-          const id=u8(),count=u8();
-          if(id!==this.constructionLayouts.length||id>=32||count>64)bad();
-          need(count*4);
-          const keys=new Array(count);
-          for(let i=0;i<count;i++){
-            const key=this.string(u32());
-            if(typeof key!=='string'||key==='__proto__'||key==='length'||keys.includes(key))bad();
-            keys[i]=key;
-          }
-          this.constructionLayouts.push(keys);break;
-        }
-        case 11:{
-          if(this.constructionNode||this.constructionString)bad();
-          const id=u32(),layout=u8(),keys=this.constructionLayouts[layout];
-          if(!keys||id!==this.objects.length)bad();
-          // Every atom is at least one byte. Count/shape admission precedes
-          // allocation; arbitrary/duplicate/nondefault layouts keep node events.
-          need(keys.length);
-          if(this.allocate(0)!==id)bad();
-          const object=this.object(id);let bytes=5+5*keys.length;
-          for(const key of keys){
-            const value=atom();
-            // Preserve the existing fresh NaN descriptor path and exact bits.
-            if(typeof value==='number'&&Number.isNaN(value)){
-              if(!Reflect.defineProperty(object,key,{value,enumerable:true,writable:true,configurable:true}))return -1;
-            }else object[key]=value;
-            bytes+=valueBytes(value);
-          }
-          this.nodeBytes[id]=bytes;this.nodeRefs[id]=keys.length;
-          this.constructionBytes+=bytes;this.references+=keys.length;
-          break;
-        }
-        case 12:{
-          if(this.constructionNode||this.constructionString)bad();
-          const id=u32(),length=u32();
-          if(id!==this.objects.length)bad();
-          // At least one byte per atom; bound the loop before allocating.
-          need(length);
-          if(this.allocate(1)!==id)bad();
-          const object=this.object(id);let bytes=9+5*length;
-          for(let index=0;index<length;index++){
-            const value=atom();
-            // Same fresh-array assignment and raw-NaN descriptor path as the
-            // generic publisher; index strings were already interned in Rust.
-            if(typeof value==='number'&&Number.isNaN(value)){
-              if(!Reflect.defineProperty(object,index,{value,enumerable:true,writable:true,configurable:true}))return -1;
-            }else object[index]=value;
-            bytes+=valueBytes(value);
-          }
-          if(object.length>length)this.constructionNeedsAudit=true;
-          if(!Reflect.set(object,'length',length))return -2;
-          this.nodeBytes[id]=bytes;this.nodeRefs[id]=length;
-          this.constructionBytes+=bytes;this.references+=length;
-          break;
-        }
-        default:bad();
-      }
-    }
-    if(offset!==bytes.byteLength)bad();
-    return 0;
-  }
+  publishBatch(bytes){return decodeErConstruction(this,bytes);}
   disposeConstruction(){this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();this.hostValues=[];this.hostIds=new Map();this.root=undefined;this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];}
   // Generic adapter ABI; no ER method/field decisions occur in this switch.
   primitive(op,args){
@@ -653,3 +470,90 @@ export class HostErOwner {
     }
   }
 }
+
+// Storage policy stays local: the shared interpreter does not inherit ER's
+// collapsed Map/Set accounting, eager ownership or host-limit error category.
+const constructionValueBytes=value=>value===null||value===undefined||typeof value==='boolean'?1:typeof value==='number'?9:5;
+const decodeErConstruction=createConstructorDecoder({
+  rawAtoms:false,
+  stringRoom(owner,id,units){
+    if(id!==owner.strings.length)invalidConstructorBatch();
+    if(id>=1_000_000||units>16_000_000-owner.units)graphBudget();
+  },
+  addString(owner,id,value){if(owner.intern(value,true)!==id)invalidConstructorBatch();},
+  nodeCount:owner=>owner.objects.length,
+  number(view,offset){bits.setBigUint64(0,view.getBigUint64(offset,true));return bits.getFloat64(0);},
+  reference(owner,tag,id){
+    switch(tag){
+      case 5:return owner.string(id);case 6:return owner.object(id);
+      case 7:return owner.registration.functions.get(id);
+      case 8:return id>=TEMP?owner.temporary.hosts[id-TEMP]:owner.hostValues[id];
+    }
+  },
+  beginNode(owner,id,kind,length){
+    if(owner.allocate(kind)!==id)invalidConstructorBatch();
+    return {id,object:owner.object(id),kind,length,properties:false,assignFresh:kind===0||kind===1,bytes:kind===0?5:9,refs:0};
+  },
+  mapEntry(owner,node,kt,kl,kh,key,vt,vl,vh,value){
+    const had=Map.prototype.has.call(node.object,key);
+    if(had)node.bytes+=constructionValueBytes(value)-constructionValueBytes(Map.prototype.get.call(node.object,key));
+    else{node.refs+=2;node.bytes+=constructionValueBytes(key)+constructionValueBytes(value);}
+    Map.prototype.set.call(node.object,key,value);
+  },
+  setValue(owner,node,tag,lo,hi,value){
+    if(!Set.prototype.has.call(node.object,value)){node.refs++;node.bytes+=constructionValueBytes(value);}
+    Set.prototype.add.call(node.object,value);
+  },
+  propertyKey:(owner,key)=>owner.string(key),
+  property(owner,node,key,name,flags,tag,lo,hi,value){
+    if(flags!==7)node.assignFresh=false;
+    const previous=Object.getOwnPropertyDescriptor(node.object,name),length=node.kind===1&&name==='length';
+    if(node.assignFresh&&name!=='__proto__'&&name!=='length'&&!(typeof value==='number'&&Number.isNaN(value)))node.object[name]=value;
+    else if(!Reflect.defineProperty(node.object,name,{value,enumerable:!!(flags&1),writable:!!(flags&2),configurable:!!(flags&4)}))return false;
+    if(previous&&!(length&&previous.writable)){node.refs--;node.bytes-=5+constructionValueBytes(previous.value);}
+    if(!(length&&(flags&2))){node.refs++;node.bytes+=5+constructionValueBytes(value);}
+    if(length)owner.constructionNeedsAudit=true;
+    return true;
+  },
+  endNode(owner,node){
+    if(node.kind===1){
+      if(node.object.length>node.length)owner.constructionNeedsAudit=true;
+      if(!Reflect.set(node.object,'length',node.length))return false;
+    }
+    owner.nodeBytes[node.id]=node.bytes;owner.nodeRefs[node.id]=node.refs;
+    owner.constructionBytes+=node.bytes;owner.references+=node.refs;
+    return true;
+  },
+  layoutKey:(owner,key)=>owner.string(key),
+  saveLayout:(owner,keys)=>keys,
+  record(owner,id,keys,atom){
+    if(owner.allocate(0)!==id)invalidConstructorBatch();
+    const object=owner.object(id);let bytes=5+5*keys.length;
+    for(const key of keys){
+      const value=atom();
+      if(typeof value==='number'&&Number.isNaN(value)){
+        if(!Reflect.defineProperty(object,key,{value,enumerable:true,writable:true,configurable:true}))return -1;
+      }else object[key]=value;
+      bytes+=constructionValueBytes(value);
+    }
+    owner.nodeBytes[id]=bytes;owner.nodeRefs[id]=keys.length;
+    owner.constructionBytes+=bytes;owner.references+=keys.length;
+    return 0;
+  },
+  dense(owner,id,length,atom){
+    if(owner.allocate(1)!==id)invalidConstructorBatch();
+    const object=owner.object(id);let bytes=9+5*length;
+    for(let index=0;index<length;index++){
+      const value=atom();
+      if(typeof value==='number'&&Number.isNaN(value)){
+        if(!Reflect.defineProperty(object,index,{value,enumerable:true,writable:true,configurable:true}))return -1;
+      }else object[index]=value;
+      bytes+=constructionValueBytes(value);
+    }
+    if(object.length>length)owner.constructionNeedsAudit=true;
+    if(!Reflect.set(object,'length',length))return -2;
+    owner.nodeBytes[id]=bytes;owner.nodeRefs[id]=length;
+    owner.constructionBytes+=bytes;owner.references+=length;
+    return 0;
+  },
+});

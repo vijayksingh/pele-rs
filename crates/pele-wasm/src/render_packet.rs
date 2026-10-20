@@ -25,6 +25,13 @@ pub(super) struct Prepared {
     links: Vec<u8>,
 }
 
+#[cfg(feature = "captured-sankey")]
+impl Prepared {
+    pub(super) fn metadata_bytes(&self) -> usize {
+        self.metadata_bytes
+    }
+}
+
 pub(super) fn prepare(
     rendered: &Rendered,
     transport: &impl Serialize,
