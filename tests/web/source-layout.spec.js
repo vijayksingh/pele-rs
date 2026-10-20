@@ -174,3 +174,56 @@ test('source layouts consume canonical operation frames without losing sparse st
     expect(row.fullPackets.full).toBe(row.fullPackets.updates);expect(row.recipe.stringOverride.ok).toBe(true);expect(row.recipe.stringReset).toEqual(row.recipe.detachedSeed);
   }
 });
+
+
+test('source layout restoration keeps scalar bits and nested publication cursors isolated',async({page},info)=>{
+  test.setTimeout(120000);await prepare(page);
+  const report=await page.evaluate(async()=>{
+    const {loadRenderer}=await import('/dist/package-web/package/full.js');
+    const oracle=await import('/dist/evidence/pele-oracle.js'),engine=await loadRenderer();
+    const {bits,number,snapshot,output,stable,error,source}=window.__sourceLayoutFeature;
+    const model=engine.parse(source),nested=engine.parse(source),reference=oracle.parse(source);
+    const width=(text,size)=>text.length*size*.6,options={measurer:{width}};
+    const expected=output(oracle.render(reference,options)),nestedExpected=output(engine.render(nested,options));
+    let observeArmed=false,publishArmed=false,inside=false;const events=[],nestedResults=[];
+    const nestedRead=phase=>{
+      if(inside)return;inside=true;
+      try{events.push(phase);const alias=nested.findOrCreateNode('A');nestedResults.push({alias:alias===nested.nodes[0]&&alias===nested.lookup.get('A'),value:output(engine.render(nested,options))});}
+      finally{inside=false;}
+    };
+    const target={scalar:number('fff8000000000042'),zero:-0,text:'cursor \ud800 title'};
+    Object.defineProperty(target,'__proto__',{value:model.nodes[0],enumerable:true,writable:false,configurable:false});
+    const proxy=new Proxy(target,{
+      getOwnPropertyDescriptor(object,key){if(observeArmed){observeArmed=false;nestedRead('descriptor');}return Reflect.getOwnPropertyDescriptor(object,key);},
+      defineProperty(object,key,descriptor){if(publishArmed){publishArmed=false;nestedRead('define');}return Reflect.defineProperty(object,key,descriptor);}
+    });
+    const list=[proxy,model.nodes[0],-0];list.length=5;
+    const map=new Map([[proxy,model.nodes[0]],[-0,proxy],[NaN,list]]),set=new Set([proxy,list,-0,NaN]);
+    target.self=proxy;model.extension={proxy,list,map,set,date:new Date(1234)};
+    let row={};
+    try{
+      // Accepted sparse records remain alongside original recipe-backed nodes.
+      const acceptedOutput=output(engine.render(model,options)),initial=snapshot([model,proxy,list,map,set]);
+      const originalBits=bits(target.scalar),initialProto=Object.getPrototypeOf(target),fixed=Object.getOwnPropertyDescriptor(target,'__proto__');
+      observeArmed=true;const matched=output(engine.render(model,options));observeArmed=false;
+      const afterMatch=snapshot([model,proxy,list,map,set]);
+      const sentinel={cursor:'original callback throw'};let original=false,threw=false,mutated=false;
+      publishArmed=true;
+      try{engine.render(model,{measurer:{width(text,size){if(!mutated){mutated=true;target.scalar=7;target.zero=1;target.text='callback';target.extra='remove';list[0]={wrong:true};map.clear();set.clear();}throw sentinel;}}});}
+      catch(value){threw=true;original=Object.is(value,sentinel);}
+      finally{publishArmed=false;observeArmed=false;}
+      const restored=snapshot([model,proxy,list,map,set]),restoredBits=bits(target.scalar),recovery=output(engine.render(model,options));
+      const alias=model.findOrCreateNode('A'),afterHelper=snapshot([model,proxy,list,map,set]);
+      row={acceptedOutput,expected,matched,recovery,initial:initial.signature,afterMatch:afterMatch.signature,restored:restored.signature,afterHelper:afterHelper.signature,originalBits,restoredBits,mutated,threw,original,events,nestedResults,nestedExpected,stable:[afterMatch,restored,afterHelper].map(value=>stable(initial.objects,value.objects)),helperAlias:alias===model.nodes[0]&&alias===model.lookup.get('A'),prototypeStable:Object.getPrototypeOf(target)===initialProto,fixedDescriptor:Object.getOwnPropertyDescriptor(target,'__proto__').value===fixed.value&&Object.getOwnPropertyDescriptor(target,'__proto__').writable===false&&Object.getOwnPropertyDescriptor(target,'__proto__').configurable===false};
+    }catch(value){row.fatal=error(value);row.events=events;}
+    finally{observeArmed=false;publishArmed=false;engine.dispose(model);engine.dispose(nested);engine.close();}
+    return row;
+  });
+  await save(info,'source-layout-cursor-reentry.json',report);
+  expect(report.fatal).toBeUndefined();expect(report).toMatchObject({mutated:true,threw:true,original:true,helperAlias:true,prototypeStable:true,fixedDescriptor:true,stable:[true,true,true]});
+  expect(report.events).toEqual(['descriptor','define']);expect(report.nestedResults).toHaveLength(2);
+  for(const nested of report.nestedResults){expect(nested.alias).toBe(true);expect(nested.value).toEqual(report.nestedExpected);}
+  expect(report.restoredBits).toBe(report.originalBits);
+  for(const stage of ['afterMatch','restored','afterHelper'])expect(report[stage],stage).toEqual(report.initial);
+  for(const stage of ['acceptedOutput','matched','recovery'])expect(report[stage],stage).toEqual(report.expected);
+});

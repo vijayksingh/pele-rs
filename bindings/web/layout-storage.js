@@ -36,15 +36,62 @@ class Reader{
     return{kind,lo,hi,properties,items};
   }
 }
+// One expression interpreter serves canonical-word output and semantic cursors.
+// The latter keeps numeric affine expressions as numbers until raw bits are needed.
 function evaluate(expr,local,item,columns,out,at){
-  let value;
+  let tag=expr.tag,lo=expr.a,hi=expr.b,numeric;
   switch(expr.op){
-    case 0:out[at]=expr.tag;out[at+1]=expr.a;out[at+2]=expr.b;return;
-    case 1:case 2:value=expr.a+(expr.op===1?local:item)*expr.b;if(!u32(value))invalid();out[at]=expr.tag;out[at+1]=value;out[at+2]=0;return;
-    case 3:case 4:{const column=columns[expr.a],index=expr.b+(expr.op===3?local:item);if(!column||!u32(index)||index>=column.length/3)invalid();out[at]=column[index*3];out[at+1]=column[index*3+1];out[at+2]=column[index*3+2];return;}
-    case 5:value=expr.a+local*expr.b;if(!u32(value))invalid();setAtom(out,at,4,value);return;
+    case 0:break;
+    case 1:case 2:lo=expr.a+(expr.op===1?local:item)*expr.b;if(!u32(lo))invalid();hi=0;break;
+    case 3:case 4:{const column=columns[expr.a],index=expr.b+(expr.op===3?local:item);if(!column||!u32(index)||index>=column.length/3)invalid();tag=column[index*3];lo=column[index*3+1];hi=column[index*3+2];break;}
+    case 5:numeric=expr.a+local*expr.b;if(!u32(numeric))invalid();tag=4;lo=hi=0;break;
     default:invalid();
   }
+  if(at===undefined){out.tag=tag;out.payload=tag===4?(numeric===undefined?number(lo,hi):numeric):lo;out.lo=lo;out.hi=hi;out.raw=numeric===undefined;}
+  else if(numeric!==undefined)setAtom(out,at,4,numeric);
+  else{out[at]=tag;out[at+1]=lo;out[at+2]=hi;}
+}
+function selectProperty(group,index,target){
+  target.itemRow=0;target.template=group.properties[index];
+  if(index>=group.properties.length){let at=index-group.properties.length;for(const p of group.dynamic){if(at<p.count){target.template=p;target.itemRow=at;break;}at-=p.count;}}
+  if(!target.template)invalid();
+}
+function selectItem(group,index,target){
+  const pair=group.kind===3?2:1;let at=Math.floor(index/pair);
+  for(const collection of group.collections){if(at<collection.count){target.template=pair===2&&index%2===0?collection.key:collection.value;target.itemRow=at;return;}at-=collection.count;}
+  invalid();
+}
+// One cursor belongs to one invocation. It retains only references into the
+// immutable graph plus scalar registers, never a materialized record array.
+class LayoutNodeCursor{
+  constructor(graph){this.graph=graph;this.id=-1;this.record=null;this.override=false;this.local=0;this.tag=0;this.payload=0;this.lo=0;this.hi=0;this.raw=true;this.template=null;this.itemRow=0;}
+  select(id){
+    if(id===this.id)return;
+    const override=this.graph.overrides.get(id),record=override??this.graph.group(id);
+    this.id=id;this.record=record;this.override=override!==undefined;this.local=this.override?0:id-record.first;
+    this.kind=kinds[record.kind];this.propertyCount=this.override?record.properties.length/5:record.propertyCount;
+    this.itemAtoms=this.override?record.items.length/3:record.itemAtoms;this.itemCount=this.itemAtoms/(record.kind===3?2:1);
+    this.aux=record.kind===5?hex(record.lo,record.hi):record.kind===6?(record.hi?undefined:errors[record.lo]):record.kind===2&&record.hi?undefined:record.lo;
+  }
+  *properties(){for(let at=0;at<this.propertyCount;at++)yield at;}
+  words(words,at){this.tag=words[at];this.lo=words[at+1];this.hi=words[at+2];this.raw=true;this.payload=this.tag===4?number(this.lo,this.hi):this.lo;}
+  key(index){
+    if(this.override){if(index>=this.propertyCount)invalid();return this.record.properties[index*5];}
+    selectProperty(this.record,index,this);evaluate(this.template.key,this.local,this.itemRow,this.graph.base.columns,this);
+    if(this.tag!==5)invalid();return this.payload;
+  }
+  property(index){
+    this.keyId=this.key(index);
+    if(this.override){const at=index*5;this.flags=this.record.properties[at+1];this.words(this.record.properties,at+2);}
+    else{this.flags=this.template.flags;evaluate(this.template.value,this.local,this.itemRow,this.graph.base.columns,this);}
+  }
+  item(index){
+    if(this.override){if(index>=this.itemAtoms)invalid();this.words(this.record.items,index*3);}
+    else{selectItem(this.record,index,this);evaluate(this.template,this.local,this.itemRow,this.graph.base.columns,this);}
+  }
+  writeAtom(out,at){if(this.tag===4&&!this.raw)setAtom(out,at,4,this.payload);else{out[at]=this.tag;out[at+1]=this.lo;out[at+2]=this.hi;}}
+  propertyWords(index,out){this.property(index);out[0]=this.keyId;out[1]=this.flags;this.writeAtom(out,2);}
+  itemWords(index,out){this.item(index);this.writeAtom(out,0);}
 }
 function missing(){const node=undefined;return node.properties;}
 export class LayoutGraph{
@@ -58,17 +105,14 @@ export class LayoutGraph{
   property(id,index,out){
     const override=this.overrides.get(id);
     if(override){if(index>=override.properties.length/5)invalid();for(let k=0;k<5;k++)out[k]=override.properties[index*5+k];return;}
-    const g=this.group(id),local=id-g.first;let p,item=0;
-    if(index<g.properties.length)p=g.properties[index];
-    else {let at=index-g.properties.length;for(const v of g.dynamic){if(at<v.count){p=v;item=at;break;}at-=v.count;}}
-    if(!p)invalid();evaluate(p.key,local,item,this.base.columns,out,2);if(out[2]!==5)invalid();out[0]=out[3];out[1]=p.flags;evaluate(p.value,local,item,this.base.columns,out,2);
+    const g=this.group(id),local=id-g.first;
+    selectProperty(g,index,this);const p=this.template,item=this.itemRow;
+    evaluate(p.key,local,item,this.base.columns,out,2);if(out[2]!==5)invalid();out[0]=out[3];out[1]=p.flags;evaluate(p.value,local,item,this.base.columns,out,2);
   }
   item(id,index,out){
     const override=this.overrides.get(id);
     if(override){if(index>=override.items.length/3)invalid();for(let k=0;k<3;k++)out[k]=override.items[index*3+k];return;}
-    const g=this.group(id),pair=g.kind===3?2:1;let at=Math.floor(index/pair);
-    for(const collection of g.collections){if(at<collection.count){evaluate(pair===2&&index%2===0?collection.key:collection.value,id-g.first,at,this.base.columns,out,0);return;}at-=collection.count;}
-    invalid();
+    const g=this.group(id);selectItem(g,index,this);evaluate(this.template,id-g.first,this.itemRow,this.base.columns,out,0);
   }
   atom(slot,out){
     if(slot===0){for(let k=0;k<3;k++)out[k]=this.rootWords[k];return;}
@@ -189,30 +233,30 @@ export function applyLayoutDelta(graph,delta){
 }
 
 class LayoutCapture{
-  constructor(baseline,delta){this.baseline=baseline;this.delta=delta;this.overrides=new Map(baseline.overrides);this.rootWords=new Uint32Array(3);this.values=[];this.changes=[];this.nodeCount=baseline.nodeCount;this.node=null;this.words=new Uint32Array(5);this.atomWords=new Uint32Array(3);}
+  constructor(baseline,delta){this.baseline=baseline;this.cursor=new LayoutNodeCursor(baseline);this.delta=delta;this.overrides=new Map(baseline.overrides);this.rootWords=new Uint32Array(3);this.values=[];this.changes=[];this.nodeCount=baseline.nodeCount;this.node=null;this.words=new Uint32Array(5);this.atomWords=new Uint32Array(3);}
   root(tag,value){setAtom(this.rootWords,0,tag,value);}
   beginArguments(length){this.values=new Array(length);}
   argument(index,tag,value){setAtom(this.atomWords,0,tag,value);this.values[index]=metadata(this.atomWords);}
-  beginNode(id){this.node={id,existing:this.baseline.hasNode(id),properties:null,items:null,propertyAt:0,itemAt:0};}
-  copyProperties(count){const words=[];for(let i=0;i<count;i++){this.baseline.property(this.node.id,i,this.words);for(let k=0;k<5;k++)words.push(this.words[k]);}return words;}
-  copyItems(count){const words=[];for(let i=0;i<count;i++){this.baseline.item(this.node.id,i,this.atomWords);for(let k=0;k<3;k++)words.push(this.atomWords[k]);}return words;}
+  beginNode(id){const existing=this.baseline.hasNode(id);if(existing)this.cursor.select(id);this.node={id,existing,properties:null,items:null,propertyAt:0,itemAt:0};}
+  copyProperties(count){const words=[];for(let i=0;i<count;i++){this.cursor.propertyWords(i,this.words);for(let k=0;k<5;k++)words.push(this.words[k]);}return words;}
+  copyItems(count){const words=[];for(let i=0;i<count;i++){this.cursor.itemWords(i,this.atomWords);for(let k=0;k<3;k++)words.push(this.atomWords[k]);}return words;}
   property(key,flags,tag,value){
     const n=this.node,index=n.propertyAt++;
-    let same=false;if(!n.properties&&n.existing&&index<this.baseline.propertyCount(n.id)){
-      this.baseline.property(n.id,index,this.words);setAtom(this.atomWords,0,tag,value);same=this.words[0]===key&&this.words[1]===flags&&this.words[2]===this.atomWords[0]&&this.words[3]===this.atomWords[1]&&this.words[4]===this.atomWords[2];
+    let same=false;if(!n.properties&&n.existing&&index<this.cursor.propertyCount){
+      this.cursor.propertyWords(index,this.words);setAtom(this.atomWords,0,tag,value);same=this.words[0]===key&&this.words[1]===flags&&this.words[2]===this.atomWords[0]&&this.words[3]===this.atomWords[1]&&this.words[4]===this.atomWords[2];
     }
     if(same)return;
     if(!n.properties)n.properties=this.copyProperties(index);
     n.properties.push(key,flags);const at=n.properties.length;n.properties.length+=3;setAtom(n.properties,at,tag,value);
   }
   beginItems(){}
-  appendItem(tag,value){const n=this.node,index=n.itemAt++;let same=false;if(!n.items&&n.existing&&index<this.baseline.itemAtoms(n.id)){this.baseline.item(n.id,index,this.words);setAtom(this.atomWords,0,tag,value);same=this.words[0]===this.atomWords[0]&&this.words[1]===this.atomWords[1]&&this.words[2]===this.atomWords[2];}if(same)return;if(!n.items)n.items=this.copyItems(index);const at=n.items.length;n.items.length+=3;setAtom(n.items,at,tag,value);}
+  appendItem(tag,value){const n=this.node,index=n.itemAt++;let same=false;if(!n.items&&n.existing&&index<this.cursor.itemAtoms){this.cursor.itemWords(index,this.words);setAtom(this.atomWords,0,tag,value);same=this.words[0]===this.atomWords[0]&&this.words[1]===this.atomWords[1]&&this.words[2]===this.atomWords[2];}if(same)return;if(!n.items)n.items=this.copyItems(index);const at=n.items.length;n.items.length+=3;setAtom(n.items,at,tag,value);}
   mapEntry(kt,k,vt,v){this.appendItem(kt,k);this.appendItem(vt,v);}
   setItem(tag,value){this.appendItem(tag,value);}
   finishNode(id,kind,aux){
     const n=this.node;if(n.id!==id)invalid();const code=kinds.indexOf(kind);let lo=0,hi=0;
     if(code===5){lo=parseInt(aux.slice(8),16);hi=parseInt(aux.slice(0,8),16);}else if(code===6){lo=errors.indexOf(aux);if(lo<0){lo=0;hi=1;}}else if(code===2){if(u32(aux))lo=aux;else hi=1;}else if(code===1)lo=aux;
-    let same=false;if(n.existing){const old=this.baseline.aux(id);same=code===this.baseline.kind(id)&&lo===old.lo&&hi===old.hi&&n.propertyAt===this.baseline.propertyCount(id)&&n.itemAt===this.baseline.itemAtoms(id)&&!n.properties&&!n.items;}
+    let same=false;if(n.existing){const old=this.cursor.record;same=code===old.kind&&lo===old.lo&&hi===old.hi&&n.propertyAt===this.cursor.propertyCount&&n.itemAt===this.cursor.itemAtoms&&!n.properties&&!n.items;}
     if(!same){const record={kind:code,lo,hi,...(hi&&(code===2||code===6)?{invalidAux:aux}:{}),properties:n.properties??this.copyProperties(n.propertyAt),items:n.items??this.copyItems(n.itemAt)};this.overrides.set(id,record);this.changes.push([id,record]);}
     this.nodeCount=Math.max(this.nodeCount,id+1);this.node=null;
   }
@@ -221,6 +265,7 @@ class LayoutCapture{
 }
 const atomScratch=new Uint32Array(3);
 export const LayoutStorage=Object.freeze({
+  createNodeCursor:graph=>new LayoutNodeCursor(graph),
   stringCount:g=>g.strings.length,stringValueAt:(g,id)=>g.strings[id],nodeCount:g=>g.nodeCount,
   *nodeIds(g){for(let id=0;id<g.nodeCount;id++)yield id;},rootSlot:()=>0,
   nodeKind:(g,id)=>kinds[g.kind(id)],nodeAux(g,id){const a=g.aux(id),kind=g.kind(id);return kind===5?hex(a.lo,a.hi):kind===6?(a.hi?undefined:errors[a.lo]):kind===2&&a.hi?undefined:a.lo;},

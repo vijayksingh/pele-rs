@@ -78,6 +78,15 @@ An accepted revision is not rolled back because transport or a result factory
 throws. The original factory value travels with the accepted graph and is thrown
 after publication.
 
+Logical publication, matching and capture use an operation-local node cursor.
+It binds an immutable layout or sparse replacement once per node, supplies
+key-only reads during deletion checks, and decodes collection atoms once.
+Semantic numeric expressions stay numbers; raw IEEE words remain available for
+exact NaN comparisons and canonical capture. Each invocation and capture owns
+its cursor, and values are copied before descriptor or Proxy actions can reenter
+another document. Generic mutation/restoration policy, fresh assignment,
+canonical IDs and non-layout storage behavior remain shared and unchanged.
+
 ## Bounds and compatibility
 
 Canonical structural/schema admission and the full logical `PELGBIN1` frame

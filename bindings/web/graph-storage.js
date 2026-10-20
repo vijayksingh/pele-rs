@@ -70,15 +70,26 @@ function matchesFlatScalar(bridge,tag,payload,value,numberHex){
   }
 }
 
+// Semantic layout cursors preserve raw numeric bits only where equality needs
+// them. Finite numeric expressions have one canonical binary64 representation.
+function matchesCursorScalar(bridge,tag,payload,value,raw,lo,hi){
+  if(tag===4)return typeof value==='number'&&Object.is(value,payload)&&(!Number.isNaN(value)||(raw&&numberBits(value)===wordBits(lo,hi)));
+  return matchesFlatScalar(bridge,tag,payload,value,undefined);
+}
+function cursorItemValue(bridge,cursor,index){cursor.item(index);return flatScalarValue(bridge,cursor.tag,cursor.payload);}
+function matchesCursorItem(bridge,cursor,index,value){cursor.item(index);return matchesCursorScalar(bridge,cursor.tag,cursor.payload,value,cursor.raw,cursor.lo,cursor.hi);}
+
 // One closure set per backend. The hot operations do not receive or select a
 // backend; the nested/flat choice is an immutable factory binding. Whether an
 // engine folds inner branches is an empirical optimization, not a guarantee.
 export function createGraphTraversal(storage = NestedStorage) {
   const nested = storage === NestedStorage;
   const readProperty = !nested && typeof storage.readProperty==='function' ? storage.readProperty : null;
+  const createNodeCursor = !nested && typeof storage.createNodeCursor==='function' ? storage.createNodeCursor : null;
 
 function reconcileGraph(bridge, graph, changed) {
-  const propertyWords=readProperty?new Uint32Array(5):null;
+  const cursor=createNodeCursor?createNodeCursor(graph):null;
+  const propertyWords=readProperty&&!cursor?new Uint32Array(5):null;
   bridge.graph = graph;
   if (nested) {
     if(changed) {
@@ -98,42 +109,44 @@ function reconcileGraph(bridge, graph, changed) {
   const nodeCount = nested ? graph.nodes.length : storage.nodeCount(graph);
   while (bridge.objects.length < nodeCount) {
     const id = bridge.objects.length, node = nested ? graph.nodes[id] : id;
-    const kind = nested ? node.kind : storage.nodeKind(graph,id);
+    if(cursor)cursor.select(id);
+    const kind = cursor?cursor.kind:nested ? node.kind : storage.nodeKind(graph,id);
     let value;
     switch (kind) {
       case 'error': {
-        const Constructor=errorConstructors[nested?node.errorType:storage.nodeAux(graph,id)];
+        const Constructor=errorConstructors[nested?node.errorType:(cursor?cursor.aux:storage.nodeAux(graph,id))];
         if(!Constructor)throw new TypeError('Unknown native Error brand');
         let message;
         if(nested)message=node.properties.some(p=>bridge.strings[p.key]==='message');
         else {
           message=false;
-          for(let i=0;i<storage.propertyCount(graph,id);i++) {
-            if(bridge.strings[storage.propertyKey(graph,storage.propertySlot(graph,id,i))]==='message'){message=true;break;}
+          for(let i=0;i<(cursor?cursor.propertyCount:storage.propertyCount(graph,id));i++) {
+            if(bridge.strings[cursor?cursor.key(i):storage.propertyKey(graph,storage.propertySlot(graph,id,i))]==='message'){message=true;break;}
           }
         }
         value=new Constructor(message?'':undefined);break;
       }
-      case 'instance': value = Object.create(bridge.registration.prototypes.get(nested?node.prototype:storage.nodeAux(graph,id))); break;
+      case 'instance': value = Object.create(bridge.registration.prototypes.get(nested?node.prototype:(cursor?cursor.aux:storage.nodeAux(graph,id)))); break;
       case 'object': value = {}; break;
-      case 'array': value = new Array(nested?node.length:storage.nodeAux(graph,id)); break;
+      case 'array': value = new Array(nested?node.length:(cursor?cursor.aux:storage.nodeAux(graph,id))); break;
       case 'map': value = new Map(); break;
       case 'set': value = new Set(); break;
-      case 'date': value = new Date(numberValue(nested?node.milliseconds:storage.nodeAux(graph,id))); break;
+      case 'date': value = new Date(numberValue(nested?node.milliseconds:(cursor?cursor.aux:storage.nodeAux(graph,id)))); break;
       default: throw new TypeError('Unsupported public object kind');
     }
     bridge.objects.push(value); bridge.ids.set(value, id); bridge.registry.owners.set(value, bridge);
   }
   for (const id of changed ?? (nested?graph.nodes.keys():storage.nodeIds(graph))) {
     const node = nested ? graph.nodes[id] : id;
-    const kind = nested ? node.kind : storage.nodeKind(graph,id);
+    if(cursor)cursor.select(id);
+    const kind = cursor?cursor.kind:nested ? node.kind : storage.nodeKind(graph,id);
     const object = bridge.objects[id], fresh = id >= freshStart;
     if (!fresh || kind === 'error') {
       let keys;
       if(nested)keys=new Set(node.properties.map(property=>bridge.strings[property.key]));
       else {
         keys=new Set();
-        for(let i=0;i<storage.propertyCount(graph,id);i++)keys.add(bridge.strings[storage.propertyKey(graph,storage.propertySlot(graph,id,i))]);
+        for(let i=0;i<(cursor?cursor.propertyCount:storage.propertyCount(graph,id));i++)keys.add(bridge.strings[cursor?cursor.key(i):storage.propertyKey(graph,storage.propertySlot(graph,id,i))]);
       }
       for (const key of Object.getOwnPropertyNames(object)) {
         if (kind === 'array' && key === 'length') continue;
@@ -144,30 +157,31 @@ function reconcileGraph(bridge, graph, changed) {
     if (kind === 'map') {
       if (!fresh) Map.prototype.clear.call(object);
       if(nested)for(const [key,value] of node.entries)Map.prototype.set.call(object,bridge.value(key),bridge.value(value));
-      else for(let i=0;i<storage.itemCount(graph,id);i++)Map.prototype.set.call(object,flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,2*i)),flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,2*i+1)));
+      else for(let i=0;i<(cursor?cursor.itemCount:storage.itemCount(graph,id));i++)Map.prototype.set.call(object,(cursor?cursorItemValue(bridge,cursor,2*i):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,2*i))),(cursor?cursorItemValue(bridge,cursor,2*i+1):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,2*i+1))));
     }
     if (kind === 'set') {
       if (!fresh) Set.prototype.clear.call(object);
       if(nested)for(const value of node.values)Set.prototype.add.call(object,bridge.value(value));
-      else for(let i=0;i<storage.itemCount(graph,id);i++)Set.prototype.add.call(object,flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,i)));
+      else for(let i=0;i<(cursor?cursor.itemCount:storage.itemCount(graph,id));i++)Set.prototype.add.call(object,cursor?cursorItemValue(bridge,cursor,i):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,i)));
     }
-    if (kind === 'date' && !fresh) Date.prototype.setTime.call(object, numberValue(nested?node.milliseconds:storage.nodeAux(graph,id)));
-    if (kind === 'array' && object.length !== (nested?node.length:storage.nodeAux(graph,id))) object.length=nested?node.length:storage.nodeAux(graph,id);
+    if (kind === 'date' && !fresh) Date.prototype.setTime.call(object, numberValue(nested?node.milliseconds:(cursor?cursor.aux:storage.nodeAux(graph,id))));
+    if (kind === 'array' && object.length !== (nested?node.length:(cursor?cursor.aux:storage.nodeAux(graph,id)))) object.length=nested?node.length:(cursor?cursor.aux:storage.nodeAux(graph,id));
     let assignFresh = fresh && (kind === 'object' || kind === 'array');
-    for(const property of nested?node.properties:storage.propertySlots(graph,id)) {
-      if(propertyWords)readProperty(graph,property,propertyWords);
-      const flags=propertyWords?propertyWords[1]:nested?property.flags:storage.propertyFlags(graph,property);
-      const keyId=propertyWords?propertyWords[0]:nested?property.key:storage.propertyKey(graph,property);
-      const tag=propertyWords?propertyWords[2]:0,lo=propertyWords?propertyWords[3]:0,hi=propertyWords?propertyWords[4]:0;
+    for(const property of cursor?cursor.properties():nested?node.properties:storage.propertySlots(graph,id)) {
+      if(cursor)cursor.property(property);else if(propertyWords)readProperty(graph,property,propertyWords);
+      const flags=cursor?cursor.flags:propertyWords?propertyWords[1]:nested?property.flags:storage.propertyFlags(graph,property);
+      const keyId=cursor?cursor.keyId:propertyWords?propertyWords[0]:nested?property.key:storage.propertyKey(graph,property);
+      const tag=cursor?cursor.tag:propertyWords?propertyWords[2]:0,lo=cursor?cursor.lo:propertyWords?propertyWords[3]:0,hi=cursor?cursor.hi:propertyWords?propertyWords[4]:0;
+      const payload=cursor?cursor.payload:undefined,raw=cursor?cursor.raw:false;
       if(flags!==7)assignFresh=false;
       const key=bridge.strings[keyId];
-      const atom=propertyWords?undefined:nested?property.value:storage.propertyAtomSlot(graph,property);
-      const value=propertyWords?flatScalarValue(bridge,tag,tag===4?wordNumber(lo,hi):lo):nested?bridge.value(atom):flatValue(bridge,storage,graph,atom);
+      const atom=cursor||propertyWords?undefined:nested?property.value:storage.propertyAtomSlot(graph,property);
+      const value=cursor?flatScalarValue(bridge,tag,payload):propertyWords?flatScalarValue(bridge,tag,tag===4?wordNumber(lo,hi):lo):nested?bridge.value(atom):flatValue(bridge,storage,graph,atom);
       if(assignFresh&&key!=='__proto__'&&!(kind==='array'&&key==='length'))object[key]=value;
       else {
         const current=!fresh&&Object.getOwnPropertyDescriptor(object,key);
         const sameValue=current&&Object.hasOwn(current,'value')&&(Object.is(current.value,value)&&
-          (typeof value!=='number'||!Number.isNaN(value)||numberBits(current.value)===(nested?property.value.value:(propertyWords?(tag===4?wordBits(lo,hi):undefined):(storage.atomTag(graph,atom)===4?storage.atomNumberBits(graph,atom):undefined)))));
+          (typeof value!=='number'||!Number.isNaN(value)||numberBits(current.value)===(nested?property.value.value:(cursor?(tag===4&&raw?wordBits(lo,hi):undefined):propertyWords?(tag===4?wordBits(lo,hi):undefined):(storage.atomTag(graph,atom)===4?storage.atomNumberBits(graph,atom):undefined)))));
         if(!sameValue||current.enumerable!==!!((nested?property.flags:flags)&1)||current.writable!==!!((nested?property.flags:flags)&2)||current.configurable!==!!((nested?property.flags:flags)&4))Object.defineProperty(object,key,{
           value,enumerable:!!((nested?property.flags:flags)&1),writable:!!((nested?property.flags:flags)&2),configurable:!!((nested?property.flags:flags)&4)
         });
@@ -179,8 +193,8 @@ function reconcileGraph(bridge, graph, changed) {
 }
 
 function matchesGraph(bridge) {
-  const propertyWords=readProperty?new Uint32Array(5):null;
-  const graph=bridge.graph;
+  const graph=bridge.graph,cursor=createNodeCursor?createNodeCursor(graph):null;
+  const propertyWords=readProperty&&!cursor?new Uint32Array(5):null;
   if(bridge.objects.length!==(nested?graph.nodes.length:storage.nodeCount(graph))||bridge.strings.length!==(nested?graph.strings.length:storage.stringCount(graph)))return false;
   for (const baseline of bridge.registration.prototypeBaseline) {
     const descriptors=Object.getOwnPropertyDescriptors(baseline.value),original=baseline.descriptors;
@@ -204,15 +218,16 @@ function matchesGraph(bridge) {
   if(!matches(nested?graph.root:storage.rootSlot(graph),bridge.root))return false;
   for(let id=0;id<(nested?graph.nodes.length:storage.nodeCount(graph));id++){
     const node=nested?graph.nodes[id]:id,object=bridge.objects[id],prototype=Object.getPrototypeOf(object);
-    const kind=nested?node.kind:storage.nodeKind(graph,id);
+    if(cursor)cursor.select(id);
+    const kind=cursor?cursor.kind:nested?node.kind:storage.nodeKind(graph,id);
     switch(kind){
       case 'object':if(prototype!==Object.prototype)return false;break;
-      case 'instance':if(prototype!==bridge.registration.prototypes.get(nested?node.prototype:storage.nodeAux(graph,id)))return false;break;
-      case 'array':if(prototype!==Array.prototype||object.length!==(nested?node.length:storage.nodeAux(graph,id)))return false;break;
+      case 'instance':if(prototype!==bridge.registration.prototypes.get(nested?node.prototype:(cursor?cursor.aux:storage.nodeAux(graph,id))))return false;break;
+      case 'array':if(prototype!==Array.prototype||object.length!==(nested?node.length:(cursor?cursor.aux:storage.nodeAux(graph,id))))return false;break;
       case 'map':if(prototype!==Map.prototype)return false;break;
       case 'set':if(prototype!==Set.prototype)return false;break;
-      case 'date':if(prototype!==Date.prototype||numberBits(Date.prototype.getTime.call(object))!==(nested?node.milliseconds:storage.nodeAux(graph,id)))return false;break;
-      case 'error':if(prototype!==errorConstructors[nested?node.errorType:storage.nodeAux(graph,id)].prototype)return false;break;
+      case 'date':if(prototype!==Date.prototype||numberBits(Date.prototype.getTime.call(object))!==(nested?node.milliseconds:(cursor?cursor.aux:storage.nodeAux(graph,id))))return false;break;
+      case 'error':if(prototype!==errorConstructors[nested?node.errorType:(cursor?cursor.aux:storage.nodeAux(graph,id))].prototype)return false;break;
       default:return false;
     }
     let count=0;
@@ -224,27 +239,28 @@ function matchesGraph(bridge) {
         const property=node.properties[count++];
         if(!property||key!==bridge.strings[property.key]||bridge.stringIds.get(key)!==property.key||descriptor.enumerable!==!!(property.flags&1)||descriptor.writable!==!!(property.flags&2)||descriptor.configurable!==!!(property.flags&4)||!matches(property.value,descriptor.value))return false;
       }else{
-        if(count>=storage.propertyCount(graph,id))return false;
-        const property=storage.propertySlot(graph,id,count++);
-        if(propertyWords)readProperty(graph,property,propertyWords);
-        const keyId=propertyWords?propertyWords[0]:storage.propertyKey(graph,property),flags=propertyWords?propertyWords[1]:storage.propertyFlags(graph,property);
-        const tag=propertyWords?propertyWords[2]:0,lo=propertyWords?propertyWords[3]:0,hi=propertyWords?propertyWords[4]:0;
+        if(count>=(cursor?cursor.propertyCount:storage.propertyCount(graph,id)))return false;
+        const property=cursor?count++:storage.propertySlot(graph,id,count++);
+        if(cursor)cursor.property(property);else if(propertyWords)readProperty(graph,property,propertyWords);
+        const keyId=cursor?cursor.keyId:propertyWords?propertyWords[0]:storage.propertyKey(graph,property),flags=cursor?cursor.flags:propertyWords?propertyWords[1]:storage.propertyFlags(graph,property);
+        const tag=cursor?cursor.tag:propertyWords?propertyWords[2]:0,lo=cursor?cursor.lo:propertyWords?propertyWords[3]:0,hi=cursor?cursor.hi:propertyWords?propertyWords[4]:0;
+        const payload=cursor?cursor.payload:undefined,raw=cursor?cursor.raw:false;
         if(key!==bridge.strings[keyId]||bridge.stringIds.get(key)!==keyId||descriptor.enumerable!==!!(flags&1)||descriptor.writable!==!!(flags&2)||descriptor.configurable!==!!(flags&4))return false;
-        if(propertyWords?!matchesFlatScalar(bridge,tag,lo,descriptor.value,tag===4&&typeof descriptor.value==='number'?wordBits(lo,hi):undefined):!matches(storage.propertyAtomSlot(graph,property),descriptor.value))return false;
+        if(cursor?!matchesCursorScalar(bridge,tag,payload,descriptor.value,raw,lo,hi):propertyWords?!matchesFlatScalar(bridge,tag,lo,descriptor.value,tag===4&&typeof descriptor.value==='number'?wordBits(lo,hi):undefined):!matches(storage.propertyAtomSlot(graph,property),descriptor.value))return false;
       }
     }
-    if(count!==(nested?node.properties.length:storage.propertyCount(graph,id)))return false;
+    if(count!==(nested?node.properties.length:(cursor?cursor.propertyCount:storage.propertyCount(graph,id))))return false;
     if(kind==='map'){
-      if(Object.getOwnPropertyDescriptor(Map.prototype,'size').get.call(object)!==(nested?node.entries.length:storage.itemCount(graph,id)))return false;
+      if(Object.getOwnPropertyDescriptor(Map.prototype,'size').get.call(object)!==(nested?node.entries.length:(cursor?cursor.itemCount:storage.itemCount(graph,id))))return false;
       let i=0;
       for(const [key,value] of Map.prototype.entries.call(object)){
         if(nested){const pair=node.entries[i++];if(!pair||!matches(pair[0],key)||!matches(pair[1],value))return false;}
-        else{const at=i++;if(!matches(storage.itemAtomSlot(graph,id,at*2),key)||!matches(storage.itemAtomSlot(graph,id,at*2+1),value))return false;}
+        else{const at=i++;if(cursor?(!matchesCursorItem(bridge,cursor,at*2,key)||!matchesCursorItem(bridge,cursor,at*2+1,value)):(!matches(storage.itemAtomSlot(graph,id,at*2),key)||!matches(storage.itemAtomSlot(graph,id,at*2+1),value)))return false;}
       }
     }
     if(kind==='set'){
-      if(Object.getOwnPropertyDescriptor(Set.prototype,'size').get.call(object)!==(nested?node.values.length:storage.itemCount(graph,id)))return false;
-      let i=0;for(const value of Set.prototype.values.call(object))if(!matches(nested?node.values[i++]:storage.itemAtomSlot(graph,id,i++),value))return false;
+      if(Object.getOwnPropertyDescriptor(Set.prototype,'size').get.call(object)!==(nested?node.values.length:(cursor?cursor.itemCount:storage.itemCount(graph,id))))return false;
+      let i=0;for(const value of Set.prototype.values.call(object))if(cursor?!matchesCursorItem(bridge,cursor,i++,value):!matches(nested?node.values[i++]:storage.itemAtomSlot(graph,id,i++),value))return false;
     }
   }
   return true;
