@@ -1,0 +1,138 @@
+{
+  "manifest": {
+    "schemaVersion": 1,
+    "sourceInputSha256": "837524e572fcfbb26f9b5ce172f56032bd162263c0a50c11b4df9d27bb9a9af5",
+    "revision": "6099c58667d71a9396aa999288a31f10f483e30c",
+    "builtAt": "2026-10-19T23:55:03.513Z",
+    "binaries": {
+      "pele-perf": "2fc4c1c24617fb1184aada27d4a3eee66199f8bd9786bf8c1ddd7f2943fa38a7",
+      "pele-perf-alloc": "a1563a4251cefe5ccda44c9c840a0710f876f3647db0d2cdf1ec103606316732"
+    }
+  },
+  "binarySHA256": "2fc4c1c24617fb1184aada27d4a3eee66199f8bd9786bf8c1ddd7f2943fa38a7",
+  "harnessSHA256": "356cef169582e3443e574acab6cd711620650e9815cddb9b622a17e05997ce09",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "source": {
+    "id": "gantt/medium",
+    "family": "gantt",
+    "scale": "medium",
+    "units": 48,
+    "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d",
+    "options": {
+      "limit": 1000000,
+      "maxEdges": 10000,
+      "fontSize": 16,
+      "padding": 8,
+      "maxWidth": 800,
+      "now": 1704067200000
+    },
+    "resources": "fixed"
+  },
+  "expected": {
+    "type": "gantt",
+    "widthBits": "4089000000000000",
+    "heightBits": "4097140000000000",
+    "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+    "svgBytes": 12574
+  },
+  "processesBefore": [
+    {
+      "pid": 410,
+      "cpuPercent": 45.7,
+      "name": "WindowServer"
+    },
+    {
+      "pid": 16644,
+      "cpuPercent": 28.7,
+      "name": "node"
+    },
+    {
+      "pid": 23310,
+      "cpuPercent": 17.8,
+      "name": "Claude Helper"
+    },
+    {
+      "pid": 23368,
+      "cpuPercent": 14.3,
+      "name": "Claude Helper (Renderer)"
+    },
+    {
+      "pid": 44311,
+      "cpuPercent": 30.4,
+      "name": "Codex (Renderer)"
+    }
+  ],
+  "profiles": [
+    {
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "batches": 205,
+      "first": {
+        "checksum": 8466239533887615,
+        "count": 1,
+        "graphNodesAfter": 353,
+        "graphNodesBefore": 254,
+        "textMeasurements": 54
+      },
+      "last": {
+        "checksum": 8466239533887615,
+        "count": 1,
+        "graphNodesAfter": 353,
+        "graphNodesBefore": 254,
+        "textMeasurements": 54
+      },
+      "file": "dist/perf-patches/gantt-native/render-mutable-publish-1.sample.txt",
+      "sampleSHA256": "37cf0254ec4b3710631b89f2d1aafe4645bd9b082d62c960d00762bf5145563b"
+    },
+    {
+      "stage": "render-mutable-publish",
+      "count": 16,
+      "batches": 143,
+      "first": {
+        "checksum": 135459832542217920,
+        "count": 16,
+        "graphNodesAfter": 1838,
+        "graphNodesBefore": 254,
+        "textMeasurements": 864
+      },
+      "last": {
+        "checksum": 135459832542217920,
+        "count": 16,
+        "graphNodesAfter": 1838,
+        "graphNodesBefore": 254,
+        "textMeasurements": 864
+      },
+      "file": "dist/perf-patches/gantt-native/render-mutable-publish-16.sample.txt",
+      "sampleSHA256": "88a78fad074bd9b3d7010e0f296e80f389be421a1e67c0426783666ebc616be8"
+    }
+  ],
+  "mode": "native sample attribution only; no latency claims; per-request reset and warm outside operation timer",
+  "processesAfter": [
+    {
+      "pid": 410,
+      "cpuPercent": 37.2,
+      "name": "WindowServer"
+    },
+    {
+      "pid": 14392,
+      "cpuPercent": 15.6,
+      "name": "Google Chrome Helper (Renderer)"
+    },
+    {
+      "pid": 16662,
+      "cpuPercent": 23.4,
+      "name": "pele-perf"
+    },
+    {
+      "pid": 23310,
+      "cpuPercent": 17.1,
+      "name": "Claude Helper"
+    },
+    {
+      "pid": 23368,
+      "cpuPercent": 12.2,
+      "name": "Claude Helper (Renderer)"
+    }
+  ],
+  "succeeded": true
+}

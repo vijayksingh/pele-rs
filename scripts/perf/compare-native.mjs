@@ -20,7 +20,7 @@ const allocations=args.includes('--allocations')||allocationOnly;
 const checkQuiet=()=>{if(!allocationOnly)guardQuiet()};
 assert(trials>=15&&trials<=30&&trials%3===0&&warmupMs>=500&&warmupMs<=1000);
 const names=['js','control','candidate'],stages=arg('--stages','render-source,render-retained').split(',');
-assert(stages.length&&new Set(stages).size===stages.length&&stages.every(s=>['render-source','render-retained'].includes(s)));
+assert(stages.length&&new Set(stages).size===stages.length&&stages.every(s=>['parse','parse-public','render-source','render-retained'].includes(s)));
 const ids=arg('--cases','').split(',').filter(Boolean),selected=cases().filter(c=>c.scale==='medium'&&(!ids.length||ids.includes(c.id)));
 assert(selected.length&&ids.every(id=>selected.some(c=>c.id===id)),'Unknown medium workload');
 const sha=b=>createHash('sha256').update(b).digest('hex');
@@ -105,7 +105,10 @@ try{
       const batch=async(name,count)=>{
         if(name!=='js')return native[name].send({op:'measure',case:c.id,stage,count});
         global.gc();const options={...c.options,...host()},model=js.parse(c.source,c.options);js.render(model,options);
-        let checksum=0;const start=process.hrtime.bigint();for(let i=0;i<count;i++){const r=js.render(stage==='render-source'?c.source:model,options);checksum+=r.svg.length+r.width+r.height;}
+        let checksum=0;const start=process.hrtime.bigint();for(let i=0;i<count;i++){
+          if(stage==='parse'||stage==='parse-public')checksum+=js.parse(c.source,c.options).type.length;
+          else{const r=js.render(stage==='render-source'?c.source:model,options);checksum+=r.svg.length+r.width+r.height;}
+        }
         return{elapsedNs:Number(process.hrtime.bigint()-start),count,checksum};
       };
       const warmups={},counts={};

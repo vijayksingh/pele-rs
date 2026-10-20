@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "Completed guarded eight-second parse profile; subsequent mutable profile interrupted by unrelated Swift compilation",
+  "consumerManifest": {
+    "schemaVersion": 1,
+    "sourceInputSha256": "5d0b924df12d053469a5c101016e6535af1303a1d4beeade97a0e96dd08efc92",
+    "revision": "a9b23509d239495ce4dfdfceef5ad45065ec42f8",
+    "builtAt": "2026-10-19T23:23:50.055Z",
+    "binaries": {
+      "pele-perf": "f43315d1d20bcb1187a6541354fe343753f3185ec013d82b4e2f2bd080e41d89",
+      "pele-perf-alloc": "60f03a6839632079416e186c893f8a3f8575a5fe78ffd3e711f2d064822b743a"
+    }
+  },
+  "sourceFileSHA256": "0bbeb1092da934ed54d880b880f370c1fcdba12e25b85bda0e92f2576a8abc0b",
+  "binarySHA256": "f43315d1d20bcb1187a6541354fe343753f3185ec013d82b4e2f2bd080e41d89",
+  "rawSampleSHA256": "c8feae637e360827a7f2b75338848e7560d45d11d6267bafcc00ea4af7d427b7",
+  "operation": "parse-public",
+  "case": "gantt/medium",
+  "batchCount": 128,
+  "batches": 78,
+  "sampling": {
+    "command": "/usr/bin/sample <own native consumer PID> 8 1 -file <output>",
+    "elapsedTimingPublished": false
+  },
+  "verification": "Pinned JS full SVG/dimensions compared with native source, typed and mutable before/after completed stage; guardQuiet passed before/every batch/after stage",
+  "scope": "Profiler also observes per-batch reset/warm, drops and input waits. Inclusive counts below share ancestors and must not be summed. Optimized LTO may inline frames.",
+  "inclusiveSampleCounts": {
+    "measuredStateOnce": 3588,
+    "publicEngineParse": 2911,
+    "createPublic": 2327,
+    "majorContextRecordBranches": [
+      1614,
+      209
+    ]
+  }
+}

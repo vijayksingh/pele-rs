@@ -69,6 +69,12 @@ JS batch. Compiler/Pele-test guards and shared-host load records remain active.
 This diagnostic neither measures Swift/WASM nor subtracts local native time from
 Linux browser measurements. It is not the browser release gate.
 
+`--stages parse,parse-public` additionally compares typed/native public parsing
+against pinned JS parse. Native public parsing constructs an additional owned
+identity graph; neither lane times its NDJSON pipe or graph serialization.
+Use typed parse as a negative control for graph-construction changes. All
+rendering output checks still run before/after a parsing comparison.
+
 Native typed documents remain retained across batches; only native public state
 is reset. JS retained models are reparsed and warmed for each batch. Historical
 reports' `freshRetainedStatePerBatch` field was too broad; their implementation

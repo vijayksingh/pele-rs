@@ -176,18 +176,25 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest measured package: native `0aba8ef`, JS `e8316b2`. The latest changes
+Latest measured package: native `7909cdf`, JS `e8316b2`. The latest changes
 reuse captured schema metadata, release disposed bridge storage, and borrow SVG
 text that needs no escaping. SVG root assembly now writes borrowed spans directly
-into the final output. Source render takes **1.62–4.96×** the Pele JS time.
-Median ratios across all sizes/resources are **2.41× source**, **11.47× parse**
-and **4.09× retained mutable render**. These describe this artifact; differences
+into the final output. Fresh Gantt arenas now use private Rust builders instead
+of general mutable property assignment. Source render takes **1.64–5.54×** the Pele JS time.
+Median ratios across all sizes/resources are **2.42× source**, **11.64× parse**
+and **3.92× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
+
+The [controlled Gantt construction comparison](docs/benchmarks/2026-10-20-gantt-builder/)
+measures 16–25% lower VM parse medians, 35% lower native public-parse median and
+25% fewer native requested allocation bytes against its matched control. This
+improves fresh parsing; retained model copying/reconciliation remains costly.
 
 The prior direct host comparison measured an 11.1% retained-render improvement
 against its own matched control, with regressions disclosed. Reports retain
 raw samples, artifact hashes and failed gates:
-[latest borrowed-root checkpoint](docs/benchmarks/2026-10-20-svg-root/),
+[latest Gantt checkpoint](docs/benchmarks/2026-10-20-gantt-builder/),
+[borrowed-root checkpoint](docs/benchmarks/2026-10-20-svg-root/),
 [SVG/disposal checkpoint](docs/benchmarks/2026-10-20-svg-disposal/),
 [prior schema checkpoint](docs/benchmarks/2026-10-20-registration-schema/),
 [direct comparison](docs/benchmarks/2026-10-20-direct-comparison/),
@@ -201,40 +208,41 @@ Source-render measurements with cached Canvas metrics:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.328 ms | 2.426 ms | 1.83× |
-| sequence | 0.543 ms | 1.058 ms | 1.95× |
-| er | 2.733 ms | 6.177 ms | 2.26× |
-| pie | 0.305 ms | 0.711 ms | 2.33× |
-| sankey | 0.853 ms | 1.467 ms | 1.72× |
-| gantt | 0.692 ms | 2.549 ms | 3.68× |
-| railroad | 0.777 ms | 1.870 ms | 2.41× |
+| flowchart | 1.306 ms | 2.418 ms | 1.85× |
+| sequence | 0.502 ms | 0.992 ms | 1.98× |
+| er | 2.752 ms | 6.218 ms | 2.26× |
+| pie | 0.272 ms | 0.615 ms | 2.26× |
+| sankey | 0.880 ms | 1.441 ms | 1.64× |
+| gantt | 0.693 ms | 2.539 ms | 3.66× |
+| railroad | 0.766 ms | 1.849 ms | 2.41× |
 
-Swift runs locally on Apple M1 Pro. Fresh source-built ARM64 SDK passed nine
-integration tests, including all 33 numeric families, 31 coordinate boundaries
-and 115 SVG-root cases, plus 168 exact output checks through eight actual APIs. Universal Intel
-rebuild remains required before release. Seven-trial timing medians below use
+Swift runs locally on Apple M1 Pro. Fresh source-built ARM64 SDK passed 14
+integration tests for mutable models, calendars, callbacks, Date identities and
+error recovery, plus 168 exact output checks through eight actual APIs. Universal Intel
+rebuild remains required before release. Nine-trial timing medians below use
 medium workloads (48 units; Railroad 15 rules) and passed the compiler/Pele-test
-quiet guard. These timing rows are from the prior native `bfee120` checkpoint;
-the latest root build has fresh correctness proof above; new timing is deferred
-while other compilation blocks the guard. Other desktop activity
-is recorded in the timing report.
+quiet guard with at least 500ms measured warmup. These are current `7909cdf`
+source timings; other desktop activity is recorded in the report. The full
+56-condition report includes all eight APIs: Gantt immutable parse remains
+5.59ms versus 0.266ms mutable parse. No historical Swift speedup is claimed.
 
 | Medium workload | Source render | Retained render | Mutable render |
 | --- | ---: | ---: | ---: |
-| flowchart | 0.590 ms | 0.482 ms | 0.596 ms |
-| sequence | 0.270 ms | 0.231 ms | 0.265 ms |
-| er | 1.531 ms | 1.309 ms | 1.452 ms |
-| pie | 0.287 ms | 0.272 ms | 0.284 ms |
-| sankey | 0.351 ms | 0.328 ms | 0.371 ms |
-| gantt | 0.433 ms | 0.366 ms | 1.079 ms |
-| railroad | 0.443 ms | 0.414 ms | 0.464 ms |
+| flowchart | 0.610 ms | 0.481 ms | 0.592 ms |
+| sequence | 0.268 ms | 0.228 ms | 0.344 ms |
+| er | 1.662 ms | 1.349 ms | 1.589 ms |
+| pie | 0.299 ms | 0.295 ms | 0.306 ms |
+| sankey | 0.357 ms | 0.326 ms | 0.379 ms |
+| gantt | 0.455 ms | 0.396 ms | 1.096 ms |
+| railroad | 0.458 ms | 0.423 ms | 0.479 ms |
 
 A separate [native-only comparison](docs/benchmarks/2026-10-20-native-core/)
 before the latest root rewrite removes WASM/Swift entirely: typed retained native/JS medians are 0.80× Flowchart,
 0.70× Sequence, 1.04× ER, 0.50× Pie, 0.41× Sankey, 1.15× Gantt and 1.38× Railroad.
 Seven medium workloads on the same Mac; this is not all-33 certification.
-Native compatibility work is still costly: Gantt public parse is 8.38× and mutable
-publication 4.00× its JS reference, with the extra return contract disclosed.
+Native compatibility work is still costly: the current matched Gantt public
+parse comparison takes 3.82× JS time. Historical mutable publication took 4.00×
+its JS reference, with the extra return contract and growing arena disclosed.
 
 Swift and VM figures cannot be compared across machines. Timings include public
 API/ownership costs and exclude startup, downloads and SVG painting. Mixed or
