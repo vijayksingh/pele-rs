@@ -19,7 +19,9 @@ records the authoritative-host-model architecture, its rejected construction
 stages, 30 independent VM conditions, 22 first-use conditions and local Swift
 checks/timings. ER parse remains mixed; retained rendering regresses by
 75.7–91.9% paired against the preceding backend. Fewer copies do not establish
-a speed improvement. Prepared/raw parity and the performance target remain open.
+a speed improvement. The [prepared follow-up](benchmarks/2026-10-20-er-host-storage/prepared/README.md)
+closes its callback gap; browser caller-authored raw parity and the performance
+target remain open.
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |

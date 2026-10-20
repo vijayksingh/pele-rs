@@ -187,8 +187,10 @@ The newer [live ER storage checkpoint](docs/benchmarks/2026-10-20-er-host-storag
 removes persistent model copies and fixes ordinary ER callback state. Its
 30-condition VM comparison still shows mixed parse results and 75.7–91.9%
 slower retained ER rendering by paired medians against the preceding backend.
-Swift checks pass; timing controls and remaining prepared/raw API gaps are
-disclosed. This architecture is still under optimization, with no 0.3 release.
+The [prepared-entry follow-up](docs/benchmarks/2026-10-20-er-host-storage/prepared/)
+fixes its callback regressions; fresh all-family Swift prepared/raw checks pass.
+Browser caller-authored raw parity and the performance target remain open.
+This architecture is still under optimization, with no 0.3 release.
 
 The [direct-parse architecture checkpoint](docs/benchmarks/2026-10-20-direct-parse/)
 shares source preparation and grammar, then constructs Gantt's canonical public

@@ -6,6 +6,12 @@ ER parse no longer retains a native public graph, decoded JS baseline or typed
 ER reconstruction. Native/Swift and exported low-level arena APIs retain their
 existing contracts. [Architecture](../../LLD_HOST_ER_STORE.md).
 
+The later [prepared-entry follow-up](prepared/README.md), source `80bed95`, fixes
+the prepared callback failures recorded below and includes fresh all-family
+Swift prepared/raw checks. Browser caller-authored raw adoption and the JS
+performance target remain open. Historical measurements below retain their
+original source/artifact scope.
+
 **This is not a performance solution or release candidate.** Retained rendering
 regresses consistently. The latest complete release gate remains the preceding
 [126-condition failure](../2026-10-20-er-token-ownership/README.md). No 0.3 release.
