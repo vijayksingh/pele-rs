@@ -1,0 +1,582 @@
+{
+  "sourceCommit": "8175006345f3b66a6c9fd942814ed0ba5ff3014d",
+  "wasmSHA256": "d5a8cbdccd9641e63acefb2d5ed66d3baa48c3d9cb70e5dc1917ca7c17f772b4",
+  "artifacts": [
+    {
+      "source": "dist/evidence/sankey-live-node-3.json",
+      "stored": "final/node.json.gz",
+      "originalSHA256": "2803d6a7d09877f432c2c44f2faa1ce9333390e2d5b483137ce5b6cd94cfd080",
+      "storedSHA256": "068c7664975969a0e10a8279448a28e622afd5d3f596c4d69f6961d8c0824978",
+      "originalBytes": 26527977,
+      "storedBytes": 911183,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-node-3.log",
+      "stored": "final/node.log",
+      "originalSHA256": "4eca5c2e13dd6019453d985f23668ccb4f5a1e249d8e94cc23ccba62259b3c40",
+      "storedSHA256": "4eca5c2e13dd6019453d985f23668ccb4f5a1e249d8e94cc23ccba62259b3c40",
+      "originalBytes": 103,
+      "storedBytes": 103,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-3.log",
+      "stored": "final/browser.log",
+      "originalSHA256": "a917380a2ee323d23cedd21a462a62e169ce3a5892f08e269f4530ce4e47d754",
+      "storedSHA256": "a917380a2ee323d23cedd21a462a62e169ce3a5892f08e269f4530ce4e47d754",
+      "originalBytes": 17112,
+      "storedBytes": 17112,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-types-3.log",
+      "stored": "final/types.log",
+      "originalSHA256": "d814ef4c65a231d631817921b27b4bba912641d7ee7328aff44497e984510684",
+      "storedSHA256": "d814ef4c65a231d631817921b27b4bba912641d7ee7328aff44497e984510684",
+      "originalBytes": 50,
+      "storedBytes": 50,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-build-wasm-3.log",
+      "stored": "final/build.log",
+      "originalSHA256": "41dc59dc31589e8cfa310f3df9a8e3790c08e9298444aa4606648d5610595088",
+      "storedSHA256": "41dc59dc31589e8cfa310f3df9a8e3790c08e9298444aa4606648d5610595088",
+      "originalBytes": 266,
+      "storedBytes": 266,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-generator-3.log",
+      "stored": "final/generator.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "storedBytes": 0,
+      "gzip": false
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/source.json",
+      "stored": "final/source.json.gz",
+      "originalSHA256": "dd2b7f0ab856055859e4ea30ffd93687ae240fc701d0af202d2a4ba130df28db",
+      "storedSHA256": "c0b5b48077c6415ce5f2222ca7ee6e461c23e3e433051f2a80a6c66fb5bebc10",
+      "originalBytes": 65405,
+      "storedBytes": 26137,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/package.json",
+      "stored": "final/package.json.gz",
+      "originalSHA256": "8dd76db1503ff24e0709c1663e3ebb95125ffc4521a0f137b51eb8e582fcb058",
+      "storedSHA256": "a02d1635d74e9bbede852a9fd946ba87d8a0b7f26d4cb52dd541fe0f8724f295",
+      "originalBytes": 76311,
+      "storedBytes": 31459,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/after.json",
+      "stored": "final/after.json.gz",
+      "originalSHA256": "f08f972ef7c617638c2e5b7290e867db194e9161269dfbed9d9bc93150b8de1c",
+      "storedSHA256": "2a7832f45855f865396340582d7b77b2aabd579e3a44070ea5d998b9333f0a07",
+      "originalBytes": 76337,
+      "storedBytes": 31468,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/reviewed-source-manifest.json",
+      "stored": "final/reviewed-source-manifest.json",
+      "originalSHA256": "20c5201926f34513d658ba0a27b421027972c4971acc08ed898f6ea1382b68e2",
+      "storedSHA256": "20c5201926f34513d658ba0a27b421027972c4971acc08ed898f6ea1382b68e2",
+      "originalBytes": 5148,
+      "storedBytes": 5148,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--05994-atch-pinned-Pele-responsive-chromium/sankey-resource-responsive.json",
+      "stored": "final/browser/sankey-resource-callbacks--05994-atch-pinned-Pele-responsive-chromium/sankey-resource-responsive.json.gz",
+      "originalSHA256": "e19f7c65a5ea984791a164fd6cd7d5f8af81e4c6befc8c72be12c5a58952e307",
+      "storedSHA256": "cc5f29dd49c02db1ee2521c3d6248f9aa249822b7ec15fe43c5c43c91e79dfe3",
+      "originalBytes": 3019245,
+      "storedBytes": 100228,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--05994-atch-pinned-Pele-responsive-firefox/sankey-resource-responsive.json",
+      "stored": "final/browser/sankey-resource-callbacks--05994-atch-pinned-Pele-responsive-firefox/sankey-resource-responsive.json.gz",
+      "originalSHA256": "00fb4401289cf5cb3c09f48c66dccc7b035042e5d1c6ca7870082ec5a93157ba",
+      "storedSHA256": "e54970d18a810451e26313c5064d601adec6b09030810fd593fe5794ca0b7633",
+      "originalBytes": 3019204,
+      "storedBytes": 100189,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--05994-atch-pinned-Pele-responsive-webkit/sankey-resource-responsive.json",
+      "stored": "final/browser/sankey-resource-callbacks--05994-atch-pinned-Pele-responsive-webkit/sankey-resource-responsive.json.gz",
+      "originalSHA256": "08915bf7f26455b257c88acfb775a41d34b678e3b9f9331e68c3eec1788ce225",
+      "storedSHA256": "066d9f5e7041a4c89ffc7ff4f21705f24bd9a2f86704bdef3f12058407247313",
+      "originalBytes": 3019237,
+      "storedBytes": 100224,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--24af3-tch-pinned-Pele-live-fields-chromium/sankey-resource-live-fields.json",
+      "stored": "final/browser/sankey-resource-callbacks--24af3-tch-pinned-Pele-live-fields-chromium/sankey-resource-live-fields.json.gz",
+      "originalSHA256": "4e2b7f64d685af3bc00a59afe655745fd987ee8b11e987deed5696d8484cf4bf",
+      "storedSHA256": "976641d75c025a97bd3f47f7fe6179cd27331e0777d263460ef7adcb3ebd5961",
+      "originalBytes": 1710460,
+      "storedBytes": 54164,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--24af3-tch-pinned-Pele-live-fields-firefox/sankey-resource-live-fields.json",
+      "stored": "final/browser/sankey-resource-callbacks--24af3-tch-pinned-Pele-live-fields-firefox/sankey-resource-live-fields.json.gz",
+      "originalSHA256": "920acaa5625691621d54fd665e9284db813f4c46cbef7bfeb2f33d48b2d802f2",
+      "storedSHA256": "ac243ed4cfb2865217a1aaf308b1c069fb2d884f0bac367cec26c53814f349b0",
+      "originalBytes": 1721611,
+      "storedBytes": 55843,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--24af3-tch-pinned-Pele-live-fields-webkit/sankey-resource-live-fields.json",
+      "stored": "final/browser/sankey-resource-callbacks--24af3-tch-pinned-Pele-live-fields-webkit/sankey-resource-live-fields.json.gz",
+      "originalSHA256": "ce47e2595f675a9800ae8342b4d27737374ca4f65fea5edd2334680a162f690b",
+      "storedSHA256": "5932c8fd6bf869512fc4f788cabcc480fc85f1d60d5ee1678157def929b508f5",
+      "originalBytes": 1712997,
+      "storedBytes": 54943,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--52735-atch-pinned-Pele-same-owner-chromium/sankey-resource-same-owner.json",
+      "stored": "final/browser/sankey-resource-callbacks--52735-atch-pinned-Pele-same-owner-chromium/sankey-resource-same-owner.json.gz",
+      "originalSHA256": "4c172aacd48ae5a549274754b54a9e3eaf30344d965edb2346ad4f70d85bbad4",
+      "storedSHA256": "9d17055c3ed3c43ad96c6a0823ba30735d9e63a99fcde646f23257e212bf344a",
+      "originalBytes": 4562801,
+      "storedBytes": 156768,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--52735-atch-pinned-Pele-same-owner-firefox/sankey-resource-same-owner.json",
+      "stored": "final/browser/sankey-resource-callbacks--52735-atch-pinned-Pele-same-owner-firefox/sankey-resource-same-owner.json.gz",
+      "originalSHA256": "a5aa3c766c5428563c143152780dfcbdc5cf20c1477eb185e82b14e53a42a2da",
+      "storedSHA256": "7c53aae6beb656ad6472070fa516e79f61bd98a2cc776d6e11376473a6a58b13",
+      "originalBytes": 4601068,
+      "storedBytes": 160494,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--52735-atch-pinned-Pele-same-owner-webkit/sankey-resource-same-owner.json",
+      "stored": "final/browser/sankey-resource-callbacks--52735-atch-pinned-Pele-same-owner-webkit/sankey-resource-same-owner.json.gz",
+      "originalSHA256": "525dbe0203d2b2e0189ccdeb8e2157fd04d32f8805d8e00e563f93c173c74203",
+      "storedSHA256": "e1acafd8f37ba3426105835c14da6d3ccc1f6a4e580ffe55b681e332bca76d62",
+      "originalBytes": 4582721,
+      "storedBytes": 158893,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--54b4d-tch-pinned-Pele-other-owner-chromium/sankey-resource-other-owner.json",
+      "stored": "final/browser/sankey-resource-callbacks--54b4d-tch-pinned-Pele-other-owner-chromium/sankey-resource-other-owner.json.gz",
+      "originalSHA256": "ac86c2fccba3cd67ab9c1b40898a927027513fa4ef68daf98fe3618387b8f2ec",
+      "storedSHA256": "0857d7f763be824f0fcb6da787fcfaff105bfcf6db80a172c7246c2a71f5e5f7",
+      "originalBytes": 2937044,
+      "storedBytes": 95781,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--54b4d-tch-pinned-Pele-other-owner-firefox/sankey-resource-other-owner.json",
+      "stored": "final/browser/sankey-resource-callbacks--54b4d-tch-pinned-Pele-other-owner-firefox/sankey-resource-other-owner.json.gz",
+      "originalSHA256": "760cceacf4a934f526f452aa46dfdb0ae0f52596961d477188ee9e1d61b57bd3",
+      "storedSHA256": "22c44b14bb8131216f4bbf36128817b736e5d28249673235502a5026331520b3",
+      "originalBytes": 2937003,
+      "storedBytes": 95743,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--54b4d-tch-pinned-Pele-other-owner-webkit/sankey-resource-other-owner.json",
+      "stored": "final/browser/sankey-resource-callbacks--54b4d-tch-pinned-Pele-other-owner-webkit/sankey-resource-other-owner.json.gz",
+      "originalSHA256": "0b9546bf25c041ca7f06c4e1bedbde0b20dd7c53c608b62d4da43754593c97cb",
+      "storedSHA256": "0aa4abd65e47cbfb38d5634eca7ef1eec22566a2c9c17778623037dc83a970e8",
+      "originalBytes": 2937036,
+      "storedBytes": 95777,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--58b40--match-pinned-Pele-detached-chromium/sankey-resource-detached.json",
+      "stored": "final/browser/sankey-resource-callbacks--58b40--match-pinned-Pele-detached-chromium/sankey-resource-detached.json.gz",
+      "originalSHA256": "f1f25e14cd7fd8a20ce3cf3c64948a3c14b34653bc4423787ca0590b05b69f5a",
+      "storedSHA256": "dbfce2bbba89d0492dd06f1252c84af92f8e00713edbc833502e9ba33faa61f8",
+      "originalBytes": 1851681,
+      "storedBytes": 62225,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--58b40--match-pinned-Pele-detached-firefox/sankey-resource-detached.json",
+      "stored": "final/browser/sankey-resource-callbacks--58b40--match-pinned-Pele-detached-firefox/sankey-resource-detached.json.gz",
+      "originalSHA256": "75cdf7faf5a6c326e74649e596030c9268087b4515ae7f508d7d8ab6f17db58c",
+      "storedSHA256": "338f630ca0c0cd59bf1c047139c4e28456e7ea30aca41ed26a7e238e898a5deb",
+      "originalBytes": 1851640,
+      "storedBytes": 62186,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--58b40--match-pinned-Pele-detached-webkit/sankey-resource-detached.json",
+      "stored": "final/browser/sankey-resource-callbacks--58b40--match-pinned-Pele-detached-webkit/sankey-resource-detached.json.gz",
+      "originalSHA256": "aa373040308fff916ea8c12091276f09add62afce8882186db32bc09a45bd0b5",
+      "storedSHA256": "913e683301df9884df41162334b49e2c3dd572f6a73849099b7287949308fbc9",
+      "originalBytes": 1851673,
+      "storedBytes": 62220,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--b017d-h-pinned-Pele-nested-render-chromium/sankey-resource-nested-render.json",
+      "stored": "final/browser/sankey-resource-callbacks--b017d-h-pinned-Pele-nested-render-chromium/sankey-resource-nested-render.json.gz",
+      "originalSHA256": "b86c3005261b3df7081b88dcb0ced1d46e6859f855deceaee5ec4972081cf709",
+      "storedSHA256": "94c5d859da7fecde703e49f6da09e351a11200dd8252cc545ec254b08696f857",
+      "originalBytes": 1197774,
+      "storedBytes": 42374,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--b017d-h-pinned-Pele-nested-render-firefox/sankey-resource-nested-render.json",
+      "stored": "final/browser/sankey-resource-callbacks--b017d-h-pinned-Pele-nested-render-firefox/sankey-resource-nested-render.json.gz",
+      "originalSHA256": "456dab5db8462ae8cd35235cd20346b75f6333f78ebacdf59b589aa750fe1681",
+      "storedSHA256": "ccd0ca3b2b2a339f07a0d96996fdf927804ff72d48baee3a9f1ed782e927d603",
+      "originalBytes": 1197733,
+      "storedBytes": 42336,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--b017d-h-pinned-Pele-nested-render-webkit/sankey-resource-nested-render.json",
+      "stored": "final/browser/sankey-resource-callbacks--b017d-h-pinned-Pele-nested-render-webkit/sankey-resource-nested-render.json.gz",
+      "originalSHA256": "593673238906e1de89a8f81e611ba93e0df52ef2f5d907d235ce814abedc1236",
+      "storedSHA256": "17e27ec18617d67c23a66093da7c0317e616d689ffab4d1c45cc33fa340ab6b7",
+      "originalBytes": 1197766,
+      "storedBytes": 42370,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--fadfb-atch-pinned-Pele-basic-icon-chromium/sankey-resource-basic-icon.json",
+      "stored": "final/browser/sankey-resource-callbacks--fadfb-atch-pinned-Pele-basic-icon-chromium/sankey-resource-basic-icon.json.gz",
+      "originalSHA256": "08d6ecf931057f1b2e5690119864bb54bf35c61bdc582d48d1443a976498c100",
+      "storedSHA256": "c20c20c95775c0c7a75732ae7fc3e556245054f6978a5a295a39e2aaa3d16325",
+      "originalBytes": 5622777,
+      "storedBytes": 197055,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--fadfb-atch-pinned-Pele-basic-icon-firefox/sankey-resource-basic-icon.json",
+      "stored": "final/browser/sankey-resource-callbacks--fadfb-atch-pinned-Pele-basic-icon-firefox/sankey-resource-basic-icon.json.gz",
+      "originalSHA256": "a482d3c29fb7e689b52eb643a732913497e089e6d53cece2e9db94ce235a54be",
+      "storedSHA256": "1f931fc12d5cf98e9ef020040d11dcbdc9204d23643735a428e6c4d43f142a9d",
+      "originalBytes": 5622736,
+      "storedBytes": 197016,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--fadfb-atch-pinned-Pele-basic-icon-webkit/sankey-resource-basic-icon.json",
+      "stored": "final/browser/sankey-resource-callbacks--fadfb-atch-pinned-Pele-basic-icon-webkit/sankey-resource-basic-icon.json.gz",
+      "originalSHA256": "1fbd35a9a8b82d90ebc81c862f7a4ac67abfab986f2f2594b10b40b97c0d76dd",
+      "storedSHA256": "e588a801ffb295b8d856a3bf1904540921c6c477e26080e3ebd73ca37843d5f8",
+      "originalBytes": 5622769,
+      "storedBytes": 197052,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--fe523-tch-pinned-Pele-basic-width-chromium/sankey-resource-basic-width.json",
+      "stored": "final/browser/sankey-resource-callbacks--fe523-tch-pinned-Pele-basic-width-chromium/sankey-resource-basic-width.json.gz",
+      "originalSHA256": "c0b8dedb6ced87477071a9f9d2c9ae2e5ae6b0017dd52e8eef1bb2656c565e96",
+      "storedSHA256": "cab846ca993dbcd6c9f4df9cacb2073a6bc27ad2b6f80580b6e8428e1d08218f",
+      "originalBytes": 5608330,
+      "storedBytes": 196002,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--fe523-tch-pinned-Pele-basic-width-firefox/sankey-resource-basic-width.json",
+      "stored": "final/browser/sankey-resource-callbacks--fe523-tch-pinned-Pele-basic-width-firefox/sankey-resource-basic-width.json.gz",
+      "originalSHA256": "38e50e631e0974505afe62fd58808fb8be2c75f9c8b7697be10570f2470c236f",
+      "storedSHA256": "63f199cef3f3d85fcacefcba859cfd0e005ccfc74db4d471b1c60cec96341080",
+      "originalBytes": 5608289,
+      "storedBytes": 195966,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/sankey-resource-callbacks--fe523-tch-pinned-Pele-basic-width-webkit/sankey-resource-basic-width.json",
+      "stored": "final/browser/sankey-resource-callbacks--fe523-tch-pinned-Pele-basic-width-webkit/sankey-resource-basic-width.json.gz",
+      "originalSHA256": "8b573f7f9f3542b0460ab3a42d79c939f3c78a9477cbc57d8ad49de835d66b55",
+      "storedSHA256": "3c051fbd81fa5d5a1678d505370f7992a5d3137420523f5a9311ba36270d7eaf",
+      "originalBytes": 5608322,
+      "storedBytes": 195998,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-Sankey-reado-4f5d5-ginal-result-factory-throws-chromium/source-layout-factory-throws.json",
+      "stored": "final/browser/source-layout-Sankey-reado-4f5d5-ginal-result-factory-throws-chromium/source-layout-factory-throws.json.gz",
+      "originalSHA256": "475570fb2c27030804ef6d909b74c3c1de162a1899002c973ebfad69a5df82b9",
+      "storedSHA256": "fab63599266b50d710faa362e08f6c4330419a70cc5d196c27a235d43b476144",
+      "originalBytes": 349703,
+      "storedBytes": 12180,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-Sankey-reado-4f5d5-ginal-result-factory-throws-firefox/source-layout-factory-throws.json",
+      "stored": "final/browser/source-layout-Sankey-reado-4f5d5-ginal-result-factory-throws-firefox/source-layout-factory-throws.json.gz",
+      "originalSHA256": "475570fb2c27030804ef6d909b74c3c1de162a1899002c973ebfad69a5df82b9",
+      "storedSHA256": "fab63599266b50d710faa362e08f6c4330419a70cc5d196c27a235d43b476144",
+      "originalBytes": 349703,
+      "storedBytes": 12180,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-Sankey-reado-4f5d5-ginal-result-factory-throws-webkit/source-layout-factory-throws.json",
+      "stored": "final/browser/source-layout-Sankey-reado-4f5d5-ginal-result-factory-throws-webkit/source-layout-factory-throws.json.gz",
+      "originalSHA256": "475570fb2c27030804ef6d909b74c3c1de162a1899002c973ebfad69a5df82b9",
+      "storedSHA256": "fab63599266b50d710faa362e08f6c4330419a70cc5d196c27a235d43b476144",
+      "originalBytes": 349703,
+      "storedBytes": 12180,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-source-layou-fd31e-ion-isolates-nested-cursors-chromium/source-layout-cursor-reentry.json",
+      "stored": "final/browser/source-layout-source-layou-fd31e-ion-isolates-nested-cursors-chromium/source-layout-cursor-reentry.json.gz",
+      "originalSHA256": "a6ec943c35320e72fac8d314db4ac955c1faaab7c0a6ad6b860a5b64b8e1578b",
+      "storedSHA256": "a2db069bad6d7253ed9920c5786d0ffdebd05db47b3d11ca7c13fe842e42cf69",
+      "originalBytes": 115661,
+      "storedBytes": 4103,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-source-layou-fd31e-ion-isolates-nested-cursors-firefox/source-layout-cursor-reentry.json",
+      "stored": "final/browser/source-layout-source-layou-fd31e-ion-isolates-nested-cursors-firefox/source-layout-cursor-reentry.json.gz",
+      "originalSHA256": "a6ec943c35320e72fac8d314db4ac955c1faaab7c0a6ad6b860a5b64b8e1578b",
+      "storedSHA256": "a2db069bad6d7253ed9920c5786d0ffdebd05db47b3d11ca7c13fe842e42cf69",
+      "originalBytes": 115661,
+      "storedBytes": 4103,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-source-layou-fd31e-ion-isolates-nested-cursors-webkit/source-layout-cursor-reentry.json",
+      "stored": "final/browser/source-layout-source-layou-fd31e-ion-isolates-nested-cursors-webkit/source-layout-cursor-reentry.json.gz",
+      "originalSHA256": "a6ec943c35320e72fac8d314db4ac955c1faaab7c0a6ad6b860a5b64b8e1578b",
+      "storedSHA256": "a2db069bad6d7253ed9920c5786d0ffdebd05db47b3d11ca7c13fe842e42cf69",
+      "originalBytes": 115661,
+      "storedBytes": 4103,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-typed-source-d0571-anonical-lifecycle-recovery-chromium/source-layout-canonical-fallback.json",
+      "stored": "final/browser/source-layout-typed-source-d0571-anonical-lifecycle-recovery-chromium/source-layout-canonical-fallback.json.gz",
+      "originalSHA256": "78bbf626978b3c04207ca0e018ffb65aa61420fe7c3364d7c946aaf8a7cd91df",
+      "storedSHA256": "860b44eaa0666526daa308bf3f38b6bdcba62914c7510464e48eba25661db637",
+      "originalBytes": 880897,
+      "storedBytes": 32994,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-typed-source-d0571-anonical-lifecycle-recovery-firefox/source-layout-canonical-fallback.json",
+      "stored": "final/browser/source-layout-typed-source-d0571-anonical-lifecycle-recovery-firefox/source-layout-canonical-fallback.json.gz",
+      "originalSHA256": "ceaa8069a336222b80b4bb00145200e4cf5cbb134d6996e2b46846543ad30704",
+      "storedSHA256": "efc31884e62e8f3edddca46a6b58ef2f7cc61f3d5670b7a29a5dc8b7fe08adbb",
+      "originalBytes": 880897,
+      "storedBytes": 32962,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-web-artifacts-3/source-layout-typed-source-d0571-anonical-lifecycle-recovery-webkit/source-layout-canonical-fallback.json",
+      "stored": "final/browser/source-layout-typed-source-d0571-anonical-lifecycle-recovery-webkit/source-layout-canonical-fallback.json.gz",
+      "originalSHA256": "73de66e9705ae2580a959862703c96894207051aa411d348ffe43206b7e075f6",
+      "storedSHA256": "d288bef4fac8035d0f79abcda37c7bd1daa8aa1d1c1225683eefa383f80f96a5",
+      "originalBytes": 881697,
+      "storedBytes": 33291,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-1/source.json",
+      "stored": "attempt-1/source.json.gz",
+      "originalSHA256": "3d22caa3e9608c8d5cc6626d34a8f8d426430d637af1ff2bcc77889c4c8b44ae",
+      "storedSHA256": "3e5d787b60ec7846a95a22f4edf3f5044d0816e7b6a148717e10ef2fa38d571c",
+      "originalBytes": 66195,
+      "storedBytes": 26371,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-1/package.json",
+      "stored": "attempt-1/package.json.gz",
+      "originalSHA256": "04fd2d76456e8f0ec18a0d099fcc62968dda554e31a995a489a5e77ace53fdf0",
+      "storedSHA256": "952a4be9c639412a2bc10db4386b40606d42dc952ee11e9d616950ee0e0485c7",
+      "originalBytes": 77101,
+      "storedBytes": 31688,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-1/sankey-live-node.json",
+      "stored": "attempt-1/sankey-live-node.json.gz",
+      "originalSHA256": "fe521250cc72e0007eca7e2ba527e798d839b7cb854974201d97335adcd23f5c",
+      "storedSHA256": "73c58e1badff16c7cadd2a2e3bd44dddef0c21dcb0dad42548e9467dafbc7bec",
+      "originalBytes": 26481406,
+      "storedBytes": 902917,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-1/sankey-live-node.log",
+      "stored": "attempt-1/sankey-live-node.log",
+      "originalSHA256": "6141550dcae53218d5fdbbb168e6d06aad98dbea2ba2ac631e37c059cc2f64bc",
+      "storedSHA256": "6141550dcae53218d5fdbbb168e6d06aad98dbea2ba2ac631e37c059cc2f64bc",
+      "originalBytes": 955,
+      "storedBytes": 955,
+      "gzip": false
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/source.json",
+      "stored": "attempt-2/source.json.gz",
+      "originalSHA256": "4d88ae61d72b10ea726c0dd229f85c98b0fdd1e61e0b3316a2b574ebe2ed4d18",
+      "storedSHA256": "afd4a2c7c6d3bdbdc4753573d0c1980be3933e5839975953c774ca73bc87c8d9",
+      "originalBytes": 65405,
+      "storedBytes": 26149,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/package.json",
+      "stored": "attempt-2/package.json.gz",
+      "originalSHA256": "b74a000a248992af7036286065a930fe41c155bb345a28f4e3860ccf27128bdb",
+      "storedSHA256": "a4552edcbadef00d117c9c8ead6d24236ea8a524507a47b69512a108b8464a05",
+      "originalBytes": 76311,
+      "storedBytes": 31470,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/sankey-live-node-2.json",
+      "stored": "attempt-2/sankey-live-node-2.json.gz",
+      "originalSHA256": "a38cff53d7c38ff086c99a51aa8e195bc1c482ce31235f778cf8cd15c4fd59fd",
+      "storedSHA256": "9b2cb63d228fce9966c920420bdd39a25bab29c4323ed7e391f892cd7e858e29",
+      "originalBytes": 26481774,
+      "storedBytes": 902878,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/sankey-live-node-2.log",
+      "stored": "attempt-2/sankey-live-node-2.log",
+      "originalSHA256": "bf3fe705c6656b7c6039c3dd349606907e3d6cbaa1d223c230d49bb201594ca6",
+      "storedSHA256": "bf3fe705c6656b7c6039c3dd349606907e3d6cbaa1d223c230d49bb201594ca6",
+      "originalBytes": 103,
+      "storedBytes": 103,
+      "gzip": false
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-runtime/attempt-2/sankey-live-web.log",
+      "stored": "attempt-2/browser.log",
+      "originalSHA256": "ee91e5289d9f770451de9be083470ce35564afd5b8326e47915e2cb7af9473ec",
+      "storedSHA256": "ee91e5289d9f770451de9be083470ce35564afd5b8326e47915e2cb7af9473ec",
+      "originalBytes": 47670,
+      "storedBytes": 47670,
+      "gzip": false
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-correctness/runtime/after-correctness.json",
+      "stored": "native/after-correctness.json.gz",
+      "originalSHA256": "bb5a6bba76081ee4aa31d87d94e48e602665074585454ee6e3b9a327b67fe45c",
+      "storedSHA256": "3a5c6dd07895d5e6876b5b26d42b7588a2cbed434af86a3250a094b51a49b3d0",
+      "originalBytes": 115465,
+      "storedBytes": 43370,
+      "gzip": true
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-correctness/runtime/correctness-commands.json",
+      "stored": "native/correctness-commands.json",
+      "originalSHA256": "e0aaf8e9c362b4596e6064302a24bbd2774bf370571238387210f7c409cc02a7",
+      "storedSHA256": "e0aaf8e9c362b4596e6064302a24bbd2774bf370571238387210f7c409cc02a7",
+      "originalBytes": 7250,
+      "storedBytes": 7250,
+      "gzip": false
+    },
+    {
+      "source": "dist/perf-patches/parse-architecture/sankey-live-correctness/runtime/c-consumers.json",
+      "stored": "native/c-consumers.json",
+      "originalSHA256": "366b8e6c6c972ddc8f7f729331e974507a5cd80e9b159a0453b4432046900067",
+      "storedSHA256": "366b8e6c6c972ddc8f7f729331e974507a5cd80e9b159a0453b4432046900067",
+      "originalBytes": 2774,
+      "storedBytes": 2774,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-native-features.log",
+      "stored": "native/native-features.log",
+      "originalSHA256": "cad3e4f47cfe48c0d889eaf9afa4e0e1cd0e98956469866f753e8fa7049e8818",
+      "storedSHA256": "cad3e4f47cfe48c0d889eaf9afa4e0e1cd0e98956469866f753e8fa7049e8818",
+      "originalBytes": 7301,
+      "storedBytes": 7301,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-swift-corpus.log",
+      "stored": "native/swift-corpus.log",
+      "originalSHA256": "9a1be9e559e71fa3f9f664582ae7d29ff2508707665aa530da9d74d53cda387a",
+      "storedSHA256": "9a1be9e559e71fa3f9f664582ae7d29ff2508707665aa530da9d74d53cda387a",
+      "originalBytes": 5718,
+      "storedBytes": 5718,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-swift-api.json",
+      "stored": "native/swift-api.json.gz",
+      "originalSHA256": "a335e5614ae50fc4e9f0c931c18084ba6a354b329a3d5e7616707955052a89c0",
+      "storedSHA256": "cb7d98b9088fa2924d5fbbc9739d4bef0662559ae32736da3d2cba3768737f15",
+      "originalBytes": 237130,
+      "storedBytes": 37452,
+      "gzip": true
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-ffi-compile.log",
+      "stored": "native/ffi-compile.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "storedBytes": 0,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-ffi-run.log",
+      "stored": "native/ffi-run.log",
+      "originalSHA256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+      "storedSHA256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+      "originalBytes": 97,
+      "storedBytes": 97,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-ffi-public-compile.log",
+      "stored": "native/ffi-public-compile.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "storedBytes": 0,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-ffi-public-run.log",
+      "stored": "native/ffi-public-run.log",
+      "originalSHA256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+      "storedSHA256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+      "originalBytes": 36,
+      "storedBytes": 36,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-ffi-parse-limits-compile.log",
+      "stored": "native/ffi-parse-limits-compile.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "storedSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "storedBytes": 0,
+      "gzip": false
+    },
+    {
+      "source": "dist/evidence/sankey-live-correctness-ffi-parse-limits-run.log",
+      "stored": "native/ffi-parse-limits-run.log",
+      "originalSHA256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
+      "storedSHA256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
+      "originalBytes": 104,
+      "storedBytes": 104,
+      "gzip": false
+    }
+  ]
+}

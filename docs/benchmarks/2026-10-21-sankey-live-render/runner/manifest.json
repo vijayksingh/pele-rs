@@ -1,0 +1,57 @@
+{
+  "status": "candidate pinned; no transfer or timing authorized",
+  "primaryControl": "unchanged e148 + PeleJS",
+  "executionPriority": [
+    "warm only on parent GO",
+    "first-use only on separate parent GO"
+  ],
+  "protocolProbeDelta": "Actual detached prepare/run/finish/Ack continuity must replace prior source-layout render update expectation",
+  "harnesses": {
+    "warm": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "firstUse": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0"
+  },
+  "files": {
+    "cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "compare-first-use-web-vm.mjs": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0",
+    "compare-web-vm.mjs": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "probe-layout-continuity.mjs": "ca4df47b5a31146f625a0e23aac3bed0aecccf1ad49fb9422627bf4ccf432de4",
+    "probe-source-ingress.mjs": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67",
+    "probe-source-layout.mjs": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+    "run-source-layout.mjs": "f6c1da07bfddc64b644272ac27505f96c934cfd1be1454710ee5abe4e1ce7972",
+    "source-layout-pins.json": "c20df8d5c80ae81c8b70cd7eb1e5b85f7a41e46feab56e9a469c6739c0bf422a"
+  },
+  "referencesSHA256": "32a1dd321ebab6965b9c0e80fe4f0a8982d042658ee7af32b4ff91376c9a99b0",
+  "preparationFiles": {
+    "pin-candidate.py": "63f72142e71953bd3f09e6c62486e85f7a092a728d08a9c9e89f27f56bc460dc",
+    "vm-artifacts.py": "1331fdd62466efe6c793866eccda4fccf649de1f4f3040c84d5c84297c28f5bf",
+    "verify-results.py": "4a28ae450c7feb858f9974f045b526066f6b7a9eee16cf46f97a36e8b6f1bbfe",
+    "PLAN.md": "ad41bb0dce189449fb926ec2e9eb42ac2021e64647cd894c2c81bfc69cb3d438"
+  },
+  "conditions": 24,
+  "trials": 21,
+  "warmupMs": 1000,
+  "probeCounts": [
+    8,
+    16,
+    12
+  ],
+  "probeReady": true,
+  "expectedStaticDeltaFromTyped03": [
+    "errors.js",
+    "full.js",
+    "live-render.js",
+    "package.json"
+  ],
+  "candidateSource": "8175006345f3b66a6c9fd942814ed0ba5ff3014d",
+  "candidateWasm": "d5a8cbdccd9641e63acefb2d5ed66d3baa48c3d9cb70e5dc1917ca7c17f772b4",
+  "candidateManifestSHA256": "8dd76db1503ff24e0709c1663e3ebb95125ffc4521a0f137b51eb8e582fcb058",
+  "candidateManifestPath": "dist/perf-patches/parse-architecture/sankey-live-runtime/package.json",
+  "candidatePackagePath": "dist/perf-patches/parse-architecture/sankey-live-runtime/candidate-package",
+  "reviewedSourceManifestSHA256": "20c5201926f34513d658ba0a27b421027972c4971acc08ed898f6ea1382b68e2",
+  "reviewedStaticDelta": [
+    "errors.js",
+    "full.js",
+    "live-render.js",
+    "package.json"
+  ]
+}
