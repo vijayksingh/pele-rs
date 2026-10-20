@@ -1,0 +1,305 @@
+{
+  "source": "comparison.json",
+  "rows": [
+    {
+      "case": "sequence/small",
+      "stage": "parse",
+      "profile": "fixed",
+      "pairedPercent": 2.29556122463499,
+      "faster": 8,
+      "trials": 21,
+      "ratioOfMedians": 1.0231267342874586,
+      "wasmOverJS": 16.344837565206934
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-model",
+      "profile": "fixed",
+      "pairedPercent": -0.9645152982113103,
+      "faster": 12,
+      "trials": 21,
+      "ratioOfMedians": 1.0058319066387185,
+      "wasmOverJS": 6.787034449264325
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-source",
+      "profile": "fixed",
+      "pairedPercent": 2.6419406796315714,
+      "faster": 5,
+      "trials": 21,
+      "ratioOfMedians": 1.0187224755200834,
+      "wasmOverJS": 2.936508292123497
+    },
+    {
+      "case": "sequence/small",
+      "stage": "parse",
+      "profile": "canvas",
+      "pairedPercent": 7.095559673006702,
+      "faster": 5,
+      "trials": 21,
+      "ratioOfMedians": 1.0891544087569742,
+      "wasmOverJS": 17.42647868677113
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-model",
+      "profile": "canvas",
+      "pairedPercent": -0.1377441951317393,
+      "faster": 11,
+      "trials": 21,
+      "ratioOfMedians": 0.9620089452559034,
+      "wasmOverJS": 5.905138797322324
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-source",
+      "profile": "canvas",
+      "pairedPercent": 1.2376142733124817,
+      "faster": 8,
+      "trials": 21,
+      "ratioOfMedians": 1.0046201311449086,
+      "wasmOverJS": 2.534974279203746
+    },
+    {
+      "case": "er/small",
+      "stage": "parse",
+      "profile": "fixed",
+      "pairedPercent": -2.0115645658846715,
+      "faster": 12,
+      "trials": 21,
+      "ratioOfMedians": 0.9814448293274529,
+      "wasmOverJS": 13.267551106070213
+    },
+    {
+      "case": "er/small",
+      "stage": "render-model",
+      "profile": "fixed",
+      "pairedPercent": 78.95174844133352,
+      "faster": 0,
+      "trials": 21,
+      "ratioOfMedians": 1.7517153051479766,
+      "wasmOverJS": 7.512643748316272
+    },
+    {
+      "case": "er/small",
+      "stage": "render-source",
+      "profile": "fixed",
+      "pairedPercent": -0.09475293569632948,
+      "faster": 11,
+      "trials": 21,
+      "ratioOfMedians": 0.9890693199104916,
+      "wasmOverJS": 2.680490786691276
+    },
+    {
+      "case": "er/small",
+      "stage": "parse",
+      "profile": "canvas",
+      "pairedPercent": -8.100145448208906,
+      "faster": 18,
+      "trials": 21,
+      "ratioOfMedians": 0.9488179296532833,
+      "wasmOverJS": 12.848182007600437
+    },
+    {
+      "case": "er/small",
+      "stage": "render-model",
+      "profile": "canvas",
+      "pairedPercent": 75.7285860290984,
+      "faster": 0,
+      "trials": 21,
+      "ratioOfMedians": 1.7795698984104167,
+      "wasmOverJS": 6.707716436870551
+    },
+    {
+      "case": "er/small",
+      "stage": "render-source",
+      "profile": "canvas",
+      "pairedPercent": -2.6390420087044175,
+      "faster": 16,
+      "trials": 21,
+      "ratioOfMedians": 0.9772353802194444,
+      "wasmOverJS": 2.3713811629101738
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "profile": "fixed",
+      "pairedPercent": -5.786416754566204,
+      "faster": 15,
+      "trials": 21,
+      "ratioOfMedians": 0.9313830841280619,
+      "wasmOverJS": 9.82973872464198
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-model",
+      "profile": "fixed",
+      "pairedPercent": 79.92564602390866,
+      "faster": 0,
+      "trials": 21,
+      "ratioOfMedians": 1.78597776524355,
+      "wasmOverJS": 6.15776127735095
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "profile": "fixed",
+      "pairedPercent": 0.22773942568259375,
+      "faster": 9,
+      "trials": 21,
+      "ratioOfMedians": 0.9968847063788757,
+      "wasmOverJS": 2.301566857737956
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "profile": "canvas",
+      "pairedPercent": -2.484741522452527,
+      "faster": 13,
+      "trials": 21,
+      "ratioOfMedians": 0.9553344491834315,
+      "wasmOverJS": 10.204634889384026
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-model",
+      "profile": "canvas",
+      "pairedPercent": 76.86517759427831,
+      "faster": 0,
+      "trials": 21,
+      "ratioOfMedians": 1.7567010863366974,
+      "wasmOverJS": 5.256555211638965
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "profile": "canvas",
+      "pairedPercent": 0.4762962269843296,
+      "faster": 7,
+      "trials": 21,
+      "ratioOfMedians": 1,
+      "wasmOverJS": 2.1692660780629667
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse",
+      "profile": "fixed",
+      "pairedPercent": 2.8346032734272386,
+      "faster": 8,
+      "trials": 21,
+      "ratioOfMedians": 1.0219561010682676,
+      "wasmOverJS": 21.622928922629818
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-model",
+      "profile": "fixed",
+      "pairedPercent": 1.056613562242048,
+      "faster": 3,
+      "trials": 21,
+      "ratioOfMedians": 1.0167047267494604,
+      "wasmOverJS": 12.59864679756391
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-source",
+      "profile": "fixed",
+      "pairedPercent": -0.7004852773883741,
+      "faster": 13,
+      "trials": 21,
+      "ratioOfMedians": 0.9939932723110073,
+      "wasmOverJS": 4.026277230940053
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse",
+      "profile": "canvas",
+      "pairedPercent": 3.228593008481462,
+      "faster": 8,
+      "trials": 21,
+      "ratioOfMedians": 1.0297172732596653,
+      "wasmOverJS": 21.963077251727764
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-model",
+      "profile": "canvas",
+      "pairedPercent": 1.9542727245426494,
+      "faster": 5,
+      "trials": 21,
+      "ratioOfMedians": 1.0152615611177007,
+      "wasmOverJS": 11.930610180507356
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-source",
+      "profile": "canvas",
+      "pairedPercent": 1.205104519280531,
+      "faster": 8,
+      "trials": 21,
+      "ratioOfMedians": 1.011360935910919,
+      "wasmOverJS": 3.8357272785797547
+    },
+    {
+      "case": "er/large",
+      "stage": "parse",
+      "profile": "fixed",
+      "pairedPercent": -2.8367220120129266,
+      "faster": 12,
+      "trials": 21,
+      "ratioOfMedians": 1.111323155576475,
+      "wasmOverJS": 10.682292962529857
+    },
+    {
+      "case": "er/large",
+      "stage": "render-model",
+      "profile": "fixed",
+      "pairedPercent": 91.92064077187203,
+      "faster": 0,
+      "trials": 21,
+      "ratioOfMedians": 1.9672964567257119,
+      "wasmOverJS": 7.088706692183723
+    },
+    {
+      "case": "er/large",
+      "stage": "render-source",
+      "profile": "fixed",
+      "pairedPercent": 1.1870761007789499,
+      "faster": 4,
+      "trials": 21,
+      "ratioOfMedians": 1.0118707610077895,
+      "wasmOverJS": 2.3593030444208414
+    },
+    {
+      "case": "er/large",
+      "stage": "parse",
+      "profile": "canvas",
+      "pairedPercent": -5.009063912961043,
+      "faster": 16,
+      "trials": 21,
+      "ratioOfMedians": 1.0126504965586192,
+      "wasmOverJS": 6.219298364597936
+    },
+    {
+      "case": "er/large",
+      "stage": "render-model",
+      "profile": "canvas",
+      "pairedPercent": 90.2058122557098,
+      "faster": 0,
+      "trials": 21,
+      "ratioOfMedians": 1.9031119459920858,
+      "wasmOverJS": 5.537037517617097
+    },
+    {
+      "case": "er/large",
+      "stage": "render-source",
+      "profile": "canvas",
+      "pairedPercent": 1.4303453621498985,
+      "faster": 9,
+      "trials": 21,
+      "ratioOfMedians": 1.0110678607604977,
+      "wasmOverJS": 2.210620602424705
+    }
+  ]
+}

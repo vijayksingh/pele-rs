@@ -7,12 +7,19 @@ run locally on macOS because the VM cannot supply the macOS/AppKit SDK.
 No release, language choice or GPU availability implies otherwise. The target of
 matching or beating Pele JS remains open. Measured results, raw samples, artifact
 hashes, reproduction steps and unshipped compiler/schema experiments are in the
-[current ER token ownership report](benchmarks/2026-10-20-er-token-ownership/README.md).
+[last complete ER token ownership report](benchmarks/2026-10-20-er-token-ownership/README.md).
 The latest complete gate still fails all 126 measured conditions. Source,
 parse and retained medians across the matrix are 2.38×, 11.06× and 4.02× JS.
 Earlier direct Gantt construction improves scoped parse costs; current normalized
 projection improves Swift Gantt parse. VM diagnostics remain mixed, with control
 slowdowns disclosed. No 0.3 release.
+
+The newer [live ER storage report](benchmarks/2026-10-20-er-host-storage/README.md)
+records the authoritative-host-model architecture, its rejected construction
+stages, 30 independent VM conditions, 22 first-use conditions and local Swift
+checks/timings. ER parse remains mixed; retained rendering regresses by
+75.7–91.9% paired against the preceding backend. Fewer copies do not establish
+a speed improvement. Prepared/raw parity and the performance target remain open.
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |

@@ -183,6 +183,13 @@ Median ratios across all sizes/resources are **2.38× source**, **11.06× parse*
 and **4.02× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
+The newer [live ER storage checkpoint](docs/benchmarks/2026-10-20-er-host-storage/)
+removes persistent model copies and fixes ordinary ER callback state. Its
+30-condition VM comparison still shows mixed parse results and 75.7–91.9%
+slower retained ER rendering by paired medians against the preceding backend.
+Swift checks pass; timing controls and remaining prepared/raw API gaps are
+disclosed. This architecture is still under optimization, with no 0.3 release.
+
 The [direct-parse architecture checkpoint](docs/benchmarks/2026-10-20-direct-parse/)
 shares source preparation and grammar, then constructs Gantt's canonical public
 arena without temporary owned task records. Native public parse removes 438
