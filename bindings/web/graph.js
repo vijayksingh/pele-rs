@@ -98,9 +98,7 @@ export class ModelBridge {
     this.registration.documents.push(new WeakRef(this));
     this.disposed=false;
     this.invoke = (...args) => this.activeInvoke ? this.activeInvoke(...args) : invoke(...args);
-    // Every indexed key is already retained by objects until disposal.
-    // Cross-document receiver ownership remains the registry WeakMap.
-    this.ids = new Map();
+    this.ids = new WeakMap();
     this.hostIds = new Map();
     this.hostValues = [];
     this.objects = [];

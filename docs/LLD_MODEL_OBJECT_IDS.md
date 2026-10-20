@@ -1,6 +1,8 @@
-# ModelBridge document-owned object index
+# Rejected experiment: document-owned object index
 
-Internal ownership change following `11f27516d98c3d89799a7fe2065eec0bd4e147cf`. `ModelBridge.ids` becomes `Map`; disposal nulls it alongside `objects`. Registry receiver ownership remains WeakMap. HostErOwner/CapturedOwner and all traversal, admission and publication ordering remain unchanged. No performance claim.
+**Status: reverted after matched VM measurement.** Small Sankey parse cases regressed 1.27–3.78%; five of six retained-render conditions regressed. Other effects were small and mixed. The experiment did not justify changing the validated baseline. Full raw results are retained separately.
+
+Experiment following `11f27516d98c3d89799a7fe2065eec0bd4e147cf`. `ModelBridge.ids` becomes `Map`; disposal nulls it alongside `objects`. Registry receiver ownership remains WeakMap. HostErOwner/CapturedOwner and all traversal, admission and publication ordering remain unchanged. No performance claim.
 
 ## Strong-reference domination
 

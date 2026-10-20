@@ -127,7 +127,6 @@ function releaseDisposedBridge(bridge) {
   bridge.strings = null;
   bridge.stringIds = null;
   bridge.objects = null;
-  bridge.ids = null;
   bridge.root = null;
   bridge.hostIds = null;
   bridge.hostValues = null;
