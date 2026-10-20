@@ -194,6 +194,41 @@ impl MutableDocument {
         };
         run().map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))
     }
+
+    pub fn invoke_source_layout_with_functions(
+        &mut self,
+        revision: &str,
+        call_json: &str,
+        dispatcher: js_sys::Function,
+    ) -> Result<JsValue, JsValue> {
+        let run = || -> Result<JsValue, PeleError> {
+            if call_json.len() > MAX_BYTES {
+                return Err(invalid(
+                    "Public method JSON exceeds 64 MiB transport budget",
+                ));
+            }
+            let revision = revision
+                .parse::<u64>()
+                .map_err(|_| invalid("Invalid public model revision"))?;
+            let call = serde_json::from_str(call_json)
+                .map_err(|_| invalid("Invalid public model method call"))?;
+            let mut host = BrowserResources {
+                width: None,
+                icons: None,
+            };
+            let outcome = self.inner.invoke_read(
+                revision,
+                call,
+                &mut Resources {
+                    host: &mut host,
+                    dispatcher,
+                },
+            )?;
+            let metadata = render_numbers::encode(&outcome.result)?;
+            super::source_layout::outcome(outcome.revision, &outcome.graph, &metadata)
+        };
+        run().map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))
+    }
     #[allow(clippy::too_many_arguments)]
     pub fn render_numbers_operation_binary_with_functions(
         &mut self,
@@ -286,6 +321,64 @@ impl MutableDocument {
                 .as_ref()
                 .map(pele::compat::render_result_transport);
             super::render_packet::arena(
+                outcome.revision,
+                &outcome.graph,
+                false,
+                outcome
+                    .result
+                    .as_ref()
+                    .map_or("", |value| value.diagram_type.as_str()),
+                outcome.result.as_ref().ok().map(|value| &value.rendered),
+                &transport,
+            )
+        };
+        run()
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_numbers_operation_source_layout_with_functions(
+        &mut self,
+        revision: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        output_kind: u32,
+        output: f64,
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+        dispatcher: js_sys::Function,
+    ) -> Result<JsValue, JsValue> {
+        let run = || -> Result<JsValue, JsValue> {
+            let (options, limit) =
+                render_numbers::options(json, mask, numbers, output_kind, output)
+                    .map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))?;
+            let revision = revision.parse::<u64>().map_err(|_| {
+                JsValue::from_str(&render_numbers::failure(&invalid(
+                    "Invalid public model revision",
+                )))
+            })?;
+            let mut host = render_numbers::NumericResources {
+                browser: BrowserResources { width, icons },
+                clock,
+            };
+            let outcome = self
+                .inner
+                .render_operation_bounded_read(
+                    revision,
+                    &options,
+                    limit,
+                    &mut Resources {
+                        host: &mut host,
+                        dispatcher,
+                    },
+                )
+                .map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))?;
+            let transport = outcome
+                .result
+                .as_ref()
+                .map(pele::compat::render_result_transport);
+            super::source_layout::render(
                 outcome.revision,
                 &outcome.graph,
                 false,

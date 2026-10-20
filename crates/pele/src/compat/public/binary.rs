@@ -48,29 +48,29 @@ pub(super) fn check_bytes(
         Ok(())
     }
 }
-struct Writer {
-    bytes: Vec<u8>,
-    budget: usize,
+pub(crate) struct Writer {
+    pub(crate) bytes: Vec<u8>,
+    pub(crate) budget: usize,
 }
 impl Writer {
-    fn put(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
+    pub(crate) fn put(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
         check_bytes(self.bytes.len(), bytes.len(), self.budget)?;
         self.bytes.extend_from_slice(bytes);
         Ok(())
     }
-    fn byte(&mut self, value: u8) -> Result<(), PeleError> {
+    pub(crate) fn byte(&mut self, value: u8) -> Result<(), PeleError> {
         self.put(&[value])
     }
-    fn u32(&mut self, value: u32) -> Result<(), PeleError> {
+    pub(crate) fn u32(&mut self, value: u32) -> Result<(), PeleError> {
         self.put(&value.to_le_bytes())
     }
-    fn count(&mut self, value: usize) -> Result<(), PeleError> {
+    pub(crate) fn count(&mut self, value: usize) -> Result<(), PeleError> {
         self.u32(u32::try_from(value).map_err(|_| limit())?)
     }
-    fn number(&mut self, value: f64) -> Result<(), PeleError> {
+    pub(crate) fn number(&mut self, value: f64) -> Result<(), PeleError> {
         self.put(&value.to_bits().to_le_bytes())
     }
-    fn atom(&mut self, value: &Atom) -> Result<(), PeleError> {
+    pub(crate) fn atom(&mut self, value: &Atom) -> Result<(), PeleError> {
         match value {
             Atom::Undefined => self.byte(0),
             Atom::Null => self.byte(1),
@@ -98,7 +98,7 @@ impl Writer {
             }
         }
     }
-    fn properties(&mut self, values: &[Property]) -> Result<(), PeleError> {
+    pub(crate) fn properties(&mut self, values: &[Property]) -> Result<(), PeleError> {
         self.count(values.len())?;
         for p in values {
             self.u32(p.key)?;
@@ -107,7 +107,7 @@ impl Writer {
         }
         Ok(())
     }
-    fn node(&mut self, node: &Node) -> Result<(), PeleError> {
+    pub(crate) fn node(&mut self, node: &Node) -> Result<(), PeleError> {
         match node {
             Node::Error { error_type, .. } => {
                 self.byte(6)?;
@@ -374,4 +374,121 @@ pub fn decode_binary_exchange(
         graph,
         metadata: bytes[graph_end..].to_vec(),
     })
+}
+
+// Internal logical transport shares the same writer and ordered structural
+// admission. Explicit byte decoders and ordinary arena encoding are unchanged.
+pub(crate) fn encode_read_exchange(
+    revision: u64,
+    graph: &dyn super::graph_read::PublicGraphRead,
+    metadata: &[u8],
+    byte_budget: usize,
+) -> Result<Vec<u8>, PeleError> {
+    use super::captured_admission as admission;
+    admission::validate(&mut super::graph_read::ReadAdapter(graph))?;
+    let extent = graph.extent();
+    let mut w = Writer {
+        bytes: Vec::new(),
+        budget: byte_budget,
+    };
+    w.put(MAGIC)?;
+    w.u32(extent.version)?;
+    w.put(&revision.to_le_bytes())?;
+    w.count(metadata.len())?;
+    w.atom(&graph.root())?;
+    w.count(extent.strings)?;
+    for id in 0..extent.strings {
+        let length = graph.string_length(id)?;
+        w.count(length)?;
+        let mut seen = 0usize;
+        graph.string_chunks(id, &mut |units| {
+            seen = seen
+                .checked_add(units.len())
+                .filter(|n| *n <= length)
+                .ok_or_else(invalid)?;
+            for unit in units {
+                w.put(&unit.to_le_bytes())?;
+            }
+            Ok(())
+        })?;
+        if seen != length {
+            return Err(invalid());
+        }
+    }
+    w.count(extent.nodes)?;
+    for id in 0..extent.nodes {
+        write_read_node(&mut w, graph, id)?;
+    }
+    w.put(metadata)?;
+    Ok(w.bytes)
+}
+
+pub(crate) fn write_read_node(
+    w: &mut Writer,
+    graph: &dyn super::graph_read::PublicGraphRead,
+    id: usize,
+) -> Result<(), PeleError> {
+    use super::captured_admission::AdmissionKind;
+    let header = graph.header(id)?;
+    match header.kind {
+        AdmissionKind::Object => w.byte(0)?,
+        AdmissionKind::Instance(p) => {
+            w.byte(1)?;
+            w.u32(p.0)?;
+        }
+        AdmissionKind::Array(n) => {
+            w.byte(2)?;
+            w.u32(n)?;
+        }
+        AdmissionKind::Map(n) => {
+            w.byte(3)?;
+            w.count(n)?;
+            super::graph_read::visit_map(graph, id, |pairs| {
+                for (k, v) in pairs {
+                    w.atom(k)?;
+                    w.atom(v)?;
+                }
+                Ok(())
+            })?;
+        }
+        AdmissionKind::Set(n) => {
+            w.byte(4)?;
+            w.count(n)?;
+            super::graph_read::visit_set(graph, id, |values| {
+                for v in values {
+                    w.atom(v)?;
+                }
+                Ok(())
+            })?;
+        }
+        AdmissionKind::Date(bits) => {
+            w.byte(5)?;
+            w.put(&bits.to_le_bytes())?;
+        }
+        AdmissionKind::Error(kind) => {
+            w.byte(6)?;
+            w.byte(match kind {
+                ErrorObjectKind::Error => 0,
+                ErrorObjectKind::Pele => 1,
+                ErrorObjectKind::Type => 2,
+                ErrorObjectKind::Range => 3,
+                ErrorObjectKind::Syntax => 4,
+                ErrorObjectKind::Reference => 5,
+                ErrorObjectKind::Eval => 6,
+                ErrorObjectKind::Uri => 7,
+            })?;
+        }
+        AdmissionKind::InvalidArray | AdmissionKind::InvalidError => return Err(invalid()),
+    }
+    w.count(header.properties)?;
+    super::graph_read::visit_properties(graph, id, |properties| {
+        for p in properties {
+            w.u32(p.key)?;
+            w.byte(p.flags)?;
+            w.atom(&p.value)?;
+        }
+        Ok(())
+    })?;
+
+    Ok(())
 }

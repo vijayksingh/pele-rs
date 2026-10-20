@@ -410,7 +410,7 @@ pub unsafe extern "C" fn pele_public_invoke_with_functions_v12(
         let mut document = unsafe { public::document(handle) }?;
         let outcome = unsafe {
             with_resources(handle, resources, |host| {
-                document.invoke(revision, call, host)
+                document.invoke_read(revision, call, host)
             })
         }?;
         public::binary_metadata(outcome.revision, &outcome.graph, &outcome.result)

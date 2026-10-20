@@ -152,7 +152,7 @@ pub unsafe extern "C" fn pele_public_render_presentation_v11(
         let (outcome, presentation) = unsafe {
             super::host_functions::with_resources(handle, resources, |host| {
                 let mut capture = PresentationCapture::new(host, budget);
-                let outcome = document.render_operation_bounded_view(
+                let outcome = document.render_operation_bounded_read(
                     expected_revision,
                     &options,
                     limit,

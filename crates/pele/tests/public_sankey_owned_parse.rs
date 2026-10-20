@@ -206,14 +206,29 @@ impl PublicDiagramModule for Delegated {
     }
 }
 fn bytes(document: &PublicDocument) -> Vec<u8> {
-    encode_binary_exchange(
+    let view = document.snapshot_read().unwrap();
+    let actual = view
+        .encode_binary(document.revision(), &[], DEFAULT_BINARY_BUDGET)
+        .unwrap();
+    let expected = encode_binary_exchange(
         document.revision(),
         &document.snapshot_view().unwrap(),
         &[],
         DEFAULT_BINARY_BUDGET,
     )
-    .unwrap()
+    .unwrap();
+    assert!(
+        actual == expected,
+        "logical snapshot differs from public canonical snapshot"
+    );
+    assert_eq!(
+        view.canonical_binary_size(0, DEFAULT_BINARY_BUDGET)
+            .unwrap(),
+        expected.len()
+    );
+    actual
 }
+
 fn same(a: Result<PublicDocument, PeleError>, b: Result<PublicDocument, PeleError>, label: &str) {
     match (a, b) {
         (Ok(a), Ok(b)) => assert!(bytes(&a) == bytes(&b), "graph table differs: {label}"),
@@ -616,4 +631,205 @@ fn sankey_indexed_source_preserves_resource_order_and_public_typed_projection() 
         }
         assert!(bytes(&actual) == bytes(&expected));
     }
+}
+
+#[test]
+fn sankey_logical_outcomes_preserve_first_use_partial_errors_and_recovery() {
+    let mut actual = PublicEngine::with_builtins()
+        .parse(SOURCE, &Default::default())
+        .unwrap();
+    let mut expected = legacy_engine().parse(SOURCE, &Default::default()).unwrap();
+    let original = expected.snapshot().unwrap();
+    // Actual document has not exported/materialized any ModelGraph before its
+    // first unchanged render or its first helper call.
+    {
+        let a = actual
+            .render_operation_read(0, &Default::default(), &mut MetricsResources)
+            .unwrap();
+        let b = expected
+            .render_operation(0, &Default::default(), &mut MetricsResources)
+            .unwrap();
+        match (&a.result, &b.result) {
+            (Ok(a), Ok(b)) => {
+                assert_eq!(a, b);
+                assert_eq!(a.rendered.width.to_bits(), b.rendered.width.to_bits());
+                assert_eq!(a.rendered.height.to_bits(), b.rendered.height.to_bits());
+            }
+            _ => assert_eq!(
+                serde_json::to_vec(&a.result).unwrap(),
+                serde_json::to_vec(&b.result).unwrap()
+            ),
+        }
+        assert_eq!(a.revision, b.revision);
+        assert!(
+            a.graph
+                .encode_binary(a.revision, &[], DEFAULT_BINARY_BUDGET)
+                .unwrap()
+                == encode_binary_exchange(b.revision, &b.graph, &[], DEFAULT_BINARY_BUDGET)
+                    .unwrap()
+        );
+    }
+    let call = MethodCall {
+        method: MethodId(1),
+        receiver: original.root.clone(),
+        arguments: vec![Atom::Number(123.)],
+    };
+    {
+        let a = actual
+            .invoke_read(1, call.clone(), &mut MetricsResources)
+            .unwrap();
+        let b = expected.invoke(1, call, &mut MetricsResources).unwrap();
+        assert_eq!(
+            serde_json::to_vec(&a.result).unwrap(),
+            serde_json::to_vec(&b.result).unwrap()
+        );
+        assert!(
+            a.graph
+                .encode_binary(a.revision, &[], DEFAULT_BINARY_BUDGET)
+                .unwrap()
+                == encode_binary_exchange(b.revision, &b.graph, &[], DEFAULT_BINARY_BUDGET)
+                    .unwrap()
+        );
+        assert_eq!(
+            serde_json::to_vec(&a.graph).unwrap(),
+            serde_json::to_vec(&b.graph).unwrap()
+        );
+    }
+    assert_eq!(
+        actual
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err(),
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err()
+    );
+    for document in [&mut actual, &mut expected] {
+        document.apply(2, original.clone()).unwrap();
+    }
+    let root = match original.root {
+        Atom::Ref(id) => id,
+        _ => panic!(),
+    };
+    let nodes = original.nodes[root as usize]
+        .properties()
+        .iter()
+        .find(|p| original.strings[p.key as usize].is("nodes"))
+        .unwrap()
+        .value
+        .clone();
+    let nodes = match nodes {
+        Atom::Ref(id) => id,
+        _ => panic!(),
+    };
+    let mut locked = original.clone();
+    let length_key = locked.strings.len() as u32;
+    locked.strings.push(JsString::from("length"));
+    let Node::Array { length, properties } = &mut locked.nodes[nodes as usize] else {
+        panic!()
+    };
+    properties.push(Property {
+        key: length_key,
+        value: Atom::Number(*length as f64),
+        flags: 0,
+    });
+    for document in [&mut actual, &mut expected] {
+        document.apply(3, locked.clone()).unwrap();
+    }
+    let call = MethodCall {
+        method: MethodId(1),
+        receiver: Atom::Ref(root),
+        arguments: vec![Atom::Number(456.)],
+    };
+    {
+        let a = actual
+            .invoke_read(4, call.clone(), &mut MetricsResources)
+            .unwrap();
+        let b = expected.invoke(4, call, &mut MetricsResources).unwrap();
+        assert!(a.result.is_err());
+        assert_eq!(
+            serde_json::to_vec(&a.result).unwrap(),
+            serde_json::to_vec(&b.result).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_vec(&a.graph).unwrap(),
+            serde_json::to_vec(&b.graph).unwrap()
+        );
+        assert!(
+            a.graph
+                .encode_binary(a.revision, &[], DEFAULT_BINARY_BUDGET)
+                .unwrap()
+                == encode_binary_exchange(b.revision, &b.graph, &[], DEFAULT_BINARY_BUDGET)
+                    .unwrap()
+        );
+    }
+    for document in [&mut actual, &mut expected] {
+        document.apply(5, original.clone()).unwrap();
+    }
+    assert_eq!(
+        actual
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap(),
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap()
+    );
+}
+
+#[test]
+fn sankey_logical_history_and_combined_transport_limits_match_public_graphs() {
+    let mut actual = PublicEngine::with_builtins()
+        .parse(SOURCE, &Default::default())
+        .unwrap();
+    let mut expected = legacy_engine().parse(SOURCE, &Default::default()).unwrap();
+    let mut graph = expected.snapshot().unwrap();
+    let key = graph.strings.len() as u32;
+    graph.strings.extend([
+        JsString(vec![0xd800, 0, 0xdc00]),
+        JsString::from("A"),
+        JsString::from("A"),
+    ]);
+    let nan = f64::from_bits(0x7ff8000000000042);
+    graph.nodes.push(Node::Date {
+        milliseconds: -0.,
+        properties: vec![Property {
+            key,
+            value: Atom::Number(nan),
+            flags: 1,
+        }],
+    });
+    graph.nodes.push(Node::Set {
+        values: vec![Atom::Number(-0.), Atom::Number(nan)],
+        properties: vec![],
+    });
+    graph.nodes.push(Node::Error {
+        error_type: ErrorObjectKind::Type,
+        properties: vec![],
+    });
+    for document in [&mut actual, &mut expected] {
+        document.apply(0, graph.clone()).unwrap();
+    }
+    let view = actual.snapshot_read().unwrap();
+    let old = expected.snapshot().unwrap();
+    assert_eq!(
+        serde_json::to_vec(&view).unwrap(),
+        serde_json::to_vec(&old).unwrap()
+    );
+    let metadata = b"\"quoted UTF8 \xf0\x9f\x98\x80\"";
+    let frame = encode_binary_exchange(1, &old, metadata, DEFAULT_BINARY_BUDGET).unwrap();
+    assert_eq!(
+        view.canonical_binary_size(metadata.len(), frame.len())
+            .unwrap(),
+        frame.len() - metadata.len()
+    );
+    assert!(view.encode_binary(1, metadata, frame.len()).unwrap() == frame);
+    assert_eq!(
+        view.canonical_binary_size(metadata.len(), frame.len() - 1)
+            .unwrap_err(),
+        encode_binary_exchange(1, &old, metadata, frame.len() - 1).unwrap_err()
+    );
+    assert_eq!(
+        view.encode_binary(1, metadata, frame.len() - 1)
+            .unwrap_err(),
+        encode_binary_exchange(1, &old, metadata, frame.len() - 1).unwrap_err()
+    );
 }

@@ -25,6 +25,9 @@ legacy projection for public providers and other diagram registrations.
 [Owned public construction](LLD_OWNED_PUBLIC_CONSTRUCTION.md) transfers captured
 parser storage through an additive codec hook; Sankey normalizes its owned model
 without reconstructing a second render model from the fresh graph.
+[Source-backed canonical models](LLD_SOURCE_CANONICAL.md) derive fresh Sankey
+records from indexed source, retain sparse edits and publish through a shared
+logical read interface while preserving existing owned graph APIs.
 [Shared construction storage](LLD_SHARED_CONSTRUCTION.md) gives ER and Sankey
 one ordered sink while preserving arena construction and existing host exports.
 [Captured projection](LLD_CAPTURED_PROJECTION.md) separates Sankey's eager

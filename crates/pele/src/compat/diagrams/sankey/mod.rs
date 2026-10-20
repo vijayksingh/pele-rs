@@ -33,3 +33,5 @@ impl DiagramModule for Sankey {
         render::render(m, c, o, r)
     }
 }
+
+mod source_store;

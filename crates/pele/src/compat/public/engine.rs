@@ -1,3 +1,4 @@
+use super::graph_read::{GraphReadView, PublicGraphRead, ReadAdapter};
 use super::{
     schema::CompiledSchema, Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph,
     ModelSchema, ModelSchemaView, PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
@@ -129,6 +130,16 @@ pub trait PublicDiagramModule: DiagramModule {
     /// Optional allocation-free export of the same graph as `export_public`.
     /// Opt in only when export has no additional observable work or failures;
     /// document snapshots still validate this graph against the retained schema.
+    fn has_source_layout(&self, _state: &Self::PublicState) -> bool {
+        false
+    }
+    /// Additive logical export. Existing providers retain their original export path.
+    fn borrow_public_read<'a>(
+        &self,
+        _state: &'a Self::PublicState,
+    ) -> Option<&'a dyn PublicGraphRead> {
+        None
+    }
     fn borrow_public_graph<'a>(&self, _state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
         None
     }
@@ -310,6 +321,8 @@ trait Erased: Send + Sync {
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
     fn borrow_graph<'a>(&self, state: &'a State) -> Option<&'a ModelGraph>;
+    fn has_source_layout(&self, state: &State) -> bool;
+    fn borrow_read<'a>(&self, state: &'a State) -> Option<&'a dyn PublicGraphRead>;
     fn unchanged_public_graph_is_noop(&self) -> bool;
     fn apply(&self, state: &mut State, graph: ModelGraph) -> Result<(), PeleError>;
     fn invoke(
@@ -390,6 +403,14 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
             .export_public(s.downcast_ref().expect("paired public state"))
+    }
+    fn has_source_layout(&self, s: &State) -> bool {
+        self.0
+            .has_source_layout(s.downcast_ref().expect("paired public state"))
+    }
+    fn borrow_read<'a>(&self, s: &'a State) -> Option<&'a dyn PublicGraphRead> {
+        self.0
+            .borrow_public_read(s.downcast_ref().expect("paired public state"))
     }
     fn borrow_graph<'a>(&self, s: &'a State) -> Option<&'a ModelGraph> {
         self.0
@@ -483,6 +504,21 @@ impl Registration {
             .get_or_init(|| CompiledSchema::new(self.schema))
             .as_ref()
             .map_err(Clone::clone)
+    }
+    fn validate_read(&self, graph: &GraphReadView<'_>) -> Result<(), PeleError> {
+        match graph {
+            GraphReadView::Arena(g) => self.validate_graph(g),
+            GraphReadView::Logical(g) => {
+                let schema = self.compiled_schema()?;
+                let mut read = ReadAdapter(*g);
+                super::captured_admission::validate(&mut read)?;
+                super::captured_admission::validate_schema_ids(
+                    &mut read,
+                    schema.methods(),
+                    schema.prototypes(),
+                )
+            }
+        }
     }
     fn validate_graph(&self, graph: &ModelGraph) -> Result<(), PeleError> {
         graph.validate_compiled(self.compiled_schema()?)
@@ -984,16 +1020,45 @@ impl RawRenderOutcomeView<'_> {
         }
     }
 }
+/// Validated logical post-state. Its borrow is independent of resources.
+#[derive(Debug)]
+pub struct ReadOutcome<'a, T> {
+    pub revision: u64,
+    pub graph: GraphReadView<'a>,
+    pub result: Result<T, PublicError>,
+}
+impl<'a> ReadOutcome<'a, RenderResult> {
+    fn into_render_view(self) -> Result<RenderOutcomeView<'a>, PeleError> {
+        Ok(RenderOutcomeView {
+            revision: self.revision,
+            graph: self.graph.into_model()?,
+            result: self.result,
+        })
+    }
+}
+impl<'a> ReadOutcome<'a, Rendered> {
+    fn into_raw_view(self) -> Result<RawRenderOutcomeView<'a>, PeleError> {
+        Ok(RawRenderOutcomeView {
+            revision: self.revision,
+            graph: self.graph.into_model()?,
+            result: self.result,
+        })
+    }
+}
 #[derive(Clone, Copy)]
 enum GraphExport {
     Owned,
     Borrowed,
+    Logical,
 }
 impl GraphExport {
-    fn finish(self, graph: Cow<'_, ModelGraph>) -> Cow<'_, ModelGraph> {
+    fn finish(self, graph: GraphReadView<'_>) -> Result<GraphReadView<'_>, PeleError> {
         match self {
-            Self::Owned => Cow::Owned(graph.into_owned()),
-            Self::Borrowed => graph,
+            Self::Logical => Ok(graph),
+            Self::Borrowed => Ok(GraphReadView::Arena(graph.into_model()?)),
+            Self::Owned => Ok(GraphReadView::Arena(Cow::Owned(
+                graph.into_model()?.into_owned(),
+            ))),
         }
     }
 }
@@ -1102,8 +1167,20 @@ impl PublicDocument {
     /// The document cannot mutate while this view is retained. Extensions that
     /// only implement owned export retain that export and its original errors.
     pub fn snapshot_view(&self) -> Result<Cow<'_, ModelGraph>, PeleError> {
-        let graph = self.graph_view()?;
-        self.registration.validate_graph(&graph)?;
+        self.snapshot_read()?.into_model()
+    }
+    pub fn has_source_layout(&self) -> bool {
+        self.registration.codec.has_source_layout(&self.state)
+    }
+    fn read_view(&self) -> Result<GraphReadView<'_>, PeleError> {
+        Ok(match self.registration.codec.borrow_read(&self.state) {
+            Some(g) => GraphReadView::Logical(g),
+            None => GraphReadView::Arena(self.graph_view()?),
+        })
+    }
+    pub fn snapshot_read(&self) -> Result<GraphReadView<'_>, PeleError> {
+        let graph = self.read_view()?;
+        self.registration.validate_read(&graph)?;
         Ok(graph)
     }
     pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
@@ -1135,6 +1212,28 @@ impl PublicDocument {
         call: MethodCall,
         host: &mut dyn RenderResources,
     ) -> Result<InvocationOutcome, PeleError> {
+        let outcome = self.invoke_policy(expected_revision, call, host, GraphExport::Owned)?;
+        Ok(InvocationOutcome {
+            revision: outcome.revision,
+            graph: outcome.graph.into_model()?.into_owned(),
+            result: outcome.result,
+        })
+    }
+    pub fn invoke_read(
+        &mut self,
+        expected_revision: u64,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, Atom>, PeleError> {
+        self.invoke_policy(expected_revision, call, host, GraphExport::Logical)
+    }
+    fn invoke_policy(
+        &mut self,
+        expected_revision: u64,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+        export: GraphExport,
+    ) -> Result<ReadOutcome<'_, Atom>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
@@ -1146,39 +1245,52 @@ impl PublicDocument {
             .checked_add(1)
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
         {
-            let before = self.graph_view()?;
-            call.validate_compiled(&before, self.registration.compiled_schema()?)?;
+            let before = self.read_view()?;
+            match &before {
+                GraphReadView::Arena(graph) => {
+                    call.validate_compiled(graph, self.registration.compiled_schema()?)?
+                }
+                GraphReadView::Logical(_) => {
+                    self.registration.validate_read(&before)?;
+                    super::schema::validate_call_after_graph(
+                        &call,
+                        before.reader().extent(),
+                        self.registration.compiled_schema()?.methods(),
+                    )?;
+                }
+            }
         }
         let mut result = self
             .registration
             .codec
             .invoke(&mut self.state, call, &self.config, host);
         self.revision = next;
-        let graph = self.snapshot()?;
+        let graph = export.finish(self.snapshot_read()?)?;
         // A malformed native return is an operation protocol error, while its
         // successful partial mutations still publish in the same outcome.
         if let Ok(atom) = &result {
-            let checked = graph.validate_atom(atom).and_then(|_| {
-                if let Atom::BuiltinFunction(id) = atom {
-                    if self
-                        .registration
-                        .schema
-                        .method(super::MethodId(*id))
-                        .is_none()
-                    {
-                        return Err(PeleError::new(
-                            "Unknown public builtin function",
-                            ErrorCode::Semantic,
-                        ));
+            let checked =
+                super::captured_admission::atom(graph.reader().extent(), atom).and_then(|_| {
+                    if let Atom::BuiltinFunction(id) = atom {
+                        if self
+                            .registration
+                            .schema
+                            .method(super::MethodId(*id))
+                            .is_none()
+                        {
+                            return Err(PeleError::new(
+                                "Unknown public builtin function",
+                                ErrorCode::Semantic,
+                            ));
+                        }
                     }
-                }
-                Ok(())
-            });
+                    Ok(())
+                });
             if let Err(e) = checked {
                 result = Err(e.into());
             }
         }
-        Ok(InvocationOutcome {
+        Ok(ReadOutcome {
             revision: next,
             graph,
             result,
@@ -1200,6 +1312,7 @@ impl PublicDocument {
             host,
             GraphExport::Owned,
         )
+        .and_then(ReadOutcome::into_raw_view)
         .map(RawRenderOutcomeView::into_owned)
     }
     /// Borrow the validated post-state without changing dispatch or revision order.
@@ -1217,6 +1330,16 @@ impl PublicDocument {
             host,
             GraphExport::Borrowed,
         )
+        .and_then(ReadOutcome::into_raw_view)
+    }
+    pub fn render_raw_operation_read(
+        &mut self,
+        revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, Rendered>, PeleError> {
+        self.render_raw_operation_policy(revision, config, settings, host, GraphExport::Logical)
     }
     fn render_raw_operation_policy(
         &mut self,
@@ -1225,7 +1348,7 @@ impl PublicDocument {
         settings: &RenderSettings,
         host: &mut dyn RenderResources,
         export: GraphExport,
-    ) -> Result<RawRenderOutcomeView<'_>, PeleError> {
+    ) -> Result<ReadOutcome<'_, Rendered>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
@@ -1236,7 +1359,7 @@ impl PublicDocument {
             .revision
             .checked_add(1)
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        self.snapshot_view()?;
+        self.snapshot_read()?;
         let mut operation_error = None;
         let result = crate::compat::engine::render_raw_registered(
             &self.registration.descriptor,
@@ -1254,8 +1377,8 @@ impl PublicDocument {
         )
         .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
         self.revision = next;
-        let graph = export.finish(self.snapshot_view()?);
-        Ok(RawRenderOutcomeView {
+        let graph = export.finish(self.snapshot_read()?)?;
+        Ok(ReadOutcome {
             revision: next,
             graph,
             result,
@@ -1277,6 +1400,7 @@ impl PublicDocument {
             false,
             GraphExport::Owned,
         )
+        .and_then(ReadOutcome::into_render_view)
         .map(RenderOutcomeView::into_owned)
     }
     /// Exact output comparison after rendering. Dispatched mutations/revision
@@ -1296,6 +1420,7 @@ impl PublicDocument {
             true,
             GraphExport::Owned,
         )
+        .and_then(ReadOutcome::into_render_view)
         .map(RenderOutcomeView::into_owned)
     }
     /// Additive native lane: bound returned SVG bytes even when the caller keeps
@@ -1315,6 +1440,7 @@ impl PublicDocument {
             true,
             GraphExport::Owned,
         )
+        .and_then(ReadOutcome::into_render_view)
         .map(RenderOutcomeView::into_owned)
     }
     /// Legacy output policy with a validated borrowed post-state.
@@ -1332,6 +1458,7 @@ impl PublicDocument {
             false,
             GraphExport::Borrowed,
         )
+        .and_then(ReadOutcome::into_render_view)
     }
     /// Exact output policy with a validated borrowed post-state.
     pub fn render_operation_with_output_limit_view(
@@ -1349,6 +1476,7 @@ impl PublicDocument {
             true,
             GraphExport::Borrowed,
         )
+        .and_then(ReadOutcome::into_render_view)
     }
     /// Bounded rendering with a validated borrowed post-state. Existing owned
     /// APIs still materialize their graph before publishing presentation.
@@ -1367,6 +1495,40 @@ impl PublicDocument {
             true,
             GraphExport::Borrowed,
         )
+        .and_then(ReadOutcome::into_render_view)
+    }
+    pub fn render_operation_read(
+        &mut self,
+        revision: u64,
+        options: &RenderOptions,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
+        self.render_operation_policy(revision, options, host, None, false, GraphExport::Logical)
+    }
+    pub fn render_operation_with_output_limit_read(
+        &mut self,
+        revision: u64,
+        options: &RenderOptions,
+        limit: OutputLimit,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
+        self.render_operation_policy(
+            revision,
+            options,
+            host,
+            Some(limit),
+            true,
+            GraphExport::Logical,
+        )
+    }
+    pub fn render_operation_bounded_read(
+        &mut self,
+        revision: u64,
+        options: &RenderOptions,
+        limit: Option<OutputLimit>,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
+        self.render_operation_policy(revision, options, host, limit, true, GraphExport::Logical)
     }
     fn render_operation_policy(
         &mut self,
@@ -1376,7 +1538,7 @@ impl PublicDocument {
         limit: Option<OutputLimit>,
         enforce_native_bytes: bool,
         export: GraphExport,
-    ) -> Result<RenderOutcomeView<'_>, PeleError> {
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
@@ -1387,7 +1549,7 @@ impl PublicDocument {
             .revision
             .checked_add(1)
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        self.snapshot_view()?;
+        self.snapshot_read()?;
         let mut operation_error = None;
         let mut presentation = crate::compat::PresentationCapture::deferred(host);
         let result = crate::compat::engine::render_registered_policy(
@@ -1423,9 +1585,9 @@ impl PublicDocument {
         self.revision = next;
         // The owned policy clones here, at the original snapshot stage. Its
         // wrapper only moves that already owned graph after publication.
-        let graph = export.finish(self.snapshot_view()?);
+        let graph = export.finish(self.snapshot_read()?)?;
         presentation.publish();
-        Ok(RenderOutcomeView {
+        Ok(ReadOutcome {
             revision: next,
             graph,
             result,

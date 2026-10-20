@@ -1,5 +1,14 @@
-import {numberValue, reconcileNestedGraph as reconcileGraph, matchesNestedGraph as matchesGraph, snapshotNestedGraph as snapshotGraph} from './graph-storage.js';
+import {LayoutGraph,LayoutStorage,applyLayoutDelta} from './layout-storage.js';
+import {getGraphTraversal,numberValue, reconcileNestedGraph as reconcileGraph, matchesNestedGraph as matchesGraph, snapshotNestedGraph as snapshotGraph} from './graph-storage.js';
 export {stringValue} from './graph-storage.js';
+const layoutTraversal=getGraphTraversal(LayoutStorage);
+const layoutMethods={
+  reconcile(graph,changed){if(!(graph instanceof LayoutGraph))throw new TypeError('Source layout outcome lost its baseline');return layoutTraversal.reconcileGraph(this,graph,changed);},
+  reconcileDelta(delta){return this.reconcile(applyLayoutDelta(this.graph,delta),delta.nodes.map(([id])=>id));},
+  matchesPublishedGraph(){return layoutTraversal.matchesGraph(this);},
+  snapshot(values=[],delta=false){return layoutTraversal.snapshotGraph(this,values,delta);},
+  hostReferenceId(value){if(!this.hostIds.has(value)){if(this.hostValues.length>=1_000_000)throw new RangeError('Host reference budget exceeded');this.hostIds.set(value,this.hostValues.length);this.hostValues.push(value);}return this.hostIds.get(value);}
+};
 /** Schema functions/prototypes share identity across documents of one renderer. */
 export class ModelRegistry {
   constructor() { this.schemas = new Map(); this.owners = new WeakMap(); this.sharedFunctions = new Map(); }
@@ -91,6 +100,7 @@ export class ModelBridge {
     this.hostIds = new Map();
     this.hostValues = [];
     this.objects = [];
+    if(graph instanceof LayoutGraph)Object.assign(this,layoutMethods);
     this.reconcile(graph);
   }
   reconcile(graph, changed) {

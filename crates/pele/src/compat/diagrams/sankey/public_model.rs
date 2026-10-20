@@ -191,12 +191,16 @@ static SCHEMA: ModelSchema = ModelSchema {
     ],
 };
 pub struct SankeyPublicState {
-    graph: ModelGraph,
+    graph: Canonical,
     model: Result<Projection, PeleError>,
+}
+enum Canonical {
+    Arena(ModelGraph),
+    Source(super::source_store::SourceCanonical),
 }
 enum Projection {
     Legacy(SankeyModel),
-    Indexed(IndexedSankey),
+    Indexed(std::sync::Arc<IndexedSankey>),
 }
 fn invalid(message: &str) -> PeleError {
     let mut error = PeleError::new(message, ErrorCode::Semantic);
@@ -590,8 +594,10 @@ impl PublicDiagramModule for Sankey {
         // syntax error. Sankey's existing parser ignores the edge-limit policy.
         Some((|| {
             let model = super::parser::parse_indexed(context)?;
-            let graph = initial_from(GraphWriter::default(), &model, None)?;
-            let model = source_text_budget(&model.nodes).map(|()| Projection::Indexed(model));
+            let graph = super::source_store::SourceCanonical::new(model)?;
+            let model = source_text_budget(&graph.source.nodes)
+                .map(|()| Projection::Indexed(graph.source.clone()));
+            let graph = Canonical::Source(graph);
             Ok(SankeyPublicState { graph, model })
         })())
     }
@@ -602,21 +608,34 @@ impl PublicDiagramModule for Sankey {
         _: &Object,
         _: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
-        let result = invoke_graph(&mut s.graph, call);
+        let result = match &mut s.graph {
+            Canonical::Arena(graph) => invoke_graph(graph, call),
+            Canonical::Source(graph) => invoke_store(graph, call),
+        };
         // lookup.set precedes nodes.push: a throwing call can leave a cached
         // node absent from the array. Never rebuild that cache or roll it back.
-        s.model = imported(&s.graph).map(Projection::Legacy);
+        s.model = match &mut s.graph {
+            Canonical::Arena(graph) => imported(graph),
+            Canonical::Source(graph) => imported_from(graph),
+        }
+        .map(Projection::Legacy);
         result
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
         let model = imported(&graph).map(Projection::Legacy);
-        Ok(SankeyPublicState { graph, model })
+        Ok(SankeyPublicState {
+            graph: Canonical::Arena(graph),
+            model,
+        })
     }
     fn create_public(&self, model: &SankeyModel) -> Result<Self::PublicState, PeleError> {
         let graph = initial_graph(model)?;
         let model = imported(&graph).map(Projection::Legacy);
-        Ok(SankeyPublicState { graph, model })
+        Ok(SankeyPublicState {
+            graph: Canonical::Arena(graph),
+            model,
+        })
     }
     fn create_public_parsed(
         &self,
@@ -628,16 +647,37 @@ impl PublicDiagramModule for Sankey {
         let model = parsed.into_model();
         let graph = initial_graph(&model)?;
         let model = normalized_source(model).map(Projection::Legacy);
-        Ok(SankeyPublicState { graph, model })
+        Ok(SankeyPublicState {
+            graph: Canonical::Arena(graph),
+            model,
+        })
     }
     fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
-        Some(&state.graph)
+        match &state.graph {
+            Canonical::Arena(graph) => Some(graph),
+            Canonical::Source(_) => None,
+        }
+    }
+    fn has_source_layout(&self, state: &Self::PublicState) -> bool {
+        matches!(&state.graph, Canonical::Source(_))
+    }
+    fn borrow_public_read<'a>(
+        &self,
+        state: &'a Self::PublicState,
+    ) -> Option<&'a dyn crate::compat::public::PublicGraphRead> {
+        match &state.graph {
+            Canonical::Source(graph) => Some(graph),
+            Canonical::Arena(_) => None,
+        }
     }
     fn unchanged_public_graph_is_noop(&self) -> bool {
         true
     }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError> {
-        Ok(state.graph.clone())
+        match &state.graph {
+            Canonical::Arena(graph) => Ok(graph.clone()),
+            Canonical::Source(graph) => crate::compat::public::graph_read::materialize(graph),
+        }
     }
     fn apply_public(
         &self,
@@ -646,7 +686,10 @@ impl PublicDiagramModule for Sankey {
     ) -> Result<(), PeleError> {
         graph.validate()?;
         let model = imported(&graph).map(Projection::Legacy);
-        state.graph = graph;
+        match &mut state.graph {
+            Canonical::Arena(old) => *old = graph,
+            Canonical::Source(old) => old.adopt(graph)?,
+        };
         state.model = model;
         Ok(())
     }
@@ -659,7 +702,9 @@ impl PublicDiagramModule for Sankey {
     ) -> Result<Rendered, PeleError> {
         match state.model.as_ref().map_err(Clone::clone)? {
             Projection::Legacy(model) => self.render(model, config, options, host),
-            Projection::Indexed(model) => super::render::render(model, config, options, host),
+            Projection::Indexed(model) => {
+                super::render::render(model.as_ref(), config, options, host)
+            }
         }
     }
 }

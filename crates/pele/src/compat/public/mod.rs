@@ -5,6 +5,11 @@ pub(crate) mod captured_read;
 pub(crate) mod captured_write;
 mod engine;
 mod graph;
+pub(crate) mod graph_read;
+#[doc(hidden)]
+pub use graph_read::{GraphReadView, PublicGraphRead};
+#[doc(hidden)]
+pub use captured_admission::{Extent as GraphExtent, Header as GraphHeader, AdmissionKind as GraphNodeKind};
 mod initial_store;
 #[doc(hidden)]
 pub use initial_store::InitialWriter;
@@ -15,6 +20,7 @@ mod schema;
 #[doc(hidden)]
 pub use engine::HostErEntrySelection;
 pub use engine::{
+    ReadOutcome,
     ParsedPublicModel, PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome,
     RawRenderOutcomeView, RenderOutcomeView,
 };
@@ -27,14 +33,13 @@ pub use schema::{
     RecordId, RecordKind, RecordSchema, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 
-mod binary;
+pub(crate) mod binary;
 pub use binary::{
     decode_binary_exchange, encode_binary_exchange, BinaryExchange, DEFAULT_BINARY_BUDGET,
 };
 
 pub(crate) use engine::create_prepared_edge_public;
 
-#[cfg(feature = "web-host-sankey")]
 pub(crate) mod captured_transport;
 #[cfg(feature = "web-host-sankey")]
 pub(crate) use engine::CapturedSankeyRegistration;

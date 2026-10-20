@@ -25,7 +25,6 @@ pub(super) struct Prepared {
     links: Vec<u8>,
 }
 
-#[cfg(any(feature = "captured-sankey", feature = "native-canonical-sankey"))]
 impl Prepared {
     pub(super) fn metadata_bytes(&self) -> usize {
         self.metadata_bytes

@@ -1,3 +1,5 @@
+import {LayoutGraph} from './layout-storage.js';
+import {decodeLayoutOutcome} from './layout-packet.js';
 import {CapturedOwner,capturedSankeyAvailable,rememberCapturedModel,capturedObservedFrame} from './captured-owner.js';
 import {HostErOwner} from './host-er-store.js';
 import initialize from './initialize.js';
@@ -65,6 +67,10 @@ function finiteConfigJSON(config) {
 }
 function binaryResult(call) {
   try {const exchange=decodeGraphBinary(call());return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
+  catch(error){if(typeof error==='string')return result(error);throw error;}
+}
+function layoutResult(call,baseline,revision,raw,type){
+  try{return decodeLayoutOutcome(call(),baseline,revision,raw,type);}
   catch(error){if(typeof error==='string')return result(error);throw error;}
 }
 // Additive retained render packet. Every outcome still carries the full graph.
@@ -180,7 +186,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     const unchanged = confirmed && entry.unchangedApplyIsNoop &&
       input.graph.root.kind === baseline.root.kind && input.graph.root.value === baseline.root.value &&
       delta.nodes.length === 0 && delta.strings.length === 0 &&
-      input.graph.nodes.length === baseline.nodes.length && input.graph.strings.length === baseline.strings.length;
+      (input.graph instanceof LayoutGraph ? input.graph.nodeCount === baseline.nodeCount : input.graph.nodes.length === baseline.nodes.length) && input.graph.strings.length === baseline.strings.length;
     if (!unchanged) entry.revision = result(entry.handle.apply_binary(encodeGraphBinary(entry.revision, input.graph)));
     return input;
   }
@@ -260,7 +266,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     const tags={number:4,string:5,ref:6,builtinFunction:7,hostReference:8};return owner.value([tags[atom.kind],atom.value]);
   }
   function adoptMutable(mutable, preparedType, existingBridge) {
-          const snapshot = binaryResult(()=>mutable.snapshot_binary());
+          let sourceSnapshot;
+          try{sourceSnapshot=mutable.snapshot_source_layout?.();}catch(error){if(typeof error==='string')return result(error);throw error;}
+          const snapshot = sourceSnapshot == null ? binaryResult(()=>mutable.snapshot_binary()) : decodeLayoutOutcome(sourceSnapshot);
           // Raw-model adoption already has a bridge. Validate its native metadata
           // afresh before reusing it; never trust a cache hit on this path.
           const schemaKey = existingBridge ? undefined : mutable.schema_cache_key?.();
@@ -276,7 +284,10 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           const invoke = (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             const input = prepareMutableInput(entry, [receiver, ...argumentsValue]);
-            const outcome = binaryResult(()=>mutable.invoke_binary_with_functions(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)}),modelHostFunctions(bridge,operationError)));
+            const call=JSON.stringify({method,receiver:input.values[0],arguments:input.values.slice(1)}),functions=modelHostFunctions(bridge,operationError);
+            const outcome = bridge.graph instanceof LayoutGraph
+              ? layoutResult(()=>mutable.invoke_source_layout_with_functions(entry.revision,call,functions),bridge.graph,entry.revision)
+              : binaryResult(()=>mutable.invoke_binary_with_functions(entry.revision,call,functions));
             publishMutableOutcome(entry, outcome);
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
@@ -454,7 +465,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         prepareMutableInput(entry);
         const dispatcher=modelHostFunctions(entry.bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;});
         const packet=entry.handle.render_raw_operation_packet_with_functions;
-        const outcome=typeof packet==='function'
+        const outcome=entry.bridge.graph instanceof LayoutGraph
+          ?layoutResult(()=>entry.handle.render_raw_operation_source_layout_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.bridge.graph,entry.revision,true,entry.rawType)
+          :typeof packet==='function'
           ?arenaRenderResult(()=>packet.call(entry.handle,entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.revision,true,entry.rawType)
           :binaryResult(()=>entry.handle.render_raw_operation_binary_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher));
         publishMutableOutcome(entry, outcome);
@@ -632,7 +645,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
               prepareMutableInput(document);
               const dispatcher=modelHostFunctions(bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;});
               const packet=document.handle.render_numbers_operation_packet_with_functions;
-              const outcome=typeof packet==='function'
+              const outcome=bridge.graph instanceof LayoutGraph
+                ?layoutResult(()=>document.handle.render_numbers_operation_source_layout_with_functions(document.revision,...numericArguments,dispatcher),bridge.graph,document.revision,false,document.rawType)
+                :typeof packet==='function'
                 ?arenaRenderResult(()=>packet.call(document.handle,document.revision,...numericArguments,dispatcher),document.revision,false,document.rawType)
                 :binaryResult(()=>document.handle.render_numbers_operation_binary_with_functions(document.revision,...numericArguments,dispatcher));
               publishMutableOutcome(document, outcome);return outcome.result;

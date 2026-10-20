@@ -1,19 +1,20 @@
-#[cfg(feature = "native-canonical-sankey")]
-mod native_canonical;
-#[cfg(feature = "captured-sankey")]
-mod captured_store;
 #[cfg(feature = "captured-sankey")]
 mod captured_sankey;
+#[cfg(feature = "captured-sankey")]
+mod captured_store;
 mod foreign_provider;
 mod host_construction;
 mod host_er;
 mod host_functions;
+#[cfg(feature = "native-canonical-sankey")]
+mod native_canonical;
 mod parse_limits;
 mod prepared_entries;
 mod public_remaining_er;
 mod public_remaining_info;
 mod render_numbers;
 mod render_packet;
+mod source_layout;
 mod wasm_registry;
 use wasm_bindgen::prelude::*;
 
@@ -351,6 +352,10 @@ impl MutableDocument {
             }
             Err(error) => pele::compat::error_envelope(&error),
         }
+    }
+    /// Optional owned source-layout publication; legacy providers are not exported.
+    pub fn snapshot_source_layout(&self) -> Result<JsValue, JsValue> {
+        source_layout::snapshot(&self.inner)
     }
     pub fn snapshot_binary(&self) -> Result<Vec<u8>, JsValue> {
         let run = || -> Result<Vec<u8>, pele::compat::PeleError> {
