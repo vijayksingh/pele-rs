@@ -176,7 +176,7 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest complete matrix package: native `129ad96`, JS `e8316b2`. The latest changes
+Latest complete matrix package: native `46da621`, JS `e8316b2`. The latest changes
 reuse captured schema metadata, release disposed bridge storage, and borrow SVG
 text that needs no escaping. SVG root assembly now writes borrowed spans directly
 into the final output. Fresh Gantt arenas now use private Rust builders instead
@@ -184,10 +184,19 @@ of general mutable property assignment. Gantt string lookups borrow stack UTF-16
 instead of creating temporary owned strings. Small Gantt records now search
 their existing arena property slices; larger records retain hashing. The newer
 focused `02ee639` checkpoint also removes temporary fresh-record field vectors.
-Source render takes **1.61–4.86×** the Pele JS time.
-Median ratios across all sizes/resources are **2.43× source**, **11.30× parse**
-and **4.04× retained mutable render**. These describe this artifact; differences
+Source render takes **1.60–4.97×** the Pele JS time.
+Median ratios across all sizes/resources are **2.39× source**, **11.39× parse**
+and **4.02× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
+
+The [direct-parse architecture checkpoint](docs/benchmarks/2026-10-20-direct-parse/)
+shares source preparation and grammar, then constructs Gantt's canonical public
+arena without temporary owned task records. Native public parse removes 438
+allocations and has an 11.0% lower matched median. Independent VM parse medians
+are 2.5–9.5% lower across six Gantt size/resource conditions. First edited and
+callback renders remain slightly slower, and control rows also move; this is
+not a general browser win. Full output checks pass, but the new complete
+126-condition performance gate still fails every condition.
 
 The [controlled Gantt construction comparison](docs/benchmarks/2026-10-20-gantt-builder/)
 measures 16–25% lower VM parse medians, 35% lower native public-parse median and
@@ -218,7 +227,8 @@ focused change; 0.3 remains blocked.
 The prior direct host comparison measured an 11.1% retained-render improvement
 against its own matched control, with regressions disclosed. Reports retain
 raw samples, artifact hashes and failed gates:
-[latest adaptive-property checkpoint](docs/benchmarks/2026-10-20-gantt-properties/),
+[latest direct-parse checkpoint](docs/benchmarks/2026-10-20-direct-parse/),
+[adaptive-property checkpoint](docs/benchmarks/2026-10-20-gantt-properties/),
 [fixed-field checkpoint](docs/benchmarks/2026-10-20-gantt-fields/),
 [Gantt lookup checkpoint](docs/benchmarks/2026-10-20-gantt-lookup/),
 [Gantt construction checkpoint](docs/benchmarks/2026-10-20-gantt-builder/),
@@ -231,20 +241,20 @@ raw samples, artifact hashes and failed gates:
 No JS speedup or GPU acceleration is claimed.
 
 Independent Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
-Verified 5 µs clock ticks; nine alternating trials after at least 100 ms warmup.
+Verified 5 µs clock ticks; nine alternating trials after at least 500 ms warmup.
 The separate controlled Gantt comparison uses 15 trials and 1,000 ms warmup.
 Large workloads use 200 units, except Sankey (199 links) and Railroad (60 rules).
 Source-render measurements with cached Canvas metrics:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.371 ms | 2.434 ms | 1.78× |
-| sequence | 0.505 ms | 1.015 ms | 2.01× |
-| er | 3.161 ms | 6.340 ms | 2.01× |
-| pie | 0.271 ms | 0.617 ms | 2.27× |
-| sankey | 0.864 ms | 1.468 ms | 1.70× |
-| gantt | 0.707 ms | 2.535 ms | 3.58× |
-| railroad | 0.771 ms | 1.844 ms | 2.39× |
+| flowchart | 1.327 ms | 2.398 ms | 1.81× |
+| sequence | 0.518 ms | 1.040 ms | 2.01× |
+| er | 2.818 ms | 6.420 ms | 2.28× |
+| pie | 0.276 ms | 0.628 ms | 2.27× |
+| sankey | 0.863 ms | 1.431 ms | 1.66× |
+| gantt | 0.689 ms | 2.563 ms | 3.72× |
+| railroad | 0.769 ms | 1.847 ms | 2.40× |
 
 Swift runs locally on Apple M1 Pro. Fresh source-built ARM64 SDK passed 14
 integration tests for mutable models, calendars, callbacks, Date identities and
@@ -273,7 +283,7 @@ before the latest root rewrite removes WASM/Swift entirely: typed retained nativ
 0.70× Sequence, 1.04× ER, 0.50× Pie, 0.41× Sankey, 1.15× Gantt and 1.38× Railroad.
 Seven medium workloads on the same Mac; this is not all-33 certification.
 Native compatibility work is still costly: the latest matched Gantt medium
-comparison takes 0.166 ms for native public parse versus 0.082 ms for JS.
+comparison takes 0.149 ms for native public parse versus 0.082 ms for JS.
 Typed native parse takes 0.055 ms in that run; public graph construction adds
 work before any WASM crossing. These are stage medians, not subtractable phase
 measurements or all-diagram guarantees. Current matched-history diagnostics show 22–25%
