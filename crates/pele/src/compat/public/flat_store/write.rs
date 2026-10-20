@@ -44,12 +44,24 @@ impl FlatWorking {
         self.data.headers.set(id as usize, header)
     }
     fn add_node(&mut self, node: Node) -> Result<u32, PeleError> {
+        self.add_node_with::<false>(node)
+    }
+    fn add_node_with<const FRESH: bool>(&mut self, node: Node) -> Result<u32, PeleError> {
         let id = word(self.data.headers.len())?;
         let props = node.properties();
-        let pstart = self.data.properties.reserve_span(capacity(props.len())?)?;
-        for (i, p) in props.iter().enumerate() {
-            self.data.properties.set(pstart + i, property_words(p))?;
-        }
+        let pstart = if FRESH {
+            self.data
+                .properties
+                .append_span_with(capacity(props.len())?, |i| {
+                    Ok(props.get(i).map(property_words).unwrap_or_default())
+                })?
+        } else {
+            let start = self.data.properties.reserve_span(capacity(props.len())?)?;
+            for (i, p) in props.iter().enumerate() {
+                self.data.properties.set(start + i, property_words(p))?;
+            }
+            start
+        };
         let mut h = [0, 0, 0, word(pstart)?, word(props.len())?, 0, 0];
         match node {
             Node::Object { .. } => {}
@@ -75,24 +87,49 @@ impl FlatWorking {
                 h[0] = 3;
                 h[6] = word(entries.len())?;
                 let n = entries.len().checked_mul(2).ok_or_else(fault)?;
-                let start = self.data.items.reserve_span(capacity(n)?)?;
+                let start = if FRESH {
+                    self.data.items.append_span_with(capacity(n)?, |i| {
+                        Ok(entries
+                            .get(i / 2)
+                            .map(|(k, v)| words(if i % 2 == 0 { k } else { v }))
+                            .unwrap_or_default())
+                    })?
+                } else {
+                    self.data.items.reserve_span(capacity(n)?)?
+                };
                 h[5] = word(start)?;
-                for (i, (k, v)) in entries.iter().enumerate() {
-                    self.data.items.set(start + 2 * i, words(k))?;
-                    self.data.items.set(start + 2 * i + 1, words(v))?;
+                if !FRESH {
+                    for (i, (k, v)) in entries.iter().enumerate() {
+                        self.data.items.set(start + 2 * i, words(k))?;
+                        self.data.items.set(start + 2 * i + 1, words(v))?;
+                    }
                 }
             }
             Node::Set { values, .. } => {
                 h[0] = 4;
                 h[6] = word(values.len())?;
-                let start = self.data.items.reserve_span(capacity(values.len())?)?;
+                let start = if FRESH {
+                    self.data
+                        .items
+                        .append_span_with(capacity(values.len())?, |i| {
+                            Ok(values.get(i).map(words).unwrap_or_default())
+                        })?
+                } else {
+                    self.data.items.reserve_span(capacity(values.len())?)?
+                };
                 h[5] = word(start)?;
-                for (i, v) in values.iter().enumerate() {
-                    self.data.items.set(start + i, words(v))?;
+                if !FRESH {
+                    for (i, v) in values.iter().enumerate() {
+                        self.data.items.set(start + i, words(v))?;
+                    }
                 }
             }
         }
-        self.commit_node(id, h)?;
+        if FRESH {
+            self.data.headers.push(h)?;
+        } else {
+            self.commit_node(id, h)?;
+        }
         Ok(id)
     }
     fn same_key(&self, a: &Atom, b: &Atom) -> Result<bool, PeleError> {
@@ -266,6 +303,25 @@ impl CapturedWrite for FlatWorking {
 pub struct NativeSourceWriter {
     working: FlatWorking,
 }
+impl FlatStringHistory {
+    /// The source path has valid Rust text and needs no duplicate history row.
+    /// Reuse the lookup digest when committing a newly appended UTF16 payload.
+    fn intern_source(&mut self, text: &str) -> Result<u32, PeleError> {
+        let length = text.encode_utf16().count();
+        let digest = self.digest(text.encode_utf16(), length);
+        if let Some(id) = self.first_hashed(text, digest)? {
+            return Ok(id);
+        }
+        let start = self.units.len();
+        word(start.checked_add(length).ok_or_else(fault)?)?;
+        let mut units = text.encode_utf16();
+        self.units.append_span_with(length, |_| {
+            Ok(units.next().expect("validated UTF16 length"))
+        })?;
+        let id = word(self.descriptors.len())?;
+        self.commit_string(id, start, length, digest)
+    }
+}
 impl Default for NativeSourceWriter {
     fn default() -> Self {
         Self::new()
@@ -281,57 +337,60 @@ impl NativeSourceWriter {
 impl InitialWriter for NativeSourceWriter {
     type Output = FlatEpoch;
     fn string(&mut self, text: &str) -> Result<u32, PeleError> {
-        self.working.intern(text)
+        self.working.data.strings.intern_source(text)
     }
     fn node(&mut self, node: Node) -> Result<u32, PeleError> {
-        self.working.add_node(node)
+        self.working.add_node_with::<true>(node)
     }
     fn record<const N: usize>(
         &mut self,
         keys: &'static [&'static str; N],
         values: [Atom; N],
     ) -> Result<u32, PeleError> {
-        let start = self.working.data.properties.reserve_span(capacity(N)?)?;
-        for (i, (key, value)) in keys.iter().zip(values).enumerate() {
-            let key = self.string(key)?;
-            let a = words(&value);
-            self.working
-                .data
-                .properties
-                .set(start + i, [key, 7, a[0], a[1], a[2]])?;
-        }
-        let id = word(self.working.data.headers.len())?;
-        self.working
-            .commit_node(id, [0, 0, 0, word(start)?, word(N)?, 0, 0])?;
-        Ok(id)
-    }
-    fn dense_array(&mut self, values: &[Atom]) -> Result<u32, PeleError> {
+        let strings = &mut self.working.data.strings;
         let start = self
             .working
             .data
             .properties
-            .reserve_span(capacity(values.len())?)?;
-        for (i, value) in values.iter().enumerate() {
-            let key = self.string(&i.to_string())?;
-            let a = words(value);
+            .append_span_with(capacity(N)?, |i| {
+                if i >= N {
+                    return Ok([0; 5]);
+                }
+                let key = strings.intern_source(keys[i])?;
+                let a = words(&values[i]);
+                Ok([key, 7, a[0], a[1], a[2]])
+            })?;
+        let id = word(self.working.data.headers.len())?;
+        self.working
+            .data
+            .headers
+            .push([0, 0, 0, word(start)?, word(N)?, 0, 0])?;
+        Ok(id)
+    }
+    fn dense_array(&mut self, values: &[Atom]) -> Result<u32, PeleError> {
+        let strings = &mut self.working.data.strings;
+        let start =
             self.working
                 .data
                 .properties
-                .set(start + i, [key, 7, a[0], a[1], a[2]])?;
-        }
+                .append_span_with(capacity(values.len())?, |i| {
+                    let Some(value) = values.get(i) else {
+                        return Ok([0; 5]);
+                    };
+                    let key = strings.intern_source(&i.to_string())?;
+                    let a = words(value);
+                    Ok([key, 7, a[0], a[1], a[2]])
+                })?;
         let id = word(self.working.data.headers.len())?;
-        self.working.commit_node(
-            id,
-            [
-                2,
-                word(values.len())?,
-                0,
-                word(start)?,
-                word(values.len())?,
-                0,
-                0,
-            ],
-        )?;
+        self.working.data.headers.push([
+            2,
+            word(values.len())?,
+            0,
+            word(start)?,
+            word(values.len())?,
+            0,
+            0,
+        ])?;
         Ok(id)
     }
     fn finish(mut self, root: Atom) -> Result<FlatEpoch, PeleError> {

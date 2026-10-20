@@ -181,6 +181,9 @@ impl FlatStringHistory {
     }
     fn first(&self, text: &str) -> Result<Option<u32>, PeleError> {
         let digest = self.digest(text.encode_utf16(), text.encode_utf16().count());
+        self.first_hashed(text, digest)
+    }
+    fn first_hashed(&self, text: &str, digest: u64) -> Result<Option<u32>, PeleError> {
         if let Some(ids) = self.index[digest as usize % 256].get(&digest) {
             for id in ids {
                 if self.is_text(*id, text)? {
@@ -201,6 +204,15 @@ impl FlatStringHistory {
             Ok(())
         })?;
         let digest = hash.finish();
+        self.commit_string(id, start, length, digest)
+    }
+    fn commit_string(
+        &mut self,
+        id: u32,
+        start: usize,
+        length: usize,
+        digest: u64,
+    ) -> Result<u32, PeleError> {
         self.descriptors.push([word(start)?, word(length)?])?;
         Arc::make_mut(&mut Arc::make_mut(&mut self.index)[digest as usize % 256])
             .entry(digest)

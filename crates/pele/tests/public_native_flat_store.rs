@@ -220,6 +220,58 @@ fn native_flat_frozen_source_corpus_preserves_complete_graphs_and_errors() {
 }
 
 #[test]
+fn native_flat_fresh_source_crosses_pages_and_keeps_first_helper_aliases() {
+    let engine = PublicEngine::with_builtins();
+    let title = format!("{}{}", "🙂".repeat(1200), "e\u{301}".repeat(33));
+    let mut text = format!("---\ntitle: {title}\n---\nsankey\n");
+    // ASCII CSV labels; source metadata supplies multi-page Unicode. Repeated
+    // endpoints require first-content IDs and shared node identities.
+    for i in 0..1100 {
+        text.push_str(&format!(
+            "N{i},N{},{}\n",
+            i + 1,
+            if i == 0 { "-0" } else { "1.25" }
+        ));
+    }
+    let (mut doc, mut accepted) = source(&engine, &text);
+    let mut arena = engine.parse(&text, &ParseOptions::default()).unwrap();
+    same(&mut accepted, &arena);
+    let before = bytes(&graph(&mut accepted));
+    let root = id(CapturedRead::root(&accepted));
+    let nodes = id(field(&mut accepted, root, "nodes"));
+    let links = id(field(&mut accepted, root, "links"));
+    assert_eq!(
+        CapturedRead::header(&mut accepted, nodes)
+            .unwrap()
+            .unwrap()
+            .array_length,
+        Some(1101)
+    );
+    assert_eq!(
+        CapturedRead::header(&mut accepted, links)
+            .unwrap()
+            .unwrap()
+            .array_length,
+        Some(1100)
+    );
+    let mut work = accepted.fork();
+    let name = work.intern("N1100").unwrap();
+    doc.apply(0, &mut work).unwrap();
+    arena.apply(0, graph(&mut work)).unwrap();
+    let call = method(
+        &doc,
+        CapturedRead::root(&work),
+        "findOrCreateNode",
+        vec![Atom::String(name)],
+    );
+    let actual = doc.invoke(1, &mut work, call.clone()).unwrap();
+    let expected = arena.invoke(1, call, &mut MetricsResources).unwrap();
+    assert_eq!(result(&actual.result), result(&expected.result));
+    same(&mut work, &arena);
+    assert_eq!(bytes(&graph(&mut accepted)), before);
+}
+
+#[test]
 fn native_flat_source_prepared_first_helper_render_and_epoch_isolation() {
     let engine = PublicEngine::with_builtins();
     let text = "sankey\nA,B,5\nB,C,2";

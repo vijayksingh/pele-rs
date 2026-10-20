@@ -67,6 +67,55 @@ impl<T: Copy + Default + PartialEq> Pages<T> {
         }
         Ok(start)
     }
+    /// Append final values with one mutable page borrow per chunk. A failed
+    /// generator leaves its completed prefix and the reserved default suffix,
+    /// matching reserve_span followed by ordered fallible writes.
+    pub fn append_span_with(
+        &mut self,
+        capacity: usize,
+        mut value: impl FnMut(usize) -> Result<T, PeleError>,
+    ) -> Result<usize, PeleError> {
+        let start = self.length;
+        let end = start
+            .checked_add(capacity)
+            .filter(|n| *n <= u32::MAX as usize)
+            .ok_or_else(fault)?;
+        let mut error = None;
+        while self.length < end {
+            let page = self.length / PAGE;
+            if page / DIRECTORY == self.directories.len() {
+                self.directories.push(Arc::new(Vec::new()));
+            }
+            let directory = Arc::make_mut(&mut self.directories[page / DIRECTORY]);
+            if page % DIRECTORY == directory.len() {
+                directory.push(Arc::new(Vec::new()));
+            }
+            let values = Arc::make_mut(&mut directory[page % DIRECTORY]);
+            if values.capacity() == 0 {
+                values.reserve(PAGE);
+            }
+            let count = (end - self.length).min(PAGE - values.len());
+            for _ in 0..count {
+                let next = if error.is_some() {
+                    T::default()
+                } else {
+                    match value(self.length - start) {
+                        Ok(value) => value,
+                        Err(failure) => {
+                            error = Some(failure);
+                            T::default()
+                        }
+                    }
+                };
+                values.push(next);
+                self.length += 1;
+            }
+        }
+        match error {
+            Some(error) => Err(error),
+            None => Ok(start),
+        }
+    }
     pub fn truncate(&mut self, length: usize) {
         if length >= self.length {
             return;

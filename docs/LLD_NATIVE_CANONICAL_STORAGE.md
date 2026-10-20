@@ -21,6 +21,19 @@ selection, source preparation and normalization are shared with existing paths.
 Only the exact concrete Sankey builtin selects this representation. Combined
 source dispatch keeps ER's existing direct-parser/factory fallback policy.
 
+Fresh source construction appends final property and collection rows directly
+into those same native pages, with one mutable page borrow per chunk. It retains
+the original power-of-two span capacities and default padding. If a fallible
+record generator fails, the completed prefix and reserved default suffix remain;
+no later key is interned. A const-specialized node writer shares kind encoding
+with the existing mutable writer, whose reserve/set behavior stays unchanged.
+Completed fresh headers use one append without strengthening the prior Node-ID
+bound. Source string insertion reuses its keyed lookup digest for index commit
+after appending UTF16 in page chunks; exact collision comparison, first-content
+IDs, explicit history duplicates and all admission/error stages remain. No second
+graph, string mirror or delayed first-use conversion is introduced. This layer
+changes construction mechanics; performance requires separate measurements.
+
 `CapturedRead`, `CapturedWrite` and `AdmissionRead` access local pages. Default
 scalar admission visitors preserve arena borrowed-slice behavior; flat overrides
 decode stack scalars directly without per-node temporary vectors or host imports.
@@ -93,6 +106,11 @@ restoration and the WASM artifact remain unchanged. Performance and default-path
 controls must be measured separately before selecting this layer.
 
 ## Verification gates
+
+The proposed [native source publication boundary](LLD_NATIVE_SOURCE_PUBLICATION.md)
+keeps these admission stages and the ready epoch, replacing only the first
+guarded JS POD traversal with bounded native construction batches. It is a
+design proposal, not implemented behavior or a performance claim.
 
 Public native integrations compare exact canonical bytes and errors with the
 arena, source/prepared/raw operations, first helper/render, partial failures and
