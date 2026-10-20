@@ -1,0 +1,40 @@
+{
+  "status": "private-static-candidate",
+  "baselineHead": "d25bb26089e597b9de8985edbfced5a3955a6bbd",
+  "patchSha256": "0e168d53f0f53a28b247815b3cc0f3ec2274c32191aa3df5617463622368bc6f",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/er/public_model.rs",
+      "originalSha256": "159f3b561cb582269793dcf322f89c5cc46323615482b2a55e70e647dc4c7bae",
+      "candidateSha256": "8b2d6b14e7f69565f46c7d87b8bd4b04879ee45c0ba1a29c6eae7daa7123a6eb",
+      "originalMatchesProduction": true
+    },
+    {
+      "path": "crates/pele-wasm/src/host_er.rs",
+      "originalSha256": "42c67e0384cbc121697470d69286f02e03554cdc5c1cdedce25d94b3cef4c234",
+      "candidateSha256": "eb3306bcc461eb27a659e42c7f7d48ee8932bd591f4291bd03e3c7f5c5af0bfb",
+      "originalMatchesProduction": true
+    },
+    {
+      "path": "bindings/web/host-er-store.js",
+      "originalSha256": "4e06db135876b448edc153853890d4f5f284553bd9bad9e47ba462ab2b3958c7",
+      "candidateSha256": "a9c749d8a762326eaf75d4b07be4b6cdec7494be7180c5f4392b20d56f6836a2",
+      "originalMatchesProduction": true
+    },
+    {
+      "path": "tests/web/er-oversized-public-construction.spec.js",
+      "originalSha256": "d41f4e13fc8ac9e41575f0c7875daf9cd82f05693c5dc3476aad2e342316ba76",
+      "candidateSha256": "6a047bba7516a046b91ea8986978499d465098adf924e0da09b736370f8d54e5",
+      "originalMatchesProduction": true
+    }
+  ],
+  "validation": {
+    "rustfmt": "passed two private Rust files; edition 2021, skip_children",
+    "nodeSyntax": "passed two private JS files",
+    "gitApplyCheck": "passed against current d25bb26 worktree",
+    "builds": "not run",
+    "tests": "not run",
+    "measurements": "not run",
+    "productionDiffCheck": "clean; no production edits"
+  }
+}

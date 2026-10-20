@@ -1,0 +1,89 @@
+{
+  "completed": true,
+  "attempt": 1,
+  "reportSha256": "06112b6666d8f20bec0a91ed144977a90a9d176332738bef19e9a7217df78858",
+  "startedAt": "2026-10-20T08:59:44.236Z",
+  "completedAt": "2026-10-20T09:00:36.815Z",
+  "rows": [
+    {
+      "case": "sequence/small",
+      "stage": "parseMutable",
+      "count": 128,
+      "controlMedianMs": 0.0677766953125,
+      "candidateMedianMs": 0.0676595078125,
+      "pairedPercent": 0.09575003648076841,
+      "candidateFasterPairs": 7,
+      "trials": 15
+    },
+    {
+      "case": "sequence/small",
+      "stage": "lifetime",
+      "count": 64,
+      "controlMedianMs": 0.2231328125,
+      "candidateMedianMs": 0.2229361875,
+      "pairedPercent": -0.33028868909082965,
+      "candidateFasterPairs": 10,
+      "trials": 15
+    },
+    {
+      "case": "sequence/small",
+      "stage": "parse",
+      "count": 128,
+      "controlMedianMs": 0.0605703125,
+      "candidateMedianMs": 0.0610598984375,
+      "pairedPercent": 0.8669992327991594,
+      "candidateFasterPairs": 4,
+      "trials": 15
+    },
+    {
+      "case": "er/medium",
+      "stage": "parseMutable",
+      "count": 128,
+      "controlMedianMs": 0.178896484375,
+      "candidateMedianMs": 0.1798258515625,
+      "pairedPercent": 0.6478721623411454,
+      "candidateFasterPairs": 5,
+      "trials": 15
+    },
+    {
+      "case": "er/medium",
+      "stage": "lifetime",
+      "count": 8,
+      "controlMedianMs": 2.159239625,
+      "candidateMedianMs": 2.155474,
+      "pairedPercent": 0.6444042689117024,
+      "candidateFasterPairs": 5,
+      "trials": 15
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 32,
+      "controlMedianMs": 0.5258111875,
+      "candidateMedianMs": 0.52661328125,
+      "pairedPercent": -0.4896955241679879,
+      "candidateFasterPairs": 8,
+      "trials": 15
+    }
+  ],
+  "pairs": 90,
+  "orderCounts": {
+    "control": 45,
+    "candidate": 45
+  },
+  "measuredGuardsChecked": 180,
+  "exactBeforeAfterAndBatchResponses": true,
+  "changedInputs": [
+    {
+      "path": "CPele/macos-arm64/libpele_ffi.a",
+      "control": "33fbc11ee6347fd8068b0a383494aa45f54b3563138e34939775591d989e8366",
+      "candidate": "d87e97d356dae4b4aee43cde0d821d09150a214e84d144c4f101e8d0dbe7c5f7"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/public_model.rs",
+      "control": "159f3b561cb582269793dcf322f89c5cc46323615482b2a55e70e647dc4c7bae",
+      "candidate": "8b2d6b14e7f69565f46c7d87b8bd4b04879ee45c0ba1a29c6eae7daa7123a6eb"
+    }
+  ],
+  "scope": "Dense-array native layer versus frozen d25 borrowed-interner consumer: one Rust source input and SDK archive only; no retries or pooling. Native fallback retains the caller Vec through node publication; elapsed results do not establish lower peak memory."
+}

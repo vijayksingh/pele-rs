@@ -1,0 +1,15 @@
+{
+  "buildCommand": "CARGO_BUILD_JOBS=2 node scripts/perf/build.mjs",
+  "buildExitCode": 0,
+  "manifestSha256": "12c298a59ff43011932949a6137cc45f01fd5d8e83b7091489f131c38942c2be",
+  "revision": "be7b206afab2214a27147129443596cbdf854c05",
+  "sourceInputSha256": "ea3efcafd792f30ef25e5b32ac3f1d99319c31e8628ce610c0e0718339c47350",
+  "binaries": {
+    "pele-perf": "b9e71fab74154d7a7103640bf140a11b0ff67c8539d2d34d3d608ce5fa7e5def",
+    "pele-perf-alloc": "7dba723a80cab6640647f2f8cde90287be330e6ac2b13990f4c82f06711910e0"
+  },
+  "worktreeAtFreeze": " M bindings/web/host-er-store.js\n M crates/pele-wasm/src/host_er.rs\n M crates/pele/src/compat/diagrams/er/public_model.rs\n M docs/LLD.md\n M tests/web/er-oversized-public-construction.spec.js\n?? docs/LLD_ER_DENSE_ARRAY_PUBLICATION.md\n",
+  "toolchain": "1.98.1",
+  "buildElapsedLog": "Finished release profile [optimized] target(s) in 2m 39s",
+  "notTimingEvidence": true
+}

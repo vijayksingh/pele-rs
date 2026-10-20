@@ -183,6 +183,14 @@ Median ratios across all sizes/resources are **2.38× source**, **11.06× parse*
 and **4.02× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
+The [dense ER array publisher](docs/benchmarks/2026-10-20-er-host-storage/dense-array/)
+removes generic property records from fresh arrays while preserving canonical
+IDs and limits. VM ER parse improves 3.82–10.24% paired; complete first-use ER
+operations also improve, but parse still costs 4.52–9.96× JS. Medium Canvas
+retained rendering regresses 4.64%; Swift mutable parse/lifetime regress about
+0.65%, with native allocation counters unchanged. Fresh native, Swift/C and
+84 targeted browser checks pass. Full JS performance parity remains open.
+
 The [borrowed ER arena interner](docs/benchmarks/2026-10-20-er-host-storage/borrowed-interner/)
 removes repeated owned UTF16 allocations during native public construction.
 Matched native public parse improves 10.59%, Swift mutable parse 12.00%, and
