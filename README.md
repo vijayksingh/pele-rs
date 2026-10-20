@@ -179,6 +179,35 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 complete release-gate run, historical source `0b32797`, fails all 126 conditions.
 New scoped diagnostics do not replace that gate.
 
+The default backend now retains indexed Sankey source nodes and links, avoiding
+cloned endpoint records while preserving public models and helper behavior.
+[Matched VM and local evidence](docs/benchmarks/2026-10-20-er-host-storage/indexed-sankey/)
+for runtime `31dab0b`, recovery tests `88b87ec`:
+
+| Default Sankey path | Paired change versus previous default | Candidate / Pele JS |
+| --- | --- | --- |
+| Warm parse, six conditions | 3.64–6.69% lower | 7.93–14.31× |
+| First edited render, six conditions | 0.67–4.08% lower | 3.52–8.14× |
+
+First unchanged render is mixed: five conditions lower, **large/canvas 6.50%
+slower**. Source/Flowchart controls are also mixed; all 48 rows and adverse
+samples are retained. The edit adds a cyclic extension property, not diagram
+content. These scoped diagnostics do not establish general speedup.
+
+Fresh native checks pass 22 feature integrations; focused browser checks pass
+45 across Chromium, Firefox and WebKit. Fresh arm64 SDK passes Swift 16, strict
+C3 and API168, including 12,481 drawings and 16,572 expected errors. Native
+parse allocations fall from 834 to 734 for medium Sankey; no new Swift latency
+claim. Intel SDK and AppKit activation remain release checks.
+
+Work now targets direct SVG appending and the remaining mutable-parse
+publication cost. Neither Rust nor GPU availability guarantees faster execution.
+VM and Swift use different machines; their timings cannot be subtracted to
+estimate bridge cost.
+
+<details>
+<summary>Earlier measurements and rejected experimental backends</summary>
+
 The native canonical Sankey backend puts its model tables in Rust-owned POD
 pages, streams bounded host observations and shares browser publication and
 matching. Its [first runtime](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-rejected/)
@@ -298,6 +327,8 @@ Intel SDK and AppKit activation
 verification remain release checks. No GPU acceleration or all-33 JS speedup is
 claimed. Timings exclude startup, downloads and SVG painting; Swift and VM figures
 use different machines and cannot be subtracted to estimate bridge cost.
+
+</details>
 
 ## Build and verification
 
