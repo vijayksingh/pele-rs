@@ -163,7 +163,7 @@ pub(super) enum Failure {
     Cycle(usize),
 }
 pub(super) fn layout(model: &impl Input, o: Options) -> Result<Layout, PeleError> {
-    let n = model.nodes().len();
+    let n = model.node_count();
     let links: Vec<Link> = (0..model.link_count())
         .map(|i| {
             let (source, target, value) = model.link(i);
@@ -185,7 +185,7 @@ pub(super) fn layout(model: &impl Input, o: Options) -> Result<Layout, PeleError
         let message = match failure {
             Failure::Cycle(stuck) => format!(
                 "Sankey diagrams cannot have circular links, and \"{}\" is part of one.",
-                model.nodes()[stuck].id
+                model.node(stuck).id
             ),
         };
         let mut error = PeleError::new(message, ErrorCode::Semantic);

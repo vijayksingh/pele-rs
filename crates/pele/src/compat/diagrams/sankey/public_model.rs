@@ -5,7 +5,7 @@
 //! renumber nodes. The existing Sankey renderer consumes a concrete typed
 //! projection imported at the edit boundary; rendering never reparses source.
 use super::{
-    indexed::{IndexedSankey, Input},
+    indexed::{IndexedSankey, Input, NodeView},
     Sankey, SankeyLink, SankeyModel, SankeyNode,
 };
 use crate::compat::public::captured_read::{
@@ -498,8 +498,8 @@ fn imported_with_text<R: CapturedRead>(
         acc_descr: optional_text(reader, "accDescr", text_source)?,
     })
 }
-fn node(out: &mut impl InitialWriter, node: &SankeyNode) -> Result<u32, PeleError> {
-    let label = out.string(node.id.as_str())?;
+fn node(out: &mut impl InitialWriter, node: NodeView<'_>) -> Result<u32, PeleError> {
+    let label = out.string(node.id)?;
     let properties = vec![
         out.property("id", Atom::String(label))?,
         out.property("index", Atom::Number(node.index as f64))?,
@@ -533,16 +533,15 @@ fn initial_from<W: InitialWriter>(
     model: &impl Input,
     legacy: Option<&SankeyModel>,
 ) -> Result<W::Output, PeleError> {
-    let node_objects: Vec<_> = model
-        .nodes()
-        .iter()
-        .map(|n| node(&mut out, n))
+    let node_objects: Vec<_> = (0..model.node_count())
+        .map(|i| node(&mut out, model.node(i)))
         .collect::<Result<_, _>>()?;
     let mut original_nodes = HashMap::new();
     if legacy.is_some() {
-        for (record, object) in model.nodes().iter().zip(&node_objects) {
+        for (i, object) in node_objects.iter().enumerate() {
+            let record = model.node(i);
             original_nodes
-                .entry((record.index, record.id.as_str()))
+                .entry((record.index, record.id))
                 .or_insert(*object);
         }
     }
@@ -558,7 +557,15 @@ fn initial_from<W: InitialWriter>(
                     .get(&(endpoint.index, endpoint.id.as_str()))
                     .copied()
                     .map(Ok)
-                    .unwrap_or_else(|| node(&mut out, endpoint))
+                    .unwrap_or_else(|| {
+                        node(
+                            &mut out,
+                            NodeView {
+                                id: &endpoint.id,
+                                index: endpoint.index,
+                            },
+                        )
+                    })
             };
             (
                 endpoint(&legacy.links[i].source)?,
@@ -577,11 +584,10 @@ fn initial_from<W: InitialWriter>(
         link_objects.push(out.node(Node::Object { properties })?);
     }
     let links = array_node(&mut out, link_objects.into_iter().map(Atom::Ref))?;
-    let entries = model
-        .nodes()
+    let entries = node_objects
         .iter()
-        .zip(&node_objects)
-        .map(|(n, id)| Ok((Atom::String(out.string(n.id.as_str())?), Atom::Ref(*id))))
+        .enumerate()
+        .map(|(i, id)| Ok((Atom::String(out.string(model.node(i).id)?), Atom::Ref(*id))))
         .collect::<Result<_, PeleError>>()?;
     let lookup = out.node(Node::Map {
         entries,
@@ -626,7 +632,7 @@ impl PublicDiagramModule for Sankey {
         Some((|| {
             let model = super::parser::parse_indexed(context)?;
             let graph = super::source_store::SourceCanonical::new(model)?;
-            let model = source_text_budget(&graph.source.nodes)
+            let model = source_text_budget(graph.source.as_ref())
                 .map(|()| Projection::Indexed(graph.source.clone()));
             let graph = Canonical::Source(graph);
             Ok(SankeyPublicState { graph, model })
@@ -1013,7 +1019,7 @@ pub(crate) fn normalized_source(mut model: SankeyModel) -> Result<SankeyModel, P
     // and endpoint copies drawn from those exact nodes. Graph admission
     // bounds indexes to an exactly representable f64 range. Preserve the
     // importer’s per-source-node text budget and latent error boundary.
-    source_text_budget(&model.nodes)?;
+    source_text_budget(&model)?;
     // These labels are deliberately absent from the render projection.
     // Drop their allocations, not only their lengths.
     for link in &mut model.links {
@@ -1022,10 +1028,10 @@ pub(crate) fn normalized_source(mut model: SankeyModel) -> Result<SankeyModel, P
     }
     Ok(model)
 }
-fn source_text_budget(nodes: &[SankeyNode]) -> Result<(), PeleError> {
+fn source_text_budget(model: &impl Input) -> Result<(), PeleError> {
     let mut text_bytes = 0usize;
-    for node in nodes {
-        text_bytes = text_bytes.saturating_add(node.id.len().saturating_mul(2));
+    for i in 0..model.node_count() {
+        text_bytes = text_bytes.saturating_add(model.node(i).id.len().saturating_mul(2));
         if text_bytes > 128 * 1024 * 1024 {
             return Err(PeleError::new(
                 "Sankey imported text exceeds native allocation budget",

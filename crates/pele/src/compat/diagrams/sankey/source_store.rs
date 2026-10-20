@@ -1,6 +1,6 @@
 //! Source-owned logical graph. Static records and collection slots are derived;
 //! only actual mutations own generic records. No source Property/Node arena.
-use super::indexed::IndexedSankey;
+use super::indexed::{key_slot, IndexedSankey};
 use crate::compat::public::captured_admission::{
     AdmissionKind, AdmissionRead, Extent, Header, ScalarAtomRef, ScalarPropertyRef,
 };
@@ -29,16 +29,6 @@ fn layout_id() -> Option<u64> {
         .ok()
 }
 
-enum Text {
-    Label(usize),
-    Title,
-    Static(&'static str),
-    Decimal(String),
-}
-struct Entry {
-    text: Text,
-    units: usize,
-}
 #[derive(Default)]
 struct Patch {
     values: HashMap<usize, Atom>,
@@ -51,11 +41,6 @@ pub(super) struct SourceCanonical {
     pub source: Arc<IndexedSankey>,
     admission: AdmissionState,
     layout_id: Option<u64>,
-    catalog: Vec<Entry>,
-    labels: Vec<u32>,
-    indices: Vec<u32>,
-    keys: [u32; 13],
-    title: Atom,
     version: u32,
     root: Atom,
     node_count: usize,
@@ -66,87 +51,28 @@ pub(super) struct SourceCanonical {
 }
 impl SourceCanonical {
     pub fn new(source: IndexedSankey) -> Result<Self, PeleError> {
-        let mut s = Self {
+        let node_count = source.labels.len() + source.links.len() + 4;
+        let string_count = source.catalog.len();
+        let s = Self {
             source: Arc::new(source),
             admission: AdmissionState::default(),
             layout_id: layout_id(),
-            catalog: vec![],
-            labels: vec![],
-            indices: vec![],
-            keys: [0; 13],
-            title: Atom::Undefined,
             version: 1,
-            root: Atom::Undefined,
-            node_count: 0,
-            string_count: 0,
+            root: Atom::Ref((node_count - 1) as u32),
+            node_count,
+            string_count,
             strings: HashMap::new(),
             nodes: HashMap::new(),
             patches: HashMap::new(),
         };
-        let mut ids = HashMap::<String, u32>::new();
-        for i in 0..s.source.nodes.len() {
-            let id = s.add_text(Text::Label(i), &mut ids);
-            s.labels.push(id);
-            s.add_key("id", &mut ids);
-            s.add_key("index", &mut ids);
-        }
-        for i in 0..s.source.nodes.len() {
-            let id = s.add_text(Text::Decimal(i.to_string()), &mut ids);
-            s.indices.push(id);
-        }
-        if !s.source.links.is_empty() {
-            for key in ["source", "target", "value"] {
-                s.add_key(key, &mut ids);
-            }
-        }
-        for i in s.indices.len()..s.source.links.len() {
-            let id = s.add_text(Text::Decimal(i.to_string()), &mut ids);
-            s.indices.push(id);
-        }
-        s.add_key("sankey", &mut ids);
-        for key in ["type", "nodes", "links"] {
-            s.add_key(key, &mut ids);
-        }
-        if s.source.title.is_some() {
-            s.title = Atom::String(s.add_text(Text::Title, &mut ids));
-        }
-        for key in ["title", "accTitle", "accDescr", "lookup"] {
-            s.add_key(key, &mut ids);
-        }
-        s.node_count = s.source.nodes.len() + s.source.links.len() + 4;
-        s.string_count = s.catalog.len();
-        s.root = Atom::Ref((s.node_count - 1) as u32);
         graph_read::validate_initial_structure(&s)?;
         Ok(s)
     }
-    fn text<'a>(&'a self, t: &'a Text) -> &'a str {
-        match t {
-            Text::Label(i) => &self.source.nodes[*i].id,
-            Text::Title => self.source.title.as_deref().expect("source title"),
-            Text::Static(s) => s,
-            Text::Decimal(s) => s,
-        }
-    }
-    fn add_text(&mut self, t: Text, ids: &mut HashMap<String, u32>) -> u32 {
-        let text = self.text(&t);
-        if let Some(id) = ids.get(text) {
-            return *id;
-        }
-        let id = self.catalog.len() as u32;
-        let units = text.encode_utf16().count();
-        ids.insert(text.to_owned(), id);
-        self.catalog.push(Entry { text: t, units });
-        id
-    }
-    fn add_key(&mut self, key: &'static str, ids: &mut HashMap<String, u32>) {
-        let id = self.add_text(Text::Static(key), ids);
-        self.keys[key_slot(key)] = id;
-    }
     fn key(&self, key: &str) -> u32 {
-        self.keys[key_slot(key)]
+        self.source.keys[key_slot(key)] as u32
     }
     fn base_header(&self, id: usize) -> Result<Header, PeleError> {
-        let n = self.source.nodes.len();
+        let n = self.source.labels.len();
         let m = self.source.links.len();
         Ok(if id < n {
             Header {
@@ -183,37 +109,49 @@ impl SourceCanonical {
         })
     }
     fn base_property(&self, id: usize, slot: usize) -> Property {
-        let n = self.source.nodes.len();
+        let n = self.source.labels.len();
         let m = self.source.links.len();
         let (key, value) = if id < n {
             if slot == 0 {
-                (self.keys[0], Atom::String(self.labels[id]))
-            } else {
                 (
-                    self.keys[1],
-                    Atom::Number(self.source.nodes[id].index as f64),
+                    self.source.keys[0] as u32,
+                    Atom::String(self.source.labels[id] as u32),
                 )
+            } else {
+                (self.source.keys[1] as u32, Atom::Number(id as f64))
             }
         } else if id == n {
-            (self.indices[slot], Atom::Ref(slot as u32))
+            (self.source.indices[slot] as u32, Atom::Ref(slot as u32))
         } else if id < n + m + 1 {
             let link = &self.source.links[id - n - 1];
             match slot {
-                0 => (self.keys[2], Atom::Ref(link.source as u32)),
-                1 => (self.keys[3], Atom::Ref(link.target as u32)),
-                _ => (self.keys[4], Atom::Number(link.value)),
+                0 => (self.source.keys[2] as u32, Atom::Ref(link.source as u32)),
+                1 => (self.source.keys[3] as u32, Atom::Ref(link.target as u32)),
+                _ => (self.source.keys[4] as u32, Atom::Number(link.value)),
             }
         } else if id == n + m + 1 {
-            (self.indices[slot], Atom::Ref((n + 1 + slot) as u32))
+            (
+                self.source.indices[slot] as u32,
+                Atom::Ref((n + 1 + slot) as u32),
+            )
         } else {
             match slot {
-                0 => (self.keys[6], Atom::String(self.keys[5])),
-                1 => (self.keys[7], Atom::Ref(n as u32)),
-                2 => (self.keys[8], Atom::Ref((n + m + 1) as u32)),
-                3 => (self.keys[9], self.title.clone()),
-                4 => (self.keys[10], Atom::Undefined),
-                5 => (self.keys[11], Atom::Undefined),
-                _ => (self.keys[12], Atom::Ref((n + m + 2) as u32)),
+                0 => (
+                    self.source.keys[6] as u32,
+                    Atom::String(self.source.keys[5] as u32),
+                ),
+                1 => (self.source.keys[7] as u32, Atom::Ref(n as u32)),
+                2 => (self.source.keys[8] as u32, Atom::Ref((n + m + 1) as u32)),
+                3 => (
+                    self.source.keys[9] as u32,
+                    self.source
+                        .title
+                        .map(|id| Atom::String(id as u32))
+                        .unwrap_or(Atom::Undefined),
+                ),
+                4 => (self.source.keys[10] as u32, Atom::Undefined),
+                5 => (self.source.keys[11] as u32, Atom::Undefined),
+                _ => (self.source.keys[12] as u32, Atom::Ref((n + m + 2) as u32)),
             }
         };
         Property {
@@ -245,7 +183,10 @@ impl SourceCanonical {
         Ok(value)
     }
     fn base_entry(&self, slot: usize) -> (Atom, Atom) {
-        (Atom::String(self.labels[slot]), Atom::Ref(slot as u32))
+        (
+            Atom::String(self.source.labels[slot] as u32),
+            Atom::Ref(slot as u32),
+        )
     }
     fn entry_at(&self, id: usize, slot: usize) -> Result<(Atom, Atom), PeleError> {
         if let Some(Node::Map { entries, .. }) = self.nodes.get(&id) {
@@ -276,9 +217,10 @@ impl SourceCanonical {
         }
         id < self.string_count
             && self
+                .source
                 .catalog
                 .get(id)
-                .is_some_and(|e| self.text(&e.text) == text)
+                .is_some_and(|e| e.text.as_str() == text)
     }
     fn same_string(&self, a: usize, b: usize) -> Result<bool, PeleError> {
         if a >= self.string_count || b >= self.string_count {
@@ -286,15 +228,34 @@ impl SourceCanonical {
         }
         Ok(match (self.strings.get(&a), self.strings.get(&b)) {
             (Some(a), Some(b)) => a == b,
-            (Some(a), None) => {
-                a.is(self.text(&self.catalog.get(b).ok_or_else(graph_read::invalid)?.text))
-            }
-            (None, Some(b)) => {
-                b.is(self.text(&self.catalog.get(a).ok_or_else(graph_read::invalid)?.text))
-            }
+            (Some(a), None) => a.is(self
+                .source
+                .catalog
+                .get(b)
+                .ok_or_else(graph_read::invalid)?
+                .text
+                .as_str()),
+            (None, Some(b)) => b.is(self
+                .source
+                .catalog
+                .get(a)
+                .ok_or_else(graph_read::invalid)?
+                .text
+                .as_str()),
             (None, None) => {
-                self.text(&self.catalog.get(a).ok_or_else(graph_read::invalid)?.text)
-                    == self.text(&self.catalog.get(b).ok_or_else(graph_read::invalid)?.text)
+                self.source
+                    .catalog
+                    .get(a)
+                    .ok_or_else(graph_read::invalid)?
+                    .text
+                    .as_str()
+                    == self
+                        .source
+                        .catalog
+                        .get(b)
+                        .ok_or_else(graph_read::invalid)?
+                        .text
+                        .as_str()
             }
         })
     }
@@ -307,9 +268,10 @@ impl SourceCanonical {
         let mut strings = HashMap::new();
         for (id, text) in graph.strings.into_iter().enumerate() {
             let equal = self
+                .source
                 .catalog
                 .get(id)
-                .is_some_and(|e| text.0.iter().copied().eq(self.text(&e.text).encode_utf16()));
+                .is_some_and(|e| text.0.iter().copied().eq(e.text.as_str().encode_utf16()));
             if !equal {
                 strings.insert(id, text);
             }
@@ -343,11 +305,11 @@ impl SourceCanonical {
             }
         }
         if let Node::Map { entries, .. } = node {
-            if entries.len() != self.labels.len() {
+            if entries.len() != self.source.labels.len() {
                 return false;
             }
             for (i, (k, v)) in entries.iter().enumerate() {
-                if !same_atom(k, &Atom::String(self.labels[i]))
+                if !same_atom(k, &Atom::String(self.source.labels[i] as u32))
                     || !same_atom(v, &Atom::Ref(i as u32))
                 {
                     return false;
@@ -536,7 +498,7 @@ impl PublicGraphRead for SourceCanonical {
         self.strings
             .get(&id)
             .map(|s| s.0.len())
-            .or_else(|| self.catalog.get(id).map(|e| e.units))
+            .or_else(|| self.source.catalog.get(id).map(|e| e.units))
             .ok_or_else(graph_read::invalid)
     }
     fn string_lengths(
@@ -562,7 +524,13 @@ impl PublicGraphRead for SourceCanonical {
             }
             return Ok(());
         }
-        let text = self.text(&self.catalog.get(id).ok_or_else(graph_read::invalid)?.text);
+        let text = self
+            .source
+            .catalog
+            .get(id)
+            .ok_or_else(graph_read::invalid)?
+            .text
+            .as_str();
         let mut chunk = [0u16; 1024];
         let mut n = 0;
         for unit in text.encode_utf16() {
@@ -1202,10 +1170,10 @@ impl SourceCanonical {
             if self.layout_id.is_some() {
                 // A full frame carries the original base even after replacement
                 // or truncation. Current changes follow as complete patches.
-                w.count(self.catalog.len())?;
-                for entry in &self.catalog {
+                w.count(self.source.catalog.len())?;
+                for entry in &self.source.catalog {
                     w.count(entry.units)?;
-                    for unit in self.text(&entry.text).encode_utf16() {
+                    for unit in entry.text.as_str().encode_utf16() {
                         w.put(&unit.to_le_bytes())?;
                     }
                 }
@@ -1230,7 +1198,7 @@ impl SourceCanonical {
                 &mut w,
                 typed,
                 ColumnKind::String,
-                self.labels.iter().map(|id| u64::from(*id)),
+                self.source.labels.iter().map(|id| u64::from(*id as u32)),
             )?;
             column(
                 &mut w,
@@ -1260,9 +1228,9 @@ impl SourceCanonical {
                 &mut w,
                 typed,
                 ColumnKind::String,
-                self.indices.iter().map(|id| u64::from(*id)),
+                self.source.indices.iter().map(|id| u64::from(*id as u32)),
             )?;
-            let n = self.source.nodes.len();
+            let n = self.source.labels.len();
             let m = self.source.links.len();
             let key = |k: &str| Expr::literal(&Atom::String(self.key(k)));
             w.count(6)?;
@@ -1371,25 +1339,6 @@ impl SourceCanonical {
     }
 }
 
-fn key_slot(key: &str) -> usize {
-    match key {
-        "id" => 0,
-        "index" => 1,
-        "source" => 2,
-        "target" => 3,
-        "value" => 4,
-        "sankey" => 5,
-        "type" => 6,
-        "nodes" => 7,
-        "links" => 8,
-        "title" => 9,
-        "accTitle" => 10,
-        "accDescr" => 11,
-        "lookup" => 12,
-        _ => unreachable!("static Sankey field"),
-    }
-}
-
 /// Incoming replacements shadow the ORIGINAL source, not current accepted
 /// patches. A rejected observation can therefore be repaired without replaying
 /// an observed-baseline delta against a different native state.
@@ -1473,7 +1422,11 @@ impl SourceCanonical {
                 next = entries.next().transpose()?;
                 raw.len() / 2
             } else {
-                self.catalog.get(id).ok_or_else(graph_read::invalid)?.units
+                self.source
+                    .catalog
+                    .get(id)
+                    .ok_or_else(graph_read::invalid)?
+                    .units
             };
             visit(units)?;
         }
@@ -1526,8 +1479,13 @@ impl crate::compat::public::source_input::LogicalCapturedText for SourceCandidat
         if let Some(value) = self.input.strings.get(&id) {
             return Ok(value.is(text));
         }
-        let entry = self.base.catalog.get(id).ok_or_else(graph_read::invalid)?;
-        Ok(self.base.text(&entry.text) == text)
+        let entry = self
+            .base
+            .source
+            .catalog
+            .get(id)
+            .ok_or_else(graph_read::invalid)?;
+        Ok(entry.text.as_str() == text)
     }
     fn original_utf8(&self, id: u32) -> Result<Option<&str>, PeleError> {
         let id = id as usize;
@@ -1537,8 +1495,13 @@ impl crate::compat::public::source_input::LogicalCapturedText for SourceCandidat
         if self.input.strings.contains_key(&id) {
             return Ok(None);
         }
-        let entry = self.base.catalog.get(id).ok_or_else(graph_read::invalid)?;
-        Ok(Some(self.base.text(&entry.text)))
+        let entry = self
+            .base
+            .source
+            .catalog
+            .get(id)
+            .ok_or_else(graph_read::invalid)?;
+        Ok(Some(entry.text.as_str()))
     }
 }
 impl PublicGraphRead for SourceCandidate<'_> {
@@ -1569,7 +1532,7 @@ impl PublicGraphRead for SourceCandidate<'_> {
             .strings
             .get(&id)
             .map(|s| s.0.len())
-            .or_else(|| self.base.catalog.get(id).map(|e| e.units))
+            .or_else(|| self.base.source.catalog.get(id).map(|e| e.units))
             .ok_or_else(graph_read::invalid)
     }
     fn string_lengths(
@@ -1595,14 +1558,14 @@ impl PublicGraphRead for SourceCandidate<'_> {
             }
             return Ok(());
         }
-        let text = self.base.text(
-            &self
-                .base
-                .catalog
-                .get(id)
-                .ok_or_else(graph_read::invalid)?
-                .text,
-        );
+        let text = self
+            .base
+            .source
+            .catalog
+            .get(id)
+            .ok_or_else(graph_read::invalid)?
+            .text
+            .as_str();
         let mut chunk = [0u16; 1024];
         let mut used = 0;
         for unit in text.encode_utf16() {

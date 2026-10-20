@@ -1150,6 +1150,12 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
         "sankey\nA,B,1",
         "---\ntitle: λ 😀\n---\nsankey-beta\n\"0\",\"B label\",-0\n\"B label\",C,Infinity\nC,\"0\",NaN",
         "sankey\nA,B,5e-324\nA,C,-2.5",
+        // A static symbol can preexist its first node ordinal; later decimal
+        // strings and title may collide with either. Doubled quotes normalize
+        // before deduplication, including repeated endpoint occurrences.
+        "---\ntitle: id\n---\nsankey\nA,id,1\nid,index,2\nindex,source,3\nsource,target,4\ntarget,value,5\nvalue,sankey,6\nsankey,type,7\ntype,nodes,8\nnodes,links,9\nlinks,0,10\n0,12,11\n12,title,12\ntitle,accTitle,13\naccTitle,accDescr,14\naccDescr,lookup,15\nlookup,A,16",
+        "---\ntitle: 'quoted \" label'\n---\nsankey\n\" quoted \"\" label \",id,1\nid,\"quoted \"\" label\",2\n\"quoted \"\" label\",index,-0",
+
     ] {
         let actual = PublicEngine::with_builtins().parse(source, &Default::default()).unwrap();
         let expected = legacy_engine().parse(source, &Default::default()).unwrap();

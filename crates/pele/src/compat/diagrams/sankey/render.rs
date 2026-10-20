@@ -64,7 +64,7 @@ impl<'a, M: Input> PhaseInput for Typed<'a, M> {
         layout::layout(self.0, options)
     }
     fn label(&mut self, index: usize) -> Result<Self::Label, PeleError> {
-        Ok(&self.0.nodes()[index].id)
+        Ok(self.0.node(index).id)
     }
     fn text(&mut self, label: &Self::Label) -> Result<Self::Text, PeleError> {
         Ok(*label)
