@@ -98,7 +98,7 @@ Reject or narrow if exact graph bytes diverge, fallback changes original errors,
 
 ## Existing callback limitation
 
-A new first-use check, run before this parser change, finds ER resource-callback
+At the initial direct-parser checkpoint, a first-use check found ER resource-callback
 mutation/reentrancy mismatches against pinned JS. The same failure exists in
 the prior control: measuring callback edits can be overwritten by publication;
 semantic field edits can also affect JS's in-progress render, and nested
@@ -106,6 +106,10 @@ addEntity calls are rejected by the native busy guard. Direct construction does
 not change rendering or fix that failure. Callback acceptance stays blocked;
 passing parse/graph/SVG corpus slices do not establish universal API parity.
 The failing assertion remains in the first-use comparator.
+
+The subsequent [browser host-storage lane](LLD_HOST_ER_STORE.md) addresses these
+live browser callbacks separately. This paragraph records the earlier arena
+checkpoint; it does not describe the current host-storage callback results.
 
 ## Borrowed token text
 
@@ -122,3 +126,15 @@ full lexical scan remain. A failed direct target drops its reader; fallback
 still tokenizes the prepared source afresh. Quoted substring conversions,
 destination model/graph copies, concatenation and scanner scratch strings remain.
 No parser, provider, error/admission or public lifetime contract changes.
+
+## Borrowed arena string interning
+
+ER's native `InitialWriter` passes borrowed text to a crate-private GraphWriter
+interner. Inputs of at most 64 UTF-8 bytes use a stack UTF-16 buffer: hits reuse
+the canonical ID, while misses reuse those encoded units for insertion. Longer
+inputs retain the owned conversion path. The public generic `string` method
+still invokes its caller-supplied conversion exactly once, even on hits.
+
+Canonical IDs, insertion order and finish-time graph admission are unchanged.
+This removes repeated temporary vectors from native/Swift arena construction.
+Ordinary browser host construction already uses its separate UTF-8 interner.

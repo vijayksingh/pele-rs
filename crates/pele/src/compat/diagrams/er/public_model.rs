@@ -495,7 +495,7 @@ impl InitialWriter for GraphWriter {
         Ok(GraphWriter::property(self, key, value))
     }
     fn string(&mut self, value: &str) -> Result<u32, PeleError> {
-        Ok(GraphWriter::string(self, value))
+        Ok(GraphWriter::string_str(self, value))
     }
     fn node(&mut self, node: Node) -> Result<u32, PeleError> {
         Ok(GraphWriter::node(self, node))

@@ -331,6 +331,23 @@ impl GraphWriter {
         if let Some(id) = self.strings.get(&value) {
             return *id;
         }
+        self.insert_string(value)
+    }
+    /// Borrowed well-formed input for internal construction sinks. The public
+    /// generic conversion API above still converts exactly once on every call.
+    pub(crate) fn string_str(&mut self, value: &str) -> u32 {
+        let mut buffer = [0; 64];
+        if let Some(units) = JsString::short_utf16(value, &mut buffer) {
+            if let Some(id) = self.strings.get(units) {
+                return *id;
+            }
+            // Reuse the encoded stack units on a miss, with neither a second
+            // UTF16 traversal nor another lookup of the known-absent key.
+            return self.insert_string(JsString(units.to_vec()));
+        }
+        self.string(value)
+    }
+    fn insert_string(&mut self, value: JsString) -> u32 {
         let id = self.graph.strings.len() as u32;
         self.graph.strings.push(value.clone());
         self.strings.insert(value, id);
