@@ -17,6 +17,7 @@ import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';
 export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
 import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
+import {bridgeObservationToken,completedObservationToken,completedPublicationToken} from './graph-storage.js';
 import { defaultMeasurer } from './resources.js';
 export { canvasMeasurer, metricsMeasurer, forgetTextWidths } from './resources.js';
 function result(json) {
@@ -166,6 +167,20 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   const documents = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry();
   // Native keys identify captured immutable metadata, scoped to this renderer.
   const schemaRegistrations = new Map();
+  // Native baseline authority is independent of live host equality. Tokens are
+  // replaced before observations/publications, including attempts that throw.
+  const acceptedBaselines = new WeakMap();
+  function acceptedBaseline(entry) {
+    const receipt = acceptedBaselines.get(entry);
+    return receipt && receipt.revision === entry.revision &&
+      receipt.token === bridgeObservationToken(entry.bridge) && receipt.graph === entry.bridge.graph &&
+      receipt.root === entry.bridge.root ? receipt : undefined;
+  }
+  function acceptBaseline(entry, token) {
+    if (token && token === bridgeObservationToken(entry.bridge))
+      acceptedBaselines.set(entry, {token, revision:entry.revision, graph:entry.bridge.graph, root:entry.bridge.root});
+    else acceptedBaselines.delete(entry);
+  }
   const finalizer = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(handle => handle.free()) : null;
   let registryBusy = false;
   const registryCall = operation => {
@@ -199,14 +214,27 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       } catch (value) { fail(value); }
       // Every dispatched frame finishes, including resource/read failures. This
       // short call has no user callback and acknowledges the latest revision.
+      let revision, finished=false;
       try {
+        const receipt = acceptedBaseline(entry);
         ack = nativeDetachedCall(() => entry.handle.finish_detached_render(job));
-        const revision = ack.revision;
+        revision = ack.revision;
+        const keepsBaseline = receipt && acceptedBaseline(entry) === receipt &&
+          BigInt(revision) === BigInt(receipt.revision) + 1n;
         entry.revision = revision;
-        // The result factory can itself call helpers. Publish its predecessor
-        // revision first, then never overwrite a newer nested revision.
-        outcome = detachedRenderResult(unlocked(() => ack.materialize()), revision, raw, entry.rawType);
-      } catch (value) { fail(value); }
+        if (keepsBaseline) acceptBaseline(entry, receipt.token);
+        else acceptedBaselines.delete(entry);
+        finished=true;
+      } catch (value) { acceptedBaselines.delete(entry); fail(value); }
+      if (finished) {
+        // The factory may run newer helpers. Never restore an outer receipt
+        // after it. A malformed returned transport conservatively loses proof.
+        let response, materialized=false;
+        try { response=unlocked(() => ack.materialize()); materialized=true; }
+        catch (value) { fail(value); }
+        if (materialized) try { outcome=detachedRenderResult(response,revision,raw,entry.rawType); }
+        catch (value) { acceptedBaselines.delete(entry); fail(value); }
+      }
       if (originalFailed) throw original;
       if (failed) throw error;
       return outcome;
@@ -219,25 +247,38 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   // bridge.graph tracks observations, including edits rejected by native apply.
   // Only a completely published native outcome can acknowledge that baseline.
   function prepareMutableInput(entry, values = []) {
-    const confirmed = entry.confirmedGraph;
+    const receipt = acceptedBaseline(entry);
     entry.confirmedGraph = false;
-    const baseline = entry.bridge.graph;
-    if(confirmed&&entry.unchangedApplyIsNoop&&values.length===0&&entry.bridge.matchesPublishedGraph())return {graph:baseline,values:[]};
+    if(receipt&&entry.unchangedApplyIsNoop&&values.length===0) {
+      if(entry.bridge.matchesPublishedGraph()&&acceptedBaseline(entry)===receipt)
+        return {graph:entry.bridge.graph,values:[]};
+    }
+    const prior = acceptedBaseline(entry), baseline = entry.bridge.graph;
     const input = entry.bridge.snapshot(values, entry.sourceIngressIdentity ? 'packed' : true), delta = input.delta;
-    const unchanged = confirmed && entry.unchangedApplyIsNoop &&
+    const token = completedObservationToken(entry.bridge,input);
+    const unchanged = prior && token && token===bridgeObservationToken(entry.bridge) && entry.unchangedApplyIsNoop &&
       input.graph.root.kind === baseline.root.kind && input.graph.root.value === baseline.root.value &&
       delta.nodes.length === 0 && delta.strings.length === 0 &&
       (input.graph instanceof LayoutGraph ? input.graph.nodeCount === baseline.nodeCount : input.graph.nodes.length === baseline.nodes.length) && input.graph.strings.length === baseline.strings.length;
     if (!unchanged) {
       const sparse=entry.sourceIngressIdentity?encodeSourceInput(entry.revision,input.graph,entry.sourceIngressIdentity):null;
       entry.revision=result(sparse===null?entry.handle.apply_binary(encodeGraphBinary(entry.revision,input.graph)):entry.handle.apply_source_input(sparse));
+      // Only sealed source ingress promises this exact observed baseline.
+      // Other providers obtain authority from their complete publication.
+      if(entry.sourceIngressIdentity)acceptBaseline(entry,token);
+    } else {
+      // Existing no-op policy proved the completed observation unchanged. The
+      // successful snapshot token also rejects nested superseding observations.
+      acceptBaseline(entry,token);
     }
     return input;
   }
   function publishMutableOutcome(entry, outcome) {
     entry.revision = outcome.revision;
+    acceptedBaselines.delete(entry);
     entry.bridge.reconcile(outcome.graph);
     entry.confirmedGraph = true;
+    acceptBaseline(entry,completedPublicationToken(entry.bridge,outcome.graph));
     if(Object.hasOwn(outcome,'factoryError'))throw outcome.factoryError;
   }
   function foreignParse(source, options) {
@@ -332,6 +373,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             const input = prepareMutableInput(entry, [receiver, ...argumentsValue]);
             const call=JSON.stringify({method,receiver:input.values[0],arguments:input.values.slice(1)}),functions=modelHostFunctions(bridge,operationError);
+            acceptedBaselines.delete(entry);
             const outcome = bridge.graph instanceof LayoutGraph
               ? layoutResult(()=>mutable.invoke_source_layout_with_functions(entry.revision,call,functions),bridge.graph,entry.revision)
               : binaryResult(()=>mutable.invoke_binary_with_functions(entry.revision,call,functions));
@@ -343,6 +385,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
           entry.confirmedGraph = true;
+          acceptBaseline(entry,completedPublicationToken(bridge,snapshot.graph));
           const model = bridge.root;
           documents.set(model, entry);
           ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
@@ -520,6 +563,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           return renderedValue(outcome.Ok);
         }
         const packet=entry.handle.render_raw_operation_packet_with_functions;
+        acceptedBaselines.delete(entry);
         const outcome=entry.bridge.graph instanceof LayoutGraph
           ?layoutResult(()=>entry.handle.render_raw_operation_source_layout_with_functions(entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.bridge.graph,entry.revision,true,entry.rawType)
           :typeof packet==='function'
@@ -702,6 +746,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
               const job=typeof document.handle.prepare_detached_render_numbers==='function'
                 ?nativeDetachedCall(()=>document.handle.prepare_detached_render_numbers(document.revision,numeric.json,numeric.mask,numeric.numbers,numeric.outputKind,numeric.output)):undefined;
               if(job)return runDetachedRender(document,job,false,width,icons,clock,undefined,dispatcher);
+              acceptedBaselines.delete(document);
               const packet=document.handle.render_numbers_operation_packet_with_functions;
               const outcome=bridge.graph instanceof LayoutGraph
                 ?layoutResult(()=>document.handle.render_numbers_operation_source_layout_with_functions(document.revision,...numericArguments,dispatcher),bridge.graph,document.revision,false,document.rawType)

@@ -35,6 +35,35 @@ const sameNode=(a,b)=>a&&a.kind===b.kind&&a.prototype===b.prototype&&a.errorType
 // Other backends implement the scalar slot/capture interface documented privately.
 export const NestedStorage = Object.freeze({});
 
+// Internal observation identity, not proof of native acceptance. Failed reads
+// may already append string/object history while bridge.graph stays unchanged.
+const observationTokens = new WeakMap(), completedObservations = new WeakMap(), completedPublications = new WeakMap();
+export function invalidateBridgeObservation(bridge) {
+  const token = {}; observationTokens.set(bridge, token); completedPublications.delete(bridge); return token;
+}
+export function bridgeObservationToken(bridge) { return observationTokens.get(bridge); }
+export function completedObservationToken(bridge, input) {
+  const proof=completedObservations.get(input);
+  return proof && proof.token===observationTokens.get(bridge) && proof.graph===input.graph &&
+    proof.graph===bridge.graph && proof.root===bridge.root ? proof.token : undefined;
+}
+function completeObservation(bridge, input, token) {
+  if (observationTokens.get(bridge) === token && input.graph===bridge.graph)
+    completedObservations.set(input,{token,graph:input.graph,root:bridge.root});
+  return input;
+}
+export function completeBridgePublication(bridge, graph, token) {
+  if(observationTokens.get(bridge)===token && bridge.graph===graph)
+    completedPublications.set(bridge,{token,graph,root:bridge.root});
+  else completedPublications.delete(bridge);
+}
+export function completedPublicationToken(bridge, graph) {
+  const proof=completedPublications.get(bridge);
+  return proof && proof.token===observationTokens.get(bridge) && proof.graph===graph &&
+    proof.graph===bridge.graph && proof.root===bridge.root ? proof.token : undefined;
+}
+
+
 function flatValue(bridge, storage, graph, slot) {
   const tag = storage.atomTag(graph, slot);
   const value = storage.atomPayload(graph, slot);
@@ -88,6 +117,7 @@ export function createGraphTraversal(storage = NestedStorage) {
   const createNodeCursor = !nested && typeof storage.createNodeCursor==='function' ? storage.createNodeCursor : null;
 
 function reconcileGraph(bridge, graph, changed) {
+  const publication=invalidateBridgeObservation(bridge);
   const cursor=createNodeCursor?createNodeCursor(graph):null;
   const propertyWords=readProperty&&!cursor?new Uint32Array(5):null;
   bridge.graph = graph;
@@ -189,6 +219,7 @@ function reconcileGraph(bridge, graph, changed) {
     }
   }
   bridge.root=nested?bridge.value(graph.root):flatValue(bridge,storage,graph,storage.rootSlot(graph));
+  completeBridgePublication(bridge,graph,publication);
   return bridge.root;
 }
 
@@ -267,6 +298,7 @@ function matchesGraph(bridge) {
 }
 
 function snapshotGraph(bridge, values = [], delta = false) {
+  const observation = invalidateBridgeObservation(bridge);
   for (const baseline of bridge.registration.prototypeBaseline) {
     const descriptors = Object.getOwnPropertyDescriptors(baseline.value), original = baseline.descriptors;
     if (Object.getPrototypeOf(baseline.value) !== baseline.parent || Reflect.ownKeys(descriptors).length !== Reflect.ownKeys(original).length || Reflect.ownKeys(original).some(key => {
@@ -383,11 +415,11 @@ function snapshotGraph(bridge, values = [], delta = false) {
   if(nested){
     const appended=bridge.strings.slice(baseline.strings.length).map(units);
     bridge.graph={version:1,root,strings:delta?baseline.strings.concat(appended):bridge.strings.map(units),nodes};
-    return{graph:bridge.graph,values:argumentsValue,...(delta?{delta:{stringsStart:baseline.strings.length,strings:appended,nodesStart:baseline.nodes.length,nodes:changes.sort((a,b)=>a[0]-b[0])}}:{})};
+    return completeObservation(bridge,{graph:bridge.graph,values:argumentsValue,...(delta?{delta:{stringsStart:baseline.strings.length,strings:appended,nodesStart:baseline.nodes.length,nodes:changes.sort((a,b)=>a[0]-b[0])}}:{})},observation);
   }
   const result=capture.finish(bridge.strings);
   bridge.graph=result.graph;
-  return result;
+  return completeObservation(bridge,result,observation);
   } catch(error) {
     try { capture?.abort?.(bridge.strings); } catch {}
     throw error;

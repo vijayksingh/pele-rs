@@ -1,11 +1,11 @@
 import {LayoutGraph,LayoutStorage,applyLayoutDelta} from './layout-storage.js';
 import {tryInitializeSourceLayout} from './source-initializer.js';
-import {getGraphTraversal,numberValue, reconcileNestedGraph as reconcileGraph, matchesNestedGraph as matchesGraph, snapshotNestedGraph as snapshotGraph} from './graph-storage.js';
+import {completeBridgePublication,invalidateBridgeObservation,getGraphTraversal,numberValue, reconcileNestedGraph as reconcileGraph, matchesNestedGraph as matchesGraph, snapshotNestedGraph as snapshotGraph} from './graph-storage.js';
 export {stringValue} from './graph-storage.js';
 const layoutTraversal=getGraphTraversal(LayoutStorage);
 const layoutMethods={
-  reconcile(graph,changed){if(!(graph instanceof LayoutGraph))throw new TypeError('Source layout outcome lost its baseline');return layoutTraversal.reconcileGraph(this,graph,changed);},
-  reconcileDelta(delta){return this.reconcile(applyLayoutDelta(this.graph,delta),delta.nodes.map(([id])=>id));},
+  reconcile(graph,changed){invalidateBridgeObservation(this);if(!(graph instanceof LayoutGraph))throw new TypeError('Source layout outcome lost its baseline');return layoutTraversal.reconcileGraph(this,graph,changed);},
+  reconcileDelta(delta){invalidateBridgeObservation(this);return this.reconcile(applyLayoutDelta(this.graph,delta),delta.nodes.map(([id])=>id));},
   matchesPublishedGraph(){return layoutTraversal.matchesGraph(this);},
   snapshot(values=[],delta=false){return layoutTraversal.snapshotGraph(this,values,delta);},
   hostReferenceId(value){if(!this.hostIds.has(value)){if(this.hostValues.length>=1_000_000)throw new RangeError('Host reference budget exceeded');this.hostIds.set(value,this.hostValues.length);this.hostValues.push(value);}return this.hostIds.get(value);}
@@ -90,6 +90,7 @@ export class ModelRegistry {
 }
 export class ModelBridge {
   constructor(graph, schema, registry, invoke, prevalidatedRegistration) {
+    const publication=invalidateBridgeObservation(this);
     this.registry = registry;
     if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || registry.schemas.get(`${schema.id}:${schema.version}`) !== prevalidatedRegistration)) throw new TypeError('Invalid prevalidated model registration');
     this.registration = prevalidatedRegistration ?? registry.registration(schema);
@@ -102,7 +103,8 @@ export class ModelBridge {
     this.hostValues = [];
     this.objects = [];
     if(graph instanceof LayoutGraph)Object.assign(this,layoutMethods);
-    if (!(graph instanceof LayoutGraph && tryInitializeSourceLayout(this,graph))) this.reconcile(graph);
+    if (graph instanceof LayoutGraph && tryInitializeSourceLayout(this,graph)) completeBridgePublication(this,graph,publication);
+    else this.reconcile(graph);
   }
   reconcile(graph, changed) {
     return reconcileGraph(this, graph, changed);
@@ -111,6 +113,7 @@ export class ModelBridge {
     return matchesGraph(this);
   }
   reconcileDelta(delta) {
+    invalidateBridgeObservation(this);
     if (delta.stringsStart !== this.graph.strings.length || delta.nodesStart !== this.graph.nodes.length) throw new TypeError('Stale native model delta');
     const nodes=this.graph.nodes.slice();
     for(const [id,node] of delta.nodes) nodes[id]=node;
