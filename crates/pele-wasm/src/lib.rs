@@ -1,3 +1,5 @@
+#[cfg(feature = "native-canonical-sankey")]
+mod native_canonical;
 #[cfg(feature = "captured-sankey")]
 mod captured_store;
 #[cfg(feature = "captured-sankey")]

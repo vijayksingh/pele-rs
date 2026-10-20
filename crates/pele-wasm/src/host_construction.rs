@@ -149,6 +149,7 @@ impl<T: ConstructionBatchTransport> ConstructionEmitter<T> {
 impl<T: ConstructionBatchTransport> ConstructionEmitter<T> {
     /// Assigned string ID comes from the caller's current canonical storage.
     /// Source uses the private pre-counted form so it does not scan UTF16 twice.
+    #[cfg(feature = "captured-sankey")]
     pub(crate) fn append_string(&mut self, id: u32, value: &str) -> Result<(), PeleError> {
         let units = value.encode_utf16().count();
         u32::try_from(units).map_err(|_| construction_frame_limit())?;
@@ -192,6 +193,7 @@ impl<T: ConstructionBatchTransport> ConstructionEmitter<T> {
             _ => return Err(self.transport.invalid("Unsupported host constructor node")),
         })
     }
+    #[cfg(feature = "captured-sankey")]
     pub(crate) fn append_node(
         &mut self,
         id: u32,

@@ -1,5 +1,4 @@
 import {CapturedOwner,capturedSankeyAvailable,rememberCapturedModel,capturedObservedFrame} from './captured-owner.js';
-import {createCapturedContext,capturedEpoch,closeCapturedContext} from './captured-store.js';
 import {HostErOwner} from './host-er-store.js';
 import initialize from './initialize.js';
 import {modelHostFunctions} from "./host-functions.js";
@@ -292,11 +291,11 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           finalizer?.register(model, mutable, model);
           return model;
   }
-  function adoptCaptured(handle,context,preparedType,existingOwner) {
+  function adoptCaptured(handle,epoch,preparedType,existingOwner) {
     // Native already completed initial snapshot/schema/+17 frame admission.
     // Registration still occurs here, after that gate, as in adoptMutable.
+    let graph;
     try {
-      const graph=capturedEpoch(context);
       const schemaKey=existingOwner?undefined:handle.schema_cache_key?.();
       let registration=typeof schemaKey==='string'?schemaRegistrations.get(schemaKey):undefined;
       if(!registration){
@@ -306,16 +305,17 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       }
       const rawType=handle.entry_type(),live=preparedType===undefined?liveProviders.get(rawType):undefined;
       const entry={handle,revision:handle.revision(),disposed:false,preparedType,rawType,provider:live?.provider,confirmedGraph:false,unchangedApplyIsNoop:handle.unchanged_public_graph_is_noop?.()===true};
-      const owner=existingOwner??new CapturedOwner(registration,registry,capturedNativeValue,result,operationError);
+      const owner=existingOwner??new CapturedOwner(registration,registry,capturedNativeValue,result,operationError,nativeCapabilities.native_canonical_memory(),handle);
       entry.bridge=owner;entry.capturedOwner=owner;
-      owner.attach(entry,graph);owner.reconcile(graph);entry.confirmedGraph=true;
+      const admitted=epoch;epoch=undefined;graph=owner.view(admitted);
+      owner.attach(entry);owner.reconcile(graph);entry.confirmedGraph=true;
       const model=owner.root;
       documents.set(model,entry);
       ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
       finalizer?.register(model,handle,model);
       rememberCapturedModel(model,owner,existingOwner?'raw':preparedType===undefined?'source':'prepared');
       return model;
-    } finally {closeCapturedContext(context);}
+    } finally {graph?.release();if(epoch){try{epoch.close();}finally{epoch.free?.();}}}
   }
   const renderer = {
     capabilities() { return nativeRegistry ? nativeValue(() => nativeRegistry.capabilities()) : result(builtin_capabilities()); },
@@ -336,7 +336,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     parsePrepared(type, source, config, title, lineOffset, maxEdges) {
       const limits=parseLimitValues({maxEdges});
       if(capturedSankey&&type==='sankey'){
-        const parsed=registryCall(()=>capturedNativeValue(()=>nativeRegistry.parse_prepared_with_captured_sankey(type,source,finiteConfigJSON(config),title,lineOffset,limits.edgeKind,limits.edgeValue,undefined)));
+        const parsed=registryCall(()=>capturedNativeValue(()=>nativeRegistry.parse_prepared_with_native_sankey(type,source,finiteConfigJSON(config),title,lineOffset,limits.edgeKind,limits.edgeValue)));
         const handle=parsed[1];
         try{return parsed[0]===1?adoptCaptured(handle,parsed[2],type):adoptMutable(handle,type);}
         catch(error){handle.free();throw error;}
@@ -364,25 +364,27 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       if(rawDisposed.has(model))throw new TypeError('Public model document is disposed');
       let entry=documents.get(model);
       if(!entry&&capturedSankey&&type==='sankey'){
-        const selection=registryCall(()=>capturedNativeValue(()=>nativeRegistry.select_prepared_captured_sankey(type)));
+        const selection=registryCall(()=>capturedNativeValue(()=>nativeRegistry.select_prepared_native_sankey(type)));
         if(selection){
-          let context,graph,handle;
+          let graph,handle,epoch;
           try{
             const schema=registryCall(()=>result(selection.schema()));
             const registration=registry.registration(schema);
-            // Match the arena provisional WeakRef/failure schedule. A failed
-            // observation leaves its discovered identities/history as before.
-            const owner=new CapturedOwner(registration,registry,capturedNativeValue,result,operationError);
-            owner.root=model;graph=owner.snapshot().graph;
-            context=createCapturedContext(owner,graph,[],false);
-            handle=registryCall(()=>{
+            // Preserve provisional registration and failure timing. Existing
+            // caller objects acquire IDs but never fresh native ownership.
+            handle=registryCall(()=>capturedNativeValue(()=>nativeRegistry.create_prepared_native_sankey(selection)));
+            const owner=new CapturedOwner(registration,registry,capturedNativeValue,result,operationError,nativeCapabilities.native_canonical_memory(),handle);
+            owner.seed(capturedNativeValue(()=>handle.initial_epoch()));
+            owner.root=model;graph=owner.snapshot().graph.retain();
+            epoch=registryCall(()=>{
               capturedObservedFrame(graph);
-              return capturedNativeValue(()=>nativeRegistry.bind_prepared_captured_sankey(selection,context,finiteConfigJSON(config)));
+              return capturedNativeValue(()=>nativeRegistry.bind_prepared_native_sankey(selection,handle,finiteConfigJSON(config)));
             });
-            adoptCaptured(handle,context,type,owner);handle=undefined;
+            const admitted=epoch;epoch=undefined;
+            adoptCaptured(handle,admitted,type,owner);handle=undefined;
             entry=documents.get(model);
           }catch(error){handle?.free();throw error;}
-          finally{if(context)closeCapturedContext(context);graph?.releaseArguments();selection.free();}
+          finally{if(epoch){try{epoch.close();}finally{epoch.free?.();}}try{graph?.releaseArguments();}finally{graph?.release();selection.free();}}
         }
       }
       if(!entry&&nativeRegistry.select_prepared_host_er&&nativeRegistry.bind_prepared_host_er){
@@ -444,7 +446,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       try {
         if(entry.capturedOwner){
           const owner=entry.capturedOwner,input=owner.prepare(entry);input.graph.releaseArguments();
-          const outcome=owner.packet(entry,'raw',(context,commit)=>entry.handle.render_raw_captured(context,entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,commit));
+          const outcome=owner.packet(entry,'raw',()=>entry.handle.render_raw_native(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline));
           if(callbackFailed)throw callbackError;
           if(Object.hasOwn(outcome,'Err'))throw operationError(outcome.Err,owner);
           return renderedValue(outcome.Ok);
@@ -491,7 +493,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
               return owner.primitive.bind(owner);
             };
             try{parsed=capturedSankey
-              ?capturedNativeValue(()=>nativeRegistry.parse_with_host_storage(source,limits.json,limits.sourceKind,limits.sourceValue,limits.edgeKind,limits.edgeValue,make,capture,undefined))
+              ?capturedNativeValue(()=>nativeRegistry.parse_with_native_storage(source,limits.json,limits.sourceKind,limits.sourceValue,limits.edgeKind,limits.edgeValue,make,capture))
               :nativeRegistry.parse_with_host_er(source,limits.json,limits.sourceKind,limits.sourceValue,limits.edgeKind,limits.edgeValue,make,capture);
             }catch(error){if(failed)throw original;throw error;}
             if(failed){parsed?.[1]?.free();throw original;}

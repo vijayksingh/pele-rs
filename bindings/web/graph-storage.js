@@ -243,6 +243,7 @@ function snapshotGraph(bridge, values = [], delta = false) {
   const baseline=bridge.graph, changes=nested?[]:null;
   const pending=[],seen=new Set(),nodes=nested?baseline.nodes.slice():null;
   const capture=nested?null:storage.beginCapture(baseline,delta);
+  try {
   const store=nested?(id,node)=>{if(!delta||!sameNode(nodes[id],node)){nodes[id]=node;changes.push([id,node]);}}:null;
   let codeUnits=bridge.strings.reduce((n,s)=>n+s.length,0),propertiesCount=0;
   const budget=()=>{throw new RangeError('Public model graph exceeds host exchange budget');};
@@ -353,6 +354,10 @@ function snapshotGraph(bridge, values = [], delta = false) {
   const result=capture.finish(bridge.strings);
   bridge.graph=result.graph;
   return result;
+  } catch(error) {
+    try { capture?.abort?.(bridge.strings); } catch {}
+    throw error;
+  }
 }
 
   return Object.freeze({reconcileGraph, matchesGraph, snapshotGraph});

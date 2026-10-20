@@ -10,6 +10,7 @@ publish = false
 crate-type = ["cdylib"]
 
 [features]
+native-canonical-sankey = ["pele/web-host-sankey"]
 captured-sankey = ["pele/web-host-sankey"]
 
 [dependencies]

@@ -14,6 +14,11 @@ case "${PELE_WASM_CAPTURED_SANKEY:-0}" in
     1) pele_wasm_build_args+=(--features captured-sankey) ;;
     *) echo 'PELE_WASM_CAPTURED_SANKEY must be 0 or 1' >&2; exit 2 ;;
 esac
+case "${PELE_WASM_NATIVE_CANONICAL_SANKEY:-0}" in
+    0) ;;
+    1) pele_wasm_build_args+=(--features native-canonical-sankey) ;;
+    *) echo 'PELE_WASM_NATIVE_CANONICAL_SANKEY must be 0 or 1' >&2; exit 2 ;;
+esac
 # rust-lld on macOS needs the LLVM library shipped in the toolchain's lib/.
 DYLD_FALLBACK_LIBRARY_PATH="$rust_bin/../lib:${DYLD_FALLBACK_LIBRARY_PATH:-/usr/local/lib:/usr/lib}" \
 CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_OPT_LEVEL="$pele_wasm_opt_level" \
