@@ -183,6 +183,13 @@ Median ratios across all sizes/resources are **2.38× source**, **11.06× parse*
 and **4.02× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
+The [entry read frame](docs/benchmarks/2026-10-20-er-host-storage/entry-frame/)
+improves retained ER rendering by 11.02–14.37% paired against the lexer artifact.
+The subsequent [error-brand allocation removal](docs/benchmarks/2026-10-20-er-host-storage/error-brands/)
+improves it another 7.44–10.01% against the frame artifact, while parse controls
+are mixed. Retained ER still takes 3.35–4.30× JS time in that latest scoped run.
+These separate measurement windows must not be compounded into a single gain.
+
 The [shared ER lexer follow-up](docs/benchmarks/2026-10-20-er-host-storage/lexer/)
 improves VM ER parse by 6.1–8.6% paired against the preceding packet artifact.
 Local Swift ER mutable/immutable parse improves 20.8%/10.0% against frozen

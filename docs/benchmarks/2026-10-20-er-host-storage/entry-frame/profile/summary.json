@@ -1,0 +1,1008 @@
+{
+  "browser": "156.0.8078.4",
+  "wasmSHA256": "1036593e94ae9113a848aaf1a0cbb118e05991d6abdc3c6e977fec17bb4d66f2",
+  "runtimeHashes": {
+    "all-diagram-entries.js": "2198ccdbf3586d74e9770006fb05c820e445a0968a6256a2ab0d6627f92cd424",
+    "builtin-entries.js": "c613f773cdfcd8d9922737c6a88dab17db3c070903e14bce2f198e369d02aba3",
+    "core.d.ts": "9ecbec2091a240664457e687e8b6083ace52a620a64ef65a876bf8fc606a4441",
+    "core.js": "b4189751676890c646ec76fb831eb16c141279b27f44dd665f3f03813f23754a",
+    "diagram-entries.d.ts": "97b2290e3dbfd3aa735dfea383a63c0da0ed1ca445dfa68db4669bf24ecb9c47",
+    "diagram-entries.js": "649ddeffc62753190854d0440dde259011400f826852b4aa20a14bb6507f2008",
+    "diagrams/agentflow.d.ts": "ed966aa366e4f443ebc04f7766bcb326c033fcf1b5198802a3d3262ac4fd1640",
+    "diagrams/agentflow.js": "76b816c01cf6b17ef9eebf6943e44dfc217839f04ad1e556ebcc60871d6bab63",
+    "diagrams/architecture.d.ts": "685d1aad08763ed184576061f1af57ebd020e97275a35ee28c743bed76491d65",
+    "diagrams/architecture.js": "f6797d1af08dd37c49d99cec1dcd76dd45390a635d3f57af5eb43400f176bc38",
+    "diagrams/block.d.ts": "4bb13f66ae9d1ea73e1e73bb382ffdd2d5396ed2a442fc35b3feed09f486929d",
+    "diagrams/block.js": "9ec59c1ae0c9ebca58d3d5facf7c2e10a66b7d1aa9fe5a2a9d47def7d6def9cd",
+    "diagrams/c4.d.ts": "8bbe330bc5e9233c3b4f2b08ea3ff801111962bef52b66b0bf412da82929c9f9",
+    "diagrams/c4.js": "4648be6d26ce54747289b95972989f1d57b8cb01cb7015e1d1c150c40b1b5470",
+    "diagrams/class.d.ts": "0663430c12f41c282d2025e332341c869d93570bcd3e5657029dcc18e9de7847",
+    "diagrams/class.js": "d2d07b788987e4107ab9f4c76e46ce35001598530d1cc4a6317d73060ef58802",
+    "diagrams/cynefin.d.ts": "b251614dde7430ff521e12c769cf8e083edd793a6d63b31678ffb1df55a431a3",
+    "diagrams/cynefin.js": "dda906572a81cf956d584fb2a1beb54662f0d9f8c8b8c0e15159a26bb62f1701",
+    "diagrams/er.d.ts": "cfe808613977d282727b2f2375f3b2fe781bc9cad5e02e023f753a2f6cf851cc",
+    "diagrams/er.js": "4f58c75060c6965e255f9dc43d5e4c71700bd15fd41408bc6c210df2c7f1c414",
+    "diagrams/eventmodeling.d.ts": "a20be3600f375bb9358120f3b8b8588856ce46b365e2b7e7d0c9f276f3b56a24",
+    "diagrams/eventmodeling.js": "2bd0d3ae5ee0cc85c81638fa225601001fa984d338b28d617e4f4625b0b211f6",
+    "diagrams/flowchart.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+    "diagrams/flowchart.js": "1d8357752cfc2560c778b6b8e8677b28e31bb33b738b83e50cda2fe60b10c6d6",
+    "diagrams/gantt.d.ts": "6cfab071c62f397e4ea63e8622637f9e307c47868fe38ac370fb1dffbdcb76f5",
+    "diagrams/gantt.js": "084cd1ef3df8e755d4be23a4697f7a09e9eef2f9242669b7ba089108f7be86b3",
+    "diagrams/gitGraph.d.ts": "e893045bf79909c866b514bb924ee048fd01f8bc2caa2f023b225e89b5ac41de",
+    "diagrams/gitGraph.js": "bd51ef5f4b2d158e3b47c95eef52c5575bb4d77cf6becdbd57ed20071f771bc1",
+    "diagrams/info.d.ts": "318d29ac48e33d7a5ff62ad5832803ab30c1759273cb700f4f81e90a7a772f5a",
+    "diagrams/info.js": "4973c7dd85283de9615c3ede99cae84b077ae53c897a219c42ac56627fb7bf12",
+    "diagrams/ishikawa.d.ts": "3c3d832ac347626f6ecd4ec520eb1c57ba47ada2b3aa3c68aac8ff9b42e96577",
+    "diagrams/ishikawa.js": "11e6631b6d577db24d85b51e9f0a7ba1e05601b1f3ce18891bc24bf225f78b03",
+    "diagrams/journey.d.ts": "d9364c99a6013ccf33cbbf7753b6606c80dc24a9543c3f764045c70ada30c553",
+    "diagrams/journey.js": "a618aa5122dff51245d6f1d24a19df278eb81de128d2a442408445ced8200115",
+    "diagrams/kanban.d.ts": "887e9f8e63e1e20e4d34228705bc9f276424bf0606b407a99e29be9a1a7ba61b",
+    "diagrams/kanban.js": "d55dd426f18681396dbdd3294fd7afcec3d4df189cb4769c961367647b010770",
+    "diagrams/mindmap.d.ts": "b73b90c318ead5a5aa869d4cba49e357ea1b90182669e0e139f0b6def47828af",
+    "diagrams/mindmap.js": "93c4922666ee8e0cac9822bb4b9af6bf22471f63bbb352fe5818e4d57451b7ab",
+    "diagrams/packet.d.ts": "c5a09be592cd97ee1c86e8c2281d7c87b677b55cdeeac9a99e6d2111010b054e",
+    "diagrams/packet.js": "ada87c921a18dd72d3c52f14c7a53b8cd628fc0275bf232ac9d1201b967cb7bb",
+    "diagrams/pie.d.ts": "7a3ccf3e6b762089d37cafe61d1aab941c8de69072301b78a3f14afda3915a02",
+    "diagrams/pie.js": "e31a8fe275411e76361094ed3a3b03bb58e1ab50edae051371f0838b876d2c43",
+    "diagrams/quadrantChart.d.ts": "45d683e54a3f1c28c46de448930329f5344d2d673308c41ad6dbc61871942f69",
+    "diagrams/quadrantChart.js": "8877ba13ccfdb408fadd9e63929625864544e1c95f07bb0674d9770dfa6874d5",
+    "diagrams/radar.d.ts": "e963a59434fd12ff343b2ed389c30b3d03e32e8e299f8555c0d1af864415594b",
+    "diagrams/radar.js": "dc956214601d6084d77c96108ca00a2be58640df1a9d3e6251045250e99b7604",
+    "diagrams/railroad.d.ts": "23c4cb03d8c1abea156392964bd5b0e6f8d7087ab3d0bce66e3348438e84f773",
+    "diagrams/railroad.js": "d0d30c37203c93db5b127b6e8e34affbf095996403e362990b20aa70baeb2a81",
+    "diagrams/requirement.d.ts": "1398a66ab6c04298e009433e681091b0b024bff2d7d48a45057360b3666322e1",
+    "diagrams/requirement.js": "bf9651beff933c6a3db084e1ab2567a8d1487aa935822e04dbcf66de4eb60de1",
+    "diagrams/sankey.d.ts": "8ecb9af4bb2f44e5712842315c53b133937c2b028881d939d54628b63d5a9421",
+    "diagrams/sankey.js": "c6fcc9edcd50910cbe5b0773e4d6a683b6befda044dcca92f115c72d987187ef",
+    "diagrams/sequence.d.ts": "cecc8a8a1c16cf47bf3e43e9dded18cfc96c1777f9ad85f825db8d6851a2a5e3",
+    "diagrams/sequence.js": "b87558078379f8183a95f613064e2cae76bb5b3fe6bf91f64e085e99a382a6ad",
+    "diagrams/state.d.ts": "7bfba0476f781b60a6313af1dd7ff28d6e592249e0a57e59d51d466b6a8644ef",
+    "diagrams/state.js": "d627791aeac455514abbde4a4c74089209d9a21cb0fbe6d1c53ff8346b718163",
+    "diagrams/swimlane.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+    "diagrams/swimlane.js": "2ad18d6a0e9bf45d20161539843a305235efbf34ea83b5080fb8f722e8329dc0",
+    "diagrams/timeline.d.ts": "ffdce40a2ca1cabfd08a5e5fae52cb14056f4057153184e4dc2480a63e9b3875",
+    "diagrams/timeline.js": "449a69e40593627605fd8ad5818cae1da8ca075529f61cd92dcb340dc72f58fc",
+    "diagrams/treemap.d.ts": "f326b681722b56667c012c82c6250717deac5c41b26c06706dd1f23d83d66f19",
+    "diagrams/treemap.js": "8487c58c79eb01ce6a8ba9b1eb7f4cc05940316aa649365dacff76062832c37f",
+    "diagrams/treeView.d.ts": "3a1ff6d58f50f61387906e6ad1d6a8fa389cbf0d1bf71458d38cddfc78cb18c9",
+    "diagrams/treeView.js": "06c583a03010f7f26aacc1cbc8a5a3982e47890339e6115f8fbc6486b279f497",
+    "diagrams/usecase.d.ts": "35d802519f837262075c97f2fb868a5d9cbe1e11d1c7d6fe6b6f4fc5accaa85c",
+    "diagrams/usecase.js": "de333bea8f335fea2117c273f272bc51902c77c839f19bf9915a6ac00a402e65",
+    "diagrams/venn.d.ts": "9449b3af69edba6a5913152ed172e2aa9e07275d144f7de0a6f83f0e0f0c4708",
+    "diagrams/venn.js": "7bab9528e3c06dabfb2cc6c41ca717717a5d44091777d74a1d8570770bf64d57",
+    "diagrams/wardley.d.ts": "76f8a09179ba84a8fd08009928c1b2d78b03c00667de33d5b6bd74425a698865",
+    "diagrams/wardley.js": "8757dec7935fc53e299fa212589d6fc9f544905c1986a6d988cf15ef8d0952c5",
+    "diagrams/xychart.d.ts": "e280a1e33debe14d03128c02f426da021b21f5c9b365b2738dd376783b8d7050",
+    "diagrams/xychart.js": "bcb6d5fb732fbd5567cc72167e2e38d405a733020aed6b8fc6b788eb884fa89f",
+    "errors.js": "b7ecbd71b53235f2e83825571145db878f65059e5d6d3d814de348d634ab4a98",
+    "FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+    "FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+    "full.d.ts": "6bd357541b024665c872be6f1cf2433059c22b0b17bbccd682cdb981b96a6307",
+    "full.js": "55f8e877f0fed9b22793f080cd8ef0c9d37e9b57067e38c71c78a5f48d65a879",
+    "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+    "graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+    "host-er-store.js": "7f82bb76b428dcd786d9720e3b9077e3be48081b276d2831648e6b42f95ff955",
+    "host-functions.js": "f86795a2710cb9e4ea70604c122f8685d0d994acb29b1f8b8afe954ffbc53b06",
+    "index.d.ts": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+    "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+    "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+    "lazy.d.ts": "b5252f51d93719e01ec2221ce14686d5a79ca69fdbfa545ba7fad83fca253503",
+    "lazy.js": "9c18e4d7da1c6bba736a4f739a43179b7af514493ba6d97364d31e80429cbb93",
+    "LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+    "MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+    "mount.js": "61bf88521d76030f64fc8457ebe80137dedc61a6a93db6ec2d6ac8324863a07b",
+    "NOTICE": "b29bd5d01e4cd9cf1a6cd96ffdb12ed6548ab290c01e0a374f12d7212c3baf01",
+    "package.json": "42b3141f8f64a819fb957d7c00900cc7201069f8119940da1019742e3ef64a0c",
+    "parse-limits.js": "643293e8fe70ff35a9ecc431601f5cfa8430c3ad91e9f8681a5c8f3fcc0043c9",
+    "PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+    "pkg/pele_bg.wasm": "1036593e94ae9113a848aaf1a0cbb118e05991d6abdc3c6e977fec17bb4d66f2",
+    "pkg/pele_bg.wasm.d.ts": "998aedab75f54e0d384efaff681a0946bad9eda6fa078a6dbc077e6693701c9b",
+    "pkg/pele.d.ts": "418271694d980899dac54c9994553c9a4396e5577be20d7404417d6cbcb0aa9b",
+    "pkg/pele.js": "6dc4a06603bec09da769538e6e58813d27214b710877af50d08130c89b17f928",
+    "README.md": "8fc9239e13d6c39ab7d5b3232e7e9d79f715cbc958fab0ea221b34e4f3e153f3",
+    "registry.d.ts": "251873bffdbc0e1608e5050f321790178cb48270ede48c728ae4ea3af8019199",
+    "registry.js": "0b6fd01dd8228ae286b1827ffa7ef280f169d4fbb43be6034de8d739aaee9855",
+    "REGISTRY.md": "b618e3039b3f50a2553ef124508adc458fd34e8ee9f4b3ffff96f7a75b702054",
+    "render-numbers.js": "c47561036e06abe9795f766863a2f3600e44f6312888077e3ba0c09ec47cb102",
+    "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+    "V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+    "window.js": "10838164b41efcdf3252a2fadcbbf799a49be9b9197f795a2cda2e0bc8e7d3d0",
+    "zoom.js": "c5d293c1f157b04e37344318de97b4c066a18d95d730f5a7ce76655020d72734"
+  },
+  "harnessSHA256": "8481a04a81b15893e0e61536d1e6d88d2eb15bb48d62b385f4c9c4e42fa6421f",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "host": {
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "AMD EPYC-Genoa Processor",
+    "logicalCPUs": 8,
+    "loadBefore": [
+      0.41,
+      0.55,
+      0.5
+    ],
+    "loadAfter": [
+      0.5,
+      0.56,
+      0.51
+    ]
+  },
+  "samplingIntervalUs": 250,
+  "durationMs": 1500,
+  "profiles": [
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "runtime": "js",
+      "operations": 1937,
+      "checksum": 160397210,
+      "top": [
+        {
+          "name": "Ze",
+          "percent": 12.345552780777975
+        },
+        {
+          "name": "q1",
+          "percent": 11.501945615941302
+        },
+        {
+          "name": "hg",
+          "percent": 8.923689014663466
+        },
+        {
+          "name": "width",
+          "percent": 7.9403003619434545
+        },
+        {
+          "name": "d",
+          "percent": 6.839327003906763
+        },
+        {
+          "name": "ch",
+          "percent": 5.414591245925466
+        },
+        {
+          "name": "W1",
+          "percent": 4.454628935156274
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 4.352122510708491
+        },
+        {
+          "name": "http://127.0.0.1:33515/oracle.js",
+          "percent": 3.243383514456059
+        },
+        {
+          "name": "De",
+          "percent": 2.81536742146513
+        },
+        {
+          "name": "(program)",
+          "percent": 2.6108722817839483
+        },
+        {
+          "name": "ng",
+          "percent": 2.396217098770505
+        },
+        {
+          "name": "fontSet",
+          "percent": 2.3639897001751797
+        },
+        {
+          "name": "Ki",
+          "percent": 2.0153125442884052
+        },
+        {
+          "name": "U",
+          "percent": 1.966259596225641
+        },
+        {
+          "name": "Sn",
+          "percent": 1.9603059402602394
+        },
+        {
+          "name": "addEntity",
+          "percent": 1.6735597491440002
+        },
+        {
+          "name": "D",
+          "percent": 1.2716232578276014
+        },
+        {
+          "name": "je",
+          "percent": 1.2524680168954403
+        },
+        {
+          "name": "gg",
+          "percent": 1.0721110693348537
+        },
+        {
+          "name": "yn",
+          "percent": 1.0130922188952214
+        },
+        {
+          "name": "Qa",
+          "percent": 0.916410023109245
+        },
+        {
+          "name": "s",
+          "percent": 0.8410186187647588
+        },
+        {
+          "name": "Hi",
+          "percent": 0.8173334222067484
+        },
+        {
+          "name": "gt",
+          "percent": 0.8055555375795411
+        },
+        {
+          "name": "h",
+          "percent": 0.6173682381514157
+        },
+        {
+          "name": "o",
+          "percent": 0.5518780225319992
+        },
+        {
+          "name": "Ie",
+          "percent": 0.532722781599838
+        },
+        {
+          "name": "S",
+          "percent": 0.5162208003913882
+        },
+        {
+          "name": "sg",
+          "percent": 0.4615377646222114
+        },
+        {
+          "name": "nn",
+          "percent": 0.4355228765994788
+        },
+        {
+          "name": "g",
+          "percent": 0.4086667111033742
+        },
+        {
+          "name": "Fl",
+          "percent": 0.35844891730824857
+        },
+        {
+          "name": "ig",
+          "percent": 0.35683107601330255
+        },
+        {
+          "name": "a",
+          "percent": 0.35514852106655864
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "runtime": "wasm",
+      "operations": 966,
+      "checksum": 229878692,
+      "top": [
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 7.189818740551918
+        },
+        {
+          "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+          "percent": 6.748788489704939
+        },
+        {
+          "name": "result",
+          "percent": 5.8631349404926
+        },
+        {
+          "name": "decode",
+          "percent": 5.118198197727365
+        },
+        {
+          "name": "width",
+          "percent": 4.374633345832783
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 3.6734664546550873
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 3.6411290269896663
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::TypedRead>",
+          "percent": 3.2307376722539645
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+          "percent": 3.1851386328388864
+        },
+        {
+          "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+          "percent": 2.675775151005988
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+          "percent": 2.514349325225676
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 2.385783552204367
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::svg::num",
+          "percent": 2.3443655135379498
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 2.018247455142435
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.30",
+          "percent": 1.9822516518219364
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[3]",
+          "percent": 1.910325373317637
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::text::layout_label",
+          "percent": 1.8182780287104094
+        },
+        {
+          "name": "(program)",
+          "percent": 1.7047377271295994
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 1.5957703951176363
+        },
+        {
+          "name": "wasm-to-js",
+          "percent": 1.4756972798670442
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width",
+          "percent": 1.3459556003851747
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::lexer::tokenize",
+          "percent": 1.3250505966418724
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::layout::layered::position",
+          "percent": 1.2113796387876665
+        },
+        {
+          "name": "fontSet",
+          "percent": 1.182308617957137
+        },
+        {
+          "name": "decodeText",
+          "percent": 1.0332951381494107
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::str::converts::from_utf8",
+          "percent": 0.9644392820699089
+        },
+        {
+          "name": "__wbg_apply_5d9aa7604c2490a8",
+          "percent": 0.958625077903803
+        },
+        {
+          "name": "<pele[37270552ffd5eb7c]::compat::diagrams::er::model::ErModel>::add_entity",
+          "percent": 0.8881360184068557
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::insert_large_chunk",
+          "percent": 0.8685375773975099
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::unlink_chunk",
+          "percent": 0.7582636826515907
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[1]",
+          "percent": 0.7350721941238647
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc[508e33bd5656020b]::alloc::Global>[4]",
+          "percent": 0.712925955783304
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::layout::layered::layered",
+          "percent": 0.6918249676299083
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::layout::compound::compound_layout",
+          "percent": 0.691563655083117
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::iter::adapters::rev::Rev<core[ed718c3d60ebd546]::ops::range::Range<usize>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::try_fold::<(), core[ed718c3d60ebd546]::iter::traits::iterator::Iterator::find_map::check<usize, usize, pele[37270552ffd5eb7c]::compat::svg::crossing_ascii::{closure#0}>::{closure#0}, core[ed718c3d60ebd546]::ops::control_flow::ControlFlow<usize>>",
+          "percent": 0.6547839141222446
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "runtime": "js",
+      "operations": 15504,
+      "checksum": 35194,
+      "top": [
+        {
+          "name": "(garbage collector)",
+          "percent": 22.561723714014793
+        },
+        {
+          "name": "ng",
+          "percent": 15.594770854988884
+        },
+        {
+          "name": "U",
+          "percent": 12.655411329074356
+        },
+        {
+          "name": "addEntity",
+          "percent": 11.846464766033739
+        },
+        {
+          "name": "D",
+          "percent": 8.51708954331295
+        },
+        {
+          "name": "(program)",
+          "percent": 7.363873670919478
+        },
+        {
+          "name": "h",
+          "percent": 4.804542086059929
+        },
+        {
+          "name": "sg",
+          "percent": 3.918714464859746
+        },
+        {
+          "name": "S",
+          "percent": 2.2546433816321474
+        },
+        {
+          "name": "y",
+          "percent": 1.9960714827378288
+        },
+        {
+          "name": "x",
+          "percent": 1.944899647715825
+        },
+        {
+          "name": "Fl",
+          "percent": 1.1246089670317747
+        },
+        {
+          "name": "addAttributes",
+          "percent": 0.9146811378149996
+        },
+        {
+          "name": "Vl",
+          "percent": 0.8783676307933608
+        },
+        {
+          "name": "f",
+          "percent": 0.6099312817743187
+        },
+        {
+          "name": "i",
+          "percent": 0.5297209716976595
+        },
+        {
+          "name": "_",
+          "percent": 0.5181918956143888
+        },
+        {
+          "name": "addRelationship",
+          "percent": 0.33384998390861576
+        },
+        {
+          "name": "M",
+          "percent": 0.2902614449199931
+        },
+        {
+          "name": "MS",
+          "percent": 0.272197170629093
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.23181457793100557
+        },
+        {
+          "name": "run",
+          "percent": 0.2256492966030533
+        },
+        {
+          "name": "g",
+          "percent": 0.16812722181325856
+        },
+        {
+          "name": "http://127.0.0.1:33515/oracle.js",
+          "percent": 0.1292242966338797
+        },
+        {
+          "name": "parse",
+          "percent": 0.10869390981179862
+        },
+        {
+          "name": "qx",
+          "percent": 0.06424223143726271
+        },
+        {
+          "name": "now",
+          "percent": 0.05900174230850328
+        },
+        {
+          "name": "vp",
+          "percent": 0.042108871469914044
+        },
+        {
+          "name": "evaluate",
+          "percent": 0.021146914954876306
+        },
+        {
+          "name": "Zx",
+          "percent": 0.019975511502565373
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "runtime": "wasm",
+      "operations": 1912,
+      "checksum": 39018,
+      "top": [
+        {
+          "name": "allocate",
+          "percent": 19.904714941585517
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 10.159703479523248
+        },
+        {
+          "name": "property",
+          "percent": 7.548273036737572
+        },
+        {
+          "name": "(program)",
+          "percent": 5.710327901558013
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction as pele[37270552ffd5eb7c]::compat::diagrams::er::public_model::InitialWriter>::string",
+          "percent": 4.066491253825393
+        },
+        {
+          "name": "need",
+          "percent": 3.6704321454696935
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&str>",
+          "percent": 3.639126348690113
+        },
+        {
+          "name": "intern",
+          "percent": 3.5329124930832383
+        },
+        {
+          "name": "__wbg_new_from_slice_4ee02165f9de919e",
+          "percent": 3.4918824508110022
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction as pele[37270552ffd5eb7c]::compat::diagrams::er::public_model::InitialWriter>::node",
+          "percent": 2.8612494463453775
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::lexer::tokenize",
+          "percent": 2.7337677247900505
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+          "percent": 2.4948649710092012
+        },
+        {
+          "name": "text",
+          "percent": 2.3604821720074733
+        },
+        {
+          "name": "publishBatch",
+          "percent": 1.978413429747659
+        },
+        {
+          "name": "endNode",
+          "percent": 1.8900169013660368
+        },
+        {
+          "name": "pele_wasm[e6e81f4f4d17d0e2]::host_er::construction_atom",
+          "percent": 1.3295239385829203
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 1.2809654481873378
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 0.9854111222783092
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&alloc[508e33bd5656020b]::string::String>",
+          "percent": 0.7755556308400368
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 0.7040981107359434
+        },
+        {
+          "name": "<pele[37270552ffd5eb7c]::compat::diagrams::er::direct_parse::Direct<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction>>::ensure_entity",
+          "percent": 0.7002711496065759
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::public_model::rec::<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction>",
+          "percent": 0.6405454611613635
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::direct_parse::parse_into::<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction>",
+          "percent": 0.5993272076860436
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 0.5980097292644581
+        },
+        {
+          "name": "u8",
+          "percent": 0.5724130056450814
+        },
+        {
+          "name": "passStringToWasm0",
+          "percent": 0.5328259159298198
+        },
+        {
+          "name": "<pele[37270552ffd5eb7c]::compat::diagrams::er::lexer::Scanner>::kw",
+          "percent": 0.5143184809599273
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::ptr::drop_glue::<pele[37270552ffd5eb7c]::compat::public::graph::Node>",
+          "percent": 0.4933643003499474
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 0.48000130493100807
+        },
+        {
+          "name": "<hashbrown[ffa38be938e2ba6e]::map::HashMap<alloc[508e33bd5656020b]::string::String, u32, std[5a6270b673d0c64d]::hash::random::RandomState>>::insert",
+          "percent": 0.4633132449242575
+        },
+        {
+          "name": "primitive",
+          "percent": 0.4483190857452599
+        },
+        {
+          "name": "atom",
+          "percent": 0.42717669393219626
+        },
+        {
+          "name": "<pele[37270552ffd5eb7c]::compat::diagrams::er::lexer::Scanner>::emit",
+          "percent": 0.42516910776597067
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostConstruction>::event",
+          "percent": 0.38464096203529086
+        },
+        {
+          "name": "parseLimitOptions",
+          "percent": 0.3729091303764099
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-model",
+      "runtime": "js",
+      "operations": 2394,
+      "checksum": 195425659,
+      "top": [
+        {
+          "name": "Ze",
+          "percent": 15.850759247033059
+        },
+        {
+          "name": "q1",
+          "percent": 15.751501586125828
+        },
+        {
+          "name": "hg",
+          "percent": 10.31899647348674
+        },
+        {
+          "name": "De",
+          "percent": 7.735398785848859
+        },
+        {
+          "name": "d",
+          "percent": 6.438994541150706
+        },
+        {
+          "name": "width",
+          "percent": 6.293618460250237
+        },
+        {
+          "name": "W1",
+          "percent": 5.384325534210399
+        },
+        {
+          "name": "ch",
+          "percent": 5.213571440073429
+        },
+        {
+          "name": "(program)",
+          "percent": 3.1807539331089676
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 2.545595078984235
+        },
+        {
+          "name": "Sn",
+          "percent": 2.3786412457126294
+        },
+        {
+          "name": "je",
+          "percent": 2.1705930661342006
+        },
+        {
+          "name": "a",
+          "percent": 1.607961224456933
+        },
+        {
+          "name": "Ki",
+          "percent": 1.6010048147372828
+        },
+        {
+          "name": "gg",
+          "percent": 1.4407497463808956
+        },
+        {
+          "name": "yn",
+          "percent": 1.255438720793546
+        },
+        {
+          "name": "gt",
+          "percent": 1.149804350976635
+        },
+        {
+          "name": "http://127.0.0.1:33515/oracle.js",
+          "percent": 1.013639071834592
+        },
+        {
+          "name": "Qa",
+          "percent": 0.9576657380718507
+        },
+        {
+          "name": "s",
+          "percent": 0.8209851693209449
+        },
+        {
+          "name": "Cs",
+          "percent": 0.7670729939936555
+        },
+        {
+          "name": "wt",
+          "percent": 0.5392505756751099
+        },
+        {
+          "name": "ig",
+          "percent": 0.5197339817394245
+        },
+        {
+          "name": "Hi",
+          "percent": 0.505821162300124
+        },
+        {
+          "name": "lu",
+          "percent": 0.492165987665255
+        },
+        {
+          "name": "o",
+          "percent": 0.4497190061351669
+        },
+        {
+          "name": "aR",
+          "percent": 0.4044379317563324
+        },
+        {
+          "name": "nn",
+          "percent": 0.33912497383294954
+        },
+        {
+          "name": "Ie",
+          "percent": 0.3118790357643194
+        },
+        {
+          "name": "B1",
+          "percent": 0.25191220753288995
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.23741968728361862
+        },
+        {
+          "name": "T",
+          "percent": 0.21828956055458043
+        },
+        {
+          "name": "O1",
+          "percent": 0.1990306114233265
+        },
+        {
+          "name": "F1",
+          "percent": 0.1875010064250173
+        },
+        {
+          "name": "V",
+          "percent": 0.18344310075522133
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-model",
+      "runtime": "wasm",
+      "operations": 583,
+      "checksum": 237359100,
+      "top": [
+        {
+          "name": "audit",
+          "percent": 10.226855375878927
+        },
+        {
+          "name": "http://127.0.0.1:33515/package/host-er-store.js",
+          "percent": 5.205472506485714
+        },
+        {
+          "name": "decode",
+          "percent": 3.9074845568165495
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 3.7469911549869637
+        },
+        {
+          "name": "width",
+          "percent": 3.2027826656725478
+        },
+        {
+          "name": "atom",
+          "percent": 2.877570640823047
+        },
+        {
+          "name": "room",
+          "percent": 2.632962835604444
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 2.5338976495419536
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::HostRead<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>>",
+          "percent": 2.3061907290846677
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 2.29000488175556
+        },
+        {
+          "name": "(program)",
+          "percent": 2.2739490412323087
+        },
+        {
+          "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Counted> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+          "percent": 2.0810839447445075
+        },
+        {
+          "name": "wasm-to-js",
+          "percent": 1.8588373101331854
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+          "percent": 1.822305397687569
+        },
+        {
+          "name": "__wbg_hostErReadOwn_1d66b88ab119400e",
+          "percent": 1.6410759103239054
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+          "percent": 1.628595256961702
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 1.6144245151233667
+        },
+        {
+          "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+          "percent": 1.5607967077076486
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::entry_frame::EntryFrame>::own",
+          "percent": 1.4747972056337149
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.30",
+          "percent": 1.4338450617889846
+        },
+        {
+          "name": "structure",
+          "percent": 1.4027734351893322
+        },
+        {
+          "name": "begin",
+          "percent": 1.392242883914973
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::svg::num",
+          "percent": 1.3535658591727278
+        },
+        {
+          "name": "errorKind",
+          "percent": 1.225314145195501
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>::units",
+          "percent": 1.1090230573570525
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width",
+          "percent": 1.0459697565167536
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 0.9751160473250775
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[37270552ffd5eb7c]::compat::public::schema::PrototypeId>",
+          "percent": 0.9575001251315506
+        },
+        {
+          "name": "<pele[37270552ffd5eb7c]::compat::host_er::Admission<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>>::required",
+          "percent": 0.9396891927292393
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::text::layout_label",
+          "percent": 0.9311087435427244
+        },
+        {
+          "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::entry_frame::EntryFrame>::units_at",
+          "percent": 0.9288986278431676
+        },
+        {
+          "name": "decodeText",
+          "percent": 0.9205781922683652
+        },
+        {
+          "name": "pele[37270552ffd5eb7c]::compat::layout::layered::position",
+          "percent": 0.7555345522338094
+        },
+        {
+          "name": "fontSet",
+          "percent": 0.7083420817079774
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[1]",
+          "percent": 0.6746053155882711
+        }
+      ]
+    }
+  ]
+}
