@@ -369,3 +369,9 @@ impl DetachedRenderCompletion {
         Ok((next, self.result, self.presentation))
     }
 }
+
+/// Native live readers share the canonical JavaScript number formatter.
+#[doc(hidden)]
+pub fn live_number_string(value: f64) -> String {
+    crate::compat::svg::js_num(value)
+}

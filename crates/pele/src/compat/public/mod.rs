@@ -7,6 +7,7 @@ mod detached_render;
 mod engine;
 #[doc(hidden)]
 pub use detached_render::{
+    live_number_string,
     DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion, DetachedRenderJob,
     DetachedRenderOutcome, DetachedRenderRequest, DetachedRenderValue, LiveRenderRead,
     LiveStringUse, LiveValueKind,

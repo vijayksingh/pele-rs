@@ -92,7 +92,8 @@ PeleResult *pele_render_document_with_resources_v3(const PeleResult *, const uin
  * Expected revisions accept exact uint64 values. Graph input <=64 MiB.
  * NULL resources select default native resources. Parse sets *out_document=NULL
  * before work; a successful handle must be freed once. Recursive/concurrent
- * operations on one handle return an error; never free during an active call. */
+ * operations on one handle return an error, except synchronous callbacks in the
+ * additive v15 detached lifecycle below. Never free during an active call. */
 typedef struct PelePublicDocument PelePublicDocument;
 /* Owned selective registry. mode0 empty, mode1 all33 built-ins; all successful
  * results use owned version2 envelopes. create writes NULL before any failure
@@ -220,6 +221,30 @@ PeleResult *pele_public_render_operation_with_numbers_v9(PelePublicDocument *doc
     const PeleRenderNumbersV9 *numbers, uint32_t output_limit_kind,
     uint64_t output_limit_bits, const PeleHostResourcesV3 *resources);
 void pele_public_document_free_v4(PelePublicDocument *);
+
+/* Additive detached builtin rendering (v15). Preparation returns {selected:bool}
+ * and an owned job, or NULL job for unsupported providers. Existing entrypoints
+ * stay unchanged. The document MUST outlive every job, including abandoned jobs.
+ * Never free the document/job during any active run/callback. Run releases the
+ * document lock, permitting synchronous same-owner snapshot/apply/invoke/nested
+ * detached rendering. Native Ref IDs remain graph coordinates: arbitrary table
+ * replacement/truncation is not JavaScript retained-object lifetime parity.
+ * Finish consumes completion in nesting order and returns the existing bounded
+ * binary render outcome. out_revision is updated to current committed revision
+ * before returning an export error; callers must acknowledge it before decoding
+ * or rethrowing their original resource exception. Job free is required once
+ * after finish, or to abandon a prepared/completed job. Null free is safe.
+ * All options/resource input spans have the same bounds as v9/v13. */
+typedef struct PeleDetachedRenderJobV15 PeleDetachedRenderJobV15;
+PeleResult *pele_public_prepare_detached_render_v15(PelePublicDocument *, uint64_t,
+    const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t,
+    PeleDetachedRenderJobV15 **);
+PeleResult *pele_public_prepare_detached_raw_v15(PelePublicDocument *, uint64_t,
+    const uint8_t *, size_t, const uint8_t *, size_t, const PeleRenderNumbersV9 *,
+    PeleDetachedRenderJobV15 **);
+PeleResult *pele_detached_render_run_v15(PeleDetachedRenderJobV15 *, const PeleHostResourcesV3 *);
+PeleResult *pele_public_finish_detached_render_v15(PelePublicDocument *, PeleDetachedRenderJobV15 *, uint64_t *);
+void pele_detached_render_job_free_v15(PeleDetachedRenderJobV15 *);
 
 
 /* Additive owner-confined provider prototype (v10). Only canonical built-in IDs

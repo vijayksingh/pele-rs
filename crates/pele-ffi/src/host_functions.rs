@@ -140,11 +140,11 @@ impl HostFunction for Function {
 }
 struct Resources<'a> {
     host: &'a mut dyn RenderResources,
-    bindings: &'a Bindings,
+    bindings: &'a RefCell<Bindings>,
 }
 impl RenderResources for Resources<'_> {
     fn host_function(&mut self, id: u32) -> Result<Rc<dyn HostFunction>, PublicError> {
-        self.bindings.functions.get(&id).cloned().ok_or_else(|| {
+        self.bindings.try_borrow().map_err(|_| public::invalid("Host function bindings are already in use"))?.functions.get(&id).cloned().ok_or_else(|| {
             public::invalid("Unbound or foreign-owner host function reference").into()
         })
     }
@@ -185,8 +185,8 @@ impl RenderResources for Resources<'_> {
         self.host.capture_presentation(v)
     }
 }
-/// Caller holds the public document operation guard. Reuses its owner bindings
-/// for both orchestrated and raw render entry points.
+/// Reuses owner bindings for ordinary and detached render entry points.
+/// Only callable lookup borrows bindings; no binding borrow crosses a callback.
 pub(super) unsafe fn with_resources<T>(
     handle: *const PelePublicDocument,
     resources: *const PeleHostResourcesV3,
@@ -194,15 +194,11 @@ pub(super) unsafe fn with_resources<T>(
 ) -> Result<T, PeleError> {
     let owner =
         unsafe { handle.as_ref() }.ok_or_else(|| public::invalid("Null public document"))?;
-    let bindings = owner
-        .host_functions
-        .try_borrow()
-        .map_err(|_| public::invalid("Host function bindings are already in use"))?;
     unsafe {
         calendar::with_resources(resources, |host| {
             run(&mut Resources {
                 host,
-                bindings: &bindings,
+                bindings: &owner.host_functions,
             })
         })
     }

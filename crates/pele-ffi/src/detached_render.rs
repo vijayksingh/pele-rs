@@ -1,0 +1,410 @@
+//! Owned C jobs: no document or binding borrow crosses a resource callback.
+use super::{
+    host_functions, public, PeleHostResourcesV3, PelePublicDocument, PeleRenderNumbersV9,
+    PeleResult,
+};
+use pele::compat::{
+    public::{
+        Atom, DetachedRenderCompletion, DetachedRenderJob, DetachedRenderRequest,
+        DetachedRenderValue, GraphNodeKind, JavaScriptErrorKind, JsString, LiveRenderRead,
+        LiveStringUse, LiveValueKind, PublicError, PublicGraphRead,
+    },
+    ErrorCode, PeleError,
+};
+use std::{
+    panic::{catch_unwind, AssertUnwindSafe},
+    ptr,
+    sync::Mutex,
+};
+
+#[derive(Clone)]
+enum Value {
+    Atom(Atom),
+    String(JsString),
+}
+fn invalid(message: &str) -> PeleError {
+    public::invalid(message)
+}
+fn type_error(message: String) -> PublicError {
+    PublicError::JavaScript {
+        name: JavaScriptErrorKind::TypeError,
+        message: JsString::from(message.as_str()),
+    }
+}
+fn string(reader: &dyn PublicGraphRead, id: u32) -> Result<JsString, PeleError> {
+    let length = reader.string_length(id as usize)?;
+    if length > 16_000_000 {
+        return Err(PeleError::new(
+            "Public model graph exceeds work budget",
+            ErrorCode::Limit,
+        ));
+    }
+    let mut units = Vec::with_capacity(length);
+    reader.string_chunks(id as usize, &mut |chunk| {
+        if chunk.len() > length - units.len() {
+            return Err(invalid("Invalid captured string length"));
+        }
+        units.extend_from_slice(chunk);
+        Ok(())
+    })?;
+    if units.len() != length {
+        return Err(invalid("Invalid captured string length"));
+    }
+    Ok(JsString(units))
+}
+fn own(reader: &dyn PublicGraphRead, atom: Atom) -> Result<Value, PeleError> {
+    match atom {
+        Atom::String(id) => Ok(Value::String(string(reader, id)?)),
+        atom => Ok(Value::Atom(atom)),
+    }
+}
+struct Reader {
+    owner: *const PelePublicDocument,
+    root: Value,
+}
+impl Reader {
+    fn field(&self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
+        if let Value::String(text) = receiver {
+            if key == "length" {
+                return Ok(Value::Atom(Atom::Number(text.0.len() as f64)));
+            }
+            if let Ok(index) = key.parse::<usize>() {
+                if index.to_string() == key {
+                    return Ok(text.0.get(index).map_or(Value::Atom(Atom::Undefined), |v| {
+                        Value::String(JsString(vec![*v]))
+                    }));
+                }
+            }
+        }
+        let id = match receiver {
+            Value::Atom(Atom::Ref(id)) => *id as usize,
+            Value::Atom(Atom::Undefined | Atom::Null) => {
+                return Err(type_error(format!(
+                    "Cannot read properties of {} (reading '{key}')",
+                    if matches!(receiver, Value::Atom(Atom::Null)) {
+                        "null"
+                    } else {
+                        "undefined"
+                    }
+                )))
+            }
+            _ => return Ok(Value::Atom(Atom::Undefined)),
+        };
+        // Native IDs are current graph coordinates, not JavaScript object leases.
+        let document = unsafe { public::document(self.owner) }?;
+        let graph = document.snapshot_read()?;
+        let read = graph.reader();
+        let header = read.header(id)?;
+        let mut start = 0;
+        while start < header.properties {
+            let mut found = None;
+            let mut count = 0;
+            read.properties(id, start, &mut |properties| {
+                count = properties.len();
+                for property in properties {
+                    if string(read, property.key)?.is(key) {
+                        found = Some(own(read, property.value.clone())?);
+                        break;
+                    }
+                }
+                Ok(())
+            })?;
+            if let Some(value) = found {
+                return Ok(value);
+            }
+            if count == 0 || count > header.properties - start {
+                return Err(invalid("Invalid captured property batch").into());
+            }
+            start += count;
+        }
+        if key == "length" {
+            if let GraphNodeKind::Array(length) = header.kind {
+                return Ok(Value::Atom(Atom::Number(f64::from(length))));
+            }
+        }
+        Ok(Value::Atom(Atom::Undefined))
+    }
+}
+impl LiveRenderRead for Reader {
+    type Value = Value;
+    fn root(&self) -> Value {
+        self.root.clone()
+    }
+    fn get(&mut self, value: &Value, key: &str) -> Result<Value, PublicError> {
+        self.field(value, key)
+    }
+    fn index(&mut self, value: &Value, index: usize) -> Result<Value, PublicError> {
+        self.field(value, &index.to_string())
+    }
+    fn kind(&self, value: &Value) -> LiveValueKind {
+        match value {
+            Value::String(_) => LiveValueKind::String,
+            Value::Atom(atom) => match atom {
+                Atom::Undefined => LiveValueKind::Undefined,
+                Atom::Null => LiveValueKind::Null,
+                Atom::Bool(_) => LiveValueKind::Boolean,
+                Atom::Number(_) => LiveValueKind::Number,
+                Atom::BuiltinFunction(_) => LiveValueKind::Function,
+                _ => LiveValueKind::Object,
+            },
+        }
+    }
+    fn number(&self, value: &Value) -> Option<f64> {
+        if let Value::Atom(Atom::Number(n)) = value {
+            Some(*n)
+        } else {
+            None
+        }
+    }
+    fn truthy(&self, value: &Value) -> bool {
+        match value {
+            Value::String(s) => !s.0.is_empty(),
+            Value::Atom(Atom::Undefined | Atom::Null) => false,
+            Value::Atom(Atom::Bool(b)) => *b,
+            Value::Atom(Atom::Number(n)) => *n != 0. && !n.is_nan(),
+            _ => true,
+        }
+    }
+    fn string_units(&self, value: &Value) -> Result<Option<JsString>, PublicError> {
+        Ok(if let Value::String(s) = value {
+            Some(s.clone())
+        } else {
+            None
+        })
+    }
+    fn to_string(&mut self, value: &Value) -> Result<JsString, PublicError> {
+        if let Value::String(s) = value {
+            return Ok(s.clone());
+        }
+        let text = match value {
+            Value::Atom(Atom::Undefined) => "undefined".into(),
+            Value::Atom(Atom::Null) => "null".into(),
+            Value::Atom(Atom::Bool(b)) => b.to_string(),
+            Value::Atom(Atom::Number(n)) => pele::compat::public::live_number_string(*n),
+            _ => {
+                return Err(invalid("Native live object string coercion is not implemented").into())
+            }
+        };
+        Ok(JsString::from(text.as_str()))
+    }
+    fn require_string(
+        &mut self,
+        value: &Value,
+        site: LiveStringUse,
+    ) -> Result<JsString, PublicError> {
+        if let Value::String(s) = value {
+            return Ok(s.clone());
+        }
+        match value {
+            Value::Atom(Atom::Undefined | Atom::Null) => Err(type_error(format!(
+                "Cannot read properties of {} (reading '{}')",
+                if matches!(value, Value::Atom(Atom::Null)) {
+                    "null"
+                } else {
+                    "undefined"
+                },
+                site.method
+            ))),
+            _ => Err(type_error(format!(
+                "{}.{} is not a function",
+                site.expression_receiver, site.method
+            ))),
+        }
+    }
+}
+enum State {
+    Ready(DetachedRenderJob),
+    Running,
+    Complete(DetachedRenderCompletion),
+    Finished,
+}
+/// Owner must outlive this job; free only after run/finish calls return.
+pub struct PeleDetachedRenderJobV15 {
+    owner: *mut PelePublicDocument,
+    root: Value,
+    state: Mutex<State>,
+}
+fn prepare(
+    owner: *mut PelePublicDocument,
+    revision: u64,
+    request: DetachedRenderRequest,
+    out: *mut *mut PeleDetachedRenderJobV15,
+) -> Result<PeleResult, PeleError> {
+    let out = unsafe { out.as_mut() }.ok_or_else(|| invalid("Null detached job output"))?;
+    let mut document = unsafe { public::document(owner) }?;
+    let Some(job) = document.prepare_detached_render(revision, request)? else {
+        return public::success(serde_json::json!({"selected":false}));
+    };
+    let graph = document.snapshot_read()?;
+    let root = own(graph.reader(), graph.reader().root())?;
+    let result = public::success(serde_json::json!({"selected":true}))?;
+    *out = Box::into_raw(Box::new(PeleDetachedRenderJobV15 {
+        owner,
+        root,
+        state: Mutex::new(State::Ready(job)),
+    }));
+    Ok(result)
+}
+/// # Safety
+/// Same input bounds as v9. Owner outlives the returned job and every callback.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_prepare_detached_render_v15(
+    owner: *mut PelePublicDocument,
+    revision: u64,
+    bytes: *const u8,
+    len: usize,
+    numbers: *const PeleRenderNumbersV9,
+    kind: u32,
+    bits: u64,
+    out: *mut *mut PeleDetachedRenderJobV15,
+) -> *mut PeleResult {
+    if !out.is_null() {
+        unsafe { *out = ptr::null_mut() }
+    }
+    public::bounded_call(|| {
+        if !unsafe { public::document(owner) }?.has_detached_public_render() {
+            return public::success(serde_json::json!({"selected":false}));
+        }
+        let (options, limit) =
+            unsafe { super::render_numbers::options(bytes, len, numbers, kind, bits) }?;
+        prepare(
+            owner,
+            revision,
+            DetachedRenderRequest::Normal {
+                options,
+                limit,
+                enforce_native_bytes: true,
+            },
+            out,
+        )
+    })
+}
+/// # Safety
+/// Same input bounds as v13. Owner outlives the returned job and every callback.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_prepare_detached_raw_v15(
+    owner: *mut PelePublicDocument,
+    revision: u64,
+    config: *const u8,
+    config_len: usize,
+    bytes: *const u8,
+    len: usize,
+    numbers: *const PeleRenderNumbersV9,
+    out: *mut *mut PeleDetachedRenderJobV15,
+) -> *mut PeleResult {
+    if !out.is_null() {
+        unsafe { *out = ptr::null_mut() }
+    }
+    public::bounded_call(|| {
+        if !unsafe { public::document(owner) }?.has_detached_public_render() {
+            return public::success(serde_json::json!({"selected":false}));
+        }
+        let config = unsafe { super::prepared::config(config, config_len) }?;
+        let settings = unsafe { super::render_numbers::raw_options(bytes, len, numbers) }?;
+        prepare(
+            owner,
+            revision,
+            DetachedRenderRequest::Raw { config, settings },
+            out,
+        )
+    })
+}
+/// # Safety
+/// Job/owner/resources remain live synchronously. No concurrent free or use.
+#[no_mangle]
+pub unsafe extern "C" fn pele_detached_render_run_v15(
+    job: *mut PeleDetachedRenderJobV15,
+    resources: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let job = unsafe { job.as_ref() }.ok_or_else(|| invalid("Null detached job"))?;
+        // Validate resource setup before consuming the job; no callbacks occur here.
+        unsafe {
+            host_functions::with_resources(job.owner, resources, |host| {
+                let inner = {
+                    let mut state = job
+                        .state
+                        .try_lock()
+                        .map_err(|_| invalid("Detached job is already in use"))?;
+                    if !matches!(*state, State::Ready(_)) {
+                        return Err(invalid("Public render job already dispatched"));
+                    }
+                    match std::mem::replace(&mut *state, State::Running) {
+                        State::Ready(value) => value,
+                        _ => unreachable!(),
+                    }
+                };
+                let mut reader = Reader {
+                    owner: job.owner,
+                    root: job.root.clone(),
+                };
+                let completion = inner.run(&mut reader, host);
+                *job.state
+                    .lock()
+                    .map_err(|_| invalid("Detached job is unavailable"))? =
+                    State::Complete(completion);
+                public::success(serde_json::json!({"completed":true}))
+            })
+        }
+    })
+}
+/// # Safety
+/// Owner/job are live. out_revision writable. Finish consumes the completion;
+/// out_revision acknowledges current committed state even if export fails.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_finish_detached_render_v15(
+    owner: *mut PelePublicDocument,
+    job: *mut PeleDetachedRenderJobV15,
+    out_revision: *mut u64,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let revision = unsafe { out_revision.as_mut() }
+            .ok_or_else(|| invalid("Null detached revision output"))?;
+        let job = unsafe { job.as_ref() }.ok_or_else(|| invalid("Null detached job"))?;
+        if job.owner != owner {
+            return Err(invalid("Public render job belongs to another document"));
+        }
+        let completion = {
+            let mut state = job
+                .state
+                .try_lock()
+                .map_err(|_| invalid("Detached job is already in use"))?;
+            if !matches!(*state, State::Complete(_)) {
+                return Err(invalid("Public render job has no completion"));
+            }
+            match std::mem::replace(&mut *state, State::Finished) {
+                State::Complete(value) => value,
+                _ => unreachable!(),
+            }
+        };
+        let mut document = unsafe { public::document(owner) }?;
+        let kind = document.diagram_type().clone();
+        let result = (|| {
+            let outcome = document.finish_detached_render(completion)?;
+            let result = outcome.result.map(|value| match value {
+                DetachedRenderValue::Normal(value) => value,
+                DetachedRenderValue::Raw(rendered) => pele::compat::RenderResult {
+                    diagram_type: kind,
+                    rendered,
+                },
+            });
+            public::binary_metadata(
+                outcome.revision,
+                &outcome.graph,
+                &result.as_ref().map(pele::compat::render_result_transport),
+            )
+        })();
+        *revision = document.revision();
+        result
+    })
+}
+/// # Safety
+/// Free exactly once after all calls/callbacks return; owner remains live.
+#[no_mangle]
+pub unsafe extern "C" fn pele_detached_render_job_free_v15(job: *mut PeleDetachedRenderJobV15) {
+    let _ = catch_unwind(AssertUnwindSafe(|| {
+        if !job.is_null() {
+            drop(unsafe { Box::from_raw(job) })
+        }
+    }));
+}

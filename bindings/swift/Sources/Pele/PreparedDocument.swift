@@ -35,6 +35,9 @@ extension Pele {
             let config = try JSONEncoder().encode(config)
             var raw = options; raw.config = [:]; raw.limit = nil; raw.maxEdges = nil
             let settings = try RenderNumberEncoding(raw, outputLimit: .undefined)
+            if let detached = try document.renderDetached(settings: settings, resources: resources, rawConfig: config) {
+                return detached
+            }
             return try document.withHandle { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in
                     document.withHostFunctionResources(takeError) {

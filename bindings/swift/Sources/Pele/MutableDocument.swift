@@ -25,6 +25,7 @@ extension Pele {
     public final class MutableDocument {
         private var handle: OpaquePointer?
         private var active = false
+        private var detachedDepth = 0
         var hostFunctions: [UInt32: HostFunctionBox] = [:]
         public let type: String
         public private(set) var revision: UInt64
@@ -33,7 +34,7 @@ extension Pele {
         }
         deinit { if let handle { pele_public_document_free_v4(handle) } }
         public func close() throws {
-            guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
+            guard !active && detachedDepth == 0 else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
             if let handle {
                 active = true; self.handle = nil
                 defer { active = false }
@@ -44,7 +45,19 @@ extension Pele {
             guard let handle else { throw PeleError(code: "semantic", message: "Mutable document is closed") }
             guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
             active = true; defer { active = false }
-            return try withExtendedLifetime(self) { try operation(handle) }
+            return try withHostFunctionErrorScope {
+                try withExtendedLifetime(self) { try operation(handle) }
+            }
+        }
+        // Retain ownership across callbacks while allowing short nested native calls.
+        // Disposal remains forbidden for the complete detached lifecycle.
+        func withDetachedLifetime<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
+            guard let handle else { throw PeleError(code: "semantic", message: "Mutable document is closed") }
+            guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
+            detachedDepth += 1; defer { detachedDepth -= 1 }
+            return try withHostFunctionErrorScope {
+                try withExtendedLifetime(self) { try operation(handle) }
+            }
         }
         internal func acceptPreparedRevision(_ revision: UInt64) { self.revision = revision }
         public func snapshot() throws -> PublicSnapshot {
@@ -110,6 +123,9 @@ extension Pele {
         private func renderOperation(options: Engine.Options, resources: HostResources, outputLimit: OutputLimit?, presentationBudget: PresentationBudget? = nil) throws -> PublicRenderOutcome {
             let settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
             let presentation = try presentationBudget?.packet()
+            if presentation == nil, let detached = try renderDetached(settings: settings, resources: resources) {
+                return detached
+            }
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in
                     withHostFunctionResources(takeError) {
