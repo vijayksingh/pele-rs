@@ -1,0 +1,65 @@
+[
+  {
+    "stage": "parse",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/normalized-projection/swift-parse-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-projection/swift-parse-sequence-small-attempt1.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "parse",
+    "workload": "sequence/small",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-projection/swift-parse-sequence-small-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-projection/swift-parse-sequence-small-attempt2.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "parse",
+    "workload": "gantt/medium",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-projection/swift-parse-gantt-medium-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-projection/swift-parse-gantt-medium-attempt2.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-source",
+    "workload": "sequence/small",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-source-sequence-small-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-source-sequence-small-attempt2.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-source",
+    "workload": "gantt/medium",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-source-gantt-medium-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-source-gantt-medium-attempt2.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-retained",
+    "workload": "sequence/small",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-retained-sequence-small-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-retained-sequence-small-attempt2.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-retained",
+    "workload": "gantt/medium",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-retained-gantt-medium-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-projection/swift-render-retained-gantt-medium-attempt2.log",
+    "code": 0,
+    "complete": true
+  }
+]

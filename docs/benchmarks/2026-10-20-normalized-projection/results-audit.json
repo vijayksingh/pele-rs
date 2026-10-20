@@ -1,0 +1,1232 @@
+{
+  "reports": [
+    {
+      "file": "swift-parse-gantt-medium-attempt2.json",
+      "sha256": "f8710e81dd2874a01d378e6a8484be6dc28b994bdaad86087e08e2f005bc3f16",
+      "startedAt": "2026-10-20T02:57:07.903Z",
+      "completedAt": "2026-10-20T02:57:14.331Z",
+      "rows": [
+        {
+          "case": "gantt/medium",
+          "stage": "parse",
+          "count": 16,
+          "controlMs": {
+            "median": 0.8582109375,
+            "mad": 0.012747375000000005,
+            "min": 0.8382578125,
+            "max": 6.7152995,
+            "sampleP95": 6.7152995
+          },
+          "candidateMs": {
+            "median": 0.629153625,
+            "mad": 0.02093231249999994,
+            "min": 0.5947864375,
+            "max": 0.669513,
+            "sampleP95": 0.669513
+          },
+          "medianPercentChange": -26.69009476472676,
+          "pairedPercentChange": -26.69009476472676,
+          "pairedMinPercentChange": -90.31215584651139,
+          "pairedMaxPercentChange": -23.441848165949008,
+          "wins": 15,
+          "warmup": {
+            "control": {
+              "operations": 1670,
+              "elapsedNs": 1408292418
+            },
+            "candidate": {
+              "operations": 1670,
+              "elapsedNs": 1013468126
+            },
+            "pairs": 19
+          }
+        }
+      ]
+    },
+    {
+      "file": "swift-parse-sequence-small-attempt2.json",
+      "sha256": "af4df73f90f57ac0fda2d584180309738978679e39886e456411ef897fd61628",
+      "startedAt": "2026-10-20T02:56:52.424Z",
+      "completedAt": "2026-10-20T02:57:07.704Z",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "stage": "parse",
+          "count": 128,
+          "controlMs": {
+            "median": 0.05959146875,
+            "mad": 0.0004934921874999998,
+            "min": 0.0580244140625,
+            "max": 0.0636725234375,
+            "sampleP95": 0.0636725234375
+          },
+          "candidateMs": {
+            "median": 0.059991859375,
+            "mad": 0.0004720078125000013,
+            "min": 0.0589111328125,
+            "max": 0.06153971875,
+            "sampleP95": 0.06153971875
+          },
+          "medianPercentChange": 0.6718925265623676,
+          "pairedPercentChange": 0.7015487436067058,
+          "pairedMinPercentChange": -5.7806159765489635,
+          "pairedMaxPercentChange": 6.024094114479017,
+          "wins": 7,
+          "warmup": {
+            "control": {
+              "operations": 16646,
+              "elapsedNs": 1004091452
+            },
+            "candidate": {
+              "operations": 16646,
+              "elapsedNs": 1022073576
+            },
+            "pairs": 136
+          }
+        }
+      ]
+    },
+    {
+      "file": "swift-render-retained-gantt-medium-attempt2.json",
+      "sha256": "15407d0723c43cb5080678ecc92e0fb572fd83283ca882e191a7336fde752ff3",
+      "startedAt": "2026-10-20T02:57:46.180Z",
+      "completedAt": "2026-10-20T02:57:53.085Z",
+      "rows": [
+        {
+          "case": "gantt/medium",
+          "stage": "render-retained",
+          "count": 64,
+          "controlMs": {
+            "median": 0.366393875,
+            "mad": 0.0020501249999999582,
+            "min": 0.3631451875,
+            "max": 0.3719765625,
+            "sampleP95": 0.3719765625
+          },
+          "candidateMs": {
+            "median": 0.367415359375,
+            "mad": 0.002473312499999991,
+            "min": 0.3637766875,
+            "max": 0.374666015625,
+            "sampleP95": 0.374666015625
+          },
+          "medianPercentChange": 0.27879406417479213,
+          "pairedPercentChange": 0.4002344401129232,
+          "pairedMinPercentChange": -0.6976249315752914,
+          "pairedMaxPercentChange": 2.3182162901868475,
+          "wins": 3,
+          "warmup": {
+            "control": {
+              "operations": 2822,
+              "elapsedNs": 1039446501
+            },
+            "candidate": {
+              "operations": 2822,
+              "elapsedNs": 1039858957
+            },
+            "pairs": 28
+          }
+        }
+      ]
+    },
+    {
+      "file": "swift-render-retained-sequence-small-attempt2.json",
+      "sha256": "bd7ae595adc151559ebb96884d440f61404e506dbb2ba5f860f2a721d4026a9c",
+      "startedAt": "2026-10-20T02:57:33.191Z",
+      "completedAt": "2026-10-20T02:57:45.987Z",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "stage": "render-retained",
+          "count": 128,
+          "controlMs": {
+            "median": 0.06986490625,
+            "mad": 0.0011357421874999968,
+            "min": 0.0679723359375,
+            "max": 0.0725068359375,
+            "sampleP95": 0.0725068359375
+          },
+          "candidateMs": {
+            "median": 0.0690234375,
+            "mad": 0.001485351562499987,
+            "min": 0.0668349609375,
+            "max": 0.0718157578125,
+            "sampleP95": 0.0718157578125
+          },
+          "medianPercentChange": -1.2044226424478888,
+          "pairedPercentChange": 0.0997894555923029,
+          "pairedMinPercentChange": -5.348364243673154,
+          "pairedMaxPercentChange": 4.042894284455922,
+          "wins": 7,
+          "warmup": {
+            "control": {
+              "operations": 14470,
+              "elapsedNs": 1047495495
+            },
+            "candidate": {
+              "operations": 14470,
+              "elapsedNs": 1005437788
+            },
+            "pairs": 119
+          }
+        }
+      ]
+    },
+    {
+      "file": "swift-render-source-gantt-medium-attempt2.json",
+      "sha256": "b3fbabe8a5ed6e339fb0a77a5b9341a886cf36e9117e4b398361a050062b5bc3",
+      "startedAt": "2026-10-20T02:57:26.644Z",
+      "completedAt": "2026-10-20T02:57:32.996Z",
+      "rows": [
+        {
+          "case": "gantt/medium",
+          "stage": "render-source",
+          "count": 32,
+          "controlMs": {
+            "median": 0.4430546875,
+            "mad": 0.003733062499999995,
+            "min": 0.42948828125,
+            "max": 0.452109375,
+            "sampleP95": 0.452109375
+          },
+          "candidateMs": {
+            "median": 0.4415638125,
+            "mad": 0.004878906250000037,
+            "min": 0.43523959375,
+            "max": 0.50981121875,
+            "sampleP95": 0.50981121875
+          },
+          "medianPercentChange": -0.3364990918869326,
+          "pairedPercentChange": 0.26259235474692666,
+          "pairedMinPercentChange": -3.5084430620355933,
+          "pairedMaxPercentChange": 14.135509147514602,
+          "wins": 6,
+          "warmup": {
+            "control": {
+              "operations": 2310,
+              "elapsedNs": 1028018748
+            },
+            "candidate": {
+              "operations": 2310,
+              "elapsedNs": 1032307457
+            },
+            "pairs": 24
+          }
+        }
+      ]
+    },
+    {
+      "file": "swift-render-source-sequence-small-attempt2.json",
+      "sha256": "3ffd00b6a5179d68bb305bcbe67ba9cbab090c95333339caf2e4b992d771e6b0",
+      "startedAt": "2026-10-20T02:57:14.538Z",
+      "completedAt": "2026-10-20T02:57:26.435Z",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "stage": "render-source",
+          "count": 128,
+          "controlMs": {
+            "median": 0.0823684921875,
+            "mad": 0.0011738281249999982,
+            "min": 0.0803531953125,
+            "max": 0.08634375,
+            "sampleP95": 0.08634375
+          },
+          "candidateMs": {
+            "median": 0.0833544921875,
+            "mad": 0.001102539062499991,
+            "min": 0.0814068984375,
+            "max": 0.088577796875,
+            "sampleP95": 0.088577796875
+          },
+          "medianPercentChange": 1.197059669072864,
+          "pairedPercentChange": 0.5765561185613999,
+          "pairedMinPercentChange": -1.426635085618333,
+          "pairedMaxPercentChange": 6.675052923742775,
+          "wins": 4,
+          "warmup": {
+            "control": {
+              "operations": 12038,
+              "elapsedNs": 1008551420
+            },
+            "candidate": {
+              "operations": 12038,
+              "elapsedNs": 1023362214
+            },
+            "pairs": 100
+          }
+        }
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "case": "gantt-medium",
+      "sourceSHA256": "819896f1906505142ed7e7ce0cf6d9b6e8c3df69d3ad062298f157a62b50ca45",
+      "counts": {
+        "exercise": 4130,
+        "foundation": 41,
+        "configValue": 0,
+        "nativeParse": 3813,
+        "swiftEvents": 2102,
+        "registration": 0,
+        "envelopeCount": 239,
+        "projection": 686,
+        "legacyProjection": 0,
+        "legacyModelParse": 0
+      },
+      "percentOfExercise": {
+        "exercise": 100,
+        "foundation": 0.9927360774818402,
+        "configValue": 0,
+        "nativeParse": 92.32445520581113,
+        "swiftEvents": 50.89588377723971,
+        "registration": 0,
+        "envelopeCount": 5.786924939467313,
+        "projection": 16.610169491525422,
+        "legacyProjection": 0,
+        "legacyModelParse": 0
+      }
+    },
+    {
+      "case": "sequence-small",
+      "sourceSHA256": "7c420901f503e17de42e5752975b54edce2403deb1b7e5bd4a7e899e6d7c4339",
+      "counts": {
+        "exercise": 1179,
+        "foundation": 83,
+        "configValue": 0,
+        "nativeParse": 917,
+        "swiftEvents": 297,
+        "registration": 0,
+        "envelopeCount": 45,
+        "projection": 324,
+        "legacyProjection": 324,
+        "legacyModelParse": 0
+      },
+      "percentOfExercise": {
+        "exercise": 100,
+        "foundation": 7.039864291772688,
+        "configValue": 0,
+        "nativeParse": 77.77777777777777,
+        "swiftEvents": 25.19083969465649,
+        "registration": 0,
+        "envelopeCount": 3.816793893129771,
+        "projection": 27.480916030534353,
+        "legacyProjection": 27.480916030534353,
+        "legacyModelParse": 0
+      }
+    }
+  ],
+  "web": {
+    "reportSHA256": "b530922b0532c9978a5e964a195e7ee15a3ef68487309824a616ad45b090683b",
+    "rows": [
+      {
+        "case": "sequence/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.02484375238418579,
+          "control": 0.0747656300663948,
+          "candidate": 0.07527343928813934
+        },
+        "medianPercentChange": 0.6792014208849562,
+        "pairedPercentChange": 1.00000281082957,
+        "wins": 4,
+        "pairedMinPercentChange": -3.715176372656137,
+        "pairedMaxPercentChange": 11.205978693266673,
+        "pairedRatios": [
+          0.9801526072919923,
+          1.0342568455798085,
+          1.0067920142088496,
+          0.9816753730639038,
+          1.1120597869326667,
+          1.056714790564656,
+          1.0100000281082957,
+          1.0124030887021582,
+          0.9628482362734386,
+          1.0164106689946617,
+          1.0311701900799157,
+          1.0026853462555017,
+          1.0045111900650372,
+          1.0225321913664034,
+          0.9883945953783135
+        ]
+      },
+      {
+        "case": "sequence/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.008085936307907104,
+          "control": 0.12707031518220901,
+          "candidate": 0.12898436933755875
+        },
+        "medianPercentChange": 1.5062952764421267,
+        "pairedPercentChange": 1.5062952764421267,
+        "wins": 5,
+        "pairedMinPercentChange": -31.767587786124054,
+        "pairedMaxPercentChange": 61.95297806150333,
+        "pairedRatios": [
+          1.0150629527644213,
+          0.6823241221387595,
+          0.7021516384086348,
+          1.1756879778320752,
+          1.0122323456222966,
+          1.364626767124031,
+          1.1323488459397972,
+          1.0263075071672179,
+          0.9805684983224957,
+          1.0244677621405895,
+          1.6195297806150333,
+          1.059096970443821,
+          0.9763440727898123,
+          0.989106801018891,
+          1.0022335575776453
+        ]
+      },
+      {
+        "case": "sequence/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.016796879470348358,
+          "control": 0.11781249940395355,
+          "candidate": 0.11414062231779099
+        },
+        "medianPercentChange": -3.1167126618479535,
+        "pairedPercentChange": -2.2968806120725604,
+        "wins": 9,
+        "pairedMinPercentChange": -20.412088964400333,
+        "pairedMaxPercentChange": 18.14616736157393,
+        "pairedRatios": [
+          0.9648273584821468,
+          0.7958791103559967,
+          0.9770311938792744,
+          1.1814616736157393,
+          0.9532493416927821,
+          0.8934476558942154,
+          1.0138792374311547,
+          0.8734328426531891,
+          0.9824206033889032,
+          1.0652966293792758,
+          0.882566556882515,
+          1.0491920615123693,
+          1.1252587639473217,
+          1.0174537405964192,
+          0.8822070920613797
+        ]
+      },
+      {
+        "case": "sequence/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.02777343988418579,
+          "control": 0.07562500238418579,
+          "candidate": 0.07499999552965164
+        },
+        "medianPercentChange": -0.826455318783359,
+        "pairedPercentChange": -1.0954668283021052,
+        "wins": 10,
+        "pairedMinPercentChange": -4.601674616312412,
+        "pairedMaxPercentChange": 5.002600613631514,
+        "pairedRatios": [
+          0.9922400610904134,
+          0.9895778656918482,
+          1.0072313732042746,
+          0.9830245976343187,
+          1.0026109262692708,
+          1.013844527123299,
+          1.0500260061363151,
+          0.989045331716979,
+          0.9821520399148472,
+          1.0057172875083236,
+          0.9761193313196413,
+          0.9539832538368759,
+          0.9657257913333693,
+          0.9728370708765217,
+          0.9600405164447794
+        ]
+      },
+      {
+        "case": "sequence/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 64,
+          "candidate": 64
+        },
+        "medianMs": {
+          "js": 0.009140625596046448,
+          "control": 0.14351561665534973,
+          "candidate": 0.17625001072883606
+        },
+        "medianPercentChange": 22.808942215743254,
+        "pairedPercentChange": -0.604951491262884,
+        "wins": 8,
+        "pairedMinPercentChange": -34.19434263186152,
+        "pairedMaxPercentChange": 65.88927220240284,
+        "pairedRatios": [
+          0.6580565736813848,
+          1.405552700243065,
+          0.888628389331235,
+          0.8096003650586442,
+          1.1230283675769306,
+          0.8859470055443631,
+          1.1057117446735096,
+          1.1905013438000303,
+          1.6588927220240284,
+          1.610607892696965,
+          0.9820681861763849,
+          1.085695868845206,
+          0.9939504850873712,
+          0.9706226854347376,
+          0.9317386238180199
+        ]
+      },
+      {
+        "case": "sequence/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.01972655951976776,
+          "control": 0.12261718511581421,
+          "candidate": 0.11992187798023224
+        },
+        "medianPercentChange": -2.1981479456050113,
+        "pairedPercentChange": -1.0855322845091386,
+        "wins": 9,
+        "pairedMinPercentChange": -19.622353736317788,
+        "pairedMaxPercentChange": 9.94371591836929,
+        "pairedRatios": [
+          1.0748752051351789,
+          1.0767205108001658,
+          0.9677096807210235,
+          0.8790490418733032,
+          0.9597117123510911,
+          1.008282900093575,
+          0.9926868793876981,
+          1.099437159183693,
+          0.9504391508541608,
+          0.8037764626368221,
+          1.0064999245924693,
+          0.8851573676987796,
+          0.9891446771549086,
+          0.88908876535084,
+          1.0032679862818004
+        ]
+      },
+      {
+        "case": "gantt/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.035039059817790985,
+          "control": 0.17671874910593033,
+          "candidate": 0.17878906428813934
+        },
+        "medianPercentChange": 1.1715311435166464,
+        "pairedPercentChange": 0.7755381962736507,
+        "wins": 4,
+        "pairedMinPercentChange": -11.037831843042268,
+        "pairedMaxPercentChange": 6.1055022834666905,
+        "pairedRatios": [
+          1.0101477848057991,
+          1.0050851104259144,
+          1.0071364784508314,
+          1.0052504453852993,
+          1.0171530079787845,
+          1.0077553819627365,
+          1.0265151639106513,
+          1.0149417776698721,
+          0.9832463323378268,
+          1.061055022834667,
+          1.0205128220394408,
+          1.010831117895606,
+          0.9932131379446911,
+          0.8896216815695773,
+          0.968075896676013
+        ]
+      },
+      {
+        "case": "gantt/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.005195312201976776,
+          "control": 0.16710937768220901,
+          "candidate": 0.16562499850988388
+        },
+        "medianPercentChange": -0.8882680271528276,
+        "pairedPercentChange": -1.7257672704560023,
+        "wins": 9,
+        "pairedMinPercentChange": -67.76572661548322,
+        "pairedMaxPercentChange": 29.960317497861322,
+        "pairedRatios": [
+          0.98274232729544,
+          0.704973097475833,
+          1.0184780025380304,
+          0.6804686034994198,
+          1.0627867759249028,
+          0.9832261567278767,
+          0.6185594953442786,
+          0.9322112791179971,
+          0.6005014634430429,
+          1.041585628313218,
+          1.038738550520135,
+          0.32234273384516793,
+          1.011269741034315,
+          1.2996031749786132,
+          0.9426381502243926
+        ]
+      },
+      {
+        "case": "gantt/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        },
+        "medianMs": {
+          "js": 0.02925781160593033,
+          "control": 0.5918749868869781,
+          "candidate": 0.574999988079071
+        },
+        "medianPercentChange": -2.851108626276422,
+        "pairedPercentChange": -3.0883915439454235,
+        "wins": 8,
+        "pairedMinPercentChange": -9.892264692539044,
+        "pairedMaxPercentChange": 11.98895044508137,
+        "pairedRatios": [
+          0.9010773530746096,
+          1.0573333231608073,
+          0.9108860643604134,
+          1.1198895044508137,
+          0.9315628111435529,
+          0.9691160845605458,
+          0.940010300861165,
+          1.060843700050082,
+          0.9364748621777979,
+          1.0791586126981487,
+          0.9080973486859263,
+          1.0349861848588575,
+          0.9213796510911311,
+          1.0748778696644432,
+          1.0010559904016252
+        ]
+      },
+      {
+        "case": "gantt/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "counts": {
+          "js": 128,
+          "control": 64,
+          "candidate": 64
+        },
+        "medianMs": {
+          "js": 0.04253906011581421,
+          "control": 0.20078124105930328,
+          "candidate": 0.19890624284744263
+        },
+        "medianPercentChange": -0.9338512910709862,
+        "pairedPercentChange": -0.7739967560310701,
+        "wins": 10,
+        "pairedMinPercentChange": -12.647669571938092,
+        "pairedMaxPercentChange": 5.707395560017625,
+        "pairedRatios": [
+          0.9911776162282813,
+          0.9855638336324589,
+          0.995290465696993,
+          0.9937327947333571,
+          1.02109371094266,
+          1.015052079967009,
+          0.9875487236682903,
+          0.9803619467706501,
+          0.8735233042806191,
+          1.0287741236928705,
+          1.0117508511160156,
+          1.0570739556001763,
+          0.966539884797598,
+          0.9922600324396893,
+          0.9805900622842617
+        ]
+      },
+      {
+        "case": "gantt/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 128,
+          "candidate": 128
+        },
+        "medianMs": {
+          "js": 0.005156256258487701,
+          "control": 0.16179687529802322,
+          "candidate": 0.16035155951976776
+        },
+        "medianPercentChange": -0.8932902910474994,
+        "pairedPercentChange": -0.5680403643775533,
+        "wins": 8,
+        "pairedMinPercentChange": -27.2239140206714,
+        "pairedMaxPercentChange": 44.628506559467326,
+        "pairedRatios": [
+          1.2712172460073488,
+          0.968845844323171,
+          0.9728682883319792,
+          1.4462850655946733,
+          0.9816513706547092,
+          1.4443595276847254,
+          0.9943195963562245,
+          0.9891732619754651,
+          1.237337568656217,
+          1.0408088097625954,
+          0.727760859793286,
+          1.0656566259849096,
+          1.108468299334137,
+          0.7438822100102779,
+          0.9777669230240139
+        ]
+      },
+      {
+        "case": "gantt/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        },
+        "medianMs": {
+          "js": 0.03707031160593033,
+          "control": 0.6179687678813934,
+          "candidate": 0.6065624952316284
+        },
+        "medianPercentChange": -1.845768466401565,
+        "pairedPercentChange": -1.2804145779653053,
+        "wins": 10,
+        "pairedMinPercentChange": -8.465857857475644,
+        "pairedMaxPercentChange": 8.016657776131787,
+        "pairedRatios": [
+          1.0533467753257046,
+          0.9925849933264745,
+          1.0801665777613179,
+          0.919458273112203,
+          0.9815423153359843,
+          0.9399234038384272,
+          0.925297118229011,
+          1.008835762906252,
+          0.987195854220347,
+          0.9582564704690001,
+          0.9682193234409403,
+          1.027836722256711,
+          0.9153414214252436,
+          1.06666666993968,
+          0.9963551317312002
+        ]
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        },
+        "medianMs": {
+          "js": 0.15132812410593033,
+          "control": 0.6481249928474426,
+          "candidate": 0.6634374856948853
+        },
+        "medianPercentChange": 2.3625833005095798,
+        "pairedPercentChange": 1.7005966095153369,
+        "wins": 1,
+        "pairedMinPercentChange": -0.14412555165008722,
+        "pairedMaxPercentChange": 13.259531218276832,
+        "pairedRatios": [
+          1.0275383518223447,
+          1.0280193202439767,
+          1.0130560686704526,
+          1.0219012735258595,
+          1.010069529741378,
+          1.1325953121827683,
+          1.0084520739618308,
+          1.0171663219051055,
+          1.0259802725916431,
+          1.0060298621965948,
+          1.0136022044726878,
+          1.0170059660951534,
+          1.0299372228110608,
+          1.004580533658496,
+          0.9985587444834991
+        ]
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "fixed",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        },
+        "medianMs": {
+          "js": 0.023671872913837433,
+          "control": 0.5481249988079071,
+          "candidate": 0.5648437440395355
+        },
+        "medianPercentChange": 3.0501701743195886,
+        "pairedPercentChange": 3.0501701743195886,
+        "wins": 6,
+        "pairedMinPercentChange": -58.22739233116367,
+        "pairedMaxPercentChange": 554.7451806763121,
+        "pairedRatios": [
+          1.034057541561973,
+          0.6413280087671597,
+          0.983103394247993,
+          1.5210466374951543,
+          1.027769771486721,
+          1.0636310651083416,
+          0.9965870610806161,
+          1.5480375315265629,
+          1.0305017017431959,
+          0.6555033001437922,
+          1.0534373321359605,
+          3.3068013038401833,
+          0.41772607668836326,
+          6.547451806763121,
+          0.7600924847498337
+        ]
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "fixed",
+        "stage": "render-model",
+        "counts": {
+          "js": 128,
+          "control": 8,
+          "candidate": 8
+        },
+        "medianMs": {
+          "js": 0.13300781697034836,
+          "control": 1.778749942779541,
+          "candidate": 1.7374999523162842
+        },
+        "medianPercentChange": -2.3190438111159173,
+        "pairedPercentChange": -1.9400392839806546,
+        "wins": 10,
+        "pairedMinPercentChange": -15.875415931200255,
+        "pairedMaxPercentChange": 11.068171564339568,
+        "pairedRatios": [
+          0.8513555489223331,
+          0.9805996071601935,
+          0.8896418166649588,
+          0.9539588527620664,
+          1.0755287034209793,
+          0.9337330278927313,
+          1.01270411831515,
+          1.1106817156433957,
+          0.9748672890452157,
+          1.0031723706724127,
+          0.9827771955280851,
+          1.0122788760129648,
+          0.8412458406879975,
+          0.9814087034972946,
+          0.8747977183150443
+        ]
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "counts": {
+          "js": 128,
+          "control": 16,
+          "candidate": 16
+        },
+        "medianMs": {
+          "js": 0.17195311933755875,
+          "control": 0.6949999928474426,
+          "candidate": 0.6887499690055847
+        },
+        "medianPercentChange": -0.8992840152776571,
+        "pairedPercentChange": -0.045361159688672714,
+        "wins": 8,
+        "pairedMinPercentChange": -12.172135389225735,
+        "pairedMaxPercentChange": 44.41404302588809,
+        "pairedRatios": [
+          1.1502985595341766,
+          0.9696142226088871,
+          1.444140430258881,
+          1.0023256346236828,
+          0.9466959933412529,
+          0.9810895950649735,
+          0.9990701786354788,
+          1.0172816834129086,
+          0.8782786461077426,
+          0.9870016834748322,
+          0.9995463884031133,
+          1.3201712367113971,
+          1.0217716962507355,
+          1.0907336067985272,
+          0.9658274132484403
+        ]
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "canvas",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 32,
+          "candidate": 32
+        },
+        "medianMs": {
+          "js": 0.023164063692092896,
+          "control": 0.5462499856948853,
+          "candidate": 0.5535937249660492
+        },
+        "medianPercentChange": 1.344391663795097,
+        "pairedPercentChange": 1.9813528881771347,
+        "wins": 4,
+        "pairedMinPercentChange": -29.67406535626743,
+        "pairedMaxPercentChange": 51.226389704081335,
+        "pairedRatios": [
+          0.9672543538713971,
+          1.0313225040036067,
+          1.5122638970408133,
+          1.005148804840912,
+          1.0251010052816938,
+          1.0025914238074114,
+          1.006244603944189,
+          1.0198135288817713,
+          1.4205392883171342,
+          0.9979890923327159,
+          1.51107952787487,
+          1.0290443823348163,
+          0.7032593464373257,
+          0.9917449215283243,
+          1.341559179957756
+        ]
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "canvas",
+        "stage": "render-model",
+        "counts": {
+          "js": 128,
+          "control": 8,
+          "candidate": 8
+        },
+        "medianMs": {
+          "js": 0.15125000476837158,
+          "control": 1.7887500524520874,
+          "candidate": 1.7787500619888306
+        },
+        "medianPercentChange": -0.559049066108952,
+        "pairedPercentChange": 0.3542344424062538,
+        "wins": 7,
+        "pairedMinPercentChange": -21.14525099483151,
+        "pairedMaxPercentChange": 12.089444385094339,
+        "pairedRatios": [
+          0.7885474900516849,
+          1.0150244686431427,
+          1.0323440920559341,
+          1.0242957937790749,
+          0.8995842870584658,
+          1.0256776478662897,
+          1.0547101524641873,
+          0.8836247482997306,
+          1.1208944438509434,
+          0.8422610780465747,
+          1.039351098516304,
+          0.9957731970952941,
+          0.984626117360051,
+          1.0035423444240625,
+          0.9812760400373903
+        ]
+      },
+      {
+        "case": "gantt/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "counts": {
+          "js": 32,
+          "control": 8,
+          "candidate": 8
+        },
+        "medianMs": {
+          "js": 0.612968772649765,
+          "control": 2.469374895095825,
+          "candidate": 2.4581249952316284
+        },
+        "medianPercentChange": -0.45557682985030157,
+        "pairedPercentChange": -0.025656458068701316,
+        "wins": 9,
+        "pairedMinPercentChange": -26.423898996788033,
+        "pairedMaxPercentChange": 13.431341487260395,
+        "pairedRatios": [
+          1.134313414872604,
+          0.8896207010093092,
+          0.9837604339133461,
+          0.999743435419313,
+          0.999999951688233,
+          0.9449519015738423,
+          0.9873032477575697,
+          0.9919089357038341,
+          1.112162795680221,
+          1.132122403468062,
+          1.011403972969592,
+          0.9994917291595989,
+          0.7357610100321197,
+          1.0012823115557732,
+          1.0858011477691745
+        ]
+      },
+      {
+        "case": "gantt/large",
+        "profile": "fixed",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 8,
+          "candidate": 8
+        },
+        "medianMs": {
+          "js": 0.14441405981779099,
+          "control": 1.9012500047683716,
+          "candidate": 1.9387500286102295
+        },
+        "medianPercentChange": 1.9723878368340442,
+        "pairedPercentChange": 2.23333358764648,
+        "wins": 5,
+        "pairedMinPercentChange": -35.37883304023093,
+        "pairedMaxPercentChange": 142.89143777507806,
+        "pairedRatios": [
+          0.9866533324092525,
+          1.0109999974568684,
+          1.9394590914174472,
+          2.4289143777507807,
+          1.0282708944179706,
+          1.0589208447817917,
+          0.976481912756008,
+          1.0223333358764648,
+          0.6462116695976907,
+          1.0247770065628672,
+          1.0825900218762237,
+          0.7057757670814088,
+          1.1666666289302667,
+          1.0068259647831825,
+          0.9884132406215783
+        ]
+      },
+      {
+        "case": "gantt/large",
+        "profile": "fixed",
+        "stage": "render-model",
+        "counts": {
+          "js": 32,
+          "control": 2,
+          "candidate": 2
+        },
+        "medianMs": {
+          "js": 0.5021874904632568,
+          "control": 5.877500057220459,
+          "candidate": 5.950000286102295
+        },
+        "medianPercentChange": 1.2335215342579309,
+        "pairedPercentChange": 1.1484412921585196,
+        "wins": 5,
+        "pairedMinPercentChange": -14.687388530717094,
+        "pairedMaxPercentChange": 19.75670744264393,
+        "pairedRatios": [
+          1.1947885303573154,
+          0.9933222893916067,
+          1.0114844129215852,
+          0.9830003606372214,
+          1.013593869259926,
+          1.0004292967428154,
+          1.0008676160269905,
+          0.8531261146928291,
+          1.1975670744264393,
+          1.1888693919185254,
+          0.993100562762466,
+          0.9935815307922149,
+          1.027789635848106,
+          1.1961683026623045,
+          1.058353355919634
+        ]
+      },
+      {
+        "case": "gantt/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "counts": {
+          "js": 32,
+          "control": 8,
+          "candidate": 8
+        },
+        "medianMs": {
+          "js": 0.6878125071525574,
+          "control": 2.5362499952316284,
+          "candidate": 2.5243749618530273
+        },
+        "medianPercentChange": -0.46821225829185575,
+        "pairedPercentChange": -0.024438486957945038,
+        "wins": 8,
+        "pairedMinPercentChange": -6.0415169343821296,
+        "pairedMaxPercentChange": 3.783513491994528,
+        "pairedRatios": [
+          1.0271003285630194,
+          0.9942571898472473,
+          0.9876786594149817,
+          0.9831953106908843,
+          1.0039545191173982,
+          1.0378351349199453,
+          0.9945638913494645,
+          1.0057499885559082,
+          0.9997556151304205,
+          0.9963081561755609,
+          1.0329562262079837,
+          1.0191685450908945,
+          0.9911656291938267,
+          1.0065048844970825,
+          0.9395848306561787
+        ]
+      },
+      {
+        "case": "gantt/large",
+        "profile": "canvas",
+        "stage": "parse",
+        "counts": {
+          "js": 128,
+          "control": 8,
+          "candidate": 8
+        },
+        "medianMs": {
+          "js": 0.09800781309604645,
+          "control": 1.8887499570846558,
+          "candidate": 1.955625057220459
+        },
+        "medianPercentChange": 3.5407069043181805,
+        "pairedPercentChange": 2.453580155378088,
+        "wins": 5,
+        "pairedMinPercentChange": -36.08292464618087,
+        "pairedMaxPercentChange": 60.95301288823649,
+        "pairedRatios": [
+          0.6391707535381913,
+          1.4893903172089675,
+          1.0123046505815922,
+          1.032268982281159,
+          0.7039370465943613,
+          1.499999934679843,
+          0.9861504998309982,
+          0.6830858806654442,
+          0.9795653237212366,
+          1.0177198491925556,
+          1.5762045162839498,
+          1.0693269910715835,
+          1.5643693264362053,
+          1.0245358015537809,
+          1.609530128882365
+        ]
+      },
+      {
+        "case": "gantt/large",
+        "profile": "canvas",
+        "stage": "render-model",
+        "counts": {
+          "js": 32,
+          "control": 2,
+          "candidate": 2
+        },
+        "medianMs": {
+          "js": 0.6334374845027924,
+          "control": 6.107499599456787,
+          "candidate": 6.090000152587891
+        },
+        "medianPercentChange": -0.28652391349240913,
+        "pairedPercentChange": 0.08130267257531187,
+        "wins": 7,
+        "pairedMinPercentChange": -6.17760728651321,
+        "pairedMaxPercentChange": 21.940249157678714,
+        "pairedRatios": [
+          0.9382239271348679,
+          1.1623630557606222,
+          1.0008130267257531,
+          1.0280630260589392,
+          0.9868210887868538,
+          1.0073951683113695,
+          1.007861006762841,
+          1.2194024915767872,
+          0.9763939792059405,
+          1.0120481517181352,
+          0.9995876194275531,
+          0.9942053232395432,
+          0.9654746404965597,
+          1.0259957619273865,
+          0.9679486733725965
+        ]
+      }
+    ],
+    "changedRuntimeFiles": [
+      "pkg/pele_bg.wasm"
+    ],
+    "controlPackageFileCount": 105,
+    "candidatePackageFileCount": 105
+  },
+  "gate": {
+    "reportSHA256": "6df5d500ac168cd9a82149a2c86ea7a593c3fd08734a4fba75408894b439995c",
+    "gateSHA256": "e284e001803f23dde9f1620622c328cfec3a1c86919a2aa6428b118dfaad8980",
+    "passed": false,
+    "checked": 126,
+    "slowerCount": 126,
+    "medianRatioByStage": {
+      "render-source": 2.455619144313938,
+      "parse": 11.674665303433157,
+      "render-model": 4.110346935645284
+    }
+  },
+  "comparatorSha256": "034e659a98c206b5cb09b4d9fe67a30f54bd9593f16312c589c4fdc956f75f80",
+  "checks": "All assertions passed; current input aggregate and frozen package contents checked separately without executing consumer/build/browser."
+}
