@@ -112,7 +112,7 @@ impl Target for ErModel {
 }
 struct Reader<'a, 'b, D> {
     src: &'a str,
-    tokens: Vec<Token>,
+    tokens: Vec<Token<'a>>,
     i: usize,
     db: &'b mut D,
 }
@@ -121,7 +121,7 @@ impl<D: Target> Reader<'_, '_, D> {
         self.tokens.get(self.i).map_or(T::END, |t| t.kind)
     }
     fn take(&mut self) -> String {
-        let s = std::mem::take(&mut self.tokens[self.i].text);
+        let s = self.tokens[self.i].text.to_owned();
         self.i += 1;
         s
     }
@@ -137,7 +137,7 @@ impl<D: Target> Reader<'_, '_, D> {
                 &format!(
                     "Expecting {expected}, got '{}'",
                     if t.kind == T::CHAR {
-                        t.text.as_str()
+                        t.text
                     } else {
                         NAMES[t.kind as usize]
                     }

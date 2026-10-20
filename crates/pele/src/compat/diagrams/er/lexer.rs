@@ -2,9 +2,9 @@
 use super::tokens::T;
 use crate::compat::source::space;
 #[derive(Clone, Debug)]
-pub(super) struct Token {
+pub(super) struct Token<'a> {
     pub kind: T,
-    pub text: String,
+    pub text: &'a str,
     pub start: usize,
 }
 #[derive(Clone, Copy, PartialEq)]
@@ -38,14 +38,14 @@ struct Scanner<'a> {
     src: &'a str,
     p: usize,
     state: S,
-    out: Vec<Token>,
+    out: Vec<Token<'a>>,
     failed_dir: usize,
     tilde_next: Option<usize>,
     whitespace_next: usize,
     tilde_line: usize,
     tilde_last: Option<usize>,
 }
-impl Scanner<'_> {
+impl<'a> Scanner<'a> {
     fn ch(&self, at: usize) -> Option<char> {
         self.src.get(at..)?.chars().next()
     }
@@ -58,7 +58,7 @@ impl Scanner<'_> {
     fn emit(&mut self, t: T, end: usize) {
         self.out.push(Token {
             kind: t,
-            text: self.src[self.p..end].into(),
+            text: &self.src[self.p..end],
             start: self.p,
         });
         self.p = end
@@ -365,7 +365,7 @@ impl Scanner<'_> {
         self.emit(T::CHAR, self.p + c.len_utf8())
     }
 }
-pub(super) fn tokenize(src: &str) -> Vec<Token> {
+pub(super) fn tokenize<'a>(src: &'a str) -> Vec<Token<'a>> {
     let mut s = Scanner {
         src,
         p: 0,
@@ -429,7 +429,7 @@ pub(super) fn tokenize(src: &str) -> Vec<Token> {
                 } else {
                     s.out.push(Token {
                         kind: T::ERROR,
-                        text: String::new(),
+                        text: "",
                         start: s.p,
                     });
                     return s.out;

@@ -107,13 +107,18 @@ not change rendering or fix that failure. Callback acceptance stays blocked;
 passing parse/graph/SVG corpus slices do not establish universal API parity.
 The failing assertion remains in the first-use comparator.
 
-## Consumed token ownership
+## Borrowed token text
 
-The shared ER reader transfers each consumed token String into its existing
-consumer instead of cloning it. Its cursor is monotonic: no backtracking,
-consumed-token lookup or vector replay occurs. Error reporting observes the
-current unconsumed token and unchanged original source; terminal sentinels are
-not consumed through this operation. A direct-target fallback drops the reader
-and tokenizes the prepared source afresh. Any future rewind/token-reuse design
-must revisit this ownership invariant. Lexer and destination allocations remain;
-this removes a copy without changing the parser or public contracts.
+The shared lexer retains source slices in its token vector. It creates owned
+Strings only when grammar actions consume text. No payload is decoded or
+transformed during lexing: quoted names, comments, backticks and accessibility
+values retain their original contiguous source spans, kinds and byte offsets.
+Explicit lexical ERROR text is empty. Reader and token lifetimes cannot outlive
+the source, while all returned models and public target inputs remain owned.
+
+This removes eager allocations for skipped punctuation/keywords and unconsumed
+suffixes, as well as the original consumed-token clone. The complete vector and
+full lexical scan remain. A failed direct target drops its reader; fallback
+still tokenizes the prepared source afresh. Quoted substring conversions,
+destination model/graph copies, concatenation and scanner scratch strings remain.
+No parser, provider, error/admission or public lifetime contract changes.
