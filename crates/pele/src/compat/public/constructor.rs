@@ -11,6 +11,7 @@ use std::any::TypeId;
 #[doc(hidden)]
 pub struct PublicConstructorFactory<S> {
     creator: TypeId,
+    class: TypeId,
     prototype: PrototypeId,
     construct: Construction<S>,
     arguments: Arguments,
@@ -66,6 +67,7 @@ impl<S> PublicConstructorFactory<S> {
     ) -> Self {
         Self {
             creator: TypeId::of::<D>(),
+            class: TypeId::of::<D>(),
             prototype,
             construct: Construction::Ignored(construct),
             arguments: Arguments::Ignored,
@@ -79,11 +81,19 @@ impl<S> PublicConstructorFactory<S> {
     ) -> Self {
         Self {
             creator: TypeId::of::<D>(),
+            class: TypeId::of::<D>(),
             prototype,
             construct: Construction::First(construct),
             arguments: Arguments::FirstValue,
             live_fields,
         }
+    }
+    pub(crate) fn sharing_class<D: 'static>(mut self) -> Self {
+        self.class = TypeId::of::<D>();
+        self
+    }
+    pub(super) fn class_id(&self) -> TypeId {
+        self.class
     }
     pub(super) fn for_creator<D: 'static>(self, prototype: PrototypeId) -> Option<Self> {
         (self.creator == TypeId::of::<D>() && self.prototype == prototype).then_some(self)

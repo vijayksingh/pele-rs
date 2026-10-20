@@ -316,53 +316,20 @@ impl MutableDocument {
         inline_icons: Option<js_sys::Function>,
         dispatcher: Option<js_sys::Function>,
     ) -> Result<JsValue, JsValue> {
-        let run = || -> Result<JsValue, JsValue> {
-            let config = config(config_json).map_err(failure)?;
-            // Raw entries have no core output policy. JS removes parse-only
-            // fields before decoding; numeric render fields retain raw f64.
-            let (options, _) =
-                super::render_numbers::options(json, mask, numbers, 3, 0.).map_err(failure)?;
-            let revision = revision
-                .parse::<u64>()
-                .map_err(|_| failure(invalid("Invalid public model revision")))?;
-            let mut host = RawResources {
-                resources: super::render_numbers::NumericResources {
-                    browser: super::BrowserResources { width, icons },
-                    clock,
-                },
-                inline: super::BrowserResources {
-                    width: None,
-                    icons: inline_icons,
-                },
-            };
-            let outcome = match dispatcher {
-                Some(dispatcher) => self
-                    .inner
-                    .render_raw_operation_view(
-                        revision,
-                        &config,
-                        &options.render,
-                        &mut super::host_functions::Resources {
-                            host: &mut host,
-                            dispatcher,
-                        },
-                    )
-                    .map_err(failure)?,
-                None => self
-                    .inner
-                    .render_raw_operation_view(revision, &config, &options.render, &mut host)
-                    .map_err(failure)?,
-            };
-            super::render_packet::arena(
-                outcome.revision,
-                &outcome.graph,
-                true,
-                "",
-                outcome.result.as_ref().ok(),
-                &outcome.result.as_ref().map(transport),
-            )
-        };
-        run()
+        raw_operation_packet(
+            self,
+            None,
+            revision,
+            config_json,
+            json,
+            mask,
+            numbers,
+            width,
+            icons,
+            clock,
+            inline_icons,
+            dispatcher,
+        )
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -483,4 +450,73 @@ pub(super) fn host_er_raw_resources(
             icons: inline_icons,
         },
     }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn raw_operation_packet(
+    document: &mut MutableDocument,
+    target: Option<&CapturedPublicConstructor>,
+    revision: &str,
+    config_json: &str,
+    json: &str,
+    mask: u32,
+    numbers: &[f64],
+    width: Option<js_sys::Function>,
+    icons: Option<js_sys::Function>,
+    clock: Option<js_sys::Function>,
+    inline_icons: Option<js_sys::Function>,
+    dispatcher: Option<js_sys::Function>,
+) -> Result<JsValue, JsValue> {
+    let run = || -> Result<JsValue, JsValue> {
+        let config = config(config_json).map_err(failure)?;
+        // Raw entries have no core output policy. JS removes parse-only
+        // fields before decoding; numeric render fields retain raw f64.
+        let (options, _) =
+            super::render_numbers::options(json, mask, numbers, 3, 0.).map_err(failure)?;
+        let revision = revision
+            .parse::<u64>()
+            .map_err(|_| failure(invalid("Invalid public model revision")))?;
+        let mut host = RawResources {
+            resources: super::render_numbers::NumericResources {
+                browser: super::BrowserResources { width, icons },
+                clock,
+            },
+            inline: super::BrowserResources {
+                width: None,
+                icons: inline_icons,
+            },
+        };
+        let mut resources = dispatcher.map(|dispatcher| super::host_functions::Resources {
+            host: &mut host as &mut dyn RenderResources,
+            dispatcher,
+        });
+        let host: &mut dyn RenderResources = match resources.as_mut() {
+            Some(resources) => resources,
+            None => &mut host,
+        };
+        let outcome = match target {
+            Some(target) => target.render_raw_operation_view(
+                &mut document.inner,
+                revision,
+                &config,
+                &options.render,
+                host,
+            ),
+            None => {
+                document
+                    .inner
+                    .render_raw_operation_view(revision, &config, &options.render, host)
+            }
+        }
+        .map_err(failure)?;
+        super::render_packet::arena(
+            outcome.revision,
+            &outcome.graph,
+            true,
+            "",
+            outcome.result.as_ref().ok(),
+            &outcome.result.as_ref().map(transport),
+        )
+    };
+    run()
 }

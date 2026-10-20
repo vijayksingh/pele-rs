@@ -178,6 +178,7 @@ function reconcileGraph(bridge, graph, changed) {
     if(cursor)cursor.select(id);
     const kind = cursor?cursor.kind:nested ? node.kind : storage.nodeKind(graph,id);
     const object = bridge.objects[id], fresh = id >= freshStart;
+    if(bridge.liveFields?.isProtectedNode(id))continue;
     if (!fresh || kind === 'error') {
       let keys;
       if(nested)keys=new Set(node.properties.map(property=>bridge.strings[property.key]));
@@ -186,6 +187,7 @@ function reconcileGraph(bridge, graph, changed) {
         for(let i=0;i<(cursor?cursor.propertyCount:storage.propertyCount(graph,id));i++)keys.add(bridge.strings[cursor?cursor.key(i):storage.propertyKey(graph,storage.propertySlot(graph,id,i))]);
       }
       for (const key of Object.getOwnPropertyNames(object)) {
+        if(bridge.liveFields?.field(object,key))continue;
         if (kind === 'array' && key === 'length') continue;
         if (kind === 'error' && errorDiagnostics.has(key) && !keys.has(key)) continue;
         if (!keys.has(key) && !Reflect.deleteProperty(object, key)) throw new TypeError('Native graph removed a non-configurable property');
@@ -212,6 +214,7 @@ function reconcileGraph(bridge, graph, changed) {
       const payload=cursor?cursor.payload:undefined,raw=cursor?cursor.raw:false;
       if(flags!==7)assignFresh=false;
       const key=bridge.strings[keyId];
+      if(bridge.liveFields?.field(object,key))continue;
       const atom=cursor||propertyWords?undefined:nested?property.value:storage.propertyAtomSlot(graph,property);
       const value=cursor?flatScalarValue(bridge,tag,payload):propertyWords?flatScalarValue(bridge,tag,tag===4?wordNumber(lo,hi):lo):nested?bridge.value(atom):flatValue(bridge,storage,graph,atom);
       if(assignFresh&&key!=='__proto__'&&!(kind==='array'&&key==='length'))object[key]=value;
@@ -231,6 +234,7 @@ function reconcileGraph(bridge, graph, changed) {
 }
 
 function matchesGraph(bridge) {
+  if(bridge.liveFields)return false; // Live descriptors belong to the host, not equality receipts.
   const graph=bridge.graph,cursor=createNodeCursor?createNodeCursor(graph):null;
   const propertyWords=readProperty&&!cursor?new Uint32Array(5):null;
   if(bridge.objects.length!==(nested?graph.nodes.length:storage.nodeCount(graph))||bridge.strings.length!==(nested?graph.strings.length:storage.stringCount(graph)))return false;
@@ -338,11 +342,13 @@ function snapshotGraph(bridge, values = [], delta = false) {
       case 'number':if(nested)return{kind:'number',value:numberBits(value)};atomTag=4;return value;
       case 'string':{const id=string(value);if(nested)return{kind:'string',value:id};atomTag=5;return id;}
       case 'function':{
+        if(bridge.liveFields?.isOpaque(value))return host(value);
         const id=bridge.registration.functionIds.get(value);
         if(id===undefined)return host(value);
         if(nested)return{kind:'builtinFunction',value:id};atomTag=7;return id;
       }
       case 'object':{
+        if(bridge.liveFields?.isOpaque(value))return host(value);
         const prototype=Object.getPrototypeOf(value);
         if(!(Array.isArray(value)||value instanceof Map||value instanceof Set||value instanceof Date||errorKind(value)||prototype===Object.prototype||bridge.registration.prototypeIds.has(prototype)||(bridge.rootBinding?.object===value&&bridge.rootBinding.prototype===prototype)))return host(value);
         let id=bridge.ids.get(value);
@@ -362,11 +368,18 @@ function snapshotGraph(bridge, values = [], delta = false) {
     capture.beginArguments(length);
     for(let i=0;i<length;i++)if(i in values){const payload=atom(values[i]);capture.argument(i,atomTag,payload);}
   }
-  for(const object of bridge.objects)atom(object);
+  for(let i=0;i<bridge.objects.length;i++)if(!bridge.liveFields?.isProtectedNode(i))atom(bridge.objects[i]);
   while(pending.length){
     const [id,value]=pending.pop(),properties=nested?[]:null;
+    const emittedLive=bridge.liveFields?new Set():null;
     if(!nested)capture.beginNode(id);
     for(const key of Object.getOwnPropertyNames(value)){
+      const live=bridge.liveFields?.field(value,key);
+      if(live){
+        if(!nested)throw new TypeError('Live fields require an owned graph codec');
+        if(++propertiesCount>8_000_000)budget();
+        properties.push({key:string(key),value:live.value,flags:live.flags});emittedLive.add(key);continue;
+      }
       const descriptor=Object.getOwnPropertyDescriptor(value,key);
       if(Array.isArray(value)&&key==='length'){
         if(descriptor.writable)continue;
@@ -380,6 +393,12 @@ function snapshotGraph(bridge, values = [], delta = false) {
       const flags=(descriptor.enumerable?1:0)|(descriptor.writable?2:0)|(descriptor.configurable?4:0);
       if(nested)properties.push({key:keyId,value:payload,flags});
       else capture.property(keyId,flags,atomTag,payload);
+    }
+    for(const [key,live]of bridge.liveFields?.entries(value)??[]){
+      if(emittedLive.has(key))continue;
+      if(!nested)throw new TypeError('Live fields require an owned graph codec');
+      if(++propertiesCount>8_000_000)budget();
+      properties.push({key:string(key),value:live.value,flags:live.flags});
     }
     if(value instanceof Map){
       const entries=nested?[]:null;

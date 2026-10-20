@@ -1,7 +1,8 @@
 import {test,expect} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 
-test('captured Sankey construction behavior preserves receiver, defaults, helpers and raw ownership',async({page},info)=>{
+for(const semantic of [false,true]){
+test((semantic?'semantic construction parity: ':'')+'captured Sankey construction behavior preserves receiver, defaults, helpers and raw ownership',async({page},info)=>{
   await page.goto('/examples/web/');
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js');
@@ -83,10 +84,12 @@ test('captured Sankey construction behavior preserves receiver, defaults, helper
         rows.push(row);
       }
       const callWithoutNew=constructors.map(C=>error(()=>C()).name);
-      // Unimplemented constructors remain explicit, not empty parser models.
-      const other=engine.parse('flowchart TD\nA-->B');let unsupported;
-      try{unsupported=error(()=>new other.constructor());}finally{engine.dispose(other);}
-      return {rows,callWithoutNew,metadata,unsupported};
+      // Flow now has a real captured constructor; verify ready defaults and helpers.
+      const other=engine.parse('flowchart TD\nA-->B'),reference=oracle.parse('flowchart TD\nA-->B');let flow;
+      const made=new other.constructor(),expected=new reference.constructor();
+      try{made.addVertex('Fresh');expected.addVertex('Fresh');flow={actual:snapshot(made),expected:snapshot(expected),prototype:Object.getPrototypeOf(made)===other.constructor.prototype};}
+      finally{engine.dispose(made);engine.dispose(other);}
+      return {rows,callWithoutNew,metadata,flow};
     }finally{engine.close();}
   });
   const path=info.outputPath('sankey-constructor.json');await writeFile(path,JSON.stringify(report,null,2));await info.attach('sankey-constructor.json',{path,contentType:'application/json'});
@@ -94,8 +97,11 @@ test('captured Sankey construction behavior preserves receiver, defaults, helper
   for(const [lane,metadata]of Object.entries(report.metadata)){
     expect(metadata.arity,lane).toBe(0);
     expect(metadata.callWithoutNew.name,lane).toBe('TypeError');
+    // Exact companion retains key-order equality; semantic companion checks
+    // presence/flags while raw metadata preserves the known Firefox order gap.
+    if(semantic)expect([...metadata.intrinsic.ownKeys].sort(),lane).toEqual([...report.metadata.oracleEsm.intrinsic.ownKeys].sort());
     expect(metadata.intrinsic,lane).toEqual({
-      ownKeys:report.metadata.oracleEsm.intrinsic.ownKeys,
+      ownKeys:semantic?metadata.intrinsic.ownKeys:report.metadata.oracleEsm.intrinsic.ownKeys,
       length:{data:true,writable:false,enumerable:false,configurable:true},
       name:{data:true,writable:false,enumerable:false,configurable:true},
       prototype:{data:true,writable:false,enumerable:false,configurable:false},
@@ -106,13 +112,16 @@ test('captured Sankey construction behavior preserves receiver, defaults, helper
   }
   // Known name and non-new message gaps are retained in the attached raw report,
   // not normalized or asserted equal to the oracle.
-  expect(report.unsupported).toEqual({name:'TypeError',message:'Public model construction is unavailable'});
+  expect(report.flow.actual).toEqual(report.flow.expected);
+  expect(report.flow.prototype).toBe(true);
   expect(report.rows).toHaveLength(5);
   for(const row of report.rows){
     expect(row.candidate,row.mode).toEqual(row.oracle);
     expect(row.candidate,row.mode).toMatchObject({prototype:true,rootsStable:true,alias:true,addUndefined:true,ignoredReads:0,inheritedWrites:0,original:true,arity:0,before:{name:'TypeError',message:'render() takes diagram text or a model that parse() returned.'},after:{name:'TypeError',message:'render() takes diagram text or a model that parse() returned.'}});
   }
 });
+
+}
 
 test('Sankey constructors retain captured registrations across replacement, close and disposal',async({page})=>{
   await page.goto('/examples/web/');

@@ -456,6 +456,8 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .public_constructor(prototype)?
             .for_creator::<D>(prototype)?;
         Some(Constructor {
+            class: factory.class_id(),
+            state: TypeId::of::<D::PublicState>(),
             ignores_arguments: factory.ignores_arguments(),
             live_fields: factory.live_fields(),
             construct: Box::new(move |argument| {
@@ -576,6 +578,8 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     }
 }
 struct Constructor {
+    class: TypeId,
+    state: TypeId,
     ignores_arguments: bool,
     live_fields: &'static [super::LiveConstructorField],
     construct: Box<dyn Fn(ConstructorArgument) -> Result<State, PeleError> + Send + Sync>,
@@ -589,6 +593,54 @@ pub struct CapturedPublicConstructor {
     constructor: Constructor,
 }
 impl CapturedPublicConstructor {
+    /// Bind this retained raw renderer only to an authentic compatible class
+    /// and the exact erased state type. The document keeps its original owner.
+    pub fn accepts_raw_document(&self, document: &PublicDocument) -> bool {
+        let Some(owner) = document.registration.codec.constructor(self.prototype) else {
+            return false;
+        };
+        if owner.class != self.constructor.class
+            || owner.state != self.constructor.state
+            || document.state.as_ref().type_id() != self.constructor.state
+        {
+            return false;
+        }
+        let Ok(view) = document.read_view() else {
+            return false;
+        };
+        let reader = view.reader();
+        let Atom::Ref(root) = reader.root() else {
+            return false;
+        };
+        matches!(reader.header(root as usize), Ok(super::captured_admission::Header {
+            kind: super::captured_admission::AdmissionKind::Instance(prototype), ..
+        }) if prototype == self.prototype)
+    }
+    pub fn render_raw_operation_view<'a>(
+        &self,
+        document: &'a mut PublicDocument,
+        revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<RawRenderOutcomeView<'a>, PeleError> {
+        if !self.accepts_raw_document(document) {
+            return Err(PeleError::new(
+                "Raw diagram render requires a model of this diagram",
+                ErrorCode::Semantic,
+            ));
+        }
+        document
+            .render_raw_with_registration(
+                revision,
+                config,
+                settings,
+                host,
+                GraphExport::Borrowed,
+                self.registration.clone(),
+            )
+            .and_then(ReadOutcome::into_raw_view)
+    }
     pub fn prototype(&self) -> PrototypeId {
         self.prototype
     }
@@ -1744,6 +1796,24 @@ impl PublicDocument {
         host: &mut dyn RenderResources,
         export: GraphExport,
     ) -> Result<ReadOutcome<'_, Rendered>, PeleError> {
+        self.render_raw_with_registration(
+            expected_revision,
+            config,
+            settings,
+            host,
+            export,
+            self.registration.clone(),
+        )
+    }
+    fn render_raw_with_registration(
+        &mut self,
+        expected_revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+        export: GraphExport,
+        registration: Arc<Registration>,
+    ) -> Result<ReadOutcome<'_, Rendered>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
@@ -1754,11 +1824,11 @@ impl PublicDocument {
         self.snapshot_read()?;
         let mut operation_error = None;
         let result = crate::compat::engine::render_raw_registered(
-            &self.registration.descriptor,
+            &registration.descriptor,
             settings,
             host,
             |session| {
-                self.registration
+                registration
                     .codec
                     .render_raw_operation(&mut self.state, config, settings, session)
                     .map_err(|error| {

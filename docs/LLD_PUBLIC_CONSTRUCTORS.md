@@ -130,7 +130,8 @@ A future native-authenticated constructor identity catalog must distinguish the
 pinned runtime name from the descriptive schema name and define the shared
 constructor/prototype identities across core, raw entries and registries. This
 slice neither infers authority from a name nor introduces a global schema-name
-cache. FlowDb sharing and the other constructor factories remain separate work.
+cache. The scoped FlowDb raw binding below does not unify the global constructor
+identity catalog.
 
 ## Retained options and owned method phases — native layer
 
@@ -169,3 +170,47 @@ render, two Flow features covering forty pinned cases and lifecycle/scalar
 behavior, and nineteen Gantt warning cases plus defaults/raw rendering. Existing
 Flow methods/SVG regression also passed in the private candidate. This is scoped
 feature evidence, not an all-library or platform acceptance result.
+
+## Web retained options and compatible raw owners
+
+The web adapter retains constructor options in an owner-local opaque ledger.
+Authenticated live-field metadata masks the actual receiver's declared options
+field during observation and publication, including replacement/accessor fields
+and native default objects retained in history. Rust selects each Get, Call or
+coercion phase. JavaScript performs that operation, publishes partial native
+writes, then observes callback edits before resuming. An explicit per-job failure
+flag preserves thrown `undefined`, symbols and original objects; nested caught
+failures cannot replace the outer operation's result. Ignored returns are never
+classified. Retained returns use temporary identity tokens and are released only
+after completion when the admitted graph no longer references them.
+
+Flowchart and Swimlane share the actual FlowDb constructor shell. A captured raw
+renderer can operate on a compatible owner without replacing its registration or
+copying its graph. Native authorization requires an authentic creator-filtered
+factory, matching private class and PublicState TypeIds, the actual erased state
+type, and the target root prototype. Swimlane explicitly shares Flowchart's class
+identity inside Rust. Forwarded provider factories cannot confer this authority.
+The target captured registration survives registry destruction; original helper
+routing and revision ownership stay with the document. JavaScript retains target
+capabilities per observed raw entry and selects them only inside the existing
+native busy guard. Cross-renderer/global constructor catalogs remain separate.
+
+Public feature evidence covers 66 Flow/Swimlane scenarios, constructor options
+history/accessors, borrowed receivers, registry lifetime, 19 Gantt warning cases
+plus six retained-result cases, and declared Class defaults/helpers/raw output.
+The original three-engine 45-test attempt is preserved: 37 passed, eight failed.
+Five feature failures were browser-generated TypeError wording only; three older
+Sankey failures were a now-stale Flow-unsupported assertion or the already-known
+Firefox intrinsic key order difference. The stale assertion now verifies real
+Flow construction and its first helper.
+
+Exact diagnostic comparisons remain executable and intentionally expose these
+open gaps. Separately named semantic comparisons accept only the recorded
+candidate/oracle TypeError message pairs; all state, descriptors, callback traces,
+original error identities, results and SVG remain exact. Their raw reports keep
+both messages. A separate semantic Sankey comparison checks intrinsic presence
+and flags while the exact comparison retains key-order equality. This is scoped
+functional parity, not complete diagnostic or constructor-reflection parity.
+No host-engine failure witness or error-message normalization was added to the
+runtime. Arbitrary Proxy producer arguments and advanced Class shared-enum
+mutation/getter behavior remain outside this feature's acceptance scope.

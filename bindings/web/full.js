@@ -1,3 +1,4 @@
+import {createHostLedger,retainHostValue,LiveFieldBindings,hostReply,performHostOperation,retainJobValue,releaseJobValues} from './host-values.js';
 import {LayoutGraph,encodeSourceInput} from './layout-storage.js';
 import {decodeLayoutOutcome} from './layout-packet.js';
 import {CapturedOwner,capturedSankeyAvailable,rememberCapturedModel,capturedObservedFrame} from './captured-owner.js';
@@ -130,6 +131,9 @@ function releaseDisposedBridge(bridge) {
   bridge.objects = null;
   bridge.root = null;
   bridge.rootBinding = undefined;
+  bridge.liveFields?.release();
+  bridge.liveFields = null;
+  bridge.hostLedger = null;
   bridge.hostIds = null;
   bridge.hostValues = null;
   // Break adoption closures that can otherwise retain the model environment.
@@ -167,6 +171,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   const liveProviders=new Map(canonicalProviders.map(provider=>[provider.type,{provider,native:true}]));
   function syncProviders(){for(const [type,entry] of liveProviders){const native=builtinDiagramType(entry.provider)===type;if(native!==entry.native){if(native)registryCall(()=>nativeValue(()=>{nativeRegistry.register_builtin(type);return '{"version":2,"ok":true,"result":null}';}));else registryCall(()=>foreignValue(()=>nativeRegistry.register_foreign(type,entry.provider)));entry.native=native;}}}
   const documents = new WeakMap(), constructedDocuments = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry();
+  const rawConstructors = new Map();
   // Native keys identify captured immutable metadata, scoped to this renderer.
   const schemaRegistrations = new Map();
   // Native baseline authority is independent of live host equality. Tokens are
@@ -354,24 +359,74 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     if(atom.kind==='bool')return atom.value;
     const tags={number:4,string:5,ref:6,builtinFunction:7,hostReference:8};return owner.value([tags[atom.kind],atom.value]);
   }
-  function capturedConstructorFactory(capability, registration, rawType) {
-    return receiver=>{
-      const mutable=foreignValue(()=>capability.construct());
-      try{return adoptMutable(mutable,rawType,undefined,{receiver,prototypeId:capability.prototype_id(),registration});}
+  function capturedConstructorFactory(capability, registration, rawType, liveDefinitions) {
+    return (receiver,first)=>{
+      const hostLedger=createHostLedger();
+      const mutable=foreignValue(()=>capability.ignores_arguments()?capability.construct():capability.construct_with_host_reference(first===undefined?undefined:retainHostValue(hostLedger,first)));
+      try{return adoptMutable(mutable,rawType,undefined,{receiver,prototypeId:capability.prototype_id(),registration,hostLedger,liveDefinitions});}
       catch(error){mutable.free();throw error;}
     };
   }
   function installConstructors(mutable, registration, rawType) {
-    if(typeof mutable.capture_constructor!=='function')return;
+    const ownedDefinitions=[];
+    if(typeof mutable.capture_constructor!=='function')return ownedDefinitions;
     for(const prototype of registration.schema.prototypes){
-      if(registration.constructors.has(prototype.id))continue;
+      // Capture from THIS document even when its schema already has a shell.
+      // Shared schema metadata cannot authorize live fields on another creator.
       const capability=mutable.capture_constructor(prototype.id);
       if(!capability)continue;
-      // The current captured ABI explicitly certifies ignored arguments.
-      // Future option-reading constructors need their own ordered host seam.
-      if(!capability.ignores_arguments()){capability.free();continue;}
-      registration.constructors.set(prototype.id,capturedConstructorFactory(capability,registration,rawType));
+      const liveDefinitions=typeof capability.live_fields==='function'?JSON.parse(capability.live_fields()):[];
+      if(!capability.ignores_arguments()&&typeof capability.construct_with_host_reference!=='function'){capability.free();continue;}
+      ownedDefinitions.push(...liveDefinitions);
+      let rawFactories=rawConstructors.get(rawType);
+      if(!rawFactories){rawFactories=new Map();rawConstructors.set(rawType,rawFactories);}
+      // Keep the actual captured entry even when its class shell is shared.
+      // A live shell may retain an older registration; never free its factory.
+      rawFactories.set(prototype.id,capability);
+      if(registration.constructors.has(prototype.id))continue;
+      registration.constructors.set(prototype.id,capturedConstructorFactory(capability,registration,rawType,liveDefinitions));
     }
+    return ownedDefinitions;
+  }
+  function runDetachedInvocation(entry,job){
+    let replyState=0,valueTag=0,value,original,originalFailed=false,observationFailed=false,finishedGraph;
+    const temporaryValues=new Set();
+    const bridge=entry.bridge;
+    const unlocked=run=>{entry.nativeBusy=false;try{return run();}finally{entry.nativeBusy=true;}};
+    const retainFailure=error=>{
+      if(!originalFailed){originalFailed=true;original=error;}
+      replyState=2;valueTag=0;value=bridge.hostException(error).value;
+    };
+    entry.detachedDepth=(entry.detachedDepth??0)+1;
+    acceptedBaselines.delete(entry);
+    try{
+      for(;;){
+        const outcome=binaryResult(()=>entry.handle.resume_detached_invocation(job,replyState,valueTag,value));
+        entry.revision=outcome.revision;
+        if(outcome.result?.complete===true)break;
+        const operation=outcome.result?.host;
+        if(!operation)throw new TypeError('Invalid detached invocation step');
+        // Native mutation is visible before the next user operation. Publishing
+        // itself may reenter through caller descriptors; no native borrow lives.
+        unlocked(()=>publishMutableOutcome(entry,outcome));
+        let returned,thrown,failed=false;
+        try{returned=unlocked(()=>performHostOperation(bridge,operation));}
+        catch(error){failed=true;thrown=error;}
+        try{prepareMutableInput(entry);}
+        catch(error){observationFailed=true;if(!failed){failed=true;thrown=error;}}
+        if(failed)retainFailure(thrown);
+        else {replyState=1;[valueTag,value]=operation.kind==='call'&&operation.result==='retain'?[5,retainJobValue(bridge.hostLedger,returned,temporaryValues)]:hostReply(bridge,returned);}
+      }
+      const outcome=binaryResult(()=>entry.handle.finish_detached_invocation(job));
+      finishedGraph=outcome.graph;
+      entry.revision=outcome.revision;
+      if(!observationFailed)unlocked(()=>publishMutableOutcome(entry,outcome));
+      else acceptedBaselines.delete(entry);
+      if(originalFailed)throw original;
+      if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,bridge);
+      return bridge.value(outcome.result.Ok);
+    }catch(error){if(originalFailed)throw original;throw error;}
+    finally{entry.confirmedGraph=false;entry.detachedDepth--;try{job.free();}finally{releaseJobValues(bridge.hostLedger,temporaryValues,finishedGraph);}}
   }
   function adoptMutable(mutable, preparedType, existingBridge, construction) {
           let sourceSnapshot;
@@ -401,9 +456,14 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             ?mutable.source_ingress_identity?.():undefined;
           const invoke = (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
+            bridge.liveFields?.bind(receiver,method);
             const input = prepareMutableInput(entry, [receiver, ...argumentsValue]);
             const call=JSON.stringify({method,receiver:input.values[0],arguments:input.values.slice(1)}),functions=modelHostFunctions(bridge,operationError);
             acceptedBaselines.delete(entry);
+            if(typeof mutable.prepare_detached_invocation==='function'){
+              const job=nativeDetachedCall(()=>mutable.prepare_detached_invocation(entry.revision,call));
+              if(job)return runDetachedInvocation(entry,job);
+            }
             const outcome = bridge.graph instanceof LayoutGraph
               ? layoutResult(()=>mutable.invoke_source_layout_with_functions(entry.revision,call,functions),bridge.graph,entry.revision)
               : binaryResult(()=>mutable.invoke_binary_with_functions(entry.revision,call,functions));
@@ -411,7 +471,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
           });
-          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration,rootBinding);
+          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration,rootBinding,construction?.hostLedger,construction?.liveDefinitions);
           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
           entry.confirmedGraph = true;
@@ -420,7 +480,8 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           (construction?constructedDocuments:documents).set(model, entry);
           ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options),()=>renderer.dispose(model));
           finalizer?.register(model, mutable, model);
-          installConstructors(mutable,registration,rawType);
+          const liveDefinitions=installConstructors(mutable,registration,rawType);
+          if(liveDefinitions.length&&!bridge.liveFields){bridge.liveFields=new LiveFieldBindings(bridge,liveDefinitions);bridge.liveFields.bind(model);}
           return model;
   }
   function adoptCaptured(handle,epoch,preparedType,existingOwner) {
@@ -562,9 +623,17 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         const numeric=renderNumericOptions({...options,limit:undefined,maxEdges:undefined,config:undefined,outputLimit:undefined,nativeTheme:undefined});
         return renderedValue(hostOperation(entry,'raw',[],(primitive,capture,finish,resource)=>(entry.handle.render_raw_host_packet??entry.handle.render_raw_host).call(entry.handle,primitive,capture,finish,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,resource((text,size,style)=>measurer.width(text,size,style)),resource(options.icons),resource(()=>Date.now()),resource(inherited))));
       }
-      if(!entry?.bridge||entry.rawType!==type)throw new TypeError('Raw diagram render requires a model of this diagram');
+      const targetCandidates=entry?.bridge&&entry.rawType!==type?rawConstructors.get(type):undefined;
+      if(!entry?.bridge||(entry.rawType!==type&&!targetCandidates))throw new TypeError('Raw diagram render requires a model of this diagram');
       if(entry.disposed)throw new TypeError('Public model document is disposed');
       return nativeModelCall(entry,()=>{
+      let targetRaw;
+      if(targetCandidates){
+        for(const capability of targetCandidates.values()){
+          if(capability.accepts_raw_document(entry.handle)){targetRaw=capability;break;}
+        }
+        if(!targetRaw)throw new TypeError('Raw diagram render requires a model of this diagram');
+      }
       let callbackFailed=false,callbackError;
       const capture=run=>{try{return run();}catch(error){callbackFailed=true;callbackError=error;throw error;}};
       const measurer=options.measurer??builtinMeasurer(options,type);
@@ -586,7 +655,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         prepareMutableInput(entry);
         const dispatcher=modelHostFunctions(entry.bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;});
         const configJSON=finiteConfigJSON(config);
-        const job=typeof entry.handle.prepare_detached_render_raw==='function'
+        const job=!targetRaw&&typeof entry.handle.prepare_detached_render_raw==='function'
           ?nativeDetachedCall(()=>entry.handle.prepare_detached_render_raw(entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers)):undefined;
         if(job){
           const outcome=runDetachedRender(entry,job,true,width,icons,clock,inline,dispatcher);
@@ -595,7 +664,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         }
         const packet=entry.handle.render_raw_operation_packet_with_functions;
         acceptedBaselines.delete(entry);
-        const outcome=entry.bridge.graph instanceof LayoutGraph
+        const outcome=targetRaw
+          ?arenaRenderResult(()=>targetRaw.render_raw_operation_packet_with_functions(entry.handle,entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.revision,true,type)
+          :entry.bridge.graph instanceof LayoutGraph
           ?layoutResult(()=>entry.handle.render_raw_operation_source_layout_with_functions(entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.bridge.graph,entry.revision,true,entry.rawType)
           :typeof packet==='function'
           ?arenaRenderResult(()=>packet.call(entry.handle,entry.revision,configJSON,numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,dispatcher),entry.revision,true,entry.rawType)

@@ -18,6 +18,7 @@ impl PublicDiagramModule for Swimlane {
                 crate::compat::diagrams::flowchart::construct_flow_with,
                 crate::compat::diagrams::flowchart::FLOW_LIVE_FIELDS,
             )
+            .sharing_class::<Flowchart>()
         })
     }
     fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {

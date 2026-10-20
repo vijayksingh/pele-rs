@@ -1,3 +1,4 @@
+import {createHostLedger,LiveFieldBindings} from './host-values.js';
 import {LayoutGraph,LayoutStorage,applyLayoutDelta} from './layout-storage.js';
 import {tryInitializeSourceLayout} from './source-initializer.js';
 import {completeBridgePublication,invalidateBridgeObservation,getGraphTraversal,numberValue, reconcileNestedGraph as reconcileGraph, matchesNestedGraph as matchesGraph, snapshotNestedGraph as snapshotGraph} from './graph-storage.js';
@@ -65,7 +66,7 @@ export class ModelRegistry {
       const constructor = class { constructor() {
         const construct=registration.constructors.get(prototype.id);
         if(!construct)throw new TypeError('Public model construction is unavailable');
-        construct(this);
+        construct(this,arguments[0]);
       }};
       Object.defineProperty(constructor, 'name', {value: prototype.name, configurable: true});
       const value=constructor.prototype;
@@ -92,7 +93,7 @@ export class ModelRegistry {
   }
 }
 export class ModelBridge {
-  constructor(graph, schema, registry, invoke, prevalidatedRegistration, rootBinding) {
+  constructor(graph, schema, registry, invoke, prevalidatedRegistration, rootBinding, hostLedger, liveDefinitions) {
     const publication=invalidateBridgeObservation(this);
     this.registry = registry;
     if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || registry.schemas.get(`${schema.id}:${schema.version}`) !== prevalidatedRegistration)) throw new TypeError('Invalid prevalidated model registration');
@@ -102,8 +103,9 @@ export class ModelBridge {
     this.disposed=false;
     this.invoke = (...args) => this.activeInvoke ? this.activeInvoke(...args) : invoke(...args);
     this.ids = new WeakMap();
-    this.hostIds = new Map();
-    this.hostValues = [];
+    this.hostLedger = hostLedger ?? createHostLedger();
+    this.hostIds = this.hostLedger.ids;
+    this.hostValues = this.hostLedger.values;
     this.objects = [];
     // Only this exact receiver/prototype pair aliases its native root codec.
     // It does not authorize the subclass prototype for unrelated objects.
@@ -111,6 +113,7 @@ export class ModelBridge {
     if(graph instanceof LayoutGraph)Object.assign(this,layoutMethods);
     if (graph instanceof LayoutGraph && tryInitializeSourceLayout(this,graph)) completeBridgePublication(this,graph,publication);
     else this.reconcile(graph);
+    if(liveDefinitions?.length){this.liveFields=new LiveFieldBindings(this,liveDefinitions);this.liveFields.bind(this.root);}
   }
   reconcile(graph, changed) {
     return reconcileGraph(this, graph, changed);

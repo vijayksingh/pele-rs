@@ -2,8 +2,8 @@
 mod captured_sankey;
 #[cfg(feature = "captured-sankey")]
 mod captured_store;
+mod detached_invocation;
 mod detached_render;
-mod public_constructor;
 mod foreign_provider;
 mod host_construction;
 mod host_er;
@@ -12,6 +12,7 @@ mod host_functions;
 mod native_canonical;
 mod parse_limits;
 mod prepared_entries;
+mod public_constructor;
 mod public_remaining_er;
 mod public_remaining_info;
 mod render_numbers;
