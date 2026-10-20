@@ -4,8 +4,8 @@ use super::{
     model::{DocItem, ErAttribute, ErModel, RelSpec},
     parser::{self, Target},
     public_model::{
-        arr, finish_initial, publish_entity, publish_spec, rec, EntityPublication, InitialRoots,
-        InitialWriter,
+        arr, finish_initial, publish_entity, publish_spec, EntityPublication, InitialRoots,
+        InitialWriter, RELATIONSHIP_FIELDS,
     },
 };
 use crate::compat::{
@@ -138,15 +138,9 @@ impl<W: InitialWriter> Target for Direct<W> {
         // Endpoint strings were interned by their entity records. The legacy
         // adapter's string lookups are hits here; no string-order change.
         let role = Atom::String(self.writer.string(role.as_str())?);
-        let relation = rec(
-            &mut self.writer,
-            vec![
-                ("entityA", a),
-                ("roleA", role),
-                ("entityB", b),
-                ("relSpec", Atom::Ref(spec)),
-            ],
-        )?;
+        let relation = self
+            .writer
+            .record(&RELATIONSHIP_FIELDS, [a, role, b, Atom::Ref(spec)])?;
         self.relationships.push(Atom::Ref(relation));
         Ok(())
     }

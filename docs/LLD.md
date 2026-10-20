@@ -22,3 +22,5 @@ immutable model events without a second full model JSON decode in Foundation.
 
 [Browser host storage](LLD_HOST_ER_STORE.md) defines the unreleased ER construction,
 method and live-render boundary, its bounded transfers and its verification gates.
+[Ordered record publication](LLD_ER_RECORD_PUBLICATION.md) removes intermediate
+field/property vectors from fresh ER records through a defaulted construction sink.

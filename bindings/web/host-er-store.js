@@ -242,7 +242,7 @@ export class HostErOwner {
     this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();
     this.hostValues=[];this.hostIds=new Map();this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];
     this.disposed=false;this.phase='constructing';this.epoch=0n;this.resourceDepth=0;this.methodDepth=0;this.depth=0;
-    this.invoke=invoke;this.temporary=null;this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;
+    this.invoke=invoke;this.temporary=null;this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];
   }
   assertLive(){if(this.disposed)throw new TypeError('Public model document is disposed');}
   host(value){
@@ -518,13 +518,47 @@ export class HostErOwner {
           for(let i=0;i<propertyCount;i++)if(!property())return -1;
           if(!endNode())return -2;break;
         }
+        case 10:{
+          if(this.constructionNode||this.constructionString)bad();
+          const id=u8(),count=u8();
+          if(id!==this.constructionLayouts.length||id>=32||count>64)bad();
+          need(count*4);
+          const keys=new Array(count);
+          for(let i=0;i<count;i++){
+            const key=this.string(u32());
+            if(typeof key!=='string'||key==='__proto__'||key==='length'||keys.includes(key))bad();
+            keys[i]=key;
+          }
+          this.constructionLayouts.push(keys);break;
+        }
+        case 11:{
+          if(this.constructionNode||this.constructionString)bad();
+          const id=u32(),layout=u8(),keys=this.constructionLayouts[layout];
+          if(!keys||id!==this.objects.length)bad();
+          // Every atom is at least one byte. Count/shape admission precedes
+          // allocation; arbitrary/duplicate/nondefault layouts keep node events.
+          need(keys.length);
+          if(this.allocate(0)!==id)bad();
+          const object=this.object(id);let bytes=5+5*keys.length;
+          for(const key of keys){
+            const value=atom();
+            // Preserve the existing fresh NaN descriptor path and exact bits.
+            if(typeof value==='number'&&Number.isNaN(value)){
+              if(!Reflect.defineProperty(object,key,{value,enumerable:true,writable:true,configurable:true}))return -1;
+            }else object[key]=value;
+            bytes+=valueBytes(value);
+          }
+          this.nodeBytes[id]=bytes;this.nodeRefs[id]=keys.length;
+          this.constructionBytes+=bytes;this.references+=keys.length;
+          break;
+        }
         default:bad();
       }
     }
     if(offset!==bytes.byteLength)bad();
     return 0;
   }
-  disposeConstruction(){this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();this.hostValues=[];this.hostIds=new Map();this.root=undefined;this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];}
+  disposeConstruction(){this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();this.hostValues=[];this.hostIds=new Map();this.root=undefined;this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];}
   // Generic adapter ABI; no ER method/field decisions occur in this switch.
   primitive(op,args){
     this.assertLive();
@@ -557,7 +591,7 @@ export class HostErOwner {
           references:this.references,
         };
         if(admission.references>8_000_000)graphBudget();
-        this.frameAdmission(admission,13);this.constructionBytes=0;return undefined;
+        this.frameAdmission(admission,13);this.constructionBytes=0;this.constructionLayouts=null;return undefined;
       }
       case 'defineKey':return Reflect.defineProperty(this.object(args[0]),this.string(args[1]),{value:this.value(args[2]),enumerable:!!(args[3]&1),writable:!!(args[3]&2),configurable:!!(args[3]&4)});
       case 'allocate':return this.allocate(args[0]);

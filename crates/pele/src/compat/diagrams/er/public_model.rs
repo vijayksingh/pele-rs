@@ -449,6 +449,23 @@ pub trait InitialWriter {
     type Output;
     fn string(&mut self, value: &str) -> Result<u32, PeleError>;
     fn node(&mut self, node: Node) -> Result<u32, PeleError>;
+    /// A fresh ordinary record with statically ordered fields. The default
+    /// retains the exact property/interner/budget path of generic publication.
+    fn record<const N: usize>(
+        &mut self,
+        keys: &'static [&'static str; N],
+        values: [Atom; N],
+    ) -> Result<u32, PeleError>
+    where
+        Self: Sized,
+    {
+        let properties = keys
+            .iter()
+            .zip(values)
+            .map(|(key, value)| self.property(key, value))
+            .collect::<Result<_, _>>()?;
+        self.node(Node::Object { properties })
+    }
     fn finish(self, root: Atom) -> Result<Self::Output, PeleError>;
     fn abort(self) -> Result<(), PeleError>
     where
@@ -487,6 +504,21 @@ impl InitialWriter for GraphWriter {
         GraphWriter::finish(self, root)
     }
 }
+// Layouts describe storage only. Every publisher evaluates values before
+// interning these keys, exactly as the previous ordered field vectors did.
+const ATTRIBUTE_FIELDS: [&str; 4] = ["type", "name", "keys", "comment"];
+const ATTRIBUTE_COMMENT_FIELDS: [&str; 4] = ["type", "name", "comment", "keys"];
+const ENTITY_FIELDS: [&str; 6] = [
+    "id",
+    "label",
+    "alias",
+    "attributes",
+    "cssClasses",
+    "cssStyles",
+];
+const SPEC_FIELDS: [&str; 3] = ["cardA", "relType", "cardB"];
+pub(super) const RELATIONSHIP_FIELDS: [&str; 4] = ["entityA", "roleA", "entityB", "relSpec"];
+
 pub(super) fn rec(w: &mut impl InitialWriter, fields: Vec<(&str, Atom)>) -> Result<u32, PeleError> {
     let properties = fields
         .into_iter()
@@ -536,36 +568,40 @@ pub(super) fn publish_entity(
     for (index, a) in entity.attributes.iter().enumerate() {
         let keys = texts(w, &a.keys)?;
         let comment = text(w, &a.comment)?;
-        let mut fields = vec![("type", text(w, &a.r#type)?), ("name", text(w, &a.name)?)];
-        if comment_first(index) {
-            fields.extend([("comment", comment), ("keys", Atom::Ref(keys))])
+        let kind = text(w, &a.r#type)?;
+        let name = text(w, &a.name)?;
+        let record = if comment_first(index) {
+            w.record(
+                &ATTRIBUTE_COMMENT_FIELDS,
+                [kind, name, comment, Atom::Ref(keys)],
+            )?
         } else {
-            fields.extend([("keys", Atom::Ref(keys)), ("comment", comment)])
-        }
-        attrs.push(Atom::Ref(rec(w, fields)?));
+            w.record(&ATTRIBUTE_FIELDS, [kind, name, Atom::Ref(keys), comment])?
+        };
+        attrs.push(Atom::Ref(record));
     }
     let attributes = arr(w, attrs)?;
     let styles = texts(w, entity.styles)?;
     let id = text(w, entity.id)?;
-    let fields = vec![
-        ("id", id.clone()),
-        ("label", text(w, entity.label)?),
-        ("alias", text(w, entity.alias)?),
-        ("attributes", Atom::Ref(attributes)),
-        ("cssClasses", text(w, entity.classes)?),
-        ("cssStyles", Atom::Ref(styles)),
+    let values = [
+        id.clone(),
+        text(w, entity.label)?,
+        text(w, entity.alias)?,
+        Atom::Ref(attributes),
+        text(w, entity.classes)?,
+        Atom::Ref(styles),
     ];
-    let node = rec(w, fields)?;
+    let node = w.record(&ENTITY_FIELDS, values)?;
     let key = text(w, entity.name)?;
     Ok((key, Atom::Ref(node), id))
 }
 pub(super) fn publish_spec(w: &mut impl InitialWriter, spec: &RelSpec) -> Result<u32, PeleError> {
-    let fields = vec![
-        ("cardA", text(w, &format!("{:?}", spec.card_a))?),
-        ("relType", text(w, &format!("{:?}", spec.rel_type))?),
-        ("cardB", text(w, &format!("{:?}", spec.card_b))?),
+    let values = [
+        text(w, &format!("{:?}", spec.card_a))?,
+        text(w, &format!("{:?}", spec.rel_type))?,
+        text(w, &format!("{:?}", spec.card_b))?,
     ];
-    rec(w, fields)
+    w.record(&SPEC_FIELDS, values)
 }
 fn initial(m: &ErModel) -> Result<ModelGraph, PeleError> {
     initial_into(GraphWriter::default(), m)
@@ -598,13 +634,13 @@ pub(super) fn initial_into<W: InitialWriter>(
     let mut relationships = vec![];
     for r in &m.relationships {
         let spec = publish_spec(&mut w, &r.rel_spec)?;
-        let fields = vec![
-            ("entityA", text(&mut w, &r.entity_a)?),
-            ("roleA", text(&mut w, &r.role_a)?),
-            ("entityB", text(&mut w, &r.entity_b)?),
-            ("relSpec", Atom::Ref(spec)),
+        let values = [
+            text(&mut w, &r.entity_a)?,
+            text(&mut w, &r.role_a)?,
+            text(&mut w, &r.entity_b)?,
+            Atom::Ref(spec),
         ];
-        relationships.push(Atom::Ref(rec(&mut w, fields)?));
+        relationships.push(Atom::Ref(w.record(&RELATIONSHIP_FIELDS, values)?));
     }
     let relationships = arr(&mut w, relationships)?;
     let mut classes = vec![];

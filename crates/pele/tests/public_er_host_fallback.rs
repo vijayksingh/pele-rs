@@ -18,7 +18,10 @@ struct Sink {
 impl InitialWriter for Sink {
     type Output = Vec<u8>;
     fn string(&mut self, value: &str) -> Result<u32, PeleError> {
-        Ok(self.graph.string(value))
+        // External publication sinks can retain the existing dynamic interface;
+        // the optional fixed-record primitive must not remove that capability.
+        let graph: &mut dyn InitialWriter<Output = ModelGraph> = &mut self.graph;
+        graph.string(value)
     }
     fn node(&mut self, node: Node) -> Result<u32, PeleError> {
         Ok(self.graph.node(node))

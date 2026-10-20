@@ -1508,8 +1508,13 @@ fn metadata(value: &impl serde::Serialize) -> Result<String, JsValue> {
 }
 
 /// Pure unpublished construction emits bounded storage events, never a graph.
+struct HostRecordLayout {
+    identity: usize,
+    length: usize,
+}
 struct HostConstruction {
     store: HostStore,
+    record_layouts: Vec<HostRecordLayout>,
     strings: HashMap<String, u32>,
     string_units: usize,
     nodes: u32,
@@ -1682,6 +1687,75 @@ impl pele::compat::host_er::InitialWriter for HostConstruction {
         self.strings.insert(value.to_owned(), id);
         Ok(id)
     }
+    fn record<const N: usize>(
+        &mut self,
+        keys: &'static [&'static str; N],
+        values: [Atom; N],
+    ) -> Result<u32, PeleError> {
+        // Private identity of immutable layout storage, never sent to JS. A
+        // compiler may merge identical constants; their field order is equal.
+        let identity = keys.as_ptr() as usize;
+        let known = self
+            .record_layouts
+            .iter()
+            .position(|layout| layout.identity == identity && layout.length == N);
+        let layout = if let Some(id) = known {
+            id
+        } else {
+            // Optional bounded specialization. Unusual future layouts use the
+            // exact generic property path; this is not a new model limit.
+            let eligible = N <= 64
+                && self.record_layouts.len() < 32
+                && keys.iter().enumerate().all(|(index, key)| {
+                    *key != "__proto__" && *key != "length" && !keys[..index].contains(key)
+                });
+            if !eligible {
+                let properties = keys
+                    .iter()
+                    .zip(values)
+                    .map(|(key, value)| self.property(key, value))
+                    .collect::<Result<_, _>>()?;
+                return self.node(pele::compat::public::Node::Object { properties });
+            }
+            // First layout occurrence interns keys at the original rec() stage,
+            // after all values. Later occurrences are guaranteed interner hits;
+            // this sink charges text/table storage only on first intern.
+            let mut ids = Vec::with_capacity(N);
+            for key in keys {
+                ids.push(self.string(key)?);
+            }
+            let id = self.record_layouts.len();
+            self.event(10, 3 + 4 * N)?;
+            self.frame.push(id as u8);
+            self.frame.push(N as u8);
+            for key in ids {
+                self.frame.extend_from_slice(&key.to_le_bytes());
+            }
+            self.record_layouts.push(HostRecordLayout {
+                identity,
+                length: N,
+            });
+            id
+        };
+        // Match node() admission after key interning. All fixed-layout records
+        // fit a single bounded event, independently of their referenced strings.
+        if self.nodes >= 1_000_000 {
+            return Err(PeleError::new(
+                "Public model graph exceeds work budget",
+                ErrorCode::Limit,
+            ));
+        }
+        let id = self.nodes;
+        let bytes = 6 + values.iter().map(construction_atom_len).sum::<usize>();
+        self.event(11, bytes)?;
+        self.frame.extend_from_slice(&id.to_le_bytes());
+        self.frame.push(layout as u8);
+        for value in values {
+            construction_atom(&mut self.frame, &value);
+        }
+        self.nodes += 1;
+        Ok(id)
+    }
     fn node(&mut self, node: pele::compat::public::Node) -> Result<u32, PeleError> {
         use pele::compat::public::Node;
         let (kind, length) = match &node {
@@ -1819,6 +1893,7 @@ fn host_construction(
         .map_err(|_| pele(invalid("Invalid host construction factory")))?;
     Ok(HostConstruction {
         store: HostStore::new(primitive, capture.clone()).map_err(pele)?,
+        record_layouts: Vec::new(),
         strings: HashMap::new(),
         string_units: 0,
         nodes: 0,
