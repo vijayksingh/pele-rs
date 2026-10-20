@@ -215,7 +215,8 @@ raw samples, artifact hashes and failed gates:
 [SVG/disposal checkpoint](docs/benchmarks/2026-10-20-svg-disposal/),
 [prior schema checkpoint](docs/benchmarks/2026-10-20-registration-schema/),
 [direct comparison](docs/benchmarks/2026-10-20-direct-comparison/),
-[rejected copying experiments](docs/benchmarks/2026-10-20-copying-candidates/).
+[rejected copying experiments](docs/benchmarks/2026-10-20-copying-candidates/),
+[rejected initial publication](docs/benchmarks/2026-10-20-initial-publication/).
 No JS speedup or GPU acceleration is claimed.
 
 Independent Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.

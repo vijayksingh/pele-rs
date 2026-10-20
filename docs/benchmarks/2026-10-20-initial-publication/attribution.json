@@ -1,0 +1,1670 @@
+{
+  "decision": "rejected; production unchanged",
+  "method": "Ratios pair control/candidate by trial index. Bootstrap resamples those 15 pairs, 10000 replicates, fixed seed. Intervals are descriptive: serial batches and shared heaps violate independent-trial assumptions. Ratio of medians and median paired ratio are distinct estimators. No multiple-comparison correction, no subtraction of A/A or source shifts.",
+  "runs": [
+    {
+      "file": "web-comparison.json",
+      "sha256": "5c97a5fa70def14006657231f4852d921124d7bb99887d5b7991cc3315cfd8ca",
+      "harnessSHA256": "7d632fa69ddfbd18fe716388f6e277e6b48ed267fa378b9f73d4ff74f7e1a808",
+      "wasmControl": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+      "wasmCandidate": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+      "succeeded": true,
+      "warmupMs": 1000,
+      "regularRuntimeDifferencesExcludingAppleDouble": [
+        "full.js",
+        "graph-binary.js",
+        "graph.js"
+      ],
+      "appleDoubleDifferenceCount": 107,
+      "rows": [
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.02894531935453415,
+            "control": 0.07441406697034836,
+            "candidate": 0.07562500238418579
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "ratioOfMediansPercent": 1.6272936867164578,
+          "medianPairedPercent": 0.538795174284501,
+          "pairedMedianDescriptive95Percent": [
+            -1.3007284543776976,
+            5.406817414282217
+          ],
+          "candidateSlowerPairs": 9,
+          "pairs": 15,
+          "pairedPercent": [
+            -3.7363646090692204,
+            -1.2799987792968759,
+            -1.3007284543776976,
+            2.5613738284283816,
+            5.543577881820783,
+            2.271538557413577,
+            -0.21152304865927896,
+            0.538795174284501,
+            -6.371592898688516,
+            41.36792519882759,
+            4.571743575351794,
+            -3.2101250519279367,
+            18.854542863722102,
+            0.3097545861787232,
+            5.406817414282217
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.008085936307907104,
+            "control": 0.12855468690395355,
+            "candidate": 0.13843750208616257
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "ratioOfMediansPercent": 7.687635060394737,
+          "medianPairedPercent": 4.314798185590418,
+          "pairedMedianDescriptive95Percent": [
+            -10.661574320738787,
+            16.464416187103083
+          ],
+          "candidateSlowerPairs": 10,
+          "pairs": 15,
+          "pairedPercent": [
+            -10.661574320738787,
+            11.768661825609716,
+            3.747654086306751,
+            -27.67527693609343,
+            15.64436597081922,
+            16.715343984522303,
+            4.314798185590418,
+            29.00686429888499,
+            0.6251833388469796,
+            -7.419013416414277,
+            -27.457224595233942,
+            5.232748276329335,
+            16.464416187103083,
+            36.09068905308086,
+            -16.885245696603214
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "render-model",
+          "medianMs": {
+            "js": 0.019648440182209015,
+            "control": 0.12003906071186066,
+            "candidate": 0.12093750387430191
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "ratioOfMediansPercent": 0.7484590075207853,
+          "medianPairedPercent": -0.39800641261372727,
+          "pairedMedianDescriptive95Percent": [
+            -3.9329442145419113,
+            10.556117590747371
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            -2.828716169906176,
+            11.68706094826424,
+            -8.747805474760472,
+            -7.08471623775857,
+            -0.39800641261372727,
+            2.1221075536674627,
+            -0.9317763274734214,
+            23.885454806140018,
+            0.09976314499000605,
+            16.94284842944642,
+            -3.9329442145419113,
+            -12.822026065216418,
+            1.6081446980933611,
+            -8.315948793916128,
+            10.556117590747371
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.34984375536441803,
+            "control": 0.6496874988079071,
+            "candidate": 0.66796875
+          },
+          "counts": {
+            "js": 64,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": 2.813853002502986,
+          "medianPairedPercent": 0.7546238230723423,
+          "pairedMedianDescriptive95Percent": [
+            0.2324464738657328,
+            2.9872314244300924
+          ],
+          "candidateSlowerPairs": 11,
+          "pairs": 15,
+          "pairedPercent": [
+            0.9571704603310138,
+            4.150577440125525,
+            1.9082100943520253,
+            -1.0241406338694747,
+            1.024209831085976,
+            2.9872314244300924,
+            3.559402465011874,
+            0.2436703002805407,
+            0.6796179654654066,
+            0.7546238230723423,
+            -8.893164646119267,
+            -0.09491485216310824,
+            3.059541642888397,
+            0.2324464738657328,
+            -0.09359128624604196
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.07308593392372131,
+            "control": 0.8081250190734863,
+            "candidate": 0.8396874666213989
+          },
+          "counts": {
+            "js": 128,
+            "control": 16,
+            "candidate": 16
+          },
+          "ratioOfMediansPercent": 3.9056392022237985,
+          "medianPairedPercent": 3.47791865705962,
+          "pairedMedianDescriptive95Percent": [
+            0.8894026945392319,
+            7.425934290774894
+          ],
+          "candidateSlowerPairs": 12,
+          "pairs": 15,
+          "pairedPercent": [
+            -13.710969949712782,
+            -56.452160197278424,
+            11.674342938928216,
+            -44.83544015532948,
+            14.569535488907249,
+            4.756332676407249,
+            3.47791865705962,
+            8.197360641467878,
+            3.0118220713472033,
+            7.425934290774894,
+            2.299299127421439,
+            6.2948203175028805,
+            3.287258669102444,
+            5.557708189908461,
+            0.8894026945392319
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "medianMs": {
+            "js": 0.29625000059604645,
+            "control": 0.9740625023841858,
+            "candidate": 0.96031254529953
+          },
+          "counts": {
+            "js": 64,
+            "control": 16,
+            "candidate": 16
+          },
+          "ratioOfMediansPercent": -1.4116093218864645,
+          "medianPairedPercent": -0.3355781375099731,
+          "pairedMedianDescriptive95Percent": [
+            -5.550207051658185,
+            1.9979328625123527
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            -2.089549481716746,
+            -17.875500134364053,
+            -7.443265177792025,
+            -0.3355781375099731,
+            -5.550207051658185,
+            -1.99137192233515,
+            1.431821041176451,
+            3.702542656803276,
+            28.41444765456591,
+            0.4552340629438989,
+            2.844719921995309,
+            -2.768271851348547,
+            -21.795197445782954,
+            25.406293706116756,
+            1.9979328625123527
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.653124988079071,
+            "control": 1.4806249737739563,
+            "candidate": 1.4796874523162842
+          },
+          "counts": {
+            "js": 32,
+            "control": 16,
+            "candidate": 16
+          },
+          "ratioOfMediansPercent": -0.06331930598755253,
+          "medianPairedPercent": -0.21105630201002645,
+          "pairedMedianDescriptive95Percent": [
+            -1.114621621952283,
+            0.8675409340382245
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            -1.114621621952283,
+            -0.21105630201002645,
+            -1.0855959538724202,
+            -1.2410644690244776,
+            0.5307815087613577,
+            0.8675409340382245,
+            -1.6355644326077834,
+            2.164227617073178,
+            7.495812199643015,
+            -0.2326578019332226,
+            0.7188164018436138,
+            9.930278408019543,
+            1.5508724720086908,
+            -0.8030413423864902,
+            -2.9339358060956666
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.06582031399011612,
+            "control": 0.8053125143051147,
+            "candidate": 0.807812511920929
+          },
+          "counts": {
+            "js": 128,
+            "control": 16,
+            "candidate": 16
+          },
+          "ratioOfMediansPercent": 0.310438192801632,
+          "medianPairedPercent": -0.7760991827192587,
+          "pairedMedianDescriptive95Percent": [
+            -38.97025260715349,
+            2.6851092329564175
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            -38.97025260715349,
+            -3.9343035700495244,
+            -4.437113940263271,
+            4.995944366155181,
+            1.5276046682748845,
+            -0.7760991827192587,
+            2.6851092329564175,
+            73.83584922972541,
+            -5.89568979561238,
+            -41.18812080629858,
+            1.3069303909150731,
+            -42.16839980099334,
+            73.88888241332275,
+            3.304424513267623,
+            -41.58568578620845
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "medianMs": {
+            "js": 0.6309374868869781,
+            "control": 1.7731250524520874,
+            "candidate": 1.7868748903274536
+          },
+          "counts": {
+            "js": 32,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 0.7754578762705577,
+          "medianPairedPercent": 3.6672322435561844,
+          "pairedMedianDescriptive95Percent": [
+            -0.6362682903873096,
+            9.86547303529437
+          ],
+          "candidateSlowerPairs": 11,
+          "pairs": 15,
+          "pairedPercent": [
+            4.23048812612874,
+            -11.400963269440123,
+            -6.018517554892567,
+            0.03524930767011547,
+            1.4925376169284688,
+            -0.6362682903873096,
+            1.249548272977874,
+            20.02114958460206,
+            4.266951734828184,
+            3.6672322435561844,
+            4.489790834222784,
+            14.495283758922595,
+            -14.687952493563595,
+            9.86547303529437,
+            62.97873353533645
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.17003905773162842,
+            "control": 0.6948437690734863,
+            "candidate": 0.6907812654972076
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": -0.5846643169436061,
+          "medianPairedPercent": -0.022569574955744187,
+          "pairedMedianDescriptive95Percent": [
+            -2.127184877262156,
+            2.1036015195283086
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            -2.811245509730198,
+            -0.5259536808688625,
+            -0.8545110359437613,
+            0.9830781466083849,
+            2.23763702852926,
+            5.8514273507254355,
+            -25.540027918906063,
+            0.6625519879958519,
+            -6.394241721519601,
+            0.7841442203181614,
+            -2.0851830870640797,
+            45.25366295872648,
+            -2.127184877262156,
+            -0.022569574955744187,
+            2.1036015195283086
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.024648435413837433,
+            "control": 0.6509374976158142,
+            "candidate": 0.6615625023841858
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": 1.6322619003034555,
+          "medianPairedPercent": 4.992031780095152,
+          "pairedMedianDescriptive95Percent": [
+            -7.054105365379392,
+            19.54772515039562
+          ],
+          "candidateSlowerPairs": 11,
+          "pairs": 15,
+          "pairedPercent": [
+            1.8867962664672167,
+            14.339722839533685,
+            54.28345016474208,
+            4.992031780095152,
+            53.2065134141896,
+            9.528794023428034,
+            -42.309797630779634,
+            6.527677172643642,
+            2.9325531786463577,
+            27.809360044498675,
+            -23.85352024046754,
+            -7.054105365379392,
+            19.54772515039562,
+            1.4402313578188775,
+            -26.90069106312126
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "medianMs": {
+            "js": 0.14441405981779099,
+            "control": 1.7481250762939453,
+            "candidate": 1.7393749952316284
+          },
+          "counts": {
+            "js": 128,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": -0.500540904136404,
+          "medianPairedPercent": 0.39682760850057175,
+          "pairedMedianDescriptive95Percent": [
+            -6.919062498346474,
+            2.9016266390053946
+          ],
+          "candidateSlowerPairs": 8,
+          "pairs": 15,
+          "pairedPercent": [
+            -10.105531823321567,
+            0.39682760850057175,
+            -8.358514944418616,
+            -0.18220602118853568,
+            6.304034530155667,
+            -7.341521813757767,
+            2.9016266390053946,
+            15.382075346049318,
+            2.430043634462664,
+            -6.919062498346474,
+            -4.821364527668559,
+            10.624547809136974,
+            0.8424891303838944,
+            -1.4658624843293278,
+            0.5811905624967473
+          ]
+        }
+      ]
+    },
+    {
+      "file": "first-use-comparison.json",
+      "sha256": "017ece0f4c89845bba41d3f6c0bb7f08fd2136944462636c13274c01ce3cca1b",
+      "harnessSHA256": "4c05fe81f63786cdbaf47648da5cbe7e3a1346a9be58f33de0a7cb93bce36384",
+      "wasmControl": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+      "wasmCandidate": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+      "succeeded": true,
+      "warmupMs": 1000,
+      "regularRuntimeDifferencesExcludingAppleDouble": [
+        "full.js",
+        "graph-binary.js",
+        "graph.js"
+      ],
+      "appleDoubleDifferenceCount": 107,
+      "rows": [
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.02875000238418579,
+            "control": 0.07425780594348907,
+            "candidate": 0.07550781220197678
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "ratioOfMediansPercent": 1.6833331426987952,
+          "medianPairedPercent": 0.5882283343053629,
+          "pairedMedianDescriptive95Percent": [
+            -1.1000475788062736,
+            6.1767935578330935
+          ],
+          "candidateSlowerPairs": 8,
+          "pairs": 15,
+          "pairedPercent": [
+            -5.597966426586631,
+            -1.1000475788062736,
+            3.114940195090421,
+            0.5882283343053629,
+            -0.6642874679213095,
+            15.899131372089537,
+            30.45092655149655,
+            3.077702420504358,
+            -6.053031544149967,
+            9.740604616409865,
+            6.1767935578330935,
+            4.599569277732063,
+            -0.6152440205571152,
+            -4.402819324068796,
+            -2.2619591572508257
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.028828121721744537,
+            "control": 0.31343749165534973,
+            "candidate": 0.3313281238079071
+          },
+          "counts": {
+            "js": 128,
+            "control": 64,
+            "candidate": 64
+          },
+          "ratioOfMediansPercent": 5.70787880482071,
+          "medianPairedPercent": 3.6411535563545483,
+          "pairedMedianDescriptive95Percent": [
+            -12.332321376612187,
+            18.379341698526108
+          ],
+          "candidateSlowerPairs": 11,
+          "pairs": 15,
+          "pairedPercent": [
+            16.380904818825016,
+            3.6411535563545483,
+            23.02520502737697,
+            -20.31191492924246,
+            9.217301518129673,
+            3.2901336922115387,
+            -12.332321376612187,
+            4.014133352029625,
+            1.671990156261427,
+            36.34169708459647,
+            -30.151663458929278,
+            0.35009076718770515,
+            54.78751105600559,
+            -36.002429447683284,
+            18.379341698526108
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.028984375298023224,
+            "control": 0.40156251192092896,
+            "candidate": 0.4153124988079071
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": 3.424121146469372,
+          "medianPairedPercent": 5.865699042135963,
+          "pairedMedianDescriptive95Percent": [
+            1.4832204682191152,
+            10.246540248731195
+          ],
+          "candidateSlowerPairs": 11,
+          "pairs": 15,
+          "pairedPercent": [
+            -37.30626838597008,
+            13.92995295751096,
+            3.190237860428047,
+            21.671127092443765,
+            -1.009317649734831,
+            23.417713639828452,
+            6.093048620902075,
+            5.865699042135963,
+            5.1424019056585335,
+            1.4832204682191152,
+            6.217614413930073,
+            -13.100723015740524,
+            -3.475337433562653,
+            10.246540248731195,
+            160.58868682691408
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.3342968672513962,
+            "control": 0.6239062547683716,
+            "candidate": 0.6503125131130219
+          },
+          "counts": {
+            "js": 64,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": 4.2324080168828715,
+          "medianPairedPercent": 5.058854100489052,
+          "pairedMedianDescriptive95Percent": [
+            2.181366317000122,
+            7.65810379576517
+          ],
+          "candidateSlowerPairs": 12,
+          "pairs": 15,
+          "pairedPercent": [
+            -0.938089853920987,
+            3.9264976130778617,
+            5.058854100489052,
+            -2.2157997739663315,
+            11.440138001089961,
+            8.19588823837163,
+            2.181366317000122,
+            -0.9761901128859773,
+            2.4105349724017566,
+            7.794874142377806,
+            6.968369745675251,
+            6.570464415048494,
+            7.65810379576517,
+            2.196707638160067,
+            5.393773310865035
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.3782031238079071,
+            "control": 1.9237500429153442,
+            "candidate": 1.9587500095367432
+          },
+          "counts": {
+            "js": 64,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 1.819361447205381,
+          "medianPairedPercent": 1.007139544113933,
+          "pairedMedianDescriptive95Percent": [
+            -0.15929003613632808,
+            17.66286887791022
+          ],
+          "candidateSlowerPairs": 10,
+          "pairs": 15,
+          "pairedPercent": [
+            -16.72417742484935,
+            -0.6802691666301097,
+            1.007139544113933,
+            17.66286887791022,
+            18.01625693716653,
+            4.399206177304649,
+            0.3889754632121267,
+            49.42133714031458,
+            1.0894681866347788,
+            -9.259257636691542,
+            19.164213931403463,
+            -0.15929003613632808,
+            0.6876260597292516,
+            -1.195865652381345,
+            1.0536703522603386
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.3917187452316284,
+            "control": 2.3018749952316284,
+            "candidate": 2.414375066757202
+          },
+          "counts": {
+            "js": 64,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 4.887323236866448,
+          "medianPairedPercent": 4.913136423576359,
+          "pairedMedianDescriptive95Percent": [
+            2.6716589638077215,
+            7.454447305701484
+          ],
+          "candidateSlowerPairs": 13,
+          "pairs": 15,
+          "pairedPercent": [
+            -12.354945481725322,
+            24.078688251504076,
+            27.12765625560378,
+            4.887323236866448,
+            2.6716589638077215,
+            7.0528352672550865,
+            4.913136423576359,
+            1.792990646530046,
+            8.890524307857373,
+            5.38354333232689,
+            7.454447305701484,
+            5.739936336272833,
+            -5.68097007818994,
+            4.593540130917817,
+            4.204698440543386
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.6712500154972076,
+            "control": 1.512499988079071,
+            "candidate": 1.5134375095367432
+          },
+          "counts": {
+            "js": 32,
+            "control": 16,
+            "candidate": 16
+          },
+          "ratioOfMediansPercent": 0.061984890251975955,
+          "medianPairedPercent": 0.22490413145519472,
+          "pairedMedianDescriptive95Percent": [
+            -1.273764394362964,
+            2.0114350458332986
+          ],
+          "candidateSlowerPairs": 10,
+          "pairs": 15,
+          "pairedPercent": [
+            0.04162895510806397,
+            -1.4136419468523842,
+            -1.273764394362964,
+            -1.0867396049980438,
+            4.249054309765299,
+            2.0114350458332986,
+            0.7279542055430799,
+            0.6120704973429536,
+            -3.1946958769614953,
+            0.020951663477353222,
+            0.6669439305486469,
+            2.4877636431042793,
+            -2.356966525646842,
+            7.417359686428737,
+            0.22490413145519472
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.7224999964237213,
+            "control": 2.8212499618530273,
+            "candidate": 2.805000066757202
+          },
+          "counts": {
+            "js": 32,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": -0.5759821113174968,
+          "medianPairedPercent": 1.0374359108923148,
+          "pairedMedianDescriptive95Percent": [
+            -1.2613361469294149,
+            3.571427156985174
+          ],
+          "candidateSlowerPairs": 10,
+          "pairs": 15,
+          "pairedPercent": [
+            -1.2613361469294149,
+            1.006487971715786,
+            1.089175279238086,
+            5.963994917046267,
+            6.996956282757427,
+            12.519018040052332,
+            -15.041040032512665,
+            12.29508466870275,
+            3.571427156985174,
+            -0.7174880988502719,
+            2.103846509150742,
+            1.0374359108923148,
+            0.470116390111075,
+            -9.971097998461287,
+            -1.2923349151123587
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.7017187476158142,
+            "control": 3.3587498664855957,
+            "candidate": 3.4524998664855957
+          },
+          "counts": {
+            "js": 32,
+            "control": 4,
+            "candidate": 4
+          },
+          "ratioOfMediansPercent": 2.7912170815534543,
+          "medianPairedPercent": 3.4292118331576305,
+          "pairedMedianDescriptive95Percent": [
+            1.58905534369842,
+            4.470934607931132
+          ],
+          "candidateSlowerPairs": 14,
+          "pairs": 15,
+          "pairedPercent": [
+            3.4292118331576305,
+            2.550638818708739,
+            3.556559273005022,
+            1.852537992738501,
+            4.130996160529321,
+            0.8597891231803434,
+            14.334862468934496,
+            -0.433835620197931,
+            2.002220925982723,
+            4.423433403392041,
+            4.470934607931132,
+            1.1206545832297188,
+            1.58905534369842,
+            17.721527796270166,
+            18.794199274852573
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.1726953163743019,
+            "control": 0.6740625202655792,
+            "candidate": 0.68359375
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": 1.4139978782184093,
+          "medianPairedPercent": 1.7421603096205107,
+          "pairedMedianDescriptive95Percent": [
+            -0.8806469620533108,
+            3.1293426832026183
+          ],
+          "candidateSlowerPairs": 9,
+          "pairs": 15,
+          "pairedPercent": [
+            -23.12698237906493,
+            4.613581447671322,
+            2.6513399728639087,
+            -0.8677273386044848,
+            2.7970479568133255,
+            3.4278931828881642,
+            -0.8806469620533108,
+            38.53092942404422,
+            1.7421603096205107,
+            3.1293426832026183,
+            0.4577680319205246,
+            4.172661436140257,
+            -0.046773755043538756,
+            -7.058569566060269,
+            -2.5301999772700756
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.19160156697034836,
+            "control": 2.3362499475479126,
+            "candidate": 2.4293750524520874
+          },
+          "counts": {
+            "js": 128,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 3.9860933973232315,
+          "medianPairedPercent": 0.6977947394956496,
+          "pairedMedianDescriptive95Percent": [
+            -7.552576655337306,
+            17.218543046357617
+          ],
+          "candidateSlowerPairs": 9,
+          "pairs": 15,
+          "pairedPercent": [
+            -13.904213885051997,
+            23.02040567203445,
+            -0.05396777671854425,
+            -41.425732726627054,
+            4.46763515552826,
+            1.9804653558017637,
+            0.6977947394956496,
+            -10.838832053685476,
+            21.782450707824587,
+            22.776390353561872,
+            0.42883905039494685,
+            -8.347085642337548,
+            1.2362658236139135,
+            -7.552576655337306,
+            17.218543046357617
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.1925390586256981,
+            "control": 2.7368749380111694,
+            "candidate": 2.7862499952316284
+          },
+          "counts": {
+            "js": 128,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 1.8040669865733383,
+          "medianPairedPercent": 1.969417016855468,
+          "pairedMedianDescriptive95Percent": [
+            -7.344637097694717,
+            6.1826729923937895
+          ],
+          "candidateSlowerPairs": 10,
+          "pairs": 15,
+          "pairedPercent": [
+            1.3016707355174573,
+            1.969417016855468,
+            14.159892413133267,
+            18.7760834571592,
+            -6.895174086943367,
+            0.9887337489970394,
+            -7.344637097694717,
+            15.174360380935802,
+            2.813651513333326,
+            -8.338570250172372,
+            -13.278003513576719,
+            13.398102744035146,
+            -8.435958047881886,
+            6.1826729923937895,
+            3.1657414960042374
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-invoke",
+          "medianMs": {
+            "js": 0.07027343660593033,
+            "control": 1.981874942779541,
+            "candidate": 2.0812500715255737
+          },
+          "counts": {
+            "js": 128,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 5.014197747848859,
+          "medianPairedPercent": 4.96364097947144,
+          "pairedMedianDescriptive95Percent": [
+            4.227999901556201,
+            10.708666223240648
+          ],
+          "candidateSlowerPairs": 13,
+          "pairs": 15,
+          "pairedPercent": [
+            6.389782607344419,
+            30.472237366188914,
+            -19.308991090143934,
+            3.2247819031636205,
+            4.717584469040292,
+            5.409732863122652,
+            4.227999901556201,
+            -18.5267841515222,
+            3.153015288209815,
+            4.337049531443982,
+            10.708666223240648,
+            7.360003662109382,
+            34.216337731723925,
+            4.96364097947144,
+            20.760320033499546
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-callback",
+          "medianMs": {
+            "js": 0.19191405922174454,
+            "control": 4.201250076293945,
+            "candidate": 4.129999876022339
+          },
+          "counts": {
+            "js": 128,
+            "control": 4,
+            "candidate": 4
+          },
+          "ratioOfMediansPercent": -1.695928568347893,
+          "medianPairedPercent": -0.06293410110616016,
+          "pairedMedianDescriptive95Percent": [
+            -9.506758289476757,
+            3.6113506761930925
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            -0.06293410110616016,
+            2.7308135207702255,
+            -2.195795061299244,
+            -8.222224977281357,
+            7.642488758811461,
+            3.6113506761930925,
+            13.09903617959911,
+            -0.5719742901277969,
+            -39.970446312539124,
+            -10.4301362268581,
+            3.4971128473497037,
+            4.224933205911929,
+            1.4007338297318483,
+            -13.232518052979792,
+            -9.506758289476757
+          ]
+        }
+      ]
+    },
+    {
+      "file": "first-use-aa.json",
+      "sha256": "ebb3d9b28f4089a517f629978de9097e9cfd46c56f432f487b0e1879c90ae747",
+      "harnessSHA256": "4c05fe81f63786cdbaf47648da5cbe7e3a1346a9be58f33de0a7cb93bce36384",
+      "wasmControl": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+      "wasmCandidate": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+      "succeeded": true,
+      "warmupMs": 500,
+      "regularRuntimeDifferencesExcludingAppleDouble": [],
+      "appleDoubleDifferenceCount": 0,
+      "rows": [
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.028398439288139343,
+            "control": 0.07539062201976776,
+            "candidate": 0.07457031309604645
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "ratioOfMediansPercent": -1.088078200901732,
+          "medianPairedPercent": -0.5022620905882347,
+          "pairedMedianDescriptive95Percent": [
+            -3.556703853738996,
+            1.8776845114281349
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            3.6858363163380092,
+            -14.503124969850823,
+            -1.1917075198359273,
+            -1.781971456747522,
+            3.8274987656214954,
+            4.29936018780297,
+            -11.451086454800341,
+            -3.556703853738996,
+            -3.4711602852435464,
+            1.8776845114281349,
+            0.7861615258389243,
+            2.1948599609953323,
+            -0.5022620905882347,
+            0.9184125707359936,
+            -5.614030055800711
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.028906255960464478,
+            "control": 0.29218751192092896,
+            "candidate": 0.28398437798023224
+          },
+          "counts": {
+            "js": 128,
+            "control": 64,
+            "candidate": 64
+          },
+          "ratioOfMediansPercent": -2.8074895763911423,
+          "medianPairedPercent": -2.2065082835313943,
+          "pairedMedianDescriptive95Percent": [
+            -6.408924174674535,
+            4.193458151534446
+          ],
+          "candidateSlowerPairs": 5,
+          "pairs": 15,
+          "pairedPercent": [
+            -61.74826663535301,
+            -4.9722274195217135,
+            4.193458151534446,
+            -4.444450163126234,
+            40.91164500174849,
+            -6.408924174674535,
+            11.978602813124928,
+            4.998603366542764,
+            -12.023530847886033,
+            -2.2065082835313943,
+            2.452088079081638,
+            -12.700697825421425,
+            -1.0746797662113061,
+            -16.46863193379361,
+            -1.1220627927967963
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.029062502086162567,
+            "control": 0.40281251072883606,
+            "candidate": 0.40015625953674316
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": -0.6594261899380283,
+          "medianPairedPercent": 2.8269964024347782,
+          "pairedMedianDescriptive95Percent": [
+            -9.117861846593456,
+            7.964277566299716
+          ],
+          "candidateSlowerPairs": 8,
+          "pairs": 15,
+          "pairedPercent": [
+            12.882086951058724,
+            2.8269964024347782,
+            3.4747499408144034,
+            -22.61757281858211,
+            -9.117861846593456,
+            7.964277566299716,
+            -3.52227049538707,
+            8.880165964070352,
+            -11.00946273540262,
+            -10.940434339506766,
+            -0.04118710296139305,
+            5.022648293613918,
+            3.870715248902523,
+            -0.9227211418924353,
+            19.627615714391933
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.33265623450279236,
+            "control": 0.6112499833106995,
+            "candidate": 0.6176562607288361
+          },
+          "counts": {
+            "js": 32,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": 1.0480617739142328,
+          "medianPairedPercent": 0.4285356086891845,
+          "pairedMedianDescriptive95Percent": [
+            -0.25445390180930394,
+            3.097460281901432
+          ],
+          "candidateSlowerPairs": 10,
+          "pairs": 15,
+          "pairedPercent": [
+            -1.2014297704170396,
+            -6.067965682169241,
+            1.4109779800082656,
+            -0.9642201528492378,
+            0.10050481480938789,
+            3.21743575937119,
+            3.097460281901432,
+            -0.511113876514846,
+            -0.25445390180930394,
+            3.543001627049147,
+            0.4285356086891845,
+            1.644397195256575,
+            4.792575720656833,
+            0.463913382778558,
+            0.3588807711536024
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.41609373688697815,
+            "control": 1.894374966621399,
+            "candidate": 1.8631250858306885
+          },
+          "counts": {
+            "js": 32,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": -1.6496143235277372,
+          "medianPairedPercent": 0.1691384553083486,
+          "pairedMedianDescriptive95Percent": [
+            -2.3754514221074663,
+            9.956203934049945
+          ],
+          "candidateSlowerPairs": 8,
+          "pairs": 15,
+          "pairedPercent": [
+            -2.3754514221074663,
+            -1.6842807705310325,
+            -6.595885294213133,
+            -20.026995288668836,
+            23.655910463826046,
+            21.80868589030871,
+            0.1691384553083486,
+            24.694710989446822,
+            -0.20512637929019917,
+            1.8448954802940953,
+            9.956203934049945,
+            -0.8831529353440559,
+            -10.455998691723934,
+            0.3471272579925966,
+            2.453514410605373
+          ]
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.44874998927116394,
+            "control": 2.2793750762939453,
+            "candidate": 2.2706249952316284
+          },
+          "counts": {
+            "js": 32,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": -0.3838807027996327,
+          "medianPairedPercent": -0.14052624274244474,
+          "pairedMedianDescriptive95Percent": [
+            -3.5626906635363387,
+            3.7482521750710207
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            -3.5626906635363387,
+            3.1152659249703785,
+            -15.567036967273584,
+            3.7482521750710207,
+            50.49369779770805,
+            -8.014707154193712,
+            0.7819010571323615,
+            4.424286315654635,
+            -0.7677561756881945,
+            0.2767027757570206,
+            -0.14052624274244474,
+            -14.824538493565187,
+            -1.1815215612601349,
+            17.53761351398473,
+            -11.948619190081345
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.6709375083446503,
+            "control": 1.5309374928474426,
+            "candidate": 1.5475000143051147
+          },
+          "counts": {
+            "js": 32,
+            "control": 16,
+            "candidate": 16
+          },
+          "ratioOfMediansPercent": 1.0818548461352773,
+          "medianPairedPercent": 0.755257891328931,
+          "pairedMedianDescriptive95Percent": [
+            0.5303923278361156,
+            8.352143921726451
+          ],
+          "candidateSlowerPairs": 11,
+          "pairs": 15,
+          "pairedPercent": [
+            -3.2039813141324647,
+            0.6504097756426797,
+            15.454159507759702,
+            -1.5577593627549402,
+            15.182110458670174,
+            -0.9593819614186039,
+            16.100625314442606,
+            -0.18021333912813242,
+            3.1880751167931765,
+            8.352143921726451,
+            0.6991611470370529,
+            2.496391600913239,
+            0.5303923278361156,
+            1.5324039133152834,
+            0.755257891328931
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.7623437643051147,
+            "control": 2.9175000190734863,
+            "candidate": 2.8874998092651367
+          },
+          "counts": {
+            "js": 32,
+            "control": 2,
+            "candidate": 2
+          },
+          "ratioOfMediansPercent": -1.0282848196133676,
+          "medianPairedPercent": -0.8086096318542624,
+          "pairedMedianDescriptive95Percent": [
+            -3.3726939738078943,
+            4.099830837545393
+          ],
+          "candidateSlowerPairs": 6,
+          "pairs": 15,
+          "pairedPercent": [
+            -39.29510375284133,
+            22.155708846868105,
+            -1.0282848196133676,
+            5.286364488827133,
+            7.359311148197523,
+            -5.582142837586989,
+            2.4626100143344765,
+            -0.7839734858592018,
+            -3.3698364806190373,
+            7.194908455947369,
+            4.099830837545393,
+            -24.268603403476163,
+            -3.3726939738078943,
+            -0.8086096318542624,
+            -10.385521557092902
+          ]
+        },
+        {
+          "case": "er/medium",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.7096875011920929,
+            "control": 3.6837499141693115,
+            "candidate": 3.4725000858306885
+          },
+          "counts": {
+            "js": 32,
+            "control": 4,
+            "candidate": 4
+          },
+          "ratioOfMediansPercent": -5.734640875757169,
+          "medianPairedPercent": 0.21344526730564528,
+          "pairedMedianDescriptive95Percent": [
+            -6.684761992721788,
+            4.751132002763492
+          ],
+          "candidateSlowerPairs": 8,
+          "pairs": 15,
+          "pairedPercent": [
+            18.117019208932405,
+            2.235648829576564,
+            -14.111999511718754,
+            2.124876153278743,
+            -2.157221734401249,
+            4.751132002763492,
+            0.8199626839664909,
+            0.21344526730564528,
+            -12.650417774676747,
+            15.031483762168229,
+            -6.684761992721788,
+            5.047313677013077,
+            -11.3093251369346,
+            -0.30792888805096785,
+            -4.659630978395512
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.18175781518220901,
+            "control": 0.6817187666893005,
+            "candidate": 0.6707812547683716
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "ratioOfMediansPercent": -1.604402351140466,
+          "medianPairedPercent": -1.4133471096111183,
+          "pairedMedianDescriptive95Percent": [
+            -3.3393491706390166,
+            2.4604968948752637
+          ],
+          "candidateSlowerPairs": 4,
+          "pairs": 15,
+          "pairedPercent": [
+            -9.126172631953445,
+            31.35644092642036,
+            13.433108717072994,
+            -5.607790769873611,
+            -1.0909919085117292,
+            -0.18678478601111825,
+            -2.8518896898027446,
+            -1.4651187630586815,
+            2.4604968948752637,
+            4.380240348147124,
+            -1.4133471096111183,
+            -0.2092053733849908,
+            -3.3393491706390166,
+            -3.369244063066046,
+            -8.85593270680165
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-render",
+          "medianMs": {
+            "js": 0.18242186307907104,
+            "control": 2.265625,
+            "candidate": 2.259999990463257
+          },
+          "counts": {
+            "js": 64,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": -0.24827628300108096,
+          "medianPairedPercent": 1.0972194419903047,
+          "pairedMedianDescriptive95Percent": [
+            -1.6199894325973019,
+            8.303703559476672
+          ],
+          "candidateSlowerPairs": 8,
+          "pairs": 15,
+          "pairedPercent": [
+            28.413790998787714,
+            -12.318137613724623,
+            -1.6199894325973019,
+            19.360317484739987,
+            20.904749935823276,
+            2.6096927883184184,
+            1.0972194419903047,
+            8.303703559476672,
+            3.100774499147363,
+            -6.440311814096145,
+            -11.1579469588714,
+            3.111368579441298,
+            -0.8749685876963675,
+            -0.6936789705821678,
+            -0.5073289115603674
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-edited-render",
+          "medianMs": {
+            "js": 0.19105468690395355,
+            "control": 2.6018749475479126,
+            "candidate": 2.6356250047683716
+          },
+          "counts": {
+            "js": 128,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 1.2971437098568517,
+          "medianPairedPercent": 0.6494987554975129,
+          "pairedMedianDescriptive95Percent": [
+            -5.376344836755875,
+            10.268175789981715
+          ],
+          "candidateSlowerPairs": 10,
+          "pairs": 15,
+          "pairedPercent": [
+            -12.201641244941808,
+            -5.376344836755875,
+            -4.483790958106482,
+            9.69682061148054,
+            110.98745287069298,
+            3.4085368774035896,
+            0.43321373882296843,
+            7.573232489901249,
+            11.535672100988092,
+            10.268175789981715,
+            -9.691432676248535,
+            17.901234567901227,
+            -10.565791714421923,
+            0.6494987554975129,
+            0.5284679921647939
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-invoke",
+          "medianMs": {
+            "js": 0.07167968153953552,
+            "control": 1.8799999952316284,
+            "candidate": 1.8956249952316284
+          },
+          "counts": {
+            "js": 128,
+            "control": 8,
+            "candidate": 8
+          },
+          "ratioOfMediansPercent": 0.8311170233846088,
+          "medianPairedPercent": -0.03300405654665939,
+          "pairedMedianDescriptive95Percent": [
+            -0.9545783585626966,
+            5.01001995071344
+          ],
+          "candidateSlowerPairs": 7,
+          "pairs": 15,
+          "pairedPercent": [
+            20.78303103153585,
+            -0.9545783585626966,
+            -0.03300405654665939,
+            0.23341012123525573,
+            5.01001995071344,
+            28.614454255104427,
+            0.8311170233846088,
+            -19.677852144177333,
+            -19.70250738189184,
+            -0.8078016531981702,
+            27.416114740976294,
+            2.1183563067085798,
+            -1.8739839670548153,
+            -0.29860701529675904,
+            -0.831946776529946
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse-first-callback",
+          "medianMs": {
+            "js": 0.20386718213558197,
+            "control": 4.072499990463257,
+            "candidate": 4.009999990463257
+          },
+          "counts": {
+            "js": 128,
+            "control": 4,
+            "candidate": 4
+          },
+          "ratioOfMediansPercent": -1.5346838587196765,
+          "medianPairedPercent": 0.275398261161075,
+          "pairedMedianDescriptive95Percent": [
+            -4.531355815814775,
+            4.118232301502722
+          ],
+          "candidateSlowerPairs": 8,
+          "pairs": 15,
+          "pairedPercent": [
+            -10.094558280393407,
+            1.9706148530354017,
+            93.70119357066345,
+            0.9322536799736936,
+            18.564349613918306,
+            0.275398261161075,
+            0.8503951425627543,
+            -1.7495386622437437,
+            -1.926019715721683,
+            -9.9562394974533,
+            6.673082831616606,
+            4.118232301502722,
+            -4.531355815814775,
+            -16.906667073567704,
+            -17.357991092757562
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Single VM/browser and canvas profile; four workloads only.",
+    "A/A uses 500ms warmup; candidate first-use uses1000ms. Counts differ on some rows, notably ER first-render. It diagnoses instance/run variation, not a rowwise correction.",
+    "Source and post-first-render lanes do not execute initial packed publication in timed work. Their shifts demonstrate unresolved control variation or indirect effects; neither random noise nor a packed CPU mechanism is proven.",
+    "54 browser E2E passed according to parent; this analysis does not rerun them. Correctness does not establish performance."
+  ],
+  "conclusion": {
+    "coldParse": "All four ratio-of-medians results are slower: +0.31% to +7.69%; no demonstrated parse gain.",
+    "firstUse": "Eight of ten actual first-use ratio-of-medians results are slower; ER unchanged first-render and Gantt callback are modestly lower. Gantt first invoke +5.01%. No complete-lifecycle win justifies adoption.",
+    "controls": "Flowchart source shifts upward in both candidate reports (+2.81%, +4.23%); several other source rows also rise. Identical-runtime A/A ranges -5.73% to +1.30%. These limit precise attribution; they do not rescue the unsuccessful candidate.",
+    "hypothesesOnly": [
+      "Initial string conversion uses Uint16Array.subarray followed by spread; legacy uses an ordinary Array slice followed by spread. Both allocate a view/slice; V8 can optimize their iteration differently. Source cannot establish a typed-array penalty.",
+      "Direct publication re-reads tags, lengths, keys and atom payloads via DataView after validation; legacy loads decoded JS fields. Allocation savings trade against repeated byte reads, switches and bounds checks. Source cannot establish their sampled weight.",
+      "First invoke/edited render/callback materializes the entire legacy graph after already publishing packed state, creating deferred decode work. This is definite extra work in that path, but its share of observed latency is unmeasured.",
+      "Although this candidate removed the predecessor full-frame copy and second reference pass, it retained those string/publication tradeoffs. Lower retained object count alone is insufficient evidence."
+    ]
+  }
+}

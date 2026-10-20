@@ -1,0 +1,328 @@
+--- a/bindings/web/full.js
++++ b/bindings/web/full.js
+@@ -7,7 +7,7 @@
+ export {enableZoom} from './zoom.js';
+ import { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry, foreign_decode_entities } from './pkg/pele.js';
+ import {renderNumericOptions} from './render-numbers.js';
+-import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
++import {encodeGraphBinary,decodeGraphBinary,takeOwnedGraphBinary} from './graph-binary.js';
+ import {fromNativeError} from './errors.js';
+ export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
+ import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
+@@ -41,6 +41,12 @@
+ }
+ function binaryResult(call) {
+   try {const exchange=decodeGraphBinary(call());return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
++  catch(error){if(typeof error==='string')return result(error);throw error;}
++}
++// Only initial snapshots from the actual generated WASM wrapper transfer
++// ownership here. Final outcomes and existing-bridge adoption stay legacy.
++function initialBinaryResult(call) {
++  try {const graph=takeOwnedGraphBinary(call());return {revision:graph.revision,graph,result:graph.metadata};}
+   catch(error){if(typeof error==='string')return result(error);throw error;}
+ }
+ // Only these pinned renderers pass the mono family into defaultMeasurer.
+@@ -126,8 +132,8 @@
+   function prepareMutableInput(entry, values = []) {
+     const confirmed = entry.confirmedGraph;
+     entry.confirmedGraph = false;
++    if(confirmed&&entry.unchangedApplyIsNoop&&values.length===0&&entry.bridge.matchesPublishedGraph())return {values:[]};
+     const baseline = entry.bridge.graph;
+-    if(confirmed&&entry.unchangedApplyIsNoop&&values.length===0&&entry.bridge.matchesPublishedGraph())return {graph:baseline,values:[]};
+     const input = entry.bridge.snapshot(values, true), delta = input.delta;
+     const unchanged = confirmed && entry.unchangedApplyIsNoop &&
+       input.graph.root.kind === baseline.root.kind && input.graph.root.value === baseline.root.value &&
+@@ -169,7 +175,7 @@
+     } finally { entry.busy = false; }
+   }
+   function adoptMutable(mutable, preparedType, existingBridge) {
+-          const snapshot = binaryResult(()=>mutable.snapshot_binary());
++          const snapshot = (existingBridge ? binaryResult : initialBinaryResult)(()=>mutable.snapshot_binary());
+           // Raw-model adoption already has a bridge. Validate its native metadata
+           // afresh before reusing it; never trust a cache hit on this path.
+           const schemaKey = existingBridge ? undefined : mutable.schema_cache_key?.();
+--- a/bindings/web/graph.js
++++ b/bindings/web/graph.js
+@@ -1,3 +1,4 @@
++import {materializeGraphBinary,packedAtomEnd} from './graph-binary.js';
+ import {PeleError} from './errors.js';
+ // Host values only: diagram state transitions and rendering remain in Rust.
+ const errorConstructors={error:Error,pele:PeleError,type:TypeError,range:RangeError,syntax:SyntaxError,reference:ReferenceError,eval:EvalError,uri:URIError};
+@@ -123,7 +124,18 @@
+     this.objects = [];
+     this.reconcile(graph);
+   }
++  // Ordinary graph access is the explicit legacy fallback boundary. Releasing
++  // packed bytes here avoids retaining two complete representations afterward.
++  get graph() {
++    if (!this._graph && this.packed) {
++      this._graph = materializeGraphBinary(this.packed);
++      this.packed = null;
++    }
++    return this._graph;
++  }
++  set graph(value) { this._graph = value; this.packed = null; }
+   reconcile(graph, changed) {
++    if (graph.packed) return this.reconcileBinary(graph);
+     this.graph = graph;
+     if(changed) {
+       for(let i=this.strings.length;i<graph.strings.length;i++){const value=stringValue(graph.strings[i]);this.strings.push(value);this.stringIds.set(value,i);}
+@@ -195,6 +207,7 @@
+     return this.root;
+   }
+   matchesPublishedGraph() {
++    if(this.packed)return this.matchesPublishedBinary();
+     const graph=this.graph;
+     if(this.objects.length!==graph.nodes.length||this.strings.length!==graph.strings.length)return false;
+     for (const baseline of this.registration.prototypeBaseline) {
+@@ -242,6 +255,173 @@
+       if(node.kind==='set'){
+         if(Object.getOwnPropertyDescriptor(Set.prototype,'size').get.call(object)!==node.values.length)return false;
+         let i=0;for(const value of Set.prototype.values.call(object))if(!matches(node.values[i++],value))return false;
++      }
++    }
++    return true;
++  }
++  packedValue(index, offset) {
++    const view=index.view;
++    switch(view.getUint8(offset)) {
++      case 0:return undefined;
++      case 1:return null;
++      case 2:return false;
++      case 3:return true;
++      case 4:return view.getFloat64(offset+1,true);
++      case 5:return this.strings[view.getUint32(offset+1,true)];
++      case 6:return this.objects[view.getUint32(offset+1,true)];
++      case 7:return this.registration.functions.get(view.getUint32(offset+1,true));
++      case 8:return this.hostValues[view.getUint32(offset+1,true)];
++      default:throw new TypeError('Unknown public atom kind');
++    }
++  }
++  reconcileBinary(index) {
++    this._graph=null;this.packed=index;
++    this.strings=index.strings;
++    this.stringIds=new Map();
++    for(let id=0;id<this.strings.length;id++)this.stringIds.set(this.strings[id],id);
++    const view=index.view,freshStart=this.objects.length;
++    while(this.objects.length<index.nodeOffsets.length) {
++      const id=this.objects.length,start=index.nodeOffsets[id],tag=view.getUint8(start);
++      let value;
++      switch(tag) {
++        case 0:value={};break;
++        case 1:value=Object.create(this.registration.prototypes.get(view.getUint32(start+1,true)));break;
++        case 2:value=new Array(view.getUint32(start+1,true));break;
++        case 3:value=new Map();break;
++        case 4:value=new Set();break;
++        case 5:value=new Date(view.getFloat64(start+1,true));break;
++        case 6:{
++          const Constructor=errorConstructors[['error','pele','type','range','syntax','reference','eval','uri'][view.getUint8(start+1)]];
++          let p=index.propertyOffsets[id],count=view.getUint32(p,true),message=false;p+=4;
++          for(let j=0;j<count;j++){if(this.strings[view.getUint32(p,true)]==='message')message=true;p=packedAtomEnd(view,p+5);}
++          value=new Constructor(message?'':undefined);break;
++        }
++        default:throw new TypeError('Unsupported public object kind');
++      }
++      this.objects.push(value);this.ids.set(value,id);this.registry.owners.set(value,this);
++    }
++    for(let id=0;id<index.nodeOffsets.length;id++) {
++      const start=index.nodeOffsets[id],tag=view.getUint8(start),object=this.objects[id],fresh=id>=freshStart;
++      const properties=index.propertyOffsets[id],count=view.getUint32(properties,true);
++      if(!fresh||tag===6) {
++        const keys=new Set();let p=properties+4;
++        for(let j=0;j<count;j++){keys.add(this.strings[view.getUint32(p,true)]);p=packedAtomEnd(view,p+5);}
++        for(const key of Object.getOwnPropertyNames(object)) {
++          if(tag===2&&key==='length')continue;
++          if(tag===6&&errorDiagnostics.has(key)&&!keys.has(key))continue;
++          if(!keys.has(key)&&!Reflect.deleteProperty(object,key))throw new TypeError('Native graph removed a non-configurable property');
++        }
++      }
++      if(tag===3) {
++        if(!fresh)Map.prototype.clear.call(object);
++        let p=start+5;const length=view.getUint32(start+1,true);
++        for(let j=0;j<length;j++){const key=this.packedValue(index,p);p=packedAtomEnd(view,p);const value=this.packedValue(index,p);p=packedAtomEnd(view,p);Map.prototype.set.call(object,key,value);}
++      }
++      if(tag===4) {
++        if(!fresh)Set.prototype.clear.call(object);
++        let p=start+5;const length=view.getUint32(start+1,true);
++        for(let j=0;j<length;j++){Set.prototype.add.call(object,this.packedValue(index,p));p=packedAtomEnd(view,p);}
++      }
++      if(tag===5&&!fresh)Date.prototype.setTime.call(object,view.getFloat64(start+1,true));
++      if(tag===2){const length=view.getUint32(start+1,true);if(object.length!==length)object.length=length;}
++      let assignFresh=fresh&&(tag===0||tag===2),p=properties+4;
++      for(let j=0;j<count;j++) {
++        const key=this.strings[view.getUint32(p,true)],flags=view.getUint8(p+4),atom=p+5,value=this.packedValue(index,atom);
++        p=packedAtomEnd(view,atom);
++        if(flags!==7)assignFresh=false;
++        if(assignFresh&&key!=='__proto__'&&!(tag===2&&key==='length'))object[key]=value;
++        else {
++          const current=!fresh&&Object.getOwnPropertyDescriptor(object,key);
++          const sameValue=current&&Object.hasOwn(current,'value')&&Object.is(current.value,value)&&
++            (typeof value!=='number'||!Number.isNaN(value)||(view.getUint8(atom)===4&&numberBits(current.value)===view.getBigUint64(atom+1,true).toString(16).padStart(16,'0')));
++          if(!sameValue||current.enumerable!==!!(flags&1)||current.writable!==!!(flags&2)||current.configurable!==!!(flags&4))Object.defineProperty(object,key,{value,enumerable:!!(flags&1),writable:!!(flags&2),configurable:!!(flags&4)});
++        }
++      }
++    }
++    this.root=this.packedValue(index,index.rootOffset);
++    return this.root;
++  }
++  validatePrototypeBaseline() {
++    for (const baseline of this.registration.prototypeBaseline) {
++      const descriptors = Object.getOwnPropertyDescriptors(baseline.value), original = baseline.descriptors;
++      if (Object.getPrototypeOf(baseline.value) !== baseline.parent || Reflect.ownKeys(descriptors).length !== Reflect.ownKeys(original).length || Reflect.ownKeys(original).some(key => {
++        const a=original[key],b=descriptors[key];
++        return !b || a.value!==b.value || a.get!==b.get || a.set!==b.set || a.enumerable!==b.enumerable || a.writable!==b.writable || a.configurable!==b.configurable;
++      })) throw new TypeError('Prototype edits require an explicit native prototype mutation codec');
++    }
++  }
++  packedAtomMatches(index, offset, value) {
++    const view=index.view,tag=view.getUint8(offset);
++    switch(tag) {
++      case 0:return value===undefined;
++      case 1:return value===null;
++      case 2:return value===false;
++      case 3:return value===true;
++      case 4:
++        if(typeof value!=='number')return false;
++        bits.setFloat64(0,value);
++        return bits.getBigUint64(0)===view.getBigUint64(offset+1,true);
++      case 5:{const id=view.getUint32(offset+1,true);return typeof value==='string'&&value===this.strings[id]&&this.stringIds.get(value)===id;}
++      case 6:{const id=view.getUint32(offset+1,true);return value===this.objects[id]&&this.ids.get(value)===id;}
++      case 7:{const id=view.getUint32(offset+1,true);return value===this.registration.functions.get(id)&&this.registration.functionIds.get(value)===id;}
++      // Host references and extra method arguments keep the established codec.
++      case 8:return false;
++      default:return false;
++    }
++  }
++  matchesPublishedBinary() {
++    const index=this.packed;
++    if(!index||this.objects.length!==index.nodeOffsets.length||this.strings.length!==index.strings.length)return false;
++    this.validatePrototypeBaseline();
++    if(!this.packedAtomMatches(index,index.rootOffset,this.root))return false;
++    const view=index.view;
++    for(let id=0;id<index.nodeOffsets.length;id++) {
++      const object=this.objects[id],start=index.nodeOffsets[id],tag=view.getUint8(start),prototype=Object.getPrototypeOf(object);
++      switch(tag) {
++        case 0:if(prototype!==Object.prototype)return false;break;
++        case 1:if(prototype!==this.registration.prototypes.get(view.getUint32(start+1,true)))return false;break;
++        case 2:if(prototype!==Array.prototype||object.length!==view.getUint32(start+1,true))return false;break;
++        case 3:if(prototype!==Map.prototype)return false;break;
++        case 4:if(prototype!==Set.prototype)return false;break;
++        case 5:
++          if(prototype!==Date.prototype)return false;
++          bits.setFloat64(0,Date.prototype.getTime.call(object));
++          if(bits.getBigUint64(0)!==view.getBigUint64(start+1,true))return false;
++          break;
++        case 6:if(prototype!==errorConstructors[['error','pele','type','range','syntax','reference','eval','uri'][view.getUint8(start+1)]].prototype)return false;break;
++        default:return false;
++      }
++      let p=index.propertyOffsets[id],count=view.getUint32(p,true),seen=0;p+=4;
++      for(const key of Object.getOwnPropertyNames(object)) {
++        const descriptor=Object.getOwnPropertyDescriptor(object,key);
++        if(tag===2&&key==='length'&&descriptor.writable)continue;
++        if(!Object.hasOwn(descriptor,'value')) {
++          if(tag===6&&errorDiagnostics.has(key))continue;
++          return false;
++        }
++        if(seen++>=count)return false;
++        const keyId=view.getUint32(p,true),flags=view.getUint8(p+4);
++        if(key!==this.strings[keyId]||this.stringIds.get(key)!==keyId||
++          descriptor.enumerable!==!!(flags&1)||descriptor.writable!==!!(flags&2)||descriptor.configurable!==!!(flags&4)||
++          !this.packedAtomMatches(index,p+5,descriptor.value))return false;
++        p=packedAtomEnd(view,p+5);
++      }
++      if(seen!==count)return false;
++      if(tag===3) {
++        const count=view.getUint32(start+1,true);
++        // Native size access avoids a user-owned property shadowing size.
++        if(Object.getOwnPropertyDescriptor(Map.prototype,'size').get.call(object)!==count)return false;
++        let p=start+5;
++        for(const [key,value] of Map.prototype.entries.call(object)) {
++          if(!this.packedAtomMatches(index,p,key))return false;p=packedAtomEnd(view,p);
++          if(!this.packedAtomMatches(index,p,value))return false;p=packedAtomEnd(view,p);
++        }
++      }
++      if(tag===4) {
++        const count=view.getUint32(start+1,true);
++        if(Object.getOwnPropertyDescriptor(Set.prototype,'size').get.call(object)!==count)return false;
++        let p=start+5;
++        for(const value of Set.prototype.values.call(object)){if(!this.packedAtomMatches(index,p,value))return false;p=packedAtomEnd(view,p);}
+       }
+     }
+     return true;
+--- a/bindings/web/graph-binary.js
++++ b/bindings/web/graph-binary.js
+@@ -87,3 +87,74 @@
+   const metadata=metadataLength?JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes.subarray(end))):null;
+   return{revision,graph:{version,root,strings,nodes},metadata};
+ }
++
++// Private ownership-consuming entry: only fresh wasm-bindgen .slice() returns
++// enter this lane. General callers must use indexGraphBinary, which copies.
++export function takeOwnedGraphBinary(bytes){
++  if(!(bytes instanceof Uint8Array)||bytes.length>BUDGET)throw limit();
++  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
++  let offset=0,end=bytes.length,work=0,units=0,maxString=-1,maxNode=-1;
++  const need=n=>{if(!Number.isSafeInteger(n)||n<0||n>end-offset)throw invalid();};
++  const u8=()=>{need(1);return view.getUint8(offset++);};
++  const u32=()=>{need(4);const value=view.getUint32(offset,true);offset+=4;return value;};
++  const count=(maximum,minimum)=>{const n=u32();if(n>maximum)throw limit();need(n*minimum);return n;};
++  const addWork=n=>{work+=n;if(work>8_000_000)throw limit();};
++  const atom=()=>{switch(u8()){
++    case 0:case 1:case 2:case 3:return;
++    case 4:need(8);offset+=8;return;
++    case 5:maxString=Math.max(maxString,u32());return;
++    case 6:maxNode=Math.max(maxNode,u32());return;
++    case 7:case 8:u32();return;
++    default:throw invalid();
++  }};
++  for(const value of magic)if(u8()!==value)throw invalid();
++  if(u32()!==1)throw invalid();need(8);
++  const revision=view.getBigUint64(offset,true).toString();offset+=8;
++  const metadataLength=u32();need(metadataLength);end-=metadataLength;
++  const rootOffset=offset;atom();const stringCount=count(1_000_000,4);
++  const strings=new Array(stringCount);let scratch;
++  for(let i=0;i<stringCount;i++){
++    const length=count(16_000_000,2);units+=length;if(units>16_000_000)throw limit();
++    const needed=Math.min(8192,length);
++    if(needed&&(!scratch||scratch.length<needed)){
++      let capacity=scratch?.length??128;while(capacity<needed)capacity*=2;
++      scratch=new Uint16Array(capacity);
++    }
++    let value='';
++    for(let j=0;j<length;j+=8192){
++      const n=Math.min(8192,length-j);
++      for(let k=0;k<n;k++){scratch[k]=view.getUint16(offset,true);offset+=2;}
++      value+=String.fromCharCode(...scratch.subarray(0,n));
++    }
++    strings[i]=value;
++  }
++  const nodeCount=count(1_000_000,5);
++  const nodeOffsets=new Uint32Array(nodeCount),propertyOffsets=new Uint32Array(nodeCount);
++  for(let i=0;i<nodeCount;i++){
++    nodeOffsets[i]=offset;
++    switch(u8()){
++      case 0:break;
++      case 1:case 2:u32();break;
++      case 3:{const length=count(4_000_000,2);addWork(length*2);for(let j=0;j<length;j++){atom();atom();}break;}
++      case 4:{const length=count(8_000_000,1);addWork(length);for(let j=0;j<length;j++)atom();break;}
++      case 5:need(8);offset+=8;break;
++      case 6:if(u8()>=errorTypes.length)throw invalid();break;
++      default:throw invalid();
++    }
++    propertyOffsets[i]=offset;const length=count(8_000_000,6);addWork(length);
++    for(let j=0;j<length;j++){maxString=Math.max(maxString,u32());const flags=u8();atom();if(flags&~7)throw invalid();}
++  }
++  if(offset!==end)throw invalid();
++  // References fail only after every structural/work check, exactly as legacy.
++  // All invalid string/key/ref IDs share the same semantic error.
++  if(maxString>=stringCount||maxNode>=nodeCount)throw invalid();
++  const metadata=metadataLength?JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(bytes.subarray(end))):null;
++  return{packed:true,revision,bytes,view,rootOffset,strings,nodeOffsets,propertyOffsets,metadata};
++}
++// Defensive entry for general transport consumers and public integration tests.
++export function indexGraphBinary(input){
++  if(!(input instanceof Uint8Array)||input.length>BUDGET)throw limit();
++  return takeOwnedGraphBinary(input.slice());
++}
++export function packedAtomEnd(view,offset){const tag=view.getUint8(offset);return offset+(tag===4?9:tag>=5?5:1);}
++export function materializeGraphBinary(index){return decodeGraphBinary(index.bytes).graph;}
