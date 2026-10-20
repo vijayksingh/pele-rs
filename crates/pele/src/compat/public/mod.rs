@@ -8,7 +8,9 @@ mod schema;
 #[cfg(feature = "web-host-er")]
 #[doc(hidden)]
 pub use engine::HostErEntrySelection;
-pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome};
+pub use engine::{
+    ParsedPublicModel, PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome,
+};
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 
 pub use schema::{

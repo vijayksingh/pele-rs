@@ -301,6 +301,24 @@ impl ParsedDocument {
                 error
             })
     }
+    // Consume parser-owned storage only within the paired public codec. The
+    // captured module stays alive throughout the construction callback.
+    pub(crate) fn into_public_state<T: Any, R>(
+        self,
+        create: impl FnOnce(T, bool, Option<EdgeLimit>) -> Result<R, PeleError>,
+    ) -> Result<(R, Object), PeleError> {
+        let Self {
+            registration,
+            model,
+            config,
+            edge_limit,
+            prepared,
+        } = self;
+        let model = *model.downcast::<T>().expect("paired public codec");
+        let state = create(model, prepared, edge_limit);
+        drop(registration);
+        state.map(|state| (state, config))
+    }
     /// Query the retained typed model without re-parsing or retargeting registration.
     pub fn query(&self, operation: &str, arguments: &Value) -> Result<Value, PeleError> {
         self.registration

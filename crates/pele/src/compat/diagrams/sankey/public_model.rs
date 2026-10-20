@@ -380,6 +380,70 @@ fn array_node(out: &mut GraphWriter, entries: impl Iterator<Item = Atom>) -> u32
         properties,
     })
 }
+fn initial_graph(model: &SankeyModel) -> Result<ModelGraph, PeleError> {
+    let mut out = GraphWriter::default();
+    let node_objects: Vec<_> = model.nodes.iter().map(|n| node(&mut out, n)).collect();
+    let mut original_nodes = HashMap::new();
+    for (record, object) in model.nodes.iter().zip(&node_objects) {
+        original_nodes
+            .entry((record.index, record.id.as_str()))
+            .or_insert(*object);
+    }
+    let nodes = array_node(&mut out, node_objects.iter().copied().map(Atom::Ref));
+    let mut link_objects = Vec::with_capacity(model.links.len());
+    for link in &model.links {
+        let mut endpoint = |endpoint: &SankeyNode| {
+            // The source parser's records are owned value copies in the
+            // immutable API. Recover its guaranteed index/record alias
+            // once here; all subsequent edits use arena IDs exclusively.
+            original_nodes
+                .get(&(endpoint.index, endpoint.id.as_str()))
+                .copied()
+                .unwrap_or_else(|| node(&mut out, endpoint))
+        };
+        let source = endpoint(&link.source);
+        let target = endpoint(&link.target);
+        let properties = vec![
+            out.property("source", Atom::Ref(source)),
+            out.property("target", Atom::Ref(target)),
+            out.property("value", Atom::Number(link.value)),
+        ];
+        link_objects.push(out.node(Node::Object { properties }));
+    }
+    let links = array_node(&mut out, link_objects.into_iter().map(Atom::Ref));
+    let entries = model
+        .nodes
+        .iter()
+        .zip(&node_objects)
+        .map(|(n, id)| (Atom::String(out.string(n.id.as_str())), Atom::Ref(*id)))
+        .collect();
+    let lookup = out.node(Node::Map {
+        entries,
+        properties: vec![],
+    });
+    let kind = out.string("sankey");
+    let mut properties = vec![
+        out.property("type", Atom::String(kind)),
+        out.property("nodes", Atom::Ref(nodes)),
+        out.property("links", Atom::Ref(links)),
+    ];
+    for (key, text) in [
+        ("title", &model.title),
+        ("accTitle", &model.acc_title),
+        ("accDescr", &model.acc_descr),
+    ] {
+        let value = text.as_ref().map_or(Atom::Undefined, |text| {
+            Atom::String(out.string(text.as_str()))
+        });
+        properties.push(out.property(key, value));
+    }
+    properties.push(out.property("lookup", Atom::Ref(lookup)));
+    let root = out.node(Node::Instance {
+        prototype: SANKEY_PROTO,
+        properties,
+    });
+    out.finish(Atom::Ref(root))
+}
 impl PublicDiagramModule for Sankey {
     type PublicState = SankeyPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
@@ -404,69 +468,47 @@ impl PublicDiagramModule for Sankey {
         Ok(SankeyPublicState { graph, model })
     }
     fn create_public(&self, model: &SankeyModel) -> Result<Self::PublicState, PeleError> {
-        let mut out = GraphWriter::default();
-        let node_objects: Vec<_> = model.nodes.iter().map(|n| node(&mut out, n)).collect();
-        let mut original_nodes = HashMap::new();
-        for (record, object) in model.nodes.iter().zip(&node_objects) {
-            original_nodes
-                .entry((record.index, record.id.as_str()))
-                .or_insert(*object);
-        }
-        let nodes = array_node(&mut out, node_objects.iter().copied().map(Atom::Ref));
-        let mut link_objects = Vec::with_capacity(model.links.len());
-        for link in &model.links {
-            let mut endpoint = |endpoint: &SankeyNode| {
-                // The source parser's records are owned value copies in the
-                // immutable API. Recover its guaranteed index/record alias
-                // once here; all subsequent edits use arena IDs exclusively.
-                original_nodes
-                    .get(&(endpoint.index, endpoint.id.as_str()))
-                    .copied()
-                    .unwrap_or_else(|| node(&mut out, endpoint))
-            };
-            let source = endpoint(&link.source);
-            let target = endpoint(&link.target);
-            let properties = vec![
-                out.property("source", Atom::Ref(source)),
-                out.property("target", Atom::Ref(target)),
-                out.property("value", Atom::Number(link.value)),
-            ];
-            link_objects.push(out.node(Node::Object { properties }));
-        }
-        let links = array_node(&mut out, link_objects.into_iter().map(Atom::Ref));
-        let entries = model
-            .nodes
-            .iter()
-            .zip(&node_objects)
-            .map(|(n, id)| (Atom::String(out.string(n.id.as_str())), Atom::Ref(*id)))
-            .collect();
-        let lookup = out.node(Node::Map {
-            entries,
-            properties: vec![],
-        });
-        let kind = out.string("sankey");
-        let mut properties = vec![
-            out.property("type", Atom::String(kind)),
-            out.property("nodes", Atom::Ref(nodes)),
-            out.property("links", Atom::Ref(links)),
-        ];
-        for (key, text) in [
-            ("title", &model.title),
-            ("accTitle", &model.acc_title),
-            ("accDescr", &model.acc_descr),
-        ] {
-            let value = text.as_ref().map_or(Atom::Undefined, |text| {
-                Atom::String(out.string(text.as_str()))
-            });
-            properties.push(out.property(key, value));
-        }
-        properties.push(out.property("lookup", Atom::Ref(lookup)));
-        let root = out.node(Node::Instance {
-            prototype: SANKEY_PROTO,
-            properties,
-        });
-        let graph = out.finish(Atom::Ref(root))?;
+        let graph = initial_graph(model)?;
         let model = imported(&graph);
+        Ok(SankeyPublicState { graph, model })
+    }
+    fn create_public_parsed(
+        &self,
+        parsed: crate::compat::public::ParsedPublicModel<SankeyModel>,
+    ) -> Result<Self::PublicState, PeleError> {
+        if !parsed.is_from_module::<Self>() || parsed.is_prepared() {
+            return parsed.create_legacy(self);
+        }
+        let mut model = parsed.into_model();
+        let graph = initial_graph(&model)?;
+        // The canonical parser has unique labels, dense nodes[i].index == i,
+        // and endpoint copies drawn from those exact nodes. Graph admission
+        // bounds indexes to an exactly representable f64 range. Preserve the
+        // importer’s per-source-node text budget and latent error boundary.
+        let mut text_bytes = 0usize;
+        let mut error = None;
+        for node in &model.nodes {
+            text_bytes = text_bytes.saturating_add(node.id.len().saturating_mul(2));
+            if text_bytes > 128 * 1024 * 1024 {
+                error = Some(PeleError::new(
+                    "Sankey imported text exceeds native allocation budget",
+                    ErrorCode::Limit,
+                ));
+                break;
+            }
+        }
+        let model = match error {
+            Some(error) => Err(error),
+            None => {
+                // These labels are deliberately absent from the render
+                // projection. Drop their allocations, not only their lengths.
+                for link in &mut model.links {
+                    drop(std::mem::take(&mut link.source.id));
+                    drop(std::mem::take(&mut link.target.id));
+                }
+                Ok(model)
+            }
+        };
         Ok(SankeyPublicState { graph, model })
     }
     fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {

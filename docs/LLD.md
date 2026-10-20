@@ -16,6 +16,9 @@ shares the same grammar and preserves exact arena bytes through conservative fal
 [Direct normalized projection](LLD_NORMALIZED_PROJECTION.md) removes the first
 model JSON buffer and reparse for the captured Gantt and ER builtins, while preserving
 legacy projection for public providers and other diagram registrations.
+[Owned public construction](LLD_OWNED_PUBLIC_CONSTRUCTION.md) transfers captured
+parser storage through an additive codec hook; Sankey normalizes its owned model
+without reconstructing a second render model from the fresh graph.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.

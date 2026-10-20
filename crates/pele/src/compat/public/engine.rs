@@ -9,10 +9,50 @@ use crate::compat::{
     RenderResult, RenderSettings, Rendered, SourceLimit,
 };
 use std::{
-    any::Any,
+    any::{Any, TypeId},
     borrow::Cow,
     sync::{Arc, OnceLock},
 };
+/// Owned output of a captured parser, with its exact public-construction policy.
+/// The engine alone creates this carrier. Model type or schema identity does not
+/// certify which module parsed it; delegates must check concrete provenance.
+pub struct ParsedPublicModel<M> {
+    model: M,
+    creator: TypeId,
+    prepared: bool,
+    edge_limit: Option<EdgeLimit>,
+}
+impl<M> ParsedPublicModel<M> {
+    pub fn model(&self) -> &M {
+        &self.model
+    }
+    pub fn is_prepared(&self) -> bool {
+        self.prepared
+    }
+    pub fn edge_limit(&self) -> Option<EdgeLimit> {
+        self.edge_limit
+    }
+    /// True only for the concrete module paired with the captured parser.
+    pub fn is_from_module<D: DiagramModule>(&self) -> bool {
+        self.creator == TypeId::of::<D>()
+    }
+    pub fn into_model(self) -> M {
+        self.model
+    }
+    /// Preserve the existing borrowed construction hooks and their dispatch order.
+    pub fn create_legacy<D>(self, module: &D) -> Result<D::PublicState, PeleError>
+    where
+        D: PublicDiagramModule<Model = M> + ?Sized,
+    {
+        if self.prepared {
+            module.create_public_prepared(&self.model, self.edge_limit.expect("prepared policy"))
+        } else if let Some(limit) = self.edge_limit {
+            module.create_public_with_edge_limit(&self.model, limit)
+        } else {
+            module.create_public(&self.model)
+        }
+    }
+}
 /// Typed codec opt-in. Parsing, geometry and rendering remain in the native module.
 pub trait PublicDiagramModule: DiagramModule {
     type PublicState: Send + 'static;
@@ -50,6 +90,15 @@ pub trait PublicDiagramModule: DiagramModule {
         None
     }
     fn create_public(&self, model: &Self::Model) -> Result<Self::PublicState, PeleError>;
+    /// Consume a captured parser result. The default preserves all existing
+    /// borrowed hooks. Opt-ins must preserve eager projection admission and
+    /// normalization; arbitrary typed adaptation never calls this hook.
+    fn create_public_parsed(
+        &self,
+        parsed: ParsedPublicModel<Self::Model>,
+    ) -> Result<Self::PublicState, PeleError> {
+        parsed.create_legacy(self)
+    }
     /// Construct this module's real mutable state directly from a caller arena.
     /// No source parsing, seeded model or missing-property defaults are implied.
     fn create_public_from_graph(&self, _graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
@@ -252,7 +301,10 @@ trait Erased: Send + Sync {
         context: ParseContext<'_>,
         edge_limit: Option<EdgeLimit>,
     ) -> Option<Result<State, PeleError>>;
-    fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError>;
+    fn create_owned(
+        &self,
+        doc: crate::compat::ParsedDocument,
+    ) -> Result<(State, Object), PeleError>;
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
     fn borrow_graph<'a>(&self, state: &'a State) -> Option<&'a ModelGraph>;
@@ -310,18 +362,20 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .try_parse_public(context, edge_limit)
             .map(|result| result.map(|state| Box::new(state) as State))
     }
-    fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError> {
-        let model = doc.model::<D::Model>().expect("paired public codec");
-        if doc.is_prepared() {
-            return Ok(Box::new(self.0.create_public_prepared(
-                model,
-                doc.edge_limit().expect("prepared policy"),
-            )?));
-        }
-        Ok(Box::new(match doc.edge_limit() {
-            Some(limit) => self.0.create_public_with_edge_limit(model, limit)?,
-            None => self.0.create_public(model)?,
-        }))
+    fn create_owned(
+        &self,
+        doc: crate::compat::ParsedDocument,
+    ) -> Result<(State, Object), PeleError> {
+        doc.into_public_state::<D::Model, _>(|model, prepared, edge_limit| {
+            self.0
+                .create_public_parsed(ParsedPublicModel {
+                    model,
+                    creator: TypeId::of::<D>(),
+                    prepared,
+                    edge_limit,
+                })
+                .map(|state| Box::new(state) as State)
+        })
     }
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError> {
         Ok(Box::new(self.0.create_public_from_graph(graph)?))
@@ -867,11 +921,11 @@ impl PublicEngine {
             function_shapes: registration.function_shapes,
         }
         .validate()?;
-        let state = registration.codec.create(&document)?;
+        let (state, config) = registration.codec.create_owned(document)?;
         Ok(PublicDocument {
             registration,
             state,
-            config: document.config().clone(),
+            config,
             revision: 0,
         })
     }
