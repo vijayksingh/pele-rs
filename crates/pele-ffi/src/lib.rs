@@ -1,4 +1,6 @@
 //! Opaque, immutable owned results. Unsafe code is confined to the C adapter.
+mod constructors;
+pub use constructors::*;
 mod detached_render;
 pub use detached_render::*;
 mod eager_projection;

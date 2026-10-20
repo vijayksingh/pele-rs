@@ -10,6 +10,10 @@ Parsing, layout and SVG stay in Rust; host resources and presentation stay in
 thin Swift and WebAssembly adapters. Registries and diagram module interfaces
 support extension without changing the built-ins.
 
+[Captured public constructors](LLD_PUBLIC_CONSTRUCTORS.md) create independent
+native class owners with exact defaults, beginning with Sankey. Construction
+does not grant core parsed-model provenance.
+
 SVG paint layers can use a borrowed append sink for coordinates, numbers and
 escaped text. It shares the same formatting core as the existing owned-string
 helpers; Sankey uses it without temporary element strings. The sink owns no

@@ -148,7 +148,8 @@ function reconcileGraph(bridge, graph, changed) {
     if(cursor)cursor.select(id);
     const kind = cursor?cursor.kind:nested ? node.kind : storage.nodeKind(graph,id);
     let value;
-    switch (kind) {
+    if(bridge.rootBinding?.id===id)value=bridge.rootBinding.object;
+    else switch (kind) {
       case 'error': {
         const Constructor=errorConstructors[nested?node.errorType:(cursor?cursor.aux:storage.nodeAux(graph,id))];
         if(!Constructor)throw new TypeError('Unknown native Error brand');
@@ -259,7 +260,7 @@ function matchesGraph(bridge) {
     const kind=cursor?cursor.kind:nested?node.kind:storage.nodeKind(graph,id);
     switch(kind){
       case 'object':if(prototype!==Object.prototype)return false;break;
-      case 'instance':if(prototype!==bridge.registration.prototypes.get(nested?node.prototype:(cursor?cursor.aux:storage.nodeAux(graph,id))))return false;break;
+      case 'instance':{const nativePrototype=nested?node.prototype:(cursor?cursor.aux:storage.nodeAux(graph,id));if(prototype!==(bridge.rootBinding?.object===object&&bridge.rootBinding.prototypeId===nativePrototype?bridge.rootBinding.prototype:bridge.registration.prototypes.get(nativePrototype)))return false;break;}
       case 'array':if(prototype!==Array.prototype||object.length!==(nested?node.length:(cursor?cursor.aux:storage.nodeAux(graph,id))))return false;break;
       case 'map':if(prototype!==Map.prototype)return false;break;
       case 'set':if(prototype!==Set.prototype)return false;break;
@@ -343,7 +344,7 @@ function snapshotGraph(bridge, values = [], delta = false) {
       }
       case 'object':{
         const prototype=Object.getPrototypeOf(value);
-        if(!(Array.isArray(value)||value instanceof Map||value instanceof Set||value instanceof Date||errorKind(value)||prototype===Object.prototype||bridge.registration.prototypeIds.has(prototype)))return host(value);
+        if(!(Array.isArray(value)||value instanceof Map||value instanceof Set||value instanceof Date||errorKind(value)||prototype===Object.prototype||bridge.registration.prototypeIds.has(prototype)||(bridge.rootBinding?.object===value&&bridge.rootBinding.prototype===prototype)))return host(value);
         let id=bridge.ids.get(value);
         if(id===undefined){id=bridge.objects.length;if(id>=1_000_000)budget();bridge.objects.push(value);bridge.ids.set(value,id);}
         if(!seen.has(id)){seen.add(id);pending.push([id,value]);}
@@ -413,7 +414,7 @@ function snapshotGraph(bridge, values = [], delta = false) {
       if(nested)store(id,{kind:'array',length,properties});
       else capture.finishNode(id,'array',length);
     }else{
-      const prototype=bridge.registration.prototypeIds.get(Object.getPrototypeOf(value));
+      const actualPrototype=Object.getPrototypeOf(value),prototype=bridge.rootBinding?.object===value&&bridge.rootBinding.prototype===actualPrototype?bridge.rootBinding.prototypeId:bridge.registration.prototypeIds.get(actualPrototype);
       if(nested)store(id,prototype===undefined?{kind:'object',properties}:{kind:'instance',prototype,properties});
       else capture.finishNode(id,prototype===undefined?'object':'instance',prototype);
     }

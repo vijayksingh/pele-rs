@@ -3,6 +3,7 @@ mod captured_sankey;
 #[cfg(feature = "captured-sankey")]
 mod captured_store;
 mod detached_render;
+mod public_constructor;
 mod foreign_provider;
 mod host_construction;
 mod host_er;

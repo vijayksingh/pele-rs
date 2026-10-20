@@ -110,6 +110,19 @@ typedef struct PelePublicDocument PelePublicDocument;
  * every known built-in even when unregistered. NULL registry operations fail.
  * Synchronize free with all operations; no registry pointer is retained by docs. */
 typedef struct PeleRegistry PeleRegistry;
+/* Captured builtin constructor (v16). Capture returns {selected:bool}; false
+ * writes NULL for unported/foreign prototypes. A selected factory retains its
+ * registration after registry replacement/free. Construct has no source input
+ * or callbacks and creates low-level mutable state, not core parse provenance.
+ * Construction returns ordinary document metadata plus constructorCreated.
+ * Free each factory/document once; never free during an active call.
+ * id is readable UTF-8 <=4096 bytes; outputs writable and nulled before failure.
+ * prototype is the exact ID exposed by the public model schema. */
+typedef struct PelePublicConstructorV16 PelePublicConstructorV16;
+PeleResult *pele_registry_capture_constructor_v16(const PeleRegistry *, const uint8_t *, size_t,
+    uint32_t prototype, PelePublicConstructorV16 **out_constructor);
+PeleResult *pele_public_constructor_construct_v16(const PelePublicConstructorV16 *, PelePublicDocument **);
+void pele_public_constructor_free_v16(PelePublicConstructorV16 *);
 PeleResult *pele_registry_create_v8(uint32_t mode, PeleRegistry **out_registry);
 void pele_registry_free_v8(PeleRegistry *registry);
 PeleResult *pele_registry_capabilities_v8(const PeleRegistry *registry);

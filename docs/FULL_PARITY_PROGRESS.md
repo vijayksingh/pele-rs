@@ -1,5 +1,18 @@
 # Current functional parity — incomplete (2026-10-21)
 
+Latest functional slice adds captured Sankey construction through Rust, C v16,
+Swift and WebAssembly. Fresh factories own exact native defaults, helpers and
+raw rendering without parsing; captured registration and subclass receivers
+survive the relevant lifecycle operations. Two native Rust features, two strict
+C clients, two Swift constructor features and six real browser executions pass.
+The prior 31 Swift regression features passed against the new SDK. Constructor
+runtime names/diagnostics, shared prototype identity and the other 21 class-root
+families remain incomplete; see [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
+
+Native normal/prepared Sankey callback reentry is implemented and separately
+[verified](parity/2026-10-21-native-sankey-callbacks/README.md). Presentation/image
+routes and arbitrary native graph-ID lifetime remain outside that proof.
+
 All 33 diagram parsers/renderers and mutable family adapters exist. This is not
 full public API parity. The current functional audit against pinned Pele 1.6.0
 records these concrete gaps at runtime `d7caf8c`:

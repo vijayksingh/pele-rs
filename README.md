@@ -19,10 +19,17 @@ web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
 **The full API port is unfinished.** The current functional audit confirms
-callback mutation gaps in 31 families and missing model constructors in 22.
+callback mutation gaps in 31 families. Sankey now has a native constructor
+factory exposed through C, Swift and the web; 21 class-root families still lack
+construction. Constructor metadata and shared prototype identity also remain
+incomplete. See the [constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md).
 Passing tests include checks that explicitly expect unsupported behavior;
 they do not establish complete Pele parity. See the
 [remaining-work audit](docs/parity/2026-10-21-runtime-audit/README.md).
+
+Native normal/prepared Sankey resource callbacks support same-document helpers,
+edits and nested rendering. [Scoped verification](docs/parity/2026-10-21-native-sankey-callbacks/README.md)
+preserves the original failures, matching SDK identity and actual C/Swift results.
 
 ![Packed Rust WASM demo: five diagram families, mutable pie, error recovery and dark palette](docs/images/full-demo.gif)
 

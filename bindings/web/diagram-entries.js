@@ -1,6 +1,6 @@
 import initialize from './initialize.js';
 // Low-level built-in host facade. Prepared parsing, models and drawing stay Rust.
-import {markBuiltinDiagram,rawModelOwner} from './builtin-entries.js';
+import {markBuiltinDiagram,rawModelOwner,disposeRawModel} from './builtin-entries.js';
 import {NativeRegistry} from './pkg/pele.js';
 import {createRenderer} from './full.js';
 let pending, renderer;
@@ -11,7 +11,7 @@ export function loadDiagramEntries(moduleOrPath) {
 }
 function ready(){if(!renderer)throw new Error('Call and await loadDiagramEntries() before parsing or rendering a diagram entry');return renderer;}
 /** Free an owned low-level model; normal collection also has a native finalizer. */
-export function disposeDiagramModel(model){ready().dispose(model);}
+export function disposeDiagramModel(model){if(!disposeRawModel(model))ready().dispose(model);}
 export function builtinEntry(metadata){
   const diagram={type:metadata.type,...(Object.hasOwn(metadata,'section')?{section:metadata.section}:{}),...(Object.hasOwn(metadata,'keepComments')?{keepComments:metadata.keepComments}:{}),
     parse(source,config,title,lineOffset,limits){

@@ -20,7 +20,7 @@ export class ModelRegistry {
       if (JSON.stringify(known.schema)!==JSON.stringify(schema)) throw new TypeError('Conflicting native model schema identity');
       return known;
     }
-    const registration = {schema, functions: new Map(), functionIds: new WeakMap(), prototypes: new Map(), prototypeIds: new WeakMap(), documents: [], sharedIds: new Map((schema.sharedFunctions??[]).map(entry=>[entry.identity,entry.method]))};
+    const registration = {schema, functions: new Map(), functionIds: new WeakMap(), prototypes: new Map(), prototypeIds: new WeakMap(), documents: [], constructors: new Map(), sharedIds: new Map((schema.sharedFunctions??[]).map(entry=>[entry.identity,entry.method]))};
     this.schemas.set(key, registration);
     const aliases=new Map((schema.sharedFunctions??[]).map(entry=>[entry.method,entry.identity]));
     const shapes=new Map((schema.functionShapes??[]).map(entry=>[entry.method,entry.constructible]));
@@ -59,19 +59,22 @@ export class ModelRegistry {
       registration.functionIds.set(callable, method.id);
     }
     for (const prototype of schema.prototypes) {
-      const value = Object.create(null);
+      // Shell owns JavaScript newTarget/receiver semantics. Only a captured
+      // native capability can install initialization; unimplemented classes
+      // retain the explicit construction error. Arguments are not inspected.
+      const constructor = class { constructor() {
+        const construct=registration.constructors.get(prototype.id);
+        if(!construct)throw new TypeError('Public model construction is unavailable');
+        construct(this);
+      }};
+      Object.defineProperty(constructor, 'name', {value: prototype.name, configurable: true});
+      const value=constructor.prototype;
       registration.prototypes.set(prototype.id, value);
       registration.prototypeIds.set(value, prototype.id);
     }
     for (const prototype of schema.prototypes) {
       const value = registration.prototypes.get(prototype.id), parent = prototype.parent;
       Object.setPrototypeOf(value, parent.kind === 'null' ? null : parent.kind === 'prototype' ? registration.prototypes.get(parent.prototype) : Object.prototype);
-      // Construction remains an explicit native capability gap. The descriptor
-      // still exposes the correct class-shaped prototype and member flags.
-      const constructor = function () { throw new TypeError('Public model construction is unavailable'); };
-      Object.defineProperty(constructor, 'name', {value: prototype.name, configurable: true});
-      Object.defineProperty(constructor, 'prototype', {value, writable: false});
-      Object.defineProperty(value, 'constructor', {value: constructor, writable: true, configurable: true});
       for (const member of prototype.members) {
         const descriptor = {enumerable: !!(member.flags & 1), configurable: !!(member.flags & 4)};
         if (member.kind === 'method') {
@@ -89,7 +92,7 @@ export class ModelRegistry {
   }
 }
 export class ModelBridge {
-  constructor(graph, schema, registry, invoke, prevalidatedRegistration) {
+  constructor(graph, schema, registry, invoke, prevalidatedRegistration, rootBinding) {
     const publication=invalidateBridgeObservation(this);
     this.registry = registry;
     if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || registry.schemas.get(`${schema.id}:${schema.version}`) !== prevalidatedRegistration)) throw new TypeError('Invalid prevalidated model registration');
@@ -102,6 +105,9 @@ export class ModelBridge {
     this.hostIds = new Map();
     this.hostValues = [];
     this.objects = [];
+    // Only this exact receiver/prototype pair aliases its native root codec.
+    // It does not authorize the subclass prototype for unrelated objects.
+    this.rootBinding = rootBinding;
     if(graph instanceof LayoutGraph)Object.assign(this,layoutMethods);
     if (graph instanceof LayoutGraph && tryInitializeSourceLayout(this,graph)) completeBridgePublication(this,graph,publication);
     else this.reconcile(graph);

@@ -15,7 +15,8 @@ export function builtinDiagramType(diagram){
 // Pele src/text/icons.ts at458322a5 (MIT,kepano): scoped host icon lookup.
 // Ownership/context only; no diagram-model algorithms.
 const rawOwners = new WeakMap();
-export function ownRawModel(model, type, render) { rawOwners.set(model, {type, render}); }
+export function ownRawModel(model, type, render, dispose) { rawOwners.set(model, {type, render, dispose}); }
+export function disposeRawModel(model) { const owner=rawOwners.get(model);if(!owner?.dispose)return false;owner.dispose();return true; }
 export function rawModelOwner(model, type) { const owner=rawOwners.get(model); return owner?.type===type?owner:undefined; }
 let inlineIcons;
 export function withBuiltinIcons(icons, run) {

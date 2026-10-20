@@ -18,6 +18,7 @@ extension Pele {
         private let document: MutableDocument
         public var type: String { document.type }
         public var revision: UInt64 { document.revision }
+        public var isConstructorCreated: Bool { document.isConstructorCreated }
         internal init(_ document: MutableDocument) { self.document = document }
         public func close() throws { try document.close() }
         public func snapshot() throws -> PublicSnapshot { try document.snapshot() }

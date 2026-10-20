@@ -1,0 +1,870 @@
+{
+  "revision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "baea1fcbcbfae50b868520eb38abf2b3a4d97cf4258f6d64428345b83a7e2c83",
+  "measurement": "text.length * size * .6",
+  "initial": {
+    "graph": {
+      "root": [
+        "ref",
+        0
+      ],
+      "nodes": [
+        {
+          "kind": "instance",
+          "properties": [
+            [
+              "type",
+              [
+                "string",
+                "sankey"
+              ],
+              7
+            ],
+            [
+              "nodes",
+              [
+                "ref",
+                1
+              ],
+              7
+            ],
+            [
+              "links",
+              [
+                "ref",
+                2
+              ],
+              7
+            ],
+            [
+              "title",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accTitle",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accDescr",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "lookup",
+              [
+                "ref",
+                3
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "length",
+              [
+                "number",
+                "0000000000000000"
+              ],
+              2
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "length",
+              [
+                "number",
+                "0000000000000000"
+              ],
+              2
+            ]
+          ]
+        },
+        {
+          "kind": "map",
+          "properties": [],
+          "entries": []
+        }
+      ]
+    },
+    "render": {
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-sankey\" viewBox=\"0 0 616 416\" width=\"616\" height=\"416\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"sankey\"><g transform=\"translate(8,8)\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\"></g><g class=\"pele-sankey-nodes\"></g><g class=\"pele-labels\" font-size=\"14\"></g></g></svg>",
+      "width": "4083400000000000",
+      "height": "407a000000000000",
+      "trace": []
+    }
+  },
+  "populated": {
+    "graph": {
+      "root": [
+        "ref",
+        0
+      ],
+      "nodes": [
+        {
+          "kind": "instance",
+          "properties": [
+            [
+              "type",
+              [
+                "string",
+                "sankey"
+              ],
+              7
+            ],
+            [
+              "nodes",
+              [
+                "ref",
+                1
+              ],
+              7
+            ],
+            [
+              "links",
+              [
+                "ref",
+                4
+              ],
+              7
+            ],
+            [
+              "title",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accTitle",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accDescr",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "lookup",
+              [
+                "ref",
+                6
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "0",
+              [
+                "ref",
+                2
+              ],
+              7
+            ],
+            [
+              "1",
+              [
+                "ref",
+                3
+              ],
+              7
+            ],
+            [
+              "length",
+              [
+                "number",
+                "4000000000000000"
+              ],
+              2
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "A"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "0000000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "B"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "3ff0000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "0",
+              [
+                "ref",
+                5
+              ],
+              7
+            ],
+            [
+              "length",
+              [
+                "number",
+                "3ff0000000000000"
+              ],
+              2
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "source",
+              [
+                "ref",
+                2
+              ],
+              7
+            ],
+            [
+              "target",
+              [
+                "ref",
+                3
+              ],
+              7
+            ],
+            [
+              "value",
+              [
+                "number",
+                "4000000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "map",
+          "properties": [],
+          "entries": [
+            [
+              [
+                "string",
+                "A"
+              ],
+              [
+                "ref",
+                2
+              ]
+            ],
+            [
+              [
+                "string",
+                "B"
+              ],
+              [
+                "ref",
+                3
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    "render": {
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-sankey\" viewBox=\"0 0 616 416\" width=\"616\" height=\"416\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"sankey\"><g transform=\"translate(8,8)\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\"><path class=\"pele-sankey-link\" data-id=\"A-&gt;B\" d=\"M10,0C300,0 300,0 590,0L590,400C300,400 300,400 10,400Z\" fill=\"var(--pele-series-1,#4c78a8)\"><title>A → B: 2</title></path></g><g class=\"pele-sankey-nodes\"><rect class=\"pele-sankey-node\" data-id=\"A\" x=\"0\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-1,#4c78a8)\"/><rect class=\"pele-sankey-node\" data-id=\"B\" x=\"590\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-labels\" font-size=\"14\"><g class=\"pele-label\" data-id=\"A\"><text x=\"16\" y=\"204.9\" text-anchor=\"start\">A <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">2</tspan></text></g><g class=\"pele-label\" data-id=\"B\"><text x=\"584\" y=\"204.9\" text-anchor=\"end\">B <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">2</tspan></text></g></g></g></svg>",
+      "width": "4083400000000000",
+      "height": "407a000000000000",
+      "trace": [
+        [
+          "A 2",
+          "402c000000000000"
+        ],
+        [
+          "B 2",
+          "402c000000000000"
+        ]
+      ]
+    },
+    "sameNode": true
+  },
+  "partial": {
+    "graph": {
+      "root": [
+        "ref",
+        0
+      ],
+      "nodes": [
+        {
+          "kind": "instance",
+          "properties": [
+            [
+              "type",
+              [
+                "string",
+                "sankey"
+              ],
+              7
+            ],
+            [
+              "nodes",
+              [
+                "ref",
+                1
+              ],
+              7
+            ],
+            [
+              "links",
+              [
+                "ref",
+                4
+              ],
+              7
+            ],
+            [
+              "title",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accTitle",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accDescr",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "lookup",
+              [
+                "ref",
+                6
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "0",
+              [
+                "ref",
+                2
+              ],
+              7
+            ],
+            [
+              "1",
+              [
+                "ref",
+                3
+              ],
+              7
+            ],
+            [
+              "length",
+              [
+                "number",
+                "4000000000000000"
+              ],
+              0
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "A"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "0000000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "B"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "3ff0000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "0",
+              [
+                "ref",
+                5
+              ],
+              7
+            ],
+            [
+              "length",
+              [
+                "number",
+                "3ff0000000000000"
+              ],
+              2
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "source",
+              [
+                "ref",
+                2
+              ],
+              7
+            ],
+            [
+              "target",
+              [
+                "ref",
+                3
+              ],
+              7
+            ],
+            [
+              "value",
+              [
+                "number",
+                "4000000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "map",
+          "properties": [],
+          "entries": [
+            [
+              [
+                "string",
+                "A"
+              ],
+              [
+                "ref",
+                2
+              ]
+            ],
+            [
+              [
+                "string",
+                "B"
+              ],
+              [
+                "ref",
+                3
+              ]
+            ],
+            [
+              [
+                "string",
+                "D"
+              ],
+              [
+                "ref",
+                7
+              ]
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "D"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "4000000000000000"
+              ],
+              7
+            ]
+          ]
+        }
+      ]
+    },
+    "failure": {
+      "name": "TypeError",
+      "message": "Cannot assign to read only property 'length' of object '[object Array]'"
+    },
+    "orphan": true
+  },
+  "repaired": {
+    "graph": {
+      "root": [
+        "ref",
+        0
+      ],
+      "nodes": [
+        {
+          "kind": "instance",
+          "properties": [
+            [
+              "type",
+              [
+                "string",
+                "sankey"
+              ],
+              7
+            ],
+            [
+              "nodes",
+              [
+                "ref",
+                1
+              ],
+              7
+            ],
+            [
+              "links",
+              [
+                "ref",
+                5
+              ],
+              7
+            ],
+            [
+              "title",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accTitle",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "accDescr",
+              [
+                "undefined"
+              ],
+              7
+            ],
+            [
+              "lookup",
+              [
+                "ref",
+                7
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "0",
+              [
+                "ref",
+                2
+              ],
+              7
+            ],
+            [
+              "1",
+              [
+                "ref",
+                3
+              ],
+              7
+            ],
+            [
+              "2",
+              [
+                "ref",
+                4
+              ],
+              7
+            ],
+            [
+              "length",
+              [
+                "number",
+                "4008000000000000"
+              ],
+              2
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "A"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "0000000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "B"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "3ff0000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "id",
+              [
+                "string",
+                "D"
+              ],
+              7
+            ],
+            [
+              "index",
+              [
+                "number",
+                "4000000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "array",
+          "properties": [
+            [
+              "0",
+              [
+                "ref",
+                6
+              ],
+              7
+            ],
+            [
+              "length",
+              [
+                "number",
+                "3ff0000000000000"
+              ],
+              2
+            ]
+          ]
+        },
+        {
+          "kind": "object",
+          "properties": [
+            [
+              "source",
+              [
+                "ref",
+                2
+              ],
+              7
+            ],
+            [
+              "target",
+              [
+                "ref",
+                3
+              ],
+              7
+            ],
+            [
+              "value",
+              [
+                "number",
+                "4000000000000000"
+              ],
+              7
+            ]
+          ]
+        },
+        {
+          "kind": "map",
+          "properties": [],
+          "entries": [
+            [
+              [
+                "string",
+                "A"
+              ],
+              [
+                "ref",
+                2
+              ]
+            ],
+            [
+              [
+                "string",
+                "B"
+              ],
+              [
+                "ref",
+                3
+              ]
+            ],
+            [
+              [
+                "string",
+                "D"
+              ],
+              [
+                "ref",
+                4
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    "render": {
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-sankey\" viewBox=\"0 0 616 427\" width=\"616\" height=\"427\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"sankey\"><g transform=\"translate(8,8)\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\"><path class=\"pele-sankey-link\" data-id=\"A-&gt;B\" d=\"M10,0C300,0 300,0 590,0L590,373C300,373 300,373 10,373Z\" fill=\"var(--pele-series-1,#4c78a8)\"><title>A → B: 2</title></path></g><g class=\"pele-sankey-nodes\"><rect class=\"pele-sankey-node\" data-id=\"A\" x=\"0\" y=\"0\" width=\"10\" height=\"373\" rx=\"2\" fill=\"var(--pele-series-1,#4c78a8)\"/><rect class=\"pele-sankey-node\" data-id=\"B\" x=\"590\" y=\"0\" width=\"10\" height=\"373\" rx=\"2\" fill=\"var(--pele-series-2,#f58518)\"/><rect class=\"pele-sankey-node\" data-id=\"D\" x=\"590\" y=\"400\" width=\"10\" height=\"1\" rx=\"0.5\" fill=\"var(--pele-series-3,#54a24b)\"/></g><g class=\"pele-labels\" font-size=\"14\"><g class=\"pele-label\" data-id=\"A\"><text x=\"16\" y=\"191.4\" text-anchor=\"start\">A <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">2</tspan></text></g><g class=\"pele-label\" data-id=\"B\"><text x=\"584\" y=\"191.4\" text-anchor=\"end\">B <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">2</tspan></text></g><g class=\"pele-label\" data-id=\"D\"><text x=\"584\" y=\"404.9\" text-anchor=\"end\">D <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">0</tspan></text></g></g></g></svg>",
+      "width": "4083400000000000",
+      "height": "407ab00000000000",
+      "trace": [
+        [
+          "A 2",
+          "402c000000000000"
+        ],
+        [
+          "B 2",
+          "402c000000000000"
+        ],
+        [
+          "D 0",
+          "402c000000000000"
+        ]
+      ]
+    }
+  },
+  "coreError": {
+    "name": "TypeError",
+    "message": "render() takes diagram text or a model that parse() returned."
+  }
+}

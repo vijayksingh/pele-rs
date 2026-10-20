@@ -3,6 +3,9 @@
 pub(crate) mod captured_admission;
 pub(crate) mod captured_read;
 pub(crate) mod captured_write;
+mod constructor;
+#[doc(hidden)]
+pub use constructor::PublicConstructorFactory;
 mod detached_render;
 mod engine;
 #[doc(hidden)]
@@ -30,8 +33,8 @@ mod schema;
 #[doc(hidden)]
 pub use engine::HostErEntrySelection;
 pub use engine::{
-    ParsedPublicModel, PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome,
-    RawRenderOutcomeView, ReadOutcome, RenderOutcomeView,
+    CapturedPublicConstructor, ParsedPublicModel, PublicDiagramModule, PublicDocument, PublicEngine,
+    RawRenderOutcome, RawRenderOutcomeView, ReadOutcome, RenderOutcomeView,
 };
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 

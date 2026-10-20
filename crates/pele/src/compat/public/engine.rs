@@ -5,7 +5,8 @@ use super::detached_render::{
 use super::graph_read::{GraphReadView, PublicGraphRead};
 use super::{
     schema::CompiledSchema, Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph,
-    ModelSchema, ModelSchemaView, PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
+    ModelSchema, ModelSchemaView, PrototypeId, PublicConstructorFactory, PublicError,
+    RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 use crate::compat::engine::{ParseAdmission, ParsePlan};
 use crate::compat::{
@@ -69,6 +70,15 @@ pub trait PublicDiagramModule: DiagramModule {
     }
     fn function_shapes(&self) -> &'static [FunctionShape] {
         &[]
+    }
+    /// Captured class construction is distinct from typed adaptation and parse.
+    /// Only an authentic builtin creator can authorize the opaque factory.
+    #[doc(hidden)]
+    fn public_constructor(
+        &self,
+        _prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        None
     }
     /// Method IDs, receiver identity and arguments come from this document's
     /// current arena. The module owns native behavior, including partial edits.
@@ -342,6 +352,7 @@ trait Erased: Send + Sync {
         doc: crate::compat::ParsedDocument,
     ) -> Result<(State, Object), PeleError>;
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
+    fn constructor(&self, prototype: PrototypeId) -> Option<Constructor>;
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
     fn borrow_graph<'a>(&self, state: &'a State) -> Option<&'a ModelGraph>;
     fn has_source_layout(&self, state: &State) -> bool;
@@ -429,6 +440,16 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     }
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError> {
         Ok(Box::new(self.0.create_public_from_graph(graph)?))
+    }
+    fn constructor(&self, prototype: PrototypeId) -> Option<Constructor> {
+        let factory = self
+            .0
+            .public_constructor(prototype)?
+            .for_creator::<D>(prototype)?;
+        Some(Constructor {
+            ignores_arguments: factory.ignores_arguments(),
+            construct: Box::new(move || factory.construct().map(|state| Box::new(state) as State)),
+        })
     }
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
@@ -537,6 +558,51 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .render_public(s.downcast_mut().expect("paired public state"), c, o, h)
     }
 }
+struct Constructor {
+    ignores_arguments: bool,
+    construct: Box<dyn Fn() -> Result<State, PeleError> + Send + Sync>,
+}
+/// An authentic class factory retaining its original module registration.
+/// Registry replacement or destruction does not invalidate a captured factory.
+/// Each construction owns independent native state; it never parses source.
+pub struct CapturedPublicConstructor {
+    registration: Arc<Registration>,
+    prototype: PrototypeId,
+    constructor: Constructor,
+}
+impl CapturedPublicConstructor {
+    pub fn prototype(&self) -> PrototypeId {
+        self.prototype
+    }
+    pub fn schema_view(&self) -> ModelSchemaView {
+        ModelSchemaView {
+            model: self.registration.schema,
+            shared_functions: self.registration.shared_functions,
+            function_shapes: self.registration.function_shapes,
+        }
+    }
+    /// Sankey's implicit constructor ignores all arguments, including opaque
+    /// host objects. Adapters must not pre-observe these ignored values.
+    pub fn ignores_arguments(&self) -> bool {
+        self.constructor.ignores_arguments
+    }
+    pub fn construct(&self) -> Result<PublicDocument, PeleError> {
+        self.schema_view().validate()?;
+        let document = PublicDocument {
+            registration: self.registration.clone(),
+            state: (self.constructor.construct)()?,
+            config: Object::default(),
+            revision: 0,
+            render_book: None,
+            constructor_created: true,
+        };
+        // Publication receives an admitted, ready owner, not a deferred parser
+        // or an unvalidated empty model. Wire-size admission remains at export.
+        document.snapshot_read()?;
+        Ok(document)
+    }
+}
+
 pub(super) struct Registration {
     pub(super) descriptor: ModuleDescriptor,
     schema: &'static ModelSchema,
@@ -546,6 +612,17 @@ pub(super) struct Registration {
     codec: Box<dyn Erased>,
 }
 impl Registration {
+    fn capture_constructor(
+        self: &Arc<Self>,
+        prototype: PrototypeId,
+    ) -> Option<CapturedPublicConstructor> {
+        let constructor = self.codec.constructor(prototype)?;
+        Some(CapturedPublicConstructor {
+            registration: self.clone(),
+            prototype,
+            constructor,
+        })
+    }
     fn compiled_schema(&self) -> Result<&CompiledSchema, PeleError> {
         // Register stays infallible. Cache validation (including its error) only
         // where this captured schema would already have been checked.
@@ -874,6 +951,16 @@ impl PublicEngine {
                 error
             })
     }
+    /// Capture a concrete builtin class factory, without parsing or creating a
+    /// document. Extensions with copied schemas or forwarded factories cannot
+    /// acquire builtin constructor authority.
+    pub fn capture_constructor(
+        &self,
+        id: &DiagramId,
+        prototype: PrototypeId,
+    ) -> Result<Option<CapturedPublicConstructor>, PeleError> {
+        Ok(self.graph_registration(id)?.capture_constructor(prototype))
+    }
     /// Construct an owned native model from supplied graph data. Registration
     /// selection is explicit and remains retained across replacement or drop.
     pub fn create_from_graph_as(
@@ -891,6 +978,7 @@ impl PublicEngine {
             config,
             revision: 0,
             render_book: None,
+            constructor_created: false,
         })
     }
     /// Captured builtin-only browser construction; fallback consumes the same
@@ -990,6 +1078,7 @@ impl PublicEngine {
                     config: plan.into_config(),
                     revision: 0,
                     render_book: None,
+                    constructor_created: false,
                 })
             }
             None => self.create_document(plan.parse()?),
@@ -1024,6 +1113,7 @@ impl PublicEngine {
             config,
             revision: 0,
             render_book: None,
+            constructor_created: false,
         })
     }
 }
@@ -1115,8 +1205,18 @@ pub struct PublicDocument {
     config: Object,
     revision: u64,
     render_book: Option<Arc<Mutex<RenderBook>>>,
+    constructor_created: bool,
 }
 impl PublicDocument {
+    /// Distinguishes class-created owners from parse/adaptation. Low-level
+    /// document operations remain available; a host core-render facade must not
+    /// treat this as proof that its public parse operation returned the model.
+    pub fn is_constructor_created(&self) -> bool {
+        self.constructor_created
+    }
+    pub fn capture_constructor(&self, prototype: PrototypeId) -> Option<CapturedPublicConstructor> {
+        self.registration.capture_constructor(prototype)
+    }
     fn next_revision(&self) -> Result<u64, PeleError> {
         detached_render::next_revision(self.revision, self.render_book.as_ref())
     }
@@ -1221,6 +1321,7 @@ impl PublicDocument {
             config,
             revision: 0,
             render_book: None,
+            constructor_created: false,
         })
     }
     /// Construct a concrete provider directly from an arena, without parsing.
@@ -1254,6 +1355,7 @@ impl PublicDocument {
             config,
             revision: 0,
             render_book: None,
+            constructor_created: false,
         })
     }
     /// Effective parse configuration owned by this retained document.

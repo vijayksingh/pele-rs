@@ -129,6 +129,7 @@ function releaseDisposedBridge(bridge) {
   bridge.stringIds = null;
   bridge.objects = null;
   bridge.root = null;
+  bridge.rootBinding = undefined;
   bridge.hostIds = null;
   bridge.hostValues = null;
   // Break adoption closures that can otherwise retain the model environment.
@@ -165,7 +166,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
   const capturedSankey=capturedSankeyAvailable(nativeRegistry,nativeCapabilities);
   const liveProviders=new Map(canonicalProviders.map(provider=>[provider.type,{provider,native:true}]));
   function syncProviders(){for(const [type,entry] of liveProviders){const native=builtinDiagramType(entry.provider)===type;if(native!==entry.native){if(native)registryCall(()=>nativeValue(()=>{nativeRegistry.register_builtin(type);return '{"version":2,"ok":true,"result":null}';}));else registryCall(()=>foreignValue(()=>nativeRegistry.register_foreign(type,entry.provider)));entry.native=native;}}}
-  const documents = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry();
+  const documents = new WeakMap(), constructedDocuments = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry();
   // Native keys identify captured immutable metadata, scoped to this renderer.
   const schemaRegistrations = new Map();
   // Native baseline authority is independent of live host equality. Tokens are
@@ -351,7 +352,26 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     if(atom.kind==='bool')return atom.value;
     const tags={number:4,string:5,ref:6,builtinFunction:7,hostReference:8};return owner.value([tags[atom.kind],atom.value]);
   }
-  function adoptMutable(mutable, preparedType, existingBridge) {
+  function capturedConstructorFactory(capability, registration, rawType) {
+    return receiver=>{
+      const mutable=foreignValue(()=>capability.construct());
+      try{return adoptMutable(mutable,rawType,undefined,{receiver,prototypeId:capability.prototype_id(),registration});}
+      catch(error){mutable.free();throw error;}
+    };
+  }
+  function installConstructors(mutable, registration, rawType) {
+    if(typeof mutable.capture_constructor!=='function')return;
+    for(const prototype of registration.schema.prototypes){
+      if(registration.constructors.has(prototype.id))continue;
+      const capability=mutable.capture_constructor(prototype.id);
+      if(!capability)continue;
+      // The current captured ABI explicitly certifies ignored arguments.
+      // Future option-reading constructors need their own ordered host seam.
+      if(!capability.ignores_arguments()){capability.free();continue;}
+      registration.constructors.set(prototype.id,capturedConstructorFactory(capability,registration,rawType));
+    }
+  }
+  function adoptMutable(mutable, preparedType, existingBridge, construction) {
           let sourceSnapshot;
           try{sourceSnapshot=mutable.snapshot_source_layout?.();}catch(error){if(typeof error==='string')return result(error);throw error;}
           const snapshot = sourceSnapshot == null ? binaryResult(()=>mutable.snapshot_binary()) : decodeLayoutOutcome(sourceSnapshot);
@@ -364,7 +384,14 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             if(existingBridge && registration !== existingBridge.registration) throw new TypeError('Conflicting native model schema identity');
             if(typeof schemaKey === 'string') schemaRegistrations.set(schemaKey,registration);
           }
+          if(construction&&registration!==construction.registration)throw new TypeError('Conflicting native constructor schema identity');
           const schema = registration.schema;
+          let rootBinding;
+          if(construction){
+            const root=snapshot.graph.root,node=root?.kind==='ref'&&snapshot.graph.nodes?.[root.value];
+            if(!node||node.kind!=='instance'||node.prototype!==construction.prototypeId)throw new TypeError('Invalid native constructor root');
+            rootBinding={object:construction.receiver,id:root.value,prototypeId:construction.prototypeId,prototype:Object.getPrototypeOf(construction.receiver)};
+          }
           const rawType=mutable.entry_type(), live=preparedType===undefined?liveProviders.get(rawType):undefined;
           const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider, confirmedGraph: false, unchangedApplyIsNoop: mutable.unchanged_public_graph_is_noop?.() === true};
           // Captured concrete provider capability, never selected by schema.
@@ -382,15 +409,16 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
           });
-          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration);
+          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration,rootBinding);
           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
           entry.confirmedGraph = true;
           acceptBaseline(entry,completedPublicationToken(bridge,snapshot.graph));
           const model = bridge.root;
-          documents.set(model, entry);
-          ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
+          (construction?constructedDocuments:documents).set(model, entry);
+          ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options),()=>renderer.dispose(model));
           finalizer?.register(model, mutable, model);
+          installConstructors(mutable,registration,rawType);
           return model;
   }
   function adoptCaptured(handle,epoch,preparedType,existingOwner) {
@@ -464,7 +492,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     },
     renderRaw(type, model, config, options = {}) {
       if(rawDisposed.has(model))throw new TypeError('Public model document is disposed');
-      let entry=documents.get(model);
+      let entry=documents.get(model)??constructedDocuments.get(model);
       if(!entry&&capturedSankey&&type==='sankey'){
         const selection=registryCall(()=>capturedNativeValue(()=>nativeRegistry.select_prepared_native_sankey(type)));
         if(selection){
@@ -780,11 +808,11 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       return result((document.handle ?? document).query(operation, JSON.stringify(argumentsValue)));
     },
     dispose(model) {
-      const document = documents.get(model);
+      const document = documents.get(model)??constructedDocuments.get(model);
       if (document?.busy || document?.nativeBusy || document?.detachedDepth) throw new TypeError('Public model document is already in use');
       if (document) acceptedBaselines.delete(document);
       if(document?.hostStore){document.hostStore.dispose();rawDisposed.add(model);documents.delete(model);document.disposed=true;finalizer?.unregister(model);document.handle.free();document.policy?.free();return;}
-      if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free();if(document.capturedOwner)document.capturedOwner.release();else if(document.bridge)releaseDisposedBridge(document.bridge); }
+      if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); constructedDocuments.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free();if(document.capturedOwner)document.capturedOwner.release();else if(document.bridge)releaseDisposedBridge(document.bridge); }
     }
   };
   return renderer;

@@ -617,10 +617,27 @@ fn initial_from<W: InitialWriter>(
     })?;
     out.finish(Atom::Ref(root))
 }
+fn construct_default() -> Result<SankeyPublicState, PeleError> {
+    // Pele SankeyDb has only field initializers and an implicit constructor:
+    // no source, no parse options, and no reads of caller arguments.
+    Sankey.create_public(&SankeyModel::new(None))
+}
+
 impl PublicDiagramModule for Sankey {
     type PublicState = SankeyPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == SANKEY_PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                SANKEY_PROTO,
+                construct_default,
+            )
+        })
     }
     fn try_parse_public(
         &self,

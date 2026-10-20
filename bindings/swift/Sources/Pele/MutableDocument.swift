@@ -4,6 +4,7 @@ import CPele
 private struct PublicDocumentMetadata: Decodable {
     let type: String
     let revision: String
+    let constructorCreated: Bool?
 }
 func ownedPublicDocument(_ result: OpaquePointer?, document: OpaquePointer?) throws -> Pele.MutableDocument {
     do {
@@ -11,7 +12,8 @@ func ownedPublicDocument(_ result: OpaquePointer?, document: OpaquePointer?) thr
         guard let handle = document, let revision = UInt64(metadata.revision), String(revision) == metadata.revision else {
             throw PeleError(code: "internal", message: "Invalid mutable document metadata")
         }
-        return Pele.MutableDocument(handle: handle, type: metadata.type, revision: revision)
+        return Pele.MutableDocument(handle: handle, type: metadata.type, revision: revision,
+                                    isConstructorCreated: metadata.constructorCreated ?? false)
     } catch {
         if let document { pele_public_document_free_v4(document) }
         throw error
@@ -28,9 +30,11 @@ extension Pele {
         private var detachedDepth = 0
         var hostFunctions: [UInt32: HostFunctionBox] = [:]
         public let type: String
+        public let isConstructorCreated: Bool
         public private(set) var revision: UInt64
-        fileprivate init(handle: OpaquePointer, type: String, revision: UInt64) {
+        fileprivate init(handle: OpaquePointer, type: String, revision: UInt64, isConstructorCreated: Bool = false) {
             self.handle = handle; self.type = type; self.revision = revision
+            self.isConstructorCreated = isConstructorCreated
         }
         deinit { if let handle { pele_public_document_free_v4(handle) } }
         public func close() throws {
