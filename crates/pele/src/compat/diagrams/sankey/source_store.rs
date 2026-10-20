@@ -1,11 +1,14 @@
 //! Source-owned logical graph. Static records and collection slots are derived;
 //! only actual mutations own generic records. No source Property/Node arena.
 use super::indexed::IndexedSankey;
-use crate::compat::public::captured_admission::{AdmissionKind, Extent, Header};
+use crate::compat::public::captured_admission::{
+    AdmissionKind, AdmissionRead, Extent, Header, ScalarAtomRef, ScalarPropertyRef,
+};
 use crate::compat::public::captured_read::{CapturedRead, NodeHeader, NodeKind, PropertyPrefix};
 use crate::compat::public::captured_write::{CapturedWrite, GraphCounts, MapMatch, OwnQuery};
 use crate::compat::public::graph_read::{
-    self, AdmissionState, PublicGraphRead, TrustedGraphOwner, TrustedGraphRead,
+    self, AdmissionState, PublicGraphRead, ReadAdapter, TrustedGraphOwner, TrustedGraphRead,
+    TrustedInitialGraphOwner,
 };
 use crate::compat::public::{Atom, JsString, ModelGraph, Node, Property, PrototypeId};
 use crate::compat::PeleError;
@@ -113,7 +116,7 @@ impl SourceCanonical {
         s.node_count = s.source.nodes.len() + s.source.links.len() + 4;
         s.string_count = s.catalog.len();
         s.root = Atom::Ref((s.node_count - 1) as u32);
-        graph_read::validate_structure(&s)?;
+        graph_read::validate_initial_structure(&s)?;
         Ok(s)
     }
     fn text<'a>(&'a self, t: &'a Text) -> &'a str {
@@ -241,6 +244,9 @@ impl SourceCanonical {
         }
         Ok(value)
     }
+    fn base_entry(&self, slot: usize) -> (Atom, Atom) {
+        (Atom::String(self.labels[slot]), Atom::Ref(slot as u32))
+    }
     fn entry_at(&self, id: usize, slot: usize) -> Result<(Atom, Atom), PeleError> {
         if let Some(Node::Map { entries, .. }) = self.nodes.get(&id) {
             return entries.get(slot).cloned().ok_or_else(graph_read::invalid);
@@ -255,12 +261,13 @@ impl SourceCanonical {
                 .cloned()
                 .ok_or_else(graph_read::invalid);
         }
+        let (key, value) = self.base_entry(slot);
         Ok((
-            Atom::String(self.labels[slot]),
+            key,
             patch
                 .and_then(|p| p.map_values.get(&slot))
                 .cloned()
-                .unwrap_or(Atom::Ref(slot as u32)),
+                .unwrap_or(value),
         ))
     }
     fn string_is(&self, id: usize, text: &str) -> bool {
@@ -377,6 +384,110 @@ fn same_kind(k: AdmissionKind, n: &Node) -> bool {
 impl TrustedGraphOwner for SourceCanonical {
     fn admission_state(&self) -> &AdmissionState {
         &self.admission
+    }
+}
+impl TrustedInitialGraphOwner for SourceCanonical {
+    type InitialRead<'a> = InitialRead<'a>;
+    fn initial_read(&self) -> Self::InitialRead<'_> {
+        InitialRead(self)
+    }
+}
+pub(super) struct InitialRead<'a>(&'a SourceCanonical);
+impl AdmissionRead for InitialRead<'_> {
+    fn extent(&mut self) -> Result<Extent, PeleError> {
+        Ok(PublicGraphRead::extent(self.0))
+    }
+    fn with_root<R>(
+        &mut self,
+        visit: impl FnOnce(&Atom) -> Result<R, PeleError>,
+    ) -> Result<R, PeleError> {
+        visit(&self.0.root)
+    }
+    fn visit_string_lengths(
+        &mut self,
+        mut visit: impl FnMut(usize) -> Result<(), PeleError>,
+    ) -> Result<(), PeleError> {
+        PublicGraphRead::string_lengths(self.0, &mut visit)
+    }
+    fn header(&mut self, node: usize) -> Result<Header, PeleError> {
+        PublicGraphRead::header(self.0, node)
+    }
+    fn with_properties<R>(
+        &mut self,
+        node: usize,
+        start: usize,
+        visit: impl FnOnce(&[Property]) -> Result<R, PeleError>,
+    ) -> Result<R, PeleError> {
+        ReadAdapter(self.0).with_properties(node, start, visit)
+    }
+    fn with_map_entries<R>(
+        &mut self,
+        node: usize,
+        start: usize,
+        visit: impl FnOnce(&[(Atom, Atom)]) -> Result<R, PeleError>,
+    ) -> Result<R, PeleError> {
+        ReadAdapter(self.0).with_map_entries(node, start, visit)
+    }
+    fn with_set_values<R>(
+        &mut self,
+        node: usize,
+        start: usize,
+        visit: impl FnOnce(&[Atom]) -> Result<R, PeleError>,
+    ) -> Result<R, PeleError> {
+        ReadAdapter(self.0).with_set_values(node, start, visit)
+    }
+    fn visit_properties(
+        &mut self,
+        node: usize,
+        start: usize,
+        remaining: usize,
+        mut visit: impl FnMut(ScalarPropertyRef<'_>) -> Result<(), PeleError>,
+    ) -> Result<usize, PeleError> {
+        // Defensive fallback keeps this reader exact even if reused after an
+        // edit. Ordinary mutation paths do not issue initial-owner evidence.
+        if self.0.nodes.contains_key(&node) || self.0.patches.contains_key(&node) {
+            return ReadAdapter(self.0).visit_properties(node, start, remaining, visit);
+        }
+        let total = PublicGraphRead::header(self.0, node)?.properties;
+        let end = start
+            .checked_add(remaining)
+            .filter(|end| *end <= total)
+            .ok_or_else(graph_read::invalid)?;
+        for slot in start..end {
+            let property = self.0.base_property(node, slot);
+            visit(ScalarPropertyRef {
+                key: property.key,
+                flags: property.flags,
+                value: ScalarAtomRef::borrowed(&property.value),
+            })?;
+        }
+        Ok(remaining)
+    }
+    fn visit_map_entries(
+        &mut self,
+        node: usize,
+        start: usize,
+        remaining: usize,
+        mut visit: impl FnMut(ScalarAtomRef<'_>, ScalarAtomRef<'_>) -> Result<(), PeleError>,
+    ) -> Result<usize, PeleError> {
+        if self.0.nodes.contains_key(&node) || self.0.patches.contains_key(&node) {
+            return ReadAdapter(self.0).visit_map_entries(node, start, remaining, visit);
+        }
+        let AdmissionKind::Map(total) = PublicGraphRead::header(self.0, node)?.kind else {
+            return Err(graph_read::invalid());
+        };
+        let end = start
+            .checked_add(remaining)
+            .filter(|end| *end <= total)
+            .ok_or_else(graph_read::invalid)?;
+        for slot in start..end {
+            let (key, value) = self.0.base_entry(slot);
+            visit(
+                ScalarAtomRef::borrowed(&key),
+                ScalarAtomRef::borrowed(&value),
+            )?;
+        }
+        Ok(remaining)
     }
 }
 impl PublicGraphRead for SourceCanonical {
@@ -587,12 +698,13 @@ impl SourceCanonical {
         for (offset, entry) in batch[..count].iter_mut().enumerate() {
             let slot = start + offset;
             *entry = if slot < base {
+                let (key, value) = self.base_entry(slot);
                 (
-                    Atom::String(self.labels[slot]),
+                    key,
                     patch
                         .and_then(|p| p.map_values.get(&slot))
                         .cloned()
-                        .unwrap_or(Atom::Ref(slot as u32)),
+                        .unwrap_or(value),
                 )
             } else {
                 patch

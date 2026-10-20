@@ -36,6 +36,20 @@ failures and graph adoption. Unchanged exports still check the current metadata
 length and combined byte budget. Standalone binary and FFI encoders retain their
 existing validation stages. Generation exhaustion disables reuse.
 
+Fresh source construction feeds scalar fields directly into the authoritative
+structural validator. An optional observer uses the shared canonical-width
+counter and records schema IDs in encounter order during that same pass. Only
+successful structural validation can issue this sealed initial evidence; no
+property batches or separate initial schema/count walks are required. Schema
+compilation and ID membership checks retain their existing snapshot boundary.
+Byte-count failures remain deferred until export, after metadata serialization;
+each export still checks its current metadata length and combined budget.
+Mutation and adoption discard the initial evidence before writing and retain
+the generic validators, including after partial failures. Arbitrary providers
+cannot supply this crate-private initial traversal. Source layout encoding keeps
+its existing declarative recipe; this layer changes neither its ABI nor its
+field declarations.
+
 Explicit APIs returning `ModelGraph` or `Cow<ModelGraph>` still materialize that
 representation at their original export stage. Additive `snapshot_read`,
 `invoke_read` and render read outcomes let binary/JSON adapters avoid that copy.

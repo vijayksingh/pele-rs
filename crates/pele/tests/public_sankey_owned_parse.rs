@@ -1217,3 +1217,139 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
             .unwrap()
     );
 }
+
+#[test]
+fn sankey_first_export_limit_failure_retries_without_prior_count_or_materialization() {
+    let expected = legacy_engine().parse(SOURCE, &Default::default()).unwrap();
+    let graph = expected.snapshot().unwrap();
+    let oracle = GraphReadView::Arena(std::borrow::Cow::Borrowed(&graph));
+    for metadata in [0usize, 31, 32] {
+        let actual = PublicEngine::with_builtins()
+            .parse(SOURCE, &Default::default())
+            .unwrap();
+        let payload = vec![0; metadata];
+        let frame = encode_binary_exchange(0, &graph, &payload, DEFAULT_BINARY_BUDGET).unwrap();
+        // This is the source document's first snapshot and first size request.
+        // Its failing export must not prevent an exact-budget retry.
+        let view = actual.snapshot_read().unwrap();
+        assert_eq!(
+            view.canonical_binary_size(metadata, frame.len() - 1)
+                .unwrap_err(),
+            oracle
+                .canonical_binary_size(metadata, frame.len() - 1)
+                .unwrap_err()
+        );
+        assert_eq!(
+            view.canonical_binary_size(metadata, frame.len()).unwrap(),
+            frame.len() - metadata
+        );
+        for (size, budget) in [
+            (usize::MAX, usize::MAX),
+            (0, 0),
+            (0, frame.len() - metadata),
+            (31, frame.len() - metadata + 31),
+            (32, frame.len() - metadata + 31),
+            (32, frame.len() - metadata + 32),
+        ] {
+            assert_eq!(
+                view.canonical_binary_size(size, budget),
+                oracle.canonical_binary_size(size, budget)
+            );
+        }
+        assert_eq!(view.encode_binary(0, &payload, frame.len()).unwrap(), frame);
+        assert_eq!(
+            serde_json::to_vec(&view).unwrap(),
+            serde_json::to_vec(&graph).unwrap()
+        );
+    }
+}
+
+#[test]
+fn sankey_first_helper_without_export_preserves_partial_state_and_repair() {
+    for locked in [false, true] {
+        let mut actual = PublicEngine::with_builtins()
+            .parse(SOURCE, &Default::default())
+            .unwrap();
+        let mut expected = legacy_engine().parse(SOURCE, &Default::default()).unwrap();
+        // Only the separate legacy oracle supplies receiver IDs and edits.
+        // The source owner has had no snapshot, size request, or render.
+        let original = expected.snapshot().unwrap();
+        let mut before = original.clone();
+        if locked {
+            let Atom::Ref(root) = original.root else {
+                panic!()
+            };
+            let Atom::Ref(nodes) = original.nodes[root as usize]
+                .properties()
+                .iter()
+                .find(|p| original.strings[p.key as usize].is("nodes"))
+                .unwrap()
+                .value
+            else {
+                panic!()
+            };
+            let key = before.strings.len() as u32;
+            before.strings.push(JsString::from("length"));
+            let Node::Array { length, properties } = &mut before.nodes[nodes as usize] else {
+                panic!()
+            };
+            properties.push(Property {
+                key,
+                value: Atom::Number(*length as f64),
+                flags: 0,
+            });
+            actual.apply(0, before.clone()).unwrap();
+            expected.apply(0, before.clone()).unwrap();
+        }
+        let revision = u64::from(locked);
+        let call = MethodCall {
+            method: MethodId(1),
+            receiver: original.root.clone(),
+            arguments: vec![Atom::Number(456.)],
+        };
+        {
+            let a = actual
+                .invoke_read(revision, call.clone(), &mut MetricsResources)
+                .unwrap();
+            let b = expected
+                .invoke(revision, call, &mut MetricsResources)
+                .unwrap();
+            assert_eq!(a.result.is_err(), locked);
+            assert_eq!(
+                serde_json::to_vec(&a.result).unwrap(),
+                serde_json::to_vec(&b.result).unwrap()
+            );
+            assert_eq!(a.revision, revision + 1);
+            assert_eq!(a.revision, b.revision);
+            assert_eq!(
+                serde_json::to_vec(&a.graph).unwrap(),
+                serde_json::to_vec(&b.graph).unwrap()
+            );
+            assert_ne!(
+                serde_json::to_vec(&a.graph).unwrap(),
+                serde_json::to_vec(&before).unwrap()
+            );
+            assert_eq!(
+                a.graph
+                    .encode_binary(a.revision, &[], DEFAULT_BINARY_BUDGET)
+                    .unwrap(),
+                encode_binary_exchange(b.revision, &b.graph, &[], DEFAULT_BINARY_BUDGET).unwrap()
+            );
+        }
+        assert_eq!(
+            actual.render(&Default::default(), &mut MetricsResources),
+            expected.render(&Default::default(), &mut MetricsResources)
+        );
+        actual.apply(revision + 1, original.clone()).unwrap();
+        expected.apply(revision + 1, original).unwrap();
+        assert!(bytes(&actual) == bytes(&expected));
+        assert_eq!(
+            actual
+                .render(&Default::default(), &mut MetricsResources)
+                .unwrap(),
+            expected
+                .render(&Default::default(), &mut MetricsResources)
+                .unwrap()
+        );
+    }
+}

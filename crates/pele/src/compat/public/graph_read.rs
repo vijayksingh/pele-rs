@@ -67,6 +67,14 @@ pub struct TrustedGraphRead<'a> {
 pub(crate) trait TrustedGraphOwner: PublicGraphRead {
     fn admission_state(&self) -> &AdmissionState;
 }
+// Only an audited crate-owned reader can supply the initial scalar traversal.
+// It must expose exactly this owner's canonical state, with no user callbacks.
+pub(crate) trait TrustedInitialGraphOwner: TrustedGraphOwner {
+    type InitialRead<'a>: AdmissionRead
+    where
+        Self: 'a;
+    fn initial_read(&self) -> Self::InitialRead<'_>;
+}
 impl<'a> TrustedGraphRead<'a> {
     pub(crate) fn new<T: TrustedGraphOwner>(owner: &'a T) -> Self {
         Self {
@@ -84,6 +92,33 @@ impl<'a> TrustedGraphRead<'a> {
             .receipt
             .get()
             .filter(|r| r.generation == generation)
+    }
+    fn initial_schema(
+        &self,
+        compiled: &super::schema::CompiledSchema,
+    ) -> Option<Result<(), PeleError>> {
+        self.receipt()?;
+        let initial = self.state.initial.borrow();
+        let (generation, facts) = initial.as_ref()?;
+        if Some(*generation) != self.generation {
+            return None;
+        }
+        Some(facts.validate_schema(compiled.methods(), compiled.prototypes()))
+    }
+    fn initial_size(&self) -> Option<Result<usize, PeleError>> {
+        self.receipt()?;
+        let initial = self.state.initial.borrow();
+        let (generation, facts) = initial.as_ref()?;
+        if Some(*generation) != self.generation {
+            return None;
+        }
+        Some(facts.canonical_bytes())
+    }
+    fn record_initial(&self, facts: super::captured_admission::InitialAdmission) {
+        self.record_structure();
+        if let Some(receipt) = self.receipt() {
+            *self.state.initial.borrow_mut() = Some((receipt.generation, facts));
+        }
     }
     fn record_structure(&self) {
         if let Some(generation) = self.generation {
@@ -118,12 +153,14 @@ struct AdmissionReceipt {
 pub(crate) struct AdmissionState {
     generation: std::cell::Cell<Option<u64>>,
     receipt: std::cell::Cell<Option<AdmissionReceipt>>,
+    initial: std::cell::RefCell<Option<(u64, super::captured_admission::InitialAdmission)>>,
 }
 impl Default for AdmissionState {
     fn default() -> Self {
         Self {
             generation: std::cell::Cell::new(Some(0)),
             receipt: std::cell::Cell::new(None),
+            initial: std::cell::RefCell::new(None),
         }
     }
 }
@@ -132,6 +169,7 @@ impl AdmissionState {
     /// Exhaustion disables reuse forever rather than changing public errors.
     pub(crate) fn invalidate(&mut self) {
         self.receipt.set(None);
+        *self.initial.get_mut() = None;
         self.generation
             .set(self.generation.get().and_then(|n| n.checked_add(1)));
     }
@@ -140,6 +178,13 @@ fn trusted(reader: &dyn PublicGraphRead) -> Option<TrustedGraphRead<'_>> {
     reader
         .trusted_read()
         .filter(|read| std::ptr::eq(read.reader, reader))
+}
+pub(crate) fn validate_initial_structure<O: TrustedInitialGraphOwner>(
+    owner: &O,
+) -> Result<(), PeleError> {
+    let facts = super::captured_admission::validate_initial(&mut owner.initial_read())?;
+    TrustedGraphRead::new(owner).record_initial(facts);
+    Ok(())
 }
 pub(crate) fn validate_structure(reader: &dyn PublicGraphRead) -> Result<(), PeleError> {
     let proof = trusted(reader);
@@ -168,11 +213,17 @@ pub(super) fn validate_schema(
     {
         return Ok(());
     }
-    super::captured_admission::validate_schema_ids(
-        &mut ReadAdapter(reader),
-        compiled.methods(),
-        compiled.prototypes(),
-    )?;
+    match proof
+        .as_ref()
+        .and_then(|proof| proof.initial_schema(compiled))
+    {
+        Some(result) => result?,
+        None => super::captured_admission::validate_schema_ids(
+            &mut ReadAdapter(reader),
+            compiled.methods(),
+            compiled.prototypes(),
+        )?,
+    }
     if let Some(proof) = proof {
         proof.record_schema(schema);
     }
@@ -299,16 +350,23 @@ impl<'a> GraphReadView<'a> {
         let reader = self.reader();
         validate_structure(reader)?;
         let proof = trusted(reader);
-        if let Some(bytes) = proof
-            .as_ref()
-            .and_then(TrustedGraphRead::receipt)
-            .and_then(|r| r.canonical_bytes)
-        {
+        let known_size = proof.as_ref().and_then(|proof| {
+            proof
+                .receipt()
+                .and_then(|r| r.canonical_bytes)
+                .map(Ok)
+                .or_else(|| proof.initial_size())
+        });
+        if let Some(bytes) = known_size {
+            let bytes = bytes?;
             // Same canonical counter's u32 metadata field and combined bound.
             // No output or host effect can occur between its individual puts.
             u32::try_from(metadata_bytes).map_err(|_| super::binary::limit())?;
             super::binary::check_bytes(0, bytes, budget)?;
             super::binary::check_bytes(bytes, metadata_bytes, budget)?;
+            if let Some(proof) = proof {
+                proof.record_size(bytes);
+            }
             return Ok(bytes);
         }
         let total = super::captured_transport::canonical_frame_bytes(

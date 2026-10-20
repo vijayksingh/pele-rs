@@ -3,21 +3,53 @@ use super::{binary, captured_admission as admission, Atom};
 use crate::compat::PeleError;
 use admission::{AdmissionKind, AdmissionRead};
 
-struct Counter {
+pub(super) struct Counter {
     bytes: usize,
     budget: usize,
 }
 impl Counter {
+    pub(super) fn new(budget: usize) -> Self {
+        Self { bytes: 0, budget }
+    }
+    pub(super) fn bytes(&self) -> usize {
+        self.bytes
+    }
+    pub(super) fn prefix(&mut self, metadata: usize) -> Result<(), PeleError> {
+        self.put(8)?;
+        self.put(4)?;
+        self.put(8)?;
+        self.count(metadata)
+    }
+    pub(super) fn string(&mut self, units: usize) -> Result<(), PeleError> {
+        self.count(units)?;
+        self.put(units.checked_mul(2).ok_or_else(binary::limit)?)
+    }
+    pub(super) fn node_prefix(&mut self, kind: AdmissionKind) -> Result<(), PeleError> {
+        self.put(1)?;
+        match kind {
+            AdmissionKind::Object => Ok(()),
+            AdmissionKind::Instance(_) | AdmissionKind::Array(_) | AdmissionKind::InvalidArray => {
+                self.put(4)
+            }
+            AdmissionKind::Date(_) => self.put(8),
+            AdmissionKind::Error(_) | AdmissionKind::InvalidError => self.put(1),
+            AdmissionKind::Map(count) | AdmissionKind::Set(count) => self.count(count),
+        }
+    }
+    pub(super) fn property(&mut self, value: &Atom) -> Result<(), PeleError> {
+        self.put(5)?;
+        self.atom(value)
+    }
     fn put(&mut self, count: usize) -> Result<(), PeleError> {
         binary::check_bytes(self.bytes, count, self.budget)?;
         self.bytes = self.bytes.checked_add(count).ok_or_else(binary::limit)?;
         Ok(())
     }
-    fn count(&mut self, count: usize) -> Result<(), PeleError> {
+    pub(super) fn count(&mut self, count: usize) -> Result<(), PeleError> {
         u32::try_from(count).map_err(|_| binary::limit())?;
         self.put(4)
     }
-    fn atom(&mut self, atom: &Atom) -> Result<(), PeleError> {
+    pub(super) fn atom(&mut self, atom: &Atom) -> Result<(), PeleError> {
         self.put(match atom {
             Atom::Undefined | Atom::Null | Atom::Bool(_) => 1,
             Atom::Number(_) => 9,
@@ -33,11 +65,8 @@ pub fn canonical_frame_bytes<S: AdmissionRead>(
     budget: usize,
 ) -> Result<usize, PeleError> {
     let extent = store.extent()?;
-    let mut out = Counter { bytes: 0, budget };
-    out.put(8)?;
-    out.put(4)?;
-    out.put(8)?;
-    out.count(metadata_bytes)?;
+    let mut out = Counter::new(budget);
+    out.prefix(metadata_bytes)?;
     store.with_root(|atom| out.atom(atom))?;
     out.count(extent.strings)?;
     let mut seen = 0usize;
@@ -46,8 +75,7 @@ pub fn canonical_frame_bytes<S: AdmissionRead>(
             return Err(binary::invalid());
         }
         seen += 1;
-        out.count(units)?;
-        out.put(units.checked_mul(2).ok_or_else(binary::limit)?)
+        out.string(units)
     })?;
     if seen != extent.strings {
         return Err(binary::invalid());
@@ -55,23 +83,13 @@ pub fn canonical_frame_bytes<S: AdmissionRead>(
     out.count(extent.nodes)?;
     for node in 0..extent.nodes {
         let header = store.header(node)?;
-        out.put(1)?;
-        match header.kind {
-            AdmissionKind::Object => {}
-            AdmissionKind::Instance(_) | AdmissionKind::Array(_) | AdmissionKind::InvalidArray => {
-                out.put(4)?
-            }
-            AdmissionKind::Date(_) => out.put(8)?,
-            AdmissionKind::Error(_) | AdmissionKind::InvalidError => out.put(1)?,
-            AdmissionKind::Map(count) | AdmissionKind::Set(count) => {
-                out.count(count)?;
-                admission::items(store, node, header.kind, |atom| out.atom(atom))?;
-            }
+        out.node_prefix(header.kind)?;
+        if matches!(header.kind, AdmissionKind::Map(_) | AdmissionKind::Set(_)) {
+            admission::items(store, node, header.kind, |atom| out.atom(atom))?;
         }
         out.count(header.properties)?;
         admission::properties(store, node, header.properties, |property| {
-            out.put(5)?;
-            property.value.with_atom(|value| out.atom(value))
+            property.value.with_atom(|value| out.property(value))
         })?;
     }
     out.put(metadata_bytes)?;

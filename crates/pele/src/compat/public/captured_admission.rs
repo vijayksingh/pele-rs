@@ -37,7 +37,7 @@ enum ScalarAtom<'a> {
     Owned(Atom),
 }
 impl<'a> ScalarAtomRef<'a> {
-    fn borrowed(value: &'a Atom) -> Self {
+    pub(crate) fn borrowed(value: &'a Atom) -> Self {
         Self(ScalarAtom::Borrowed(value))
     }
     #[cfg(feature = "web-host-sankey")]
@@ -281,11 +281,28 @@ pub(super) fn items<S: AdmissionRead>(
     Ok(())
 }
 
+trait ValidationObserver {
+    fn extent(&mut self, _: Extent) {}
+    fn string(&mut self, _: usize) {}
+    fn root(&mut self, _: &Atom) {}
+    fn header(&mut self, _: Header) {}
+    fn property(&mut self, _: &Atom) {}
+    fn item(&mut self, _: &Atom) {}
+}
+struct Unobserved;
+impl ValidationObserver for Unobserved {}
 pub(crate) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError> {
+    validate_with(store, &mut Unobserved)
+}
+fn validate_with<S: AdmissionRead>(
+    store: &mut S,
+    observer: &mut impl ValidationObserver,
+) -> Result<(), PeleError> {
     let extent = store.extent()?;
     if extent.version != 1 {
         return Err(invalid("Unsupported public graph version"));
     }
+    observer.extent(extent);
     let mut units = 0usize;
     let mut strings = 0usize;
     store.visit_string_lengths(|length| {
@@ -296,6 +313,7 @@ pub(crate) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError>
         units = units
             .checked_add(length)
             .ok_or_else(|| invalid("Public graph size overflow"))?;
+        observer.string(length);
         Ok(())
     })?;
     if strings != extent.strings {
@@ -307,7 +325,11 @@ pub(crate) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError>
             ErrorCode::Limit,
         ));
     }
-    store.with_root(|value| atom(extent, value))?;
+    store.with_root(|value| {
+        atom(extent, value)?;
+        observer.root(value);
+        Ok(())
+    })?;
     let mut work = 0usize;
     for node in 0..extent.nodes {
         let header = store.header(node)?;
@@ -331,13 +353,22 @@ pub(crate) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError>
                 ErrorCode::Limit,
             ));
         }
+        observer.header(header);
         properties(store, node, header.properties, |property| {
             if property.key as usize >= extent.strings || property.flags & !7 != 0 {
                 return Err(invalid("Invalid public property"));
             }
-            property.value.with_atom(|value| atom(extent, value))
+            property.value.with_atom(|value| {
+                atom(extent, value)?;
+                observer.property(value);
+                Ok(())
+            })
         })?;
-        items(store, node, header.kind, |value| atom(extent, value))?;
+        items(store, node, header.kind, |value| {
+            atom(extent, value)?;
+            observer.item(value);
+            Ok(())
+        })?;
     }
     Ok(())
 }
@@ -348,10 +379,8 @@ pub(crate) fn validate_schema_ids<S: AdmissionRead>(
     prototypes: &HashSet<PrototypeId>,
 ) -> Result<(), PeleError> {
     let check = |value: &Atom| -> Result<(), PeleError> {
-        if let Atom::BuiltinFunction(id) = value {
-            if !methods.contains(&MethodId(*id)) {
-                return Err(invalid("Unknown public builtin function"));
-            }
+        if let Some(use_) = SchemaUse::atom(value) {
+            use_.validate(methods, prototypes)?;
         }
         Ok(())
     };
@@ -360,9 +389,7 @@ pub(crate) fn validate_schema_ids<S: AdmissionRead>(
     for node in 0..extent.nodes {
         let header = store.header(node)?;
         if let AdmissionKind::Instance(prototype) = header.kind {
-            if !prototypes.contains(&prototype) {
-                return Err(invalid("Unknown public instance prototype"));
-            }
+            SchemaUse::Prototype(prototype).validate(methods, prototypes)?;
         }
         properties(store, node, header.properties, |property| {
             property.value.with_atom(check)
@@ -370,4 +397,134 @@ pub(crate) fn validate_schema_ids<S: AdmissionRead>(
         items(store, node, header.kind, check)?;
     }
     Ok(())
+}
+
+// Evidence is minted only after the authoritative structural validator succeeds.
+// Counting observes the same admitted scalars, but never returns an error during
+// construction; transport errors remain deferred until an export requests size.
+pub(crate) struct InitialAdmission {
+    canonical_bytes: Result<usize, PeleError>,
+    schema_uses: Vec<SchemaUse>,
+}
+impl InitialAdmission {
+    pub(crate) fn canonical_bytes(&self) -> Result<usize, PeleError> {
+        self.canonical_bytes.clone()
+    }
+    pub(crate) fn validate_schema(
+        &self,
+        methods: &HashSet<MethodId>,
+        prototypes: &HashSet<PrototypeId>,
+    ) -> Result<(), PeleError> {
+        for use_ in &self.schema_uses {
+            use_.validate(methods, prototypes)?;
+        }
+        Ok(())
+    }
+}
+#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+enum SchemaUse {
+    Method(MethodId),
+    Prototype(PrototypeId),
+}
+impl SchemaUse {
+    fn atom(value: &Atom) -> Option<Self> {
+        if let Atom::BuiltinFunction(id) = value {
+            Some(Self::Method(MethodId(*id)))
+        } else {
+            None
+        }
+    }
+    fn validate(
+        &self,
+        methods: &HashSet<MethodId>,
+        prototypes: &HashSet<PrototypeId>,
+    ) -> Result<(), PeleError> {
+        match self {
+            Self::Method(id) if !methods.contains(id) => {
+                Err(invalid("Unknown public builtin function"))
+            }
+            Self::Prototype(id) if !prototypes.contains(id) => {
+                Err(invalid("Unknown public instance prototype"))
+            }
+            _ => Ok(()),
+        }
+    }
+}
+struct InitialObserver {
+    counter: super::captured_transport::Counter,
+    count_error: Option<PeleError>,
+    schema_uses: Vec<SchemaUse>,
+    seen: HashSet<SchemaUse>,
+}
+impl InitialObserver {
+    fn count(
+        &mut self,
+        step: impl FnOnce(&mut super::captured_transport::Counter) -> Result<(), PeleError>,
+    ) {
+        if self.count_error.is_none() {
+            self.count_error = step(&mut self.counter).err();
+        }
+    }
+    fn use_(&mut self, use_: SchemaUse) {
+        if self.seen.insert(use_) {
+            self.schema_uses.push(use_);
+        }
+    }
+    fn atom_use(&mut self, atom: &Atom) {
+        if let Some(use_) = SchemaUse::atom(atom) {
+            self.use_(use_);
+        }
+    }
+}
+impl ValidationObserver for InitialObserver {
+    fn extent(&mut self, extent: Extent) {
+        // Pure deferred addition may follow structural order rather than wire
+        // order. Shared primitives retain the exact width of every field.
+        self.count(|c| {
+            c.prefix(0)?;
+            c.count(extent.strings)?;
+            c.count(extent.nodes)
+        });
+    }
+    fn string(&mut self, units: usize) {
+        self.count(|c| c.string(units));
+    }
+    fn root(&mut self, value: &Atom) {
+        self.count(|c| c.atom(value));
+        self.atom_use(value);
+    }
+    fn header(&mut self, header: Header) {
+        self.count(|c| {
+            c.node_prefix(header.kind)?;
+            c.count(header.properties)
+        });
+        if let AdmissionKind::Instance(id) = header.kind {
+            self.use_(SchemaUse::Prototype(id));
+        }
+    }
+    fn property(&mut self, value: &Atom) {
+        self.count(|c| c.property(value));
+        self.atom_use(value);
+    }
+    fn item(&mut self, value: &Atom) {
+        self.count(|c| c.atom(value));
+        self.atom_use(value);
+    }
+}
+pub(crate) fn validate_initial<S: AdmissionRead>(
+    store: &mut S,
+) -> Result<InitialAdmission, PeleError> {
+    let mut observer = InitialObserver {
+        counter: super::captured_transport::Counter::new(usize::MAX),
+        count_error: None,
+        schema_uses: Vec::new(),
+        seen: HashSet::new(),
+    };
+    validate_with(store, &mut observer)?;
+    Ok(InitialAdmission {
+        canonical_bytes: observer
+            .count_error
+            .map_or_else(|| Ok(observer.counter.bytes()), Err),
+        schema_uses: observer.schema_uses,
+    })
 }
