@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "2be54917938f880d09d2b34cafe1d32bb3633e8f",
+  "lanes": {
+    "native": {
+      "count": 468,
+      "beforeAfterExact": true,
+      "commitBlobHashesExact": true,
+      "historicalHead": "558bb3f90e1e88f230f047766f3ca44ee109d3a4"
+    },
+    "web": {
+      "count": 547,
+      "beforeAfterExact": true,
+      "commitBlobHashesExact": true,
+      "historicalHead": "558bb3f90e1e88f230f047766f3ca44ee109d3a4"
+    }
+  },
+  "finalTestHashes": {
+    "tests/web/sankey-constructor.spec.js": "d8ac995858207476b2665ab1f8eb7f22b0f1d0512dd3b81dd6f60445d47741e0",
+    "bindings/swift/Tests/PeleTests/PublicConstructorTests.swift": "cc1d8dd30484d1b687c440b7ea221109288378ac1bc0eb7ef4f8714e5851f584",
+    "tests/ffi_constructor_v16.c": "448b398732e7a89ed8c7054fe2ed21766189c631926a2861cb09c0bea8564b31",
+    "fixtures/public-sankey-constructor.json": "a4078f5fc841f54e89cf982e4f7f09f14945a0022eb9f643cfd196da4770492a"
+  },
+  "note": "Before-build HEAD identifies the earlier checkout with uncommitted constructor changes. All frozen input hashes independently match immutable commit blobs. Test observer repairs happened after native/package builds and changed no runtime input."
+}

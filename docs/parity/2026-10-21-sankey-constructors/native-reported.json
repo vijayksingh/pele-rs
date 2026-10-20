@@ -1,0 +1,11 @@
+{
+  "status": "reported-pass-without-retained-raw-log",
+  "reporter": "implementing native agent",
+  "command": "PATH=<pinned Rust 1.98.1 bin>:$PATH CARGO_BUILD_JOBS=2 cargo test --locked -p pele-rs --test public_sankey_constructor",
+  "passed": 2,
+  "failed": 0,
+  "compilationSecondsReported": 27.22,
+  "testSecondsReported": 0.02,
+  "earlierAttempts": "Unpinned cargo/rustfmt shell invocations failed at the missing rustup-init shim before test execution; direct pinned tools then succeeded.",
+  "limitation": "These fields preserve the agent execution report. No standalone raw test log was retained, so the portable verifier does not claim independent verification of this native result."
+}
