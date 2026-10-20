@@ -8,7 +8,28 @@ use pele::compat::{
     },
     ErrorCode, PeleError,
 };
+use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen(raw_module = "../live-render.js")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = executeLiveRead)]
+    fn execute_live_read(
+        read: &js_sys::Function,
+        command: u32,
+        receiver: &JsValue,
+        key: &JsValue,
+        context: u32,
+    ) -> Result<JsValue, JsValue>;
+}
+
+#[repr(u32)]
+enum ReadCommand {
+    Get = 0,
+    Index = 1,
+    ToString = 2,
+    RequireString = 3,
+}
 
 fn invalid(message: &str) -> PeleError {
     PeleError::new(message, ErrorCode::Semantic)
@@ -25,23 +46,32 @@ fn revision(value: &str) -> Result<u64, JsValue> {
 struct Reader {
     root: JsValue,
     read: js_sys::Function,
+    keys: HashMap<String, JsValue>,
+    key_bytes: usize,
 }
 impl Reader {
+    fn key(&mut self, key: &str) -> JsValue {
+        if let Some(value) = self.keys.get(key) {
+            return value.clone();
+        }
+        let value = JsValue::from_str(key);
+        // Retain immutable control operands only, never public field values.
+        // This bounds cache storage without adding a new rejection/limit to
+        // dynamic keys supplied by a future renderer.
+        if self.keys.len() < 128 && key.len() <= 16 * 1024 - self.key_bytes {
+            self.key_bytes += key.len();
+            self.keys.insert(key.to_owned(), value.clone());
+        }
+        value
+    }
     fn call(
         &self,
-        op: &str,
+        command: ReadCommand,
         receiver: &JsValue,
         key: &JsValue,
-        expression: &JsValue,
+        context: u32,
     ) -> Result<JsValue, PublicError> {
-        self.read
-            .call4(
-                &JsValue::UNDEFINED,
-                &JsValue::from_str(op),
-                receiver,
-                key,
-                expression,
-            )
+        execute_live_read(&self.read, command as u32, receiver, key, context)
             // The JS job channel retains the original thrown value, including
             // undefined. Do not inspect it here and invoke a second getter.
             .map_err(|_| invalid("Host callback failed").into())
@@ -69,19 +99,15 @@ impl LiveRenderRead for Reader {
         self.root.clone()
     }
     fn get(&mut self, receiver: &JsValue, key: &str) -> Result<JsValue, PublicError> {
-        self.call(
-            "get",
-            receiver,
-            &JsValue::from_str(key),
-            &JsValue::UNDEFINED,
-        )
+        let key = self.key(key);
+        self.call(ReadCommand::Get, receiver, &key, 0)
     }
     fn index(&mut self, receiver: &JsValue, index: usize) -> Result<JsValue, PublicError> {
         self.call(
-            "index",
+            ReadCommand::Index,
             receiver,
             &JsValue::from_f64(index as f64),
-            &JsValue::UNDEFINED,
+            0,
         )
     }
     fn kind(&self, value: &JsValue) -> LiveValueKind {
@@ -115,7 +141,7 @@ impl LiveRenderRead for Reader {
         Self::units(value)
     }
     fn to_string(&mut self, value: &JsValue) -> Result<JsString, PublicError> {
-        let text = self.call("toString", value, &JsValue::UNDEFINED, &JsValue::UNDEFINED)?;
+        let text = self.call(ReadCommand::ToString, value, &JsValue::UNDEFINED, 0)?;
         Self::units(&text)?
             .ok_or_else(|| invalid("Live reader returned a non-string conversion").into())
     }
@@ -124,12 +150,9 @@ impl LiveRenderRead for Reader {
         value: &JsValue,
         site: LiveStringUse,
     ) -> Result<JsString, PublicError> {
-        let text = self.call(
-            "requireString",
-            value,
-            &JsValue::from_str(site.method),
-            &JsValue::from_str(site.expression_receiver),
-        )?;
+        let method = self.key(site.method);
+        let context = u32::from(site.expression_receiver == "t");
+        let text = self.call(ReadCommand::RequireString, value, &method, context)?;
         Self::units(&text)?.ok_or_else(|| invalid("Live reader returned a non-string value").into())
     }
 }
@@ -164,7 +187,12 @@ impl NativeDetachedRenderJob {
             .job
             .take()
             .ok_or_else(|| failure(invalid("Public render job already dispatched")))?;
-        let mut reader = Reader { root, read };
+        let mut reader = Reader {
+            root,
+            read,
+            keys: HashMap::new(),
+            key_bytes: 0,
+        };
         let mut host = prepared_entries::host_er_raw_resources(width, icons, clock, inline_icons);
         let completion = match dispatcher {
             Some(dispatcher) => job.run(

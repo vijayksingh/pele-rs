@@ -1,17 +1,22 @@
 // Host values stay opaque across resource callbacks. Rust chooses every field
 // and render phase; this adapter supplies ordinary JavaScript value operations.
+// Typed operands avoid converting the same control strings on every property
+// read. The callback itself remains job-local and owns original thrown values.
+export function executeLiveRead(read, operation, value, key, context) {
+  return read(operation, value, key, context);
+}
 export function liveRenderRead(capture) {
-  return (operation, value, key, expression) => {
+  return (operation, value, key, context) => {
     try {
       switch (operation) {
-        case 'get': case 'index': return value[key];
-        case 'toString': return `${value}`;
-        case 'requireString': {
+        case 0: case 1: return value[key];
+        case 2: return `${value}`;
+        case 3: {
           if (typeof value === 'string') return value;
           // Run the pinned first string operation in this engine. In particular,
           // do not stringify a missing or numeric label and hide its TypeError.
           if (key !== 'includes') throw new TypeError('Unknown live string operation');
-          if (expression === 't') { const t = value; t.includes("&"); }
+          if (context === 1) { const t = value; t.includes("&"); }
           else { const e = value, vx = "¶ß"; e.includes(vx); }
           return value;
         }

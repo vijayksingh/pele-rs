@@ -50,6 +50,12 @@ The facade never reconciles an outer render snapshot over callback mutations. It
 
 Failed native JavaScript primitives use a typed `JavaScriptFailure` resource operation. Portable hosts retain the existing PublicError wire and message. Browser hosts derive the current engine's name/message by running the intrinsic on an isolated descriptor-equivalent array; caller mutations and callbacks are never replayed. Resource decorators forward this operation. Strict string failures execute the pinned expression form because WebKit includes that expression in its TypeError message.
 
+## Typed browser read commands
+
+The browser import uses numeric commands0=get,1=index,2=ToString,3=requireString and context1=t/0=e. Its typed WASM signature passes integers directly, rather than converting control strings for every property read. The job-local Reader interns property/method JavaScript string handles on first use. It retains at most128 keys and16KiB of owned key text; further keys use the existing uncached conversion, without a new public rejection. It retains no public field values and shares no cache across jobs.
+
+The core phase-reader contract, property-read order, callback boundaries, original-error channel and UTF16 budgets remain unchanged. String operands still return before method validation; wrong-type string use preserves the exact pinned expression. This layer changes transport metadata only. Independent VM profiles attribute33.61/35.05% of candidate medium/large retained samples to live control-string decoding, so the change targets measured repeated conversion rather than a presumed Rust speedup.
+
 ## Verification boundary
 
 Integration controls cover owner/lifetime/revision behavior and default typed rendering. Browser comparisons use actual pinned Pele in the same engine and compare complete SVG, dimension bits, callback traces, ordered descriptors, aliases, retained references, partial helper effects and original arbitrary throws. Existing native frame/provider tests remain independent controls. Generic JavaScript Error stack locations remain host implementation details and are retained separately in reports; PeleError source line, column and snippet remain strict comparison fields.
