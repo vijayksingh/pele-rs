@@ -9,7 +9,9 @@ construction uses its separate direct-parse path.
 
 ## Private strategy and extension contract
 
-`Module` captures a private projection strategy alongside its diagram module.
+The concrete erased `Module<D, P>` type captures a private projection policy
+through `PhantomData<P>`. Both policies are zero-sized; there is no stored tag
+or runtime policy branch. Unit builtin handlers remain zero-sized when boxed.
 Only the audited Gantt instance installed by `Engine::with_builtins` opts in.
 Public `register` always selects the original projection, even when a replacement
 uses the Gantt descriptor or model type. Retained documents keep their captured
@@ -66,3 +68,11 @@ measure on the independent VM: unchanged mutable model code does not justify
 assuming unchanged compiled performance. Keep raw samples and artifact hashes.
 Geometrically growing arrays and formatter bookkeeping can offset eliminated
 buffering; source inspection alone cannot establish an optimization win.
+
+The first rollout stored a runtime enum beside each unit handler. That caused
+33 additional one-byte allocation requests when constructing builtin registries.
+The static policy correction restores the prior boxing behavior. The public
+`registry_allocations` example records construction-only requests: 69 to 36
+allocations, zero remaining one-byte handler requests, and unchanged four
+reallocations in this native diagnostic. Requested bytes are cumulative traffic,
+not allocator-reserved memory, live memory or RSS. Timing needs separate proof.

@@ -3,7 +3,7 @@ use super::{
     Object, OutputLimit, ParseLimits, PeleError, PrepareOptions, SourceLimit, Value, DIAGRAM_TYPES,
 };
 use serde::Serialize;
-use std::{any::Any, collections::HashMap, sync::Arc};
+use std::{any::Any, collections::HashMap, marker::PhantomData, sync::Arc};
 type Model = Box<dyn Any + Send + Sync>;
 trait ErasedModule: Send + Sync {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError>;
@@ -42,14 +42,26 @@ trait ErasedModule: Send + Sync {
     fn model_view(&self, model: &Model) -> Result<Value, PeleError>;
     fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError>;
 }
-#[derive(Clone, Copy)]
-enum Projection {
-    Legacy,
-    // Selected only by our private builtin registration. Public providers never
-    // inherit it from a matching descriptor, model type or registration name.
-    NormalizedBuiltin,
+// Projection policy belongs to the erased module's concrete type, not its
+// stored bytes. Unit builtin modules must remain zero-sized when boxed.
+trait ModelProjection: Send + Sync + 'static {
+    fn project(model: &impl Serialize) -> Result<Value, PeleError>;
 }
-struct Module<D>(D, Projection);
+struct Legacy;
+impl ModelProjection for Legacy {
+    fn project(model: &impl Serialize) -> Result<Value, PeleError> {
+        project_model(model)
+    }
+}
+// Selected only by private builtin registration. Public providers never inherit
+// this policy from a matching descriptor, model type or registration name.
+struct NormalizedBuiltin;
+impl ModelProjection for NormalizedBuiltin {
+    fn project(model: &impl Serialize) -> Result<Value, PeleError> {
+        super::normalized_projection::project(model)
+    }
+}
+struct Module<D, P>(D, PhantomData<P>);
 struct ModelWriter {
     bytes: Vec<u8>,
     exceeded: bool,
@@ -95,7 +107,7 @@ pub(crate) fn project_model(model: &impl Serialize) -> Result<Value, PeleError> 
             )
         })
 }
-impl<D: DiagramModule> ErasedModule for Module<D> {
+impl<D: DiagramModule, P: ModelProjection> ErasedModule for Module<D, P> {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError> {
         Ok(Box::new(self.0.parse(context)?))
     }
@@ -146,10 +158,7 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
             .downcast_ref::<D::Model>()
             .expect("private module/model pairing");
         self.0.validate_model_projection(model)?;
-        match self.1 {
-            Projection::Legacy => project_model(model),
-            Projection::NormalizedBuiltin => super::normalized_projection::project(model),
-        }
+        P::project(model)
     }
     fn render_with_output_limit(
         &self,
@@ -310,7 +319,7 @@ impl Engine {
         engine.register(super::diagrams::architecture::Architecture);
         engine.register(super::diagrams::sankey::Sankey);
         engine.register(super::diagrams::state::State);
-        engine.register_projected(super::diagrams::gantt::Gantt, Projection::NormalizedBuiltin);
+        engine.register_projected::<_, NormalizedBuiltin>(super::diagrams::gantt::Gantt);
         engine.register(super::diagrams::sequence::Sequence);
         engine.register(super::diagrams::xychart::XyChart);
         engine.register(super::diagrams::class_diagram::Class);
@@ -330,13 +339,13 @@ impl Engine {
         Self::default()
     }
     pub fn register<D: DiagramModule>(&mut self, module: D) {
-        self.register_projected(module, Projection::Legacy);
+        self.register_projected::<D, Legacy>(module);
     }
-    fn register_projected<D: DiagramModule>(&mut self, module: D, projection: Projection) {
+    fn register_projected<D: DiagramModule, P: ModelProjection>(&mut self, module: D) {
         let descriptor = module.descriptor();
         let registration = Arc::new(Registration {
             descriptor,
-            module: Box::new(Module(module, projection)),
+            module: Box::new(Module::<D, P>(module, PhantomData)),
         });
         if let Some(i) = self
             .modules
