@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test';
+import {writeFile} from 'node:fs/promises';
 
 test('disposal retains caller values and borrowed helpers while releasing document ownership',async({page})=>{
  await page.goto('/examples/web/');
@@ -31,4 +32,41 @@ test('disposal retains caller values and borrowed helpers while releasing docume
   return failures;
  },process.env.PELE_TEST_PACKAGE_ROOT??'/dist/package-web/package');
  expect(failures).toEqual([]);
+});
+
+test('disposed public models release their roots while caller-held nodes survive',async({page,browserName},info)=>{
+ test.skip(browserName!=='chromium','Explicit garbage collection requires Chromium CDP');
+ await page.goto('/examples/web/');
+ await page.evaluate(async packageRoot=>{
+  const {loadRenderer}=await import(packageRoot+'/full.js'),engine=await loadRenderer();
+  const rows=[];
+  // A retained leaf keeps its owning bridge reachable. It has no edge back to
+  // the public root, so disposal must release that root independently.
+  for(const stage of ['parsed','rendered','helper']){
+   const model=engine.parse('sankey\nA,B,5\nB,C,3');
+   if(stage==='rendered')engine.render(model);
+   if(stage==='helper')model.findOrCreateNode('Detached');
+   const leaf=model.nodes[0],reference=new WeakRef(model),prototype=Object.getPrototypeOf(model);
+   engine.dispose(model);
+   rows.push({stage,leaf,reference,prototype});
+  }
+  globalThis.__disposalReachability={engine,rows};
+ },process.env.PELE_TEST_PACKAGE_ROOT??'/dist/package-web/package');
+ // WeakRef construction pins its target for that JS job. Collect only after
+ // returning to the browser, and never dereference the root before collection.
+ const session=await page.context().newCDPSession(page);
+ try{
+  await session.send('HeapProfiler.collectGarbage');
+  const report=await page.evaluate(()=>{
+   const state=globalThis.__disposalReachability;
+   return state.rows.map(({stage,leaf,reference,prototype})=>({stage,rootCollected:reference.deref()===undefined,leafId:leaf.id,leafIndex:leaf.index,helperRetained:typeof prototype.findOrCreateNode==='function'}));
+  });
+  const path=info.outputPath('disposed-root-reachability.json');
+  await writeFile(path,JSON.stringify(report,null,2));
+  await info.attach('disposed-root-reachability.json',{path,contentType:'application/json'});
+  expect(report).toEqual(['parsed','rendered','helper'].map(stage=>({stage,rootCollected:true,leafId:'A',leafIndex:0,helperRetained:true})));
+ }finally{
+  await session.detach();
+  await page.evaluate(()=>{globalThis.__disposalReachability?.engine.close();delete globalThis.__disposalReachability;});
+ }
 });

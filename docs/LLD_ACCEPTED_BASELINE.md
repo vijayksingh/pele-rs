@@ -23,3 +23,13 @@ Current native prepare/finish/schema validation, full canonical size and metadat
 One public browser integration compares normal/raw results, objects, aliases, descriptors, errors and subsequent operations against actual pinned Pele. It counts real prepare/finish/apply calls. Cases: three unchanged renders; callback mutation+original throw; failed proxy capture with retained detached history; registered-prototype rejection/recovery; partial helper failure+repair; result-factory nested helper+original throw. Reports persist before assertions.
 
 The unchanged fixture fails on the predecessor package: three real readonly jobs/finishes but two source applies, instead of zero. Existing comprehensive callback, provider, schema, full graph and budget suites remain integration gates. This feature does not independently force every schema/combined-budget failure or every possible Proxy reentry.
+
+## Terminal receipt release
+
+Explicit disposal first rejects busy/native-busy/detached operations. Only after that gate does it delete the renderer's accepted-baseline receipt. `releaseDisposedBridge` deletes the observation token and completed-publication proof before clearing existing transport fields. This is terminal cancellation, not a new observation: it allocates no replacement token and cannot grant acceptance.
+
+A completed-publication WeakMap value contains `{token, graph, root}`. Weak keys do not release that value while their bridge remains reachable. Registration WeakRefs can keep a dereferenced bridge alive through the current JavaScript job; an externally retained native-created leaf also keeps its bridge reachable through `registry.owners`. Clearing bridge fields alone therefore retained the entire public root and canonical graph through the publication proof. Explicit proof deletion removes that additional edge without changing the retained leaf, its descriptors, or helper routing.
+
+`completedObservations` remains keyed by ephemeral operation inputs. The bridge has no edge to those inputs; disposal's busy gate excludes active operations. No cleanup index is introduced. Registry ownership, shared methods/prototypes, registration WeakRefs and disposed-receiver routing remain unchanged. Rejected busy disposal leaves every receipt intact.
+
+Public lifecycle regression retains only a leaf and a WeakRef to its root, crosses a browser job boundary, then requests browser garbage collection. Parse-only, rendered and helper-mutated lanes must release the root while keeping the leaf usable and borrowed-helper routing intact. The predecessor package retained all three roots. This establishes terminal reachability; performance and GC-cost attribution require separate matched measurements.

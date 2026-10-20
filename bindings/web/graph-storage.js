@@ -41,6 +41,12 @@ const observationTokens = new WeakMap(), completedObservations = new WeakMap(), 
 export function invalidateBridgeObservation(bridge) {
   const token = {}; observationTokens.set(bridge, token); completedPublications.delete(bridge); return token;
 }
+// Terminal release: a retained leaf can keep its disposed bridge alive through
+// registry ownership. Proofs must not keep the released graph/root alive too.
+export function releaseBridgeObservation(bridge) {
+  observationTokens.delete(bridge);
+  completedPublications.delete(bridge);
+}
 export function bridgeObservationToken(bridge) { return observationTokens.get(bridge); }
 export function completedObservationToken(bridge, input) {
   const proof=completedObservations.get(input);

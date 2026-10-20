@@ -17,7 +17,7 @@ import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';
 export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
 import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
-import {bridgeObservationToken,completedObservationToken,completedPublicationToken} from './graph-storage.js';
+import {bridgeObservationToken,completedObservationToken,completedPublicationToken,releaseBridgeObservation} from './graph-storage.js';
 import { defaultMeasurer } from './resources.js';
 export { canvasMeasurer, metricsMeasurer, forgetTextWidths } from './resources.js';
 function result(json) {
@@ -123,6 +123,7 @@ function renderError(error) {
 // containers. Keep registry identity for helpers borrowed by another document.
 function disposedBridgeInvoke() { throw new TypeError('Public model document is disposed'); }
 function releaseDisposedBridge(bridge) {
+  releaseBridgeObservation(bridge);
   bridge.graph = null;
   bridge.strings = null;
   bridge.stringIds = null;
@@ -781,6 +782,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     dispose(model) {
       const document = documents.get(model);
       if (document?.busy || document?.nativeBusy || document?.detachedDepth) throw new TypeError('Public model document is already in use');
+      if (document) acceptedBaselines.delete(document);
       if(document?.hostStore){document.hostStore.dispose();rawDisposed.add(model);documents.delete(model);document.disposed=true;finalizer?.unregister(model);document.handle.free();document.policy?.free();return;}
       if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free();if(document.capturedOwner)document.capturedOwner.release();else if(document.bridge)releaseDisposedBridge(document.bridge); }
     }
