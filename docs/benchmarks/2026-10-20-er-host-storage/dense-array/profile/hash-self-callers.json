@@ -1,0 +1,17 @@
+{
+  "method": "Only hash/SipHash/hashbrown self samples, classified by ancestry; mutually exclusive, string interner takes priority over outer direct target. No inclusive time summed.",
+  "callers": {
+    "HostConstruction::string": {
+      "microseconds": 71662,
+      "percentOfWholeProfile": 4.677746467473075
+    },
+    "Direct::ensure_entity outside string interner": {
+      "microseconds": 16093,
+      "percentOfWholeProfile": 1.050472689864143
+    },
+    "Other Rust hash callers": {
+      "microseconds": 12640,
+      "percentOfWholeProfile": 0.8250776610876013
+    }
+  }
+}

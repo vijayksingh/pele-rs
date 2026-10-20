@@ -1,0 +1,121 @@
+{
+  "profile": "dist/perf-patches/parse-architecture/er-dense-array-first/profile/er-medium-parse-wasm.cpuprofile",
+  "sha256": "c8af8ca3792adbaf02242ac433e9837e9a8f766527e1a9de41b2e526a3f1ed21",
+  "samples": 4311,
+  "totalMicroseconds": 1531977,
+  "phase": "dense770, pre-literal; parse loop includes explicit dispose",
+  "method": "timeDeltas-weighted self and ancestry membership; each sample counted at most once per target/union",
+  "targets": {
+    "adoption": {
+      "selfMicroseconds": 6204,
+      "inclusiveDeduplicatedMicroseconds": 6899,
+      "selfPercent": 0.40496691529964224,
+      "inclusiveDeduplicatedPercent": 0.45033313163317723,
+      "matchedFunctions": [
+        {
+          "functionName": "adoptHostEr",
+          "scriptId": "12",
+          "url": "http://127.0.0.1:33661/package/full.js",
+          "lineNumber": 197,
+          "columnNumber": 22
+        }
+      ]
+    },
+    "rawOwner": {
+      "selfMicroseconds": 695,
+      "inclusiveDeduplicatedMicroseconds": 695,
+      "selfPercent": 0.045366216333535034,
+      "inclusiveDeduplicatedPercent": 0.045366216333535034,
+      "matchedFunctions": [
+        {
+          "functionName": "ownRawModel",
+          "scriptId": "16",
+          "url": "http://127.0.0.1:33661/package/builtin-entries.js",
+          "lineNumber": 17,
+          "columnNumber": 27
+        }
+      ]
+    },
+    "wrapper": {
+      "selfMicroseconds": 1667,
+      "inclusiveDeduplicatedMicroseconds": 1667,
+      "selfPercent": 0.10881364406906892,
+      "inclusiveDeduplicatedPercent": 0.10881364406906892,
+      "matchedFunctions": [
+        {
+          "functionName": "__wrap",
+          "scriptId": "21",
+          "url": "http://127.0.0.1:33661/package/pkg/pele.js",
+          "lineNumber": 62,
+          "columnNumber": 17
+        },
+        {
+          "functionName": "__wrap",
+          "scriptId": "21",
+          "url": "http://127.0.0.1:33661/package/pkg/pele.js",
+          "lineNumber": 62,
+          "columnNumber": 17
+        }
+      ]
+    },
+    "hostParsed": {
+      "selfMicroseconds": 0,
+      "inclusiveDeduplicatedMicroseconds": 3810,
+      "selfPercent": 0.0,
+      "inclusiveDeduplicatedPercent": 0.24869825069175322,
+      "matchedFunctions": [
+        {
+          "functionName": "pele_wasm[e6e81f4f4d17d0e2]::host_er::host_parsed",
+          "scriptId": "29",
+          "url": "http://127.0.0.1:33661/package/pkg/pele_bg.wasm",
+          "lineNumber": 0,
+          "columnNumber": 5795366
+        },
+        {
+          "functionName": "pele_wasm[e6e81f4f4d17d0e2]::host_er::host_parsed",
+          "scriptId": "29",
+          "url": "http://127.0.0.1:33661/package/pkg/pele_bg.wasm",
+          "lineNumber": 0,
+          "columnNumber": 5795366
+        }
+      ]
+    },
+    "nativeFree": {
+      "selfMicroseconds": 0,
+      "inclusiveDeduplicatedMicroseconds": 0,
+      "selfPercent": 0.0,
+      "inclusiveDeduplicatedPercent": 0.0,
+      "matchedFunctions": []
+    },
+    "ownershipUnion": {
+      "selfMicroseconds": 6204,
+      "inclusiveDeduplicatedMicroseconds": 10709,
+      "selfPercent": 0.40496691529964224,
+      "inclusiveDeduplicatedPercent": 0.6990313823249305,
+      "matchedFunctions": [
+        {
+          "functionName": "pele_wasm[e6e81f4f4d17d0e2]::host_er::host_parsed",
+          "scriptId": "29",
+          "url": "http://127.0.0.1:33661/package/pkg/pele_bg.wasm",
+          "lineNumber": 0,
+          "columnNumber": 5795366
+        },
+        {
+          "functionName": "adoptHostEr",
+          "scriptId": "12",
+          "url": "http://127.0.0.1:33661/package/full.js",
+          "lineNumber": 197,
+          "columnNumber": 22
+        },
+        {
+          "functionName": "pele_wasm[e6e81f4f4d17d0e2]::host_er::host_parsed",
+          "scriptId": "29",
+          "url": "http://127.0.0.1:33661/package/pkg/pele_bg.wasm",
+          "lineNumber": 0,
+          "columnNumber": 5795366
+        }
+      ]
+    }
+  },
+  "limits": "No allocation attribution from samples, no assignment of detached GC samples to ownership; compiler inlining can hide costs."
+}

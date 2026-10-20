@@ -1,0 +1,642 @@
+{
+  "decision": "rejected; dense-array control restored",
+  "method": "Pair by trial index. Median(candidate/control - 1) differs from ratio of independent medians. Samples are batch means, not individual-operation latency.",
+  "rows": [
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.008203119039535522,
+        "control": 0.14238281548023224,
+        "candidate": 0.14562500268220901
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": 0.6214669935740158,
+      "pairedWins": 9,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 2.2770916497482085,
+      "candidateOverJS": 17.752394178404437,
+      "p95BatchMeanMs": {
+        "js": 0.021679691970348358,
+        "control": 0.24515625089406967,
+        "candidate": 0.2763671875
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.01699218899011612,
+        "control": 0.11781249940395355,
+        "candidate": 0.1142578125
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": -2.288022614018792,
+      "pairedWins": 13,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -3.017240888647388,
+      "candidateOverJS": 6.724137341366705,
+      "p95BatchMeanMs": {
+        "js": 0.023164063692092896,
+        "control": 0.12730468809604645,
+        "candidate": 0.13722655922174454
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.024921879172325134,
+        "control": 0.07457031309604645,
+        "candidate": 0.07460937649011612
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": -1.526310569361633,
+      "pairedWins": 13,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 0.052384645374026206,
+      "candidateOverJS": 2.9937299661161663,
+      "p95BatchMeanMs": {
+        "js": 0.03136718273162842,
+        "control": 0.08164063096046448,
+        "candidate": 0.07976562529802322
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.008242189884185791,
+        "control": 0.13007812201976776,
+        "candidate": 0.126953125
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": -0.8269364489022046,
+      "pairedWins": 11,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -2.4024001663345507,
+      "candidateOverJS": 15.402839146375857,
+      "p95BatchMeanMs": {
+        "js": 0.03164061903953552,
+        "control": 0.18843749910593033,
+        "candidate": 0.1411718800663948
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.019765622913837433,
+        "control": 0.11894531548023224,
+        "candidate": 0.11546874791383743
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": -1.7555442312209513,
+      "pairedWins": 14,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -2.9228284883338507,
+      "candidateOverJS": 5.841897744239599,
+      "p95BatchMeanMs": {
+        "js": 0.02792968600988388,
+        "control": 0.13468750566244125,
+        "candidate": 0.12781250476837158
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.028203122317790985,
+        "control": 0.0736718699336052,
+        "candidate": 0.07359375059604645
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": -0.47494488819515013,
+      "pairedWins": 12,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -0.10603685996996015,
+      "candidateOverJS": 2.609418551846734,
+      "p95BatchMeanMs": {
+        "js": 0.03355468809604645,
+        "control": 0.08101563155651093,
+        "candidate": 0.07675781846046448
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.012226566672325134,
+        "control": 0.11585937440395355,
+        "candidate": 0.126953125
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": 9.996512827367553,
+      "pairedWins": 3,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 9.575185998646196,
+      "candidateOverJS": 10.383383038131116,
+      "p95BatchMeanMs": {
+        "js": 0.034492187201976776,
+        "control": 0.18898437172174454,
+        "candidate": 0.19691406190395355
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.08824218809604645,
+        "control": 0.40531250834465027,
+        "candidate": 0.39656248688697815
+      },
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "pairedMedianChangePercent": -2.002099758422604,
+      "pairedWins": 16,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -2.158833314424058,
+      "candidateOverJS": 4.4940237254242055,
+      "p95BatchMeanMs": {
+        "js": 0.10343750566244125,
+        "control": 0.44484373927116394,
+        "candidate": 0.4359375238418579
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.10484375059604645,
+        "control": 0.2414843738079071,
+        "candidate": 0.2427343726158142
+      },
+      "counts": {
+        "js": 128,
+        "control": 64,
+        "candidate": 64
+      },
+      "pairedMedianChangePercent": 0.5551929184669513,
+      "pairedWins": 8,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 0.517631343260927,
+      "candidateOverJS": 2.315201156347868,
+      "p95BatchMeanMs": {
+        "js": 0.1277734413743019,
+        "control": 0.28062500059604645,
+        "candidate": 0.30124999582767487
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.013164058327674866,
+        "control": 0.12707030773162842,
+        "candidate": 0.1353124976158142
+      },
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "pairedMedianChangePercent": 8.837816456868609,
+      "pairedWins": 6,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 6.486322439379966,
+      "candidateOverJS": 10.278934827517899,
+      "p95BatchMeanMs": {
+        "js": 0.03285156935453415,
+        "control": 0.5033593773841858,
+        "candidate": 0.2568359375
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.11515624821186066,
+        "control": 0.47562500834465027,
+        "candidate": 0.4548437297344208
+      },
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "pairedMedianChangePercent": -3.5714290178217145,
+      "pairedWins": 15,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -4.369256924179821,
+      "candidateOverJS": 3.9497963575334127,
+      "p95BatchMeanMs": {
+        "js": 0.14070312678813934,
+        "control": 0.5390625,
+        "candidate": 0.5617187321186066
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.11363281309604645,
+        "control": 0.2590624988079071,
+        "candidate": 0.2590624988079071
+      },
+      "counts": {
+        "js": 128,
+        "control": 64,
+        "candidate": 64
+      },
+      "pairedMedianChangePercent": -0.6467538771984693,
+      "pairedWins": 13,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 0,
+      "candidateOverJS": 2.2798212219646308,
+      "p95BatchMeanMs": {
+        "js": 0.12421874701976776,
+        "control": 0.2824999988079071,
+        "candidate": 0.2842968702316284
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.06828125566244125,
+        "control": 0.49296873807907104,
+        "candidate": 0.5490624904632568
+      },
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "pairedMedianChangePercent": 10.572830189527394,
+      "pairedWins": 2,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 11.378764625676618,
+      "candidateOverJS": 8.041189124840214,
+      "p95BatchMeanMs": {
+        "js": 0.16499999910593033,
+        "control": 0.6640625,
+        "candidate": 0.8735937476158142
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.5523437559604645,
+        "control": 2.1106250286102295,
+        "candidate": 2.103749990463257
+      },
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "pairedMedianChangePercent": -1.746461627173368,
+      "pairedWins": 14,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -0.3257347019853918,
+      "candidateOverJS": 3.808769390006173,
+      "p95BatchMeanMs": {
+        "js": 0.6198437511920929,
+        "control": 2.4187499284744263,
+        "candidate": 2.2981250286102295
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.6084375083446503,
+        "control": 1.3290625214576721,
+        "candidate": 1.3171875476837158
+      },
+      "counts": {
+        "js": 32,
+        "control": 16,
+        "candidate": 16
+      },
+      "pairedMedianChangePercent": -1.5144375142707056,
+      "pairedWins": 17,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -0.8934849626887509,
+      "candidateOverJS": 2.1648690779556494,
+      "p95BatchMeanMs": {
+        "js": 1.0610937476158142,
+        "control": 1.6150000095367432,
+        "candidate": 1.5518749952316284
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.07082030922174454,
+        "control": 0.4871875047683716,
+        "candidate": 0.5454687476158142
+      },
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "pairedMedianChangePercent": 11.743540034106402,
+      "pairedWins": 2,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 11.962795079309728,
+      "candidateOverJS": 7.702151453588041,
+      "p95BatchMeanMs": {
+        "js": 0.15773437172174454,
+        "control": 0.6309374868869781,
+        "candidate": 0.9501562416553497
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.6390624940395355,
+        "control": 2.1712499856948853,
+        "candidate": 2.179374933242798
+      },
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "pairedMedianChangePercent": 0.2035522053365435,
+      "pairedWins": 10,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 0.3742059920065932,
+      "candidateOverJS": 3.4102688760013056,
+      "p95BatchMeanMs": {
+        "js": 0.6820312738418579,
+        "control": 2.325624942779541,
+        "candidate": 2.293125033378601
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.682812511920929,
+        "control": 1.4040625095367432,
+        "candidate": 1.3925000429153442
+      },
+      "counts": {
+        "js": 32,
+        "control": 16,
+        "candidate": 16
+      },
+      "pairedMedianChangePercent": -0.6087904390179144,
+      "pairedWins": 12,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -0.8235008443615466,
+      "candidateOverJS": 2.039359294981107,
+      "p95BatchMeanMs": {
+        "js": 1.278593748807907,
+        "control": 1.665624976158142,
+        "candidate": 1.464687466621399
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.29093748331069946,
+        "control": 1.8743749856948853,
+        "candidate": 2.0674999952316284
+      },
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "pairedMedianChangePercent": 10.672460650008308,
+      "pairedWins": 2,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 10.30343506559046,
+      "candidateOverJS": 7.106337663008149,
+      "p95BatchMeanMs": {
+        "js": 0.6079687476158142,
+        "control": 2.8793751001358032,
+        "candidate": 3.178125023841858
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 2.0293749570846558,
+        "control": 8.3125,
+        "candidate": 8.292500019073486
+      },
+      "counts": {
+        "js": 8,
+        "control": 2,
+        "candidate": 2
+      },
+      "pairedMedianChangePercent": -0.18376559461988906,
+      "pairedWins": 12,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -0.24060127430391987,
+      "candidateOverJS": 4.086233542068669,
+      "p95BatchMeanMs": {
+        "js": 2.2168750762939453,
+        "control": 8.96999979019165,
+        "candidate": 9.019999980926514
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 2.4262499809265137,
+        "control": 5.461249828338623,
+        "candidate": 5.363749980926514
+      },
+      "counts": {
+        "js": 4,
+        "control": 4,
+        "candidate": 4
+      },
+      "pairedMedianChangePercent": -1.3591341964104275,
+      "pairedWins": 17,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -1.7853028240198632,
+      "candidateOverJS": 2.210716135226204,
+      "p95BatchMeanMs": {
+        "js": 2.90625,
+        "control": 6.286250114440918,
+        "candidate": 5.731250047683716
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.41015625,
+        "control": 1.919374942779541,
+        "candidate": 2.115000009536743
+      },
+      "counts": {
+        "js": 64,
+        "control": 8,
+        "candidate": 8
+      },
+      "pairedMedianChangePercent": 10.700003306070972,
+      "pairedWins": 4,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 10.192123612591697,
+      "candidateOverJS": 5.156571451822916,
+      "p95BatchMeanMs": {
+        "js": 0.4864843785762787,
+        "control": 3.090000033378601,
+        "candidate": 4.692499995231628
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 2.5118749141693115,
+        "control": 8.684999942779541,
+        "candidate": 8.78000020980835
+      },
+      "counts": {
+        "js": 8,
+        "control": 2,
+        "candidate": 2
+      },
+      "pairedMedianChangePercent": 1.5859262751461545,
+      "pairedWins": 6,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": 1.0938430357479545,
+      "candidateOverJS": 3.4953970678559587,
+      "p95BatchMeanMs": {
+        "js": 2.7862499952316284,
+        "control": 9.587500095367432,
+        "candidate": 9.595000267028809
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 2.944999933242798,
+        "control": 5.977499961853027,
+        "candidate": 5.877500057220459
+      },
+      "counts": {
+        "js": 8,
+        "control": 2,
+        "candidate": 2
+      },
+      "pairedMedianChangePercent": -1.135887473975561,
+      "pairedWins": 12,
+      "pairedTies": 0,
+      "pairs": 21,
+      "ratioOfMediansChangePercent": -1.6729386076243191,
+      "candidateOverJS": 1.995755582496271,
+      "p95BatchMeanMs": {
+        "js": 3.601249933242798,
+        "control": 6.547500133514404,
+        "candidate": 6.627500057220459
+      }
+    }
+  ],
+  "rowCount": 24,
+  "trialsPerLanePerRow": 21,
+  "sampleCount": 1512,
+  "erParsePairedChangePercentRange": [
+    8.837816456868609,
+    11.743540034106402
+  ],
+  "erParseWinsRange": [
+    2,
+    6
+  ],
+  "firstUse": "not run after clear ordinary-parse regression"
+}

@@ -1,0 +1,36 @@
+{
+  "status": "private-review-ready",
+  "baselineHead": "7ceb15edab31503e41493b9d0b67d0bfe0db06b9",
+  "baselineNote": "Current dense-array runtime; rejected canonical-string-index changes absent. Both permanent string Maps preserved.",
+  "patchSha256": "c5a80eb5362bf708386908ad2811b06bb21e625ba76838bcf18da222278cd51c",
+  "files": [
+    {
+      "path": "bindings/web/host-er-store.js",
+      "originalSha256": "a9c749d8a762326eaf75d4b07be4b6cdec7494be7180c5f4392b20d56f6836a2",
+      "candidateSha256": "0d44947ddc5f989a5fd0ddf892e4a788e7db56587e0142ed5dcd0fd8fb3ad752",
+      "originalMatchesProduction": true,
+      "baselineSource": "bindings/web/host-er-store.js"
+    },
+    {
+      "path": "crates/pele-wasm/src/host_er.rs",
+      "originalSha256": "eb3306bcc461eb27a659e42c7f7d48ee8932bd591f4291bd03e3c7f5c5af0bfb",
+      "candidateSha256": "10b2fd8c843d5d7ce24df86ff8c0647ef2862e61223f886b7feaeb32ba65dc13",
+      "originalMatchesProduction": true,
+      "baselineSource": "crates/pele-wasm/src/host_er.rs"
+    }
+  ],
+  "validation": {
+    "rustfmt": "passed private Rust file",
+    "nodeSyntax": "passed after dense baseline rebase",
+    "gitApplyCheck": "passed against restored dense production",
+    "builds": "not run",
+    "tests": "not run",
+    "measurements": "not run"
+  },
+  "eligibility": "arity3/4/6; String or Ref strictly before current node only",
+  "rebase": {
+    "supersededPatchSha256": "c5a80eb5362bf708386908ad2811b06bb21e625ba76838bcf18da222278cd51c",
+    "archive": "superseded-one-map",
+    "semanticChanges": "None in literal code. Baseline restored to original two permanent string Maps."
+  }
+}

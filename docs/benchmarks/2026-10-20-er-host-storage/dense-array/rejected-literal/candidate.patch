@@ -1,0 +1,72 @@
+--- a/bindings/web/host-er-store.js
++++ b/bindings/web/host-er-store.js
+@@ -432,6 +432,14 @@
+         default:bad();
+       }
+     };
++    // Complete-record events contain only strings and earlier object refs.
++    // No user conversion, callback or self-reference can run during decoding.
++    const recordValue=node=>{
++      const tag=u8(),id=u32();
++      if(tag===5&&id<this.strings.length)return this.strings[id];
++      if(tag===6&&id<node)return this.objects[id];
++      bad();
++    };
+     // Inline and fragmented nodes share publication and accounting rules.
+     const beginNode=(id,kind,length)=>{
+       if(this.constructionNode||this.constructionString||kind>4||id!==this.objects.length)bad();
+@@ -575,6 +583,33 @@
+           this.constructionBytes+=bytes;this.references+=length;
+           break;
+         }
++        case 13:{
++          if(this.constructionNode||this.constructionString)bad();
++          const id=u32(),layout=u8(),keys=this.constructionLayouts[layout];
++          if(!keys||id!==this.objects.length||(keys.length!==3&&keys.length!==4&&keys.length!==6))bad();
++          need(keys.length);
++          // Match allocate's admission before reading any value. Eligible
++          // references precede this node, so no observable empty shell is needed.
++          if(this.objects.length>=1_000_000)graphBudget();
++          const v0=recordValue(id),v1=recordValue(id),v2=recordValue(id);let object;
++          switch(keys.length){
++            case 3:object={[keys[0]]:v0,[keys[1]]:v1,[keys[2]]:v2};break;
++            case 4:{
++              const v3=recordValue(id);
++              object={[keys[0]]:v0,[keys[1]]:v1,[keys[2]]:v2,[keys[3]]:v3};break;
++            }
++            case 6:{
++              const v3=recordValue(id),v4=recordValue(id),v5=recordValue(id);
++              object={[keys[0]]:v0,[keys[1]]:v1,[keys[2]]:v2,[keys[3]]:v3,[keys[4]]:v4,[keys[5]]:v5};break;
++            }
++          }
++          // Eager identity publication is complete before the next event.
++          this.objects.push(object);this.ids.set(object,id);this.registry.owners.set(object,this);
++          const bytes=5+10*keys.length;
++          this.nodeBytes[id]=bytes;this.nodeRefs[id]=keys.length;
++          this.constructionBytes+=bytes;this.references+=keys.length;
++          break;
++        }
+         default:bad();
+       }
+     }
+--- a/crates/pele-wasm/src/host_er.rs
++++ b/crates/pele-wasm/src/host_er.rs
+@@ -1746,8 +1746,17 @@
+             ));
+         }
+         let id = self.nodes;
++        // A complete literal needs no empty shell when every reference already
++        // names a published node. Other atoms (especially NaN) keep the generic
++        // fresh-property path. These arities describe storage, not ER fields.
++        let complete = matches!(N, 3 | 4 | 6)
++            && values.iter().all(|value| match value {
++                Atom::String(_) => true,
++                Atom::Ref(reference) => *reference < id,
++                _ => false,
++            });
+         let bytes = 6 + values.iter().map(construction_atom_len).sum::<usize>();
+-        self.event(11, bytes)?;
++        self.event(if complete { 13 } else { 11 }, bytes)?;
+         self.frame.extend_from_slice(&id.to_le_bytes());
+         self.frame.push(layout as u8);
+         for value in values {

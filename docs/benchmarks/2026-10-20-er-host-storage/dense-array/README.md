@@ -37,6 +37,16 @@ ER parse rows regress, including small Canvas +5.25%. Its isolated package,
 retains the preceding two-index implementation; no first-use run was performed
 for the rejected experiment.
 
+The [computed-property record-literal experiment](rejected-literal/README.md)
+also passes 84 checks but regresses every ER parse condition by 8.84–11.74%.
+It is rejected and restored to this dense runtime. All 24 rows and package
+proof remain archived; no first-use run followed that regression.
+
+[Six saved dense-control profiles](profile/README.md) partition ER parse self
+time into 53.79% JavaScript, 31.55% WASM/runtime, 11.60% GC and remaining glue or
+unattributed samples. They identify separate host and native costs; they do not
+measure improvement or directly explain the rejected candidate's regression.
+
 ## Native and Swift controls
 
 One complete guarded Swift window compares the frozen d25 consumer with dense-array: six conditions ×15 pairs, **90 pairs with 45/45 first order**, matched 1000 ms warmup and batch cap 128. Native source inputs differ only in `er/public_model.rs` plus the rebuilt SDK archive. All results are retained:
