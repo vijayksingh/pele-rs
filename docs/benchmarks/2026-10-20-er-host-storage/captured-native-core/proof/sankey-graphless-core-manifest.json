@@ -1,0 +1,112 @@
+{
+  "baselineCommit": "3818fc7692a26049c4cb0950310a7a59fdbc7017",
+  "productionHeadAtFreeze": "ae15d16a757e679364209e6a9565c205c78eb595",
+  "patchSha256": "08a1f67ee88307cedbb45167e00582416ed419b0479c21d99fe5abc1dd2283d5",
+  "files": [
+    {
+      "path": "crates/pele/Cargo.toml",
+      "originalSha256": "341e1dbede29a242c7ea93e955d97a1e5b537118972ca136403e69b9c2c25dda",
+      "candidateSha256": "ad929f4d70e9c246943a5cca0663eba1cf3dfc3ecbd4aa4c9443ab43b0bcdab9",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/mod.rs",
+      "originalSha256": "7d560963fe1cecfa5fe7858ac74f63b95727420244e6887d536b596338d1f9a6",
+      "candidateSha256": "f6b41edd9492840bd43404eb557c050770d9e53588b64a264f55cd3610dfa644",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/public_model.rs",
+      "originalSha256": "0e60e476d22ac5a648556b6ecc492261126185c2fbd7d8c8d0e3f2d6306c0d81",
+      "candidateSha256": "39636e8187113ba69854cb1660297d4d71ee5ad915a3157bc2b9f0b364a45558",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/engine.rs",
+      "originalSha256": "f28d61ac0ff8e6d9fc5ae9742c110a007f195947a5c46bbfb54c7d705f649b76",
+      "candidateSha256": "71c6d9db7c115214157f76fcab35cddce76e05636d2a1592845628a2104f829f",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/host_sankey.rs",
+      "originalSha256": null,
+      "candidateSha256": "4e47bfa55ce06091552d1b3b40ed1f15c23230624c184c76196668c547c199c4",
+      "status": "new"
+    },
+    {
+      "path": "crates/pele/src/compat/mod.rs",
+      "originalSha256": "a49a7045f16601354392cb9889b2c333cc5e85c931645e2b264e1297f32b44b2",
+      "candidateSha256": "890073338c8fc91e94cd9f408322926416928e578d966ff613bfe3652c493b97",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/binary.rs",
+      "originalSha256": "e51e9c291a41aad102681d0d111733df7ce4dd256c266404788b6d39fd8b1803",
+      "candidateSha256": "3a6f253229fc5e33d17c32947ebfb63663fb01ccf53f60d34bb226a13ba1f07d",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/captured_admission.rs",
+      "originalSha256": "1fea81a7e4e989a8d5d20cdf718087d29a7d4bfb23b20d47dd0cbda37530f86c",
+      "candidateSha256": "e6310c87ebec52ddf7da92e3f98a7295c1d6f244e2e4999b7d427c605493367c",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/captured_read.rs",
+      "originalSha256": "0587fad212ff41a1a89c906cd9e6df8e3801649d13d6a7696658f8977bcaa21b",
+      "candidateSha256": "2e78667340177cd8e31523a66371070424660a8eda69d78571374a200e7cf02d",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/captured_transport.rs",
+      "originalSha256": null,
+      "candidateSha256": "b05a5b404e8df3c411a1390ba4be67847d0a0fe01468f112129cfc0e82b35120",
+      "status": "new"
+    },
+    {
+      "path": "crates/pele/src/compat/public/captured_write.rs",
+      "originalSha256": "c72da2e92d14a44f973f65985ed507de32be18c7d19de194d85df887d249829e",
+      "candidateSha256": "ccaf280d708f3cd3bd63ee76b5b225ea1daec261e58defdc6dbf56dbf954b6d6",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/engine.rs",
+      "originalSha256": "15b971f94ff82d76c57b44ed8a39e432c16db5ccc4032485ba424755083747bd",
+      "candidateSha256": "eadb4c1789b0d99a13ab44d84b438d25a398d8bba1eba6be049f56e1dccc4963",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/graph.rs",
+      "originalSha256": "75b5a79e014a3c9def6138d55cdf0ad770c15a73a910bcec3d78128d0e14d165",
+      "candidateSha256": "981d480dfb4dbe4f9bf71763b9ba891b70301561bccb36564c68177297e6735b",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/mod.rs",
+      "originalSha256": "b6270b049e8b879a4ae09d2df9cd862a336edc0166483ce2c2ea676721e313b2",
+      "candidateSha256": "b180db81fa5f3a90bd49efeb565aef3205d1fe716ad73615d827d9e6ff2d0577",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/src/compat/public/schema.rs",
+      "originalSha256": "109615681e58228bad8139dfb44123d84ec3e863bda392e58270e567f80e6249",
+      "candidateSha256": "31895ddbda1c53231a8c4cfddba05ce9b6f1a1c142d60f8a1043fc914b87b79f",
+      "status": "modified"
+    },
+    {
+      "path": "crates/pele/tests/public_sankey_graphless.rs",
+      "originalSha256": null,
+      "candidateSha256": "eded086af27ca8af58fb87d61115edea7ba27004b5fc2c1abb45d357c0dc7b4f",
+      "status": "new"
+    }
+  ],
+  "validation": {
+    "originalsMatchProduction": true,
+    "rustfmt": "passed",
+    "gitApplyCheck": "passed",
+    "build": "not run; parent owned",
+    "tests": "not run; parent owned",
+    "browserSelection": "disabled; no adapter wiring"
+  },
+  "scope": "private native graphless Sankey owner and shared independent admission; no production edits"
+}

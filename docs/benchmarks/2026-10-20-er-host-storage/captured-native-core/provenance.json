@@ -1,0 +1,165 @@
+{
+  "scope": "Captured correctness records only; no included binaries or packages; immutable Git mappings independently read during packaging. No timings.",
+  "origins": {
+    "proof/before-sdk.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/before-sdk.json",
+      "sourceSha256": "99a340a87ea3b2eac553ea2617ecb7f1659e36e5a409f1e35ee76956e1e937a4",
+      "gzip": true
+    },
+    "proof/after-sdk.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/after-sdk.json",
+      "sourceSha256": "6f691cf757cd140b14412e4f85d5993b1b4b7a224e99c8aef1457dfac6650cfb",
+      "gzip": true
+    },
+    "proof/before-correctness.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/before-correctness.json",
+      "sourceSha256": "dc337913ae4e36e91c6c85fcfa57fb3b49d1a7793edbd125f7f11817759d511c",
+      "gzip": true
+    },
+    "proof/after-correctness.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/after-correctness.json",
+      "sourceSha256": "db5ec39719d1126bb88f51438252a9c729b46d47d5a52282586113c025a9af98",
+      "gzip": true
+    },
+    "proof/correctness-commands.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/correctness-commands.json",
+      "sourceSha256": "2beeac0ebac4aa4795d971a78923a3d2f41042754bd2b1e1e530100a27c3af65",
+      "gzip": true
+    },
+    "proof/c-consumers.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/c-consumers.json",
+      "sourceSha256": "f126479d22e86e49305f3e7df7d358170f3e8cf0877e1c4cee3331ea2f6e1285",
+      "gzip": true
+    },
+    "proof/attempt-started.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/attempt-started.json",
+      "sourceSha256": "dc1abe9d04986eb79f89f8a64f8ede71299e49cd58467eb7f9499c79b01bd4e0",
+      "gzip": true
+    },
+    "execution/freeze.mjs": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/freeze.mjs",
+      "sourceSha256": "b94861dec01cab0e681bdb177c5c5e2ed72d3713b77f17a55f3d31a9fe661dae",
+      "gzip": false
+    },
+    "execution/run-correctness.py": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/runtime/run-correctness.py",
+      "sourceSha256": "2e10a2829ced206d163e8c4b667fae12ecc08340209559dc2d21c536fe496297",
+      "gzip": false
+    },
+    "proof/swift-build-manifest.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/candidate-swift/swift-build-manifest.json",
+      "sourceSha256": "0c784216ffbe5ed236aa189724bf93bb76876d2d3096f85e3743847d36c89adb",
+      "gzip": true
+    },
+    "proof/swift-api.json.gz": {
+      "source": "dist/evidence/captured-native-core-swift-api.json",
+      "sourceSha256": "de7f5c6d2aa0200ddd7f3de70184fdc35e77c5ce5f2afc543508c3ac56609729",
+      "gzip": true
+    },
+    "logs/captured-native-core-ffi-compile.log.gz": {
+      "source": "dist/evidence/captured-native-core-ffi-compile.log",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip": true
+    },
+    "logs/captured-native-core-ffi-parse-limits-compile.log.gz": {
+      "source": "dist/evidence/captured-native-core-ffi-parse-limits-compile.log",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip": true
+    },
+    "logs/captured-native-core-ffi-parse-limits-run.log.gz": {
+      "source": "dist/evidence/captured-native-core-ffi-parse-limits-run.log",
+      "sourceSha256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
+      "gzip": true
+    },
+    "logs/captured-native-core-ffi-public-compile.log.gz": {
+      "source": "dist/evidence/captured-native-core-ffi-public-compile.log",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "gzip": true
+    },
+    "logs/captured-native-core-ffi-public-run.log.gz": {
+      "source": "dist/evidence/captured-native-core-ffi-public-run.log",
+      "sourceSha256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+      "gzip": true
+    },
+    "logs/captured-native-core-ffi-run.log.gz": {
+      "source": "dist/evidence/captured-native-core-ffi-run.log",
+      "sourceSha256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+      "gzip": true
+    },
+    "logs/captured-native-core-freeze-after-correctness.log.gz": {
+      "source": "dist/evidence/captured-native-core-freeze-after-correctness.log",
+      "sourceSha256": "9c00befe841c28c667672980f3d938c398f572655e3d567cb995d05dd1047e3a",
+      "gzip": true
+    },
+    "logs/captured-native-core-freeze-after-sdk.log.gz": {
+      "source": "dist/evidence/captured-native-core-freeze-after-sdk.log",
+      "sourceSha256": "839ba8e94f499d8f1b587c092c0863b0fa5d0f6008f03464ace6aa11f84cf354",
+      "gzip": true
+    },
+    "logs/captured-native-core-freeze-before-correctness.log.gz": {
+      "source": "dist/evidence/captured-native-core-freeze-before-correctness.log",
+      "sourceSha256": "27d59460348fa598a93fb52853517f76af49b87b1ed2dfe2a4e8de3bae9ff691",
+      "gzip": true
+    },
+    "logs/captured-native-core-freeze-before-sdk.log.gz": {
+      "source": "dist/evidence/captured-native-core-freeze-before-sdk.log",
+      "sourceSha256": "50475ba8e8601ed3d116457ad239510afdddbc9e85378d56532082f0dd4e0e3d",
+      "gzip": true
+    },
+    "logs/captured-native-core-sdk-build.log.gz": {
+      "source": "dist/evidence/captured-native-core-sdk-build.log",
+      "sourceSha256": "baebb97996252551c083f13b477cdd7eb8c06ccf3b50979e2c82afa28fd28243",
+      "gzip": true
+    },
+    "logs/captured-native-core-swift-api.log.gz": {
+      "source": "dist/evidence/captured-native-core-swift-api.log",
+      "sourceSha256": "5dccb1699b96055fcb0cfe7f14d0f4dae3cd40c6acfcf0c42af6d17a9776734e",
+      "gzip": true
+    },
+    "logs/captured-native-core-swift-build.log.gz": {
+      "source": "dist/evidence/captured-native-core-swift-build.log",
+      "sourceSha256": "aab8e5cc130c7ee47db4a6d1a7e172ca8c1e29a743a841e69554ad16df8fce1c",
+      "gzip": true
+    },
+    "logs/captured-native-core-swift-corpus.log.gz": {
+      "source": "dist/evidence/captured-native-core-swift-corpus.log",
+      "sourceSha256": "4af320ecb1a5e5427158b5878cb91b0a3af648d3ae57c4d6fa27484f0d6811a6",
+      "gzip": true
+    },
+    "logs/sankey-graphless-core-native.log.gz": {
+      "source": "dist/evidence/sankey-graphless-core-native.log",
+      "sourceSha256": "f72998e204649ef166fe9e0f4de009f924d678441ccc39d34d1d9cf27e2ba968",
+      "gzip": true
+    },
+    "logs/sankey-graphless-default-native.log.gz": {
+      "source": "dist/evidence/sankey-graphless-default-native.log",
+      "sourceSha256": "9bf6b55780ad56a5ad022a2f3d064875bfc4d36be68292136c88ca3164055bff",
+      "gzip": true
+    },
+    "logs/combined-host-dispatch-native.log.gz": {
+      "source": "dist/evidence/combined-host-dispatch-native.log",
+      "sourceSha256": "ccc1bf915fa60f38afdce236107be650289e2ac22654068e8b6ff58f8b530c24",
+      "gzip": true
+    },
+    "proof/sankey-graphless-core-manifest.json": {
+      "source": "dist/perf-patches/parse-architecture/sankey-graphless-core/manifest.json",
+      "sourceSha256": "827a4247d3e0bd9d718b72d599d762dc99d8f55cdb3362fa8bb19ff467677990",
+      "gzip": false
+    },
+    "proof/combined-host-dispatch-manifest.json": {
+      "source": "dist/perf-patches/parse-architecture/combined-host-dispatch/manifest.json",
+      "sourceSha256": "5c6f628f48fbacb16168e843fb5a905eec68eaca80c06f07ce2738daa150feba",
+      "gzip": false
+    },
+    "execution/swift-build.mjs": {
+      "source": "scripts/perf/swift/build.mjs",
+      "sourceSha256": "c6d23dc6f051bb181e25a7290c958970a2b1e2d67b24f3550ed928c355ea0cb5",
+      "gzip": false
+    },
+    "execution/swift-run.mjs": {
+      "source": "scripts/perf/swift/run.mjs",
+      "sourceSha256": "d69cc871f08bc486ebfc624abb416b3bd1859cebb749c2a49cb8c2bd0abbeb59",
+      "gzip": false
+    }
+  }
+}

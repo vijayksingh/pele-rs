@@ -1,0 +1,96 @@
+{
+  "scope": "JavaScript constructor decoder only; no newly compiled Rust/WASM",
+  "wasmSourceCommit": "365ec6d0df050199f9efb93d23d9ce7d352c60fa",
+  "controlBrowserCommit": "e48ea33f65294f752fa5f3bee85c67611fb5db36",
+  "newNativeCoreIncluded": false,
+  "variants": {
+    "v1": {
+      "freezeAllFilesRechecked": true,
+      "runtimeFiles": 109,
+      "changed": [
+        "constructor-storage.js",
+        "flat-constructor.js",
+        "host-er-store.js",
+        "package.json"
+      ],
+      "sourcePatchSha256": "5a62144a2e1286ae7e0dd02fd97c0d6c624278fe8cf9e07e8ef55a05c9ae7cda",
+      "syntax": [
+        {
+          "path": "constructor-storage.js",
+          "sha256": "d97fbe745769cf63bc3510c134820b601854999c6ad655ef833c3f0e21d9722d",
+          "command": "node --check <frozen candidate package>/constructor-storage.js",
+          "exitCode": 0
+        },
+        {
+          "path": "flat-constructor.js",
+          "sha256": "011312d3493461ab66009d49ae00e52ec210f288755bd7fc57684bfdd8979bff",
+          "command": "node --check <frozen candidate package>/flat-constructor.js",
+          "exitCode": 0
+        },
+        {
+          "path": "host-er-store.js",
+          "sha256": "dee85deb947bbd4a732669933d074bfe059b8fa8456b25cf1edd0e600ec23177",
+          "command": "node --check <frozen candidate package>/host-er-store.js",
+          "exitCode": 0
+        }
+      ],
+      "wasmSha256": "3f6c40133130905f170ba582b3b9ef0c8718e795f2305e402200d5877563fc5b",
+      "status": "rejected"
+    },
+    "v2": {
+      "freezeAllFilesRechecked": true,
+      "runtimeFiles": 109,
+      "changed": [
+        "constructor-storage.js",
+        "flat-constructor.js",
+        "host-er-store.js",
+        "package.json"
+      ],
+      "sourcePatchSha256": "632455d0352390966b1b0a5460581d9f92285179d4d01f714db515df50598228",
+      "syntax": [
+        {
+          "path": "constructor-storage.js",
+          "sha256": "6b11e301d8d45fc8fd39ebfb7e398831dd3d1baaca0cde8f5e966913d48005a4",
+          "command": "node --check <frozen candidate package>/constructor-storage.js",
+          "exitCode": 0
+        },
+        {
+          "path": "flat-constructor.js",
+          "sha256": "1442ae694e62b3db28d5852f31ed2ba5234707560458552426579b5150d2393d",
+          "command": "node --check <frozen candidate package>/flat-constructor.js",
+          "exitCode": 0
+        },
+        {
+          "path": "host-er-store.js",
+          "sha256": "e57c96409d693f6fb7db8a17e872397a18434cc618239988295340cf423f3eeb",
+          "command": "node --check <frozen candidate package>/host-er-store.js",
+          "exitCode": 0
+        }
+      ],
+      "wasmSha256": "3f6c40133130905f170ba582b3b9ef0c8718e795f2305e402200d5877563fc5b",
+      "status": "evaluated bulk storage redesign"
+    }
+  },
+  "logs": [
+    {
+      "file": "v1/focused-web.log.gz",
+      "uncompressedSha256": "49b9721703fc99e363f46479f45a534c2425b81d806256808f42422d8906f107",
+      "passed": 57
+    },
+    {
+      "file": "v1/vm.log.gz",
+      "uncompressedSha256": "9b10846286627af6b475925e2bf693cdbf92b4146da557f1430056a54765de38",
+      "passed": null
+    },
+    {
+      "file": "v2/focused-web.log.gz",
+      "uncompressedSha256": "89dd9f3cdc056cf7ff265d073e4b1a0ca064debd9cb846c10e5c64c14d3321d7",
+      "passed": 57
+    },
+    {
+      "file": "v2/vm.log.gz",
+      "uncompressedSha256": "288e0b6bacc3094f47f44ee2cadba4749e7cf54c167d645145c71a83f42b1603",
+      "passed": null
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "sourceHead": "25d87cb49bb451d3e7c1e70c2856ccb6fef4abd0",
+  "patchSha256": "74742ebcb964e2cad0d12f7e48678170fdc0baa13be478ec8edf190af1bdbdcb",
+  "files": {
+    "crates/pele/src/compat/host_sankey.rs": {
+      "originalSha256": "4e47bfa55ce06091552d1b3b40ed1f15c23230624c184c76196668c547c199c4",
+      "candidateSha256": "ba939557a2936bb3088e308c3a7536b9796ca88e86b73dc69368dd8bc9f4c37a"
+    },
+    "crates/pele/src/compat/public/engine.rs": {
+      "originalSha256": "eadb4c1789b0d99a13ab44d84b438d25a398d8bba1eba6be049f56e1dccc4963",
+      "candidateSha256": "e0451e5f41fa7325c3c950688a54b85fd68ce825bd658498ed484b4d5d352ed2"
+    },
+    "crates/pele/tests/public_sankey_graphless.rs": {
+      "originalSha256": "eded086af27ca8af58fb87d61115edea7ba27004b5fc2c1abb45d357c0dc7b4f",
+      "candidateSha256": "d4fd50795f7629e16d95713363f3b6576147e4dbb745f0687ed0ca620529d8cd"
+    }
+  },
+  "validation": {
+    "gitApplyCheck": "passed",
+    "rustfmt": "passed 1.98.1, private files only",
+    "existingErEligibleBody": "byte-equal after extraction",
+    "execution": "NOT RUN: parent owns builds and integration gates"
+  }
+}

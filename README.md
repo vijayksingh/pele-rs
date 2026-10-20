@@ -190,6 +190,8 @@ adverse conditions. Both packages use identical `365ec6d` WASM. These results co
 only the browser traversal preparation, not the later native graphless Sankey owner
 and not the 126-condition release gate.
 
+The [shared constructor evidence](docs/benchmarks/2026-10-20-er-host-storage/shared-constructor/README.md) retains both the rejected per-field extraction and its bulk-storage redesign. V1 increased all six ER parse conditions (median paired +5.45%). V2 removes the per-record wrapper/per-field sink callback while preserving the shared wire decoder: parse shifts −0.84% to +1.86% (median −0.33%, four lower/two higher), with retained/source controls mixed. Each version passed 57 focused browser checks; both VM runs used the same frozen `365ec6d` WASM and accepted V2 traversal control. These are descriptive enabling-layer results, not neutrality, a general speedup, a new Sankey backend or a passing release gate.
+
 An earlier [storage preparation](docs/benchmarks/2026-10-20-er-host-storage/shared-public-primitives/),
 source `1906d68`, separates construction and projection from native graph storage.
 It still retains the arena and initial snapshot/decode. Its 30-condition VM run
@@ -232,8 +234,14 @@ Correctness is pinned separately from performance:
   and repair. Fresh SDK at `365ec6d` passes Swift 16, strict C3 and API168 with all
   354 source/SDK inputs unchanged. The traversal experiment stopped at 147 browser
   passes, one interruption and 269 unrun checks; it is not a full-suite pass.
-- Captured admission `3818fc7`: **42 native integrations** pass. SDK and browser
-  artifacts above remain pinned to their earlier sources.
+- Captured native core `25d87cb`: **61 feature-enabled and 29 default native
+  integrations** pass. Its fresh arm64 SDK passes Swift 16, strict C3 and API168;
+  the ER/Sankey corpus covers 12,481 drawings and 16,572 expected errors with zero
+  explicit budget differences. All 357 source/SDK inputs stay unchanged through
+  correctness. Later combined source dispatch `eb72419` passes **22 native
+  integrations** separately; the SDK proof remains pinned to `25d87cb`.
+  [Exact logs, source bindings and portable verifier](docs/benchmarks/2026-10-20-er-host-storage/captured-native-core/README.md).
+  These overlapping checks do not establish captured-browser validation or latency.
 
 Work now targets complete captured Sankey storage, preserving an eager render
 projection and full callback restoration while removing the persistent native
