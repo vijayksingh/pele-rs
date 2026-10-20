@@ -170,12 +170,12 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     } finally { entry.busy = false; }
   }
   function hostOperation(entry,kind,values,call) {
-    const owner=entry.hostStore,token=owner.begin(kind,values);
+    const owner=entry.hostStore,token=owner.begin(kind,values,kind==='render'&&typeof entry.handle.render_host_frame_packet==='function');
     let original,failed=false,outcome,error,thrown=false,json,packetBytes;
     const capture=value=>{if(!failed){failed=true;original=value;}};
     const resource=fn=>fn&&((...args)=>owner.resource(()=>{try{return fn(...args);}catch(value){capture(value);throw value;}}));
     try {
-      const response=call(owner.primitive.bind(owner),capture,()=>owner.structure(token),resource,token.audit.args);
+      const response=call(owner.primitive.bind(owner),capture,()=>owner.structure(token),resource,token.audit.args,()=>{const frame=token.audit.readFrame;token.audit.readFrame=undefined;return frame;});
       if(typeof response==='string'){
         json=response;outcome=JSON.parse(json);
         if(kind==='method'&&outcome&&Object.hasOwn(outcome,'Ok'))outcome.Ok=nativeAtomValue(owner,outcome.Ok);
@@ -493,7 +493,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           const document = documents.get(input);
           if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
           if(document.hostStore){
-            const value=hostOperation(document,'render',[],(primitive,capture,finish,resource)=>(document.handle.render_host_packet??document.handle.render_host).call(document.handle,primitive,capture,finish,numeric.json,numeric.mask,numeric.numbers,numeric.outputKind,numeric.output,resource(width),resource(icons),resource(clock)));
+            const value=hostOperation(document,'render',[],(primitive,capture,finish,resource,_values,takeFrame)=>(document.handle.render_host_frame_packet??document.handle.render_host_packet??document.handle.render_host).call(document.handle,primitive,capture,finish,numeric.json,numeric.mask,numeric.numbers,numeric.outputKind,numeric.output,resource(width),resource(icons),resource(clock),takeFrame()));
             if(callbackFailed)throw callbackError;return renderedValue(value);
           }
           if (document.bridge) {

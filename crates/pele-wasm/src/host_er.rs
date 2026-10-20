@@ -1,5 +1,8 @@
 //! Operation-scoped host storage. No model externref is retained by a policy.
+#[path = "er_entry_frame.rs"]
+mod entry_frame;
 use super::wasm_registry::NativeRegistry;
+use entry_frame::EntryFrame;
 use js_sys::{Array, Function, Uint16Array, Uint8Array};
 use pele::compat::{
     host_er::{MethodStore, RenderStore},
@@ -211,6 +214,7 @@ pub struct HostStore {
     // results are never cached. A full cache changes cost, never admission.
     unit_cache: RefCell<HashMap<u32, Rc<Vec<u16>>>>,
     cached_units: Cell<usize>,
+    entry_frame: Option<Rc<RefCell<Option<EntryFrame>>>>,
 }
 pub enum Cursor {
     Array(u32, u32),
@@ -235,13 +239,28 @@ impl HostStore {
             live_units: Cell::new(0),
             unit_cache: RefCell::new(HashMap::new()),
             cached_units: Cell::new(0),
+            entry_frame: None,
         };
         value.root = atom(value.call("root", &[])?)?;
         value.refs = unsigned(&Array::from(&value.call("counts", &[])?).get(3))? as usize;
         value.context = value.call("context", &[])?;
         Ok(value)
     }
+    fn attach_frame(&mut self, frame: Option<Uint8Array>) {
+        self.entry_frame = frame
+            .filter(|bytes| bytes.length() as usize <= entry_frame::MAX_BYTES)
+            .and_then(|bytes| EntryFrame::decode(bytes.to_vec()))
+            .map(|value| Rc::new(RefCell::new(Some(value))));
+    }
+    fn frame<T>(&self, read: impl FnOnce(&EntryFrame) -> Option<T>) -> Option<T> {
+        self.entry_frame
+            .as_ref()
+            .and_then(|frame| frame.borrow().as_ref().and_then(read))
+    }
     fn call(&self, op: &str, args: &[JsValue]) -> Result<JsValue, PublicError> {
+        if matches!(op, "joinUnits" | "coerceUnits" | "stringFailure") {
+            discard_frame(&self.entry_frame);
+        }
         let arguments = Array::new();
         for value in args {
             arguments.push(value);
@@ -309,6 +328,9 @@ impl HostStore {
         }))
     }
     fn kind(&self, id: u32) -> Result<(u32, u32), PublicError> {
+        if let Some(value) = self.frame(|frame| frame.kind(id)) {
+            return Ok(value);
+        }
         let word = self.captured(read_kind(&self.context, id))?;
         if !word.is_finite() || word < 0.0 || word >= (6_u64 << 32) as f64 || word.fract() != 0.0 {
             return Err(invalid("Invalid host kind word"));
@@ -329,6 +351,9 @@ impl HostStore {
         })
     }
     fn own_count(&self, id: u32) -> Result<usize, PublicError> {
+        if let Some(value) = self.frame(|frame| frame.own_count(id)) {
+            return Ok(value);
+        }
         let count = self.captured(read_own_count(&self.context, id))?;
         // Match unsigned() validation without another JsValue conversion.
         if count.is_finite() && count >= 0.0 && count <= u32::MAX as f64 && count.fract() == 0.0 {
@@ -338,6 +363,9 @@ impl HostStore {
         }
     }
     fn peek_own(&self, id: u32, key: &str) -> Result<Option<Atom>, PublicError> {
+        if let Some(value) = self.frame(|frame| frame.own(id, key)) {
+            return Ok(value);
+        }
         let key = self.key(key);
         let word = self.captured(read_own(&self.context, id, key.as_ref()))?;
         self.read_atom(word)
@@ -346,6 +374,9 @@ impl HostStore {
         let Ok(index) = u32::try_from(index) else {
             return self.peek_own(id, &index.to_string());
         };
+        if let Some(value) = self.frame(|frame| frame.index(id, index)) {
+            return Ok(value);
+        }
         let word = self.captured(read_index(&self.context, id, index))?;
         self.read_atom(word)
     }
@@ -356,11 +387,16 @@ impl HostStore {
         if let Some(units) = known {
             return Ok(units);
         }
-        let data = self.captured(read_units(&self.context, id))?;
-        if data.length() > 16_000_000 {
-            return Err(limit());
-        }
-        let units = Rc::new(data.to_vec());
+        let units = if let Some(units) = self.frame(|frame| frame.units(id)) {
+            units
+        } else {
+            let data = self.captured(read_units(&self.context, id))?;
+            if data.length() > 16_000_000 {
+                return Err(limit());
+            }
+            data.to_vec()
+        };
+        let units = Rc::new(units);
         let mut cache = self.unit_cache.borrow_mut();
         // These are optional storage caps, not graph/string limits. Permanent
         // and temporary string histories retain their existing independent
@@ -884,6 +920,9 @@ impl RenderStore for HostStore {
         if length > 1_000_000 {
             return Err(pele(limit()));
         }
+        if let Some(entries) = self.frame(|frame| frame.map_entries(*id)) {
+            return Ok(entries);
+        }
         let cursor = self
             .captured(read_map_iterator(&self.context, *id))
             .map_err(pele)?;
@@ -1051,6 +1090,81 @@ impl RenderStore for HostStore {
     }
 }
 
+fn discard_frame(frame: &Option<Rc<RefCell<Option<EntryFrame>>>>) {
+    if let Some(frame) = frame {
+        frame.borrow_mut().take();
+    }
+}
+struct FrameResources<R> {
+    frame: Option<Rc<RefCell<Option<EntryFrame>>>>,
+    inner: R,
+}
+impl<R: pele::compat::RenderResources> pele::compat::RenderResources for FrameResources<R> {
+    fn host_function(
+        &mut self,
+        reference: u32,
+    ) -> Result<Rc<dyn pele::compat::public::HostFunction>, PublicError> {
+        discard_frame(&self.frame);
+        self.inner.host_function(reference)
+    }
+    fn presentation_budget(&self) -> Option<pele::compat::PresentationBudget> {
+        self.inner.presentation_budget()
+    }
+    fn capture_presentation(&mut self, outcome: pele::compat::PresentationOutcome) {
+        discard_frame(&self.frame);
+        self.inner.capture_presentation(outcome);
+    }
+    fn image(&mut self, uri: &str) -> Result<pele::compat::ImageResource, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.image(uri)
+    }
+    fn text_width(&mut self, request: pele::compat::TextRequest<'_>) -> Result<f64, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.text_width(request)
+    }
+    fn icon(&mut self, name: &str) -> Result<Option<pele::compat::TrustedSvg>, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.icon(name)
+    }
+    fn raw_inline_icon(
+        &mut self,
+        name: &str,
+    ) -> Result<Option<pele::compat::TrustedSvg>, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.raw_inline_icon(name)
+    }
+    fn direct_icon(&mut self, name: &str) -> Result<Option<pele::compat::TrustedSvg>, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.direct_icon(name)
+    }
+    fn parse_date(&mut self, value: &str) -> Result<Option<f64>, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.parse_date(value)
+    }
+    fn calendar_fields(
+        &mut self,
+        value: f64,
+    ) -> Result<Option<pele::compat::CalendarFields>, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.calendar_fields(value)
+    }
+    fn calendar_instant(
+        &mut self,
+        value: pele::compat::CivilDateTime,
+    ) -> Result<Option<f64>, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.calendar_instant(value)
+    }
+    fn direct_now_millis(&mut self) -> Result<f64, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.direct_now_millis()
+    }
+    fn now_millis(&mut self) -> Result<f64, PeleError> {
+        discard_frame(&self.frame);
+        self.inner.now_millis()
+    }
+}
+
 /// Temporary facade selection: captured policy plus originating registry.
 /// Released after adoption; it never owns the caller root or a graph.
 #[wasm_bindgen(js_name=HostErEntrySelection)]
@@ -1133,6 +1247,7 @@ impl HostErDocument {
             width,
             icons,
             clock,
+            None,
         )?;
         metadata(&result.as_ref().map(pele::compat::render_result_transport))
     }
@@ -1163,6 +1278,48 @@ impl HostErDocument {
             width,
             icons,
             clock,
+            None,
+        )?;
+        let transport = result.as_ref().map(pele::compat::render_result_transport);
+        match &result {
+            Ok(value) => successful_packet(
+                false,
+                value.diagram_type.as_str(),
+                &value.rendered,
+                &transport,
+            ),
+            Err(_) => metadata(&transport).map(JsValue::from),
+        }
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_host_frame_packet(
+        &self,
+        primitive: Function,
+        capture: Function,
+        finish: Function,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        output_kind: u32,
+        output: f64,
+        width: Option<Function>,
+        icons: Option<Function>,
+        clock: Option<Function>,
+        frame: Option<Uint8Array>,
+    ) -> Result<JsValue, JsValue> {
+        let result = self.render_host_body(
+            primitive,
+            capture,
+            finish,
+            json,
+            mask,
+            numbers,
+            output_kind,
+            output,
+            width,
+            icons,
+            clock,
+            frame,
         )?;
         let transport = result.as_ref().map(pele::compat::render_result_transport);
         match &result {
@@ -1255,20 +1412,25 @@ impl HostErDocument {
         width: Option<Function>,
         icons: Option<Function>,
         clock: Option<Function>,
+        frame: Option<Uint8Array>,
     ) -> Result<Result<pele::compat::RenderResult, PublicError>, JsValue> {
         let (options, limit) =
             super::render_numbers::options(json, mask, numbers, output_kind, output)
                 .map_err(native_failure)?;
         let result = (|| {
-            let store = HostStore::new(primitive, capture).map_err(pele)?;
+            let mut store = HostStore::new(primitive, capture).map_err(pele)?;
+            store.attach_frame(frame);
             pele::compat::host_er::validate_render(&store)?;
             self.policy.render(
                 &store,
                 &options,
                 limit,
-                &mut super::render_numbers::NumericResources {
-                    browser: super::BrowserResources { width, icons },
-                    clock,
+                &mut FrameResources {
+                    frame: store.entry_frame.clone(),
+                    inner: super::render_numbers::NumericResources {
+                        browser: super::BrowserResources { width, icons },
+                        clock,
+                    },
                 },
             )
         })()

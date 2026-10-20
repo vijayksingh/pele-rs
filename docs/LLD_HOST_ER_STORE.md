@@ -106,6 +106,30 @@ slot. Temporary observed handles survive until the outer operation ends, even
 when nested admission promotes the underlying object. Active disposal remains
 rejected. The policy contains no permanent JS root and no core Send weakening.
 
+## Operation-local entry reads
+
+Outermost normal host ER renders can encode the own-data observations already
+made by entry audit into one optional flat read frame. Native admission and safe
+initial reads use bounded byte offsets rather than repeating per-field host
+imports. This is temporary storage for one operation, with no property mirror
+or retained imported model. UTF16 validation and per-occurrence work charges
+remain at their original native read positions.
+
+The native frame plus node/string offsets is capped at 8 MiB. A full or invalid
+optional frame falls back to the existing live reader, with no new public Limit.
+JS staging and native copies may coexist; this logical cap is not process peak.
+All callbacks/resources and generic user conversion boundaries drop the frame
+before entering host code, and it is never restored. Borrowed frame accesses
+return owned values before an import. Captured row/style handles retain their
+existing lifetime; later reads remain live.
+
+Raw rendering remains live because config serialization can mutate the model
+after entry audit. Nested rendering remains live to preserve temporary canonical
+IDs across nested admission. Both stay supported. Methods, source rendering,
+construction and old JSON/packet exports keep their existing paths. Universal
+Proxy/intrinsic observation equivalence remains outside the documented model
+contract; the initial raw Proxy rejection controls are unchanged.
+
 ## Successful result transport
 
 Additive browser-only render endpoints transfer successful SVG, dimension bits

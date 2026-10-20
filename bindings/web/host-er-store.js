@@ -188,6 +188,41 @@ export function hostErReadMapChunk(context,cursor,maximum){
   return bytes.subarray(0,offset);
 }
 
+// Optional read-mode scratch, never a retained model. Public limits still belong
+// to audit(); exceeding this cap silently falls back to existing live imports.
+const ENTRY_FRAME_BYTES=8*1024*1024;
+class EntryReadFrame {
+  constructor(){this.bytes=new Uint8Array(2048);this.view=new DataView(this.bytes.buffer);this.used=12;this.records=0;}
+  abandon(){this.bytes=null;this.view=null;}
+  room(count){
+    if(!this.bytes)return false;
+    if(count>ENTRY_FRAME_BYTES-this.used){this.abandon();return false;}
+    if(this.used+count>this.bytes.length){let size=this.bytes.length;while(size<this.used+count)size=Math.min(ENTRY_FRAME_BYTES,size*2);const next=new Uint8Array(size);next.set(this.bytes.subarray(0,this.used));this.bytes=next;this.view=new DataView(next.buffer);}
+    return true;
+  }
+  node(id){if(!this.room(17))return -1;const offset=this.used;this.used+=17;this.view.setUint32(offset,id,true);this.records++;return offset;}
+  atom(value){
+    this.view.setUint8(this.used,value[0]);
+    this.view.setBigUint64(this.used+1,value[0]===4?BigInt('0x'+value[1]):BigInt(value[1]??0),true);this.used+=9;
+  }
+  property(key,flags,value){if(!this.room(14))return;this.view.setUint32(this.used,key,true);this.view.setUint8(this.used+4,flags);this.used+=5;this.atom(value);}
+  pair(key,value){if(this.room(18)){this.atom(key);this.atom(value);}}
+  item(value){if(this.room(9))this.atom(value);}
+  end(offset,kind,data,properties,entries){
+    if(!this.bytes||offset<0)return;
+    if(!Number.isInteger(data)||data<0||data>0xffffffff){this.abandon();return;}
+    this.view.setUint8(offset+4,kind);this.view.setUint32(offset+5,data,true);this.view.setUint32(offset+9,properties,true);this.view.setUint32(offset+13,entries,true);
+  }
+  finish(owner){
+    if(!this.bytes)return undefined;
+    const offsets=4*(owner.objects.length+owner.strings.length),strings=4*owner.strings.length+2*owner.units;
+    if(offsets+strings>ENTRY_FRAME_BYTES-this.used||!this.room(strings)){this.abandon();return undefined;}
+    this.view.setUint32(0,owner.objects.length,true);this.view.setUint32(4,owner.strings.length,true);this.view.setUint32(8,this.records,true);
+    for(const text of owner.strings){this.view.setUint32(this.used,text.length,true);this.used+=4;for(let i=0;i<text.length;i++){this.view.setUint16(this.used,text.charCodeAt(i),true);this.used+=2;}}
+    return this.bytes.subarray(0,this.used);
+  }
+}
+
 // Deliberately no graph, nodes, decoded properties or native model owner.
 export class HostErOwner {
   constructor(registration,registry,root,invoke) {
@@ -253,32 +288,33 @@ export class HostErOwner {
     }
   }
   // Same discovery order as ModelBridge.snapshot; accumulates counts, not values.
-  audit(values=[],entry=true,initialSnapshot=false){
+  audit(values=[],entry=true,initialSnapshot=false,collectFrame=false){
     this.assertLive();if(entry)this.prototypeAudit();
-    const pending=[],seen=new Set(),accounting=[];let references=0,nodeBytes=0,invalidArrayLength=false,invalidErrorBrand=false;
+    const pending=[],seen=new Set(),accounting=[],frame=collectFrame?new EntryReadFrame():null;let references=0,nodeBytes=0,invalidArrayLength=false,invalidErrorBrand=false;
     const visit=value=>{const atom=this.atom(value,true);if(atom[0]===6&&!seen.has(atom[1])){seen.add(atom[1]);pending.push(atom[1]);}return atom;};
     const root=visit(this.root),args=values.map(visit);
     for(const value of this.objects)visit(value);
     while(pending.length){
-      const id=pending.pop(),value=this.objects[id],startReferences=references;let count=0,propertyBytes=0;
+      const id=pending.pop(),value=this.objects[id],startReferences=references,record=frame?.node(id);let count=0,propertyBytes=0,kind=0,data=0,entries=0,arrayLength;
       for(const key of Object.getOwnPropertyNames(value)){
         const descriptor=Object.getOwnPropertyDescriptor(value,key);
-        if(Array.isArray(value)&&key==='length'&&descriptor.writable)continue;
+        if(Array.isArray(value)&&key==='length'){arrayLength=descriptor.value;if(descriptor.writable)continue;}
         if(!Object.hasOwn(descriptor,'value')){if(errorKind(value)&&diagnostics.has(key))continue;accessorError();}
         if(++references>8_000_000)graphBudget();
-        this.intern(key);propertyBytes+=5+atomBytes(visit(descriptor.value));count++;
+        const keyId=this.intern(key),atom=visit(descriptor.value);propertyBytes+=5+atomBytes(atom);count++;frame?.property(keyId,(descriptor.enumerable?1:0)|(descriptor.writable?2:0)|(descriptor.configurable?4:0),atom);
       }
       let bytes=1+4+propertyBytes;
-      if(value instanceof Map){bytes+=4;for(const [key,item]of Map.prototype.entries.call(value)){references+=2;if(references>8_000_000)graphBudget();bytes+=atomBytes(visit(key))+atomBytes(visit(item));}}
-      else if(value instanceof Set){bytes+=4;for(const item of Set.prototype.values.call(value)){if(++references>8_000_000)graphBudget();bytes+=atomBytes(visit(item));}}
-      else if(value instanceof Date){if(initialSnapshot)Date.prototype.getTime.call(value);bytes+=8;}
+      if(value instanceof Map){kind=2;bytes+=4;for(const [key,item]of Map.prototype.entries.call(value)){references+=2;if(references>8_000_000)graphBudget();const a=visit(key),b=visit(item);bytes+=atomBytes(a)+atomBytes(b);frame?.pair(a,b);entries++;}data=entries;}
+      else if(value instanceof Set){kind=3;bytes+=4;for(const item of Set.prototype.values.call(value)){if(++references>8_000_000)graphBudget();const atom=visit(item);bytes+=atomBytes(atom);frame?.item(atom);entries++;}data=entries;}
+      else if(value instanceof Date){kind=4;if(initialSnapshot)Date.prototype.getTime.call(value);bytes+=8;}
       else if(errorKind(value)){if(initialSnapshot){const brand=errorKind(value);invalidErrorBrand ||= brand===undefined;}bytes+=1;}
       else if(Array.isArray(value)){
+        kind=1;data=arrayLength;
         if(initialSnapshot){const length=value.length;invalidArrayLength ||= !Number.isInteger(length)||length<0||length>0xffffffff;}
         bytes+=4;
       }
-      else if(this.registration.prototypeIds.has(Object.getPrototypeOf(value)))bytes+=4;
-      nodeBytes+=bytes;accounting.push(id,bytes,references-startReferences);
+      else {const prototypeId=this.registration.prototypeIds.get(Object.getPrototypeOf(value));if(prototypeId!==undefined){kind=5;data=prototypeId;bytes+=4;}}
+      frame?.end(record,kind,data,count,entries);nodeBytes+=bytes;accounting.push(id,bytes,references-startReferences);
     }
     // Unclassifiable retained objects keep their last admitted native-node
     // storage cost. Their current value is a host reference, as in snapshot().
@@ -286,7 +322,7 @@ export class HostErOwner {
     for(let n=0;n<accounting.length;n+=3){this.nodeBytes[accounting[n]]=accounting[n+1];this.nodeRefs[accounting[n]]=accounting[n+2];}
     this.references=references;
     const graphBytes=8+4+8+4+atomBytes(root)+4+this.strings.length*4+this.units*2+4+nodeBytes;
-    return {root,args,graphBytes,nodes:this.objects.length,strings:this.strings.length,units:this.units,references,invalidArrayLength,invalidErrorBrand};
+    return {root,args,graphBytes,nodes:this.objects.length,strings:this.strings.length,units:this.units,references,invalidArrayLength,invalidErrorBrand,readFrame:frame?.finish(this)};
   }
   // Caller adoption observes existing objects, never publishes replacements.
   // Keep captured counts for both old binary gates even if config mutates data.
@@ -307,13 +343,13 @@ export class HostErOwner {
     this.hostValues=null;this.hostIds=null;this.nodeBytes=null;this.nodeRefs=null;this.invoke=undefined;this.temporary=null;
   }
   frameAdmission(audit,metadataBytes){if(audit.graphBytes+metadataBytes>64*1024*1024||audit.references>8_000_000)frameBudget();}
-  begin(kind,values=[]){
+  begin(kind,values=[],collectFrame=false){
     this.assertLive();
     const nested=this.phase==='running'&&this.resourceDepth>0;
     if(this.phase!=='idle'&&this.phase!=='needsAudit'&&!nested)throw new TypeError('Public model document is already in use');
     if(this.depth>=128)throw new PeleError('Host operation nesting exceeds work budget','limit');
     const previous=this.phase;this.phase='entryAudit';
-    try{const audit=this.audit(values);this.frameAdmission(audit,0);if(this.epoch===0xffffffffffffffffn)throw new RangeError('Public model revision exhausted');this.epoch++;if(this.depth===0)this.temporary={objects:[],objectsIds:new WeakMap(),strings:[],stringsIds:new Map(),hosts:[],hostsIds:new Map(),units:0};this.depth++;this.phase='running';if(kind==='method')this.methodDepth++;return{audit,previous,nested,kind,finishedAudit:false};}
+    try{const audit=this.audit(values,true,false,collectFrame&&kind==='render'&&this.depth===0);this.frameAdmission(audit,0);if(this.epoch===0xffffffffffffffffn)throw new RangeError('Public model revision exhausted');this.epoch++;if(this.depth===0)this.temporary={objects:[],objectsIds:new WeakMap(),strings:[],stringsIds:new Map(),hosts:[],hostsIds:new Map(),units:0};this.depth++;this.phase='running';if(kind==='method')this.methodDepth++;return{audit,previous,nested,kind,finishedAudit:false};}
     catch(error){this.phase=nested?previous:'needsAudit';throw error;}
   }
   structure(token){this.phase='finalAudit';try{token.audit=this.audit([],false);token.finishedAudit=true;if(token.audit.references>8_000_000)throw new PeleError('Public graph exceeds work budget','limit');return token.audit;}catch(error){token.auditError=error;token.auditFailed=true;throw error;}}

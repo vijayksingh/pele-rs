@@ -14,7 +14,7 @@ test('ER success packet preserves complete public results, numeric bits, counts 
     const {loadRenderer}=await import('/dist/package-web/package/full.js');
     const wasm=await import('/dist/package-web/package/pkg/pele.js');
     const engine=await loadRenderer(),prototype=wasm.HostErDocument.prototype;
-    const packetKeys=['render_host_packet','render_raw_host_packet'],oldKeys=['render_host','render_raw_host'];
+    const packetKeys=['render_host_packet','render_raw_host_packet',...(typeof prototype.render_host_frame_packet==='function'?['render_host_frame_packet']:[])],oldKeys=['render_host','render_raw_host'];
     const descriptors=new Map([...packetKeys,...oldKeys].map(key=>[key,Object.getOwnPropertyDescriptor(prototype,key)]));
     if([...descriptors.values()].some(value=>!value))throw new Error('Both public transport capabilities required');
     const data=new DataView(new ArrayBuffer(8));
@@ -79,7 +79,8 @@ test('ER result packet keeps nested render, original throws, final audit precede
     const {loadRenderer}=await import('/dist/package-web/package/full.js');
     const wasm=await import('/dist/package-web/package/pkg/pele.js');
     const engine=await loadRenderer(),prototype=wasm.HostErDocument.prototype;
-    const descriptors=new Map(['render_host_packet','render_raw_host_packet'].map(key=>[key,Object.getOwnPropertyDescriptor(prototype,key)]));
+    const packetKeys=['render_host_packet','render_raw_host_packet',...(typeof prototype.render_host_frame_packet==='function'?['render_host_frame_packet']:[])];
+    const descriptors=new Map(packetKeys.map(key=>[key,Object.getOwnPropertyDescriptor(prototype,key)]));
     const rows=[],source='erDiagram\nA { int aid PK }\nB { string bid FK }\nA ||--o{ B : owns';
     const view=new DataView(new ArrayBuffer(8)),bits=value=>{view.setFloat64(0,value);return view.getBigUint64(0).toString(16);};
     const rendered=value=>({...value,width:bits(value.width),height:bits(value.height)});
@@ -131,7 +132,7 @@ test('ER packet preserves both envelope and combined graph-plus-metadata byte ga
     const {loadRenderer}=await import('/dist/package-web/package/full.js');
     const wasm=await import('/dist/package-web/package/pkg/pele.js');
     const engine=await loadRenderer(),prototype=wasm.HostErDocument.prototype;
-    const keys=['render_host_packet','render_raw_host_packet','render_host','render_raw_host'];
+    const packetKeys=['render_host_packet','render_raw_host_packet',...(typeof prototype.render_host_frame_packet==='function'?['render_host_frame_packet']:[])],keys=[...packetKeys,'render_host','render_raw_host'];
     const descriptors=new Map(keys.map(key=>[key,Object.getOwnPropertyDescriptor(prototype,key)]));
     const restore=()=>{for(const [key,d]of descriptors)Object.defineProperty(prototype,key,d);};
     const maximum=64*1024*1024,rows=[];let observed;
@@ -141,8 +142,9 @@ test('ER packet preserves both envelope and combined graph-plus-metadata byte ga
       // use one bounded accessibility string instead of a million-property model.
       for(const raw of [false,true])for(const [mode,legacy]of [['json',true],['packet',false]]){
         restore();
-        if(legacy)for(const key of keys.slice(0,2))Object.defineProperty(prototype,key,{...descriptors.get(key),value:undefined});
-        const key=raw?(legacy?'render_raw_host':'render_raw_host_packet'):(legacy?'render_host':'render_host_packet');
+        if(legacy)for(const key of packetKeys)Object.defineProperty(prototype,key,{...descriptors.get(key),value:undefined});
+        const normalPacket=packetKeys.includes('render_host_frame_packet')?'render_host_frame_packet':'render_host_packet';
+        const key=raw?(legacy?'render_raw_host':'render_raw_host_packet'):(legacy?'render_host':normalPacket);
         Object.defineProperty(prototype,key,{...descriptors.get(key),value:function(...args){
           const value=descriptors.get(key).value.apply(this,args);
           observed=typeof value==='string'?{success:value.startsWith('{"Ok":'),bytes:new TextEncoder().encode(value).length}:{success:true,bytes:value[1]};
