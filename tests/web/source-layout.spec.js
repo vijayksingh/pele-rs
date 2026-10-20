@@ -112,20 +112,22 @@ test('source layouts consume canonical operation frames without losing sparse st
             }});
             model=engine.parse(source);const nodes=model.nodes,links=model.links,lookup=model.lookup,first=nodes[0];
             const extra={text:'漢😀\ud800',nan:number('fff8000000000042'),zero:-0,infinity:Infinity};extra.self=extra;
-            const initialNumeric={nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)};
+            const initialNumeric={nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)},numericHistory=[];
+            const trackNumeric=stage=>numericHistory.push({stage,nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)});
             extra.map=new Map([[NaN,extra],[-0,first]]);extra.set=new Set([extra,first]);
             Object.defineProperty(extra,'hidden',{value:'non-enumerable 漢😀',writable:false,enumerable:false,configurable:true});
             model.extra=extra;model.detached=[extra,first];const detached=model.detached;
             const draw=mutate=>{const trace=[];let fired=false;const options={measurer:{width(text,size,style){trace.push([text,bits(size),style]);if(mutate&&!fired){fired=true;mutate();}return text.length*size*.6;}}};try{const value=raw?engine.renderRaw('sankey',model,{},options):engine.render(model,options);return{ok:true,value:output(value),trace};}catch(value){return{ok:false,error:error(value),trace};}};
-            const seed=draw();delete model.detached;const detachedSeed=draw();
-            const hit=model.findOrCreateNode('A'),added=model.findOrCreateNode('漢😀');model.addLink(nodes[2],added,2);
+            const seed=draw();trackNumeric('seed');delete model.detached;const detachedSeed=draw();trackNumeric('detached seed');
+            const hit=model.findOrCreateNode('A');trackNumeric('existing helper');
+            const added=model.findOrCreateNode('漢😀');trackNumeric('append helper');model.addLink(nodes[2],added,2);trackNumeric('link helper');
             model.title='Title 漢😀 &amp;';links[0].value=7;
-            const edited=draw(),before=snapshot([model,detached]);let fired=false;
+            const edited=draw(),before=snapshot([model,detached]);trackNumeric('edited');let fired=false;
             const callback=draw(()=>{fired=true;extra.text='callback';extra.zero=123;delete model.extra;detached[0]={unaccepted:true};});
-            const accepted=snapshot([model,detached]);
-            first.id=42;const invalid=draw(),invalidState=snapshot([model,detached]).signature;
-            first.id='A';const recovery=draw(),next=draw(),after=snapshot([model,detached]);
-            row[mode]={seed,detachedSeed,edited,before:before.signature,callback,accepted:accepted.signature,invalid,invalidState,recovery,next,after:after.signature,fired,restored:stable(before.objects,accepted.objects),identity:model.nodes===nodes&&model.links===links&&model.lookup===lookup&&hit===first&&lookup.get('A')===first&&added===nodes.at(-1)&&lookup.get('漢😀')===added&&links.at(-1).target===added&&model.extra===extra&&extra.self===extra&&detached[0]===extra&&detached[1]===first,initialNumeric,numeric:{nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)}};
+            const accepted=snapshot([model,detached]);trackNumeric('callback restoration');
+            first.id=42;const invalid=draw(),invalidState=snapshot([model,detached]).signature;trackNumeric('invalid edit');
+            first.id='A';const recovery=draw();trackNumeric('repair');const next=draw(),after=snapshot([model,detached]);trackNumeric('next');
+            row[mode]={seed,detachedSeed,edited,before:before.signature,callback,accepted:accepted.signature,invalid,invalidState,recovery,next,after:after.signature,fired,restored:stable(before.objects,accepted.objects),identity:model.nodes===nodes&&model.links===links&&model.lookup===lookup&&hit===first&&lookup.get('A')===first&&added===nodes.at(-1)&&lookup.get('漢😀')===added&&links.at(-1).target===added&&model.extra===extra&&extra.self===extra&&detached[0]===extra&&detached[1]===first,initialNumeric,numericHistory,numeric:{nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)}};
           }catch(value){row[mode]={fatal:error(value)};}
           finally{if(model)engine.dispose(model);engine.close();restore();row[mode+'Packets']=packets;}
         }
@@ -139,7 +141,23 @@ test('source layouts consume canonical operation frames without losing sparse st
   await save(info,'source-layout-canonical-fallback.json',report);
   expect(report.fatal).toBeUndefined();expect(report.restored).toBe(true);expect(report.rows).toHaveLength(2);
   for(const row of report.rows){
-    expect(row.recipe.fatal,`${row.raw}/recipe`).toBeUndefined();expect(row.canonical.fatal,`${row.raw}/canonical`).toBeUndefined();expect(row.canonical,row.raw+'').toEqual(row.recipe);
+    expect(row.recipe.fatal,`${row.raw}/recipe`).toBeUndefined();expect(row.canonical.fatal,`${row.raw}/canonical`).toBeUndefined();
+    // Engines can box the freshly created fixture NaN differently between
+    // iterations. Prove exact original bits in EACH lane before comparing
+    // that one input field symbolically across independently created models.
+    const comparable=value=>{
+      expect(value.numeric).toEqual(value.initialNumeric);expect(value.numericHistory).toHaveLength(10);
+      for(const {stage,...numeric}of value.numericHistory)expect(numeric,stage).toEqual(value.initialNumeric);
+      const nan=BigInt('0x'+value.initialNumeric.nan);expect((nan&0x7ff0000000000000n)===0x7ff0000000000000n&&(nan&0xfffffffffffffn)!==0n).toBe(true);
+      const copy=structuredClone(value);
+      for(const stage of ['before','accepted','invalidState','after']){
+        const properties=copy[stage].nodes.flatMap(node=>node.properties).filter(property=>property[0]==='nan');
+        expect(properties,stage).toHaveLength(1);expect(properties[0][3][2],stage).toEqual(['number',value.initialNumeric.nan]);
+        properties[0][3][2][1]='original fixture NaN';
+      }
+      copy.initialNumeric.nan=copy.numeric.nan='original fixture NaN';for(const numeric of copy.numericHistory)numeric.nan='original fixture NaN';return copy;
+    };
+    expect(comparable(row.canonical),row.raw+'').toEqual(comparable(row.recipe));
     expect(row.canonical).toMatchObject({fired:true,restored:true,identity:true,numeric:{zero:'8000000000000000',infinity:'7ff0000000000000'}});
     expect(row.canonical.numeric).toEqual(row.canonical.initialNumeric);
     const nan=BigInt('0x'+row.canonical.numeric.nan);expect((nan&0x7ff0000000000000n)===0x7ff0000000000000n&&(nan&0xfffffffffffffn)!==0n).toBe(true);

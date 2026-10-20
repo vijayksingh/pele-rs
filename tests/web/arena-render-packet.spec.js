@@ -2,9 +2,30 @@ import {test,expect} from '@playwright/test';
 import {writeFile} from 'node:fs/promises';
 async function save(info,name,report){const path=info.outputPath(name);await writeFile(path,JSON.stringify(report,null,2));await info.attach(name,{path,contentType:'application/json'});}
 
+// These comparisons deliberately exercise the old arena binary/packet APIs.
+// The default source-layout lifecycle has its own complete feature slice.
+async function legacyArenaComparison(page,run){
+  await page.evaluate(async()=>{
+    const {MutableDocument}=await import('/dist/package-web/package/pkg/pele.js');
+    const prototype=MutableDocument.prototype,name='snapshot_source_layout',descriptor=Object.getOwnPropertyDescriptor(prototype,name);
+    window.__legacyArenaCapability={MutableDocument,prototype,parent:Object.getPrototypeOf(prototype),keys:Reflect.ownKeys(prototype),name,descriptor};
+    if(descriptor)Object.defineProperty(prototype,name,{...descriptor,value:undefined});
+  });
+  try{return await run();}
+  finally{await page.evaluate(()=>{
+    const saved=window.__legacyArenaCapability;
+    try{
+      if(saved.descriptor)Object.defineProperty(saved.prototype,saved.name,saved.descriptor);else delete saved.prototype[saved.name];
+      const actual=Object.getOwnPropertyDescriptor(saved.prototype,saved.name);
+      const same=saved.descriptor?actual&&Reflect.ownKeys(actual).length===Reflect.ownKeys(saved.descriptor).length&&Reflect.ownKeys(saved.descriptor).every(key=>actual[key]===saved.descriptor[key]):actual===undefined;
+      if(!same||saved.MutableDocument.prototype!==saved.prototype||Object.getPrototypeOf(saved.prototype)!==saved.parent||Reflect.ownKeys(saved.prototype).length!==saved.keys.length||Reflect.ownKeys(saved.prototype).some((key,index)=>key!==saved.keys[index]))throw Error('Arena comparison did not restore native capability descriptor');
+    }finally{delete window.__legacyArenaCapability;}
+  });}
+}
+
 test('arena packets preserve full graphs, revisions and retained/raw results across all arena families',async({page},info)=>{
   test.setTimeout(180000);await page.goto('/examples/web/');
-  const report=await page.evaluate(async()=>{
+  const report=await legacyArenaComparison(page,()=>page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js');
     const wasm=await import('/dist/package-web/package/pkg/pele.js');
     const {decodeGraphBinary}=await import('/dist/package-web/package/graph-binary.js');
@@ -33,7 +54,7 @@ test('arena packets preserve full graphs, revisions and retained/raw results acr
         engine.dispose(model);
       }rows.push(row);
     }return rows;}finally{restore();engine.close();}
-  });
+  }));
   await save(info,'arena-packet-all-families.json',report);
   expect(report).toHaveLength(66);
   for(const row of report){expect(row.packet,row.id+'/'+row.raw).toEqual(row.legacy);expect(row.packet.transport,row.id).toBeDefined();if(!row.raw)expect(row.packet.ok,row.id).toBe(true);}
@@ -42,7 +63,7 @@ test('arena packets preserve full graphs, revisions and retained/raw results acr
 
 test('arena packet callbacks, full restoration, malformed edits, dimension bits and recovery match legacy',async({page},info)=>{
   test.setTimeout(180000);await page.goto('/examples/web/');
-  const report=await page.evaluate(async()=>{
+  const report=await legacyArenaComparison(page,()=>page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js');const wasm=await import('/dist/package-web/package/pkg/pele.js');
     const prototype=wasm.MutableDocument.prototype,keys=['render_numbers_operation_packet_with_functions','render_raw_operation_packet_with_functions'];
     const descriptors=new Map(keys.map(k=>[k,Object.getOwnPropertyDescriptor(prototype,k)]));const restore=()=>{for(const[k,d]of descriptors)Object.defineProperty(prototype,k,d);};
@@ -67,7 +88,7 @@ test('arena packet callbacks, full restoration, malformed edits, dimension bits 
         row[mode]={output,error,original,trace,state,repaired};row[mode+'Packets']=packets;
       }rows.push(row);
     }return rows;}finally{restore();engine.close();}
-  });
+  }));
   await save(info,'arena-packet-callbacks.json',report);
   for(const row of report){expect(row.packet,`${row.raw}/${row.variant}`).toEqual(row.legacy);if(row.variant.startsWith('throw'))expect(row.packet.original).toBe(true);}
   const nan=report.find(r=>!r.raw&&r.variant==='nan');expect(nan.packet.error).toBeUndefined();expect(nan.packetPackets).toBeGreaterThan(0);
@@ -82,7 +103,7 @@ test('arena packet factory throws retain committed graph publication and origina
     await route.fulfill({response,body:text.replace(declaration,'function originalArenaResult(')+'\nexport function hostErRenderResult(...args){if(globalThis.__arenaFactoryThrow){throw globalThis.__arenaFactoryValue;}return originalArenaResult(...args);}\n'});
   });
   await page.goto('/examples/web/');
-  const report=await page.evaluate(async()=>{
+  const report=await legacyArenaComparison(page,()=>page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js');const engine=await loadRenderer(),rows=[];
     try{for(const raw of [false,true])for(const kind of ['object','undefined','symbol']){
       const model=engine.parse('flowchart TD\nA --> B'),extra={n:1};model.extra=extra;
@@ -95,14 +116,14 @@ test('arena packet factory throws retain committed graph publication and origina
       const restored=model.extra===extra&&extra.n===1;const recovery=draw({measurer:{width:(text,size)=>text.length*size*.6}}).svg.length;engine.dispose(model);
       rows.push({raw,kind,fired,threw,original,restored,recovery});
     }return rows;}finally{globalThis.__arenaFactoryThrow=false;delete globalThis.__arenaFactoryValue;engine.close();}
-  });
+  }));
   await save(info,'arena-packet-factory-errors.json',report);
   for(const row of report){expect(row).toMatchObject({fired:true,threw:true,original:true,restored:true});expect(row.recovery).toBeGreaterThan(0);}
 });
 
 test('arena packets retain exact combined graph and metadata 64 MiB admission',async({page},info)=>{
   test.setTimeout(180000);await page.goto('/examples/web/');
-  const report=await page.evaluate(async()=>{
+  const report=await legacyArenaComparison(page,()=>page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js');const wasm=await import('/dist/package-web/package/pkg/pele.js');
     const prototype=wasm.MutableDocument.prototype,pairs=[['render_numbers_operation_packet_with_functions','render_numbers_operation_binary_with_functions'],['render_raw_operation_packet_with_functions','render_raw_operation_binary_with_functions']];
     const descriptors=new Map(pairs.flat().map(k=>[k,Object.getOwnPropertyDescriptor(prototype,k)]));const restore=()=>{for(const[k,d]of descriptors)Object.defineProperty(prototype,k,d);};
@@ -140,7 +161,7 @@ test('arena packets retain exact combined graph and metadata 64 MiB admission',a
       engine.dispose(fresh);engine.close();
       rows.push({raw,mode,first,second,third,count,metadataStep,expectedMetadata,expectedFrame,error,attempted,calls:attemptedCalls,retry,recovery});
     }return rows;}finally{restore();}
-  });
+  }));
   await save(info,'arena-packet-combined-budget.json',report);
   for(const raw of [false,true]){const old=report.find(r=>r.raw===raw&&r.mode==='legacy'),packet=report.find(r=>r.raw===raw&&r.mode==='packet');expect({...packet,mode:'legacy'}).toEqual(old);expect(packet.expectedMetadata).toBeLessThan(64*1024*1024);expect(packet.expectedFrame).toBeGreaterThan(64*1024*1024);expect(packet.error).toMatchObject({name:'PeleError',message:'Public binary graph exceeds transport budget',code:'limit'});expect(packet.calls).toBeGreaterThan(0);expect(packet.attempted).toBeUndefined();expect(packet.retry).toMatchObject({message:'Stale public model revision'});expect(packet.recovery).toBeGreaterThan(0);}
 });
