@@ -19,8 +19,8 @@ web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
 **The full API port is unfinished.** The current functional audit confirms
-callback mutation gaps in 31 families. Eight class families now have native
-constructor factories exposed through C, Swift and the web; 14 still lack
+callback mutation gaps in 31 families. Fifteen class families now have native
+constructor factories exposed through C, Swift and the web; seven still lack
 construction. Constructor metadata and shared prototype identity also remain
 incomplete. See the [constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md).
 Passing tests include checks that explicitly expect unsupported behavior;

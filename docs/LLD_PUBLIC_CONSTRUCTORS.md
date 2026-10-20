@@ -1,7 +1,8 @@
 # Captured public class constructors
 
-Native factories support eight authentic builtin root classes: Sankey, Venn,
-Ishikawa, Requirement, Railroad, C4, XYChart and ER (`PrototypeId(1)`). They
+Native factories support fifteen authentic builtin root classes: Sankey, Venn,
+Ishikawa, Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap,
+Timeline, Journey, QuadrantChart and State (`PrototypeId(1)`). They
 complement [caller-authored graph construction](DECLARED_MODEL_CONSTRUCTION.md):
 construction supplies real class defaults; graph adoption never invents defaults.
 Other root classes and nested `ClassMember` remain incomplete.
@@ -73,6 +74,22 @@ registration and exposes the same captured factory protocol as ordinary owned
 documents. It performs no schema-based certification or registry lookup after
 closure. Native feature tests cover source, typed fallback, prepared and raw
 policy lifetimes; web and Swift consumers exercise the actual adapters.
+
+The next six factories reuse empty native builders shared with parser population;
+construction performs no parsing. Their feature fixture covers 17 helper calls,
+six persistent aliases and 12 raw empty/populated outcomes. State shares its
+ordered field initializer while preserving a distinct lifecycle: construction
+does not extract the root document or populate the drawing cache. Its fixture
+covers seven helpers, two aliases, explicit root-document replacement and three
+raw drawings. Web checks also preserve the shared Mindmap/Kanban getType helper.
+
+Fresh consolidated verification for this extension: nine native integrations,
+ten Swift features against a freshly built ARM64 SDK, one strict C client
+exercising all fifteen factories, and six browser feature executions across
+Chromium, Firefox and WebKit. The browser fixture covers 21 construction scenarios
+and seven retained-registry lifetimes. These results do not certify the remaining
+seven class-root families (Class, Flowchart, Swimlane, Agentflow, Gantt, Sequence
+and Block), nested ClassMember, or the metadata gaps below.
 
 Cross-family and cross-renderer constructor/prototype unification is not claimed
 by this slice. In pinned Pele Flowchart and Swimlane share FlowDb; option-taking

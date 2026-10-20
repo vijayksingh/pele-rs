@@ -663,19 +663,7 @@ pub(super) fn parse(src: &str, title: Option<&str>) -> Result<QuadrantModel, Pel
         tokens: tokenize(src),
         i: 0,
     };
-    let mut m = QuadrantModel {
-        diagram_type: DiagramType::QuadrantChart,
-        title: title.map(str::to_string),
-        acc_title: None,
-        acc_descr: None,
-        quadrants: Default::default(),
-        x_axis_left: None,
-        x_axis_right: None,
-        y_axis_bottom: None,
-        y_axis_top: None,
-        points: Vec::new(),
-        classes: Vec::new(),
-    };
+    let mut m = QuadrantModel::empty(title);
     while is_eol(r.kind()) || r.kind() == T::Space {
         r.i += 1
     }

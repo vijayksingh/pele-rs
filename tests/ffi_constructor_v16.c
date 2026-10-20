@@ -37,16 +37,18 @@ static PeleResult *capture(PeleRegistry *registry, const char *name, uint32_t pr
     return pele_registry_capture_constructor_v16(registry, (const uint8_t *)name, strlen(name), prototype, out);
 }
 static void additional_constructors(void) {
-    const char *families[] = {"venn", "ishikawa", "requirement", "railroad", "c4", "xychart", "er"};
-    PelePublicConstructorV16 *factories[7] = {0};
+    const char *families[] = {"venn", "ishikawa", "requirement", "railroad", "c4", "xychart", "er",
+        "architecture", "kanban", "mindmap", "timeline", "journey", "quadrantChart", "state"};
+    const size_t count = sizeof families / sizeof families[0];
+    PelePublicConstructorV16 *factories[sizeof families / sizeof families[0]] = {0};
     PeleRegistry *registry = NULL;
     success(pele_registry_create_v8(1, &registry), NULL);
-    for (size_t i = 0; i < 7; ++i) {
+    for (size_t i = 0; i < count; ++i) {
         success(capture(registry, families[i], 1, &factories[i]), "\"selected\":true");
         assert(factories[i]);
     }
     pele_registry_free_v8(registry);
-    for (size_t i = 0; i < 7; ++i) {
+    for (size_t i = 0; i < count; ++i) {
         PelePublicDocument *document = NULL;
         char expected[64];
         int length = snprintf(expected, sizeof expected, "\"type\":\"%s\"", families[i]);

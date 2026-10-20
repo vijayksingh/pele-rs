@@ -1,15 +1,21 @@
 # Current functional parity — incomplete (2026-10-21)
 
-Eight class-root factories are now implemented: Sankey, Venn, Ishikawa,
-Requirement, Railroad, C4, XYChart and ER. The seven-family extension passes four
-consolidated native features, a strict C client exercising all eight factories,
-and ten Swift features including all 33 prepared entries. Six browser executions
-cover 21 construction scenarios and seven retained-registry lifetimes. A broader
-browser run passed 62 checks but failed one constructor reflection-order observer;
-the subsequent scoped feature run passes with that difference retained as an
-explicit metadata gap. Full API parity remains unfinished: 14 class-root
-factories, argument-taking/nested constructors, shared identities and callback
-mutation behavior remain work. See [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
+Fifteen class-root factories are implemented: Sankey, Venn, Ishikawa,
+Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
+Journey, QuadrantChart and State. The latest seven-family extension passes nine
+native integrations, ten Swift features against a fresh ARM64 SDK and a strict
+C client exercising all fifteen factories. Six browser executions across
+Chromium, Firefox and WebKit cover 21 construction scenarios and seven retained
+registry lifetimes. State preserves its initially empty drawing cache until
+explicit extraction. The seven remaining root families are Class, Flowchart,
+Swimlane, Agentflow, Gantt, Sequence and Block; nested ClassMember is additional.
+Constructor reflection/shared identities and callback mutation behavior also
+remain work. See [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
+
+The earlier seven-family extension passed four native features, ten Swift
+features, a strict C client and six browser executions. A broader browser run
+passed 62 checks but failed one constructor reflection-order observer; that
+known difference remains explicit, with the original failed evidence preserved.
 
 The preceding functional slice adds captured Sankey construction through Rust, C v16,
 Swift and WebAssembly. Fresh factories own exact native defaults, helpers and
@@ -32,14 +38,15 @@ records these concrete gaps at runtime `d7caf8c`:
   width callback changes `model.title`, then throws an original object. Pele
   retains the edit; native restores the previous title. All 33 preserve throw
   identity and call width once. Sankey and ER retain the edit in this case.
-- **22 exposed model constructors are stubs:** pinned constructors succeed;
-  native constructor functions throw. Plain-object families are separate.
+- **The audit found 22 constructor stubs.** Subsequent slices implement 15;
+  seven class-root families and nested ClassMember remain incomplete.
+  Plain-object families are separate.
 - Native codecs still explicitly reject active lone UTF-16, sparse collection,
   dynamic coercion and overridden-dispatch cases. Some integration tests
   deliberately assert these gaps and recovery; their passing totals must not be
   reported as complete behavioral parity.
-- C/Swift Sankey same-document callback reentry is being implemented. No passing
-  result is claimed here while that implementation and its proof are underway.
+- Subsequent C/Swift normal/prepared Sankey callback reentry is verified above;
+  presentation/image callbacks and arbitrary native graph-ID lifetime remain open.
 
 See the [33-family checklist and reproducible evidence](parity/2026-10-21-runtime-audit/README.md).
 Runtime behavior, fresh platform artifacts and release publication are separate

@@ -1,5 +1,5 @@
 //! JourneyDb's real builder/getActors prototype, Pele 458322a5 (MIT, kepano).
-//! Constructors, exotic coercion/properties and active UTF-16 rendering remain explicit gaps.
+//! Exotic coercion/properties and active UTF-16 rendering remain explicit gaps.
 use super::{Journey, JourneyModel, JourneyTask};
 use crate::compat::{
     public::*, source::space, DiagramModule, DiagramType, ErrorCode, Object, PeleError,
@@ -654,7 +654,23 @@ fn array_node(out: &mut GraphWriter, values: impl IntoIterator<Item = Atom>) -> 
         properties,
     })
 }
+fn construct_default() -> Result<JourneyPublicState, PeleError> {
+    Journey.create_public(&JourneyModel::empty(None))
+}
+
 impl PublicDiagramModule for Journey {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = JourneyPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA

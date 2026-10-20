@@ -1,5 +1,5 @@
 //! Native mutable MindmapDb, Pele 458322a5 (MIT kepano).
-//! Constructors, exotic runtime coercion/descriptors, detached child records,
+//! Exotic runtime coercion/descriptors, detached child records,
 //! active lone UTF-16 and sparse active arrays remain explicit gaps.
 use super::{Mindmap, MindmapModel, MindmapNode};
 use crate::compat::{
@@ -617,7 +617,23 @@ fn export_array(out: &mut GraphWriter, values: Vec<Atom>) -> Atom {
         properties,
     }))
 }
+fn construct_default() -> Result<MindmapPublicState, PeleError> {
+    Mindmap.create_public(&MindmapModel::empty(None))
+}
+
 impl PublicDiagramModule for Mindmap {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
+    }
+
     fn function_shapes(&self) -> &'static [FunctionShape] {
         &[FunctionShape {
             method: GET_TYPE,

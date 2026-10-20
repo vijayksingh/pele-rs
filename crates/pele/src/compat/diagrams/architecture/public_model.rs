@@ -1,5 +1,5 @@
 //! ArchitectureDb native public model, Pele 458322a5 (MIT kepano).
-//! Constructors, exotic coercion/descriptors and active lone UTF-16 rendering
+//! Exotic coercion/descriptors and active lone UTF-16 rendering
 //! remain explicit gaps. Retained graph values are never normalized or reparsed.
 use super::{ArchEdge, ArchGroup, ArchLayoutHint, ArchNode, Architecture, ArchitectureModel};
 use crate::compat::{
@@ -1122,7 +1122,23 @@ fn export_string(out: &mut GraphWriter, s: &Option<String>) -> Atom {
     s.as_deref()
         .map_or(Atom::Undefined, |s| Atom::String(out.string(s)))
 }
+fn construct_default() -> Result<ArchitecturePublicState, PeleError> {
+    Architecture.create_public(&ArchitectureModel::empty(None))
+}
+
 impl PublicDiagramModule for Architecture {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = ArchitecturePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA

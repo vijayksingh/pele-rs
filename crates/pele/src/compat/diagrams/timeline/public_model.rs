@@ -484,7 +484,23 @@ fn invoke(g: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
     }
     Ok(Atom::Undefined)
 }
+fn construct_default() -> Result<TimelinePublicState, PeleError> {
+    Timeline.create_public(&TimelineModel::empty(None))
+}
+
 impl PublicDiagramModule for Timeline {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTOTYPE,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = TimelinePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA

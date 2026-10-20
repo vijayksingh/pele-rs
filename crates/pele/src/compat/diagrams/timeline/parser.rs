@@ -2,7 +2,7 @@
 use super::{TimelineModel, TimelinePeriod};
 use crate::compat::{
     source::{space, word},
-    DiagramType, ErrorCode, PeleError,
+    ErrorCode, PeleError,
 };
 #[derive(Clone, Copy, PartialEq)]
 enum T {
@@ -234,16 +234,7 @@ pub(super) fn parse(s: &str, title: Option<&str>) -> Result<TimelineModel, PeleE
             false,
         )
     };
-    let mut m = TimelineModel {
-        diagram_type: DiagramType::Timeline,
-        title: title.map(Into::into),
-        acc_title: None,
-        acc_descr: None,
-        direction: "LR".into(),
-        sections: Vec::new(),
-        periods: Vec::new(),
-        current_section: String::new(),
-    };
+    let mut m = TimelineModel::empty(title);
     match tokens[0].kind {
         T::Timeline | T::Lr => {}
         T::Td => m.direction = "TD".into(),

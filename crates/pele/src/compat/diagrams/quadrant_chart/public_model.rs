@@ -15,7 +15,7 @@ use crate::compat::{
 use std::collections::HashMap;
 
 const QUADRANT_PROTO: PrototypeId = PrototypeId(1);
-// Constructor call/construction remains an explicit capability gap. Every real
+// Native root construction is an explicit capability. Every real
 // instance builder method below has pinned name, arity and flags6 placement.
 static SCHEMA: ModelSchema = ModelSchema {
     id: "pele/quadrantChart@1",
@@ -672,7 +672,23 @@ fn array_node(w: &mut GraphWriter, values: Vec<Atom>) -> u32 {
         properties,
     })
 }
+fn construct_default() -> Result<QuadrantPublicState, PeleError> {
+    QuadrantChart.create_public(&QuadrantModel::empty(None))
+}
+
 impl PublicDiagramModule for QuadrantChart {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == QUADRANT_PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                QUADRANT_PROTO,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = QuadrantPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA

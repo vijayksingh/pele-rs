@@ -2,7 +2,7 @@
 use super::{JourneyModel, JourneyTask};
 use crate::compat::{
     source::{space, word},
-    DiagramType, PeleError,
+    PeleError,
 };
 #[derive(Clone, Copy, PartialEq)]
 enum K {
@@ -300,15 +300,7 @@ pub(super) fn parse(src: &str, title: Option<&str>) -> Result<JourneyModel, Pele
     if ts[0].k != K::Journey {
         return Err(fail(0, "'journey'"));
     }
-    let mut m = JourneyModel {
-        diagram_type: DiagramType::Journey,
-        title: title.map(str::to_string),
-        acc_title: None,
-        acc_descr: None,
-        sections: Vec::new(),
-        tasks: Vec::new(),
-        current_section: String::new(),
-    };
+    let mut m = JourneyModel::empty(title);
     let mut section = String::new();
     let mut i = 1;
     loop {

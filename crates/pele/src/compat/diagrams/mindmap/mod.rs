@@ -237,12 +237,7 @@ impl DiagramModule for Mindmap {
     }
     fn parse(&self, c: ParseContext<'_>) -> Result<Self::Model, PeleError> {
         let mut db = Db {
-            model: MindmapModel {
-                title: c.title.map(str::to_owned),
-                nodes: Vec::new(),
-                base_level: 0,
-                open: Vec::new(),
-            },
+            model: MindmapModel::empty(c.title),
             base: 0,
             open: Vec::new(),
         };
@@ -267,3 +262,15 @@ impl DiagramModule for Mindmap {
 
 mod public_model;
 pub use public_model::MindmapPublicState;
+
+impl MindmapModel {
+    /// Empty class state shared by parser population and native construction.
+    pub(super) fn empty(title: Option<&str>) -> Self {
+        Self {
+            title: title.map(str::to_owned),
+            nodes: Vec::new(),
+            base_level: 0,
+            open: Vec::new(),
+        }
+    }
+}

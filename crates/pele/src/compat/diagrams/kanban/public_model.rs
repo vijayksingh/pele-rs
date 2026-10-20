@@ -1,5 +1,5 @@
 //! Native mutable KanbanDb, Pele 458322a5 (MIT kepano). No diagram logic in JS.
-//! Arbitrary prototype replacement/coercion, constructors and active lone UTF-16
+//! Arbitrary prototype replacement/coercion and active lone UTF-16
 //! rendering remain explicit gaps; the arena itself preserves all code units.
 use super::{Kanban, KanbanModel, KanbanNode, KanbanSection};
 use crate::compat::{
@@ -617,7 +617,23 @@ fn export_array(out: &mut GraphWriter, values: Vec<Atom>) -> Atom {
         properties,
     }))
 }
+fn construct_default() -> Result<KanbanPublicState, PeleError> {
+    Kanban.create_public(&KanbanModel::empty(None))
+}
+
 impl PublicDiagramModule for Kanban {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
+    }
+
     fn function_shapes(&self) -> &'static [FunctionShape] {
         &[FunctionShape {
             method: GET_TYPE,

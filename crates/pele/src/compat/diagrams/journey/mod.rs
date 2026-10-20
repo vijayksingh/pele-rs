@@ -67,3 +67,18 @@ impl DiagramModule for Journey {
         render::render(m, c, o, r)
     }
 }
+
+impl JourneyModel {
+    /// Empty class state shared by parser population and native construction.
+    pub(super) fn empty(title: Option<&str>) -> Self {
+        Self {
+            diagram_type: DiagramType::Journey,
+            title: title.map(str::to_owned),
+            acc_title: None,
+            acc_descr: None,
+            sections: Vec::new(),
+            tasks: Vec::new(),
+            current_section: String::new(),
+        }
+    }
+}

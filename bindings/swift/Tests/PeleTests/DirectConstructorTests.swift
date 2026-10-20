@@ -23,23 +23,28 @@ final class DirectConstructorTests: XCTestCase {
         let cases: [Case]
     }
 
-    func testSevenCapturedConstructorsUseNativeDefaultsAndRawRenderingAfterClosure() throws {
+    func testFourteenCapturedConstructorsUseNativeDefaultsAndRawRenderingAfterClosure() throws {
         var path = URL(fileURLWithPath: #filePath)
         for _ in 0..<5 { path.deleteLastPathComponent() }
-        let fixture = try JSONDecoder().decode(Fixture.self,
-            from: Data(contentsOf: path.appendingPathComponent("fixtures/public-direct-constructors.json")))
-        XCTAssertEqual(fixture.oracleSHA256, "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d")
-        XCTAssertEqual(fixture.cases.map(\.family).sorted(),
-                       ["c4", "er", "ishikawa", "railroad", "requirement", "venn", "xychart"])
+        let files = ["public-direct-constructors.json", "public-next-six-constructors.json", "public-state-constructor.json"]
+        let fixtures = try files.map {
+            try JSONDecoder().decode(Fixture.self, from: Data(contentsOf: path.appendingPathComponent("fixtures/" + $0)))
+        }
+        for fixture in fixtures {
+            XCTAssertEqual(fixture.oracleSHA256, "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d")
+        }
+        let cases = fixtures.flatMap(\.cases)
+        XCTAssertEqual(cases.map(\.family).sorted(),
+                       ["architecture", "c4", "er", "ishikawa", "journey", "kanban", "mindmap", "quadrantChart", "railroad", "requirement", "state", "timeline", "venn", "xychart"])
         let registry = try Pele.Registry.allBuiltins()
-        let factories = try fixture.cases.map {
+        let factories = try cases.map {
             try XCTUnwrap(registry.captureConstructor(for: $0.family, prototype: $0.prototype), $0.family)
         }
         try registry.close()
         var resources = Pele.HostResources()
         resources.textWidth = { Double($0.text.utf16.count) * $0.size * 0.6 }
         var options = Pele.Engine.Options(); options.now = 1_704_067_200_000
-        for (row, factory) in zip(fixture.cases, factories) {
+        for (row, factory) in zip(cases, factories) {
             let model = try factory.constructPrepared(), sibling = try factory.constructPrepared()
             defer { try? model.close(); try? sibling.close() }
             factory.close()
