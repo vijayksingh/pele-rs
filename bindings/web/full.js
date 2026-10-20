@@ -1,3 +1,4 @@
+import {HostErOwner} from './host-er-store.js';
 import initialize from './initialize.js';
 import {modelHostFunctions} from "./host-functions.js";
 import {builtinDiagramType,builtinDiagramOrigin,ownRawModel,withBuiltinIcons,builtinInlineIcons} from './builtin-entries.js';
@@ -168,6 +169,35 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output)));
     } finally { entry.busy = false; }
   }
+  function hostOperation(entry,kind,values,call) {
+    const owner=entry.hostStore,token=owner.begin(kind,values);
+    let original,failed=false,outcome,error,thrown=false,json;
+    const capture=value=>{if(!failed){failed=true;original=value;}};
+    const resource=fn=>fn&&((...args)=>owner.resource(()=>{try{return fn(...args);}catch(value){capture(value);throw value;}}));
+    try {json=call(owner.primitive.bind(owner),capture,()=>owner.structure(token),resource,token.audit.args);outcome=JSON.parse(json);if(kind==='method'&&outcome&&Object.hasOwn(outcome,'Ok'))outcome.Ok=nativeAtomValue(owner,outcome.Ok);}
+    catch(value){thrown=true;error=value;}
+    try {owner.finish(token,json===undefined?0:new TextEncoder().encode(json).length);}catch(value){if(!thrown){thrown=true;error=value;}}
+    if(failed)throw original;
+    if(thrown){if(typeof error==='string')return result(error);throw error;}
+    if(!outcome||Object.hasOwn(outcome,'Ok')===Object.hasOwn(outcome,'Err'))throw new TypeError('Invalid host operation outcome');
+    if(Object.hasOwn(outcome,'Err'))throw operationError(outcome.Err,owner);
+    return outcome.Ok;
+  }
+  function adoptHostEr(handle,owner,provider) {
+    const model=owner.root,rawType='er';
+    const entry={handle,rawType,provider,disposed:false,hostStore:owner};
+    owner.invoke=(method,receiver,args)=>hostOperation(entry,'method',[receiver,...args],(primitive,capture,finish,_resource,values)=>handle.invoke_host(method,primitive,capture,finish,values));
+    owner.phase='idle';
+    if(owner.registration.documents.length>256)owner.registration.documents=owner.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
+    owner.registration.documents.push(new WeakRef(owner));documents.set(model,entry);
+    ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
+    finalizer?.register(model,handle,model);return model;
+  }
+  function nativeAtomValue(owner,atom) {
+    if(atom.kind==='undefined')return undefined;if(atom.kind==='null')return null;
+    if(atom.kind==='bool')return atom.value;
+    const tags={number:4,string:5,ref:6,builtinFunction:7,hostReference:8};return owner.value([tags[atom.kind],atom.value]);
+  }
   function adoptMutable(mutable, preparedType, existingBridge) {
           const snapshot = binaryResult(()=>mutable.snapshot_binary());
           // Raw-model adoption already has a bridge. Validate its native metadata
@@ -233,6 +263,12 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         try{adoptMutable(handle,type,bridge);}catch(error){handle.free();throw error;}
         entry=documents.get(model);
       }
+      if(entry?.hostStore){
+        if(entry.rawType!==type)throw new TypeError('Raw diagram render requires a model of this diagram');
+        const measurer=options.measurer??builtinMeasurer(options,type),inherited=builtinInlineIcons();
+        const numeric=renderNumericOptions({...options,limit:undefined,maxEdges:undefined,config:undefined,outputLimit:undefined,nativeTheme:undefined});
+        return renderedValue(hostOperation(entry,'raw',[],(primitive,capture,finish,resource)=>entry.handle.render_raw_host(primitive,capture,finish,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,resource((text,size,style)=>measurer.width(text,size,style)),resource(options.icons),resource(()=>Date.now()),resource(inherited))));
+      }
       if(!entry?.bridge||entry.rawType!==type)throw new TypeError('Raw diagram render requires a model of this diagram');
       if(entry.disposed)throw new TypeError('Public model document is disposed');
       return nativeModelCall(entry,()=>{
@@ -274,7 +310,20 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       try {
         if (nativeRegistry) {
           const limits = parseLimitOptions(options);
-          document = nativeRegistry.parse(source, limits.json, limits.sourceKind, limits.sourceValue, limits.edgeKind, limits.edgeValue);
+          if(nativeRegistry.parse_with_host_er){
+            let owner,failed=false,original;
+            const capture=error=>{if(!failed){failed=true;original=error;}};
+            let parsed;
+            try{parsed=nativeRegistry.parse_with_host_er(source,limits.json,limits.sourceKind,limits.sourceValue,limits.edgeKind,limits.edgeValue,(key,schema)=>{
+              let registration=schemaRegistrations.get(key);
+              if(!registration){if(schema===undefined)return undefined;registration=registry.registration(result(schema));schemaRegistrations.set(key,registration);}
+              owner=new HostErOwner(registration,registry,undefined,()=>{throw new TypeError('Public model construction is incomplete');});
+              return owner.primitive.bind(owner);
+            },capture);}catch(error){if(failed)throw original;throw error;}
+            if(failed){parsed?.[1]?.free();throw original;}
+            if(parsed[0]===1)return adoptHostEr(parsed[1],owner,liveProviders.get('er')?.provider);
+            document=parsed[1];
+          }else document = nativeRegistry.parse(source, limits.json, limits.sourceKind, limits.sourceValue, limits.edgeKind, limits.edgeValue);
         } else document = parse_v2(source, JSON.stringify(options));
       }
       catch (error) { if (typeof error === 'string') return result(error); throw error; }
@@ -386,6 +435,10 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         else {
           const document = documents.get(input);
           if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
+          if(document.hostStore){
+            const value=hostOperation(document,'render',[],(primitive,capture,finish,resource)=>document.handle.render_host(primitive,capture,finish,numeric.json,numeric.mask,numeric.numbers,numeric.outputKind,numeric.output,resource(width),resource(icons),resource(clock)));
+            if(callbackFailed)throw callbackError;return renderedValue(value);
+          }
           if (document.bridge) {
             bridge=document.bridge;
             operation=nativeModelCall(document,()=>{
@@ -409,6 +462,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       const document = documents.get(model);
       if (!document) throw new TypeError('query() takes a model that parse() returned.');
       if (document.foreign) throw new TypeError('Custom provider models are ordinary host objects; call their methods directly.');
+      if(document.hostStore)throw new TypeError('This mutable model does not expose read-only queries.');
       if (document.bridge) {
         if(document.bridge.registration.schema.id==='pele/agentflow@1'&&operation==='semanticModel'&&argumentsValue===null)return model.semanticModel();
         throw new TypeError('This mutable model does not expose read-only queries.');
@@ -418,6 +472,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     dispose(model) {
       const document = documents.get(model);
       if (document?.busy || document?.nativeBusy) throw new TypeError('Public model document is already in use');
+      if(document?.hostStore){document.hostStore.dispose();rawDisposed.add(model);documents.delete(model);document.disposed=true;finalizer?.unregister(model);document.handle.free();document.policy?.free();return;}
       if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free();if(document.bridge)releaseDisposedBridge(document.bridge); }
     }
   };

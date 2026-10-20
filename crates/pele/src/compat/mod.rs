@@ -240,3 +240,7 @@ pub fn success_envelope_len<T: Serialize>(result: &T) -> usize {
     .expect("serializable engine value");
     count.0
 }
+
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub mod host_er;

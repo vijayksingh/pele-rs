@@ -19,3 +19,6 @@ legacy projection for public providers and other diagram registrations.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.
+
+[Browser host storage](LLD_HOST_ER_STORE.md) defines the unreleased ER construction,
+method and live-render boundary, its bounded transfers and its verification gates.

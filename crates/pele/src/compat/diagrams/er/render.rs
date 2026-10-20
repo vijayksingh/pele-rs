@@ -1,7 +1,8 @@
 //! Direct Pele er/render.ts entity tables and relationships, 458322a5 (MIT, kepano).
 use super::super::common::generics::parse_generic_types;
 use super::{
-    graph::{self, Node},
+    graph::Node,
+    live_read::{CellField, ErRead, TypedRead},
     markers::{marker, MARKER_LENGTH},
     model::ErModel,
 };
@@ -43,8 +44,8 @@ struct Row {
     cells: [Label; 4],
     h: f64,
 }
-struct View {
-    node: Node,
+struct View<A: Clone, S: Clone, V: Clone> {
+    node: Node<A, S, V>,
     style: ResolvedStyle,
     label: Label,
     w: f64,
@@ -192,9 +193,19 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_read(&TypedRead(db), config, options, resources)
+}
+pub(super) fn render_read<R: ErRead>(
+    input: &R,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, PeleError> {
+    // yt chooses the auto-direction wrapper before any callback in either draw.
+    let horizontal = matches!(input.direction()?.as_ref(), "LR" | "RL");
     let selected = (|| -> Result<_, PeleError> {
-        let across = draw(db, config, options, resources, false)?;
-        if !matches!(db.direction.as_str(), "LR" | "RL") {
+        let across = draw(input, config, options, resources, false)?;
+        if !horizontal {
             return Ok(across);
         }
         let Some(available) = options.max_width.filter(|n| *n > 0.) else {
@@ -210,7 +221,7 @@ pub(super) fn render(
         {
             return Ok(across);
         }
-        let down = draw(db, config, options, resources, true)?;
+        let down = draw(input, config, options, resources, true)?;
         Ok(if down.0.width < across.0.width {
             down
         } else {
@@ -222,23 +233,22 @@ pub(super) fn render(
     }
     Ok(selected.0)
 }
-fn draw(
-    db: &ErModel,
+fn draw<R: ErRead>(
+    input: &R,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     turned: bool,
 ) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), PeleError> {
-    let (nodes, edges) = graph::build(db);
+    let (nodes, edges) = input.capture()?;
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = options.padding.unwrap_or(8.);
-    let index: HashMap<_, _> = nodes
-        .iter()
-        .enumerate()
-        .map(|(i, n)| (n.id.clone(), i))
-        .collect();
-    let mut views: Vec<View> = vec![];
+    let mut index = HashMap::new();
+    for (i, node) in nodes.iter().enumerate() {
+        index.insert(input.key(&node.id)?.into_owned(), i);
+    }
+    let mut views: Vec<View<R::Attributes, R::Styles, R::Scalar>> = vec![];
     let mut cnodes = vec![];
     let mut cedges = vec![];
     let mut labels = vec![];
@@ -247,10 +257,22 @@ fn draw(
     let mut loops_by_node: Vec<Vec<usize>> = vec![vec![]; nodes.len()];
     let mut loop_of = vec![];
     for edge in &edges {
-        let (Some(&src), Some(&dst)) = (index.get(&edge.start), index.get(&edge.end)) else {
+        let (Some(&src), Some(&dst)) = (
+            index.get(input.key(&edge.start)?.as_ref()),
+            index.get(input.key(&edge.end)?.as_ref()),
+        ) else {
             continue;
         };
-        let label = lab(&edge.label, small, 200., 0, options, resources)?;
+        let edge_text = input.label(&edge.label)?;
+        let label = layout_label(
+            edge_text.as_deref(),
+            true,
+            resources,
+            options,
+            small,
+            200.,
+            0,
+        )?;
         let lp = if src == dst {
             let i = loops.len();
             loops.push(Loop {
@@ -285,50 +307,52 @@ fn draw(
         });
         labels.push(label);
     }
-    let horizontal = |i: usize| {
+    let horizontal = |i: usize| -> Result<bool, PeleError> {
         let mut at = i;
         for _ in 0..nodes.len() {
-            let Some(up) = nodes[at]
-                .parent_id
-                .as_ref()
-                .and_then(|s| index.get(s))
-                .copied()
-            else {
+            let Some(parent_id) = &nodes[at].parent_id else {
+                break;
+            };
+            let Some(&up) = index.get(input.key(parent_id)?.as_ref()) else {
                 break;
             };
             if let Some(dir) = &nodes[up].dir {
-                if !dir.is_empty() {
-                    return matches!(dir.as_str(), "LR" | "RL");
+                if input.truthy(dir)? {
+                    return Ok(matches!(input.scalar_direction(dir)?.as_ref(), "LR" | "RL"));
                 }
             }
             at = up;
         }
-        matches!(db.direction.as_str(), "LR" | "RL")
+        Ok(matches!(input.direction()?.as_ref(), "LR" | "RL"))
     };
     for (i, node) in nodes.iter().enumerate() {
         let mut styles = node.css_compiled_styles.clone();
-        styles.extend_from_slice(&node.css_styles);
+        match input.styles(&node.css_styles)? {
+            std::borrow::Cow::Borrowed(values) => styles.extend_from_slice(values),
+            std::borrow::Cow::Owned(values) => styles.extend(values),
+        }
         let style = resolve_style(&styles);
         let base = u8::from(style.bold) | if style.italic { 2 } else { 0 };
         let name_size = style.font_size.unwrap_or(size);
         let row_size = style.font_size.unwrap_or(small);
         let key_size = style.font_size.unwrap_or(round(size * 0.75));
-        let label = lab(
-            if node.is_group {
-                &node.label
-            } else if !node.alias.is_empty() {
-                &node.alias
-            } else {
-                &node.label
-            },
+        let label_value = if node.is_group || !input.truthy(&node.alias)? {
+            &node.label
+        } else {
+            &node.alias
+        };
+        let label_text = input.label(label_value)?;
+        let label = layout_label(
+            label_text.as_deref(),
+            true,
+            resources,
+            options,
             name_size,
             if node.is_group { 4000. } else { 240. },
             base,
-            options,
-            resources,
         )?;
         let own = &loops_by_node[i];
-        let below = !own.is_empty() && !node.is_group && horizontal(i);
+        let below = !own.is_empty() && !node.is_group && horizontal(i)?;
         let mut view = View {
             node: node.clone(),
             style,
@@ -363,11 +387,12 @@ fn draw(
         if node.is_group {
             c = CNode::new(0., 0., -1);
             c.is_group = true;
-            c.dir = node
-                .dir
-                .as_deref()
-                .filter(|s| !s.is_empty())
-                .map(|s| direction(Some(s)));
+            c.dir = match &node.dir {
+                Some(value) if input.truthy(value)? => {
+                    Some(direction(Some(input.scalar_direction(value)?.as_ref())))
+                }
+                _ => None,
+            };
             c.pad_x = GROUP_PAD;
             c.pad_top = if view.label.height > 0. {
                 view.label.height + 16.
@@ -378,16 +403,28 @@ fn draw(
             c.min_w = (view.label.width + 2. * GROUP_PAD - 12.).js_max(MIN_WIDTH);
         } else {
             let name_h = view.label.height.js_max(round(name_size * 1.5));
-            if node.attributes.is_empty() {
+            let attribute_count = match &node.attributes {
+                Some(attributes) => input.attribute_len(attributes)?,
+                None => 0,
+            };
+            if attribute_count == 0 {
                 view.w = (view.label.width + 2. * BOX_PAD_X).js_max(min_w);
                 view.h = (name_h + 2. * BOX_PAD_Y).js_max(if below { 0. } else { bands + 8. });
             } else {
                 let row_line = round(row_size * 1.5);
                 let mut widths = [0_f64; 4];
-                for attr in &node.attributes {
+                let attributes = node
+                    .attributes
+                    .as_ref()
+                    .expect("entity attributes captured");
+                let mut attribute_index = 0;
+                while let Some(attr) = input.attribute_at(attributes, attribute_index)? {
+                    attribute_index += 1;
+                    // Retain this row handle across callbacks, but fetch each
+                    // subsequent field only after the preceding cell is laid out.
                     let cells = [
                         lab(
-                            &cell_text(&attr.r#type),
+                            &cell_text(input.cell(&attr, CellField::Type)?.as_ref()),
                             row_size,
                             1e6,
                             base,
@@ -395,7 +432,7 @@ fn draw(
                             resources,
                         )?,
                         lab(
-                            &cell_text(&attr.name),
+                            &cell_text(input.cell(&attr, CellField::Name)?.as_ref()),
                             row_size,
                             1e6,
                             base,
@@ -403,7 +440,7 @@ fn draw(
                             resources,
                         )?,
                         layout_label(
-                            Some(&attr.keys.join(", ")),
+                            Some(&input.keys(&attr)?),
                             false,
                             resources,
                             options,
@@ -412,7 +449,7 @@ fn draw(
                             base,
                         )?,
                         lab(
-                            &cell_text(&attr.comment),
+                            &cell_text(input.cell(&attr, CellField::Comment)?.as_ref()),
                             row_size,
                             260.,
                             base,
@@ -478,11 +515,12 @@ fn draw(
         cnodes.push(c);
     }
     for (i, n) in nodes.iter().enumerate() {
-        cnodes[i].parent = n
-            .parent_id
-            .as_ref()
-            .and_then(|p| index.get(p))
-            .map_or(-1, |i| *i as isize)
+        cnodes[i].parent = match &n.parent_id {
+            Some(parent) => index
+                .get(input.key(parent)?.as_ref())
+                .map_or(-1, |i| *i as isize),
+            None => -1,
+        }
     }
     let layout = compound_layout(
         &mut cnodes,
@@ -490,7 +528,7 @@ fn draw(
         if turned {
             Dir::TB
         } else {
-            direction(Some(&db.direction))
+            direction(Some(input.direction()?.as_ref()))
         },
         &LayeredOptions {
             node_sep: number_option(config, "nodeSpacing", 48.),
@@ -517,8 +555,9 @@ fn draw(
         layout_width =
             layout_width.js_max(c.x + c.w / 2. + MARKER_LENGTH + LOOP * 0.75 + 10. + reach);
     }
+    let title_text = input.title()?;
     let title = layout_label(
-        db.title.as_deref(),
+        title_text.as_deref(),
         false,
         resources,
         options,
@@ -537,15 +576,23 @@ fn draw(
     shift_layout(&mut cnodes, &mut cedges, ox, oy);
     let width = (inner + 2. * pad).ceil();
     let height = (layout.height + title_height + 2. * pad).ceil();
-    let mut presentation = resources.presentation_budget().map(|budget| {
-        crate::compat::presentation::FrameBuilder::new(
+    // This is the established typed/native presentation phase. The browser
+    // host entry rejects native presentation before drawing; its accessibility
+    // reads therefore occur only at the late SVG root boundary below.
+    let mut presentation = if let Some(budget) = resources.presentation_budget() {
+        let acc_title = input.acc_title()?;
+        let source_title = input.title()?;
+        let acc_descr = input.acc_descr()?;
+        Some(crate::compat::presentation::FrameBuilder::new(
             budget,
             width,
             height,
-            db.acc_title.as_deref().or(db.title.as_deref()),
-            db.acc_descr.as_deref(),
-        )
-    });
+            acc_title.as_deref().or(source_title.as_deref()),
+            acc_descr.as_deref(),
+        ))
+    } else {
+        None
+    };
     let mut links = vec![];
     let mut crossings = Crossings::new();
     if cnodes.iter().any(|c| c.is_group) {
@@ -559,10 +606,15 @@ fn draw(
         let c = &cnodes[i];
         let node = &view.node;
         if let Some(frame) = &mut presentation {
-            frame.label(if c.is_group { &node.id } else { &node.label }, &view.label);
+            frame.label(
+                input
+                    .scalar_text(if c.is_group { &node.id } else { &node.label }, "capture")?
+                    .as_ref(),
+                &view.label,
+            );
         }
-        let stripped = node
-            .css_classes
+        let css_classes = input.scalar_text(&node.css_classes, "replace")?;
+        let stripped = css_classes
             .strip_prefix("default")
             .map(|s| {
                 if s.chars().next().is_some_and(crate::compat::source::space) {
@@ -571,7 +623,7 @@ fn draw(
                     s
                 }
             })
-            .unwrap_or(&node.css_classes);
+            .unwrap_or(css_classes.as_ref());
         let classes = class_names(stripped);
         if c.is_group {
             view.w = c.w;
@@ -589,7 +641,7 @@ fn draw(
                 &crossings,
                 GROUP_PAD,
             );
-            clusters.push_str(&format!("<g class=\"pele-cluster{classes}\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"{}/>{}</g>",esc_text(&node.id)?,num(x),num(y),num(c.w),num(c.h),view.style.shape,label_svg_with_resources(&view.label,title_x,y+8.+view.label.height/2.,&format!(" class=\"pele-cluster-label\" fill=\"var(--_m)\"{}",view.style.text),resources)?));
+            clusters.push_str(&format!("<g class=\"pele-cluster{classes}\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"{}/>{}</g>",esc_text(input.scalar_text(&node.id, "accessibility")?.as_ref())?,num(x),num(y),num(c.w),num(c.h),view.style.shape,label_svg_with_resources(&view.label,title_x,y+8.+view.label.height/2.,&format!(" class=\"pele-cluster-label\" fill=\"var(--_m)\"{}",view.style.text),resources)?));
             continue;
         }
         let w = view.w;
@@ -615,11 +667,12 @@ fn draw(
             &format!(" class=\"pele-label\"{text}"),
             resources,
         )?;
-        let display = decode_entities(if node.alias.is_empty() {
-            &node.label
-        } else {
+        let display_value = if input.truthy(&node.alias)? {
             &node.alias
-        })?;
+        } else {
+            &node.label
+        };
+        let display = decode_entities(input.scalar_text(display_value, "accessibility")?.as_ref())?;
         if format!("{classes} ").contains(" internal-link ")
             && !name.is_empty()
             && options.links != Some(false)
@@ -637,7 +690,7 @@ fn draw(
             if safe {
                 if let Some(frame) = &mut presentation {
                     frame.link(
-                        &node.label,
+                        input.scalar_text(&node.label, "capture")?.as_ref(),
                         &display,
                         true,
                         crate::compat::PresentationRect::centered(
@@ -654,7 +707,7 @@ fn draw(
                 }
             }
             links.push(LinkInfo {
-                id: node.label.clone(),
+                id: input.scalar_text(&node.label, "capture")?.into_owned(),
                 href: display,
                 internal: true,
             })
@@ -679,7 +732,7 @@ fn draw(
             for (r, row) in view.rows.iter().enumerate() {
                 if let Some(frame) = &mut presentation {
                     for cell in &row.cells {
-                        frame.label(&node.label, cell);
+                        frame.label(input.scalar_text(&node.label, "capture")?.as_ref(), cell);
                     }
                 }
                 if r % 2 == 0 {
@@ -731,7 +784,7 @@ fn draw(
             let divider = num(y0 + view.head_h);
             format!("<rect {shape} fill=\"var(--_s)\" stroke=\"var(--_b)\"{}/><g class=\"pele-er-stripes\" fill=\"var(--_bg)\"{}>{stripes}</g><path class=\"pele-er-divider\" d=\"M{},{divider}H{}\" stroke=\"{line_color}\"/><rect {shape} fill=\"none\" stroke=\"var(--_b)\"{}/>{name}<g class=\"pele-er-attributes\" font-size=\"{}\">{cells}</g>",view.style.shape,if view.style.shape.contains("fill:"){" opacity=\"0.6\""}else{""},num(x0),num(x0+w),view.style.line,js_num(view.row_size))
         };
-        nodes_out.push_str(&format!("<g class=\"pele-node pele-entity{classes}\" data-id=\"{}\" transform=\"translate({},{})\">{body}</g>",esc_text(&node.label)?,num(c.x),num(c.y)));
+        nodes_out.push_str(&format!("<g class=\"pele-node pele-entity{classes}\" data-id=\"{}\" transform=\"translate({},{})\">{body}</g>",esc_text(input.scalar_text(&node.label, "accessibility")?.as_ref())?,num(c.x),num(c.y)));
     }
     for (i, own) in loops_by_node.iter().enumerate() {
         if own.is_empty() {
@@ -774,8 +827,8 @@ fn draw(
                     num(x + spread),
                     num(y)
                 );
-                start = marker(edge.arrow_start, x - spread, y, 0., -1.);
-                end = marker(edge.arrow_end, x + spread, y, 0., -1.);
+                start = marker(&edge.arrow_start, x - spread, y, 0., -1.);
+                end = marker(&edge.arrow_end, x + spread, y, 0., -1.);
                 ce.label_x = x;
                 ce.label_y = y + far + label.height / 2.;
             } else {
@@ -792,8 +845,8 @@ fn draw(
                     num(y + spread),
                     num(x)
                 );
-                start = marker(edge.arrow_start, x, y - spread, -1., 0.);
-                end = marker(edge.arrow_end, x, y + spread, -1., 0.);
+                start = marker(&edge.arrow_start, x, y - spread, -1., 0.);
+                end = marker(&edge.arrow_end, x, y + spread, -1., 0.);
                 ce.label_x = x + far + label.width / 2.;
                 ce.label_y = y;
             }
@@ -823,8 +876,8 @@ fn draw(
             } else {
                 path.d
             };
-            start = marker(edge.arrow_start, path.sx, path.sy, path.sdx, path.sdy);
-            end = marker(edge.arrow_end, path.ex, path.ey, path.edx, path.edy);
+            start = marker(&edge.arrow_start, path.sx, path.sy, path.sdx, path.sdy);
+            end = marker(&edge.arrow_end, path.ex, path.ey, path.edx, path.edy);
         }
         edges_out.push_str(&format!(
             "<g class=\"pele-edge pele-er-{}\" data-id=\"{}\"><path d=\"{d}\"{}/>{start}{end}</g>",
@@ -876,14 +929,17 @@ fn draw(
             )
         }
     );
+    // Root metadata follows all body/icon callbacks, as in the pinned rt.
+    let acc_title = input.acc_title()?;
+    let acc_descr = input.acc_descr()?;
     let svg = svg::document(
         "er",
         width,
         height,
         size,
         options,
-        db.acc_title.as_deref(),
-        db.acc_descr.as_deref(),
+        acc_title.as_deref(),
+        acc_descr.as_deref(),
         &body,
     )?;
     Ok((
@@ -917,7 +973,11 @@ struct End {
     at: usize,
     toward: f64,
 }
-fn spread_ends(edges: &mut [CEdge], nodes: &[CNode], views: &[View]) {
+fn spread_ends<A: Clone, S: Clone, V: Clone>(
+    edges: &mut [CEdge],
+    nodes: &[CNode],
+    views: &[View<A, S, V>],
+) {
     let mut sides: Vec<(usize, Vec<End>)> = vec![];
     for (i, e) in edges.iter().enumerate() {
         if e.src == e.dst || e.route.len() < 6 {
@@ -991,7 +1051,7 @@ fn spread_ends(edges: &mut [CEdge], nodes: &[CNode], views: &[View]) {
         }
     }
 }
-fn inset(route: &mut [f64], at: usize, v: &View, c: &CNode) {
+fn inset<A: Clone, S: Clone, V: Clone>(route: &mut [f64], at: usize, v: &View<A, S, V>, c: &CNode) {
     if c.is_group {
         return;
     }

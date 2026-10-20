@@ -38,3 +38,29 @@ impl DiagramModule for Er {
 
 mod public_model;
 pub use public_model::ErPublicState;
+
+mod live_read;
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub use live_read::{render_store, RenderStore};
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub use public_model::MethodStore;
+
+#[cfg(feature = "web-host-er")]
+pub(crate) use direct_parse::parse_into as parse_host_into;
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub use public_model::InitialWriter;
+
+#[cfg(feature = "web-host-er")]
+mod host_initial;
+#[cfg(feature = "web-host-er")]
+pub(crate) use host_initial::admit as admit_host_initial;
+#[cfg(feature = "web-host-er")]
+pub(crate) fn publish_host_initial<W: InitialWriter>(
+    writer: W,
+    model: &ErModel,
+) -> Result<W::Output, PeleError> {
+    public_model::initial_into(writer, model)
+}

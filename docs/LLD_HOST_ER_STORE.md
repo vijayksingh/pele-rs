@@ -1,0 +1,134 @@
+# ER host storage
+
+Status: unreleased architecture under integration and measurement. Performance
+parity is required before 0.3. A smaller representation is not proof of speed.
+
+## Ownership
+
+Ordinary browser builtin ER parsing creates the actual public JavaScript
+objects through a Rust construction sink. Native and Swift retain their existing
+owned document contracts. Exported low-level MutableDocument, revision, binary,
+prepared and caller-authored model contracts remain unchanged.
+
+The browser policy retains captured registration/config, not a JavaScript model
+or a persistent native graph. The JavaScript owner holds public objects, identity
+maps, string/host-reference history and scalar byte/reference accounting per
+retained node. It stores no property mirror, decoded graph or typed ErModel.
+
+Core defines three storage interfaces: construction, method operations and live
+render reads. Grammar, helpers, validation, topology, layout, text and SVG remain
+Rust. The adapter implements object identity, descriptors, collection operations,
+primitive conversion, resources and lifecycle. This seam can support further
+modules without making the core depend on a particular application or JS values.
+
+## Eager construction
+
+One captured ParsePlan performs preparation/provider selection. The direct ER
+construction target shares the existing grammar. If conservative direct syntax
+cannot represent a source, its unpublished owner is discarded, that same plan
+runs the legacy grammar once, and the shared publisher writes a fresh host owner.
+The temporary typed model drops before parse returns. Counting-only admission
+preserves legacy graph/transport limits before fallback publication; it retains
+unique strings and scalar counts, not completed nodes or another model.
+
+The constructor assigns fresh canonical IDs locally and streams at most 128
+ordered storage events / 64 KiB per transfer. Large UTF16 strings use bounded
+fragments. Nodes that fit use one inline event; larger nodes retain ordered
+begin/payload/property/end events. Both encodings use the same publication and
+accounting rules. Each completed event writes the final public object; pending state is
+one object being completed or fragments of one string. Rust keeps an ephemeral
+interner and bounded transfer buffer, then drops both. No first-use conversion
+or deferred native upgrade is allowed.
+
+Fresh publication accumulates exact per-node byte/reference totals. Duplicate
+properties and Map/Set entries use actual object operations for accounting.
+Array length rewrites/truncation retain full-audit fallback. Final admission
+includes every string/node, descriptors, root and metadata; it does not need to
+reread ordinary fresh records. Partial failure discards pending publication.
+
+## Operations and resources
+
+Every operation audits current own data and retained history at entry and exit.
+Detached objects remain roots. Objects reclassified as host references retain
+their previous node storage charge. No full graph scan occurs at each width or
+icon callback. Successful/error outcomes retain caller mutations; cleanup never
+restores stale values. Original arbitrary callback throws take priority over
+secondary admission failures. Repair retries audit the current caller objects.
+
+A HostStore exists only for one invocation. It owns its transfer context and
+bounded optional caches for immutable string units and property-key strings.
+A full cache skips caching; it does not reject a previously valid model. Work
+and text budgets still charge every use. No mutable field or conversion-result
+cache exists. Rust interior borrows end before host imports.
+
+Typed own/index/kind/UTF16 imports avoid generic command arrays for frequent
+reads. Packed scalar replies carry canonical IDs and descriptor flags exactly;
+numbers use an operation-local immediate raw-bit slot. Generic method mutation
+commands remain separate. Native host errors pass through the same captured
+exception path, including browser-specific primitive conversion behavior.
+Map membership transfers use at most 128 pairs / 2,309 bytes and preserve the
+previous first-excess-pair failure boundary. Primitive string conversion stays
+native; object, function and opaque-value conversion still enters the host.
+
+Same-model nested helpers, render and raw render may enter while a resource is
+suspended. Each invocation has independent geometry, read context and numeric
+slot. Temporary observed handles survive until the outer operation ends, even
+when nested admission promotes the underlying object. Active disposal remains
+rejected. The policy contains no permanent JS root and no core Send weakening.
+
+## Live read schedule
+
+- Select the horizontal wrapper before the first drawing callback.
+- Capture each pass's topology and scalar values. Retain attribute/style array
+  handles; replacing a property does not retarget a captured array.
+- Measure edge labels first, then read retained node styles at each node phase.
+- Read attribute length/index live. Retain one row handle, then read and measure
+  type, name, joined keys and comment in order. Never prefetch later cells.
+- Read direction at its layout use, title after layout, and accessibility after
+  body/icon evaluation. Preserve conversion/error order and original throws.
+- A second pass captures again. Mutations persist even if that SVG loses.
+
+Caller primitive conversions can themselves run code. Read batching or caching
+must not cross an unproven conversion/resource boundary. The typed/native path
+uses this same drawing algorithm with borrowed arrays and strings, preserving
+its existing presentation-capture phase. Ordinary browser host rendering exposes
+no new presentation API. Existing explicit unsupported prototype/accessor and
+intrinsic-mutation policies remain in force.
+
+## Verification and release
+
+Public integration/E2E checks cover exact complete source/model/error output,
+constructor/fallback/cap boundaries, retained identities, all helpers, callbacks,
+nested operations, arbitrary throws, repair, Unicode transfer boundaries and
+provider ownership. Native/Swift negative controls are required because shared
+publication/rendering code changes too. Exported low-level and prepared/raw
+lanes require their own proof; ordinary host-lane results do not establish them.
+
+Initial independent VM experiments exposed substantial regressions: the first
+host backend took 4.19 times the old backend's ER-medium parse time, and per-node
+batching still took 2.32 times. Profiles identified repeated boundary string
+conversion and generic array transfers. Streaming and typed reads must be
+measured, including cold parse, first unchanged/edited/callback render, helpers,
+retained/raw paths and source controls. Source-derived crossing counts are not
+speed measurements. Keep adverse samples and exact artifacts; do not move costs
+into first use or substitute a focused run for the complete JS performance gate.
+
+No full API parity, performance parity or release-readiness claim follows from
+this architecture document.
+
+The streamed backend passed 339 browser tests across Chromium, Firefox and
+WebKit. The subsequent inline-node/typed-Map layer passed 30 focused browser
+checks, including both 7,000-entry oversized-node encodings. Current native
+ER publication checks, 168 Swift API conditions, eight Swift integration tests
+and three C integration consumers pass. Native public-parse allocation requests,
+reallocations and bytes match the preceding token-ownership baseline; borrowed
+render arrays remove 668 allocation requests from each measured ER render.
+
+The latest focused independent VM run is still adverse: ER-medium parse takes
+0.715 ms versus 0.722 ms for the old backend and 0.110 ms for JS; retained render
+takes 3.144 ms versus 1.771 ms and 0.486 ms respectively. These are nine-trial
+fixed-resource diagnostic medians, not the complete release gate. The latest
+complete gate remains the previous 126-condition failure. Prepared parsing and
+caller-authored raw roots still use the preceding arena path; six prepared
+callback comparisons reproduce mismatches in each browser engine. They require
+separate fixes and proof. No 0.3 release.

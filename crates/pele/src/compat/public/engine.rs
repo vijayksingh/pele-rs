@@ -245,6 +245,8 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
 }
 type State = Box<dyn Any + Send>;
 trait Erased: Send + Sync {
+    #[cfg(feature = "web-host-er")]
+    fn is_host_er(&self) -> bool;
     fn try_parse_public(
         &self,
         context: ParseContext<'_>,
@@ -295,6 +297,10 @@ trait Erased: Send + Sync {
 }
 struct Codec<D>(Arc<D>);
 impl<D: PublicDiagramModule> Erased for Codec<D> {
+    #[cfg(feature = "web-host-er")]
+    fn is_host_er(&self) -> bool {
+        std::any::TypeId::of::<D>() == std::any::TypeId::of::<crate::compat::diagrams::er::Er>()
+    }
     fn try_parse_public(
         &self,
         context: ParseContext<'_>,
@@ -667,6 +673,70 @@ impl PublicEngine {
             config,
             revision: 0,
         })
+    }
+    /// Captured builtin-only browser construction; fallback consumes the same
+    /// prepared plan once. Existing low-level parse methods remain arena-based.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_host_er_with_limits<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        mut make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        let plan =
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Limits(limits))?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        if !registration.codec.is_host_er() {
+            return self
+                .parse_plan(plan)
+                .map(crate::compat::host_er::Parsed::Arena);
+        }
+        let schema = ModelSchemaView {
+            model: registration.schema,
+            shared_functions: registration.shared_functions,
+            function_shapes: registration.function_shapes,
+        };
+        let writer = make(schema)?;
+        match crate::compat::diagrams::er::parse_host_into(plan.context(), writer) {
+            Some(result) => {
+                let output = result?;
+                schema.validate()?;
+                let policy = crate::compat::host_er::Policy::captured(
+                    registration.descriptor.clone(),
+                    plan.into_config(),
+                );
+                Ok(crate::compat::host_er::Parsed::Host { policy, output })
+            }
+            None => {
+                // Direct construction has discarded its unpublished owner. Keep
+                // the captured plan and run the existing grammar exactly once.
+                let document = plan.parse()?;
+                schema.validate()?;
+                let model = document
+                    .model::<crate::compat::diagrams::er::ErModel>()
+                    .expect("captured builtin ER model");
+                // Preserve legacy GraphWriter/facade admission before host
+                // primitives can reject a partial large publication earlier.
+                crate::compat::diagrams::er::admit_host_initial(model)?;
+                let output =
+                    crate::compat::diagrams::er::publish_host_initial(make(schema)?, model)?;
+                let policy = crate::compat::host_er::Policy::captured(
+                    registration.descriptor.clone(),
+                    document.config().clone(),
+                );
+                // The typed model is transient; neither the policy nor output
+                // retains it, a public graph, or a later conversion obligation.
+                Ok(crate::compat::host_er::Parsed::Host { policy, output })
+            }
+        }
     }
     fn parse_plan(&self, plan: ParsePlan) -> Result<PublicDocument, PeleError> {
         let registration = self

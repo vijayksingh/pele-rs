@@ -442,30 +442,81 @@ fn imported(g: &ModelGraph) -> Result<ErModel, PeleError> {
     }
     Ok(m)
 }
-pub(super) fn rec(w: &mut GraphWriter, fields: Vec<(&str, Atom)>) -> u32 {
-    let properties = fields.into_iter().map(|(k, v)| w.property(k, v)).collect();
+/// Construction-only sink. Each completed node is consumed immediately; a
+/// host sink never needs a graph or a second property table after this call.
+#[doc(hidden)]
+pub trait InitialWriter {
+    type Output;
+    fn string(&mut self, value: &str) -> Result<u32, PeleError>;
+    fn node(&mut self, node: Node) -> Result<u32, PeleError>;
+    fn finish(self, root: Atom) -> Result<Self::Output, PeleError>;
+    fn abort(self) -> Result<(), PeleError>
+    where
+        Self: Sized,
+    {
+        Ok(())
+    }
+    fn property(
+        &mut self,
+        key: &str,
+        value: Atom,
+    ) -> Result<crate::compat::public::Property, PeleError> {
+        Ok(crate::compat::public::Property {
+            key: self.string(key)?,
+            value,
+            flags: 7,
+        })
+    }
+}
+impl InitialWriter for GraphWriter {
+    type Output = ModelGraph;
+    fn property(
+        &mut self,
+        key: &str,
+        value: Atom,
+    ) -> Result<crate::compat::public::Property, PeleError> {
+        Ok(GraphWriter::property(self, key, value))
+    }
+    fn string(&mut self, value: &str) -> Result<u32, PeleError> {
+        Ok(GraphWriter::string(self, value))
+    }
+    fn node(&mut self, node: Node) -> Result<u32, PeleError> {
+        Ok(GraphWriter::node(self, node))
+    }
+    fn finish(self, root: Atom) -> Result<ModelGraph, PeleError> {
+        GraphWriter::finish(self, root)
+    }
+}
+pub(super) fn rec(w: &mut impl InitialWriter, fields: Vec<(&str, Atom)>) -> Result<u32, PeleError> {
+    let properties = fields
+        .into_iter()
+        .map(|(k, v)| w.property(k, v))
+        .collect::<Result<_, _>>()?;
     w.node(Node::Object { properties })
 }
-pub(super) fn arr(w: &mut GraphWriter, values: impl IntoIterator<Item = Atom>) -> u32 {
-    let properties: Vec<_> = values
-        .into_iter()
-        .enumerate()
-        .map(|(n, v)| w.property(&n.to_string(), v))
-        .collect();
+pub(super) fn arr(
+    w: &mut impl InitialWriter,
+    values: impl IntoIterator<Item = Atom>,
+) -> Result<u32, PeleError> {
+    let values = values.into_iter();
+    let mut properties = Vec::with_capacity(values.size_hint().0);
+    for (n, value) in values.enumerate() {
+        properties.push(w.property(&n.to_string(), value)?);
+    }
     w.node(Node::Array {
         length: properties.len() as u32,
         properties,
     })
 }
-fn texts(w: &mut GraphWriter, values: &[String]) -> u32 {
-    let values = values
-        .iter()
-        .map(|s| Atom::String(w.string(s.as_str())))
-        .collect::<Vec<_>>();
-    arr(w, values)
+fn texts(w: &mut impl InitialWriter, values: &[String]) -> Result<u32, PeleError> {
+    let mut atoms = Vec::with_capacity(values.len());
+    for value in values {
+        atoms.push(Atom::String(w.string(value.as_str())?));
+    }
+    arr(w, atoms)
 }
-fn text(w: &mut GraphWriter, s: &str) -> Atom {
-    Atom::String(w.string(s))
+fn text(w: &mut impl InitialWriter, s: &str) -> Result<Atom, PeleError> {
+    Ok(Atom::String(w.string(s)?))
 }
 pub(super) struct EntityPublication<'a> {
     pub name: &'a str,
@@ -477,47 +528,52 @@ pub(super) struct EntityPublication<'a> {
     pub styles: &'a [String],
 }
 pub(super) fn publish_entity(
-    w: &mut GraphWriter,
+    w: &mut impl InitialWriter,
     entity: EntityPublication<'_>,
     comment_first: impl Fn(usize) -> bool,
-) -> (Atom, Atom, Atom) {
+) -> Result<(Atom, Atom, Atom), PeleError> {
     let mut attrs = vec![];
     for (index, a) in entity.attributes.iter().enumerate() {
-        let keys = texts(w, &a.keys);
-        let comment = text(w, &a.comment);
-        let mut fields = vec![("type", text(w, &a.r#type)), ("name", text(w, &a.name))];
+        let keys = texts(w, &a.keys)?;
+        let comment = text(w, &a.comment)?;
+        let mut fields = vec![("type", text(w, &a.r#type)?), ("name", text(w, &a.name)?)];
         if comment_first(index) {
             fields.extend([("comment", comment), ("keys", Atom::Ref(keys))])
         } else {
             fields.extend([("keys", Atom::Ref(keys)), ("comment", comment)])
         }
-        attrs.push(Atom::Ref(rec(w, fields)));
+        attrs.push(Atom::Ref(rec(w, fields)?));
     }
-    let attributes = arr(w, attrs);
-    let styles = texts(w, entity.styles);
-    let id = text(w, entity.id);
+    let attributes = arr(w, attrs)?;
+    let styles = texts(w, entity.styles)?;
+    let id = text(w, entity.id)?;
     let fields = vec![
         ("id", id.clone()),
-        ("label", text(w, entity.label)),
-        ("alias", text(w, entity.alias)),
+        ("label", text(w, entity.label)?),
+        ("alias", text(w, entity.alias)?),
         ("attributes", Atom::Ref(attributes)),
-        ("cssClasses", text(w, entity.classes)),
+        ("cssClasses", text(w, entity.classes)?),
         ("cssStyles", Atom::Ref(styles)),
     ];
-    let node = rec(w, fields);
-    let key = text(w, entity.name);
-    (key, Atom::Ref(node), id)
+    let node = rec(w, fields)?;
+    let key = text(w, entity.name)?;
+    Ok((key, Atom::Ref(node), id))
 }
-pub(super) fn publish_spec(w: &mut GraphWriter, spec: &RelSpec) -> u32 {
+pub(super) fn publish_spec(w: &mut impl InitialWriter, spec: &RelSpec) -> Result<u32, PeleError> {
     let fields = vec![
-        ("cardA", text(w, &format!("{:?}", spec.card_a))),
-        ("relType", text(w, &format!("{:?}", spec.rel_type))),
-        ("cardB", text(w, &format!("{:?}", spec.card_b))),
+        ("cardA", text(w, &format!("{:?}", spec.card_a))?),
+        ("relType", text(w, &format!("{:?}", spec.rel_type))?),
+        ("cardB", text(w, &format!("{:?}", spec.card_b))?),
     ];
     rec(w, fields)
 }
 fn initial(m: &ErModel) -> Result<ModelGraph, PeleError> {
-    let mut w = GraphWriter::default();
+    initial_into(GraphWriter::default(), m)
+}
+pub(super) fn initial_into<W: InitialWriter>(
+    mut w: W,
+    m: &ErModel,
+) -> Result<W::Output, PeleError> {
     let mut entities = vec![];
     for (name, e) in &m.entities {
         let (key, value, _) = publish_entity(
@@ -532,63 +588,65 @@ fn initial(m: &ErModel) -> Result<ModelGraph, PeleError> {
                 styles: &e.css_styles,
             },
             |index| m.public_attribute_comment_first(name, index),
-        );
+        )?;
         entities.push((key, value));
     }
     let entities = w.node(Node::Map {
         entries: entities,
         properties: vec![],
-    });
+    })?;
     let mut relationships = vec![];
     for r in &m.relationships {
-        let spec = publish_spec(&mut w, &r.rel_spec);
+        let spec = publish_spec(&mut w, &r.rel_spec)?;
         let fields = vec![
-            ("entityA", text(&mut w, &r.entity_a)),
-            ("roleA", text(&mut w, &r.role_a)),
-            ("entityB", text(&mut w, &r.entity_b)),
+            ("entityA", text(&mut w, &r.entity_a)?),
+            ("roleA", text(&mut w, &r.role_a)?),
+            ("entityB", text(&mut w, &r.entity_b)?),
             ("relSpec", Atom::Ref(spec)),
         ];
-        relationships.push(Atom::Ref(rec(&mut w, fields)));
+        relationships.push(Atom::Ref(rec(&mut w, fields)?));
     }
-    let relationships = arr(&mut w, relationships);
+    let relationships = arr(&mut w, relationships)?;
     let mut classes = vec![];
     for (key, c) in &m.classes {
-        let styles = texts(&mut w, &c.styles);
-        let text_styles = texts(&mut w, &c.text_styles);
+        let styles = texts(&mut w, &c.styles)?;
+        let text_styles = texts(&mut w, &c.text_styles)?;
         let fields = vec![
-            ("id", text(&mut w, &c.id)),
+            ("id", text(&mut w, &c.id)?),
             ("styles", Atom::Ref(styles)),
             ("textStyles", Atom::Ref(text_styles)),
         ];
-        let id = rec(&mut w, fields);
-        classes.push((text(&mut w, key), Atom::Ref(id)));
+        let id = rec(&mut w, fields)?;
+        classes.push((text(&mut w, key)?, Atom::Ref(id)));
     }
     let classes = w.node(Node::Map {
         entries: classes,
         properties: vec![],
-    });
+    })?;
     let mut groups = vec![];
     let mut lookup: Vec<(Atom, Atom)> = vec![];
     let mut lookup_positions: HashMap<String, usize> = HashMap::new();
     for s in &m.subgraphs {
-        let nodes = texts(&mut w, &s.nodes);
-        let classes = texts(&mut w, &s.classes);
-        let styles = texts(&mut w, &s.css_styles);
+        let nodes = texts(&mut w, &s.nodes)?;
+        let classes = texts(&mut w, &s.classes)?;
+        let styles = texts(&mut w, &s.css_styles)?;
         let dir = s
             .dir
             .as_deref()
-            .map_or(Atom::Undefined, |v| text(&mut w, v));
+            .map(|v| text(&mut w, v))
+            .transpose()?
+            .unwrap_or(Atom::Undefined);
         let fields = vec![
-            ("id", text(&mut w, &s.id)),
+            ("id", text(&mut w, &s.id)?),
             ("nodes", Atom::Ref(nodes)),
-            ("title", text(&mut w, &s.title)),
+            ("title", text(&mut w, &s.title)?),
             ("classes", Atom::Ref(classes)),
             ("cssStyles", Atom::Ref(styles)),
             ("dir", dir),
-            ("labelType", text(&mut w, &s.label_type)),
+            ("labelType", text(&mut w, &s.label_type)?),
         ];
-        let group = Atom::Ref(rec(&mut w, fields));
-        let key = text(&mut w, &s.id);
+        let group = Atom::Ref(rec(&mut w, fields)?);
+        let key = text(&mut w, &s.id)?;
         if let Some(at) = lookup_positions.get(&s.id).copied() {
             lookup[at].1 = group.clone()
         } else {
@@ -597,16 +655,20 @@ fn initial(m: &ErModel) -> Result<ModelGraph, PeleError> {
         }
         groups.push(group);
     }
-    let subgraphs = arr(&mut w, groups);
+    let subgraphs = arr(&mut w, groups)?;
     let lookup = w.node(Node::Map {
         entries: lookup,
         properties: vec![],
-    });
-    let claimed = m.public_claimed().iter().map(|s| text(&mut w, s)).collect();
+    })?;
+    let claimed_values = m.public_claimed();
+    let mut claimed = Vec::with_capacity(claimed_values.len());
+    for value in claimed_values {
+        claimed.push(text(&mut w, value)?);
+    }
     let claimed = w.node(Node::Set {
         values: claimed,
         properties: vec![],
-    });
+    })?;
     finish_initial(
         w,
         m,
@@ -628,11 +690,11 @@ pub(super) struct InitialRoots {
     pub lookup: u32,
     pub claimed: u32,
 }
-pub(super) fn finish_initial(
-    mut w: GraphWriter,
+pub(super) fn finish_initial<W: InitialWriter>(
+    mut w: W,
     m: &ErModel,
     roots: InitialRoots,
-) -> Result<ModelGraph, PeleError> {
+) -> Result<W::Output, PeleError> {
     let InitialRoots {
         entities,
         relationships,
@@ -643,29 +705,33 @@ pub(super) fn finish_initial(
     } = roots;
     let mut properties = vec![];
     for (k, v) in [
-        ("type", text(&mut w, "er")),
-        ("direction", text(&mut w, &m.direction)),
+        ("type", text(&mut w, "er")?),
+        ("direction", text(&mut w, &m.direction)?),
         ("entities", Atom::Ref(entities)),
         ("relationships", Atom::Ref(relationships)),
         ("classes", Atom::Ref(classes)),
         ("subgraphs", Atom::Ref(subgraphs)),
     ] {
-        properties.push(w.property(k, v))
+        properties.push(w.property(k, v)?)
     }
     for (k, v) in [
         ("title", &m.title),
         ("accTitle", &m.acc_title),
         ("accDescr", &m.acc_descr),
     ] {
-        let a = v.as_deref().map_or(Atom::Undefined, |s| text(&mut w, s));
-        properties.push(w.property(k, a))
+        let a = v
+            .as_deref()
+            .map(|s| text(&mut w, s))
+            .transpose()?
+            .unwrap_or(Atom::Undefined);
+        properties.push(w.property(k, a)?)
     }
-    properties.push(w.property("subgraphLookup", Atom::Ref(lookup)));
-    properties.push(w.property("claimed", Atom::Ref(claimed)));
+    properties.push(w.property("subgraphLookup", Atom::Ref(lookup))?);
+    properties.push(w.property("claimed", Atom::Ref(claimed))?);
     let root = w.node(Node::Instance {
         prototype: PROTO,
         properties,
-    });
+    })?;
     w.finish(Atom::Ref(root))
 }
 impl PublicDiagramModule for Er {
@@ -1241,9 +1307,42 @@ impl<'a> Context<'a> {
             _ => Err(invalid("ER object primitive-conversion dispatch is unavailable").into()),
         }
     }
+}
+
+/// ER method semantics over document-local atoms. The store owns identity,
+/// primitive validation and accounting; these default algorithms own evaluation
+/// order and partial mutations. No borrowed graph data crosses this interface.
+#[doc(hidden)]
+pub trait MethodStore {
+    type Cursor;
+    fn tick(&mut self, n: usize) -> Result<(), PublicError>;
+    fn own(&mut self, id: u32, k: &str) -> Result<Option<Atom>, PublicError>;
+    fn read(&mut self, a: &Atom, k: &str) -> Result<Atom, PublicError>;
+    fn set(&mut self, a: &Atom, k: &str, v: Atom) -> Result<(), PublicError>;
+    fn intern(&mut self, s: JsString) -> Result<Atom, PublicError>;
+    fn text(&mut self, s: &str) -> Result<Atom, PublicError>;
+    fn record(&mut self, fields: Vec<(&str, Atom)>) -> Result<Atom, PublicError>;
+    fn array(&mut self, values: Vec<Atom>) -> Result<Atom, PublicError>;
+    fn native(&mut self, a: &Atom, p: &str, expr: &str, kind: u8) -> Result<u32, PublicError>;
+    fn map_get(&mut self, a: &Atom, k: &Atom, has: bool, expr: &str) -> Result<Atom, PublicError>;
+    fn map_set(&mut self, a: &Atom, k: Atom, v: Atom, expr: &str) -> Result<(), PublicError>;
+    fn set_has(&mut self, a: &Atom, k: &Atom) -> Result<bool, PublicError>;
+    fn set_add(&mut self, a: &Atom, k: Atom) -> Result<(), PublicError>;
+    fn push(&mut self, a: &Atom, v: Atom, expr: &str) -> Result<(), PublicError>;
+    fn iter(&mut self, a: &Atom) -> Result<Self::Cursor, PublicError>;
+    fn next(&mut self, it: &mut Self::Cursor) -> Result<Option<Atom>, PublicError>;
+    fn string_units(&mut self, a: &Atom, expr: &str) -> Result<Vec<u16>, PublicError>;
+    fn includes_color(&mut self, a: &Atom) -> Result<bool, PublicError>;
+    fn coercion(&mut self, a: &Atom) -> Result<Vec<u16>, PublicError>;
+    // Uncharged queries replacing direct arena inspections in the algorithms.
+    fn truth(&self, value: &Atom) -> Result<bool, PublicError>;
+    fn is_er_instance(&self, id: u32) -> Result<bool, PublicError>;
+    fn array_length(&self, id: u32) -> Result<Option<u32>, PublicError>;
+    fn string_is(&self, id: u32, text: &str) -> Result<bool, PublicError>;
+
     fn helper_entity(&mut self, r: &Atom, name: Atom) -> Result<Atom, PublicError> {
         let f = self.read(r, "addEntity")?;
-        let native = matches!(r,Atom::Ref(id) if matches!(self.g.nodes[*id as usize],Node::Instance{prototype:PROTO,..}));
+        let native = matches!(r,Atom::Ref(id) if self.is_er_instance(*id)?);
         if matches!(f, Atom::BuiltinFunction(1))
             || matches!(f, Atom::Undefined)
                 && native
@@ -1289,7 +1388,7 @@ impl<'a> Context<'a> {
             Ok(e)
         } else {
             let old = self.read(&found, "alias")?;
-            if !truth(self.g, &old) && truth(self.g, &alias) {
+            if !self.truth(&old)? && self.truth(&alias)? {
                 self.set(&found, "alias", alias)?
             }
             Ok(found)
@@ -1342,7 +1441,7 @@ impl<'a> Context<'a> {
                 for name in [arg(0), arg(2)] {
                     let lookup = self.read(r, "subgraphLookup")?;
                     let exists = self.map_get(&lookup, &name, true, "this.subgraphLookup.has")?;
-                    ends.push(if truth(self.g, &exists) {
+                    ends.push(if self.truth(&exists)? {
                         name
                     } else {
                         let e = self.helper_entity(r, name)?;
@@ -1366,7 +1465,7 @@ impl<'a> Context<'a> {
             5..=7 => {
                 let ids = arg(0);
                 let styles = arg(1);
-                if c.method.0 == 5 && !truth(self.g, &styles) {
+                if c.method.0 == 5 && !self.truth(&styles)? {
                     return Ok(Atom::Undefined);
                 }
                 let mut iter = self.iter(&ids)?;
@@ -1394,7 +1493,7 @@ impl<'a> Context<'a> {
                                 let map = self.read(r, lookup)?;
                                 let target =
                                     self.map_get(&map, &id, false, &format!("this.{lookup}.get"))?;
-                                if !truth(self.g, &target) {
+                                if !self.truth(&target)? {
                                     continue;
                                 }
                                 let mut values = self.iter(&styles)?;
@@ -1427,7 +1526,7 @@ impl<'a> Context<'a> {
                                 let map = self.read(r, "classes")?;
                                 self.map_set(&map, id, def.clone(), "this.classes.set")?
                             }
-                            if !truth(self.g, &styles) {
+                            if !self.truth(&styles)? {
                                 continue;
                             }
                             let mut values = self.iter(&styles)?;
@@ -1507,7 +1606,7 @@ impl<'a> Context<'a> {
         let units = self.string_units(&value, "idText.text.trim")?;
         let id = self.intern(JsString(trimmed(&units).to_vec()))?;
         let list_id = self.native(&list, "flat", "list.flat", 1)?;
-        let Node::Array { length, .. } = self.g.nodes[list_id as usize] else {
+        let Some(length) = self.array_length(list_id)? else {
             unreachable!()
         };
         self.tick(length as usize)?;
@@ -1515,7 +1614,7 @@ impl<'a> Context<'a> {
         for n in 0..length {
             if let Some(a) = self.own(list_id, &n.to_string())? {
                 if let Atom::Ref(sub) = a {
-                    if let Node::Array { length, .. } = self.g.nodes[sub as usize] {
+                    if let Some(length) = self.array_length(sub)? {
                         self.tick(length as usize)?;
                         for j in 0..length {
                             if let Some(v) = self.own(sub, &j.to_string())? {
@@ -1538,7 +1637,7 @@ impl<'a> Context<'a> {
             if !matches!(item, Atom::String(_)) {
                 if !matches!(item, Atom::Null | Atom::Undefined) {
                     let stmt = self.read(&item, "stmt")?;
-                    if matches!(stmt,Atom::String(id) if self.g.strings[id as usize].is("dir")) {
+                    if matches!(stmt,Atom::String(id) if self.string_is(id, "dir")?) {
                         dir = self.read(&item, "value")?
                     }
                 }
@@ -1559,7 +1658,7 @@ impl<'a> Context<'a> {
             self.set_add(&claimed, node.clone())?
         }
         let title = self.read(&title_text, "text")?;
-        let title = if truth(self.g, &title) {
+        let title = if self.truth(&title)? {
             title
         } else {
             self.text("")?
@@ -1567,7 +1666,7 @@ impl<'a> Context<'a> {
         let units = self.string_units(&title, "(titleText.text || '').trim")?;
         let title = self.intern(JsString(trimmed(&units).to_vec()))?;
         let ty = self.read(&title_text, "type")?;
-        let label_type = if matches!(ty,Atom::String(id) if ["markdown","text","string"].iter().any(|s|self.g.strings[id as usize].is(s)))
+        let label_type = if matches!(ty, Atom::String(id) if self.string_is(id, "markdown")? || self.string_is(id, "text")? || self.string_is(id, "string")?)
         {
             ty
         } else {
@@ -1590,5 +1689,87 @@ impl<'a> Context<'a> {
         let lookup = self.read(r, "subgraphLookup")?;
         self.map_set(&lookup, id.clone(), group, "this.subgraphLookup.set")?;
         Ok(id)
+    }
+}
+
+impl MethodStore for Context<'_> {
+    type Cursor = Iter;
+    fn tick(&mut self, n: usize) -> Result<(), PublicError> {
+        Context::tick(self, n)
+    }
+    fn own(&mut self, id: u32, k: &str) -> Result<Option<Atom>, PublicError> {
+        Context::own(self, id, k)
+    }
+    fn read(&mut self, a: &Atom, k: &str) -> Result<Atom, PublicError> {
+        Context::read(self, a, k)
+    }
+    fn set(&mut self, a: &Atom, k: &str, v: Atom) -> Result<(), PublicError> {
+        Context::set(self, a, k, v)
+    }
+    fn intern(&mut self, s: JsString) -> Result<Atom, PublicError> {
+        Context::intern(self, s)
+    }
+    fn text(&mut self, s: &str) -> Result<Atom, PublicError> {
+        Context::text(self, s)
+    }
+    fn record(&mut self, fields: Vec<(&str, Atom)>) -> Result<Atom, PublicError> {
+        Context::record(self, fields)
+    }
+    fn array(&mut self, values: Vec<Atom>) -> Result<Atom, PublicError> {
+        Context::array(self, values)
+    }
+    fn native(&mut self, a: &Atom, p: &str, expr: &str, kind: u8) -> Result<u32, PublicError> {
+        Context::native(self, a, p, expr, kind)
+    }
+    fn map_get(&mut self, a: &Atom, k: &Atom, has: bool, expr: &str) -> Result<Atom, PublicError> {
+        Context::map_get(self, a, k, has, expr)
+    }
+    fn map_set(&mut self, a: &Atom, k: Atom, v: Atom, expr: &str) -> Result<(), PublicError> {
+        Context::map_set(self, a, k, v, expr)
+    }
+    fn set_has(&mut self, a: &Atom, k: &Atom) -> Result<bool, PublicError> {
+        Context::set_has(self, a, k)
+    }
+    fn set_add(&mut self, a: &Atom, k: Atom) -> Result<(), PublicError> {
+        Context::set_add(self, a, k)
+    }
+    fn push(&mut self, a: &Atom, v: Atom, expr: &str) -> Result<(), PublicError> {
+        Context::push(self, a, v, expr)
+    }
+    fn iter(&mut self, a: &Atom) -> Result<Self::Cursor, PublicError> {
+        Context::iter(self, a)
+    }
+    fn next(&mut self, it: &mut Self::Cursor) -> Result<Option<Atom>, PublicError> {
+        Context::next(self, it)
+    }
+    fn string_units(&mut self, a: &Atom, expr: &str) -> Result<Vec<u16>, PublicError> {
+        Context::string_units(self, a, expr)
+    }
+    fn includes_color(&mut self, a: &Atom) -> Result<bool, PublicError> {
+        Context::includes_color(self, a)
+    }
+    fn coercion(&mut self, a: &Atom) -> Result<Vec<u16>, PublicError> {
+        Context::coercion(self, a)
+    }
+    fn truth(&self, value: &Atom) -> Result<bool, PublicError> {
+        Ok(truth(self.g, value))
+    }
+    fn is_er_instance(&self, id: u32) -> Result<bool, PublicError> {
+        Ok(matches!(
+            self.g.nodes[id as usize],
+            Node::Instance {
+                prototype: PROTO,
+                ..
+            }
+        ))
+    }
+    fn array_length(&self, id: u32) -> Result<Option<u32>, PublicError> {
+        Ok(match self.g.nodes[id as usize] {
+            Node::Array { length, .. } => Some(length),
+            _ => None,
+        })
+    }
+    fn string_is(&self, id: u32, text: &str) -> Result<bool, PublicError> {
+        Ok(self.g.strings[id as usize].is(text))
     }
 }

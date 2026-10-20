@@ -9,7 +9,7 @@ fn invalid(message: &str) -> PeleError {
 fn failure(error: PeleError) -> JsValue {
     JsValue::from_str(&super::render_numbers::failure(&error))
 }
-fn config(json: &str) -> Result<Object, PeleError> {
+pub(super) fn config(json: &str) -> Result<Object, PeleError> {
     if json.len() > 1024 * 1024 {
         return Err(PeleError::new(
             "Prepared config exceeds 1 MiB transport budget",
@@ -142,7 +142,7 @@ impl NativeRegistry {
     }
 }
 #[derive(Serialize)]
-struct RawTransport<'a> {
+pub(super) struct RawTransport<'a> {
     #[serde(flatten)]
     rendered: &'a Rendered,
     #[serde(
@@ -151,7 +151,7 @@ struct RawTransport<'a> {
     )]
     numbers: std::collections::BTreeMap<&'static str, String>,
 }
-fn transport(rendered: &Rendered) -> RawTransport<'_> {
+pub(super) fn transport(rendered: &Rendered) -> RawTransport<'_> {
     let mut numbers = std::collections::BTreeMap::new();
     for (key, value) in [("width", rendered.width), ("height", rendered.height)] {
         if !value.is_finite() || (value == 0. && value.is_sign_negative()) {
@@ -270,7 +270,7 @@ impl MutableDocument {
     }
 }
 
-struct RawResources {
+pub(super) struct RawResources {
     resources: super::render_numbers::NumericResources,
     inline: super::BrowserResources,
 }
@@ -298,5 +298,23 @@ impl RenderResources for RawResources {
     }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         self.resources.now_millis()
+    }
+}
+
+pub(super) fn host_er_raw_resources(
+    width: Option<js_sys::Function>,
+    icons: Option<js_sys::Function>,
+    clock: Option<js_sys::Function>,
+    inline_icons: Option<js_sys::Function>,
+) -> RawResources {
+    RawResources {
+        resources: super::render_numbers::NumericResources {
+            browser: super::BrowserResources { width, icons },
+            clock,
+        },
+        inline: super::BrowserResources {
+            width: None,
+            icons: inline_icons,
+        },
     }
 }

@@ -1,4 +1,5 @@
 mod foreign_provider;
+mod host_er;
 mod host_functions;
 mod parse_limits;
 mod prepared_entries;
