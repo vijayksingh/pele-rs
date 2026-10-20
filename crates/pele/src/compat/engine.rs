@@ -240,6 +240,32 @@ impl ParsePlan {
         })
     }
 }
+/// Already-prepared input borrows its source unchanged and retains its module.
+pub(crate) struct PreparedParsePlan<'a> {
+    registration: Arc<Registration>,
+    context: ParseContext<'a>,
+    config: Object,
+    edge_limit: EdgeLimit,
+}
+impl PreparedParsePlan<'_> {
+    #[cfg(feature = "web-host-er")]
+    pub(crate) fn diagram_type(&self) -> &DiagramId {
+        &self.registration.descriptor.id
+    }
+    pub(crate) fn parse(self) -> Result<ParsedDocument, PeleError> {
+        let model = self
+            .registration
+            .module
+            .parse_prepared(self.context, self.edge_limit)?;
+        Ok(ParsedDocument {
+            registration: self.registration,
+            model,
+            config: self.config,
+            edge_limit: Some(self.edge_limit),
+            prepared: true,
+        })
+    }
+}
 /// Immutable document with exact registration/config. Cannot be fabricated from JSON.
 pub struct ParsedDocument {
     registration: Arc<Registration>,
@@ -643,6 +669,14 @@ impl Engine {
         context: ParseContext<'_>,
         edge_limit: EdgeLimit,
     ) -> Result<ParsedDocument, PeleError> {
+        self.prepare_prepared_as(id, context, edge_limit)?.parse()
+    }
+    pub(crate) fn prepare_prepared_as<'a>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'a>,
+        edge_limit: EdgeLimit,
+    ) -> Result<PreparedParsePlan<'a>, PeleError> {
         SourceLimit::check_bytes(context.source)?;
         if context
             .line_offset
@@ -668,13 +702,11 @@ impl Engine {
                 e
             })?;
         let config = context.config.clone();
-        let model = registration.module.parse_prepared(context, edge_limit)?;
-        Ok(ParsedDocument {
+        Ok(PreparedParsePlan {
             registration,
-            model,
+            context,
             config,
-            edge_limit: Some(edge_limit),
-            prepared: true,
+            edge_limit,
         })
     }
     /// Invoke only the retained module's raw renderer with the supplied config.

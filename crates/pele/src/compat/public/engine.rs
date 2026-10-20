@@ -572,6 +572,46 @@ impl PublicEngine {
     ) -> Result<PublicDocument, PeleError> {
         self.create_document(self.engine.parse_prepared_as(id, context, edge_limit)?)
     }
+    /// Facade-only prepared publication. Input is parsed verbatim once; the
+    /// low-level prepared API continues to return a public arena document.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_prepared_host_er_as<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        edge_limit: EdgeLimit,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        let plan = self.engine.prepare_prepared_as(id, context, edge_limit)?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        let document = plan.parse()?;
+        if !registration.codec.is_host_er() {
+            return Self::create_document_registered(document, registration)
+                .map(crate::compat::host_er::Parsed::Arena);
+        }
+        let schema = ModelSchemaView {
+            model: registration.schema,
+            shared_functions: registration.shared_functions,
+            function_shapes: registration.function_shapes,
+        };
+        schema.validate()?;
+        let model = document
+            .model::<crate::compat::diagrams::er::ErModel>()
+            .expect("captured builtin ER model");
+        crate::compat::diagrams::er::admit_host_initial(model)?;
+        let output = crate::compat::diagrams::er::publish_host_initial(make(schema)?, model)?;
+        let policy = crate::compat::host_er::Policy::captured(
+            registration.descriptor.clone(),
+            document.config().clone(),
+        );
+        Ok(crate::compat::host_er::Parsed::Host { policy, output })
+    }
     /// Render source through this registry with exact parse limits, without
     /// exporting or importing a public model graph solely to produce SVG.
     pub fn render_source_bounded_with_limits(
@@ -777,6 +817,12 @@ impl PublicEngine {
             .find(|m| m.descriptor.id == *document.diagram_type())
             .expect("paired public registration")
             .clone();
+        Self::create_document_registered(document, registration)
+    }
+    fn create_document_registered(
+        document: crate::compat::ParsedDocument,
+        registration: Arc<Registration>,
+    ) -> Result<PublicDocument, PeleError> {
         ModelSchemaView {
             model: registration.schema,
             shared_functions: registration.shared_functions,

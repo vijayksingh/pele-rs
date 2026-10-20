@@ -10,6 +10,10 @@ objects through a Rust construction sink. Native and Swift retain their existing
 owned document contracts. Exported low-level MutableDocument, revision, binary,
 prepared and caller-authored model contracts remain unchanged.
 
+Facade prepared/standalone ER parsing also publishes host storage. Its hidden
+capability is additive; the exported low-level prepared parser still returns
+the same arena document and binary/revision APIs.
+
 The browser policy retains captured registration/config, not a JavaScript model
 or a persistent native graph. The JavaScript owner holds public objects, identity
 maps, string/host-reference history and scalar byte/reference accounting per
@@ -30,6 +34,14 @@ runs the legacy grammar once, and the shared publisher writes a fresh host owner
 The temporary typed model drops before parse returns. Counting-only admission
 preserves legacy graph/transport limits before fallback publication; it retains
 unique strings and scalar counts, not completed nodes or another model.
+
+Prepared input uses a separate borrowed PreparedParsePlan. It preserves source,
+title, offset and edge-limit presence verbatim, captures provider/config before
+parsing, and executes the existing prepared grammar once. Schema and counting
+admission follow grammar; the host factory runs only after both succeed. The
+temporary typed model drops before return. Exact native ER type identity opts
+in; custom codecs keep their captured prepared conversion. No ordinary source
+preprocessing or direct-source hook is substituted.
 
 The constructor assigns fresh canonical IDs locally and streams at most 128
 ordered storage events / 64 KiB per transfer. Large UTF16 strings use bounded
@@ -69,6 +81,8 @@ exception path, including browser-specific primitive conversion behavior.
 Map membership transfers use at most 128 pairs / 2,309 bytes and preserve the
 previous first-excess-pair failure boundary. Primitive string conversion stays
 native; object, function and opaque-value conversion still enters the host.
+Admission array counts use a direct scalar import while retaining the original
+descriptor enumeration and empty-key classification, errors and temporary IDs.
 
 Same-model nested helpers, render and raw render may enter while a resource is
 suspended. Each invocation has independent geometry, read context and numeric
@@ -124,11 +138,20 @@ and three C integration consumers pass. Native public-parse allocation requests,
 reallocations and bytes match the preceding token-ownership baseline; borrowed
 render arrays remove 668 allocation requests from each measured ER render.
 
-The latest focused independent VM run is still adverse: ER-medium parse takes
+The inline checkpoint's focused independent VM run is still adverse: ER-medium parse takes
 0.715 ms versus 0.722 ms for the old backend and 0.110 ms for JS; retained render
 takes 3.144 ms versus 1.771 ms and 0.486 ms respectively. These are nine-trial
 fixed-resource diagnostic medians, not the complete release gate. The latest
-complete gate remains the previous 126-condition failure. Prepared parsing and
-caller-authored raw roots still use the preceding arena path; six prepared
-callback comparisons reproduce mismatches in each browser engine. They require
-separate fixes and proof. No 0.3 release.
+complete gate remains the previous 126-condition failure. The broader
+30-condition comparison reports 75.7–91.9% slower paired retained ER render
+medians against the old backend, with mixed parse measurements.
+
+Prepared publication now passes the six previously failing comparisons in each
+browser. Two focused runs cover ER callbacks/construction plus all 33 packed
+entries, normal-render policy, provider/lifecycle and low-level error controls.
+Twelve native integrations, 168 Swift API conditions, eight ER/eager Swift tests,
+seven all-family prepared/caller-model Swift integrations and three C consumers
+pass against the fresh ARM64 SDK. Caller-authored browser raw roots still use
+the arena: six callback comparisons fail in each engine, while ten Array/Map/
+Set/Date/Error root controls pass. That adoption layer needs separate work.
+No full API or performance parity claim; no 0.3 release.

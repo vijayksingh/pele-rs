@@ -1437,6 +1437,63 @@ impl pele::compat::host_er::InitialWriter for HostConstruction {
         Ok(())
     }
 }
+fn host_construction(
+    schema: pele::compat::public::ModelSchemaView,
+    make: &Function,
+    capture: &Function,
+) -> Result<HostConstruction, PeleError> {
+    // Reuse the facade's existing validated immutable-schema cache.
+    // On wasm these are static linear-memory offsets, not host addresses.
+    #[cfg(target_arch = "wasm32")]
+    let key = format!(
+        "1:{:x}:{:x}:{}:{:x}:{}",
+        std::ptr::from_ref(schema.model) as usize,
+        schema.shared_functions.as_ptr() as usize,
+        schema.shared_functions.len(),
+        schema.function_shapes.as_ptr() as usize,
+        schema.function_shapes.len()
+    );
+    #[cfg(not(target_arch = "wasm32"))]
+    let key = String::from("native-host-er");
+    let factory = |json: &JsValue| {
+        make.call2(&JsValue::UNDEFINED, &JsValue::from_str(&key), json)
+            .map_err(|error| {
+                let _ = capture.call1(&JsValue::UNDEFINED, &error);
+                pele(invalid("Host construction factory failed"))
+            })
+    };
+    let cached = factory(&JsValue::UNDEFINED)?;
+    let primitive = if cached.is_undefined() {
+        factory(&JsValue::from_str(&super::public_result(&schema)))?
+    } else {
+        cached
+    };
+    let primitive = primitive
+        .dyn_into::<Function>()
+        .map_err(|_| pele(invalid("Invalid host construction factory")))?;
+    Ok(HostConstruction {
+        store: HostStore::new(primitive, capture.clone()).map_err(pele)?,
+        strings: HashMap::new(),
+        string_units: 0,
+        nodes: 0,
+        frame: Vec::new(),
+        events: 0,
+    })
+}
+fn host_parsed(parsed: pele::compat::host_er::Parsed<()>) -> Array {
+    let result = Array::new();
+    match parsed {
+        pele::compat::host_er::Parsed::Host { policy, .. } => {
+            result.push(&number(1));
+            result.push(&HostErDocument { policy }.into());
+        }
+        pele::compat::host_er::Parsed::Arena(inner) => {
+            result.push(&number(0));
+            result.push(&super::MutableDocument { inner }.into());
+        }
+    }
+    result
+}
 #[wasm_bindgen]
 impl NativeRegistry {
     /// Optional facade-only path. The low-level parse method keeps returning a
@@ -1467,56 +1524,51 @@ impl NativeRegistry {
         .map_err(native_failure)?;
         let parsed = engine
             .parse_host_er_with_limits(source, &options, limits, |schema| {
-                // Reuse the facade's existing validated immutable-schema cache.
-                // On wasm these are static linear-memory offsets, not host addresses.
-                #[cfg(target_arch = "wasm32")]
-                let key = format!(
-                    "1:{:x}:{:x}:{}:{:x}:{}",
-                    std::ptr::from_ref(schema.model) as usize,
-                    schema.shared_functions.as_ptr() as usize,
-                    schema.shared_functions.len(),
-                    schema.function_shapes.as_ptr() as usize,
-                    schema.function_shapes.len()
-                );
-                #[cfg(not(target_arch = "wasm32"))]
-                let key = String::from("native-host-er");
-                let factory = |json: &JsValue| {
-                    make.call2(&JsValue::UNDEFINED, &JsValue::from_str(&key), json)
-                        .map_err(|error| {
-                            let _ = capture.call1(&JsValue::UNDEFINED, &error);
-                            pele(invalid("Host construction factory failed"))
-                        })
-                };
-                let cached = factory(&JsValue::UNDEFINED)?;
-                let primitive = if cached.is_undefined() {
-                    factory(&JsValue::from_str(&super::public_result(&schema)))?
-                } else {
-                    cached
-                };
-                let primitive = primitive
-                    .dyn_into::<Function>()
-                    .map_err(|_| pele(invalid("Invalid host construction factory")))?;
-                Ok(HostConstruction {
-                    store: HostStore::new(primitive, capture.clone()).map_err(pele)?,
-                    strings: HashMap::new(),
-                    string_units: 0,
-                    nodes: 0,
-                    frame: Vec::new(),
-                    events: 0,
-                })
+                host_construction(schema, &make, &capture)
             })
             .map_err(native_failure)?;
-        let result = Array::new();
-        match parsed {
-            pele::compat::host_er::Parsed::Host { policy, .. } => {
-                result.push(&number(1));
-                result.push(&HostErDocument { policy }.into());
-            }
-            pele::compat::host_er::Parsed::Arena(inner) => {
-                result.push(&number(0));
-                result.push(&super::MutableDocument { inner }.into());
-            }
-        }
-        Ok(result)
+        Ok(host_parsed(parsed))
+    }
+    /// Additive facade entry; the public parse_prepared export remains arena-based.
+    #[allow(clippy::too_many_arguments)]
+    pub fn parse_prepared_with_host_er(
+        &self,
+        id: &str,
+        source: &str,
+        json: &str,
+        title: Option<String>,
+        line_offset: f64,
+        edge_kind: u32,
+        edge_value: f64,
+        make: Function,
+        capture: Function,
+    ) -> Result<Array, JsValue> {
+        let input = super::prepared_entries::prepared_input(
+            self,
+            id,
+            source,
+            json,
+            title.as_deref(),
+            line_offset,
+            edge_kind,
+            edge_value,
+        )
+        .map_err(native_failure)?;
+        let parsed = input
+            .engine
+            .parse_prepared_host_er_as(
+                &input.id,
+                pele::compat::ParseContext {
+                    source,
+                    config: &input.config,
+                    title: title.as_deref(),
+                    line_offset: input.line_offset,
+                    max_edges: pele::compat::DEFAULT_MAX_EDGES,
+                },
+                input.limit,
+                |schema| host_construction(schema, &make, &capture),
+            )
+            .map_err(native_failure)?;
+        Ok(host_parsed(parsed))
     }
 }

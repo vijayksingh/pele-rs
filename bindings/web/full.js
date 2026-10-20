@@ -183,9 +183,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     if(Object.hasOwn(outcome,'Err'))throw operationError(outcome.Err,owner);
     return outcome.Ok;
   }
-  function adoptHostEr(handle,owner,provider) {
+  function adoptHostEr(handle,owner,provider,preparedType) {
     const model=owner.root,rawType='er';
-    const entry={handle,rawType,provider,disposed:false,hostStore:owner};
+    const entry={handle,rawType,provider,preparedType,disposed:false,hostStore:owner};
     owner.invoke=(method,receiver,args)=>hostOperation(entry,'method',[receiver,...args],(primitive,capture,finish,_resource,values)=>handle.invoke_host(method,primitive,capture,finish,values));
     owner.phase='idle';
     if(owner.registration.documents.length>256)owner.registration.documents=owner.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
@@ -244,10 +244,26 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     detectType(source) { return nativeValue(() => nativeRegistry.detect_type(source)); },
     supports(source) { return nativeValue(() => nativeRegistry.supports(source)); },
     close() { registryCall(() => nativeRegistry.close()); },
-    // Internal low-level entry adapters. Models stay in their native document;
-    // neither prepared sources nor raw results cross core preprocessing.
+    // Internal low-level entry adapters. Prepared sources and raw results
+    // do not cross core preprocessing.
     parsePrepared(type, source, config, title, lineOffset, maxEdges) {
       const limits=parseLimitValues({maxEdges});
+      if(nativeRegistry.parse_prepared_with_host_er){
+        let owner,failed=false,original,parsed;
+        const capture=error=>{if(!failed){failed=true;original=error;}};
+        try{
+          parsed=registryCall(()=>nativeRegistry.parse_prepared_with_host_er(type,source,finiteConfigJSON(config),title,lineOffset,limits.edgeKind,limits.edgeValue,(key,schema)=>{
+            let registration=schemaRegistrations.get(key);
+            if(!registration){if(schema===undefined)return undefined;registration=registry.registration(result(schema));schemaRegistrations.set(key,registration);}
+            owner=new HostErOwner(registration,registry,undefined,()=>{throw new TypeError('Public model construction is incomplete');});
+            return owner.primitive.bind(owner);
+          },capture));
+        }catch(error){if(failed)throw original;if(typeof error==='string')return result(error);throw error;}
+        if(failed){parsed?.[1]?.free();throw original;}
+        const handle=parsed[1];
+        try{return parsed[0]===1?adoptHostEr(handle,owner,undefined,type):adoptMutable(handle,type);}
+        catch(error){handle.free();throw error;}
+      }
       const handle=registryCall(()=>{try{return nativeRegistry.parse_prepared(type,source,finiteConfigJSON(config),title,lineOffset,limits.edgeKind,limits.edgeValue);}catch(error){if(typeof error==='string')return result(error);throw error;}});
       try{return adoptMutable(handle,type);}catch(error){handle.free();throw error;}
     },

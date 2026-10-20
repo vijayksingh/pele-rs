@@ -38,6 +38,63 @@ fn builtin_id(id: &str) -> Result<DiagramId, PeleError> {
             )
         })
 }
+pub(super) struct PreparedInput<'a> {
+    pub engine: &'a PublicEngine,
+    pub id: DiagramId,
+    pub config: Object,
+    pub limit: EdgeLimit,
+    pub line_offset: usize,
+}
+#[allow(clippy::too_many_arguments)]
+pub(super) fn prepared_input<'a>(
+    registry: &'a NativeRegistry,
+    id: &str,
+    source: &str,
+    json: &str,
+    title: Option<&str>,
+    line_offset: f64,
+    edge_kind: u32,
+    edge_value: f64,
+) -> Result<PreparedInput<'a>, PeleError> {
+    if source.len() > MAX_PUBLIC_SOURCE_BYTES
+        || title.is_some_and(|s| s.len() > MAX_PUBLIC_SOURCE_BYTES)
+    {
+        return Err(PeleError::new(
+            "Native transport: declared input exceeds budget",
+            ErrorCode::Limit,
+        ));
+    }
+    let engine = registry
+        .inner
+        .as_ref()
+        .ok_or_else(|| invalid("Registry is closed"))?;
+    if !line_offset.is_finite()
+        || line_offset < 0.
+        || line_offset.fract() != 0.
+        || line_offset > (usize::MAX - source.len()) as f64
+    {
+        return Err(invalid("Prepared lineOffset must be a nonnegative integer within the native source-position range"));
+    }
+    let config = config(json)?;
+    let limit = edge(edge_kind, edge_value)?;
+    let id = DIAGRAM_TYPES
+        .into_iter()
+        .find(|kind| kind.as_str() == id)
+        .map(DiagramId::Builtin)
+        .ok_or_else(|| {
+            PeleError::new(
+                "Unknown prepared diagram type",
+                ErrorCode::UnsupportedDiagram,
+            )
+        })?;
+    Ok(PreparedInput {
+        engine,
+        id,
+        config,
+        limit,
+        line_offset: line_offset as usize,
+    })
+}
 #[wasm_bindgen]
 impl NativeRegistry {
     /// Declared schema for lifting a caller-authored model without parsing.
@@ -91,50 +148,27 @@ impl NativeRegistry {
         edge_value: f64,
     ) -> Result<MutableDocument, JsValue> {
         let run = || -> Result<MutableDocument, PeleError> {
-            if source.len() > MAX_PUBLIC_SOURCE_BYTES
-                || title
-                    .as_ref()
-                    .is_some_and(|s| s.len() > MAX_PUBLIC_SOURCE_BYTES)
-            {
-                return Err(PeleError::new(
-                    "Native transport: declared input exceeds budget",
-                    ErrorCode::Limit,
-                ));
-            }
-            let engine = self
-                .inner
-                .as_ref()
-                .ok_or_else(|| invalid("Registry is closed"))?;
-            if !line_offset.is_finite()
-                || line_offset < 0.
-                || line_offset.fract() != 0.
-                || line_offset > (usize::MAX - source.len()) as f64
-            {
-                return Err(invalid("Prepared lineOffset must be a nonnegative integer within the native source-position range"));
-            }
-            let config = config(json)?;
-            let limit = edge(edge_kind, edge_value)?;
-            let id = DIAGRAM_TYPES
-                .into_iter()
-                .find(|kind| kind.as_str() == id)
-                .map(DiagramId::Builtin)
-                .ok_or_else(|| {
-                    PeleError::new(
-                        "Unknown prepared diagram type",
-                        ErrorCode::UnsupportedDiagram,
-                    )
-                })?;
+            let input = prepared_input(
+                self,
+                id,
+                source,
+                json,
+                title.as_deref(),
+                line_offset,
+                edge_kind,
+                edge_value,
+            )?;
             Ok(MutableDocument {
-                inner: engine.parse_prepared_as(
-                    &id,
+                inner: input.engine.parse_prepared_as(
+                    &input.id,
                     ParseContext {
                         source,
-                        config: &config,
+                        config: &input.config,
                         title: title.as_deref(),
-                        line_offset: line_offset as usize,
+                        line_offset: input.line_offset,
                         max_edges: DEFAULT_MAX_EDGES,
                     },
-                    limit,
+                    input.limit,
                 )?,
             })
         };
