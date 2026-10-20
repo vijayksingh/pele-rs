@@ -1209,7 +1209,7 @@ impl PublicDocument {
         let input = super::source_input::BorrowedOverlay::decode(bytes)?;
         let revision = self.revision;
         let registration = &self.registration;
-        let mut ingress = registration
+        let ingress = registration
             .codec
             .source_ingress(&mut self.state)
             .ok_or_else(|| {
@@ -1220,17 +1220,10 @@ impl PublicDocument {
         }
         // No replacement maps, UTF16 vectors, or Node/Atom vectors are
         // allocated until complete virtual decoder allocation gates pass.
-        let input = ingress.prepare(input)?;
+        let prepared = ingress.prepare(input)?;
         let mut next = revision;
-        ingress.with_candidate(&input, &mut |candidate| {
-            // Full virtual decode precedes stale revision/schema, just as the
-            // complete binary decoder does. No receipt skips these predicates.
-            super::captured_transport::admit_observed(
-                &mut super::graph_read::ReadAdapter(candidate),
-                0,
-                super::DEFAULT_BINARY_BUDGET,
-            )?;
-            if input.revision != revision {
+        let admitted = prepared.admit(&mut |candidate| {
+            if candidate.revision() != revision {
                 return Err(PeleError::new(
                     "Stale public model revision",
                     ErrorCode::Semantic,
@@ -1240,11 +1233,12 @@ impl PublicDocument {
                 PeleError::new("Public model revision exhausted", ErrorCode::Limit)
             })?;
             let compiled = registration.compiled_schema()?;
-            super::graph_read::validate_schema(candidate, registration.schema, compiled)?;
-            // Preserve the module's apply-time structural admission as well.
-            super::captured_admission::validate(&mut super::graph_read::ReadAdapter(candidate))
+            // The exact candidate already passed structure before revision.
+            // Reuse that scoped proof for registration and module structure;
+            // schema IDs still run here, after compilation, in original order.
+            candidate.validate_schema(compiled)
         })?;
-        ingress.commit(input);
+        admitted.commit();
         self.revision = next;
         Ok(())
     }

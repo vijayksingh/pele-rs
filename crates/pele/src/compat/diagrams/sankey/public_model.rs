@@ -238,11 +238,23 @@ fn root_field<R: CapturedRead>(reader: &mut R, name: &str) -> Result<Option<R::V
     }
     stored_field(reader, id, name)
 }
-fn string<R: CapturedRead>(reader: &mut R, atom: &Atom) -> Result<String, PeleError> {
+fn string<R: CapturedRead>(
+    reader: &mut R,
+    atom: &Atom,
+    source: Option<&dyn crate::compat::public::source_input::LogicalCapturedText>,
+) -> Result<String, PeleError> {
     let Atom::String(id) = atom else {
         return Err(captured_error("Expected a public string"));
     };
     let length = reader.string_length(*id)? as usize;
+    // Only imported_source pairs this private policy with the exact same
+    // immutable candidate reader. Public/custom CapturedRead implementations
+    // always retain strict chunk/length/surrogate validation below.
+    if let Some(source) = source {
+        if let Some(text) = source.original_utf8(*id)? {
+            return Ok(text.to_owned());
+        }
+    }
     let mut text = String::with_capacity(length);
     let mut seen = 0usize;
     let mut high = None;
@@ -280,12 +292,16 @@ fn string<R: CapturedRead>(reader: &mut R, atom: &Atom) -> Result<String, PeleEr
     }
     Ok(text)
 }
-fn optional_text<R: CapturedRead>(reader: &mut R, key: &str) -> Result<Option<String>, PeleError> {
+fn optional_text<R: CapturedRead>(
+    reader: &mut R,
+    key: &str,
+    source: Option<&dyn crate::compat::public::source_input::LogicalCapturedText>,
+) -> Result<Option<String>, PeleError> {
     match root_field(reader, key)? {
         None => Ok(None),
         Some(value) => match value.borrow() {
             Atom::Undefined | Atom::Null => Ok(None),
-            atom => string(reader, atom).map(Some),
+            atom => string(reader, atom, source).map(Some),
         },
     }
 }
@@ -376,6 +392,20 @@ fn imported(graph: &ModelGraph) -> Result<SankeyModel, PeleError> {
     imported_from(&mut ArenaRead::new(graph))
 }
 pub(crate) fn imported_from<R: CapturedRead>(reader: &mut R) -> Result<SankeyModel, PeleError> {
+    imported_with_text(reader, None)
+}
+fn imported_source(
+    candidate: &super::source_store::SourceCandidate<'_>,
+) -> Result<SankeyModel, PeleError> {
+    imported_with_text(
+        &mut crate::compat::public::source_input::CapturedLogical(candidate),
+        Some(candidate),
+    )
+}
+fn imported_with_text<R: CapturedRead>(
+    reader: &mut R,
+    text_source: Option<&dyn crate::compat::public::source_input::LogicalCapturedText>,
+) -> Result<SankeyModel, PeleError> {
     let mut scratch: [PropertyPrefix<R::Value>; PROPERTY_CHUNK] =
         std::array::from_fn(|_| PropertyPrefix::default());
     let array_nodes = array(reader, "nodes", &mut scratch)?;
@@ -405,7 +435,7 @@ pub(crate) fn imported_from<R: CapturedRead>(reader: &mut R) -> Result<SankeyMod
             let value = fields[0]
                 .as_ref()
                 .ok_or_else(|| invalid("Sankey node ID must be a string"))?;
-            let label = string(reader, value.borrow())?;
+            let label = string(reader, value.borrow(), text_source)?;
             reserve_text(&mut text_bytes, label.len().saturating_mul(2))?;
             labels.insert(id, label.clone());
             label
@@ -462,9 +492,9 @@ pub(crate) fn imported_from<R: CapturedRead>(reader: &mut R) -> Result<SankeyMod
         diagram_type: DiagramType::Sankey,
         nodes,
         links,
-        title: optional_text(reader, "title")?,
-        acc_title: optional_text(reader, "accTitle")?,
-        acc_descr: optional_text(reader, "accDescr")?,
+        title: optional_text(reader, "title", text_source)?,
+        acc_title: optional_text(reader, "accTitle", text_source)?,
+        acc_descr: optional_text(reader, "accDescr", text_source)?,
     })
 }
 fn node(out: &mut impl InitialWriter, node: &SankeyNode) -> Result<u32, PeleError> {
@@ -1014,10 +1044,7 @@ impl crate::compat::public::source_input::SourceIngressOwner for SankeyPublicSta
             unreachable!("paired source ingress");
         };
         let candidate = graph.candidate(&input).expect("admitted source identity");
-        let model = imported_from(&mut crate::compat::public::source_input::CapturedLogical(
-            &candidate,
-        ))
-        .map(Projection::Legacy);
+        let model = imported_source(&candidate).map(Projection::Legacy);
         graph.adopt_overlay(input);
         self.model = model;
     }

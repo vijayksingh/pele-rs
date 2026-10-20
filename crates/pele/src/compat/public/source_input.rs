@@ -234,29 +234,83 @@ impl<'a> SourceIngress<'a> {
     pub(crate) fn layout_id(&self) -> Option<u64> {
         self.owner.layout_id()
     }
-    pub(crate) fn prepare(&self, input: BorrowedOverlay<'_>) -> Result<SourceOverlay, PeleError> {
-        self.owner.prepare(input)
-    }
-    pub(crate) fn with_candidate(
-        &mut self,
-        input: &SourceOverlay,
-        visit: &mut dyn FnMut(&dyn PublicGraphRead) -> Result<(), PeleError>,
-    ) -> Result<(), PeleError> {
-        self.owner.with_candidate(input, visit)
-    }
-    pub(crate) fn commit(self, input: SourceOverlay) {
-        self.owner.commit_admitted(input);
+    pub(crate) fn prepare(
+        self,
+        input: BorrowedOverlay<'_>,
+    ) -> Result<PreparedSourceIngress<'a>, PeleError> {
+        let input = self.owner.prepare(input)?;
+        Ok(PreparedSourceIngress {
+            ingress: self,
+            input,
+        })
     }
 }
 
-/// Storage-only adapter for an admitted borrowed logical candidate. It keeps the
-/// existing eager Sankey importer without constructing a ModelGraph.
-pub(crate) struct CapturedLogical<'a>(pub &'a dyn PublicGraphRead);
-impl CapturedLogical<'_> {
-    fn string_is(&self, id: u32, text: &str) -> Result<bool, PeleError> {
+/// Allocation admission cannot be detached from its exact overlay or owner.
+/// The owner borrow excludes accepted-state mutation until this value commits
+/// or drops. Only the provenance-filtered ingress can construct it.
+pub(crate) struct PreparedSourceIngress<'a> {
+    ingress: SourceIngress<'a>,
+    input: SourceOverlay,
+}
+impl<'a> PreparedSourceIngress<'a> {
+    pub(crate) fn admit(
+        self,
+        visit: &mut dyn FnMut(&StructuredSourceInput<'_>) -> Result<(), PeleError>,
+    ) -> Result<AdmittedSourceIngress<'a>, PeleError> {
+        self.ingress
+            .owner
+            .with_candidate(&self.input, &mut |reader| {
+                // prepare already performed exact canonical size and decoder
+                // allocation gates. This remains the FIRST structural traversal,
+                // before stale revision, schema compilation or schema IDs.
+                super::captured_admission::validate(&mut super::graph_read::ReadAdapter(reader))?;
+                visit(&StructuredSourceInput {
+                    reader,
+                    revision: self.input.revision,
+                })
+            })?;
+        Ok(AdmittedSourceIngress(self))
+    }
+}
+pub(crate) struct AdmittedSourceIngress<'a>(PreparedSourceIngress<'a>);
+impl AdmittedSourceIngress<'_> {
+    pub(crate) fn commit(self) {
+        self.0.ingress.owner.commit_admitted(self.0.input);
+    }
+}
+
+/// Scoped to one immutable candidate visit. No caller can replace the reader,
+/// edit the overlay, mint this proof or persist it across the owner commit.
+/// It authorizes only repeated structure checks, never schema-ID admission.
+pub(crate) struct StructuredSourceInput<'a> {
+    reader: &'a dyn PublicGraphRead,
+    revision: u64,
+}
+impl StructuredSourceInput<'_> {
+    pub(crate) fn revision(&self) -> u64 {
+        self.revision
+    }
+    pub(super) fn validate_schema(
+        &self,
+        compiled: &super::schema::CompiledSchema,
+    ) -> Result<(), PeleError> {
+        super::captured_admission::validate_schema_ids(
+            &mut super::graph_read::ReadAdapter(self.reader),
+            compiled.methods(),
+            compiled.prototypes(),
+        )
+    }
+}
+
+/// Optional source-text access does not change logical field/import policy.
+/// Implementations must return the same text as string_chunks. Original valid
+/// UTF8 may be borrowed; replacement JsStrings retain strict UTF16 decoding.
+pub(crate) trait LogicalCapturedText: PublicGraphRead {
+    fn string_equals(&self, id: u32, text: &str) -> Result<bool, PeleError> {
         let mut expected = text.encode_utf16();
         let mut same = true;
-        self.0.string_chunks(id as usize, &mut |chunk| {
+        self.string_chunks(id as usize, &mut |chunk| {
             for &unit in chunk {
                 if expected.next() != Some(unit) {
                     same = false;
@@ -266,8 +320,15 @@ impl CapturedLogical<'_> {
         })?;
         Ok(same && expected.next().is_none())
     }
+    fn original_utf8(&self, _id: u32) -> Result<Option<&str>, PeleError> {
+        Ok(None)
+    }
 }
-impl CapturedRead for CapturedLogical<'_> {
+
+/// Storage-only adapter for an admitted borrowed logical candidate. It keeps the
+/// existing eager Sankey importer without constructing a ModelGraph.
+pub(crate) struct CapturedLogical<'a, R: LogicalCapturedText + ?Sized>(pub &'a R);
+impl<R: LogicalCapturedText + ?Sized> CapturedRead for CapturedLogical<'_, R> {
     type Value = Atom;
     fn root(&self) -> Atom {
         self.0.root()
@@ -317,7 +378,7 @@ impl CapturedRead for CapturedLogical<'_> {
                 used = properties.len();
                 for p in properties {
                     for (name, value) in names.iter().zip(out.iter_mut()) {
-                        if value.is_none() && self.string_is(p.key, name)? {
+                        if value.is_none() && self.0.string_equals(p.key, name)? {
                             *value = Some(p.value.clone());
                             remaining -= 1;
                         }

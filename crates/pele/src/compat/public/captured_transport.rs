@@ -143,6 +143,7 @@ impl DecoderBudget {
 }
 /// Canonical observed slots have no malformed byte encodings. Keep the original
 /// binary API's parser and its physical-length checks for actual byte input.
+#[cfg(feature = "web-host-sankey")]
 pub fn admit_observed<S: AdmissionRead>(
     store: &mut S,
     metadata_bytes: usize,

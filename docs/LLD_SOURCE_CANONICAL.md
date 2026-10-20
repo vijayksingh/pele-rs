@@ -118,6 +118,24 @@ helper patches and advances revision atomically. Custom modules cannot forward a
 builtin ingress token to bypass their captured apply hook; creator TypeId must
 match the captured module. Existing binary and C/Swift entry points stay intact.
 
+Prepared source admission binds its already completed canonical size and decoder
+allocation gates to the exact owned overlay and exclusive state borrow. A
+consuming PreparedSourceIngress performs the first structural traversal before
+revision checks. A scoped StructuredSourceInput reuses only that candidate's
+structural proof at registration and module boundaries; schema compilation and
+the shared ordered schema-ID walker still run at the original stage. Only an
+AdmittedSourceIngress can commit. Dropping a failed candidate leaves accepted
+state, revision and receipts untouched. No global receipt or provider trust is
+extended.
+
+The same eager importer now supports a crate-private source-text policy paired
+with its exact immutable candidate. Original catalog keys compare directly as
+UTF8; original labels/title copy once from valid source text. Incoming UTF16
+string replacements resolve first and use the existing strict chunk, length and
+surrogate decoder. Public CapturedRead implementations keep that decoder. Array
+membership, first-property matching, index interpretation, latent import errors
+and text-budget charge order remain in one importer body.
+
 ## Bounds and compatibility
 
 Canonical structural/schema admission and the full logical `PELGBIN1` frame

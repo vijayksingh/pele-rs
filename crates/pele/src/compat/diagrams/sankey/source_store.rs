@@ -1444,6 +1444,30 @@ impl SourceCanonical {
         self.patches.clear();
     }
 }
+impl crate::compat::public::source_input::LogicalCapturedText for SourceCandidate<'_> {
+    fn string_equals(&self, id: u32, text: &str) -> Result<bool, PeleError> {
+        let id = id as usize;
+        if id >= self.input.string_count {
+            return Err(graph_read::invalid());
+        }
+        if let Some(value) = self.input.strings.get(&id) {
+            return Ok(value.is(text));
+        }
+        let entry = self.base.catalog.get(id).ok_or_else(graph_read::invalid)?;
+        Ok(self.base.text(&entry.text) == text)
+    }
+    fn original_utf8(&self, id: u32) -> Result<Option<&str>, PeleError> {
+        let id = id as usize;
+        if id >= self.input.string_count {
+            return Err(graph_read::invalid());
+        }
+        if self.input.strings.contains_key(&id) {
+            return Ok(None);
+        }
+        let entry = self.base.catalog.get(id).ok_or_else(graph_read::invalid)?;
+        Ok(Some(self.base.text(&entry.text)))
+    }
+}
 impl PublicGraphRead for SourceCandidate<'_> {
     fn extent(&self) -> Extent {
         Extent {

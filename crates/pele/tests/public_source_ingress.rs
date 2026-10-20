@@ -191,6 +191,24 @@ fn source_edits_reject_schema_identity_and_preserve_partial_helper_state() {
         expected_error
     );
     assert_eq!(actual.revision(), 0);
+    // Unknown schema IDs remain later than stale revision; with a current
+    // revision, root method membership precedes the detached prototype.
+    let mut both = wrong_schema.clone();
+    both[28] = 7;
+    both[29..33].copy_from_slice(&999u32.to_le_bytes());
+    let mut invalid = decode_binary_exchange(&canonical, DEFAULT_BINARY_BUDGET)
+        .unwrap()
+        .graph;
+    invalid.root = Atom::BuiltinFunction(999);
+    let schema_error = expected.apply(0, invalid.clone()).unwrap_err();
+    assert_eq!(actual.apply_source_input(&both).unwrap_err(), schema_error);
+    both[16..24].copy_from_slice(&999u64.to_le_bytes());
+    assert_eq!(
+        actual.apply_source_input(&both).unwrap_err(),
+        expected.apply(999, invalid).unwrap_err()
+    );
+    assert_eq!(actual.revision(), 0);
+    assert_eq!(bytes(&actual), bytes(&expected));
     let mut locked = original.clone();
     let r = root(&locked);
     let Atom::Ref(nodes) = field(&mut locked, r, "nodes").clone() else {
@@ -442,4 +460,180 @@ fn source_ingress_bounds_expansion_before_bad_root_stale_revision_and_repairs() 
             .render(&Default::default(), &mut MetricsResources)
             .is_ok());
     }
+}
+
+#[test]
+fn source_ingress_text_and_catalog_key_edits_keep_strict_conversion_and_first_match() {
+    let source = "---\ntitle: Original 漢😀 title\n---\nsankey\nA,B,5\nA,C,2";
+    let engine = PublicEngine::with_builtins();
+    let mut actual = engine.parse(source, &Default::default()).unwrap();
+    let mut expected = engine.parse(source, &Default::default()).unwrap();
+    let identity = actual.source_ingress_identity().unwrap();
+    let original = expected.snapshot().unwrap();
+    let id_key = original.strings.iter().position(|s| s.is("id")).unwrap();
+    let index_key = original.strings.iter().position(|s| s.is("index")).unwrap();
+    let Atom::String(label) = field(&mut original.clone(), 0, "id").clone() else {
+        panic!()
+    };
+    let mut cases = vec![original.clone()];
+    for text in [
+        JsString::from("Replacement 漢😀"),
+        JsString(vec![0xd800]),
+        JsString(vec![0xdc00]),
+        JsString::from(""),
+    ] {
+        let mut graph = original.clone();
+        graph.strings[label as usize] = text;
+        cases.push(graph);
+    }
+    // Original key ID now names another field. A new string ID named id and
+    // duplicate later field must respect first matching own-property order.
+    let mut shifted = original.clone();
+    shifted.strings[id_key] = JsString::from("ignored 漢😀");
+    let new_id_key = shifted.strings.len() as u32;
+    shifted.strings.push(JsString::from("id"));
+    for node in &mut shifted.nodes {
+        if let Some(value) = node
+            .properties()
+            .iter()
+            .find(|p| p.key == id_key as u32)
+            .map(|p| p.value.clone())
+        {
+            node.properties_mut().push(Property {
+                key: new_id_key,
+                value,
+                flags: 7,
+            });
+        }
+    }
+    shifted.nodes[0].properties_mut().push(Property {
+        key: new_id_key,
+        value: Atom::Number(7.),
+        flags: 7,
+    });
+    cases.push(shifted);
+    // Changing a different original key INTO id makes its numeric value the
+    // first actual ID; no source-key cache may keep the previous interpretation.
+    let mut swapped = original.clone();
+    swapped.strings[id_key] = JsString::from("index");
+    swapped.strings[index_key] = JsString::from("id");
+    cases.push(swapped);
+    cases.push(original.clone());
+    for (graph, succeeds) in cases
+        .into_iter()
+        .zip([true, true, false, false, true, true, false, true])
+    {
+        let revision = actual.revision();
+        expected.apply(revision, graph).unwrap();
+        actual
+            .apply_source_input(&ingress(&expected, identity, revision))
+            .unwrap();
+        assert_eq!(bytes(&actual), bytes(&expected));
+        let a = actual.render(&Default::default(), &mut MetricsResources);
+        let b = expected.render(&Default::default(), &mut MetricsResources);
+        assert_eq!(a, b);
+        assert_eq!(a.is_ok(), succeeds);
+        assert_eq!(bytes(&actual), bytes(&expected));
+    }
+    assert!(actual
+        .render(&Default::default(), &mut MetricsResources)
+        .is_ok());
+}
+
+#[test]
+fn source_ingress_original_utf8_repetition_preserves_latent_text_limit_and_repair() {
+    // Compact source/input, intentionally repeated node identity: imported
+    // owned labels exceed the existing128MiB budget, without a giant graph.
+    let label = "x".repeat(65536);
+    let source = format!("sankey\n{label},B,1");
+    let engine = PublicEngine::with_builtins();
+    let limits = ParseLimits {
+        source: Some(SourceLimit::Number(1_000_000.)),
+        max_edges: None,
+    };
+    let mut actual = engine
+        .parse_with_limits(&source, &Default::default(), limits)
+        .unwrap();
+    let mut expected = engine
+        .parse_with_limits(&source, &Default::default(), limits)
+        .unwrap();
+    let identity = actual.source_ingress_identity().unwrap();
+    let original = expected.snapshot().unwrap();
+    let mut graph = original.clone();
+    let r = root(&graph);
+    let Atom::Ref(nodes) = field(&mut graph, r, "nodes").clone() else {
+        panic!()
+    };
+    let Atom::Ref(links) = field(&mut graph, r, "links").clone() else {
+        panic!()
+    };
+    let mut properties = Vec::new();
+    for i in 0..2049 {
+        let key = graph.strings.len() as u32;
+        graph.strings.push(JsString::from(i.to_string().as_str()));
+        properties.push(Property {
+            key,
+            value: Atom::Ref(0),
+            flags: 7,
+        });
+    }
+    graph.nodes[nodes as usize] = Node::Array {
+        length: 2049,
+        properties,
+    };
+    graph.nodes[links as usize] = Node::Array {
+        length: 0,
+        properties: vec![],
+    };
+    expected.apply(0, graph).unwrap();
+    actual
+        .apply_source_input(&ingress(&expected, identity, 0))
+        .unwrap();
+    assert_eq!(actual.revision(), 1);
+    let a = actual
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err();
+    let b = expected
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err();
+    assert_eq!(a, b);
+    assert_eq!(a.code, ErrorCode::Limit);
+    assert_eq!(
+        a.message,
+        "Sankey imported text exceeds native allocation budget"
+    );
+    assert_eq!(bytes(&actual), bytes(&expected));
+    let revision = actual.revision();
+    expected.apply(revision, original).unwrap();
+    actual
+        .apply_source_input(&ingress(&expected, identity, revision))
+        .unwrap();
+    // Do not render the enormous source label: a successful alias-preserving
+    // helper proves repaired native state without expensive SVG construction.
+    let call = MethodCall {
+        method: MethodId(1),
+        receiver: actual.snapshot().unwrap().root,
+        arguments: vec![Atom::String(
+            actual
+                .snapshot()
+                .unwrap()
+                .strings
+                .iter()
+                .position(|s| s.is(&label))
+                .unwrap() as u32,
+        )],
+    };
+    let revision = actual.revision();
+    let a = actual
+        .invoke(revision, call.clone(), &mut MetricsResources)
+        .unwrap();
+    let b = expected
+        .invoke(revision, call, &mut MetricsResources)
+        .unwrap();
+    assert_eq!(
+        serde_json::to_vec(&a.result).unwrap(),
+        serde_json::to_vec(&b.result).unwrap()
+    );
+    assert!(a.result.is_ok());
+    assert_eq!(bytes(&actual), bytes(&expected));
 }
