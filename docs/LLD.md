@@ -25,6 +25,8 @@ one ordered sink while preserving arena construction and existing host exports.
 render model from storage through bounded reads and borrowed arena values.
 [Captured methods](LLD_CAPTURED_METHODS.md) keeps Sankey helper policy in Rust
 while separating scalar reads, positional writes and descriptor queries.
+[Captured admission](LLD_CAPTURED_ADMISSION.md) shares structural and schema
+validation over borrowed storage without changing public graph admission order.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.

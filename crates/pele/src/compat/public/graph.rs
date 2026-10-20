@@ -189,95 +189,14 @@ impl ModelGraph {
         methods: &HashSet<MethodId>,
         prototypes: &HashSet<PrototypeId>,
     ) -> Result<(), PeleError> {
-        let atom = |a: &Atom| -> Result<(), PeleError> {
-            if let Atom::BuiltinFunction(id) = a {
-                if !methods.contains(&MethodId(*id)) {
-                    return Err(invalid("Unknown public builtin function"));
-                }
-            }
-            Ok(())
-        };
-        atom(&self.root)?;
-        for n in &self.nodes {
-            if let Node::Instance { prototype, .. } = n {
-                if !prototypes.contains(prototype) {
-                    return Err(invalid("Unknown public instance prototype"));
-                }
-            }
-            for p in n.properties() {
-                atom(&p.value)?
-            }
-            match n {
-                Node::Map { entries, .. } => {
-                    for (k, v) in entries {
-                        atom(k)?;
-                        atom(v)?
-                    }
-                }
-                Node::Set { values, .. } => {
-                    for v in values {
-                        atom(v)?
-                    }
-                }
-                _ => {}
-            }
-        }
-        Ok(())
+        super::captured_admission::validate_schema_ids(
+            &mut super::captured_admission::ArenaAdmission(self),
+            methods,
+            prototypes,
+        )
     }
     pub fn validate(&self) -> Result<(), PeleError> {
-        if self.version != 1 {
-            return Err(invalid("Unsupported public graph version"));
-        }
-        let units = self
-            .strings
-            .iter()
-            .try_fold(0usize, |n, s| n.checked_add(s.0.len()))
-            .ok_or_else(|| invalid("Public graph size overflow"))?;
-        if self.nodes.len() > 1_000_000 || self.strings.len() > 1_000_000 || units > 16_000_000 {
-            return Err(PeleError::new(
-                "Public model graph exceeds work budget",
-                ErrorCode::Limit,
-            ));
-        }
-        self.validate_atom(&self.root)?;
-        let mut work = 0usize;
-        for node in &self.nodes {
-            let references = match node {
-                Node::Map { entries, .. } => entries.len().saturating_mul(2),
-                Node::Set { values, .. } => values.len(),
-                _ => 0,
-            };
-            work = work
-                .saturating_add(node.properties().len())
-                .saturating_add(references);
-            if work > 8_000_000 {
-                return Err(PeleError::new(
-                    "Public graph exceeds work budget",
-                    ErrorCode::Limit,
-                ));
-            }
-            for p in node.properties() {
-                if p.key as usize >= self.strings.len() || p.flags & !7 != 0 {
-                    return Err(invalid("Invalid public property"));
-                }
-                self.validate_atom(&p.value)?;
-            }
-            match node {
-                Node::Map { entries, .. } => {
-                    for (k, v) in entries {
-                        self.validate_atom(k)?;
-                        self.validate_atom(v)?;
-                    }
-                }
-                Node::Set { values, .. } => {
-                    for v in values {
-                        self.validate_atom(v)?;
-                    }
-                }
-                _ => {}
-            }
-        }
-        Ok(())
+        super::captured_admission::validate(&mut super::captured_admission::ArenaAdmission(self))
     }
     pub fn root_properties(&self) -> Result<&[Property], PeleError> {
         match &self.root {

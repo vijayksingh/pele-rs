@@ -2,6 +2,7 @@
 //! Public codecs are opt-in; an unimplemented codec never silently ignores edits.
 mod engine;
 mod graph;
+mod captured_admission;
 pub(crate) mod captured_read;
 pub(crate) mod captured_write;
 mod initial_store;
