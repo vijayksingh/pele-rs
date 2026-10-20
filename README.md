@@ -186,32 +186,41 @@ still regressed against the arena. Profiling located repeated memory-view
 refreshes and buffer getters, rather than the grammar, as a major cost.
 
 The [bounded row reader](docs/benchmarks/2026-10-20-er-host-storage/native-pod-cursor/),
-source `5db9f35`, improves **all 12 affected VM conditions** against that native
-runtime: paired parse medians fall **22.19–29.78%**, retained render
-**32.98–37.70%**. Source controls vary **−0.20% to +1.04%**. A separate matched
-arena comparison remains adverse:
+source `5db9f35`, lowered paired parse time 22.19–29.78% and retained render
+32.98–37.70% against the first native reader. The subsequent
+[operation-scoped read sessions](docs/benchmarks/2026-10-20-er-host-storage/native-read-sessions/),
+source `4033e41`, lower parse another **4.05–11.08%** and retained render
+**4.17–15.91%** versus the preceding cursor. Separate windows are not compounded.
+A matched arena comparison still fails acceptance:
 
 | Current opt-in native backend | Cost versus arena | Cost versus pinned JS |
 | --- | ---: | ---: |
-| Parse, six size/resource conditions | 1.41–1.54× | 15.90–23.02× |
-| Retained render, six conditions | 1.36–1.52× | 2.89–4.93× |
+| Parse, six size/resource conditions | 1.28–1.47× | 12.82–20.83× |
+| Retained render, six conditions | 1.20–1.41× | 2.70–4.64× |
 
-Both comparisons retain all 36 rows, 21 paired samples per row and adverse
-controls. The packages differ only in the reader module and use identical WASM.
-No cross-window gains are compounded. **The backend stays disabled.** The next
-layer tests operation-scoped bounded read sessions; it has no measured result yet.
+The latest comparisons retain all **48 rows**, 21 paired samples per row,
+source controls and adverse Flowchart controls. In the arena window, Flowchart
+paired parse medians rise 3.15–6.71% and retained render 2.91–3.48%; no default-path
+neutrality is claimed. Candidate/control packages differ in two JS modules and
+use identical WASM. **The native backend stays disabled.** Six fresh profiles
+show refresh down to 0.45% parse / 0.14% retained inclusive sampled time. Native
+construction and generic publication remain substantial; profile groups overlap
+and do not predict speedup.
 
 [Browser correctness at `3166b3d`](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-browser/)
 passes **468/468 checks**, 156 per engine, with all 586 source inputs and 113
 packed files pinned and unchanged. This includes the selected native backend,
-memory growth, callback restoration and failure recovery. The subsequent reader
-passes **54 focused checks** across Chromium, Firefox and WebKit, including long
-UTF16 publication. [Fresh local SDK correctness](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-correctness/)
+memory growth, callback restoration and failure recovery. The later session
+runtime passes **84 focused checks** across Chromium, Firefox and WebKit.
+Test-only `34da266` adds three factory-failure checks, each with six normal/raw
+cases, original thrown values, restored aliases and exact recovery; both the
+initial fixture failure and corrected run are retained.
+[Fresh local SDK correctness](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-correctness/)
 passes 16 Swift integrations, three C consumers and 168 API conditions;
-its corpus covers 12,481 drawings and 16,572
-expected errors with zero explicit budget differences. All 362 native/SDK inputs
-remain unchanged through the JS-only reader change. These checks establish
-neither performance parity nor release readiness.
+its corpus covers 12,481 drawings and 16,572 expected errors with zero explicit
+budget differences. All 362 native/SDK inputs remain unchanged through these
+JS/test changes. These checks establish neither performance parity nor release
+readiness.
 
 The previous [JS-column backend](docs/benchmarks/2026-10-20-er-host-storage/captured-backend-rejected/)
 also remains rejected: parse was 5.3–6.5× arena latency and retained render

@@ -1,0 +1,191 @@
+{
+  "sourceCommit": "4033e413faefb7f502ed874fbe39904418d6e361",
+  "factoryTestCommit": "34da2664a9846fe44469988c1a35545639f2018e",
+  "origins": {
+    "proof/source.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-runtime/source.json",
+      "sha256": "ad3b0e2883fdc7e3f0c9fefef6e099ba26ca6ba1eb7801e8451262271a3dfc16",
+      "bytes": 68464
+    },
+    "proof/package.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-runtime/package.json",
+      "sha256": "7bacd4e0ffc9bedb465c80f1ae6e6f5f1b3dda1a9c2eb75ab0687994d51e9fc6",
+      "bytes": 78998
+    },
+    "proof/after.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-runtime/after.json",
+      "sha256": "f7b3a2af3cbf8b60a6204e24b993e6ac25e43bcbad99564d0238f205b6d9803b",
+      "bytes": 79024
+    },
+    "timing/versus-cursor.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-165b900/versus-cursor.json",
+      "sha256": "f97df8b36dc0e6ea217c88c3eb19b9a860ae06010938ca1ebe42d39c5c3bb0f7",
+      "bytes": 112850
+    },
+    "timing/versus-arena.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-165b900/versus-arena.json",
+      "sha256": "6192e1e99e507e9edb8b5027e018f960d3aab5b0ea064dc821459504db5571ac",
+      "bytes": 112587
+    },
+    "profiles/summary.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profiles/summary.json",
+      "sha256": "4a6fd85e10b1c501c357ec205643ab7f5a85ae903c5d613efd533c7825f4c642",
+      "bytes": 373748
+    },
+    "profiles/sankey-medium-fixed-render-source-control-1.cpuprofile.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profiles/sankey-medium-fixed-render-source-control-1.cpuprofile",
+      "sha256": "b24c107cb62302e69bee6647af055703c2cf8cd8f22a7377179ce56b794efed3",
+      "bytes": 189576
+    },
+    "profiles/sankey-medium-fixed-parse-candidate-1.cpuprofile.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profiles/sankey-medium-fixed-parse-candidate-1.cpuprofile",
+      "sha256": "495422fc990f79e97940966d730bf01781995a7bc151d330c95b77f606c74cec",
+      "bytes": 374953
+    },
+    "profiles/sankey-medium-fixed-render-model-control-1.cpuprofile.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profiles/sankey-medium-fixed-render-model-control-1.cpuprofile",
+      "sha256": "4042e60f18eaf23b8ec06af4ce72b475526436afd6fd84826844150aa32c3c02",
+      "bytes": 189126
+    },
+    "profiles/sankey-medium-fixed-parse-control-1.cpuprofile.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profiles/sankey-medium-fixed-parse-control-1.cpuprofile",
+      "sha256": "e098da2064b736aec2d351dfeb5b16a8e08413ecf1812dbe989fd4941b71b6dd",
+      "bytes": 250381
+    },
+    "profiles/sankey-medium-fixed-render-model-candidate-1.cpuprofile.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profiles/sankey-medium-fixed-render-model-candidate-1.cpuprofile",
+      "sha256": "2f51bc0ec6e2ddcbc2bbefe80d1b31d4eeb4ce41c9208383bd0243d19437c4e3",
+      "bytes": 246386
+    },
+    "profiles/sankey-medium-fixed-render-source-candidate-1.cpuprofile.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profiles/sankey-medium-fixed-render-source-candidate-1.cpuprofile",
+      "sha256": "fb763c411e00ea5a5cb85bcfb6cc79cfe8d2848aa25671ad006cd2e4a9ee1eb6",
+      "bytes": 173559
+    },
+    "profiles/ATTRIBUTION.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/ATTRIBUTION.json",
+      "sha256": "2c656f4eb374b458e4e69b2fe7efc3c67603fb6583fefe7f204d855f434ca778",
+      "bytes": 44175
+    },
+    "execution/profile.mjs.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-record-profiler/runtime/profile-native-record-sankey-5b35.mjs",
+      "sha256": "e89923f827c83994a1d69fee9cd0667d52061dbd9863ba889c330082fb216bb4",
+      "bytes": 20097
+    },
+    "execution/compare-web-vm.mjs.gz": {
+      "source": "scripts/perf/compare-web-vm.mjs",
+      "sha256": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+      "bytes": 13857
+    },
+    "execution/cases.mjs.gz": {
+      "source": "scripts/perf/cases.mjs",
+      "sha256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+      "bytes": 2201
+    },
+    "logs/native-record-focused.log.gz": {
+      "source": "dist/evidence/native-record-focused.log",
+      "sha256": "a0ba94a7ccc71b45e168ec0f0fda6d117dfd7b4b0695ebb7003515d820b5a105",
+      "bytes": 13151
+    },
+    "logs/native-sankey-factory-failure-attempt1.log.gz": {
+      "source": "dist/evidence/native-sankey-factory-failure-attempt1.log",
+      "sha256": "ea6d21ac81739c1a6943b3c98153f4cadca5d74957ae7766b4bd6eeeb35112ea",
+      "bytes": 8881
+    },
+    "logs/native-sankey-factory-failure-attempt2.log.gz": {
+      "source": "dist/evidence/native-sankey-factory-failure-attempt2.log",
+      "sha256": "8c51695264198fd1313863040ffb6e71f2fb4d142e402db59372dfc895b8fa94",
+      "bytes": 1262
+    },
+    "logs/native-record-vm-arena.log.gz": {
+      "source": "dist/evidence/native-record-vm-arena.log",
+      "sha256": "8d4e87478420b04c4fa07a8da1ee9bc4738c5422513d58cb218b2afa81a6cbb6",
+      "bytes": 181
+    },
+    "logs/native-record-vm-cursor.log.gz": {
+      "source": "dist/evidence/native-record-vm-cursor.log",
+      "sha256": "6cb98fb5b5b80789f46ec8f96e70a6d1579dfb4d0ab6170333f5fd88141ceb0e",
+      "bytes": 182
+    },
+    "factory/attempt1-chromium.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/attempt1-results/captured-native-factory-na-cdadc-ginal-values-without-replay-chromium/captured-native-factory-errors.json",
+      "sha256": "f3fe9b971f94219b4ad50afe78fc33a419dc435d7868367aa67c9bc5074d9a9e",
+      "bytes": 452639
+    },
+    "factory/attempt1-webkit.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/attempt1-results/captured-native-factory-na-cdadc-ginal-values-without-replay-webkit/captured-native-factory-errors.json",
+      "sha256": "f3fe9b971f94219b4ad50afe78fc33a419dc435d7868367aa67c9bc5074d9a9e",
+      "bytes": 452639
+    },
+    "factory/attempt1-firefox.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/attempt1-results/captured-native-factory-na-cdadc-ginal-values-without-replay-firefox/captured-native-factory-errors.json",
+      "sha256": "f3fe9b971f94219b4ad50afe78fc33a419dc435d7868367aa67c9bc5074d9a9e",
+      "bytes": 452639
+    },
+    "factory/attempt2-chromium.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/attempt2-results/captured-native-factory-na-cdadc-ginal-values-without-replay-chromium/captured-native-factory-errors.json",
+      "sha256": "dd863576624ba0188c70ac5b911bc6db85c746d6b99aa33fc86da47a9c313925",
+      "bytes": 452639
+    },
+    "factory/attempt2-webkit.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/attempt2-results/captured-native-factory-na-cdadc-ginal-values-without-replay-webkit/captured-native-factory-errors.json",
+      "sha256": "dd863576624ba0188c70ac5b911bc6db85c746d6b99aa33fc86da47a9c313925",
+      "bytes": 452639
+    },
+    "factory/attempt2-firefox.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/attempt2-results/captured-native-factory-na-cdadc-ginal-values-without-replay-firefox/captured-native-factory-errors.json",
+      "sha256": "dd863576624ba0188c70ac5b911bc6db85c746d6b99aa33fc86da47a9c313925",
+      "bytes": 452639
+    },
+    "proof/native-source-continuity.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/source-continuity.json",
+      "sha256": "ad3745bf23f3e695bae7efba2d9e048746a0f7ba972df407f16f4c8c3862787a",
+      "bytes": 47776
+    },
+    "proof/native-source-after.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/source-after.json",
+      "sha256": "b7a085424d7ac64171bc3940b26d4576ce280c28e51a3996b5e3112f70a5bf0b",
+      "bytes": 47720
+    },
+    "scope/factory-attempt1.spec.js.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-sankey-factory-failure/captured-native-factory.spec.js",
+      "sha256": "544276439599c5ed9d636d29a875cc0b2fc430748a1411a0eb51a0afc0c995b0",
+      "bytes": 8812
+    },
+    "proof/git-mapping.json.gz": {
+      "source": "immutable git cat-file 4033e413faefb7f502ed874fbe39904418d6e361",
+      "sha256": "5cd39a6da072a89731417eba18a18888c7f965502a3f7fdaf10e5e865464ded7",
+      "bytes": 129041
+    },
+    "scope/graph-storage.js.gz": {
+      "source": "4033e413faefb7f502ed874fbe39904418d6e361:bindings/web/graph-storage.js",
+      "sha256": "2a1b44d837148f14ed8abf27aeb00a0f20e3a53e0ea97a9c4dd1b13913deb01f",
+      "bytes": 24877
+    },
+    "scope/native-storage.js.gz": {
+      "source": "4033e413faefb7f502ed874fbe39904418d6e361:bindings/web/native-storage.js",
+      "sha256": "165b9001d97f5547912096f29e1ae11d96514439bfbc828d09def110751b941c",
+      "bytes": 14897
+    },
+    "scope/LLD_NATIVE_CANONICAL_STORAGE.md.gz": {
+      "source": "4033e413faefb7f502ed874fbe39904418d6e361:docs/LLD_NATIVE_CANONICAL_STORAGE.md",
+      "sha256": "60d71d42b5393b3af9e6607639375e7fdd64641bfd3a22cac8d8b4d040138e91",
+      "bytes": 7062
+    },
+    "scope/factory.spec.js.gz": {
+      "source": "34da2664a9846fe44469988c1a35545639f2018e:tests/web/captured-native-factory.spec.js",
+      "sha256": "c9530abefd262dd4c44141704cb0bec19f503c7ba253921e383d39e0d7cf29b1",
+      "bytes": 8974
+    },
+    "scope/runtime.patch.gz": {
+      "source": "git show 4033e413faefb7f502ed874fbe39904418d6e361",
+      "sha256": "c9a69a78902b6e9b15310b209febaeda5062e39b29561ff18cc3ec1fc895f4ae",
+      "bytes": 15177
+    },
+    "proof/local-frozen-package-rehash.json.gz": {
+      "source": "local preserved native-record-runtime packages; not remote rehash",
+      "sha256": "7bffde208225b88d0ecd372bdcb3d4b1740101c205817bd6d2f83fd2e2c89811",
+      "bytes": 21071
+    }
+  }
+}
