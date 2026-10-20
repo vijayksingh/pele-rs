@@ -1,0 +1,17 @@
+{
+  "stage": "local package pin before transfer",
+  "exit": 1,
+  "expectedSource": "a4f933d9af2cd3ccd5cda7eac46dc1048a296249",
+  "actualPackageCommit": "7417fed53e34f482f726dd07a12fec4dd32b9425",
+  "actualSourceCommit": "7417fed53e34f482f726dd07a12fec4dd32b9425",
+  "afterCommit": "a4f933d9af2cd3ccd5cda7eac46dc1048a296249",
+  "error": "AssertionError: frozen['commit']==a.source",
+  "browserLaunched": false,
+  "transferred": false,
+  "files": {
+    "package.json": "b52e1e0878264130181a01d3f0817d76a8c1dc8d0c75d4a3e27043c95338dd25",
+    "source.json": "fd73ce276a893ba64b751e563d88fb6fff65718c515ce12f80c4ecc73e193fed",
+    "after.json": "34c8b6111a7554e8d250adf3eacd843d097cb1cb48c17c6a6d1993c6fb2dac15",
+    "reviewed-source-manifest.json": "feca01845358a9b07ac8e09bcc320b25f2a29a9ee4229d44d6d0683b997bf2d1"
+  }
+}
