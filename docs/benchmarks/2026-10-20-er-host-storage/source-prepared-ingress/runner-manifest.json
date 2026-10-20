@@ -1,0 +1,42 @@
+{
+  "status": "candidate pinned; no transfer or timing authorized",
+  "primaryControl": "e148 + pinned PeleJS; unchanged",
+  "referencesSHA256": "4405d45679654ff38e33daac74c11f855aee7cefcdb095445666944154003c7e",
+  "files": {
+    "cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "compare-first-use-web-vm.mjs": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0",
+    "compare-web-vm.mjs": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "probe-layout-continuity.mjs": "5930f4d8a395f59fc7ed5ebf69bbfd4964a363d40fa59018244ac44528719c3f",
+    "probe-source-ingress.mjs": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67",
+    "probe-source-layout.mjs": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+    "run-source-layout.mjs": "f0e93bbece2171e3d4e427c08f6e9da29349b62ac8f7558a590966fbf06b3b33",
+    "source-layout-pins.json": "64d59f8f43449ae055b0fac6c0daffa42d27e9b7550ac68d5e92efa240f802c7"
+  },
+  "harnesses": {
+    "warm": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "firstUse": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0"
+  },
+  "conditions": 24,
+  "trials": 21,
+  "warmupMs": 1000,
+  "probeCounts": [
+    8,
+    16,
+    12
+  ],
+  "preparationFiles": {
+    "pin-candidate.py": "24d1a6bc4ed20eed119123f00df2ff889cac56b8c1269fc8163a1ec93e250642",
+    "vm-artifacts.py": "d7811049ed421a2cffa4f4a813ba1deeca362341819c14cb283610d07f0af15f",
+    "PLAN.md": "7433381d016d044b8aba4a41f6f3ef0185400d43449bb21e79ea85a5d0536272"
+  },
+  "executionPriority": [
+    "first-use",
+    "warm only on later GO"
+  ],
+  "sourceContextNotPin": "e518012745a2eaf12c8bb048b91074566bf2000a",
+  "candidateSource": "e518012745a2eaf12c8bb048b91074566bf2000a",
+  "candidateWasm": "ed4ff97f5765e5ac06ce6e99efbb4ddc3644e64e7d4d95654b60cec670822fd0",
+  "candidateManifestSHA256": "ed33022af649aedd4ba27df0f7d9cab2aecd9ebc70d237d9cdbc7de9742ca07c",
+  "candidateManifestPath": "dist/perf-patches/parse-architecture/source-prepared-ingress-runtime/package.json",
+  "candidatePackagePath": "dist/perf-patches/parse-architecture/source-prepared-ingress-runtime/candidate-package"
+}
