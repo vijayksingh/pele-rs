@@ -9,7 +9,22 @@ use crate::compat::public::graph_read::{
 };
 use crate::compat::public::{Atom, JsString, ModelGraph, Node, Property, PrototypeId};
 use crate::compat::PeleError;
-use std::{collections::HashMap, sync::Arc};
+use std::{
+    collections::HashMap,
+    sync::{
+        atomic::{AtomicU64, Ordering},
+        Arc,
+    },
+};
+
+// Identity is process-local, never a pointer or content hash. Once exhausted,
+// new owners retain the old self-contained recipe protocol without new errors.
+static NEXT_LAYOUT_ID: AtomicU64 = AtomicU64::new(1);
+fn layout_id() -> Option<u64> {
+    NEXT_LAYOUT_ID
+        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+        .ok()
+}
 
 enum Text {
     Label(usize),
@@ -32,6 +47,7 @@ struct Patch {
 pub(super) struct SourceCanonical {
     pub source: Arc<IndexedSankey>,
     admission: AdmissionState,
+    layout_id: Option<u64>,
     catalog: Vec<Entry>,
     labels: Vec<u32>,
     indices: Vec<u32>,
@@ -50,6 +66,7 @@ impl SourceCanonical {
         let mut s = Self {
             source: Arc::new(source),
             admission: AdmissionState::default(),
+            layout_id: layout_id(),
             catalog: vec![],
             labels: vec![],
             indices: vec![],
@@ -367,11 +384,10 @@ impl PublicGraphRead for SourceCanonical {
         Some(TrustedGraphRead::new(self))
     }
     fn source_layout(&self, revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
-        match self.recipe(revision) {
-            Ok(bytes) => Ok(Some(bytes)),
-            Err(e) if e.code == crate::compat::ErrorCode::Limit => Ok(None),
-            Err(e) => Err(e),
-        }
+        self.layout_packet(revision, false)
+    }
+    fn source_layout_update(&self, revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
+        self.layout_packet(revision, true)
     }
     fn extent(&self) -> Extent {
         Extent {
@@ -989,123 +1005,169 @@ fn group(
     Ok(())
 }
 impl SourceCanonical {
-    fn recipe(&self, revision: u64) -> Result<Vec<u8>, PeleError> {
+    fn layout_packet(&self, revision: u64, update: bool) -> Result<Option<Vec<u8>>, PeleError> {
+        match self.recipe(revision, update) {
+            Ok(bytes) => Ok(Some(bytes)),
+            Err(e) if e.code == crate::compat::ErrorCode::Limit => Ok(None),
+            Err(e) => Err(e),
+        }
+    }
+    fn recipe(&self, revision: u64, update: bool) -> Result<Vec<u8>, PeleError> {
         use crate::compat::public::binary::{write_read_node, Writer, DEFAULT_BINARY_BUDGET};
         let mut w = Writer {
             bytes: Vec::new(),
             budget: DEFAULT_BINARY_BUDGET,
         };
-        w.put(b"PLCSRC01")?;
+        let update = update && self.layout_id.is_some();
+        if let Some(id) = self.layout_id {
+            w.put(if update { b"PLCSRU01" } else { b"PLCSRC02" })?;
+            w.put(&id.to_le_bytes())?;
+        } else {
+            w.put(b"PLCSRC01")?;
+        }
         w.put(&revision.to_le_bytes())?;
         w.u32(self.version)?;
         atom9(&mut w, &self.root)?;
         w.count(self.string_count)?;
         w.count(self.node_count)?;
-        w.count(self.string_count)?;
-        for id in 0..self.string_count {
-            w.count(PublicGraphRead::string_length(self, id)?)?;
-            self.string_chunks(id, &mut |units| {
-                for u in units {
-                    w.put(&u.to_le_bytes())?;
+        if !update {
+            if self.layout_id.is_some() {
+                // A full frame carries the original base even after replacement
+                // or truncation. Current changes follow as complete patches.
+                w.count(self.catalog.len())?;
+                for entry in &self.catalog {
+                    w.count(entry.units)?;
+                    for unit in self.text(&entry.text).encode_utf16() {
+                        w.put(&unit.to_le_bytes())?;
+                    }
                 }
-                Ok(())
-            })?;
+            } else {
+                // Exhausted identity space retains the prior self-contained ABI.
+                w.count(self.string_count)?;
+                for id in 0..self.string_count {
+                    w.count(PublicGraphRead::string_length(self, id)?)?;
+                    self.string_chunks(id, &mut |units| {
+                        for unit in units {
+                            w.put(&unit.to_le_bytes())?;
+                        }
+                        Ok(())
+                    })?;
+                }
+            }
+            // Five scalar columns: labels, source, target, value, decimal-key IDs.
+            w.count(5)?;
+            w.count(self.labels.len())?;
+            for id in &self.labels {
+                atom9(&mut w, &Atom::String(*id))?;
+            }
+            for col in 0..3 {
+                w.count(self.source.links.len())?;
+                for l in &self.source.links {
+                    atom9(
+                        &mut w,
+                        &match col {
+                            0 => Atom::Ref(l.source as u32),
+                            1 => Atom::Ref(l.target as u32),
+                            _ => Atom::Number(l.value),
+                        },
+                    )?;
+                }
+            }
+            w.count(self.indices.len())?;
+            for id in &self.indices {
+                atom9(&mut w, &Atom::String(*id))?;
+            }
+            let n = self.source.nodes.len();
+            let m = self.source.links.len();
+            let key = |k: &str| Expr::literal(&Atom::String(self.key(k)));
+            w.count(6)?;
+            let node_props = if n == 0 {
+                vec![]
+            } else {
+                vec![
+                    (key("id"), Expr::column(0, false)),
+                    (
+                        key("index"),
+                        Expr {
+                            op: 5,
+                            tag: 4,
+                            a: 0,
+                            b: 1,
+                        },
+                    ),
+                ]
+            };
+            group(&mut w, 0, n, 0, 0, &node_props, None, None)?;
+            group(
+                &mut w,
+                n,
+                1,
+                2,
+                n as u32,
+                &[],
+                Some((n, Expr::column(4, true), Expr::affine(6, 0, true))),
+                None,
+            )?;
+            // Empty link groups do not name absent source/target/value string keys.
+            let link_props = if m == 0 {
+                vec![]
+            } else {
+                vec![
+                    (key("source"), Expr::column(1, false)),
+                    (key("target"), Expr::column(2, false)),
+                    (key("value"), Expr::column(3, false)),
+                ]
+            };
+            group(&mut w, n + 1, m, 0, 0, &link_props, None, None)?;
+            group(
+                &mut w,
+                n + m + 1,
+                1,
+                2,
+                m as u32,
+                &[],
+                Some((
+                    m,
+                    Expr::column(4, true),
+                    Expr::affine(6, (n + 1) as u32, true),
+                )),
+                None,
+            )?;
+            group(
+                &mut w,
+                n + m + 2,
+                1,
+                3,
+                0,
+                &[],
+                None,
+                Some((n, Expr::column(0, true), Expr::affine(6, 0, true))),
+            )?;
+            let mut root_props = Vec::with_capacity(7);
+            for slot in 0..7 {
+                let p = self.base_property(n + m + 3, slot);
+                root_props.push((Expr::literal(&Atom::String(p.key)), Expr::literal(&p.value)));
+            }
+            group(&mut w, n + m + 3, 1, 1, 1, &root_props, None, None)?;
         }
-        // Five scalar columns: labels, source, target, value, decimal-key IDs.
-        w.count(5)?;
-        w.count(self.labels.len())?;
-        for id in &self.labels {
-            atom9(&mut w, &Atom::String(*id))?;
-        }
-        for col in 0..3 {
-            w.count(self.source.links.len())?;
-            for l in &self.source.links {
-                atom9(
-                    &mut w,
-                    &match col {
-                        0 => Atom::Ref(l.source as u32),
-                        1 => Atom::Ref(l.target as u32),
-                        _ => Atom::Number(l.value),
-                    },
-                )?;
+        if self.layout_id.is_some() {
+            let mut changed_strings: Vec<_> = self
+                .strings
+                .keys()
+                .copied()
+                .filter(|id| *id < self.string_count)
+                .collect();
+            changed_strings.sort_unstable();
+            w.count(changed_strings.len())?;
+            for id in changed_strings {
+                let value = &self.strings[&id];
+                w.count(id)?;
+                w.count(value.0.len())?;
+                for unit in &value.0 {
+                    w.put(&unit.to_le_bytes())?;
+                }
             }
         }
-        w.count(self.indices.len())?;
-        for id in &self.indices {
-            atom9(&mut w, &Atom::String(*id))?;
-        }
-        let n = self.source.nodes.len();
-        let m = self.source.links.len();
-        let key = |k: &str| Expr::literal(&Atom::String(self.key(k)));
-        w.count(6)?;
-        let node_props = if n == 0 {
-            vec![]
-        } else {
-            vec![
-                (key("id"), Expr::column(0, false)),
-                (
-                    key("index"),
-                    Expr {
-                        op: 5,
-                        tag: 4,
-                        a: 0,
-                        b: 1,
-                    },
-                ),
-            ]
-        };
-        group(&mut w, 0, n, 0, 0, &node_props, None, None)?;
-        group(
-            &mut w,
-            n,
-            1,
-            2,
-            n as u32,
-            &[],
-            Some((n, Expr::column(4, true), Expr::affine(6, 0, true))),
-            None,
-        )?;
-        // Empty link groups do not name absent source/target/value string keys.
-        let link_props = if m == 0 {
-            vec![]
-        } else {
-            vec![
-                (key("source"), Expr::column(1, false)),
-                (key("target"), Expr::column(2, false)),
-                (key("value"), Expr::column(3, false)),
-            ]
-        };
-        group(&mut w, n + 1, m, 0, 0, &link_props, None, None)?;
-        group(
-            &mut w,
-            n + m + 1,
-            1,
-            2,
-            m as u32,
-            &[],
-            Some((
-                m,
-                Expr::column(4, true),
-                Expr::affine(6, (n + 1) as u32, true),
-            )),
-            None,
-        )?;
-        group(
-            &mut w,
-            n + m + 2,
-            1,
-            3,
-            0,
-            &[],
-            None,
-            Some((n, Expr::column(0, true), Expr::affine(6, 0, true))),
-        )?;
-        let mut root_props = Vec::with_capacity(7);
-        for slot in 0..7 {
-            let p = self.base_property(n + m + 3, slot);
-            root_props.push((Expr::literal(&Atom::String(p.key)), Expr::literal(&p.value)));
-        }
-        group(&mut w, n + m + 3, 1, 1, 1, &root_props, None, None)?;
         let mut changed: Vec<_> = self
             .nodes
             .keys()

@@ -14,6 +14,9 @@ pub trait PublicGraphRead: Send {
     fn source_layout(&self, _revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
         Ok(None)
     }
+    fn source_layout_update(&self, revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
+        self.source_layout(revision)
+    }
     fn extent(&self) -> Extent;
     fn root(&self) -> Atom;
     fn header(&self, node: usize) -> Result<Header, PeleError>;
@@ -149,7 +152,7 @@ pub(crate) fn validate_structure(reader: &dyn PublicGraphRead) -> Result<(), Pel
     }
     Ok(())
 }
-pub(crate) fn validate_schema(
+pub(super) fn validate_schema(
     reader: &dyn PublicGraphRead,
     schema: &'static super::ModelSchema,
     compiled: &super::schema::CompiledSchema,
@@ -284,6 +287,9 @@ impl std::fmt::Debug for GraphReadView<'_> {
 impl<'a> GraphReadView<'a> {
     pub fn source_layout(&self, revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
         self.reader().source_layout(revision)
+    }
+    pub fn source_layout_update(&self, revision: u64) -> Result<Option<Vec<u8>>, PeleError> {
+        self.reader().source_layout_update(revision)
     }
     pub fn canonical_binary_size(
         &self,

@@ -22,7 +22,7 @@ fn prepare_graph(
     metadata_bytes: usize,
 ) -> Result<GraphPacket, PeleError> {
     let canonical_bytes = graph.canonical_binary_size(metadata_bytes, DEFAULT_BINARY_BUDGET)?;
-    let bytes = match graph.source_layout(revision)? {
+    let bytes = match graph.source_layout_update(revision)? {
         Some(bytes) => bytes,
         None => {
             // A compact recipe can outgrow the canonical frame after arbitrary

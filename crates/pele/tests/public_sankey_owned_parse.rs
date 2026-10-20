@@ -997,3 +997,223 @@ fn public_logical_reader_cannot_borrow_another_documents_admission() {
         );
     }
 }
+
+#[test]
+fn source_layout_updates_preserve_original_base_and_complete_current_state() {
+    // This public transport consumer reads the declarative frame independently:
+    // original catalog/layout bytes belong to the initial frame, while updates
+    // carry complete replacements relative to that base, never the prior update.
+    struct Packet<'a> {
+        header: &'a [u8],
+        strings: usize,
+        original: Vec<JsString>,
+        immutable: &'a [u8],
+        patches: Vec<(usize, JsString)>,
+        overrides: &'a [u8],
+    }
+    fn u32_at(bytes: &[u8], pos: &mut usize) -> usize {
+        let value = u32::from_le_bytes(bytes[*pos..*pos + 4].try_into().unwrap());
+        *pos += 4;
+        value as usize
+    }
+    fn text(bytes: &[u8], pos: &mut usize) -> JsString {
+        let len = u32_at(bytes, pos);
+        let end = *pos + len * 2;
+        let units = bytes[*pos..end]
+            .chunks_exact(2)
+            .map(|unit| u16::from_le_bytes(unit.try_into().unwrap()))
+            .collect();
+        *pos = end;
+        JsString(units)
+    }
+    fn packet(bytes: &[u8], full: bool) -> Packet<'_> {
+        assert_eq!(&bytes[..8], if full { b"PLCSRC02" } else { b"PLCSRU01" });
+        assert_ne!(u64::from_le_bytes(bytes[8..16].try_into().unwrap()), 0);
+        let mut pos = 37;
+        let strings = u32_at(bytes, &mut pos);
+        let _nodes = u32_at(bytes, &mut pos);
+        let base_start = pos;
+        let mut original = Vec::new();
+        if full {
+            let count = u32_at(bytes, &mut pos);
+            for _ in 0..count {
+                original.push(text(bytes, &mut pos));
+            }
+            let columns = u32_at(bytes, &mut pos);
+            for _ in 0..columns {
+                let count = u32_at(bytes, &mut pos);
+                pos += count * 9;
+            }
+            let groups = u32_at(bytes, &mut pos);
+            for _ in 0..groups {
+                // first/count/kind/aux0/aux1, then fixed properties,
+                // indexed properties, indexed Map pairs. Expr is ten bytes.
+                pos += 17;
+                let properties = u32_at(bytes, &mut pos);
+                pos += properties * 21;
+                let dynamic = u32_at(bytes, &mut pos);
+                pos += dynamic * 25;
+                let maps = u32_at(bytes, &mut pos);
+                pos += maps * 24;
+            }
+        }
+        let base_end = pos;
+        let count = u32_at(bytes, &mut pos);
+        let mut patches = Vec::new();
+        for _ in 0..count {
+            let id = u32_at(bytes, &mut pos);
+            assert!(id < strings);
+            assert!(patches.last().is_none_or(|(previous, _)| *previous < id));
+            patches.push((id, text(bytes, &mut pos)));
+        }
+        Packet {
+            header: &bytes[8..45],
+            strings,
+            original,
+            immutable: &bytes[base_start..base_end],
+            patches,
+            overrides: &bytes[pos..],
+        }
+    }
+    fn verify(document: &PublicDocument, expected: &PublicDocument, initial: &[u8]) {
+        let graph = expected.snapshot().unwrap();
+        let view = document.snapshot_read().unwrap();
+        let full_bytes = view.source_layout(document.revision()).unwrap().unwrap();
+        let update_bytes = view
+            .source_layout_update(document.revision())
+            .unwrap()
+            .unwrap();
+        let base = packet(initial, true);
+        let full = packet(&full_bytes, true);
+        let update = packet(&update_bytes, false);
+        assert_eq!(full.header, update.header);
+        assert_eq!(&full.header[..8], &base.header[..8]);
+        assert_eq!(full.immutable, base.immutable);
+        assert_eq!(full.original, base.original);
+        assert_eq!(full.patches, update.patches);
+        assert_eq!(full.overrides, update.overrides);
+        let mut restored: Vec<_> = (0..update.strings)
+            .map(|id| base.original.get(id).cloned())
+            .collect();
+        for (id, value) in update.patches {
+            restored[id] = Some(value);
+        }
+        let restored: Vec<_> = restored.into_iter().map(Option::unwrap).collect();
+        assert_eq!(restored, graph.strings);
+        let metadata = b"{\"result\":null}";
+        let encoded =
+            encode_binary_exchange(document.revision(), &graph, metadata, DEFAULT_BINARY_BUDGET)
+                .unwrap();
+        assert_eq!(
+            view.canonical_binary_size(metadata.len(), encoded.len())
+                .unwrap(),
+            encoded.len() - metadata.len()
+        );
+        assert_eq!(
+            view.canonical_binary_size(metadata.len(), encoded.len() - 1)
+                .unwrap_err(),
+            encode_binary_exchange(document.revision(), &graph, metadata, encoded.len() - 1)
+                .unwrap_err()
+        );
+        assert!(
+            view.encode_binary(document.revision(), metadata, encoded.len())
+                .unwrap()
+                == encoded
+        );
+    }
+    let source = "---\ntitle: original 😀\n---\nsankey\nA,B,2\nA,C,3";
+    let mut actual = PublicEngine::with_builtins()
+        .parse(source, &Default::default())
+        .unwrap();
+    let mut expected = legacy_engine().parse(source, &Default::default()).unwrap();
+    let original = expected.snapshot().unwrap();
+    let initial = actual
+        .snapshot_read()
+        .unwrap()
+        .source_layout(0)
+        .unwrap()
+        .unwrap();
+    verify(&actual, &expected, &initial);
+    verify(&actual, &expected, &initial);
+    // Different owner, identical diagram: bases are never interchangeable.
+    let other = PublicEngine::with_builtins()
+        .parse(source, &Default::default())
+        .unwrap();
+    let other_bytes = other
+        .snapshot_read()
+        .unwrap()
+        .source_layout(0)
+        .unwrap()
+        .unwrap();
+    assert_ne!(&initial[8..16], &other_bytes[8..16]);
+
+    let mut edited = original.clone();
+    let label = edited.strings.iter().position(|s| s.is("A")).unwrap();
+    edited.strings[label] = JsString::from("replaced λ 😀");
+    edited.strings.push(JsString(vec![0xd800, 0, 0xdc00]));
+    edited.root = Atom::Undefined;
+    for document in [&mut actual, &mut expected] {
+        document.apply(0, edited.clone()).unwrap();
+    }
+    verify(&actual, &expected, &initial);
+    assert_eq!(
+        actual
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err(),
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err()
+    );
+
+    let empty = ModelGraph {
+        version: original.version,
+        strings: vec![],
+        nodes: vec![],
+        root: Atom::Undefined,
+    };
+    for document in [&mut actual, &mut expected] {
+        document.apply(1, empty.clone()).unwrap();
+    }
+    verify(&actual, &expected, &initial);
+    for document in [&mut actual, &mut expected] {
+        document.apply(2, original.clone()).unwrap();
+    }
+    verify(&actual, &expected, &initial);
+
+    let call = MethodCall {
+        method: MethodId(1),
+        receiver: original.root.clone(),
+        arguments: vec![Atom::Number(123.)],
+    };
+    {
+        let a = actual
+            .invoke_read(3, call.clone(), &mut MetricsResources)
+            .unwrap();
+        let b = expected.invoke(3, call, &mut MetricsResources).unwrap();
+        assert_eq!(
+            serde_json::to_vec(&a.result).unwrap(),
+            serde_json::to_vec(&b.result).unwrap()
+        );
+    }
+    verify(&actual, &expected, &initial);
+    assert_eq!(
+        actual
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err(),
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err()
+    );
+    for document in [&mut actual, &mut expected] {
+        document.apply(4, original.clone()).unwrap();
+    }
+    verify(&actual, &expected, &initial);
+    assert_eq!(
+        actual
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap(),
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap()
+    );
+}

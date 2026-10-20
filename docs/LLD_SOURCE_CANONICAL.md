@@ -45,10 +45,15 @@ Old owned outcomes keep their original public types and presentation ordering.
 
 A side-effect-free capability probe precedes source publication. Legacy
 providers return false without exporting twice. A capable document emits an owned
-`PLCSRC01` recipe: complete current strings, immutable scalar columns, declarative
-record layouts and complete accepted replacements. Numeric payloads retain raw
-IEEE words. The generic JS reader evaluates layouts; grammar, helper policy and
-rendering remain in Rust.
+`PLCSRC02` recipe: the original string catalog, immutable scalar columns,
+declarative record layouts and complete current string/record replacements.
+Later `PLCSRU01` outcomes reuse that immutable base, identified by a checked
+process-local ID, and carry complete current replacements and graph extents.
+Reset and truncation reconstruct strings from the original catalog, including
+after canonical fallback. Numeric payloads retain raw IEEE words. The generic JS
+reader evaluates layouts; grammar, helper policy and rendering remain in Rust.
+The previous self-contained `PLCSRC01` decoder remains supported. Exhausted owner
+IDs permanently select that format for new owners without adding an error.
 
 The existing `ModelBridge` retains registry identities, busy/disposed state and
 callback dispatch. Its storage binding selects logical traversal once. Capture

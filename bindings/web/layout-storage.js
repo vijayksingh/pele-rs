@@ -78,16 +78,17 @@ export class LayoutGraph{
     invalid();
   }
 }
-export function decodeSourceLayout(bytes,baseline){
-  if(bytes instanceof Uint8Array&&bytes[0]===80&&bytes[1]===69)return decodeCanonicalLayout(bytes,baseline);
-  const r=new Reader(bytes);for(const b of [80,76,67,83,82,67,48,49])if(r.u8()!==b)invalid();
-  const revision=r.u64();if(r.u32()!==1)invalid();const root=new Uint32Array(3);r.atom(root,0,true);
-  const stringCount=r.u32(),nodeCount=r.u32();if(stringCount>1000000||nodeCount>1000000)limit();
-  const strings=[],count=r.count(4,1000000);if(count!==stringCount)invalid();let units=0;
-  for(let id=0;id<count;id++){
-    const n=r.count(2,16000000);units+=n;if(units>16000000)limit();let text='';
-    for(let left=n;left;){const size=Math.min(left,8192),chunk=new Array(size);for(let i=0;i<size;i++){chunk[i]=r.view.getUint16(r.at,true);r.at+=2;}text+=String.fromCharCode(...chunk);left-=size;}strings.push(text);
-  }
+function readText(r){
+  const n=r.count(2,16000000);let text='';
+  for(let left=n;left;){const size=Math.min(left,8192),chunk=new Array(size);for(let i=0;i<size;i++){chunk[i]=r.view.getUint16(r.at,true);r.at+=2;}text+=String.fromCharCode(...chunk);left-=size;}
+  return text;
+}
+function readCatalog(r){
+  const count=r.count(4,1000000),strings=[],unitPrefix=new Uint32Array(count+1);let units=0;
+  for(let id=0;id<count;id++){const text=readText(r);units+=text.length;if(units>16000000)limit();strings.push(text);unitPrefix[id+1]=units;}
+  return{strings,unitPrefix};
+}
+function readLayoutBase(r){
   const columns=[];for(let n=r.count(4);n;n--){const size=r.count(9),column=new Uint32Array(size*3);for(let i=0;i<size;i++)r.atom(column,i*3,true);columns.push(column);}
   const groups=[];let previousEnd=0;
   for(let n=r.count(25);n;n--){
@@ -99,9 +100,47 @@ export function decodeSourceLayout(bytes,baseline){
     const collections=r.count(kind===3?24:14);if(collections&&kind!==3&&kind!==4)invalid();
     for(let x=0;x<collections;x++){const count=r.u32(),key=kind===3?r.expression():null,value=r.expression();g.itemAtoms+=count*(kind===3?2:1);if(g.itemAtoms>8000000)limit();g.collections.push({count,key,value});}if(count)groups.push(g);
   }
-  const overrides=new Map();for(let n=r.count(9,1000000);n;n--){const id=r.u32();if(id>=nodeCount||overrides.has(id))invalid();overrides.set(id,r.node());}
-  if(r.at!==bytes.length)invalid();const graph=new LayoutGraph({groups,columns},strings,overrides,nodeCount,root);
-  // Group coverage may have gaps only where a complete override is supplied.
+  return{groups,columns};
+}
+function readStringPatches(r,base,count){
+  const original=base.originalStrings,n=r.count(8,1000000);
+  if(n===0&&count===original.length)return original;
+  const strings=original.slice(0,count);strings.length=count;
+  let units=base.unitPrefix[Math.min(count,original.length)],appended=0;
+  const seen=new Set();
+  for(let i=0;i<n;i++){
+    const id=r.u32();if(id>=count||seen.has(id))invalid();seen.add(id);
+    const text=readText(r);units+=text.length-(id<original.length?original[id].length:0);strings[id]=text;if(id>=original.length)appended++;
+  }
+  if(appended!==Math.max(0,count-original.length))invalid();
+  if(units>16000000)limit();
+  return strings;
+}
+function readOverrides(r,nodeCount){
+  const overrides=new Map();for(let n=r.count(9,1000000);n;n--){const id=r.u32();if(id>=nodeCount||overrides.has(id))invalid();overrides.set(id,r.node());}return overrides;
+}
+export function decodeSourceLayout(bytes,baseline){
+  if(!(bytes instanceof Uint8Array))invalid();if(bytes.length>BUDGET)limit();
+  if(bytes[0]===80&&bytes[1]===69)return decodeCanonicalLayout(bytes,baseline);
+  const r=new Reader(bytes);let magic='';for(let i=0;i<8;i++)magic+=String.fromCharCode(r.u8());
+  const legacy=magic==='PLCSRC01',full=magic==='PLCSRC02',update=magic==='PLCSRU01';if(!legacy&&!full&&!update)invalid();
+  const layoutId=legacy?undefined:r.u64();if(!legacy&&layoutId==='0')invalid();
+  const revision=r.u64();if(r.u32()!==1)invalid();const root=new Uint32Array(3);r.atom(root,0,true);
+  const stringCount=r.u32(),nodeCount=r.u32();if(stringCount>1000000||nodeCount>1000000)limit();
+  let base,strings;
+  if(update){
+    if(!(baseline instanceof LayoutGraph)||baseline.base.layoutId!==layoutId||!baseline.base.originalStrings)invalid();
+    base=baseline.base;strings=readStringPatches(r,base,stringCount);
+  }else{
+    const catalog=readCatalog(r);if(legacy&&catalog.strings.length!==stringCount)invalid();
+    base=readLayoutBase(r);
+    if(full){base.layoutId=layoutId;base.originalStrings=catalog.strings;base.unitPrefix=catalog.unitPrefix;strings=readStringPatches(r,base,stringCount);}
+    else strings=catalog.strings;
+  }
+  const overrides=readOverrides(r,nodeCount);if(r.at!==bytes.length)invalid();
+  const graph=new LayoutGraph(base,strings,overrides,nodeCount,root);
+  // Only effective rows must exist. Unused original source rows may reference
+  // IDs outside a truncated current extent; complete overrides take precedence.
   for(let id=0;id<nodeCount;id++)if(!overrides.has(id))graph.group(id);
   return{revision,graph};
 }
