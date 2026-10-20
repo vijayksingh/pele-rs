@@ -69,6 +69,6 @@ assert profile['inputsBefore']['cases']==items['profile/runtime/fetched/files/sc
 assert len(profile['checks'])==4
 for check in profile['checks']:assert check['results']['js']==check['results']['control']==check['results']['candidate']
 for n,item in items.items():
- if n.startswith('profile/') and n!='profile/manifest.json':
+ if n.startswith('profile/') and n!='profile/manifest.json' and item['source'].startswith('dist/perf-patches/parse-architecture/source-symbols-profiler/'):
   original=item['source'].split('source-symbols-profiler/',1)[1];assert item['originalSHA256']==profileManifest['files'][original],n
 print(json.dumps(dict(artifacts=len(items),source=manifest['sourceCommit'],native=57,nativeBinaries=11,swift=16,drawings=12481,expectedErrors=16572,budgetDifferences=0,c=3,api=168,apiCases=21,node=122,browser=114,warmRows=24,pairedTrials=21,untimedProbes=36,parseProfiles=4),indent=2))

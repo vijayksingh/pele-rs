@@ -20,7 +20,7 @@ This is one window versus e148, whose behavior predates the callback fixes. It d
 
 ## Parse profiles
 
-Four five-second fixed medium/large parse profiles compare `11f2751` and e148. Each sampled operation includes public parse, a type checksum and disposal. Exact model identity/descriptor/IEEE digests, SVG/dimensions and resource traces match pinned Pele before/after. All source/package/harness hashes remain fixed; the first attempt passes strict nonnegative-weight validation with no retry. The executed four-window program is explicitly adapted and pinned; it is not claimed byte-identical to the older nine-window harness.
+Four fixed medium/large parse profiles with a five-second target compare `11f2751` and e148. Each sampled operation includes public parse, a type checksum and disposal. The large candidate loop elapsed 7580.785 ms and its raw CDP span was 7876.194 ms; the target is not an exact window duration. Exact model identity/descriptor/IEEE digests, SVG/dimensions and resource traces match pinned Pele before/after. All source/package/harness hashes remain fixed; the first attempt passes strict nonnegative-weight validation with no retry. The executed four-window program is explicitly adapted and pinned; it is not claimed byte-identical to the older nine-window harness.
 
 The largest named self frame is `publish` in the source initializer: 18.43% medium / 34.04% large. Its body appends the object and inserts object-to-ID and object-to-owner entries; record construction is in its caller. GC self shares are 12.09% / 32.27%, separate from function self samples. These observations establish neither allocation counts nor an avoidable-cost ceiling. Inlining and the large candidate GC denominator limit comparisons.
 

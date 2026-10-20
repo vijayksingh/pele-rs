@@ -1,0 +1,86 @@
+{
+  "status": "candidate pinned; no transfer or timing authorized",
+  "primaryControl": "Immediate frozen11f + PeleJS; e148 probe-only",
+  "executionPriority": [
+    "warm only on parent GO",
+    "first-use only on separate parent GO"
+  ],
+  "protocolProbeDelta": {
+    "previousSHA256": "ca4df47b5a31146f625a0e23aac3bed0aecccf1ad49fb9422627bf4ccf432de4",
+    "currentSHA256": "70851eb99e6f303ccf5ddbb1801e8cde0a11e6abcf467ddace21686553a822ee",
+    "expectedHelperApplies": {
+      "before": 1,
+      "after": 0
+    },
+    "reason": "Parent-authorized accepted-baseline receipt: completed publication and unchanged helper-argument observation renew the accepted receipt. Three real jobs/finish and zero applies were proven in raw and high-level public feature checks. Existing helper alias/publication/update identity and ACK+acceptedApplyCalls+1 revision formula remain exact.",
+    "timedHarnessChanged": false,
+    "executed": true,
+    "note": "Unchanged historical accepted-baseline probe copied byte-for-byte; no execution of this new runner."
+  },
+  "harnesses": {
+    "warm": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "firstUse": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0"
+  },
+  "files": {
+    "cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "compare-first-use-web-vm.mjs": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0",
+    "compare-web-vm.mjs": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "probe-layout-continuity.mjs": "70851eb99e6f303ccf5ddbb1801e8cde0a11e6abcf467ddace21686553a822ee",
+    "probe-source-ingress.mjs": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67",
+    "probe-source-layout.mjs": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+    "run-source-layout.mjs": "97767323e2939ccc1c50e9f9db4b0450809364d46bc164204a430bcc91e4b544",
+    "source-layout-pins.json": "ccfb2b5a9ea0dcd85f2c0ada908c7d1640e4c4cfb2e4a5594dd6ba12221ea4aa"
+  },
+  "referencesSHA256": "ee5ac26f330174333d3082f395b16ae33ac8c04162cf9c026c2c197b0beb4766",
+  "preparationFiles": {
+    "PLAN.md": "efa9d11fd2fdad1f8ae74323f9da0ee5a8c7d5fe081a12052a0a7a99e45a2b61",
+    "PROBE_REVIEW.json": "4e86564cad2531d517fce0664b06144441ba07bb3e72f40a0109a84606799438",
+    "pin-candidate.py": "fcaaf53a03992f1287648318e4c0d02e497c0aae62d487e2673cc49c5adf9a7d",
+    "verify-results.py": "d481f1be76e25b7bc4296a9c76e978000d9d945357b74cf272d2bfd31e910aac",
+    "vm-artifacts.py": "25e9fcf7264797abf2cb381e4a7b56580e8413c82c2c9b6fbcbf1f10d0189b13"
+  },
+  "conditions": 24,
+  "trials": 21,
+  "warmupMs": 1000,
+  "probeCounts": [
+    8,
+    16,
+    12
+  ],
+  "probeReady": true,
+  "requiredReviewedSources": [
+    "bindings/web/full.js",
+    "bindings/web/graph-storage.js"
+  ],
+  "priorCandidateSource": "11f27516d98c3d89799a7fe2065eec0bd4e147cf",
+  "priorFileCount": 117,
+  "controlFileCount": 117,
+  "expectedStaticDeltaFrom11f": [
+    "full.js",
+    "graph-storage.js"
+  ],
+  "requiredCandidateWasm": "c0ddd411aebbcd3a2293d66cf7de50f8b0c10fafdf335d7554962922ee42f07c",
+  "probeControlFileCount": 113,
+  "probeControlPurpose": "Candidate capability checks only; immutable11f36-check proof reused; timed outputs fresh",
+  "reusedControlProof": {
+    "dist/perf-patches/parse-architecture/source-symbols-runner/runtime/warm-verification.json": "9b881d186eeb2214ef9b117b554710f6e4d9036b9a23f6f95a5dc84d13e8335d",
+    "dist/perf-patches/parse-architecture/source-symbols-runner/runtime/warm-execution.json": "c61ac7244b3930fe744e54f72eca607e262573941a8a108b6d03cfa770f04044",
+    "dist/perf-patches/parse-architecture/source-symbols-runner/runtime/fetch-warm/evidence/warm.json": "a5a897672d24d1e9d0a4d64ceb40b75ff95b27c6f7c84438d5d8646c8a12b425",
+    "dist/perf-patches/parse-architecture/source-symbols-runner/runtime/fetch-warm/evidence/warm-provenance.json": "5bf40efcb94063ff74f600323e4f91312abe7cd7a486d4a4f3cabe23ca7fbb49",
+    "dist/perf-patches/parse-architecture/source-symbols-runner/runtime/fetch-warm/evidence/warm-layout-continuity.json": "0718206c9b6b77b88040e6437db6661fcfb67c7a02a1390e774e9d43fa78d0a9",
+    "dist/perf-patches/parse-architecture/source-symbols-runner/runtime/fetch-warm/evidence/warm-activation.json": "24137bbefae30faac8591c871cc06d29a73c329a7c59061b8aaa5cf86836fbb2",
+    "dist/perf-patches/parse-architecture/source-symbols-runner/runtime/fetch-warm/evidence/warm-ingress-activation.json": "81d768312d48a25fd9132c633ffc822571bcde8ce8cb51769071d7ed10d73f38"
+  },
+  "candidateFileCount": 117,
+  "candidateSource": "d7caf8c684ac6b6fda3918a2bcbd91c5953b92c9",
+  "candidateWasm": "c0ddd411aebbcd3a2293d66cf7de50f8b0c10fafdf335d7554962922ee42f07c",
+  "candidateManifestSHA256": "4beed51b15d219952639f25a08c59b6522d99157905aa95178b259eb3b82b84f",
+  "candidateManifestPath": "dist/perf-patches/parse-architecture/disposal-receipt-runtime/package.json",
+  "candidatePackagePath": "dist/perf-patches/parse-architecture/disposal-receipt-runtime/candidate-package",
+  "reviewedSourceManifestSHA256": "944808b73283d391ae68c76db60d9aba2a7a14c5271432fd17fed9877221d4d4",
+  "reviewedStaticDelta": [
+    "full.js",
+    "graph-storage.js"
+  ],
+  "generatedDelta": []
+}
