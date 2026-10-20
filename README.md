@@ -176,14 +176,8 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest complete matrix package: native `46da621`, JS `e8316b2`. The latest changes
-reuse captured schema metadata, release disposed bridge storage, and borrow SVG
-text that needs no escaping. SVG root assembly now writes borrowed spans directly
-into the final output. Fresh Gantt arenas now use private Rust builders instead
-of general mutable property assignment. Gantt string lookups borrow stack UTF-16
-instead of creating temporary owned strings. Small Gantt records now search
-their existing arena property slices; larger records retain hashing. The newer
-focused `02ee639` checkpoint also removes temporary fresh-record field vectors.
+Latest complete matrix package: native `46da621`, JS `e8316b2`. The newer Swift
+handoff leaves the measured web runtime byte-identical.
 Source render takes **1.60–4.97×** the Pele JS time.
 Median ratios across all sizes/resources are **2.39× source**, **11.39× parse**
 and **4.02× retained mutable render**. These describe this artifact; differences
@@ -198,47 +192,30 @@ callback renders remain slightly slower, and control rows also move; this is
 not a general browser win. Full output checks pass, but the new complete
 126-condition performance gate still fails every condition.
 
-The [controlled Gantt construction comparison](docs/benchmarks/2026-10-20-gantt-builder/)
-measures 16–25% lower VM parse medians, 35% lower native public-parse median and
-25% fewer native requested allocation bytes against its matched control. This
-improves fresh parsing; retained model copying/reconciliation remains costly.
-The separate [borrowed-lookup comparison](docs/benchmarks/2026-10-20-gantt-lookup/)
-measures 14–18% lower native mutable-render medians at matched one/sixteen-render
-histories, with 44% fewer allocations. VM retained medians are 4–7% lower in its
-diagnostic; small rows overlap earlier noise. Gains from separate checkpoints
-are not combined.
+The [eager Swift checkpoint](docs/benchmarks/2026-10-20-swift-eager/) removes the
+second full model JSON buffer and recursive Foundation decode while keeping
+`Document.model` eager. Same-Mac, matched immutable-parse medians:
 
-The [adaptive-property comparison](docs/benchmarks/2026-10-20-gantt-properties/)
-measures 22–25% lower native mutable-render median against its matched
-control, with unchanged required retained storage. VM retained medians are
-2–8% lower, but medium source rendering is 1.6–3.1% slower in a source-only
-follow-up; parse costs remain unresolved. This is a native/retained improvement
-with a measured web tradeoff, not a regression-free result.
+| Workload | Old Swift | New Swift | Old / new |
+| --- | ---: | ---: | ---: |
+| Sequence small | 0.3084 ms | 0.0587 ms | 5.25× |
+| Gantt medium | 5.3088 ms | 0.8451 ms | 6.28× |
 
-The [fixed-field checkpoint](docs/benchmarks/2026-10-20-gantt-fields/)
-reduces cumulative requested native public-parse allocation bytes by 28.8%.
-A matched sixteen-operation comparison measures a 7.7% lower public-parse
-median; unchanged controls and the initial count-one run remain disclosed.
-VM parse results are mixed, with source regressions in some unchanged paths;
-this is not a general browser speedup. Fresh ARM64 Swift passes 14 integrations
-and 168 exact API output conditions. The complete matrix above predates this
-focused change; 0.3 remains blocked.
+Each wins all 15 pairs. Source and typed-retained controls remain near-flat;
+these two workloads do not establish all-33 speedups or a JS ratio. Separate
+guarded runs use 1000 ms measured warmup and identical batch counts. Raw reports,
+source/SDK hashes, profiles and interrupted-build exclusions remain linked.
+The ARM64 Swift corpus passes all 33 families, including 167,473 mutable drawings
+and 270,358 error cases, with five existing explicit transport-budget differences.
+Seven new projection integrations and 168 eight-API output conditions pass.
+Native UI activation remains unverified: 19 full-suite test cases fail 53
+assertions when the host cannot become active/key; a bare AppKit probe reproduces
+this without Pele. Universal Intel validation remains required before release.
 
-The prior direct host comparison measured an 11.1% retained-render improvement
-against its own matched control, with regressions disclosed. Reports retain
-raw samples, artifact hashes and failed gates:
-[latest direct-parse checkpoint](docs/benchmarks/2026-10-20-direct-parse/),
-[adaptive-property checkpoint](docs/benchmarks/2026-10-20-gantt-properties/),
-[fixed-field checkpoint](docs/benchmarks/2026-10-20-gantt-fields/),
-[Gantt lookup checkpoint](docs/benchmarks/2026-10-20-gantt-lookup/),
-[Gantt construction checkpoint](docs/benchmarks/2026-10-20-gantt-builder/),
-[borrowed-root checkpoint](docs/benchmarks/2026-10-20-svg-root/),
-[SVG/disposal checkpoint](docs/benchmarks/2026-10-20-svg-disposal/),
-[prior schema checkpoint](docs/benchmarks/2026-10-20-registration-schema/),
-[direct comparison](docs/benchmarks/2026-10-20-direct-comparison/),
-[rejected copying experiments](docs/benchmarks/2026-10-20-copying-candidates/),
-[rejected initial publication](docs/benchmarks/2026-10-20-initial-publication/).
-No JS speedup or GPU acceleration is claimed.
+[Earlier checkpoints](docs/PERFORMANCE.md) preserve their own matched controls,
+raw samples and tradeoffs; gains are not combined. Recent
+[rejected text/identity experiments](docs/benchmarks/2026-10-20-parse-candidates/)
+remain outside production. No JS speedup or GPU acceleration is claimed.
 
 Independent Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
 Verified 5 µs clock ticks; nine alternating trials after at least 500 ms warmup.
@@ -256,28 +233,6 @@ Source-render measurements with cached Canvas metrics:
 | gantt | 0.689 ms | 2.563 ms | 3.72× |
 | railroad | 0.769 ms | 1.847 ms | 2.40× |
 
-Swift runs locally on Apple M1 Pro. Fresh source-built ARM64 SDK passed 14
-integration tests for mutable models, calendars, callbacks, Date identities and
-error recovery, plus 168 exact output checks through eight actual APIs. Universal Intel
-rebuild remains required before release. Nine-trial timing medians below use
-medium workloads (48 units; Railroad 15 rules) and passed the compiler/Pele-test
-quiet guard with at least 500ms measured warmup. The table is the preceding
-`7909cdf` source checkpoint. Current `129ad96` has 168 correctness checks and a
-focused eight-API Gantt timing report: source/retained/mutable rendering is
-0.449/0.394/0.850ms, immutable parse 5.498ms and mutable parse 0.204ms. The first
-focused attempt rejected unrelated compilation; its clean retry passed the guard.
-Other desktop activity is recorded. No historical Swift speedup is claimed.
-
-| Medium workload | Source render | Retained render | Mutable render |
-| --- | ---: | ---: | ---: |
-| flowchart | 0.610 ms | 0.481 ms | 0.592 ms |
-| sequence | 0.268 ms | 0.228 ms | 0.344 ms |
-| er | 1.662 ms | 1.349 ms | 1.589 ms |
-| pie | 0.299 ms | 0.295 ms | 0.306 ms |
-| sankey | 0.357 ms | 0.326 ms | 0.379 ms |
-| gantt | 0.455 ms | 0.396 ms | 1.096 ms |
-| railroad | 0.458 ms | 0.423 ms | 0.479 ms |
-
 A separate [native-only comparison](docs/benchmarks/2026-10-20-native-core/)
 before the latest root rewrite removes WASM/Swift entirely: typed retained native/JS medians are 0.80× Flowchart,
 0.70× Sequence, 1.04× ER, 0.50× Pie, 0.41× Sankey, 1.15× Gantt and 1.38× Railroad.
@@ -291,10 +246,8 @@ lower mutable publication medians against matched native control; the extra
 graph/revision return contract and growing arena remain disclosed.
 
 Swift and VM figures cannot be compared across machines. Timings include public
-API/ownership costs and exclude startup, downloads and SVG painting. Rejected
-experiments remain outside the default; the adopted property lookup has the web
-tradeoffs described above. Earlier non-isolated reports
-remain historical; percentage gains are not combined across timer conditions.
+API/ownership costs and exclude startup, downloads and SVG painting. Earlier
+reports remain historical; percentage gains are not combined across timer conditions.
 
 ## Build and verification
 
@@ -312,12 +265,14 @@ scripts/build-wasm.sh
 npm run test:types
 ```
 
-The current cleanup passes all-target Rust compilation, packaged Rust consumers
-for all 33 mutable families, 28 strict C executions across ARM/Intel, all-33-family
-Swift consumers on both architectures, native painted-pixel checks, and the
-canonical web package and 60 focused browser checks through Chromium/Firefox/WebKit. An independent exact-WASM
-consumer checks all 33 complete SVG baselines and live host features. The broader
-pinned corpus history is retained in [verification evidence](docs/FULL_PARITY_PROGRESS.md).
+The latest parse checkpoint passes 42 native public integrations, strict ARM64
+C ownership/public-model/limit programs, seven Swift projection integrations,
+the full 33-family Swift model corpus, 168 consumer API conditions and all 324
+Chromium/Firefox/WebKit checks. Full Swift UI activation checks remain failing
+as disclosed above; the new ARM64 SDK is not universal Intel release proof.
+Earlier cross-platform release evidence and the broader pinned corpus history
+remain in [verification evidence](docs/FULL_PARITY_PROGRESS.md) and
+[0.2 acceptance](docs/RELEASE_0_2.md).
 
 `scripts/verify.sh` runs Rust integration corpora, packaged consumers, strict C
 ownership checks, Swift integration features, AppKit checks and packed-WASM

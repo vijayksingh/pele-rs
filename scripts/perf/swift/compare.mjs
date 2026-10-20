@@ -9,7 +9,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import assert from 'node:assert/strict';
 import { packageDir, repository, inputs, sha, guardQuiet, systemProcesses } from './build.mjs';
 
-const here = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
     const index = args.indexOf(name);
@@ -21,7 +20,9 @@ const root = repository(), timed = args.includes('--quiet-run');
 const controlDirectory = resolve(arg('--control-dir', join(root, 'dist/perf-control/swift')));
 const candidateManifestPath = resolve(arg('--candidate-manifest', join(packageDir, '.build/swift-build-manifest.json')));
 const controlManifestPath = join(controlDirectory, 'swift-build-manifest.json');
-const stages = ['parse', 'render-source', 'render-retained', 'parseMutable', 'snapshot', 'apply', 'render', 'lifetime'];
+const knownStages = ['parse', 'render-source', 'render-retained', 'parseMutable', 'snapshot', 'apply', 'render', 'lifetime'];
+const stages = arg('--stages', knownStages.join(',')).split(',');
+assert(stages.length && new Set(stages).size === stages.length && stages.every(stage => knownStages.includes(stage)), 'Unknown or duplicate stage');
 const trials = 15, warmupMs = 1000, targetBatchMs = 12;
 const ids = arg('--cases', 'gantt/medium,sequence/small').split(',').filter(Boolean);
 assert(ids.length && new Set(ids).size === ids.length, 'Cases must be a nonempty unique list');
@@ -133,7 +134,7 @@ const report = {
     worktree: execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).trim().split('\n').filter(Boolean),
     comparatorSha256, builds, changedInputs, oracleRevision, oracleSha256,
     node: process.version, platform: platform(), arch: arch(), cpu: cpus()[0]?.model, logicalCPUs: cpus().length, totalMemory: totalmem(),
-    settings: { trials, warmupMsPerBinaryPerStage: warmupMs, targetBatchMs, stages, selectedCases: selected.map(workload => workload.id), fixedClock: now, timeZone: 'UTC', resources: 'UTF16 length × size × (bold?.71:.6)', matchedCounts: true, order: 'Alternate control/candidate first by stage row and trial; 15 pairs give 8/7 per row, opposite imbalance next row', sequentialTiming: true, freshRetainedStatePerBatch: true },
+    settings: { trials, warmupMsPerBinaryPerStage: warmupMs, warmupMaximumBatch: 128, targetBatchMs, stages, selectedCases: selected.map(workload => workload.id), fixedClock: now, timeZone: 'UTC', resources: 'UTF16 length × size × (bold?.71:.6)', matchedCounts: true, order: 'Alternate control/candidate first by stage row and trial; 15 pairs give 8/7 per row, opposite imbalance next row', sequentialTiming: true, freshRetainedStatePerBatch: true },
     limitations: [
         `Frozen control source ${builds.control.manifest.revision}; candidate build source ${builds.candidate.manifest.revision}. This measures the combined binary differences listed below, not isolated eager-projection causality.`,
         'Candidate complete source/SDK aggregate is verified against current files. Historical control uses frozen binary and original manifest hashes; historical source tree is not reconstructed or claimed current.',
@@ -196,7 +197,7 @@ try {
                 // only after each side meets the full one-second target.
                 while (warmup.pairs < 6 || warmup.control.elapsedNs < warmupMs * 1e6 || warmup.candidate.elapsedNs < warmupMs * 1e6) {
                     assert(warmup.pairs < 10_000, 'Warmup failed to converge');
-                    const count = warmup.pairs < 6 ? 1 : Math.min(32, maxBatch(workload));
+                    const count = warmup.pairs < 6 ? 1 : maxBatch(workload);
                     const pair = await exercisePair(workload, expected, stage, count, true, pairedOrder(rowIndex + warmup.pairs));
                     for (const side of ['control', 'candidate']) { warmup[side].operations += count; warmup[side].elapsedNs += pair.values[side].elapsedNs; }
                     warmup.pairs++;
@@ -220,7 +221,7 @@ try {
                 const candidateMs = row.raw.map(pair => pair.values.candidate.elapsedNs / count / 1e6);
                 const ratios = candidateMs.map((value, index) => value / controlMs[index]);
                 row.statistics = {
-                    controlMs: statistics(controlMs), candidateMs: statistics(candidateMs), pairedCandidateOverControl: statistics(ratios),
+                    pairedCandidateOverControl: statistics(ratios),
                     ratioOfMedians: quantile(candidateMs, .5) / quantile(controlMs, .5),
                     candidateFasterPairs: ratios.filter(value => value < 1).length,
                     pairedPercentChanges: ratios.map(value => (value - 1) * 100), controlMs, candidateMs, ratios
@@ -243,7 +244,7 @@ try {
     assert.equal(sha(await readFile(fileURLToPath(import.meta.url))), comparatorSha256, 'Comparator changed during comparison');
     if (timed) guardQuiet();
     report.orderCounts = report.rows.flatMap(row => row.raw).reduce((counts, pair) => { counts[pair.order[0]]++; return counts; }, { control: 0, candidate: 0 });
-    if (timed) assert.equal(report.orderCounts.control, report.orderCounts.candidate, 'Global pair order imbalance');
+    if (timed) assert.equal(Math.abs(report.orderCounts.control - report.orderCounts.candidate), report.rows.length % 2, 'Global pair order imbalance');
     report.systemAfter = system(); report.completedAt = new Date().toISOString(); report.completed = true;
     await persist(); console.log(outputPath);
 } catch (error) {

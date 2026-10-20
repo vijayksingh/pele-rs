@@ -1,0 +1,290 @@
+{
+  "reports": [
+    {
+      "file": "swift-parse-timing.json",
+      "sha256": "9981160d54aa4d6f6169e459a87d269fb0b2b5ad636710d875f72919b07ecaf5",
+      "startedAt": "2026-10-20T02:33:24.976Z",
+      "completedAt": "2026-10-20T02:33:54.407Z",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "stage": "parse",
+          "count": 64,
+          "controlMs": {
+            "median": 0.308373046875,
+            "mad": 0.0023300781250000235,
+            "min": 0.305796875,
+            "max": 0.321263671875,
+            "sampleP95": 0.321263671875
+          },
+          "candidateMs": {
+            "median": 0.058729828125,
+            "mad": 0.0003912968750000023,
+            "min": 0.05751040625,
+            "max": 0.062319671875,
+            "sampleP95": 0.062319671875
+          },
+          "medianPercentChange": -80.95494119211841,
+          "pairedPercentChange": -81.05047650573948,
+          "pairedMinPercentChange": -81.75924419558991,
+          "pairedMaxPercentChange": -79.64383879755275,
+          "wins": 15,
+          "warmup": {
+            "control": {
+              "operations": 16262,
+              "elapsedNs": 5050705334
+            },
+            "candidate": {
+              "operations": 16262,
+              "elapsedNs": 1004077747
+            },
+            "pairs": 133
+          }
+        },
+        {
+          "case": "gantt/medium",
+          "stage": "parse",
+          "count": 4,
+          "controlMs": {
+            "median": 5.30882275,
+            "mad": 0.02812474999999992,
+            "min": 5.1932395,
+            "max": 5.36660425,
+            "sampleP95": 5.36660425
+          },
+          "candidateMs": {
+            "median": 0.8450835,
+            "mad": 0.011479249999999941,
+            "min": 0.830354,
+            "max": 0.88589575,
+            "sampleP95": 0.88589575
+          },
+          "medianPercentChange": -84.0815273028281,
+          "pairedPercentChange": -84.02148290542851,
+          "pairedMinPercentChange": -84.46682555360776,
+          "pairedMaxPercentChange": -83.16374335883792,
+          "wins": 15,
+          "warmup": {
+            "control": {
+              "operations": 1286,
+              "elapsedNs": 6724139499
+            },
+            "candidate": {
+              "operations": 1286,
+              "elapsedNs": 1059036667
+            },
+            "pairs": 16
+          }
+        }
+      ]
+    },
+    {
+      "file": "swift-source-timing.json",
+      "sha256": "0c6a2790e8195f0ae9375282d771d41771cb3865a8d54143b099c6294f9673aa",
+      "startedAt": "2026-10-20T02:34:40.205Z",
+      "completedAt": "2026-10-20T02:34:57.706Z",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "stage": "render-source",
+          "count": 128,
+          "controlMs": {
+            "median": 0.0822311171875,
+            "mad": 0.0013460234374999963,
+            "min": 0.079733078125,
+            "max": 0.09434603125,
+            "sampleP95": 0.09434603125
+          },
+          "candidateMs": {
+            "median": 0.082171875,
+            "mad": 0.0010315781250000017,
+            "min": 0.0796344375,
+            "max": 0.163138671875,
+            "sampleP95": 0.163138671875
+          },
+          "medianPercentChange": -0.07204351530930575,
+          "pairedPercentChange": -0.07204351530930575,
+          "pairedMinPercentChange": -14.177224267183997,
+          "pairedMaxPercentChange": 94.76973300687888,
+          "wins": 8,
+          "warmup": {
+            "control": {
+              "operations": 12294,
+              "elapsedNs": 1000812248
+            },
+            "candidate": {
+              "operations": 12294,
+              "elapsedNs": 1000313092
+            },
+            "pairs": 102
+          }
+        },
+        {
+          "case": "gantt/medium",
+          "stage": "render-source",
+          "count": 32,
+          "controlMs": {
+            "median": 0.4359270625,
+            "mad": 0.003234343750000035,
+            "min": 0.4245481875,
+            "max": 0.4610768125,
+            "sampleP95": 0.4610768125
+          },
+          "candidateMs": {
+            "median": 0.4315495,
+            "mad": 0.006240906249999956,
+            "min": 0.422209625,
+            "max": 0.48509246875,
+            "sampleP95": 0.48509246875
+          },
+          "medianPercentChange": -1.0041960861285282,
+          "pairedPercentChange": -0.9029655088875765,
+          "pairedMinPercentChange": -4.043929671344005,
+          "pairedMaxPercentChange": 6.796486349855302,
+          "wins": 12,
+          "warmup": {
+            "control": {
+              "operations": 2438,
+              "elapsedNs": 1041011956
+            },
+            "candidate": {
+              "operations": 2438,
+              "elapsedNs": 1035514793
+            },
+            "pairs": 25
+          }
+        }
+      ]
+    },
+    {
+      "file": "swift-retained-timing.json",
+      "sha256": "055247ad4f0f166fb1d6dbba189511d68b8ce2910650daec2511bfd472a9d506",
+      "startedAt": "2026-10-20T02:34:57.873Z",
+      "completedAt": "2026-10-20T02:35:18.026Z",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "stage": "render-retained",
+          "count": 128,
+          "controlMs": {
+            "median": 0.0685146484375,
+            "mad": 0.0009726562500000091,
+            "min": 0.0664150390625,
+            "max": 0.072857421875,
+            "sampleP95": 0.072857421875
+          },
+          "candidateMs": {
+            "median": 0.0686354140625,
+            "mad": 0.0007327421874999962,
+            "min": 0.06702734375,
+            "max": 0.0721787109375,
+            "sampleP95": 0.0721787109375
+          },
+          "medianPercentChange": 0.17626248948814371,
+          "pairedPercentChange": -0.30614683937539855,
+          "pairedMinPercentChange": -4.801348357875812,
+          "pairedMaxPercentChange": 3.343181049566968,
+          "wins": 8,
+          "warmup": {
+            "control": {
+              "operations": 14726,
+              "elapsedNs": 1008021338
+            },
+            "candidate": {
+              "operations": 14726,
+              "elapsedNs": 1046745747
+            },
+            "pairs": 121
+          }
+        },
+        {
+          "case": "gantt/medium",
+          "stage": "render-retained",
+          "count": 32,
+          "controlMs": {
+            "median": 0.3681796875,
+            "mad": 0.0033150937499999977,
+            "min": 0.3618580625,
+            "max": 0.4010859375,
+            "sampleP95": 0.4010859375
+          },
+          "candidateMs": {
+            "median": 0.3681458125,
+            "mad": 0.00257425,
+            "min": 0.36123959375,
+            "max": 0.385453125,
+            "sampleP95": 0.385453125
+          },
+          "medianPercentChange": -0.009200670528575206,
+          "pairedPercentChange": 0.40317879501869935,
+          "pairedMinPercentChange": -8.837982820078306,
+          "pairedMaxPercentChange": 5.705029278094953,
+          "wins": 7,
+          "warmup": {
+            "control": {
+              "operations": 2822,
+              "elapsedNs": 1056769330
+            },
+            "candidate": {
+              "operations": 2822,
+              "elapsedNs": 1068168291
+            },
+            "pairs": 28
+          }
+        }
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "case": "gantt-medium",
+      "sourceSHA256": "26335fe6e3b1d73fa62f010fa004b8ef307f8bf45c5d9391513bd4136a0450f0",
+      "counts": {
+        "exercise": 4369,
+        "foundation": 38,
+        "configValue": 0,
+        "nativeParse": 4130,
+        "swiftEvents": 1723,
+        "registration": 0,
+        "envelopeCount": 184,
+        "projection": 1642
+      },
+      "percentOfExercise": {
+        "exercise": 100,
+        "foundation": 0.8697642481116961,
+        "configValue": 0,
+        "nativeParse": 94.52964065003434,
+        "swiftEvents": 39.436942092011904,
+        "registration": 0,
+        "envelopeCount": 4.2114900434882125,
+        "projection": 37.58297093156329
+      }
+    },
+    {
+      "case": "sequence-small",
+      "sourceSHA256": "80217b5666427b4df31a063d4b9e3fea0d53d0bd55c9d73f77a644981b4d534e",
+      "counts": {
+        "exercise": 1146,
+        "foundation": 103,
+        "configValue": 0,
+        "nativeParse": 856,
+        "swiftEvents": 324,
+        "registration": 0,
+        "envelopeCount": 34,
+        "projection": 275
+      },
+      "percentOfExercise": {
+        "exercise": 100,
+        "foundation": 8.987783595113438,
+        "configValue": 0,
+        "nativeParse": 74.69458987783595,
+        "swiftEvents": 28.272251308900522,
+        "registration": 0,
+        "envelopeCount": 2.966841186736475,
+        "projection": 23.99650959860384
+      }
+    }
+  ],
+  "comparatorSha256": "a3b3d82f8a36e2d411851efec25537f60ec83d7f5f862ef7db49c43ef5b1ed3f",
+  "checks": "All assertions passed; input aggregate separately checked using build.mjs inputs(root), no consumer/build/runtime executed."
+}

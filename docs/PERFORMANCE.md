@@ -23,20 +23,33 @@ and control regressions disclosed. No 0.3 release.
 | Gantt | 0.689 ms | 2.563 ms | 3.72× |
 | Railroad | 0.769 ms | 1.847 ms | 2.40× |
 
-The following Swift table is the
-[original baseline](benchmarks/2026-10-19-vm/README.md), on separate hardware;
-it is not a cross-machine ratio or timing of the newer eager projection:
+The [current Swift checkpoint](benchmarks/2026-10-20-swift-eager/README.md)
+compares frozen Rust-backed Swift executables on this Mac. Sequence-small parse
+falls from 0.3084 to 0.0587 ms (5.25×); Gantt-medium falls from 5.3088 to
+0.8451 ms (6.28×), each winning 15/15 matched pairs. Source and retained render
+medians stay near flat. This includes the combined source changes since
+`02ee639`, not isolated bridge causality, all-family timing or a JS comparison.
+The 33-family Swift model corpus and 168 consumer API conditions pass; native UI
+activation/focus assertions and current Intel validation remain open.
 
-| Medium workload | Source render | Retained render | Mutable render |
-| --- | ---: | ---: | ---: |
-| Flowchart | 0.597 ms | 0.493 ms | 0.621 ms |
-| Sequence | 0.275 ms | 0.235 ms | 0.290 ms |
-| ER | 1.624 ms | 1.411 ms | 1.580 ms |
-| Pie | 0.306 ms | 0.290 ms | 0.309 ms |
-| Sankey | 0.399 ms | 0.372 ms | 0.420 ms |
-| Gantt | 0.450 ms | 0.383 ms | 1.130 ms |
-| Railroad | 0.469 ms | 0.442 ms | 0.501 ms |
+[Rejected parse candidates](benchmarks/2026-10-20-parse-candidates/README.md)
+retain raw first-use and live-heap evidence. Lower map count and alternate string
+storage did not establish a broad improvement and remain outside production.
+
+Historical checkpoints remain separately scoped:
+
+- [Original VM and Swift baseline](benchmarks/2026-10-19-vm/README.md)
+- [Native core attribution](benchmarks/2026-10-20-native-core/README.md)
+- [Mutable copying](benchmarks/2026-10-20-mutable/README.md)
+- [Copying candidates](benchmarks/2026-10-20-copying-candidates/README.md)
+- [Direct construction comparison](benchmarks/2026-10-20-direct-comparison/README.md)
+- [Initial publication](benchmarks/2026-10-20-initial-publication/README.md)
+- [Registration schema](benchmarks/2026-10-20-registration-schema/README.md)
+- [Schema cache](benchmarks/2026-10-20-schema-cache/README.md)
+- [Gantt builder](benchmarks/2026-10-20-gantt-builder/README.md)
+- [Gantt lookup](benchmarks/2026-10-20-gantt-lookup/README.md)
+- [Gantt fixed fields](benchmarks/2026-10-20-gantt-fields/README.md)
 
 These are warm public-API medians, excluding startup, downloads and SVG painting.
-Seven families at three sizes are measured. Mutable operations include graph
-exchange/publication costs. See the report for all profiles/stages and boundaries.
+Read each report's exact workloads, stages, controls and limitations before
+comparing checkpoints. No 0.3 release is authorized by the current results.

@@ -1,0 +1,93 @@
+{
+  "sourceCommit": "364c509",
+  "fullSuite": {
+    "tests": 126,
+    "failedAssertions": 53,
+    "failedCases": 19,
+    "failedClasses": [
+      "NativeResourceUITests",
+      "PresentationUITests",
+      "ZoomTests"
+    ],
+    "seconds": 716.064,
+    "apiCorpus": {
+      "families": 33,
+      "mutableDrawings": 167473,
+      "mutableErrorCases": 270358,
+      "explicitBudgetDifferences": 5
+    },
+    "passedSuites": [
+      "Test Suite 'AdditionalDiagramTests' passed at 2026-10-20 07:47:33.408.",
+      "Test Suite 'AsyncEngineTests' passed at 2026-10-20 07:47:33.428.",
+      "Test Suite 'CalendarIntegrationTests' passed at 2026-10-20 07:47:33.443.",
+      "Test Suite 'ClassHostFunctionTests' passed at 2026-10-20 07:47:33.446.",
+      "Test Suite 'DiagramProviderTests' passed at 2026-10-20 07:47:33.451.",
+      "Test Suite 'EagerProjectionIntegrationTests' passed at 2026-10-20 07:47:33.720.",
+      "Test Suite 'ForeignProviderTests' passed at 2026-10-20 07:47:33.721.",
+      "Test Suite 'HostFunctionTests' passed at 2026-10-20 07:47:33.728.",
+      "Test Suite 'LazyMountTests' passed at 2026-10-20 07:47:33.943.",
+      "Test Suite 'MountTests' passed at 2026-10-20 07:47:34.128.",
+      "Test Suite 'MutableArrayEditingTests' passed at 2026-10-20 07:47:34.136.",
+      "Test Suite 'MutableDocumentTests' passed at 2026-10-20 07:47:39.949.",
+      "Test Suite 'MutableRemainingTests' passed at 2026-10-20 07:47:39.995.",
+      "Test Suite 'MutableStressTests' passed at 2026-10-20 07:47:41.506.",
+      "Test Suite 'NonfiniteDiagramTests' passed at 2026-10-20 07:47:49.389.",
+      "Test Suite 'OutputLimitTests' passed at 2026-10-20 07:47:50.027.",
+      "Test Suite 'ParseLimitsTests' passed at 2026-10-20 07:47:53.607.",
+      "Test Suite 'PieTests' passed at 2026-10-20 07:47:53.876.",
+      "Test Suite 'PreparationTests' passed at 2026-10-20 07:47:54.118.",
+      "Test Suite 'PreparedDocumentTests' passed at 2026-10-20 07:47:58.050.",
+      "Test Suite 'PresentationTests' passed at 2026-10-20 07:47:58.054.",
+      "Test Suite 'ProviderMountTests' passed at 2026-10-20 07:48:05.598.",
+      "Test Suite 'ProviderResourceTests' passed at 2026-10-20 07:48:05.602.",
+      "Test Suite 'RegistryTests' passed at 2026-10-20 07:48:05.858.",
+      "Test Suite 'RenderNumberTests' passed at 2026-10-20 07:48:32.700.",
+      "Test Suite 'SVGNumberBoundaryTests' passed at 2026-10-20 07:48:32.708.",
+      "Test Suite 'SVGRootTests' passed at 2026-10-20 07:48:32.734.",
+      "Test Suite 'SourceLimitTests' passed at 2026-10-20 07:48:32.944."
+    ],
+    "failedTests": [
+      "Test Case '-[PeleTests.NativeResourceUITests testApprovedRasterUsesActualNativePixelsAndAllThreeRetainedRenderLanes]' failed (2.400 seconds).",
+      "Test Case '-[PeleTests.NativeResourceUITests testInstalledFontMetricsMatchConcreteSVGFontAndCustomMeasurementsRemainAuthoritative]' failed (2.494 seconds).",
+      "Test Case '-[PeleTests.NativeResourceUITests testOwnedGenerationRetainsLastGoodImageAcrossApprovalFailureAndRecoversWithoutReparse]' failed (2.976 seconds).",
+      "Test Case '-[PeleTests.PresentationUITests testCustomImageMappingRequiresExplicitGeometryDeclaration]' failed (1.074 seconds).",
+      "Test Case '-[PeleTests.PresentationUITests testDestroyKeyboardHostErrorsAndReplacementRespectCurrentOwner]' failed (1.069 seconds).",
+      "Test Case '-[PeleTests.PresentationUITests testFailedAndDeferredUpdatesKeepAcceptedImageMetadataAndActionOwnerAtomically]' failed (1.080 seconds).",
+      "Test Case '-[PeleTests.PresentationUITests testLinkPressCancelsAcrossActualWindowKeyLossWithZoomDisabledAndDestroyed]' failed (1.043 seconds).",
+      "Test Case '-[PeleTests.PresentationUITests testRustAccessibilityAndHostOnlyMouseAndAccessibilityActionsInActualWindow]' failed (1.061 seconds).",
+      "Test Case '-[PeleTests.PresentationUITests testUnavailableAndCustomProviderMetadataKeepNativeDrawingWithGenericAccessibility]' failed (1.116 seconds).",
+      "Test Case '-[PeleTests.PresentationUITests testZoomUsesSameCameraForAccessibleRegionsAndSuppressesDragAndDoubleClickActions]' failed (1.074 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testActualMousePanDoubleClickAndReleaseOutsideKeepOneDrawing]' failed (1.083 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testFitClampsRepeatedProgrammaticAnchorsAndStableLayout]' failed (1.065 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testFocusTraversalKeyboardForwardingAndControlsFreeFocusRelease]' failed (1.046 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testLocalizedRealButtonsUseControlStepAndRespectDisabledStates]' failed (1.093 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testModifiedWheelAnchorsLineAndPreciseEventsAndForwardsParentScroll]' failed (1.062 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testMountPoliciesCallbacksQuietRefreshAndLastGoodZoomedErrors]' failed (1.096 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testNativeMagnificationEntryCancellationAndWindowFocusLossEndCapture]' failed (1.061 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testRoomyViewportAllowsNegativeOriginAndClampsWholeImageInsidePanel]' failed (1.052 seconds).",
+      "Test Case '-[PeleTests.ZoomTests testStandaloneReplacementDestroyRetainedMethodsResizeAndWindowIsolation]' failed (2.094 seconds)."
+    ],
+    "note": "This run preceded the extra depth-boundary integration. Production sources are unchanged; the subsequent seven-test focused run includes that boundary and passes."
+  },
+  "focused": {
+    "eagerProjection": 7,
+    "nativeGanttAndBoundaries": 42,
+    "browser": 324,
+    "swiftAPIConditions": 168
+  },
+  "uiProbe": {
+    "source": "Bare AppKit process, without Pele: setActivationPolicy(.accessory), finishLaunching, activate, create visible titled window, pump run loop two seconds.",
+    "initialActivationPolicy": 2,
+    "accessoryAccepted": true,
+    "finalActivationPolicy": 1,
+    "active": false,
+    "key": false,
+    "visible": true
+  },
+  "limitations": [
+    "Full Swift suite did not pass. Nineteen test cases failed 53 assertions in native window activation/key/focus dependent UI suites. These failures remain open; no UI/release success is claimed.",
+    "The standalone host probe failed activation without loading Pele, separating the observed activation limitation from the new parse transport.",
+    "Targeted eager projection tests and the full 33-family API corpus passed; five existing explicit mutable transport budget differences remain disclosed.",
+    "SDK is macOS ARM64; universal Intel validation remains required before release."
+  ]
+}

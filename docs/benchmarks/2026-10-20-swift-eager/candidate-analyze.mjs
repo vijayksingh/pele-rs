@@ -1,0 +1,9 @@
+import fs from 'node:fs';import crypto from 'node:crypto';
+const dir='dist/perf-patches/parse-architecture/swift-eager/post-profile/',report={method:'Outermost matching frames inside public Prepared.exercise; recursion and nested witnesses counted once. Inclusive categories overlap.',profiles:[]};
+for(const name of ['gantt-medium','sequence-small']){
+ const path=dir+name+'.sample.txt',text=fs.readFileSync(path,'utf8'),section=text.split('Call graph:')[1].split('Total number in stack')[0];
+ const filters={exercise:s=>s.includes('Prepared.exercise('),foundation:s=>s.includes('JSONDecoder.decode<'),configValue:s=>s.includes('ConfigValue.init(from:)')||s.includes('Decodable.init(from:) in conformance ConfigValue'),nativeParse:s=>s.includes('pele_parse_eager_v1'),swiftEvents:s=>s.includes('receiveEagerProjection('),registration:s=>s.includes('Engine::with_builtins'),envelopeCount:s=>s.includes('success_envelope_len'),projection:s=>s.includes('project_model')||s.includes('document_envelope')},counts=Object.fromEntries(Object.keys(filters).map(k=>[k,0])),stack=[];
+ for(const line of section.split('\n')){const m=line.match(/^([ +!:|]*)(\d+) (.+)$/);if(!m)continue;const depth=m[1].length,samples=+m[2],frame=m[3];while(stack.length&&stack.at(-1).depth>=depth)stack.pop();const within=filters.exercise(frame)||stack.some(x=>filters.exercise(x.frame));if(within)for(const [key,filter]of Object.entries(filters))if(filter(frame)&&!stack.some(x=>filter(x.frame)))counts[key]+=samples;stack.push({depth,frame});}
+ report.profiles.push({case:name,sourceSHA256:crypto.createHash('sha256').update(text).digest('hex'),counts,percentOfExercise:Object.fromEntries(Object.entries(counts).map(([key,count])=>[key,100*count/counts.exercise]))});
+}
+fs.writeFileSync(dir+'attribution.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
