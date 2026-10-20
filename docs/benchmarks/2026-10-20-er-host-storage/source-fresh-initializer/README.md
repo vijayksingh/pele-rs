@@ -12,4 +12,6 @@ Correctness covers 78 browser feature cases across Chromium, Firefox and WebKit 
 
 The WASM is byte-identical to `4beb71d`: `2a73047621bbc5d6e79b365963898e617a441d787f4699cdd94e26c2c8c8e468`. Native correctness remains that fresh local run: 41 integrations, Swift 16, strict C 3 and API 168; 12,481 drawings and 16,572 expected errors with zero explicit budget differences. [Continuity](correctness/native-continuity.json) proves all 366 native/SDK inputs, SDK and consumer unchanged, with 387 Git mappings. It is not a new Swift execution or timing result.
 
+[Fresh CPU profiles](profile/RESULTS.md) bind this exact package to nine raw windows. Initializer frames occupy 21.99% of sampled parse time, including the identity-publication helper at 15.71% self; GC is 13.78% self. Native recipe encoding and JS recipe decode show 7.65% and 8.26% inclusive shares. Named groups overlap; samples do not identify allocation sources or predict a speedup. Visible validation/count frames are 3.27%, with inlining preventing a complete admission-cost claim. The old renderer-symbol parser misclassification is explicitly excluded.
+
 The complete edited-graph encode/decode/adoption round trip remains architecture work. No full API/performance release-gate pass, Intel SDK, AppKit activation, all-diagram speedup or 0.3 release is claimed.
