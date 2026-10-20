@@ -12,8 +12,11 @@ function decodeNumber(lo,hi){bits.setUint32(0,lo,true);bits.setUint32(4,hi,true)
 
 export class NativeGraphView {
   #epoch;#memory;#descriptor;#buffer;#view;#refs=1;#strings=null;#prefix=0;#owner;
+  // Four row IDs followed by copied Header7/Property5/Item3/StringDesc2 words.
+  // These are immutable scalar values, never retained views of native pages.
+  #rows=new Uint32Array(21);#units=null;
   constructor(epoch,memory,owner){
-    this.#epoch=epoch;this.#memory=memory;this.#owner=owner;
+    this.#epoch=epoch;this.#memory=memory;this.#owner=owner;this.#rows.fill(ABSENT,0,4);
     try {
     const d=owner.callNative(()=>epoch.descriptor());
     if(!(d instanceof Uint32Array)||d.length!==17||d[0]!==1||d[1]!==PAGE)invalid();
@@ -24,21 +27,41 @@ export class NativeGraphView {
     }catch(error){this.#epoch=null;try{epoch.close();}finally{epoch.free?.();}throw error;}
   }
   get epoch(){if(!this.#epoch)invalid();return this.#epoch;}
-  get owner(){return this.#owner;}
-  get nodeCount(){return this.#descriptor[7];}
-  get stringCount(){return this.#descriptor[8];}
+  get owner(){if(!this.#epoch)invalid();return this.#owner;}
+  get nodeCount(){if(!this.#epoch)invalid();return this.#descriptor[7];}
+  get stringCount(){if(!this.#epoch)invalid();return this.#descriptor[8];}
   retain(){if(!this.#epoch)invalid();this.#refs++;return this;}
-  release(){if(--this.#refs<0)invalid();if(this.#refs===0){const epoch=this.#epoch;this.#epoch=null;this.#view=null;this.#buffer=null;this.#strings=null;this.#descriptor=null;this.#memory=null;this.#owner=null;try{epoch.close();}finally{epoch.free?.();}}}
+  release(){if(--this.#refs<0)invalid();if(this.#refs===0){const epoch=this.#epoch;this.#epoch=null;this.#view=null;this.#buffer=null;this.#strings=null;this.#descriptor=null;this.#memory=null;this.#owner=null;this.#rows=null;this.#units=null;try{epoch.close();}finally{epoch.free?.();}}}
   #refresh(){if(!this.#epoch)invalid();const buffer=this.#memory.buffer;if(buffer!==this.#buffer){this.#buffer=buffer;this.#view=new DataView(buffer);}return this.#view;}
-  #range(pointer,bytes,alignment=1){this.#refresh();if(!u32(pointer)||!Number.isSafeInteger(bytes)||bytes<0||pointer%alignment||pointer+bytes>this.#buffer.byteLength)invalid();}
-  #word(table,row,width,column,unitBytes=4){
-    if(!u32(row)||row>=2**26||!Number.isInteger(column)||column<0||column>=width)invalid();
-    const view=this.#refresh(),page=Math.floor(row/PAGE),top=this.#descriptor[table];
+  #range(pointer,bytes,alignment=1){if(!u32(pointer)||!Number.isSafeInteger(bytes)||bytes<0||pointer%alignment||pointer+bytes>this.#buffer.byteLength)invalid();}
+  // Caller has refreshed once and cannot invoke user code before finishing the
+  // copy. Return only an address; no page/record view escapes this read window.
+  #address(view,table,row,width,count=1,unitBytes=4){
+    const page=Math.floor(row/PAGE),top=this.#descriptor[table];
     const directory=view.getUint32(top+Math.floor(page/DIRECTORY)*4,true);
     if(!directory)invalid();this.#range(directory,DIRECTORY*8,4);
     const entry=directory+(page%DIRECTORY)*8,pointer=view.getUint32(entry,true),length=view.getUint32(entry+4,true),offset=row%PAGE;
-    if(!pointer||length>PAGE*width||offset*width+column>=length)invalid();this.#range(pointer,length*unitBytes,unitBytes);
-    return unitBytes===2?view.getUint16(pointer+(offset*width+column)*2,true):view.getUint32(pointer+(offset*width+column)*4,true);
+    if(!pointer||length>PAGE*width||(offset+count)*width>length)invalid();this.#range(pointer,length*unitBytes,unitBytes);
+    return pointer+offset*width*unitBytes;
+  }
+  #word(table,row,width,column){
+    if(!this.#epoch||!u32(row)||row>=2**26||!Number.isInteger(column)||column<0||column>=width)invalid();
+    const cursor=table-9,start=table===9?4:table===10?11:table===11?16:19;
+    if(cursor<0||cursor>3||width!==(table===9?7:table===10?5:table===11?3:2))invalid();
+    if(this.#rows[cursor]!==row){
+      const view=this.#refresh(),address=this.#address(view,table,row,width);
+      this.#rows[cursor]=ABSENT;
+      for(let i=0;i<width;i++)this.#rows[start+i]=view.getUint32(address+i*4,true);
+      this.#rows[cursor]=row;
+    }
+    return this.#rows[start+column];
+  }
+  #copyUnits(row,count){
+    if(!this.#epoch||!u32(row)||row>=2**26||!u32(count)||count===0||count>PAGE-row%PAGE||row+count>2**26)invalid();
+    const view=this.#refresh(),address=this.#address(view,13,row,1,count,2);
+    const units=this.#units??(this.#units=[]);units.length=count;
+    for(let i=0;i<count;i++)units[i]=view.getUint16(address+i*2,true);
+    return units;
   }
   headerWord(id,column){if(!u32(id)||id>=this.nodeCount)invalid();return this.#word(9,id,7,column);}
   kindCode(id){return this.headerWord(id,0);}
@@ -46,7 +69,7 @@ export class NativeGraphView {
   propertyWord(address,column){return this.#word(10,address,5,column);}
   itemAddress(id,slot){const count=this.headerWord(id,6)*(this.kindCode(id)===3?2:1);if(!u32(slot)||slot>=count)invalid();return this.headerWord(id,5)+slot;}
   atomWord(slot,column){
-    if(!Number.isInteger(column)||column<0||column>2)invalid();
+    if(!this.#epoch||!Number.isInteger(column)||column<0||column>2)invalid();
     if(slot===0)return this.#descriptor[4+column];
     if(!Number.isSafeInteger(slot)||slot<1)invalid();
     if(slot<ITEM)return this.#word(10,slot-PROPERTY,5,column+2);
@@ -55,6 +78,7 @@ export class NativeGraphView {
     return this.#refresh().getUint32(this.#descriptor[14]+row*16+4+column*4,true);
   }
   argumentValues(){
+    if(!this.#epoch)invalid();
     const out=new Array(this.#descriptor[15]);let previous=-1;
     for(let row=0;row<this.#descriptor[16];row++){
       const index=this.#refresh().getUint32(this.#descriptor[14]+row*16,true);
@@ -69,7 +93,13 @@ export class NativeGraphView {
     if(id<this.#prefix)return this.#strings[id];
     const start=this.#word(12,id,2,0),length=this.#word(12,id,2,1),parts=[];
     // Only bounded transport scratch, never a second UTF16 model table.
-    for(let at=0;at<length;at+=1024){const count=Math.min(1024,length-at),units=new Array(count);for(let i=0;i<count;i++)units[i]=this.#word(13,start+at+i,1,0,2);parts.push(String.fromCharCode(...units));}
+    for(let at=0;at<length;){
+      const count=Math.min(PAGE-(start+at)%PAGE,length-at);
+      // Spread copies all arguments before fromCharCode can reenter. A nested
+      // operation may grow memory or overwrite this scratch without invalidating
+      // those arguments; the next native chunk always refreshes its own window.
+      parts.push(String.fromCharCode(...this.#copyUnits(start+at,count)));at+=count;
+    }
     return parts.join('');
   }
   exactEquals(other){return this.#owner.callNative(()=>this.epoch.exact_equals(other.epoch));}

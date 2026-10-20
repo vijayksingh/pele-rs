@@ -62,8 +62,21 @@ The browser owns actual public objects and identity/decoded-string ledgers. It
 must not retain another column graph. The shared observer streams batches; the
 shared publisher reads initialized POD pages through an immutable pinned epoch
 lease. Directory allocations and pages stay alive through outer walks, nested
-calls and disposal. Before every scalar access the adapter refreshes views when
-`memory.buffer` changes. No typed subarray may cross user-code-capable actions.
+calls and disposal. Every live-memory read window refreshes views when
+`memory.buffer` changes. No native-memory access may resume after a
+user-code-capable action without a fresh window.
+
+The first scalar reader repeated refresh and directory/range checks for every
+word. VM profiles attributed 41.86% of parse and 53.73% of retained sampled self
+time to refresh and buffer getters. The revised reader copies one bounded
+header/property/item/string-descriptor row into a fixed 21-word register bank.
+Each accessor checks the lease and requested row; cache hits read only immutable
+copied values. A miss refreshes once and validates the complete initialized row
+before copying. The prior row ID is invalidated until the copy completes. UTF16
+uses page-bounded copied scratch, consumed as scalar arguments before string
+construction can reenter. Shared publication/matching loops, full restoration,
+native admission and the WASM binary remain unchanged. This is an access-boundary
+change, not an assumption that resource callbacks are pure.
 
 ## Verification gates
 

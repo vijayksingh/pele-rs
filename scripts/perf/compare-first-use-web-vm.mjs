@@ -10,6 +10,8 @@ import {chromium} from '@playwright/test';
 import {cases,revision,now} from './cases.mjs';
 const arg=(name,fallback)=>{const i=process.argv.indexOf(name);return i<0?fallback:process.argv[i+1]};
 const candidateNativeCanonicalSankey=process.argv.includes('--candidate-native-canonical-sankey');
+const controlNativeCanonicalSankey=process.argv.includes('--control-native-canonical-sankey');
+assert(!controlNativeCanonicalSankey||candidateNativeCanonicalSankey,'--control-native-canonical-sankey requires --candidate-native-canonical-sankey');
 const candidateCapturedSankey=candidateNativeCanonicalSankey||process.argv.includes('--candidate-captured-sankey');
 const capturedModule='captured-owner.js';
 const roots={control:resolve(arg('--control','dist/package-web/package')),candidate:resolve(arg('--candidate','dist/package-web/package'))};
@@ -29,10 +31,11 @@ async function hashes(root,prefix=''){
 const inputs=async()=>Object.fromEntries(await Promise.all(Object.entries(roots).map(async([key,root])=>[key,await hashes(root)])));
 const before=await inputs(),oracleSHA256=sha(await readFile(oracle));assert.equal(oracleSHA256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');
 if(candidateCapturedSankey)assert(before.candidate[capturedModule],'Candidate package lacks captured-owner.js');
-const capturedBackend={candidateEnabled:candidateCapturedSankey,controlEnabled:false,moduleSHA256:{control:before.control[capturedModule]??null,candidate:before.candidate[capturedModule]??null},probeInsideTimer:false};
+const capturedBackend={candidateEnabled:candidateCapturedSankey,controlEnabled:controlNativeCanonicalSankey,moduleSHA256:{control:before.control[capturedModule]??null,candidate:before.candidate[capturedModule]??null},probeInsideTimer:false};
 if(candidateNativeCanonicalSankey)assert(before.candidate['native-storage.js'],'Candidate package lacks native-storage.js');
-const nativeCanonicalBackend={candidateEnabled:candidateNativeCanonicalSankey,controlEnabled:false,moduleSHA256:Object.fromEntries(['control','candidate'].map(name=>[name,{owner:before[name][capturedModule]??null,storage:before[name]['native-storage.js']??null}])),probeInsideTimer:false};
-const report={schemaVersion:1,diagnostic:true,startedAt:new Date().toISOString(),oracleRevision:revision,oracleSHA256,harnessSHA256:sha(await readFile(fileURLToPath(import.meta.url))),casesSHA256:sha(await readFile(new URL('./cases.mjs',import.meta.url))),runtimeHashes:before,capturedBackend,nativeCanonicalBackend,platform:{os:platform(),arch:arch(),cpu:cpus()[0]?.model,logicalCPUs:cpus().length,totalMemory:totalmem()},hostBefore:{loadAverage:loadavg(),freeMemory:freemem()},settings:{candidateNativeCanonicalSankey,candidateCapturedSankey,stages,profiles,selectedCases:ids,trials,warmupMs,batchTargetMs:12,maxBatch:128,balancedThreeWayOrder:true,matchedWasmBatchCounts:true,calibrationMedianOfThree:true,freshDocumentPerOperation:true,disposeInsideTimer:true},scope:'One browser/page holds independent control/candidate WASM instances and pinned JS. Each operation includes parse, first API use and disposal. Invoke/callback stages cover Gantt getTasks and ER addEntity/first measuring callback; other families cover first unchanged/edited render. Source is a negative control. Complete SVG, dimensions and edited-object identity checked before/after. Shared heaps and serial warmup remain limitations. Diagnostic, never the release gate.',rows:[],cases:[]};
+if(controlNativeCanonicalSankey)assert(before.control[capturedModule]&&before.control['native-storage.js'],'Control package lacks native storage modules');
+const nativeCanonicalBackend={candidateEnabled:candidateNativeCanonicalSankey,controlEnabled:controlNativeCanonicalSankey,moduleSHA256:Object.fromEntries(['control','candidate'].map(name=>[name,{owner:before[name][capturedModule]??null,storage:before[name]['native-storage.js']??null}])),probeInsideTimer:false};
+const report={schemaVersion:1,diagnostic:true,startedAt:new Date().toISOString(),oracleRevision:revision,oracleSHA256,harnessSHA256:sha(await readFile(fileURLToPath(import.meta.url))),casesSHA256:sha(await readFile(new URL('./cases.mjs',import.meta.url))),runtimeHashes:before,capturedBackend,nativeCanonicalBackend,platform:{os:platform(),arch:arch(),cpu:cpus()[0]?.model,logicalCPUs:cpus().length,totalMemory:totalmem()},hostBefore:{loadAverage:loadavg(),freeMemory:freemem()},settings:{controlNativeCanonicalSankey,candidateNativeCanonicalSankey,candidateCapturedSankey,stages,profiles,selectedCases:ids,trials,warmupMs,batchTargetMs:12,maxBatch:128,balancedThreeWayOrder:true,matchedWasmBatchCounts:true,calibrationMedianOfThree:true,freshDocumentPerOperation:true,disposeInsideTimer:true},scope:'One browser/page holds independent control/candidate WASM instances and pinned JS. Each operation includes parse, first API use and disposal. Invoke/callback stages cover Gantt getTasks and ER addEntity/first measuring callback; other families cover first unchanged/edited render. Source is a negative control. Complete SVG, dimensions and edited-object identity checked before/after. Shared heaps and serial warmup remain limitations. Diagnostic, never the release gate.',rows:[],cases:[]};
 const server=createServer(async(req,res)=>{try{
  res.setHeader('Cross-Origin-Opener-Policy','same-origin');res.setHeader('Cross-Origin-Embedder-Policy','require-corp');
  const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
@@ -43,13 +46,13 @@ const server=createServer(async(req,res)=>{try{
 await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;const deadline=setTimeout(()=>void browser?.close(),600000);
 try{
  browser=await chromium.launch({headless:true,timeout:20000});report.browser=browser.version();const page=await browser.newPage();await page.goto(`http://127.0.0.1:${server.address().port}/`);
- const clock=await page.evaluate(async({now,candidateCapturedSankey,candidateNativeCanonicalSankey,controlHasCapturedModule})=>{
+ const clock=await page.evaluate(async({now,candidateCapturedSankey,candidateNativeCanonicalSankey,controlNativeCanonicalSankey,controlHasCapturedModule})=>{
  Date.now=()=>now;const js=await import('/oracle.js'),controlAPI=await import('/control/index.js'),candidateAPI=await import('/candidate/index.js');
  let candidateOwner,controlOwner;
  if(candidateCapturedSankey){
   candidateOwner=await import('/candidate/captured-owner.js');
   if(candidateNativeCanonicalSankey&&typeof candidateOwner.capturedSankeyStorage!=='function')throw Error('Candidate package lacks native storage probe');
-  if(controlHasCapturedModule){controlOwner=await import('/control/captured-owner.js');controlOwner.enableCapturedSankeyForTesting(false);}
+  if(controlHasCapturedModule){controlOwner=await import('/control/captured-owner.js');if(controlNativeCanonicalSankey&&typeof controlOwner.capturedSankeyStorage!=='function')throw Error('Control package lacks native storage probe');controlOwner.enableCapturedSankeyForTesting(controlNativeCanonicalSankey);}
  }
  const control=await controlAPI.loadRenderer();
  if(candidateCapturedSankey)candidateOwner.enableCapturedSankeyForTesting(true);
@@ -57,19 +60,19 @@ try{
  const probeBackend=candidateCapturedSankey?(name,model,family,lane)=>{
   if(name==='js')return undefined;
   const actual=(name==='candidate'?candidateOwner:controlOwner)?.capturedSankeyBackend(model);
-  const expected=name==='candidate'&&family==='sankey'?'source':undefined;
+  const expected=(name==='candidate'||controlNativeCanonicalSankey)&&family==='sankey'?'source':undefined;
   if(actual!==expected)throw Error(name+'/'+family+'/'+lane+': expected backend '+String(expected)+', got '+String(actual));
   let storage;
   if(candidateNativeCanonicalSankey){
    const actualStorage=(name==='candidate'?candidateOwner:controlOwner)?.capturedSankeyStorage?.(model);
-   const expectedStorage=name==='candidate'&&family==='sankey'?'native':undefined;
+   const expectedStorage=(name==='candidate'||controlNativeCanonicalSankey)&&family==='sankey'?'native':undefined;
    if(actualStorage!==expectedStorage)throw Error(name+'/'+family+'/'+lane+': expected storage '+String(expectedStorage)+', got '+String(actualStorage));
    storage={expectedStorage:expectedStorage??null,actualStorage:actualStorage??null};
   }
   return {runtime:name,lane,expected:expected??null,actual:actual??null,...storage};
  }:undefined;
  window.comparison={runtimes:{js,control,candidate},controlAPI,probeBackend};
- let resolution=Infinity,last=performance.now();for(let i=0;i<4096;i++){const n=performance.now();if(n>last)resolution=Math.min(resolution,n-last);last=n;}return{crossOriginIsolated,observedClockResolutionMs:resolution};},{now,candidateCapturedSankey,candidateNativeCanonicalSankey,controlHasCapturedModule:!!before.control[capturedModule]});
+ let resolution=Infinity,last=performance.now();for(let i=0;i<4096;i++){const n=performance.now();if(n>last)resolution=Math.min(resolution,n-last);last=n;}return{crossOriginIsolated,observedClockResolutionMs:resolution};},{now,candidateCapturedSankey,candidateNativeCanonicalSankey,controlNativeCanonicalSankey,controlHasCapturedModule:!!before.control[capturedModule]});
  assert(clock.crossOriginIsolated&&clock.observedClockResolutionMs>0&&clock.observedClockResolutionMs<=.01,'High-resolution isolated timer required');Object.assign(report.settings,clock);
  for(const workload of workloads){
  const result=await page.evaluate(async({workload,stages,profiles,trials,warmupMs})=>{
