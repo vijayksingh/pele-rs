@@ -1,7 +1,7 @@
 // Same-browser, same-workload public API measurements. No paint/GPU speedup claim.
 import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,readdir} from 'node:fs/promises';
 import {resolve,dirname,extname} from 'node:path';
 import {cpus,totalmem,freemem,loadavg,platform,arch} from 'node:os';
 import {createHash} from 'node:crypto';
@@ -22,7 +22,9 @@ assert(selectedStages.length&&new Set(selectedStages).size===selectedStages.leng
 assert(selectedProfiles.length&&new Set(selectedProfiles).size===selectedProfiles.length&&selectedProfiles.every(p=>['fixed','canvas'].includes(p)),'Unknown profile');
 
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
-const inputs=async()=>Object.fromEntries(await Promise.all(['full.js','index.js','initialize.js','graph.js','graph-binary.js','resources.js','pkg/pele.js','pkg/pele_bg.wasm'].map(async name=>[name,sha(await readFile(resolve(packageDir,name)))])));
+async function inputs(prefix=''){
+ const files={};for(const entry of (await readdir(resolve(packageDir,prefix),{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){const name=prefix+entry.name;if(entry.isDirectory())Object.assign(files,await inputs(name+'/'));else if(entry.isFile())files[name]=sha(await readFile(resolve(packageDir,name)));else throw Error('Package contains a non-regular file');}return files;
+}
 const harnessSHA256=sha(await readFile(fileURLToPath(import.meta.url)));
 const casesSHA256=sha(await readFile(new URL('./cases.mjs',import.meta.url)));
 const before=await inputs(),oracle=resolve(root,'node_modules/pele/dist/pele.js'),oracleSHA256=sha(await readFile(oracle));

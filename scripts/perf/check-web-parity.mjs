@@ -1,7 +1,7 @@
 // Fail closed against the complete measured matrix and the actual package.
 // This is a release prerequisite, not a claim about unmeasured workloads.
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,readdir} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {createHash} from 'node:crypto';
 import {cases} from './cases.mjs';
@@ -16,7 +16,10 @@ assert(Number.isFinite(report.settings.observedClockResolutionMs)&&report.settin
 assert.equal(report.settings.alternatingPairOrder,true);assert.equal(report.settings.freshRetainedModelPerBatch,true);
 assert(report.settings.trials>=9&&report.settings.minimumWarmupMs>=100&&report.settings.minimumWarmupOperations>=6);
 assert.equal(report.oracleSHA256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');
-for(const name of ['index.js','full.js','initialize.js','graph.js','graph-binary.js','resources.js','pkg/pele.js','pkg/pele_bg.wasm'])assert.equal(hash(await readFile(resolve(packageDir,name))),report.runtimeHashes[name],'Package differs from measured artifact: '+name);
+async function packageHashes(prefix=''){
+ const files={};for(const entry of (await readdir(resolve(packageDir,prefix),{withFileTypes:true})).sort((a,b)=>a.name.localeCompare(b.name))){const name=prefix+entry.name;if(entry.isDirectory())Object.assign(files,await packageHashes(name+'/'));else if(entry.isFile())files[name]=hash(await readFile(resolve(packageDir,name)));else throw Error('Package contains a non-regular file');}return files;
+}
+assert.deepEqual(await packageHashes(),report.runtimeHashes,'Package differs from measured artifact');
 const workloads=cases(),expected=new Set(workloads.flatMap(c=>['fixed','canvas'].flatMap(p=>['render-source','parse','render-model'].map(s=>`${c.id}|${p}|${s}`))));
 assert.equal(report.rows.length,expected.size,'Incomplete benchmark matrix');assert.equal(report.cases.length,workloads.length);
 for(const workload of workloads){const measured=report.cases.find(c=>c.id===workload.id);assert(measured);assert.equal(measured.sourceSHA256,hash(Buffer.from(workload.source)));assert.deepEqual(measured.checks.map(c=>c.profile).sort(),['canvas','fixed']);}
