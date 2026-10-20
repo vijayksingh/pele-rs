@@ -1,0 +1,1166 @@
+{
+  "schemaVersion": 1,
+  "diagnostic": true,
+  "startedAt": "2026-10-20T06:52:00.855Z",
+  "oracleRevision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "7d632fa69ddfbd18fe716388f6e277e6b48ed267fa378b9f73d4ff74f7e1a808",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "runtimeHashes": {
+    "control": {
+      "all-diagram-entries.js": "2198ccdbf3586d74e9770006fb05c820e445a0968a6256a2ab0d6627f92cd424",
+      "builtin-entries.js": "c613f773cdfcd8d9922737c6a88dab17db3c070903e14bce2f198e369d02aba3",
+      "core.d.ts": "9ecbec2091a240664457e687e8b6083ace52a620a64ef65a876bf8fc606a4441",
+      "core.js": "b4189751676890c646ec76fb831eb16c141279b27f44dd665f3f03813f23754a",
+      "diagram-entries.d.ts": "97b2290e3dbfd3aa735dfea383a63c0da0ed1ca445dfa68db4669bf24ecb9c47",
+      "diagram-entries.js": "649ddeffc62753190854d0440dde259011400f826852b4aa20a14bb6507f2008",
+      "diagrams/agentflow.d.ts": "ed966aa366e4f443ebc04f7766bcb326c033fcf1b5198802a3d3262ac4fd1640",
+      "diagrams/agentflow.js": "76b816c01cf6b17ef9eebf6943e44dfc217839f04ad1e556ebcc60871d6bab63",
+      "diagrams/architecture.d.ts": "685d1aad08763ed184576061f1af57ebd020e97275a35ee28c743bed76491d65",
+      "diagrams/architecture.js": "f6797d1af08dd37c49d99cec1dcd76dd45390a635d3f57af5eb43400f176bc38",
+      "diagrams/block.d.ts": "4bb13f66ae9d1ea73e1e73bb382ffdd2d5396ed2a442fc35b3feed09f486929d",
+      "diagrams/block.js": "9ec59c1ae0c9ebca58d3d5facf7c2e10a66b7d1aa9fe5a2a9d47def7d6def9cd",
+      "diagrams/c4.d.ts": "8bbe330bc5e9233c3b4f2b08ea3ff801111962bef52b66b0bf412da82929c9f9",
+      "diagrams/c4.js": "4648be6d26ce54747289b95972989f1d57b8cb01cb7015e1d1c150c40b1b5470",
+      "diagrams/class.d.ts": "0663430c12f41c282d2025e332341c869d93570bcd3e5657029dcc18e9de7847",
+      "diagrams/class.js": "d2d07b788987e4107ab9f4c76e46ce35001598530d1cc4a6317d73060ef58802",
+      "diagrams/cynefin.d.ts": "b251614dde7430ff521e12c769cf8e083edd793a6d63b31678ffb1df55a431a3",
+      "diagrams/cynefin.js": "dda906572a81cf956d584fb2a1beb54662f0d9f8c8b8c0e15159a26bb62f1701",
+      "diagrams/er.d.ts": "cfe808613977d282727b2f2375f3b2fe781bc9cad5e02e023f753a2f6cf851cc",
+      "diagrams/er.js": "4f58c75060c6965e255f9dc43d5e4c71700bd15fd41408bc6c210df2c7f1c414",
+      "diagrams/eventmodeling.d.ts": "a20be3600f375bb9358120f3b8b8588856ce46b365e2b7e7d0c9f276f3b56a24",
+      "diagrams/eventmodeling.js": "2bd0d3ae5ee0cc85c81638fa225601001fa984d338b28d617e4f4625b0b211f6",
+      "diagrams/flowchart.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/flowchart.js": "1d8357752cfc2560c778b6b8e8677b28e31bb33b738b83e50cda2fe60b10c6d6",
+      "diagrams/gantt.d.ts": "6cfab071c62f397e4ea63e8622637f9e307c47868fe38ac370fb1dffbdcb76f5",
+      "diagrams/gantt.js": "084cd1ef3df8e755d4be23a4697f7a09e9eef2f9242669b7ba089108f7be86b3",
+      "diagrams/gitGraph.d.ts": "e893045bf79909c866b514bb924ee048fd01f8bc2caa2f023b225e89b5ac41de",
+      "diagrams/gitGraph.js": "bd51ef5f4b2d158e3b47c95eef52c5575bb4d77cf6becdbd57ed20071f771bc1",
+      "diagrams/info.d.ts": "318d29ac48e33d7a5ff62ad5832803ab30c1759273cb700f4f81e90a7a772f5a",
+      "diagrams/info.js": "4973c7dd85283de9615c3ede99cae84b077ae53c897a219c42ac56627fb7bf12",
+      "diagrams/ishikawa.d.ts": "3c3d832ac347626f6ecd4ec520eb1c57ba47ada2b3aa3c68aac8ff9b42e96577",
+      "diagrams/ishikawa.js": "11e6631b6d577db24d85b51e9f0a7ba1e05601b1f3ce18891bc24bf225f78b03",
+      "diagrams/journey.d.ts": "d9364c99a6013ccf33cbbf7753b6606c80dc24a9543c3f764045c70ada30c553",
+      "diagrams/journey.js": "a618aa5122dff51245d6f1d24a19df278eb81de128d2a442408445ced8200115",
+      "diagrams/kanban.d.ts": "887e9f8e63e1e20e4d34228705bc9f276424bf0606b407a99e29be9a1a7ba61b",
+      "diagrams/kanban.js": "d55dd426f18681396dbdd3294fd7afcec3d4df189cb4769c961367647b010770",
+      "diagrams/mindmap.d.ts": "b73b90c318ead5a5aa869d4cba49e357ea1b90182669e0e139f0b6def47828af",
+      "diagrams/mindmap.js": "93c4922666ee8e0cac9822bb4b9af6bf22471f63bbb352fe5818e4d57451b7ab",
+      "diagrams/packet.d.ts": "c5a09be592cd97ee1c86e8c2281d7c87b677b55cdeeac9a99e6d2111010b054e",
+      "diagrams/packet.js": "ada87c921a18dd72d3c52f14c7a53b8cd628fc0275bf232ac9d1201b967cb7bb",
+      "diagrams/pie.d.ts": "7a3ccf3e6b762089d37cafe61d1aab941c8de69072301b78a3f14afda3915a02",
+      "diagrams/pie.js": "e31a8fe275411e76361094ed3a3b03bb58e1ab50edae051371f0838b876d2c43",
+      "diagrams/quadrantChart.d.ts": "45d683e54a3f1c28c46de448930329f5344d2d673308c41ad6dbc61871942f69",
+      "diagrams/quadrantChart.js": "8877ba13ccfdb408fadd9e63929625864544e1c95f07bb0674d9770dfa6874d5",
+      "diagrams/radar.d.ts": "e963a59434fd12ff343b2ed389c30b3d03e32e8e299f8555c0d1af864415594b",
+      "diagrams/radar.js": "dc956214601d6084d77c96108ca00a2be58640df1a9d3e6251045250e99b7604",
+      "diagrams/railroad.d.ts": "23c4cb03d8c1abea156392964bd5b0e6f8d7087ab3d0bce66e3348438e84f773",
+      "diagrams/railroad.js": "d0d30c37203c93db5b127b6e8e34affbf095996403e362990b20aa70baeb2a81",
+      "diagrams/requirement.d.ts": "1398a66ab6c04298e009433e681091b0b024bff2d7d48a45057360b3666322e1",
+      "diagrams/requirement.js": "bf9651beff933c6a3db084e1ab2567a8d1487aa935822e04dbcf66de4eb60de1",
+      "diagrams/sankey.d.ts": "8ecb9af4bb2f44e5712842315c53b133937c2b028881d939d54628b63d5a9421",
+      "diagrams/sankey.js": "c6fcc9edcd50910cbe5b0773e4d6a683b6befda044dcca92f115c72d987187ef",
+      "diagrams/sequence.d.ts": "cecc8a8a1c16cf47bf3e43e9dded18cfc96c1777f9ad85f825db8d6851a2a5e3",
+      "diagrams/sequence.js": "b87558078379f8183a95f613064e2cae76bb5b3fe6bf91f64e085e99a382a6ad",
+      "diagrams/state.d.ts": "7bfba0476f781b60a6313af1dd7ff28d6e592249e0a57e59d51d466b6a8644ef",
+      "diagrams/state.js": "d627791aeac455514abbde4a4c74089209d9a21cb0fbe6d1c53ff8346b718163",
+      "diagrams/swimlane.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/swimlane.js": "2ad18d6a0e9bf45d20161539843a305235efbf34ea83b5080fb8f722e8329dc0",
+      "diagrams/timeline.d.ts": "ffdce40a2ca1cabfd08a5e5fae52cb14056f4057153184e4dc2480a63e9b3875",
+      "diagrams/timeline.js": "449a69e40593627605fd8ad5818cae1da8ca075529f61cd92dcb340dc72f58fc",
+      "diagrams/treemap.d.ts": "f326b681722b56667c012c82c6250717deac5c41b26c06706dd1f23d83d66f19",
+      "diagrams/treemap.js": "8487c58c79eb01ce6a8ba9b1eb7f4cc05940316aa649365dacff76062832c37f",
+      "diagrams/treeView.d.ts": "3a1ff6d58f50f61387906e6ad1d6a8fa389cbf0d1bf71458d38cddfc78cb18c9",
+      "diagrams/treeView.js": "06c583a03010f7f26aacc1cbc8a5a3982e47890339e6115f8fbc6486b279f497",
+      "diagrams/usecase.d.ts": "35d802519f837262075c97f2fb868a5d9cbe1e11d1c7d6fe6b6f4fc5accaa85c",
+      "diagrams/usecase.js": "de333bea8f335fea2117c273f272bc51902c77c839f19bf9915a6ac00a402e65",
+      "diagrams/venn.d.ts": "9449b3af69edba6a5913152ed172e2aa9e07275d144f7de0a6f83f0e0f0c4708",
+      "diagrams/venn.js": "7bab9528e3c06dabfb2cc6c41ca717717a5d44091777d74a1d8570770bf64d57",
+      "diagrams/wardley.d.ts": "76f8a09179ba84a8fd08009928c1b2d78b03c00667de33d5b6bd74425a698865",
+      "diagrams/wardley.js": "8757dec7935fc53e299fa212589d6fc9f544905c1986a6d988cf15ef8d0952c5",
+      "diagrams/xychart.d.ts": "e280a1e33debe14d03128c02f426da021b21f5c9b365b2738dd376783b8d7050",
+      "diagrams/xychart.js": "bcb6d5fb732fbd5567cc72167e2e38d405a733020aed6b8fc6b788eb884fa89f",
+      "errors.js": "b7ecbd71b53235f2e83825571145db878f65059e5d6d3d814de348d634ab4a98",
+      "FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "full.d.ts": "6bd357541b024665c872be6f1cf2433059c22b0b17bbccd682cdb981b96a6307",
+      "full.js": "93913b485acff85010aa880e387a902e7df94ab66cab33dd9cd31b5fa68f86b6",
+      "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+      "graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+      "host-er-store.js": "948146e47bf026469334bcb770bd442576374492be011103390ff2c54bc1320b",
+      "host-functions.js": "f86795a2710cb9e4ea70604c122f8685d0d994acb29b1f8b8afe954ffbc53b06",
+      "index.d.ts": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+      "lazy.d.ts": "b5252f51d93719e01ec2221ce14686d5a79ca69fdbfa545ba7fad83fca253503",
+      "lazy.js": "9c18e4d7da1c6bba736a4f739a43179b7af514493ba6d97364d31e80429cbb93",
+      "LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+      "MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "mount.js": "61bf88521d76030f64fc8457ebe80137dedc61a6a93db6ec2d6ac8324863a07b",
+      "NOTICE": "b29bd5d01e4cd9cf1a6cd96ffdb12ed6548ab290c01e0a374f12d7212c3baf01",
+      "package.json": "42b3141f8f64a819fb957d7c00900cc7201069f8119940da1019742e3ef64a0c",
+      "parse-limits.js": "643293e8fe70ff35a9ecc431601f5cfa8430c3ad91e9f8681a5c8f3fcc0043c9",
+      "PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "pkg/pele_bg.wasm": "7671b44fd500cac28b33753f0cfcd02c4efd3bc91ae874c775e6a4a06bf18df6",
+      "pkg/pele_bg.wasm.d.ts": "3dc6643fe8ec20a7e6a15fbb8b71c57416d56c3a6e76120c07bbbfbc3338b373",
+      "pkg/pele.d.ts": "0d0b07d3cb0b92112328275c220f705d9f8197445bc0e4b6b1c2b589764dd106",
+      "pkg/pele.js": "466ac630556e3018387eaf7cb24e6b1c4a89336833caf7af2e6f49dba3c42d9f",
+      "README.md": "8fc9239e13d6c39ab7d5b3232e7e9d79f715cbc958fab0ea221b34e4f3e153f3",
+      "registry.d.ts": "251873bffdbc0e1608e5050f321790178cb48270ede48c728ae4ea3af8019199",
+      "registry.js": "0b6fd01dd8228ae286b1827ffa7ef280f169d4fbb43be6034de8d739aaee9855",
+      "REGISTRY.md": "b618e3039b3f50a2553ef124508adc458fd34e8ee9f4b3ffff96f7a75b702054",
+      "render-numbers.js": "c47561036e06abe9795f766863a2f3600e44f6312888077e3ba0c09ec47cb102",
+      "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+      "V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "window.js": "10838164b41efcdf3252a2fadcbbf799a49be9b9197f795a2cda2e0bc8e7d3d0",
+      "zoom.js": "c5d293c1f157b04e37344318de97b4c066a18d95d730f5a7ce76655020d72734"
+    },
+    "candidate": {
+      "all-diagram-entries.js": "2198ccdbf3586d74e9770006fb05c820e445a0968a6256a2ab0d6627f92cd424",
+      "builtin-entries.js": "c613f773cdfcd8d9922737c6a88dab17db3c070903e14bce2f198e369d02aba3",
+      "core.d.ts": "9ecbec2091a240664457e687e8b6083ace52a620a64ef65a876bf8fc606a4441",
+      "core.js": "b4189751676890c646ec76fb831eb16c141279b27f44dd665f3f03813f23754a",
+      "diagram-entries.d.ts": "97b2290e3dbfd3aa735dfea383a63c0da0ed1ca445dfa68db4669bf24ecb9c47",
+      "diagram-entries.js": "649ddeffc62753190854d0440dde259011400f826852b4aa20a14bb6507f2008",
+      "diagrams/agentflow.d.ts": "ed966aa366e4f443ebc04f7766bcb326c033fcf1b5198802a3d3262ac4fd1640",
+      "diagrams/agentflow.js": "76b816c01cf6b17ef9eebf6943e44dfc217839f04ad1e556ebcc60871d6bab63",
+      "diagrams/architecture.d.ts": "685d1aad08763ed184576061f1af57ebd020e97275a35ee28c743bed76491d65",
+      "diagrams/architecture.js": "f6797d1af08dd37c49d99cec1dcd76dd45390a635d3f57af5eb43400f176bc38",
+      "diagrams/block.d.ts": "4bb13f66ae9d1ea73e1e73bb382ffdd2d5396ed2a442fc35b3feed09f486929d",
+      "diagrams/block.js": "9ec59c1ae0c9ebca58d3d5facf7c2e10a66b7d1aa9fe5a2a9d47def7d6def9cd",
+      "diagrams/c4.d.ts": "8bbe330bc5e9233c3b4f2b08ea3ff801111962bef52b66b0bf412da82929c9f9",
+      "diagrams/c4.js": "4648be6d26ce54747289b95972989f1d57b8cb01cb7015e1d1c150c40b1b5470",
+      "diagrams/class.d.ts": "0663430c12f41c282d2025e332341c869d93570bcd3e5657029dcc18e9de7847",
+      "diagrams/class.js": "d2d07b788987e4107ab9f4c76e46ce35001598530d1cc4a6317d73060ef58802",
+      "diagrams/cynefin.d.ts": "b251614dde7430ff521e12c769cf8e083edd793a6d63b31678ffb1df55a431a3",
+      "diagrams/cynefin.js": "dda906572a81cf956d584fb2a1beb54662f0d9f8c8b8c0e15159a26bb62f1701",
+      "diagrams/er.d.ts": "cfe808613977d282727b2f2375f3b2fe781bc9cad5e02e023f753a2f6cf851cc",
+      "diagrams/er.js": "4f58c75060c6965e255f9dc43d5e4c71700bd15fd41408bc6c210df2c7f1c414",
+      "diagrams/eventmodeling.d.ts": "a20be3600f375bb9358120f3b8b8588856ce46b365e2b7e7d0c9f276f3b56a24",
+      "diagrams/eventmodeling.js": "2bd0d3ae5ee0cc85c81638fa225601001fa984d338b28d617e4f4625b0b211f6",
+      "diagrams/flowchart.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/flowchart.js": "1d8357752cfc2560c778b6b8e8677b28e31bb33b738b83e50cda2fe60b10c6d6",
+      "diagrams/gantt.d.ts": "6cfab071c62f397e4ea63e8622637f9e307c47868fe38ac370fb1dffbdcb76f5",
+      "diagrams/gantt.js": "084cd1ef3df8e755d4be23a4697f7a09e9eef2f9242669b7ba089108f7be86b3",
+      "diagrams/gitGraph.d.ts": "e893045bf79909c866b514bb924ee048fd01f8bc2caa2f023b225e89b5ac41de",
+      "diagrams/gitGraph.js": "bd51ef5f4b2d158e3b47c95eef52c5575bb4d77cf6becdbd57ed20071f771bc1",
+      "diagrams/info.d.ts": "318d29ac48e33d7a5ff62ad5832803ab30c1759273cb700f4f81e90a7a772f5a",
+      "diagrams/info.js": "4973c7dd85283de9615c3ede99cae84b077ae53c897a219c42ac56627fb7bf12",
+      "diagrams/ishikawa.d.ts": "3c3d832ac347626f6ecd4ec520eb1c57ba47ada2b3aa3c68aac8ff9b42e96577",
+      "diagrams/ishikawa.js": "11e6631b6d577db24d85b51e9f0a7ba1e05601b1f3ce18891bc24bf225f78b03",
+      "diagrams/journey.d.ts": "d9364c99a6013ccf33cbbf7753b6606c80dc24a9543c3f764045c70ada30c553",
+      "diagrams/journey.js": "a618aa5122dff51245d6f1d24a19df278eb81de128d2a442408445ced8200115",
+      "diagrams/kanban.d.ts": "887e9f8e63e1e20e4d34228705bc9f276424bf0606b407a99e29be9a1a7ba61b",
+      "diagrams/kanban.js": "d55dd426f18681396dbdd3294fd7afcec3d4df189cb4769c961367647b010770",
+      "diagrams/mindmap.d.ts": "b73b90c318ead5a5aa869d4cba49e357ea1b90182669e0e139f0b6def47828af",
+      "diagrams/mindmap.js": "93c4922666ee8e0cac9822bb4b9af6bf22471f63bbb352fe5818e4d57451b7ab",
+      "diagrams/packet.d.ts": "c5a09be592cd97ee1c86e8c2281d7c87b677b55cdeeac9a99e6d2111010b054e",
+      "diagrams/packet.js": "ada87c921a18dd72d3c52f14c7a53b8cd628fc0275bf232ac9d1201b967cb7bb",
+      "diagrams/pie.d.ts": "7a3ccf3e6b762089d37cafe61d1aab941c8de69072301b78a3f14afda3915a02",
+      "diagrams/pie.js": "e31a8fe275411e76361094ed3a3b03bb58e1ab50edae051371f0838b876d2c43",
+      "diagrams/quadrantChart.d.ts": "45d683e54a3f1c28c46de448930329f5344d2d673308c41ad6dbc61871942f69",
+      "diagrams/quadrantChart.js": "8877ba13ccfdb408fadd9e63929625864544e1c95f07bb0674d9770dfa6874d5",
+      "diagrams/radar.d.ts": "e963a59434fd12ff343b2ed389c30b3d03e32e8e299f8555c0d1af864415594b",
+      "diagrams/radar.js": "dc956214601d6084d77c96108ca00a2be58640df1a9d3e6251045250e99b7604",
+      "diagrams/railroad.d.ts": "23c4cb03d8c1abea156392964bd5b0e6f8d7087ab3d0bce66e3348438e84f773",
+      "diagrams/railroad.js": "d0d30c37203c93db5b127b6e8e34affbf095996403e362990b20aa70baeb2a81",
+      "diagrams/requirement.d.ts": "1398a66ab6c04298e009433e681091b0b024bff2d7d48a45057360b3666322e1",
+      "diagrams/requirement.js": "bf9651beff933c6a3db084e1ab2567a8d1487aa935822e04dbcf66de4eb60de1",
+      "diagrams/sankey.d.ts": "8ecb9af4bb2f44e5712842315c53b133937c2b028881d939d54628b63d5a9421",
+      "diagrams/sankey.js": "c6fcc9edcd50910cbe5b0773e4d6a683b6befda044dcca92f115c72d987187ef",
+      "diagrams/sequence.d.ts": "cecc8a8a1c16cf47bf3e43e9dded18cfc96c1777f9ad85f825db8d6851a2a5e3",
+      "diagrams/sequence.js": "b87558078379f8183a95f613064e2cae76bb5b3fe6bf91f64e085e99a382a6ad",
+      "diagrams/state.d.ts": "7bfba0476f781b60a6313af1dd7ff28d6e592249e0a57e59d51d466b6a8644ef",
+      "diagrams/state.js": "d627791aeac455514abbde4a4c74089209d9a21cb0fbe6d1c53ff8346b718163",
+      "diagrams/swimlane.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/swimlane.js": "2ad18d6a0e9bf45d20161539843a305235efbf34ea83b5080fb8f722e8329dc0",
+      "diagrams/timeline.d.ts": "ffdce40a2ca1cabfd08a5e5fae52cb14056f4057153184e4dc2480a63e9b3875",
+      "diagrams/timeline.js": "449a69e40593627605fd8ad5818cae1da8ca075529f61cd92dcb340dc72f58fc",
+      "diagrams/treemap.d.ts": "f326b681722b56667c012c82c6250717deac5c41b26c06706dd1f23d83d66f19",
+      "diagrams/treemap.js": "8487c58c79eb01ce6a8ba9b1eb7f4cc05940316aa649365dacff76062832c37f",
+      "diagrams/treeView.d.ts": "3a1ff6d58f50f61387906e6ad1d6a8fa389cbf0d1bf71458d38cddfc78cb18c9",
+      "diagrams/treeView.js": "06c583a03010f7f26aacc1cbc8a5a3982e47890339e6115f8fbc6486b279f497",
+      "diagrams/usecase.d.ts": "35d802519f837262075c97f2fb868a5d9cbe1e11d1c7d6fe6b6f4fc5accaa85c",
+      "diagrams/usecase.js": "de333bea8f335fea2117c273f272bc51902c77c839f19bf9915a6ac00a402e65",
+      "diagrams/venn.d.ts": "9449b3af69edba6a5913152ed172e2aa9e07275d144f7de0a6f83f0e0f0c4708",
+      "diagrams/venn.js": "7bab9528e3c06dabfb2cc6c41ca717717a5d44091777d74a1d8570770bf64d57",
+      "diagrams/wardley.d.ts": "76f8a09179ba84a8fd08009928c1b2d78b03c00667de33d5b6bd74425a698865",
+      "diagrams/wardley.js": "8757dec7935fc53e299fa212589d6fc9f544905c1986a6d988cf15ef8d0952c5",
+      "diagrams/xychart.d.ts": "e280a1e33debe14d03128c02f426da021b21f5c9b365b2738dd376783b8d7050",
+      "diagrams/xychart.js": "bcb6d5fb732fbd5567cc72167e2e38d405a733020aed6b8fc6b788eb884fa89f",
+      "errors.js": "b7ecbd71b53235f2e83825571145db878f65059e5d6d3d814de348d634ab4a98",
+      "FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "full.d.ts": "6bd357541b024665c872be6f1cf2433059c22b0b17bbccd682cdb981b96a6307",
+      "full.js": "a3f6c01dfd45c6316fb92b09a46877f312150ea1c9d5fcde21fb56a2e396661f",
+      "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+      "graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+      "host-er-store.js": "0c8d866f161f41af9e12b54b9c55cac125487f1520d0f8a536d845a06b49e2f6",
+      "host-functions.js": "f86795a2710cb9e4ea70604c122f8685d0d994acb29b1f8b8afe954ffbc53b06",
+      "index.d.ts": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+      "lazy.d.ts": "b5252f51d93719e01ec2221ce14686d5a79ca69fdbfa545ba7fad83fca253503",
+      "lazy.js": "9c18e4d7da1c6bba736a4f739a43179b7af514493ba6d97364d31e80429cbb93",
+      "LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+      "MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "mount.js": "61bf88521d76030f64fc8457ebe80137dedc61a6a93db6ec2d6ac8324863a07b",
+      "NOTICE": "b29bd5d01e4cd9cf1a6cd96ffdb12ed6548ab290c01e0a374f12d7212c3baf01",
+      "package.json": "42b3141f8f64a819fb957d7c00900cc7201069f8119940da1019742e3ef64a0c",
+      "parse-limits.js": "643293e8fe70ff35a9ecc431601f5cfa8430c3ad91e9f8681a5c8f3fcc0043c9",
+      "PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "pkg/pele_bg.wasm": "ccb13c6348e21d778dcf8b7848c44e0547b9cfb01b84d6b14cc2b02007ac1c9a",
+      "pkg/pele_bg.wasm.d.ts": "df87375698e8a14b17910b3b016d2a90ae1ae19a084b92ab6ab7a31fa8d8591f",
+      "pkg/pele.d.ts": "bf34a7ff849f1a9c3c39bdc49c2a0afafe44d784b7d0bc287f2390ce9b175284",
+      "pkg/pele.js": "e192a9e926d5f1d545e8c640958bb5b58aef54ecd6a1216ff0805bd604296922",
+      "README.md": "8fc9239e13d6c39ab7d5b3232e7e9d79f715cbc958fab0ea221b34e4f3e153f3",
+      "registry.d.ts": "251873bffdbc0e1608e5050f321790178cb48270ede48c728ae4ea3af8019199",
+      "registry.js": "0b6fd01dd8228ae286b1827ffa7ef280f169d4fbb43be6034de8d739aaee9855",
+      "REGISTRY.md": "b618e3039b3f50a2553ef124508adc458fd34e8ee9f4b3ffff96f7a75b702054",
+      "render-numbers.js": "c47561036e06abe9795f766863a2f3600e44f6312888077e3ba0c09ec47cb102",
+      "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+      "V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "window.js": "10838164b41efcdf3252a2fadcbbf799a49be9b9197f795a2cda2e0bc8e7d3d0",
+      "zoom.js": "c5d293c1f157b04e37344318de97b4c066a18d95d730f5a7ce76655020d72734"
+    }
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "AMD EPYC-Genoa Processor",
+    "logicalCPUs": 8,
+    "totalMemory": 16366505984
+  },
+  "hostBefore": {
+    "loadAverage": [
+      0.2,
+      0.19,
+      0.25
+    ],
+    "freeMemory": 12364746752
+  },
+  "settings": {
+    "trials": 9,
+    "warmupMs": 500,
+    "batchTargetMs": 12,
+    "maxBatch": 128,
+    "balancedThreeWayOrder": true,
+    "matchedWasmBatchCounts": true,
+    "calibrationMedianOfThree": true,
+    "freshRetainedModelPerBatch": true,
+    "crossOriginIsolated": true,
+    "observedClockResolutionMs": 0.0049991607666015625
+  },
+  "scope": "One browser/page holds independent control and candidate WASM instances and pinned JS. Balanced cyclic/reverse order; whole SVG and exact dimensions before/after. Shared heaps/GC/cache pressure differ from the release harness. Diagnostic, never a replacement release gate.",
+  "rows": [
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.06574218720197678,
+        "control": 0.7032812535762787,
+        "candidate": 0.699531227350235
+      },
+      "candidateOverControl": 0.9946678143246754,
+      "candidateOverJS": 10.640522579528675,
+      "controlOverJS": 10.697563976927315,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 4602,
+          "elapsedMs": 500.05000019073486
+        },
+        "control": {
+          "operations": 597,
+          "elapsedMs": 500.5649995803833
+        },
+        "candidate": {
+          "operations": 594,
+          "elapsedMs": 500.335000038147
+        }
+      },
+      "samples": {
+        "js": [
+          0.09574218839406967,
+          0.1686718761920929,
+          0.06574218720197678,
+          0.06476562470197678,
+          0.06410156190395355,
+          0.0647265613079071,
+          0.06433593481779099,
+          0.06816406548023224,
+          0.14359375089406967
+        ],
+        "control": [
+          0.934374988079071,
+          0.6909374892711639,
+          0.6784375011920929,
+          1.016874998807907,
+          0.6821874976158142,
+          0.9931249916553497,
+          0.7139062583446503,
+          0.7032812535762787,
+          0.6639062464237213
+        ],
+        "candidate": [
+          0.6979687511920929,
+          0.7073437571525574,
+          0.6870312392711639,
+          0.6804687678813934,
+          0.7021875083446503,
+          0.6939062476158142,
+          0.9789062440395355,
+          1.4067187309265137,
+          0.699531227350235
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.1686718761920929,
+        "control": 1.016874998807907,
+        "candidate": 1.4067187309265137
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.49156248569488525,
+        "control": 3,
+        "candidate": 2.932499885559082
+      },
+      "candidateOverControl": 0.9774999618530273,
+      "candidateOverJS": 5.965670633741762,
+      "controlOverJS": 6.102988098774714,
+      "counts": {
+        "js": 32,
+        "control": 4,
+        "candidate": 4
+      },
+      "warmups": {
+        "js": {
+          "operations": 782,
+          "elapsedMs": 500.05499935150146
+        },
+        "control": {
+          "operations": 129,
+          "elapsedMs": 500.80000019073486
+        },
+        "candidate": {
+          "operations": 146,
+          "elapsedMs": 502.5050001144409
+        }
+      },
+      "samples": {
+        "js": [
+          0.6974999904632568,
+          0.4998437464237213,
+          0.4879687428474426,
+          0.47359374165534973,
+          0.49156248569488525,
+          0.4962500035762787,
+          0.546875,
+          0.4571875035762787,
+          0.46046876907348633
+        ],
+        "control": [
+          3.304999828338623,
+          3.125,
+          3,
+          2.880000114440918,
+          2.893749952316284,
+          2.8837499618530273,
+          2.877500057220459,
+          3.09375,
+          3.1024999618530273
+        ],
+        "candidate": [
+          2.9437499046325684,
+          2.9574999809265137,
+          2.932499885559082,
+          2.9499998092651367,
+          2.9149999618530273,
+          2.916249990463257,
+          2.927500009536743,
+          2.908750057220459,
+          3.1575000286102295
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.6974999904632568,
+        "control": 3.304999828338623,
+        "candidate": 3.1575000286102295
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.616406261920929,
+        "control": 1.5043749809265137,
+        "candidate": 1.571874976158142
+      },
+      "candidateOverControl": 1.0448691290984224,
+      "candidateOverJS": 2.550063283360639,
+      "controlOverJS": 2.440557589792122,
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 750,
+          "elapsedMs": 500.4399995803833
+        },
+        "control": {
+          "operations": 322,
+          "elapsedMs": 500.85500049591064
+        },
+        "candidate": {
+          "operations": 349,
+          "elapsedMs": 501.1549997329712
+        }
+      },
+      "samples": {
+        "js": [
+          0.6593749821186066,
+          0.6073437333106995,
+          0.606249988079071,
+          0.5703125,
+          0.6165624856948853,
+          0.616406261920929,
+          0.66796875,
+          0.596875011920929,
+          0.7354687452316284
+        ],
+        "control": [
+          1.540624976158142,
+          1.481874942779541,
+          1.5043749809265137,
+          1.4424999952316284,
+          1.4918750524520874,
+          1.4381248950958252,
+          1.5868749618530273,
+          1.5812500715255737,
+          1.6231249570846558
+        ],
+        "candidate": [
+          1.5,
+          1.5131250619888306,
+          1.6531250476837158,
+          1.5806249380111694,
+          1.625,
+          1.4206249713897705,
+          1.571874976158142,
+          1.4300000667572021,
+          1.6475000381469727
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.7354687452316284,
+        "control": 1.6231249570846558,
+        "candidate": 1.6531250476837158
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.06804687529802322,
+        "control": 0.668281227350235,
+        "candidate": 0.6957812607288361
+      },
+      "candidateOverControl": 1.041150390364308,
+      "candidateOverJS": 10.22502881552665,
+      "controlOverJS": 9.820895146520398,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 5391,
+          "elapsedMs": 500.0099992752075
+        },
+        "control": {
+          "operations": 682,
+          "elapsedMs": 500.4700002670288
+        },
+        "candidate": {
+          "operations": 651,
+          "elapsedMs": 500.664999961853
+        }
+      },
+      "samples": {
+        "js": [
+          0.11121094226837158,
+          0.16050781309604645,
+          0.07976562529802322,
+          0.06757812947034836,
+          0.06804687529802322,
+          0.06726562231779099,
+          0.06703124940395355,
+          0.06777343899011612,
+          0.14492187649011612
+        ],
+        "control": [
+          0.715156227350235,
+          0.7071875035762787,
+          0.6603124737739563,
+          1.5720312297344208,
+          0.6631249785423279,
+          0.9587500095367432,
+          0.6659374833106995,
+          0.668281227350235,
+          0.6570312678813934
+        ],
+        "candidate": [
+          0.7603124976158142,
+          0.7190625071525574,
+          0.8126562535762787,
+          0.6957812607288361,
+          0.682812511920929,
+          0.6665624976158142,
+          0.9589062631130219,
+          0.6659375131130219,
+          0.6595312654972076
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.16050781309604645,
+        "control": 1.5720312297344208,
+        "candidate": 0.9589062631130219
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.6785937249660492,
+        "control": 3.4049999713897705,
+        "candidate": 3.490000009536743
+      },
+      "candidateOverControl": 1.0249633006934444,
+      "candidateOverJS": 5.1429889212597,
+      "controlOverJS": 5.017729822892374,
+      "counts": {
+        "js": 32,
+        "control": 4,
+        "candidate": 4
+      },
+      "warmups": {
+        "js": {
+          "operations": 766,
+          "elapsedMs": 500.51999950408936
+        },
+        "control": {
+          "operations": 150,
+          "elapsedMs": 509.5599994659424
+        },
+        "candidate": {
+          "operations": 153,
+          "elapsedMs": 503.1049995422363
+        }
+      },
+      "samples": {
+        "js": [
+          0.7925000190734863,
+          0.6520312428474426,
+          0.6526562571525574,
+          0.6904687285423279,
+          0.7009375095367432,
+          0.6785937249660492,
+          0.6767187416553497,
+          0.711718738079071,
+          0.676562488079071
+        ],
+        "control": [
+          3.4049999713897705,
+          3.3812501430511475,
+          3.601249933242798,
+          3.4049999713897705,
+          3.34375,
+          3.40625,
+          3.413749933242798,
+          3.377500057220459,
+          3.4312500953674316
+        ],
+        "candidate": [
+          3.3637499809265137,
+          3.648750066757202,
+          3.7024998664855957,
+          3.458750009536743,
+          3.4387500286102295,
+          3.4200000762939453,
+          3.5662498474121094,
+          3.490000009536743,
+          3.5325000286102295
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.7925000190734863,
+        "control": 3.601249933242798,
+        "candidate": 3.7024998664855957
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.6684374809265137,
+        "control": 1.5137499570846558,
+        "candidate": 1.4681251049041748
+      },
+      "candidateOverControl": 0.9698597169453598,
+      "candidateOverJS": 2.1963536557962358,
+      "controlOverJS": 2.2646096310854142,
+      "counts": {
+        "js": 16,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 684,
+          "elapsedMs": 500.625
+        },
+        "control": {
+          "operations": 300,
+          "elapsedMs": 501.2249994277954
+        },
+        "candidate": {
+          "operations": 316,
+          "elapsedMs": 501.1599998474121
+        }
+      },
+      "samples": {
+        "js": [
+          0.6990624666213989,
+          0.6559375524520874,
+          0.6681250333786011,
+          0.6684374809265137,
+          0.6578125357627869,
+          0.6740624904632568,
+          0.6903125047683716,
+          0.6643749475479126,
+          0.6890625357627869
+        ],
+        "control": [
+          1.5568749904632568,
+          1.4562500715255737,
+          3.390000104904175,
+          1.4656249284744263,
+          1.497499942779541,
+          1.5693750381469727,
+          1.478124976158142,
+          1.5456249713897705,
+          1.5137499570846558
+        ],
+        "candidate": [
+          1.4574999809265137,
+          1.4424999952316284,
+          1.449375033378601,
+          3.2531250715255737,
+          1.4681251049041748,
+          1.5374999046325684,
+          1.4718750715255737,
+          1.4850000143051147,
+          1.4456250667572021
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.6990624666213989,
+        "control": 3.390000104904175,
+        "candidate": 3.2531250715255737
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.40914061665534973,
+        "control": 2.7062500715255737,
+        "candidate": 2.804374933242798
+      },
+      "candidateOverControl": 1.0362586084522147,
+      "candidateOverJS": 6.854305876957546,
+      "controlOverJS": 6.614474245184154,
+      "counts": {
+        "js": 64,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 1430,
+          "elapsedMs": 500.2750005722046
+        },
+        "control": {
+          "operations": 173,
+          "elapsedMs": 501.67500019073486
+        },
+        "candidate": {
+          "operations": 172,
+          "elapsedMs": 510.17000007629395
+        }
+      },
+      "samples": {
+        "js": [
+          0.6443750113248825,
+          0.4312500059604645,
+          0.400390625,
+          0.40914061665534973,
+          0.4436718672513962,
+          0.3733593672513962,
+          0.39937499165534973,
+          0.40648438036441803,
+          0.42585937678813934
+        ],
+        "control": [
+          2.902500033378601,
+          2.7543749809265137,
+          2.7062500715255737,
+          2.8000000715255737,
+          2.6606249809265137,
+          2.584375023841858,
+          2.618749976158142,
+          2.6437500715255737,
+          2.7156249284744263
+        ],
+        "candidate": [
+          2.966249942779541,
+          3.0137499570846558,
+          2.804374933242798,
+          3.2537500858306885,
+          3.1125000715255737,
+          2.7125000953674316,
+          2.6699999570846558,
+          2.631874918937683,
+          2.619374990463257
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.6443750113248825,
+        "control": 2.902500033378601,
+        "candidate": 3.2537500858306885
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 1.8843750953674316,
+        "control": 11.669999122619629,
+        "candidate": 11.545000076293945
+      },
+      "candidateOverControl": 0.9892888555506913,
+      "candidateOverJS": 6.1266995645804805,
+      "controlOverJS": 6.193034046835623,
+      "counts": {
+        "js": 8,
+        "control": 1,
+        "candidate": 1
+      },
+      "warmups": {
+        "js": {
+          "operations": 220,
+          "elapsedMs": 501.73499965667725
+        },
+        "control": {
+          "operations": 41,
+          "elapsedMs": 501.8699998855591
+        },
+        "candidate": {
+          "operations": 41,
+          "elapsedMs": 508.9700002670288
+        }
+      },
+      "samples": {
+        "js": [
+          1.8843750953674316,
+          1.9081249237060547,
+          1.872499942779541,
+          2.015625,
+          2.1906250715255737,
+          1.8650000095367432,
+          1.8700000047683716,
+          1.8793749809265137,
+          1.894374966621399
+        ],
+        "control": [
+          12.675000190734863,
+          11.594999313354492,
+          11.739999771118164,
+          11.669999122619629,
+          11.949999809265137,
+          11.4350004196167,
+          11.71500015258789,
+          11.530000686645508,
+          11.440000534057617
+        ],
+        "candidate": [
+          11.5,
+          11.734999656677246,
+          11.514999389648438,
+          11.6899995803833,
+          14.6899995803833,
+          11.524999618530273,
+          11.520000457763672,
+          11.704999923706055,
+          11.545000076293945
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 2.1906250715255737,
+        "control": 12.675000190734863,
+        "candidate": 14.6899995803833
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 2.424999952316284,
+        "control": 5.678750038146973,
+        "candidate": 5.65625
+      },
+      "candidateOverControl": 0.9960378537537612,
+      "candidateOverJS": 2.3324742726684704,
+      "controlOverJS": 2.3417526390970886,
+      "counts": {
+        "js": 8,
+        "control": 4,
+        "candidate": 4
+      },
+      "warmups": {
+        "js": {
+          "operations": 215,
+          "elapsedMs": 501.6550006866455
+        },
+        "control": {
+          "operations": 87,
+          "elapsedMs": 502.04500007629395
+        },
+        "candidate": {
+          "operations": 89,
+          "elapsedMs": 502.0900001525879
+        }
+      },
+      "samples": {
+        "js": [
+          2.2887500524520874,
+          2.537500023841858,
+          2.1856249570846558,
+          2.424999952316284,
+          2.5787500143051147,
+          2.193750023841858,
+          2.1999999284744263,
+          2.691249966621399,
+          2.613124966621399
+        ],
+        "control": [
+          7.9700000286102295,
+          5.6262500286102295,
+          5.733750104904175,
+          5.603749990463257,
+          5.6650002002716064,
+          5.583750009536743,
+          5.682500123977661,
+          5.721250057220459,
+          5.678750038146973
+        ],
+        "candidate": [
+          9.06000018119812,
+          5.653749942779541,
+          5.65625,
+          5.646250009536743,
+          5.75,
+          6.113749980926514,
+          5.667500019073486,
+          5.619999885559082,
+          5.647500038146973
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 2.691249966621399,
+        "control": 7.9700000286102295,
+        "candidate": 9.06000018119812
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.6262499988079071,
+        "control": 2.693750023841858,
+        "candidate": 2.763124942779541
+      },
+      "candidateOverControl": 1.0257540300041426,
+      "candidateOverJS": 4.41217556573136,
+      "controlOverJS": 4.301397251847542,
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 1217,
+          "elapsedMs": 500.0950002670288
+        },
+        "control": {
+          "operations": 170,
+          "elapsedMs": 502.0550003051758
+        },
+        "candidate": {
+          "operations": 174,
+          "elapsedMs": 501.9350004196167
+        }
+      },
+      "samples": {
+        "js": [
+          0.6596874892711639,
+          0.8470312356948853,
+          0.2904687523841858,
+          0.6262499988079071,
+          0.3318750262260437,
+          0.6740624904632568,
+          0.31734374165534973,
+          0.3323437571525574,
+          0.6876562535762787
+        ],
+        "control": [
+          2.684375047683716,
+          2.606874942779541,
+          2.712499976158142,
+          2.693750023841858,
+          2.684999942779541,
+          2.6418750286102295,
+          2.8362499475479126,
+          3.390625,
+          3.025624990463257
+        ],
+        "candidate": [
+          2.6368749141693115,
+          2.7012500762939453,
+          3.875,
+          2.763124942779541,
+          2.9768749475479126,
+          2.7606250047683716,
+          6.381250023841858,
+          2.9049999713897705,
+          2.7581249475479126
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.8470312356948853,
+        "control": 3.390625,
+        "candidate": 6.381250023841858
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 2.494374990463257,
+        "control": 12.63499927520752,
+        "candidate": 13.024999618530273
+      },
+      "candidateOverControl": 1.0308666692279131,
+      "candidateOverJS": 5.2217488021363065,
+      "controlOverJS": 5.065396872368793,
+      "counts": {
+        "js": 8,
+        "control": 1,
+        "candidate": 1
+      },
+      "warmups": {
+        "js": {
+          "operations": 199,
+          "elapsedMs": 505.14000034332275
+        },
+        "control": {
+          "operations": 36,
+          "elapsedMs": 503.3500003814697
+        },
+        "candidate": {
+          "operations": 37,
+          "elapsedMs": 511.0250005722046
+        }
+      },
+      "samples": {
+        "js": [
+          3.028125047683716,
+          2.8168751001358032,
+          2.431874990463257,
+          2.5774999856948853,
+          2.3712499141693115,
+          2.5549999475479126,
+          2.2706249952316284,
+          2.494374990463257,
+          2.3406249284744263
+        ],
+        "control": [
+          12.574999809265137,
+          13.279999732971191,
+          12.5600004196167,
+          12.675000190734863,
+          12.63499927520752,
+          12.59999942779541,
+          12.605000495910645,
+          12.774999618530273,
+          14.210000038146973
+        ],
+        "candidate": [
+          12.680000305175781,
+          12.550000190734863,
+          12.630000114440918,
+          14.444999694824219,
+          14.325000762939453,
+          13.024999618530273,
+          12.524999618530273,
+          14.195000648498535,
+          14.530000686645508
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 3.028125047683716,
+        "control": 14.210000038146973,
+        "candidate": 14.530000686645508
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 2.840000033378601,
+        "control": 6.122499942779541,
+        "candidate": 6.172500133514404
+      },
+      "candidateOverControl": 1.0081666298411043,
+      "candidateOverJS": 2.173415514425646,
+      "controlOverJS": 2.1558098136695865,
+      "counts": {
+        "js": 8,
+        "control": 2,
+        "candidate": 2
+      },
+      "warmups": {
+        "js": {
+          "operations": 158,
+          "elapsedMs": 500.3450002670288
+        },
+        "control": {
+          "operations": 82,
+          "elapsedMs": 504.1199998855591
+        },
+        "candidate": {
+          "operations": 77,
+          "elapsedMs": 500.3449993133545
+        }
+      },
+      "samples": {
+        "js": [
+          2.9931249618530273,
+          2.853749990463257,
+          2.8075000047683716,
+          2.9606250524520874,
+          2.933750033378601,
+          2.7362500429153442,
+          2.791874885559082,
+          2.830625057220459,
+          2.840000033378601
+        ],
+        "control": [
+          6.122499942779541,
+          6.080000400543213,
+          6.427499771118164,
+          6.085000038146973,
+          6.349999904632568,
+          6.217499732971191,
+          6.175000190734863,
+          6.002500057220459,
+          6.079999923706055
+        ],
+        "candidate": [
+          6.385000228881836,
+          6.085000038146973,
+          6.172500133514404,
+          6.304999828338623,
+          6.275000095367432,
+          6.080000400543213,
+          6.037499904632568,
+          6.012499809265137,
+          6.184999942779541
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 2.9931249618530273,
+        "control": 6.427499771118164,
+        "candidate": 6.385000228881836
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "er/medium",
+      "sourceSHA256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "sourceBytes": 2598,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 70404
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 71927
+        }
+      ],
+      "checksum": 587446712
+    },
+    {
+      "id": "er/large",
+      "sourceSHA256": "4969b249e415d09f27b830d3e67b339add055118255d2d65c7d4cbe0bfc3a50d",
+      "sourceBytes": 11257,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 296039
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 302426
+        }
+      ],
+      "checksum": 669157636
+    }
+  ],
+  "browser": "156.0.8078.4",
+  "completedAt": "2026-10-20T06:52:30.921Z",
+  "hostAfter": {
+    "loadAverage": [
+      0.59,
+      0.29,
+      0.28
+    ],
+    "freeMemory": 11961954304
+  },
+  "succeeded": true
+}

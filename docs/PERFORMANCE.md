@@ -4,6 +4,12 @@ Current matched web benchmarks run on an independent Linux VM. Actual Swift APIs
 run locally on macOS because the VM cannot supply the macOS/AppKit SDK.
 
 **The Rust/WASM API is currently slower than Pele JS on the measured workloads.**
+
+The [caller-owned ER follow-up](benchmarks/2026-10-20-er-host-storage/raw/README.md)
+removes its redundant graph conversions and passes focused callback checks, but
+independent VM repeated raw rendering regresses 71–88% against the preceding
+arena path. First-inclusive rendering regresses 6–27%. Those adverse results,
+ordinary controls and fresh Swift checks are retained; no 0.3 release.
 No release, language choice or GPU availability implies otherwise. The target of
 matching or beating Pele JS remains open. Measured results, raw samples, artifact
 hashes, reproduction steps and unshipped compiler/schema experiments are in the
@@ -20,8 +26,8 @@ stages, 30 independent VM conditions, 22 first-use conditions and local Swift
 checks/timings. ER parse remains mixed; retained rendering regresses by
 75.7–91.9% paired against the preceding backend. Fewer copies do not establish
 a speed improvement. The [prepared follow-up](benchmarks/2026-10-20-er-host-storage/prepared/README.md)
-closes its callback gap; browser caller-authored raw parity and the performance
-target remain open.
+closes its callback gap; the raw follow-up passes focused callback checks but
+regresses performance further. The complete performance target remains open.
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |

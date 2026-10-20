@@ -8,9 +8,11 @@ existing contracts. [Architecture](../../LLD_HOST_ER_STORE.md).
 
 The later [prepared-entry follow-up](prepared/README.md), source `80bed95`, fixes
 the prepared callback failures recorded below and includes fresh all-family
-Swift prepared/raw checks. Browser caller-authored raw adoption and the JS
-performance target remain open. Historical measurements below retain their
-original source/artifact scope.
+Swift prepared/raw checks. The [raw caller-root follow-up](raw/README.md),
+source `51f1269`, fixes the six raw callback comparisons in each browser, but
+its repeated raw rendering regresses 71–88% in paired VM medians against the
+preceding arena raw path. The JS performance target remains open. Historical
+measurements below retain their original source/artifact scope.
 
 **This is not a performance solution or release candidate.** Retained rendering
 regresses consistently. The latest complete release gate remains the preceding
