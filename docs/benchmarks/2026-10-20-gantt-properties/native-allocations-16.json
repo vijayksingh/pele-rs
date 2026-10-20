@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T00:37:46.433Z",
+  "mode": "native-allocations-only",
+  "artifacts": {
+    "control": {
+      "binarySHA256": "e9412438ff7a615a35aefb359e5a3bae9449f4598cefe7d931ad4ca869658bb1",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "29011327a6530e979e5497421de53ecb8eda721dfa97cc7df818de16141167ef",
+        "revision": "78af6782cc2fc288aa13eab0f18c04831f35eaea",
+        "builtAt": "2026-10-20T00:06:28.174Z",
+        "binaries": {
+          "pele-perf": "e9412438ff7a615a35aefb359e5a3bae9449f4598cefe7d931ad4ca869658bb1",
+          "pele-perf-alloc": "60ee3ed61bd142be56735b4339792190007cf2ca44e6e2579ac9b3b113b1a5ce"
+        }
+      },
+      "allocationBinary": "/Users/vijaysingh/unlocalhosted/pele-rs/dist/perf-patches/gantt-native/property-index/control/pele-perf-alloc",
+      "allocationSHA256": "60ee3ed61bd142be56735b4339792190007cf2ca44e6e2579ac9b3b113b1a5ce"
+    },
+    "candidate": {
+      "binarySHA256": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "bc196da8df086f9f348d79335f90ad5181f073ad614747adbf7bc72be08f9d90",
+        "revision": "d8ba90bb6c90c5ca2b43630a4d74fd1f4011327f",
+        "builtAt": "2026-10-20T00:36:34.609Z",
+        "binaries": {
+          "pele-perf": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+          "pele-perf-alloc": "121345cd78165aadff00ea10c5b7193b3556274ddb7c01fd82520eda1401cc30"
+        }
+      },
+      "allocationBinary": "/Users/vijaysingh/unlocalhosted/pele-rs/scripts/perf/native/target/release/pele-perf-alloc",
+      "allocationSHA256": "121345cd78165aadff00ea10c5b7193b3556274ddb7c01fd82520eda1401cc30"
+    }
+  },
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "settings": {
+    "nativeTypedDocumentRetainedAcrossBatches": true,
+    "nativePublicStateFreshPerBatch": true,
+    "jsRetainedModelFreshPerBatch": true,
+    "stages": [
+      "render-mutable-publish"
+    ],
+    "selectedCases": [
+      "gantt/medium"
+    ],
+    "separateAllocationBinaries": true,
+    "fixedBatchCount": 16,
+    "operationsPerCondition": 16,
+    "timingRequested": false
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "loadBefore": [
+      7.09423828125,
+      8.05712890625,
+      8.01025390625
+    ],
+    "processesBefore": [
+      {
+        "pid": 410,
+        "cpuPercent": 45.2,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 813,
+        "cpuPercent": 12.3,
+        "name": "Google Chrome Helper"
+      },
+      {
+        "pid": 31529,
+        "cpuPercent": 33.2,
+        "name": "XprotectService"
+      },
+      {
+        "pid": 34477,
+        "cpuPercent": 12.7,
+        "name": "Google Chrome Helper (Renderer)"
+      },
+      {
+        "pid": 40273,
+        "cpuPercent": 12.2,
+        "name": "node"
+      }
+    ],
+    "loadAfter": [
+      7.09423828125,
+      8.05712890625,
+      8.01025390625
+    ],
+    "processesAfter": [
+      {
+        "pid": 410,
+        "cpuPercent": 47.7,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 813,
+        "cpuPercent": 11.9,
+        "name": "Google Chrome Helper"
+      },
+      {
+        "pid": 31529,
+        "cpuPercent": 20.6,
+        "name": "XprotectService"
+      },
+      {
+        "pid": 34477,
+        "cpuPercent": 15.1,
+        "name": "Google Chrome Helper (Renderer)"
+      },
+      {
+        "pid": 40273,
+        "cpuPercent": 32.4,
+        "name": "node"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "gantt/medium",
+      "family": "gantt",
+      "scale": "medium",
+      "units": 48,
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "jsRetainedBeforeVerified": true
+    }
+  ],
+  "rows": [],
+  "allocationRows": [
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "count": 16,
+      "control": {
+        "allocations": 57112,
+        "checksum": 135459832542217920,
+        "freedBytes": 8052736,
+        "liveBytesDelta": 103424,
+        "peakAdditionalRequestedBytes": 259158,
+        "reallocations": 7731,
+        "requestedBytes": 8156160
+      },
+      "candidate": {
+        "allocations": 53160,
+        "checksum": 135459832542217920,
+        "freedBytes": 7148544,
+        "liveBytesDelta": 103424,
+        "peakAdditionalRequestedBytes": 259158,
+        "reallocations": 7731,
+        "requestedBytes": 7251968
+      }
+    }
+  ],
+  "completedAt": "2026-10-20T00:37:46.631Z",
+  "succeeded": true
+}

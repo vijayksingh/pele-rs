@@ -176,14 +176,16 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest measured package: native `712ed1f`, JS `e8316b2`. The latest changes
+Latest measured package: native `129ad96`, JS `e8316b2`. The latest changes
 reuse captured schema metadata, release disposed bridge storage, and borrow SVG
 text that needs no escaping. SVG root assembly now writes borrowed spans directly
 into the final output. Fresh Gantt arenas now use private Rust builders instead
 of general mutable property assignment. Gantt string lookups borrow stack UTF-16
-instead of creating temporary owned strings. Source render takes **1.60–5.30×** the Pele JS time.
-Median ratios across all sizes/resources are **2.44× source**, **12.15× parse**
-and **4.02× retained mutable render**. These describe this artifact; differences
+instead of creating temporary owned strings. Small Gantt records now search
+their existing arena property slices; larger records retain hashing.
+Source render takes **1.61–4.86×** the Pele JS time.
+Median ratios across all sizes/resources are **2.43× source**, **11.30× parse**
+and **4.04× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
 The [controlled Gantt construction comparison](docs/benchmarks/2026-10-20-gantt-builder/)
@@ -196,10 +198,18 @@ histories, with 44% fewer allocations. VM retained medians are 4–7% lower in i
 diagnostic; small rows overlap earlier noise. Gains from separate checkpoints
 are not combined.
 
+The [adaptive-property comparison](docs/benchmarks/2026-10-20-gantt-properties/)
+measures 22–25% lower native mutable-render median against its matched
+control, with unchanged required retained storage. VM retained medians are
+2–8% lower, but medium source rendering is 1.6–3.1% slower in a source-only
+follow-up; parse costs remain unresolved. This is a native/retained improvement
+with a measured web tradeoff, not a regression-free result.
+
 The prior direct host comparison measured an 11.1% retained-render improvement
 against its own matched control, with regressions disclosed. Reports retain
 raw samples, artifact hashes and failed gates:
-[latest Gantt lookup checkpoint](docs/benchmarks/2026-10-20-gantt-lookup/),
+[latest adaptive-property checkpoint](docs/benchmarks/2026-10-20-gantt-properties/),
+[Gantt lookup checkpoint](docs/benchmarks/2026-10-20-gantt-lookup/),
 [Gantt construction checkpoint](docs/benchmarks/2026-10-20-gantt-builder/),
 [borrowed-root checkpoint](docs/benchmarks/2026-10-20-svg-root/),
 [SVG/disposal checkpoint](docs/benchmarks/2026-10-20-svg-disposal/),
@@ -209,19 +219,20 @@ raw samples, artifact hashes and failed gates:
 No JS speedup or GPU acceleration is claimed.
 
 Independent Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
-Verified 5 µs clock ticks; nine alternating trials after at least 500 ms warmup.
+Verified 5 µs clock ticks; nine alternating trials after at least 100 ms warmup.
+The separate controlled Gantt comparison uses 15 trials and 1,000 ms warmup.
 Large workloads use 200 units, except Sankey (199 links) and Railroad (60 rules).
 Source-render measurements with cached Canvas metrics:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.371 ms | 2.431 ms | 1.77× |
-| sequence | 0.501 ms | 0.985 ms | 1.97× |
-| er | 2.849 ms | 6.190 ms | 2.17× |
-| pie | 0.274 ms | 0.625 ms | 2.28× |
-| sankey | 0.843 ms | 1.445 ms | 1.71× |
-| gantt | 0.714 ms | 2.584 ms | 3.62× |
-| railroad | 0.782 ms | 1.838 ms | 2.35× |
+| flowchart | 1.371 ms | 2.434 ms | 1.78× |
+| sequence | 0.505 ms | 1.015 ms | 2.01× |
+| er | 3.161 ms | 6.340 ms | 2.01× |
+| pie | 0.271 ms | 0.617 ms | 2.27× |
+| sankey | 0.864 ms | 1.468 ms | 1.70× |
+| gantt | 0.707 ms | 2.535 ms | 3.58× |
+| railroad | 0.771 ms | 1.844 ms | 2.39× |
 
 Swift runs locally on Apple M1 Pro. Fresh source-built ARM64 SDK passed 14
 integration tests for mutable models, calendars, callbacks, Date identities and
@@ -229,10 +240,10 @@ error recovery, plus 168 exact output checks through eight actual APIs. Universa
 rebuild remains required before release. Nine-trial timing medians below use
 medium workloads (48 units; Railroad 15 rules) and passed the compiler/Pele-test
 quiet guard with at least 500ms measured warmup. The table is the preceding
-`7909cdf` source checkpoint. Current `712ed1f` has 168 correctness checks and a
+`7909cdf` source checkpoint. Current `129ad96` has 168 correctness checks and a
 focused eight-API Gantt timing report: source/retained/mutable rendering is
-0.436/0.370/0.935ms, immutable parse 5.430ms and mutable parse 0.195ms. Broad
-current timing aborted on unrelated compilation; the guard remained active.
+0.449/0.394/0.850ms, immutable parse 5.498ms and mutable parse 0.204ms. The first
+focused attempt rejected unrelated compilation; its clean retry passed the guard.
 Other desktop activity is recorded. No historical Swift speedup is claimed.
 
 | Medium workload | Source render | Retained render | Mutable render |
@@ -250,13 +261,14 @@ before the latest root rewrite removes WASM/Swift entirely: typed retained nativ
 0.70× Sequence, 1.04× ER, 0.50× Pie, 0.41× Sankey, 1.15× Gantt and 1.38× Railroad.
 Seven medium workloads on the same Mac; this is not all-33 certification.
 Native compatibility work is still costly: the pre-lookup Gantt public parse
-comparison took 3.82× JS time. Current fixed-history diagnostics show 14–18%
+comparison took 3.82× JS time. Current matched-history diagnostics show 22–25%
 lower mutable publication medians against matched native control; the extra
 graph/revision return contract and growing arena remain disclosed.
 
 Swift and VM figures cannot be compared across machines. Timings include public
-API/ownership costs and exclude startup, downloads and SVG painting. Mixed or
-unconfirmed candidates remain outside the default. Earlier non-isolated reports
+API/ownership costs and exclude startup, downloads and SVG painting. Rejected
+experiments remain outside the default; the adopted property lookup has the web
+tradeoffs described above. Earlier non-isolated reports
 remain historical; percentage gains are not combined across timer conditions.
 
 ## Build and verification

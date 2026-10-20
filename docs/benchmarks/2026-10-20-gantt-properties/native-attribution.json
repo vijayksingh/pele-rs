@@ -1,0 +1,1230 @@
+{
+  "schemaVersion": 1,
+  "scope": "Independent read-only review of native Gantt medium adaptive property-index experiment; no new timing or builds",
+  "inputFilesSHA256": {
+    "native-comparison-1.json": "a5af6d9ab3d749a2b1289631ec82368f2a6af45b195fda42d8595d28b8143ff9",
+    "native-comparison-16.json": "9fe02ac54a9673a580bd1d39d19d04be641138635c5ee4e6d6143983c8cc3cbb",
+    "native-allocations-1.json": "0b187f5d954fccd6dbc6dd39c3b5406a220af5ab9579e4eb22a321afdc5a2d25",
+    "native-allocations-16.json": "e3c3c78f55b31f6066d8f9c94d9356e6380c5e7d191b797931106e9909690d4f"
+  },
+  "provenance": {
+    "artifacts": {
+      "control": {
+        "binarySHA256": "e9412438ff7a615a35aefb359e5a3bae9449f4598cefe7d931ad4ca869658bb1",
+        "manifest": {
+          "schemaVersion": 1,
+          "sourceInputSha256": "29011327a6530e979e5497421de53ecb8eda721dfa97cc7df818de16141167ef",
+          "revision": "78af6782cc2fc288aa13eab0f18c04831f35eaea",
+          "builtAt": "2026-10-20T00:06:28.174Z",
+          "binaries": {
+            "pele-perf": "e9412438ff7a615a35aefb359e5a3bae9449f4598cefe7d931ad4ca869658bb1",
+            "pele-perf-alloc": "60ee3ed61bd142be56735b4339792190007cf2ca44e6e2579ac9b3b113b1a5ce"
+          }
+        }
+      },
+      "candidate": {
+        "binarySHA256": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+        "manifest": {
+          "schemaVersion": 1,
+          "sourceInputSha256": "bc196da8df086f9f348d79335f90ad5181f073ad614747adbf7bc72be08f9d90",
+          "revision": "d8ba90bb6c90c5ca2b43630a4d74fd1f4011327f",
+          "builtAt": "2026-10-20T00:36:34.609Z",
+          "binaries": {
+            "pele-perf": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+            "pele-perf-alloc": "121345cd78165aadff00ea10c5b7193b3556274ddb7c01fd82520eda1401cc30"
+          }
+        }
+      }
+    },
+    "reconstructedSourceInputs": {
+      "candidate": "bc196da8df086f9f348d79335f90ad5181f073ad614747adbf7bc72be08f9d90",
+      "control": "29011327a6530e979e5497421de53ecb8eda721dfa97cc7df818de16141167ef"
+    },
+    "singleRuntimeSourceDifference": "crates/pele/src/compat/diagrams/gantt/public_model.rs",
+    "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+    "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+    "timingAndSeparateAllocationBinariesVerifiedOnDisk": true
+  },
+  "method": {
+    "samplesPerCondition": 15,
+    "pairedBy": "trial index with cyclic/reversed execution order",
+    "bootstrap": "10000 resamples of within-trial candidate/control ratios; median statistic; percentile interval; descriptive only because serial trial independence is unproven",
+    "randomSeed": 20261020,
+    "bootstrapDoesNotCover": "host-level replication, build variance, workload diversity, serial correlation or future platform behavior"
+  },
+  "timingRows": [
+    {
+      "batchCount": 1,
+      "stage": "parse",
+      "controlMedianMs": 0.061792,
+      "candidateMedianMs": 0.061416,
+      "medianElapsedChangePercent": -0.6084930088037344,
+      "pairedMedianChangePercent": -1.6332603080142616,
+      "pairedMedianBootstrap95Percent": [
+        -3.7932763352332755,
+        4.643659043659043
+      ],
+      "candidateWins": 10,
+      "trials": 15,
+      "controlRangeMs": [
+        0.060125,
+        0.075792
+      ],
+      "candidateRangeMs": [
+        0.059834,
+        0.074458
+      ],
+      "allCandidateSamplesBelowAllControlSamples": false,
+      "pairedEarlyMedianChangePercent": -3.400000000000003,
+      "pairedLateMedianChangePercent": -1.2891832353121524,
+      "rawChecksumsNodeCountsTextMeasurementsEqual": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "parse-public",
+      "controlMedianMs": 0.196459,
+      "candidateMedianMs": 0.189541,
+      "medianElapsedChangePercent": -3.5213454206730166,
+      "pairedMedianChangePercent": -0.8579553148273522,
+      "pairedMedianBootstrap95Percent": [
+        -10.789632308619657,
+        5.279999999999996
+      ],
+      "candidateWins": 9,
+      "trials": 15,
+      "controlRangeMs": [
+        0.181833,
+        0.24625
+      ],
+      "candidateRangeMs": [
+        0.182458,
+        0.253667
+      ],
+      "allCandidateSamplesBelowAllControlSamples": false,
+      "pairedEarlyMedianChangePercent": -0.8579553148273522,
+      "pairedLateMedianChangePercent": -3.5072130154645054,
+      "rawChecksumsNodeCountsTextMeasurementsEqual": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "render-source",
+      "controlMedianMs": 0.312708,
+      "candidateMedianMs": 0.309708,
+      "medianElapsedChangePercent": -0.9593614490195357,
+      "pairedMedianChangePercent": -0.3038516594210616,
+      "pairedMedianBootstrap95Percent": [
+        -7.710820674419539,
+        13.590191372554195
+      ],
+      "candidateWins": 8,
+      "trials": 15,
+      "controlRangeMs": [
+        0.294042,
+        0.427292
+      ],
+      "candidateRangeMs": [
+        0.293958,
+        0.472667
+      ],
+      "allCandidateSamplesBelowAllControlSamples": false,
+      "pairedEarlyMedianChangePercent": -1.2593340579756807,
+      "pairedLateMedianChangePercent": 4.446429433447374,
+      "rawChecksumsNodeCountsTextMeasurementsEqual": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "render-retained",
+      "controlMedianMs": 0.25075,
+      "candidateMedianMs": 0.239459,
+      "medianElapsedChangePercent": -4.502891326021919,
+      "pairedMedianChangePercent": -0.966328247913173,
+      "pairedMedianBootstrap95Percent": [
+        -6.361562640323292,
+        0.03509138381201371
+      ],
+      "candidateWins": 9,
+      "trials": 15,
+      "controlRangeMs": [
+        0.23525,
+        0.309125
+      ],
+      "candidateRangeMs": [
+        0.234792,
+        0.332666
+      ],
+      "allCandidateSamplesBelowAllControlSamples": false,
+      "pairedEarlyMedianChangePercent": -4.121758945618037,
+      "pairedLateMedianChangePercent": -0.061701003697844925,
+      "rawChecksumsNodeCountsTextMeasurementsEqual": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "render-mutable-publish",
+      "controlMedianMs": 0.688667,
+      "candidateMedianMs": 0.536459,
+      "medianElapsedChangePercent": -22.101828605116847,
+      "pairedMedianChangePercent": -22.044608359140227,
+      "pairedMedianBootstrap95Percent": [
+        -31.16662068965517,
+        -16.9349403167365
+      ],
+      "candidateWins": 15,
+      "trials": 15,
+      "controlRangeMs": [
+        0.638709,
+        0.832917
+      ],
+      "candidateRangeMs": [
+        0.496584,
+        0.631
+      ],
+      "allCandidateSamplesBelowAllControlSamples": true,
+      "pairedEarlyMedianChangePercent": -25.95123034227568,
+      "pairedLateMedianChangePercent": -19.92581875974033,
+      "rawChecksumsNodeCountsTextMeasurementsEqual": true,
+      "nativeRawState": {
+        "checksum": 8466239533887615,
+        "count": 1,
+        "graphNodesAfter": 353,
+        "graphNodesBefore": 254,
+        "textMeasurements": 54
+      }
+    },
+    {
+      "batchCount": 16,
+      "stage": "render-mutable-publish",
+      "controlMedianMs": 0.69865625,
+      "candidateMedianMs": 0.527359375,
+      "medianElapsedChangePercent": -24.518048038645613,
+      "pairedMedianChangePercent": -23.133951987088963,
+      "pairedMedianBootstrap95Percent": [
+        -27.428352867495743,
+        -21.00504201680672
+      ],
+      "candidateWins": 15,
+      "trials": 15,
+      "controlRangeMs": [
+        0.6613489375,
+        0.77453125
+      ],
+      "candidateRangeMs": [
+        0.5069583125,
+        0.5953515625
+      ],
+      "allCandidateSamplesBelowAllControlSamples": true,
+      "pairedEarlyMedianChangePercent": -21.00504201680672,
+      "pairedLateMedianChangePercent": -25.880257427231545,
+      "rawChecksumsNodeCountsTextMeasurementsEqual": true,
+      "nativeRawState": {
+        "checksum": 135459832542217920,
+        "count": 16,
+        "graphNodesAfter": 1838,
+        "graphNodesBefore": 254,
+        "textMeasurements": 864
+      }
+    }
+  ],
+  "allocationRows": [
+    {
+      "batchCount": 1,
+      "stage": "parse",
+      "control": {
+        "allocations": 1103,
+        "checksum": 5,
+        "freedBytes": 93583,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 41964,
+        "reallocations": 16,
+        "requestedBytes": 93583
+      },
+      "candidate": {
+        "allocations": 1103,
+        "checksum": 5,
+        "freedBytes": 93583,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 41964,
+        "reallocations": 16,
+        "requestedBytes": 93583
+      },
+      "identical": true,
+      "allocationsSavedPerOperation": 0.0,
+      "requestedBytesSavedPerOperation": 0.0,
+      "requestedBytesChangePercent": 0.0,
+      "liveBytesPreserved": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "parse-public",
+      "control": {
+        "allocations": 1971,
+        "checksum": 5,
+        "freedBytes": 339525,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 109626,
+        "reallocations": 195,
+        "requestedBytes": 339525
+      },
+      "candidate": {
+        "allocations": 1971,
+        "checksum": 5,
+        "freedBytes": 339525,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 109626,
+        "reallocations": 195,
+        "requestedBytes": 339525
+      },
+      "identical": true,
+      "allocationsSavedPerOperation": 0.0,
+      "requestedBytesSavedPerOperation": 0.0,
+      "requestedBytesChangePercent": 0.0,
+      "liveBytesPreserved": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "render-source",
+      "control": {
+        "allocations": 3455,
+        "checksum": 8466239533887774,
+        "freedBytes": 331045,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 101749,
+        "reallocations": 465,
+        "requestedBytes": 331045
+      },
+      "candidate": {
+        "allocations": 3455,
+        "checksum": 8466239533887774,
+        "freedBytes": 331045,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 101749,
+        "reallocations": 465,
+        "requestedBytes": 331045
+      },
+      "identical": true,
+      "allocationsSavedPerOperation": 0.0,
+      "requestedBytesSavedPerOperation": 0.0,
+      "requestedBytesChangePercent": 0.0,
+      "liveBytesPreserved": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "render-retained",
+      "control": {
+        "allocations": 2352,
+        "checksum": 8466239533887774,
+        "freedBytes": 237462,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75827,
+        "reallocations": 449,
+        "requestedBytes": 237462
+      },
+      "candidate": {
+        "allocations": 2352,
+        "checksum": 8466239533887774,
+        "freedBytes": 237462,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75827,
+        "reallocations": 449,
+        "requestedBytes": 237462
+      },
+      "identical": true,
+      "allocationsSavedPerOperation": 0.0,
+      "requestedBytesSavedPerOperation": 0.0,
+      "requestedBytesChangePercent": 0.0,
+      "liveBytesPreserved": true
+    },
+    {
+      "batchCount": 1,
+      "stage": "render-mutable-publish",
+      "control": {
+        "allocations": 3562,
+        "checksum": 8466239533887615,
+        "freedBytes": 468520,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 159376,
+        "reallocations": 484,
+        "requestedBytes": 483048
+      },
+      "candidate": {
+        "allocations": 3315,
+        "checksum": 8466239533887615,
+        "freedBytes": 412008,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 127992,
+        "reallocations": 484,
+        "requestedBytes": 426536
+      },
+      "identical": false,
+      "allocationsSavedPerOperation": 247.0,
+      "requestedBytesSavedPerOperation": 56512.0,
+      "requestedBytesChangePercent": -11.69904440138454,
+      "liveBytesPreserved": true
+    },
+    {
+      "batchCount": 16,
+      "stage": "render-mutable-publish",
+      "control": {
+        "allocations": 57112,
+        "checksum": 135459832542217920,
+        "freedBytes": 8052736,
+        "liveBytesDelta": 103424,
+        "peakAdditionalRequestedBytes": 259158,
+        "reallocations": 7731,
+        "requestedBytes": 8156160
+      },
+      "candidate": {
+        "allocations": 53160,
+        "checksum": 135459832542217920,
+        "freedBytes": 7148544,
+        "liveBytesDelta": 103424,
+        "peakAdditionalRequestedBytes": 259158,
+        "reallocations": 7731,
+        "requestedBytes": 7251968
+      },
+      "identical": false,
+      "allocationsSavedPerOperation": 247.0,
+      "requestedBytesSavedPerOperation": 56512.0,
+      "requestedBytesChangePercent": -11.086001255492784,
+      "liveBytesPreserved": true
+    }
+  ],
+  "assessment": {
+    "decision": "Sufficient evidence for a material native improvement in this measured Gantt medium mutable-publication slice, conditional on existing correctness and delivery-lane checks; no broad parity claim.",
+    "support": [
+      "Both matched histories show15/15 paired wins and completely separated observed ranges.",
+      "Typed/source/public-parse allocation controls are identical; their timing distributions overlap.",
+      "Only one runtime source file differs between independently reconstructed source input hashes.",
+      "Separate allocation runs remove exactly247 allocations and56512 requested bytes per render at both batch counts, without reducing required retained storage."
+    ],
+    "limits": [
+      "One workload and one shared M1 Pro host; background Chrome/Codex/WindowServer load remains recorded despite compiler guards.",
+      "Count1 timers are sub-millisecond and sensitive to scheduling; count16 independently supports direction with longer batches.",
+      "Count16 is a growing arena254->1838, not fixed-history steady state; count1 is254->353.",
+      "15 serial pairs are not independent machine/run replications; bootstrap intervals are descriptive, not a guaranteed population confidence bound.",
+      "Native allocations count requested bytes, not RSS or total process memory. Count16 peak additional requested bytes is unchanged259158; lower traffic does not imply lower peak.",
+      "Raw benchmark checksums/nodecounts are not complete graph hashes. Harness verifies exact SVG/type/dimension output before/after; complete graph semantics require the separate integration/frozen-graph checks.",
+      "Source/typed apparent timing improvements are noise/control movement, not evidence this property change improves those paths.",
+      "No WASM/Swift performance result or all-family speedup follows from native evidence."
+    ]
+  },
+  "webReview": {
+    "inputFile": "docs/benchmarks/2026-10-20-gantt-properties/web-comparison.json",
+    "inputSHA256": "d30c05386195d60512300d74ee70080e81733e618d3c1f7d30a065cc70e162dc",
+    "browser": "156.0.8078.4",
+    "platform": {
+      "os": "linux",
+      "arch": "x64",
+      "cpu": "AMD EPYC-Genoa Processor",
+      "logicalCPUs": 8,
+      "totalMemory": 16366505984
+    },
+    "settings": {
+      "trials": 15,
+      "warmupMs": 1000,
+      "batchTargetMs": 12,
+      "maxBatch": 128,
+      "balancedThreeWayOrder": true,
+      "matchedWasmBatchCounts": true,
+      "calibrationMedianOfThree": true,
+      "freshRetainedModelPerBatch": true,
+      "crossOriginIsolated": true,
+      "observedClockResolutionMs": 0.0049991607666015625
+    },
+    "harnessSHA256": "7d632fa69ddfbd18fe716388f6e277e6b48ed267fa378b9f73d4ff74f7e1a808",
+    "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+    "wasmSHA256": {
+      "control": "951f51e8fdcf9cbb928f8ce261176d1eab18b0c7f3b1a1c95d70c71113b99d78",
+      "candidate": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b"
+    },
+    "runtimeHashDifferences": {
+      "nonAppleDoublePaths": [
+        "pkg/pele_bg.wasm"
+      ],
+      "appleDoublePaths": [
+        "._FDLIBM-LICENSE",
+        "._FONT-OFL.txt",
+        "._LICENSE",
+        "._MERMAID-LICENSE",
+        "._NOTICE",
+        "._PELE-LICENSE",
+        "._README.md",
+        "._REGISTRY.md",
+        "._V8-LICENSE",
+        "._all-diagram-entries.js",
+        "._builtin-entries.js",
+        "._core.d.ts",
+        "._core.js",
+        "._diagram-entries.d.ts",
+        "._diagram-entries.js",
+        "._diagrams",
+        "._errors.js",
+        "._full.d.ts",
+        "._full.js",
+        "._graph-binary.js",
+        "._graph.js",
+        "._host-functions.js",
+        "._index.d.ts",
+        "._index.js",
+        "._initialize.js",
+        "._lazy.d.ts",
+        "._lazy.js",
+        "._mount.js",
+        "._package.json",
+        "._parse-limits.js",
+        "._pkg",
+        "._registry.d.ts",
+        "._registry.js",
+        "._render-numbers.js",
+        "._resources.js",
+        "._window.js",
+        "._zoom.js",
+        "diagrams/._agentflow.d.ts",
+        "diagrams/._agentflow.js",
+        "diagrams/._architecture.d.ts",
+        "diagrams/._architecture.js",
+        "diagrams/._block.d.ts",
+        "diagrams/._block.js",
+        "diagrams/._c4.d.ts",
+        "diagrams/._c4.js",
+        "diagrams/._class.d.ts",
+        "diagrams/._class.js",
+        "diagrams/._cynefin.d.ts",
+        "diagrams/._cynefin.js",
+        "diagrams/._er.d.ts",
+        "diagrams/._er.js",
+        "diagrams/._eventmodeling.d.ts",
+        "diagrams/._eventmodeling.js",
+        "diagrams/._flowchart.d.ts",
+        "diagrams/._flowchart.js",
+        "diagrams/._gantt.d.ts",
+        "diagrams/._gantt.js",
+        "diagrams/._gitGraph.d.ts",
+        "diagrams/._gitGraph.js",
+        "diagrams/._info.d.ts",
+        "diagrams/._info.js",
+        "diagrams/._ishikawa.d.ts",
+        "diagrams/._ishikawa.js",
+        "diagrams/._journey.d.ts",
+        "diagrams/._journey.js",
+        "diagrams/._kanban.d.ts",
+        "diagrams/._kanban.js",
+        "diagrams/._mindmap.d.ts",
+        "diagrams/._mindmap.js",
+        "diagrams/._packet.d.ts",
+        "diagrams/._packet.js",
+        "diagrams/._pie.d.ts",
+        "diagrams/._pie.js",
+        "diagrams/._quadrantChart.d.ts",
+        "diagrams/._quadrantChart.js",
+        "diagrams/._radar.d.ts",
+        "diagrams/._radar.js",
+        "diagrams/._railroad.d.ts",
+        "diagrams/._railroad.js",
+        "diagrams/._requirement.d.ts",
+        "diagrams/._requirement.js",
+        "diagrams/._sankey.d.ts",
+        "diagrams/._sankey.js",
+        "diagrams/._sequence.d.ts",
+        "diagrams/._sequence.js",
+        "diagrams/._state.d.ts",
+        "diagrams/._state.js",
+        "diagrams/._swimlane.d.ts",
+        "diagrams/._swimlane.js",
+        "diagrams/._timeline.d.ts",
+        "diagrams/._timeline.js",
+        "diagrams/._treeView.d.ts",
+        "diagrams/._treeView.js",
+        "diagrams/._treemap.d.ts",
+        "diagrams/._treemap.js",
+        "diagrams/._usecase.d.ts",
+        "diagrams/._usecase.js",
+        "diagrams/._venn.d.ts",
+        "diagrams/._venn.js",
+        "diagrams/._wardley.d.ts",
+        "diagrams/._wardley.js",
+        "diagrams/._xychart.d.ts",
+        "diagrams/._xychart.js",
+        "pkg/._pele.d.ts",
+        "pkg/._pele.js",
+        "pkg/._pele_bg.wasm",
+        "pkg/._pele_bg.wasm.d.ts"
+      ],
+      "note": "Full manifest retains all differences. Non-AppleDouble runtime change is only WASM; normal JS wrappers are identical. Sidecars are packaging metadata, not imported modules."
+    },
+    "statistics": {
+      "method": "20000 paired ratio bootstrap resamples per condition; percentile median interval; seed20261020; descriptive within-run only",
+      "limitations": [
+        "Serial samples share one page, heaps, caches and two WASM instances; no independence guarantee.",
+        "18 intervals are exploratory, without family-wise correction; not population significance claims.",
+        "Do not subtract source-control offsets from retained results or treat interval inclusion of zero as proof of no regression."
+      ]
+    },
+    "rows": [
+      {
+        "case": "gantt/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "batchCount": 128,
+        "controlMedianMs": 0.18492187559604645,
+        "candidateMedianMs": 0.18812499940395355,
+        "medianElapsedChangePercent": 1.7321497511220363,
+        "pairedMedianChangePercent": 1.5751503721812776,
+        "pairedMedianBootstrap95Percent": [
+          0.6527678825783312,
+          2.860192404860462
+        ],
+        "candidateWins": 1,
+        "candidateLosses": 14,
+        "controlRangeMs": [
+          0.17511718720197678,
+          0.2102343738079071
+        ],
+        "candidateRangeMs": [
+          0.17777343839406967,
+          0.2216796875
+        ],
+        "pairedEarlyMedianChangePercent": 2.860192404860462,
+        "pairedLateMedianChangePercent": 1.4008197269534284,
+        "withinRunInterpretation": "supported upward shift"
+      },
+      {
+        "case": "gantt/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "batchCount": 128,
+        "controlMedianMs": 0.16609375178813934,
+        "candidateMedianMs": 0.17640624940395355,
+        "medianElapsedChangePercent": 6.208841395170794,
+        "pairedMedianChangePercent": 3.8884936034122353,
+        "pairedMedianBootstrap95Percent": [
+          0.3854003036537046,
+          36.86905351743037
+        ],
+        "candidateWins": 3,
+        "candidateLosses": 12,
+        "controlRangeMs": [
+          0.1596093773841858,
+          0.20796874910593033
+        ],
+        "candidateRangeMs": [
+          0.16523437201976776,
+          0.23207031190395355
+        ],
+        "pairedEarlyMedianChangePercent": 4.29520052891581,
+        "pairedLateMedianChangePercent": 3.785608252433015,
+        "withinRunInterpretation": "supported upward shift"
+      },
+      {
+        "case": "gantt/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "batchCount": 32,
+        "controlMedianMs": 0.62109375,
+        "candidateMedianMs": 0.5829687416553497,
+        "medianElapsedChangePercent": -6.138366123415384,
+        "pairedMedianChangePercent": -5.72088600989189,
+        "pairedMedianBootstrap95Percent": [
+          -11.743514556496548,
+          -2.0464915989195642
+        ],
+        "candidateWins": 12,
+        "candidateLosses": 3,
+        "controlRangeMs": [
+          0.5995312333106995,
+          0.6645312607288361
+        ],
+        "candidateRangeMs": [
+          0.5654687583446503,
+          0.6206250190734863
+        ],
+        "pairedEarlyMedianChangePercent": -5.198779121881769,
+        "pairedLateMedianChangePercent": -8.132136148335823,
+        "withinRunInterpretation": "supported downward shift"
+      },
+      {
+        "case": "gantt/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "batchCount": 64,
+        "controlMedianMs": 0.2004687488079071,
+        "candidateMedianMs": 0.20156250894069672,
+        "medianElapsedChangePercent": 0.5456013165611617,
+        "pairedMedianChangePercent": 2.1056840883551864,
+        "pairedMedianBootstrap95Percent": [
+          -0.7815434230418306,
+          3.92843325522676
+        ],
+        "candidateWins": 7,
+        "candidateLosses": 8,
+        "controlRangeMs": [
+          0.19374999403953552,
+          0.22023437917232513
+        ],
+        "candidateRangeMs": [
+          0.197265625,
+          0.24867188930511475
+        ],
+        "pairedEarlyMedianChangePercent": 2.659367670283652,
+        "pairedLateMedianChangePercent": -0.2677758675437736,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "batchCount": 128,
+        "controlMedianMs": 0.1697656288743019,
+        "candidateMedianMs": 0.17109374701976776,
+        "medianElapsedChangePercent": 0.7823245225034414,
+        "pairedMedianChangePercent": -1.8687365137023515,
+        "pairedMedianBootstrap95Percent": [
+          -22.15537145116625,
+          1.7865805820949987
+        ],
+        "candidateWins": 9,
+        "candidateLosses": 6,
+        "controlRangeMs": [
+          0.1615624949336052,
+          0.5771875008940697
+        ],
+        "candidateRangeMs": [
+          0.1636328101158142,
+          0.42613281309604645
+        ],
+        "pairedEarlyMedianChangePercent": -0.02347471547484714,
+        "pairedLateMedianChangePercent": -11.48982116928552,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "batchCount": 32,
+        "controlMedianMs": 0.6346874833106995,
+        "candidateMedianMs": 0.62109375,
+        "medianElapsedChangePercent": -2.14179949473573,
+        "pairedMedianChangePercent": -3.2871397765589228,
+        "pairedMedianBootstrap95Percent": [
+          -7.821362606515992,
+          1.345179420753695
+        ],
+        "candidateWins": 11,
+        "candidateLosses": 4,
+        "controlRangeMs": [
+          0.6148437559604645,
+          0.9042187631130219
+        ],
+        "candidateRangeMs": [
+          0.5837500095367432,
+          0.8504687249660492
+        ],
+        "pairedEarlyMedianChangePercent": -4.037418593729003,
+        "pairedLateMedianChangePercent": -1.8688491551918096,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "batchCount": 32,
+        "controlMedianMs": 0.6573437452316284,
+        "candidateMedianMs": 0.6748437285423279,
+        "medianElapsedChangePercent": 2.6622270977162854,
+        "pairedMedianChangePercent": 2.543607498689626,
+        "pairedMedianBootstrap95Percent": [
+          1.076520387360036,
+          4.5268459660082305
+        ],
+        "candidateWins": 3,
+        "candidateLosses": 12,
+        "controlRangeMs": [
+          0.6400000154972076,
+          0.6971874833106995
+        ],
+        "candidateRangeMs": [
+          0.6614062488079071,
+          0.715624988079071
+        ],
+        "pairedEarlyMedianChangePercent": 1.4207918256538,
+        "pairedLateMedianChangePercent": 4.859277127664807,
+        "withinRunInterpretation": "supported upward shift"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "fixed",
+        "stage": "parse",
+        "batchCount": 32,
+        "controlMedianMs": 0.5845312476158142,
+        "candidateMedianMs": 0.6003125011920929,
+        "medianElapsedChangePercent": 2.6998135070874785,
+        "pairedMedianChangePercent": 1.0526351012902557,
+        "pairedMedianBootstrap95Percent": [
+          -13.406752023218782,
+          3.390743363981974
+        ],
+        "candidateWins": 7,
+        "candidateLosses": 8,
+        "controlRangeMs": [
+          0.5674999952316284,
+          1.037812501192093
+        ],
+        "candidateRangeMs": [
+          0.5651562511920929,
+          1.2635937631130219
+        ],
+        "pairedEarlyMedianChangePercent": 1.0526351012902557,
+        "pairedLateMedianChangePercent": 0.8923000269013492,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "fixed",
+        "stage": "render-model",
+        "batchCount": 8,
+        "controlMedianMs": 1.840000033378601,
+        "candidateMedianMs": 1.7087500095367432,
+        "medianElapsedChangePercent": -7.133153340266906,
+        "pairedMedianChangePercent": -6.723553391666082,
+        "pairedMedianBootstrap95Percent": [
+          -12.978315100799964,
+          -5.75789057164423
+        ],
+        "candidateWins": 14,
+        "candidateLosses": 1,
+        "controlRangeMs": [
+          1.8018749952316284,
+          2.069999933242798
+        ],
+        "candidateRangeMs": [
+          1.6831250190734863,
+          1.890625
+        ],
+        "pairedEarlyMedianChangePercent": -6.793478137632181,
+        "pairedLateMedianChangePercent": -6.579933181380415,
+        "withinRunInterpretation": "supported downward shift"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "batchCount": 32,
+        "controlMedianMs": 0.6682812571525574,
+        "candidateMedianMs": 0.6714062392711639,
+        "medianElapsedChangePercent": 0.46761480816051026,
+        "pairedMedianChangePercent": 1.7130604368114088,
+        "pairedMedianBootstrap95Percent": [
+          -0.9787930034664716,
+          4.642854418073372
+        ],
+        "candidateWins": 5,
+        "candidateLosses": 10,
+        "controlRangeMs": [
+          0.6493749916553497,
+          0.7131250202655792
+        ],
+        "candidateRangeMs": [
+          0.6584374904632568,
+          0.7370312511920929
+        ],
+        "pairedEarlyMedianChangePercent": 3.045560017216453,
+        "pairedLateMedianChangePercent": 1.3137393545565423,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "canvas",
+        "stage": "parse",
+        "batchCount": 32,
+        "controlMedianMs": 0.6076562404632568,
+        "candidateMedianMs": 0.5931249856948853,
+        "medianElapsedChangePercent": -2.391361069096143,
+        "pairedMedianChangePercent": 2.028128492787107,
+        "pairedMedianBootstrap95Percent": [
+          -19.18842953655957,
+          10.334431209076044
+        ],
+        "candidateWins": 7,
+        "candidateLosses": 8,
+        "controlRangeMs": [
+          0.5414062440395355,
+          0.9007812440395355
+        ],
+        "candidateRangeMs": [
+          0.5667187571525574,
+          1.4306249916553497
+        ],
+        "pairedEarlyMedianChangePercent": -3.599896221399579,
+        "pairedLateMedianChangePercent": 8.874061841906977,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "canvas",
+        "stage": "render-model",
+        "batchCount": 8,
+        "controlMedianMs": 1.9018750190734863,
+        "candidateMedianMs": 1.7506250143051147,
+        "medianElapsedChangePercent": -7.952678448978956,
+        "pairedMedianChangePercent": -6.856359255293154,
+        "pairedMedianBootstrap95Percent": [
+          -7.7109140023960965,
+          -2.59019471070997
+        ],
+        "candidateWins": 13,
+        "candidateLosses": 2,
+        "controlRangeMs": [
+          1.8231250047683716,
+          2.081249952316284
+        ],
+        "candidateRangeMs": [
+          1.6918751001358032,
+          2.4637500047683716
+        ],
+        "pairedEarlyMedianChangePercent": -7.55287034209794,
+        "pairedLateMedianChangePercent": -3.8059058758182274,
+        "withinRunInterpretation": "supported downward shift"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "batchCount": 8,
+        "controlMedianMs": 2.4499999284744263,
+        "candidateMedianMs": 2.4893749952316284,
+        "medianElapsedChangePercent": 1.6071456288458075,
+        "pairedMedianChangePercent": 0.5859860948696172,
+        "pairedMedianBootstrap95Percent": [
+          -0.02510097601289285,
+          2.806128369724359
+        ],
+        "candidateWins": 4,
+        "candidateLosses": 11,
+        "controlRangeMs": [
+          2.3943750858306885,
+          2.54812490940094
+        ],
+        "candidateRangeMs": [
+          2.4250000715255737,
+          3.7668750286102295
+        ],
+        "pairedEarlyMedianChangePercent": 1.0586104623461212,
+        "pairedLateMedianChangePercent": 0.44625082572684605,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "fixed",
+        "stage": "parse",
+        "batchCount": 8,
+        "controlMedianMs": 2.009999990463257,
+        "candidateMedianMs": 2.071874976158142,
+        "medianElapsedChangePercent": 3.078357511863694,
+        "pairedMedianChangePercent": 1.5414181595875043,
+        "pairedMedianBootstrap95Percent": [
+          -24.921348657500875,
+          7.281553487951209
+        ],
+        "candidateWins": 6,
+        "candidateLosses": 9,
+        "controlRangeMs": [
+          1.9256250858306885,
+          2.953125
+        ],
+        "candidateRangeMs": [
+          1.9206249713897705,
+          5.008125066757202
+        ],
+        "pairedEarlyMedianChangePercent": 1.5414181595875043,
+        "pairedLateMedianChangePercent": 0.761057565122436,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "fixed",
+        "stage": "render-model",
+        "batchCount": 2,
+        "controlMedianMs": 6.272500038146973,
+        "candidateMedianMs": 5.862500190734863,
+        "medianElapsedChangePercent": -6.536466240233485,
+        "pairedMedianChangePercent": -6.817266928776422,
+        "pairedMedianBootstrap95Percent": [
+          -7.458561082350346,
+          -5.91269777295087
+        ],
+        "candidateWins": 13,
+        "candidateLosses": 2,
+        "controlRangeMs": [
+          6.197500228881836,
+          7.409999847412109
+        ],
+        "candidateRangeMs": [
+          5.732499599456787,
+          7.204999923706055
+        ],
+        "pairedEarlyMedianChangePercent": -7.405936363900056,
+        "pairedLateMedianChangePercent": -6.389667252110842,
+        "withinRunInterpretation": "supported downward shift"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "batchCount": 8,
+        "controlMedianMs": 2.537500023841858,
+        "candidateMedianMs": 2.581874966621399,
+        "medianElapsedChangePercent": 1.7487662014818772,
+        "pairedMedianChangePercent": 2.139300215625295,
+        "pairedMedianBootstrap95Percent": [
+          1.0591140422058665,
+          3.9313259584735194
+        ],
+        "candidateWins": 4,
+        "candidateLosses": 11,
+        "controlRangeMs": [
+          2.5012500286102295,
+          2.6750000715255737
+        ],
+        "candidateRangeMs": [
+          2.5318750143051147,
+          2.8574999570846558
+        ],
+        "pairedEarlyMedianChangePercent": 1.8990510249591974,
+        "pairedLateMedianChangePercent": 2.509475369699876,
+        "withinRunInterpretation": "supported upward shift"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "canvas",
+        "stage": "parse",
+        "batchCount": 8,
+        "controlMedianMs": 2.0181249380111694,
+        "candidateMedianMs": 2.1143749952316284,
+        "medianElapsedChangePercent": 4.769281396191061,
+        "pairedMedianChangePercent": 3.6369290442001434,
+        "pairedMedianBootstrap95Percent": [
+          -20.943810465873725,
+          36.991998291015626
+        ],
+        "candidateWins": 6,
+        "candidateLosses": 9,
+        "controlRangeMs": [
+          1.903749942779541,
+          4.840625047683716
+        ],
+        "candidateRangeMs": [
+          1.9474999904632568,
+          3.850624918937683
+        ],
+        "pairedEarlyMedianChangePercent": 0.24776040109020236,
+        "pairedLateMedianChangePercent": 7.580122830914227,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "canvas",
+        "stage": "render-model",
+        "batchCount": 2,
+        "controlMedianMs": 6.362500190734863,
+        "candidateMedianMs": 5.875,
+        "medianElapsedChangePercent": -7.662085282838438,
+        "pairedMedianChangePercent": -7.30647115489208,
+        "pairedMedianBootstrap95Percent": [
+          -17.838406275797404,
+          6.809338824617495
+        ],
+        "candidateWins": 9,
+        "candidateLosses": 6,
+        "controlRangeMs": [
+          6.287499904632568,
+          7.660000324249268
+        ],
+        "candidateRangeMs": [
+          5.807499885559082,
+          12.357500076293945
+        ],
+        "pairedEarlyMedianChangePercent": -7.30647115489208,
+        "pairedLateMedianChangePercent": -7.3406918289642515,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      }
+    ],
+    "assessment": {
+      "retained": "All six ratio-of-median and paired-median changes are negative. Four conditions have descriptive paired intervals wholly below zero (small fixed, medium fixed/canvas, large fixed). Small canvas and large canvas remain directionally inconclusive under observed paired variation.",
+      "source": "All six paired medians are positive. Three intervals exclude zero upward: small fixed, medium fixed, large canvas. These are repeated within-run slowdowns on unchanged source paths and cannot be dismissed as random noise. Binary layout/JIT/instance or shared-heap effects are possible explanations, not established causes.",
+      "parse": "Five of six ratio-of-median changes are positive; five of six paired medians are positive (not the same five). Small fixed is a supported upward shift with a very wide interval. Other five intervals include zero, so large parse +3.08/+4.77 percent median regressions are unresolved, not disproven. Medium canvas illustrates estimator sensitivity: ratio-of-medians -2.39 percent versus paired median +2.03 percent.",
+      "decision": "Supports some retained browser improvement alongside observed source and small-parse regressions in this diagnostic. Does not support an across-the-board win or a no-regressions statement. Preserve this tradeoff in adoption reporting; full release gate remains separate.",
+      "scope": "One Chromium/EPYC VM run, three Gantt sizes, two measurers, one-second warmup, fifteen balanced trials. No Safari/Firefox/Swift performance inference."
+    }
+  },
+  "reportedNativeIntegrationCount": 17,
+  "reportedNativeIntegrationBreakdown": {
+    "newHostScale": 1,
+    "hostFunctions": 4,
+    "gantt": 8,
+    "lookupLimit": 1,
+    "binary": 3,
+    "note": "Parent-reported passed checks; this review did not rerun tests."
+  },
+  "webSourceOnlyFollowup": {
+    "inputFile": "docs/benchmarks/2026-10-20-gantt-properties/web-source-comparison.json",
+    "inputSHA256": "1358cebcd41f43a945dd9bd0b2c9e9c141270b080575ce6f9c1c1b6b2c07c742",
+    "purpose": "One justified follow-up after systematic source slowdowns in mixed-stage run; first report preserved",
+    "sameRuntimeHashesAndHarnessAsMixedRun": true,
+    "settings": {
+      "trials": 15,
+      "warmupMs": 1000,
+      "batchTargetMs": 12,
+      "maxBatch": 128,
+      "balancedThreeWayOrder": true,
+      "matchedWasmBatchCounts": true,
+      "calibrationMedianOfThree": true,
+      "freshRetainedModelPerBatch": true,
+      "crossOriginIsolated": true,
+      "observedClockResolutionMs": 0.0049991607666015625
+    },
+    "rows": [
+      {
+        "case": "gantt/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "batchCount": 64,
+        "priorMixedBatchCount": 128,
+        "controlMedianMs": 0.20664063096046448,
+        "candidateMedianMs": 0.20273436605930328,
+        "medianElapsedChangePercent": -1.8903663248630687,
+        "pairedMedianChangePercent": -1.1219118909065018,
+        "pairedMedianBootstrap95Percent": [
+          -4.2258757308857975,
+          1.5258116641078567
+        ],
+        "candidateWins": 8,
+        "candidateLosses": 7,
+        "pairedEarlyMedianChangePercent": 1.255393086298895,
+        "pairedLateMedianChangePercent": -1.5142274013071555,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "batchCount": 64,
+        "priorMixedBatchCount": 64,
+        "controlMedianMs": 0.20156250894069672,
+        "candidateMedianMs": 0.2022656351327896,
+        "medianElapsedChangePercent": 0.3488377852548741,
+        "pairedMedianChangePercent": 0.15419817793063118,
+        "pairedMedianBootstrap95Percent": [
+          -1.0748513915444957,
+          1.5515963724565207
+        ],
+        "candidateWins": 6,
+        "candidateLosses": 9,
+        "pairedEarlyMedianChangePercent": 0.11650011377426495,
+        "pairedLateMedianChangePercent": 0.6003520704357168,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "batchCount": 32,
+        "priorMixedBatchCount": 32,
+        "controlMedianMs": 0.645312488079071,
+        "candidateMedianMs": 0.655468761920929,
+        "medianElapsedChangePercent": 1.5738536026306482,
+        "pairedMedianChangePercent": 2.1178209368285517,
+        "pairedMedianBootstrap95Percent": [
+          0.359629655170024,
+          3.173099944568114
+        ],
+        "candidateWins": 3,
+        "candidateLosses": 12,
+        "pairedEarlyMedianChangePercent": 2.93262478213534,
+        "pairedLateMedianChangePercent": 0.9994269809401768,
+        "withinRunInterpretation": "supported upward shift"
+      },
+      {
+        "case": "gantt/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "batchCount": 32,
+        "priorMixedBatchCount": 32,
+        "controlMedianMs": 0.6595312356948853,
+        "candidateMedianMs": 0.6798437535762787,
+        "medianElapsedChangePercent": 3.079841678763251,
+        "pairedMedianChangePercent": 3.056150067536678,
+        "pairedMedianBootstrap95Percent": [
+          2.1718649948338165,
+          4.74826957376151
+        ],
+        "candidateWins": 1,
+        "candidateLosses": 14,
+        "pairedEarlyMedianChangePercent": 3.056150067536678,
+        "pairedLateMedianChangePercent": 3.047297317990605,
+        "withinRunInterpretation": "supported upward shift"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "batchCount": 8,
+        "priorMixedBatchCount": 8,
+        "controlMedianMs": 2.4368749856948853,
+        "candidateMedianMs": 2.4418749809265137,
+        "medianElapsedChangePercent": 0.205180621122536,
+        "pairedMedianChangePercent": 0.4909525141170823,
+        "pairedMedianBootstrap95Percent": [
+          -0.9233152409973466,
+          0.73885583573845
+        ],
+        "candidateWins": 6,
+        "candidateLosses": 9,
+        "pairedEarlyMedianChangePercent": 0.511903671619307,
+        "pairedLateMedianChangePercent": 0.014232288889304279,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      },
+      {
+        "case": "gantt/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "batchCount": 8,
+        "priorMixedBatchCount": 8,
+        "controlMedianMs": 2.508125066757202,
+        "candidateMedianMs": 2.50124990940094,
+        "medianElapsedChangePercent": -0.274115411842335,
+        "pairedMedianChangePercent": -0.42362815628642636,
+        "pairedMedianBootstrap95Percent": [
+          -1.733099445825248,
+          2.383972931225742
+        ],
+        "candidateWins": 8,
+        "candidateLosses": 7,
+        "pairedEarlyMedianChangePercent": -0.42362815628642636,
+        "pairedLateMedianChangePercent": -0.10232273466455055,
+        "withinRunInterpretation": "direction unresolved within observed paired variation"
+      }
+    ],
+    "interpretation": [
+      "Medium fixed repeats an upward shift: ratio-of-medians+1.57%, paired median+2.12%, descriptive interval[+0.36,+3.17]%.",
+      "Medium canvas now shows an upward shift: ratio-of-medians+3.08%, paired median+3.06%, descriptive interval[+2.17,+4.75]%.",
+      "Small and large source-only intervals include zero. The original small fixed and large canvas upward shifts did not reproduce in this measurement; this does not erase their original within-run observations.",
+      "Small fixed matched batch changed from128 to64; other source native counts match. Do not portray the follow-up as every condition being an identical replication.",
+      "Source-only selects timed stages; the harness still does its ordinary correctness preparation, uses independent control/candidate instances on one page, and shares heaps/GC. This reduces repeated mutable workload pressure but does not prove its absence or establish the cause of medium slowdown.",
+      "No new parse measurement occurred; parse costs from mixed run remain unresolved, including the observed small fixed upward shift."
+    ],
+    "statistics": "Same descriptive20000 paired-bootstrap procedure/seed as VM review. Serial correlation and exploratory multiple comparisons remain; intervals are not population guarantees."
+  },
+  "adoptionSummary": {
+    "supported": "Strong native Gantt medium mutable-publication benefit with exact temporary-allocation reductions and unchanged retained graph storage; browser retained medians improve in all six measured conditions, with four supported paired shifts.",
+    "costs": "Medium source-render slowdown persists in source-only comparison (about1.6%fixed/3.1%canvas median); mixed-run parse costs remain unresolved and small/fixed showed an upward shift.",
+    "wording": "Measured native mutable rendering improved substantially, with smaller retained-browser benefits. Source and parse performance are not regression-free; medium source still costs more in the follow-up. The full JS parity gate remains separate and has not passed.",
+    "avoid": [
+      "Do not label every unchanged-path movement random noise.",
+      "Do not say source-only follow-up cleared source regressions.",
+      "Do not claim parse regression resolved from a source-only measurement.",
+      "Do not infer Swift timing from native or browser results.",
+      "Do not claim0.3 readiness or whole-API JS parity."
+    ]
+  }
+}
