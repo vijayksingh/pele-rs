@@ -1,0 +1,77 @@
+{
+  "baseCommit": "e518012745a2eaf12c8bb048b91074566bf2000a",
+  "status": "private rebased candidate; no integration or runtime validation",
+  "patchSHA256": "b7cfd9d9bf285a8aa0cfcf59a16d9c7f26fedbab175c328d3e8a436b82410c87",
+  "previousFrozenPatchSHA256": "b7cfd9d9bf285a8aa0cfcf59a16d9c7f26fedbab175c328d3e8a436b82410c87",
+  "previousFrozenManifestSHA256": "ed8bdb98e97d955f9e2cccd7b5c82561572e1f879cd198b0ed64d986d91116f5",
+  "files": [
+    {
+      "path": "bindings/web/layout-storage.js",
+      "originalSHA256": "d0adfce8fd4c2afcad9fa2aada01f47138a65476d9dbe87c8d7d4d46bb42d284",
+      "candidateSHA256": "727afc18fb70ed8a60ec4ec491a94a30a64797452303013a75be1e0441762bc4"
+    },
+    {
+      "path": "bindings/web/source-initializer.js",
+      "originalSHA256": "ccac46e137773f95b369adb177c58b613646ac4b4d0e30101f3a4bb2e413b209",
+      "candidateSHA256": "98a140212ec6117784f5b63b3e1a4c0c6face53d34e029be2d2da8a70e33c2c7"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/source_store.rs",
+      "originalSHA256": "fe572d724e38afabf392170ba74acfdb10ef96c6a1b419b37574f95aaaeda52c",
+      "candidateSHA256": "7d93eb23faac76f912c70ab4ff38b65404a0f9ae257625ac1f1604bc66144ce0"
+    },
+    {
+      "path": "crates/pele/src/compat/public/binary.rs",
+      "originalSHA256": "9208d30b60e7033da9f5eefc4b4771cff8891634dab8b7600c0a9a5d3eb7798e",
+      "candidateSHA256": "e242fc38e8caa04bf950922b481aeb1f438c777b5dbfdc29428b24529b4d8ed6"
+    },
+    {
+      "path": "crates/pele/tests/public_sankey_owned_parse.rs",
+      "originalSHA256": "005a4d613f0a25cd84f2db387997f8add43da14872c096baf6b12a99d9e9cdd5",
+      "candidateSHA256": "30bc836584625c7b208aef71dadd05af07e6790d80f23c2f38e0677718715573"
+    },
+    {
+      "path": "scripts/generate-source-initializer.mjs",
+      "originalSHA256": "90fa5ba857155ba0743174d9c10ff3c0915ea5f011ab4434316d87d1c58ffd25",
+      "candidateSHA256": "2ee1170a84d0d6b72edde1815ceddd62cfaa6ec3f616a6ecd228188b8d400b7d"
+    },
+    {
+      "path": "tests/web/source-layout.spec.js",
+      "originalSHA256": "ec5ce0fe5bb9bdd8b7778345e66aa86c4a36f510b25ad05e14428e0c0fa6109b",
+      "candidateSHA256": "44521189558a005df386de1d952442318e7bf29107eb50c11fd5811c45446e0c"
+    }
+  ],
+  "rebase": {
+    "onlyChangedOriginal": "crates/pele/src/compat/diagrams/sankey/source_store.rs",
+    "exactUpstreamDeltaPreserved": true,
+    "otherSixCandidatesByteIdentical": true,
+    "noManualConflictResolution": true
+  },
+  "generation": {
+    "executionsThisRebase": 1,
+    "inputCommit": "ef9c9a77428c35ac69753caad3178527fbd97864",
+    "inputWire": "PLCSRC02",
+    "wasmSHA256": "7abe1acd61ff7109bec45f49e3fb0892dcdd7c363900d4ab1e7f163df5d49ffe",
+    "outputSHA256": "98a140212ec6117784f5b63b3e1a4c0c6face53d34e029be2d2da8a70e33c2c7",
+    "matchesCandidate": true,
+    "notTyped03RuntimeProof": true
+  },
+  "validation": {
+    "rustfmtCheck": "passed three Rust files",
+    "nodeSyntax": "passed four JavaScript files",
+    "applyCheck": "passed against exact e518 root; whitespace=error-all",
+    "builds": "not run",
+    "browser": "not run",
+    "Swift": "not run",
+    "VM": "not run",
+    "timings": "not run"
+  },
+  "remainingGates": [
+    "Compile native03 writer and run public source-layout/native feature integrations",
+    "Regenerate initializer against built03 and compare bytes",
+    "Browser public lifecycle differential across three engines",
+    "Big-endian DataView branch source-reviewed only",
+    "Legacy01 source-reviewed; no public identity-exhaustion test",
+    "Canonical and compact 64MiB boundaries remain separate; new03 padding-limit boundary not executed"
+  ]
+}
