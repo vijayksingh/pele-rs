@@ -171,7 +171,8 @@ pass against the fresh ARM64 SDK. Caller-authored raw ER adoption now keeps
 host objects directly. Forty-five focused browser checks pass across all three
 engines, including the six previously failing callback comparisons, ten exotic
 Ref-root controls, config/error ordering and lifecycle checks. Fourteen native
-integrations pass. Consolidated browser and fresh Swift checks are pending for
-this raw layer. The exact near-64-MiB zero-versus-13-byte gate has source review
+integrations pass. The consolidated 369-test browser suite passes; fresh ARM64
+SDK checks pass 168 Swift API conditions, 15 Swift integrations and three C
+consumers for this raw layer. The exact near-64-MiB zero-versus-13-byte gate has source review
 but no new large E2E fixture; it remains an explicit validation gap.
 No full API or performance parity claim; no 0.3 release.

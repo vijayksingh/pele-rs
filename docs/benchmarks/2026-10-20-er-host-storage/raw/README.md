@@ -43,7 +43,7 @@ The [private diagnostic source](benchmark/README.md), [input manifest](raw-input
 - 14 native public integration tests pass, including exact builtin selection, captured policy across replacement/drop, custom codecs, prepared/fallback publication and registry controls.
 - Fresh ARM64 SDK and Swift consumer: 168 public API conditions pass. Fifteen Swift integrations pass, including 7,535 mutable drawings and 9,902 errors for the selected corpus, eager projection and all 33 prepared/caller-model lanes.
 - Three strict C consumers pass against that SDK: ownership/error lifetimes, mutable public API and parse limits. TypeScript, formatting and diff checks pass.
-- The consolidated 369-test browser run is pending. Intel SDK and AppKit activation/focus release checks remain open. These are not waived.
+- The [consolidated browser run](full-web.log.gz) passes all 369 checks across Chromium, Firefox and WebKit (12.9 minutes). Intel SDK and AppKit activation/focus release checks remain open. These are not waived.
 
 Failed provisional owners no longer become borrowed-helper fallback owners. Config serialization writes now remain live instead of being overwritten by a pre-config snapshot. Both deliberate corrections have explicit public checks.
 

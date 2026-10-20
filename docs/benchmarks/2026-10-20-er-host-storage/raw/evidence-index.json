@@ -1,6 +1,6 @@
 {
   "sourceCommit": "51f1269",
-  "scope": "Raw caller-root adoption, unreleased; full-browser run pending",
+  "scope": "Raw caller-root adoption, unreleased; 369 consolidated browser checks pass",
   "records": [
     {
       "path": "ordinary-comparison.json",
@@ -379,6 +379,12 @@
       "source": "dist/perf-patches/parse-architecture/er-raw-host-first/profile/er-medium-render-source-js.cpuprofile",
       "sourceSha256": "3d4529794bf0077ea61be3c66688da1b1621cb5c2e9337acda7414245e4c2759",
       "archiveSha256": "f0d3245ffaa4cb199b214fb71ff625c114041a4d5d0f68e97cba0feaceebce70"
+    },
+    {
+      "path": "full-web.log.gz",
+      "source": "dist/evidence/er-raw-host-full-web.log",
+      "sourceSha256": "6e6bd493d111bde2dc7aa1b990238d0285347cff0d19d08e835c1ca8b3092010",
+      "archiveSha256": "a5a59893814d6bb79084bf117f43ee48b9683ed3a9d0c6a5cfc131b63886c173"
     }
   ]
 }
