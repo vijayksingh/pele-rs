@@ -27,6 +27,9 @@ render model from storage through bounded reads and borrowed arena values.
 while separating scalar reads, positional writes and descriptor queries.
 [Captured admission](LLD_CAPTURED_ADMISSION.md) shares structural and schema
 validation over borrowed storage without changing public graph admission order.
+[Shared browser graph traversal](LLD_SHARED_GRAPH_STORAGE.md) binds storage once
+and shares host observation, publication and comparison without selecting a new
+document backend.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.
