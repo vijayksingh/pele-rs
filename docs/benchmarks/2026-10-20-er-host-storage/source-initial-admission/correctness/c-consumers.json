@@ -1,0 +1,98 @@
+[
+  {
+    "phase": "ffi-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-initial-admission-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-initial-admission-correctness-ffi-compile.log",
+    "startedAt": "2026-10-20T17:47:16.801466+00:00",
+    "endedAt": "2026-10-20T17:47:17.141182+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-run",
+    "command": [
+      "dist/evidence/source-initial-admission-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-initial-admission-correctness-ffi-run.log",
+    "startedAt": "2026-10-20T17:47:17.141524+00:00",
+    "endedAt": "2026-10-20T17:47:17.769457+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-initial-admission-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-initial-admission-correctness-ffi-public-compile.log",
+    "startedAt": "2026-10-20T17:47:17.769957+00:00",
+    "endedAt": "2026-10-20T17:47:17.903486+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-run",
+    "command": [
+      "dist/evidence/source-initial-admission-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-initial-admission-correctness-ffi-public-run.log",
+    "startedAt": "2026-10-20T17:47:17.903881+00:00",
+    "endedAt": "2026-10-20T17:47:18.592201+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-initial-admission-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-initial-admission-correctness-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T17:47:18.592875+00:00",
+    "endedAt": "2026-10-20T17:47:18.714254+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-run",
+    "command": [
+      "dist/evidence/source-initial-admission-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-initial-admission-correctness-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T17:47:18.714663+00:00",
+    "endedAt": "2026-10-20T17:47:19.504741+00:00",
+    "exitCode": 0
+  }
+]
