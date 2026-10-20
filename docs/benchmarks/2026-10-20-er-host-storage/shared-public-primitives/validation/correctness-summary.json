@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "commit": "1906d683476b7cff1d76221a02a2591ce6d424b1",
+  "sourceInputCount": 353,
+  "gitBoundInputCount": 340,
+  "sourceInputSha256": "d898df768e0bab3d3f2f21848a79d1ac9b32ade7cf6756b4643c14c4824ce7fc",
+  "nativeArchiveSha256": "6cef08bdbbd45cd21db6d302b606968f2bd70c72a3fc5cf687a1c8bdb15b2fe1",
+  "candidateBinarySha256": "16900d32f60685e93d92a1e697650d3fb34e5e0f63be6ad7c5be9c8305fcfdbf",
+  "controlBinarySha256": "2e1491d5b80da5d64b7f042abe934f47d662901d9d8037eb1646a0d7a03cff9a",
+  "sourceAndSDKUnchangedDuringCorrectness": true,
+  "correctness": {
+    "swiftTests": 16,
+    "drawings": 12481,
+    "expectedErrors": 16572,
+    "budgetDifferences": 0,
+    "apiCases": 21,
+    "apiConditions": 168,
+    "cConsumers": 3,
+    "timing": false
+  },
+  "commandsFile": "correctness-commands.json",
+  "scope": "Consolidated shared-construction48a29aa plus captured-projection1906d68; no latency collection"
+}
