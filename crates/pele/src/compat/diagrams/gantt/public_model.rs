@@ -1849,7 +1849,7 @@ impl Context<'_> {
     fn finish_initial_object(
         &mut self,
         object: InitialObject,
-        fields: Vec<(&str, Atom)>,
+        fields: impl ExactSizeIterator<Item = (&'static str, Atom)>,
     ) -> Result<Atom, PublicError> {
         let id = object.0;
         debug_assert!(self.g.nodes[id as usize].properties().is_empty());
@@ -1881,7 +1881,10 @@ impl Context<'_> {
         }
         Ok(Atom::Ref(id))
     }
-    fn initial_record(&mut self, fields: Vec<(&str, Atom)>) -> Result<Atom, PublicError> {
+    fn initial_record(
+        &mut self,
+        fields: impl ExactSizeIterator<Item = (&'static str, Atom)>,
+    ) -> Result<Atom, PublicError> {
         let object = self.initial_object(None)?;
         self.finish_initial_object(object, fields)
     }
@@ -1935,43 +1938,46 @@ impl Context<'_> {
         let raw_data = self.text(&t.raw.data)?;
         let raw_start = self.optional_text(t.raw.start.as_deref())?;
         let raw_end = self.text(&t.raw.end)?;
-        let raw = self.initial_record(vec![
-            ("data", raw_data),
-            ("start", raw_start),
-            ("end", raw_end),
-        ])?;
-        let mut fields = vec![];
-        for (k, v) in [("id", &t.id), ("task", &t.task), ("section", &t.section)] {
-            fields.push((k, self.text(v)?));
-        }
-        for (k, value) in [
-            ("startTime", t.start_time),
-            ("endTime", t.end_time),
-            ("renderEndTime", t.render_end_time),
-        ] {
-            let value = match value {
-                Some(ms) => self.date_value(DateValue::Fresh(ms))?,
-                None if k == "renderEndTime" => Atom::Null,
-                None => Atom::Undefined,
-            };
-            fields.push((k, value));
-        }
-        for (k, v) in [
-            ("manualEndTime", t.manual_end_time),
-            ("processed", t.processed),
-            ("active", t.active),
-            ("done", t.done),
-            ("crit", t.crit),
-            ("milestone", t.milestone),
-            ("vert", t.vert),
-        ] {
-            fields.push((k, Atom::Bool(v)));
-        }
-        fields.push(("order", Atom::Number(t.order as f64)));
-        fields.push(("classes", self.initial_strings_array(&t.classes)?));
-        fields.push(("prevTaskId", self.optional_text(t.prev_task_id.as_deref())?));
-        fields.push(("raw", raw));
-        self.initial_record(fields)
+        let raw = self.initial_record(
+            [("data", raw_data), ("start", raw_start), ("end", raw_end)].into_iter(),
+        )?;
+        // Evaluate child values in canonical arena order before creating the
+        // task object. Fixed records need no temporary growable field vector.
+        let id = self.text(&t.id)?;
+        let task = self.text(&t.task)?;
+        let section = self.text(&t.section)?;
+        let start = match t.start_time {
+            Some(ms) => self.date_value(DateValue::Fresh(ms))?,
+            None => Atom::Undefined,
+        };
+        let end = match t.end_time {
+            Some(ms) => self.date_value(DateValue::Fresh(ms))?,
+            None => Atom::Undefined,
+        };
+        let render_end = match t.render_end_time {
+            Some(ms) => self.date_value(DateValue::Fresh(ms))?,
+            None => Atom::Null,
+        };
+        let fields = [
+            ("id", id),
+            ("task", task),
+            ("section", section),
+            ("startTime", start),
+            ("endTime", end),
+            ("renderEndTime", render_end),
+            ("manualEndTime", Atom::Bool(t.manual_end_time)),
+            ("processed", Atom::Bool(t.processed)),
+            ("active", Atom::Bool(t.active)),
+            ("done", Atom::Bool(t.done)),
+            ("crit", Atom::Bool(t.crit)),
+            ("milestone", Atom::Bool(t.milestone)),
+            ("vert", Atom::Bool(t.vert)),
+            ("order", Atom::Number(t.order as f64)),
+            ("classes", self.initial_strings_array(&t.classes)?),
+            ("prevTaskId", self.optional_text(t.prev_task_id.as_deref())?),
+            ("raw", raw),
+        ];
+        self.initial_record(fields.into_iter())
     }
 }
 fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
@@ -2008,7 +2014,8 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
             properties: vec![],
         })?;
         let root = c.initial_object(Some(PROTO))?;
-        let mut fields = vec![("type", c.text("gantt")?)];
+        let mut fields = Vec::with_capacity(ROOT_FIELDS.len());
+        fields.push(("type", c.text("gantt")?));
         for (k, v) in [
             ("title", m.title.as_deref()),
             ("accTitle", m.acc_title.as_deref()),
@@ -2034,7 +2041,7 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
             ("byId", by_id),
         ]);
         let (section, count, order, last) = m.public_builder_state();
-        let options = c.initial_record(vec![])?;
+        let options = c.initial_record([].into_iter())?;
         fields.extend([
             ("currentSection", c.text(section)?),
             ("taskCount", Atom::Number(count as f64)),
@@ -2055,7 +2062,7 @@ fn initial(m: &GanttModel) -> Result<ModelGraph, PeleError> {
         }
         let days = c.initial_array(days.into_iter().map(Atom::Bool).collect())?;
         fields.extend([("excludedDays", days), ("datedTokens", Atom::Bool(dated))]);
-        let root = c.finish_initial_object(root, fields)?;
+        let root = c.finish_initial_object(root, fields.into_iter())?;
         c.g.root = root;
         Ok(())
     })();
