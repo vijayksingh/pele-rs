@@ -45,7 +45,7 @@ public struct FullRenderedDiagram: Codable, Sendable {
         if !numbers.isEmpty { try fields.encode(numbers, forKey: .numbers) }
     }
 }
-private struct DocumentProjection: Decodable { let type: String; let model: ConfigValue }
+private struct DocumentProjectionMetadata: Decodable { let type: String; let projectionBytes: Int }
 
 extension Pele {
     /// Owned immutable parse result. Rust registration/config/model survive until deinit.
@@ -53,8 +53,8 @@ extension Pele {
         internal let handle: OpaquePointer
         public let type: String
         public let model: ConfigValue
-        fileprivate init(handle: OpaquePointer, projection: DocumentProjection) {
-            self.handle = handle; self.type = projection.type; self.model = projection.model
+        fileprivate init(handle: OpaquePointer, type: String, model: ConfigValue) {
+            self.handle = handle; self.type = type; self.model = model
         }
         deinit { pele_result_free(handle) }
         /// Read-only operation on the exact retained Rust model.
@@ -113,14 +113,22 @@ extension Pele {
         }
         public func parse(_ source: String, options: ParseOptions = .init()) throws -> Document {
             let bytes = Data(source.utf8), settings = try JSONEncoder().encode(options)
-            let handle = bytes.withUnsafeBytes { input in settings.withUnsafeBytes { output in
-                pele_parse_v2(input.bindMemory(to: UInt8.self).baseAddress, input.count,
-                              output.bindMemory(to: UInt8.self).baseAddress, output.count)
-            }}
+            let projection = EagerProjection()
+            let handle = withExtendedLifetime(projection) { bytes.withUnsafeBytes { input in settings.withUnsafeBytes { output in
+                pele_parse_eager_v1(input.bindMemory(to: UInt8.self).baseAddress, input.count,
+                    output.bindMemory(to: UInt8.self).baseAddress, output.count,
+                    Unmanaged.passUnretained(projection).toOpaque(), receiveEagerProjection)
+            }}}
             guard let handle else { throw PeleError(code: "internal", message: "Native document allocation failed") }
             do {
-                let projection = try Pele.compatibilityResult(handle, as: DocumentProjection.self, release: false)
-                return Document(handle: handle, projection: projection)
+                // A Swift conversion error aborts the callback and is rethrown
+                // here; it never unwinds across the C boundary.
+                if let error = projection.error { throw error }
+                let metadata = try Pele.compatibilityResult(handle, as: DocumentProjectionMetadata.self, release: false)
+                guard metadata.projectionBytes >= 0, metadata.projectionBytes <= 64 * 1024 * 1024 else {
+                    throw PeleError(code: "internal", message: "Invalid native compatibility result")
+                }
+                return Document(handle: handle, type: metadata.type, model: try projection.finish())
             } catch { pele_result_free(handle); throw error }
         }
         public func render(_ source: String, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {

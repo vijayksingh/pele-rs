@@ -1,4 +1,6 @@
 //! Opaque, immutable owned results. Unsafe code is confined to the C adapter.
+mod eager_projection;
+pub use eager_projection::*;
 mod host_functions;
 pub use host_functions::*;
 mod public;
@@ -172,6 +174,19 @@ unsafe fn compatibility_input<'a>(
     std::str::from_utf8(unsafe { slice::from_raw_parts(ptr, len) })
         .map_err(|_| PeleError::new("Native transport: input must be UTF-8", ErrorCode::Semantic))
 }
+// Shared by the legacy JSON entry and eager Swift projection entry. Admission,
+// option decoding and captured native registration stay on one parse path.
+unsafe fn parse_document_input(
+    source: *const u8,
+    source_len: usize,
+    options: *const u8,
+    options_len: usize,
+) -> Result<pele::compat::ParsedDocument, pele::compat::PeleError> {
+    let source = unsafe { compatibility_input(source, source_len, 16 * 1024 * 1024) }?;
+    let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+    let options = pele::compat::parse_options(options)?;
+    pele::compat::Engine::with_builtins().parse(source, &options)
+}
 /// Parse once. The owned result also retains the immutable Rust document until result_free.
 /// # Safety
 /// Non-null inputs must name readable byte lengths for this call.
@@ -183,10 +198,7 @@ pub unsafe extern "C" fn pele_parse_v2(
     options_len: usize,
 ) -> *mut PeleResult {
     compatibility_call(|| {
-        let source = unsafe { compatibility_input(source, source_len, 16 * 1024 * 1024) }?;
-        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
-        let options = pele::compat::parse_options(options)?;
-        let document = pele::compat::Engine::with_builtins().parse(source, &options)?;
+        let document = unsafe { parse_document_input(source, source_len, options, options_len) }?;
         let data = pele::compat::document_envelope(&document)?.into_bytes();
         Ok(PeleResult {
             status: 0,

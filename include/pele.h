@@ -19,6 +19,30 @@ PeleResult *pele_capabilities(void);
  * render_document borrows it synchronously; source/options are copied into owned models.
  * A render/error result cannot serve as a document. Transport budgets match inspect. */
 PeleResult *pele_parse_v2(const uint8_t *source, size_t source_len, const uint8_t *options, size_t options_len);
+/* Additive eager immutable projection transport; existing v2 JSON ABI unchanged.
+ * Success envelope result is {type, projectionBytes}; projectionBytes is the exact
+ * original v2 envelope size. Above 64 MiB, no events are delivered; the caller must
+ * reject the result using its existing compatibility-result admission error.
+ * A successful handle retains only the typed document and this small envelope.
+ * Callback receives 1..128 events; all pointers are borrowed only for that call.
+ * It must copy strings eagerly, must not unwind, and returns 0 to continue or
+ * nonzero to abort. Aborted calls return an error handle with no document.
+ * Scalar tags: 0 null, 1 bool (count=0/1), 2 number, 3 UTF-8 string.
+ * Container tags: 4 array begin (count=length), 5 array end,
+ * 6 object begin (count=entry count), 7 key, 8 object end.
+ * String/key count is UTF-8 byte length. Unused fields are zero/NULL.
+ * Numbers match JSON projection (nonfinite=null, negative zero=positive zero).
+ * Object keys follow JS enumeration order; consumers choose host key equality.
+ * Callbacks/context are synchronous, never retained. No host resources invoked. */
+typedef struct PeleProjectionEventV1 {
+    uint32_t tag;
+    size_t count;
+    double number;
+    const uint8_t *text;
+} PeleProjectionEventV1;
+typedef uint32_t (*PeleProjectionBatchV1)(void *, const PeleProjectionEventV1 *, size_t);
+PeleResult *pele_parse_eager_v1(const uint8_t *source, size_t source_len,
+    const uint8_t *options, size_t options_len, void *context, PeleProjectionBatchV1 receive);
 PeleResult *pele_render_v2(const uint8_t *source, size_t source_len, const uint8_t *options, size_t options_len);
 PeleResult *pele_render_document_v2(const PeleResult *document, const uint8_t *options, size_t options_len);
 PeleResult *pele_builtin_capabilities(void);

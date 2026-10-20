@@ -9,3 +9,8 @@ and [caller-authored model construction](DECLARED_MODEL_CONSTRUCTION.md).
 Parsing, layout and SVG stay in Rust; host resources and presentation stay in
 thin Swift and WebAssembly adapters. Registries and diagram module interfaces
 support extension without changing the built-ins.
+
+[Direct public parsing](LLD_DIRECT_PUBLIC_PARSE.md) shares source preparation and
+lets modules construct canonical public state without a temporary typed model.
+[Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
+immutable model events without a second full model JSON decode in Foundation.
