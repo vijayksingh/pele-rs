@@ -189,6 +189,19 @@ passes **405/405**; fresh Swift integration/API checks use the unchanged native
 SDK. Nine trials and 500 ms warmup per row make this a scoped diagnostic,
 not a replacement release gate or a regression-free claim.
 
+The [owned Sankey construction](docs/benchmarks/2026-10-20-er-host-storage/owned-construction/)
+layer, source `b19f38d`, avoids rebuilding a typed model immediately after its
+public graph is constructed. All six VM parse rows are **8.65–11.19% lower**
+paired, still **8.91–15.08× JS time**. First-use results remain mixed:
+medium/fixed first-unchanged render is **+2.242%** (7/15 lower pairs).
+One complete local native public-parse condition is 16.21% lower and takes
+**1.43× local Node JS time**; its typed-parse control is +1.05% paired.
+These local and VM measurements use different hosts and API costs; their
+ratios cannot be combined. External builds prevented six other native and all
+six Swift latency conditions from completing; rejected windows are excluded.
+Fresh native/browser checks, Swift 16 integrations, C3 and 168 API conditions
+pass. All controls and the partial timing scope remain in the evidence.
+
 The latest full release-gate matrix remains the historical
 [ER token ownership checkpoint](docs/benchmarks/2026-10-20-er-token-ownership/),
 source `0b32797`, where all 126 conditions fail. That artifact's source render

@@ -1,0 +1,1875 @@
+{
+  "sourceCommit": "b19f38d6368d1ea8183004d24c58af5828b3f577",
+  "diagnosticNotReleaseGate": true,
+  "nativeSwiftLatency": "Partial: two accepted native conditions; six other native and six Swift conditions unmeasured",
+  "nativeTimingRows": [
+    {
+      "case": "sankey/medium",
+      "stage": "parse-public",
+      "pairedPercent": -16.20815939278938,
+      "lowerPairs": 15,
+      "trials": 15,
+      "medians": {
+        "js": 0.0390051875,
+        "control": 0.066658875,
+        "candidate": 0.05575
+      },
+      "candidateOverJS": 1.4292970646532592,
+      "host": {
+        "platform": "darwin",
+        "arch": "arm64",
+        "cpu": "Apple M1 Pro",
+        "loadBefore": [
+          11.19677734375,
+          9.98193359375,
+          9.04150390625
+        ],
+        "processesBefore": [
+          {
+            "pid": 410,
+            "cpuPercent": 49,
+            "name": "WindowServer"
+          },
+          {
+            "pid": 23310,
+            "cpuPercent": 12.8,
+            "name": "Claude Helper"
+          },
+          {
+            "pid": 23368,
+            "cpuPercent": 16.7,
+            "name": "Claude Helper (Renderer)"
+          },
+          {
+            "pid": 44246,
+            "cpuPercent": 16.5,
+            "name": "Codex (Service)"
+          },
+          {
+            "pid": 44311,
+            "cpuPercent": 12.4,
+            "name": "Codex (Renderer)"
+          },
+          {
+            "pid": 53076,
+            "cpuPercent": 19.3,
+            "name": "node"
+          }
+        ],
+        "loadAfter": [
+          11.2607421875,
+          10.01513671875,
+          9.05859375
+        ],
+        "processesAfter": [
+          {
+            "pid": 410,
+            "cpuPercent": 45.7,
+            "name": "WindowServer"
+          },
+          {
+            "pid": 53076,
+            "cpuPercent": 29.6,
+            "name": "node"
+          },
+          {
+            "pid": 53111,
+            "cpuPercent": 11.1,
+            "name": "pele-perf"
+          },
+          {
+            "pid": 53139,
+            "cpuPercent": 24,
+            "name": "kamui-engine-lab"
+          }
+        ]
+      },
+      "acceptedAttempt": 3,
+      "sampleScope": "Separate complete condition; no rejected samples pooled"
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse",
+      "pairedPercent": 1.0463690212143995,
+      "lowerPairs": 5,
+      "trials": 15,
+      "medians": {
+        "js": 0.0405859375,
+        "control": 0.01908075,
+        "candidate": 0.019208375
+      },
+      "candidateOverJS": 0.4732766121270452,
+      "host": {
+        "platform": "darwin",
+        "arch": "arm64",
+        "cpu": "Apple M1 Pro",
+        "loadBefore": [
+          6.38330078125,
+          8.8203125,
+          8.69970703125
+        ],
+        "processesBefore": [
+          {
+            "pid": 410,
+            "cpuPercent": 38.8,
+            "name": "WindowServer"
+          },
+          {
+            "pid": 23310,
+            "cpuPercent": 13.3,
+            "name": "Claude Helper"
+          },
+          {
+            "pid": 23368,
+            "cpuPercent": 12.9,
+            "name": "Claude Helper (Renderer)"
+          },
+          {
+            "pid": 44246,
+            "cpuPercent": 12,
+            "name": "Codex (Service)"
+          },
+          {
+            "pid": 44311,
+            "cpuPercent": 13,
+            "name": "Codex (Renderer)"
+          },
+          {
+            "pid": 57416,
+            "cpuPercent": 22.7,
+            "name": "node"
+          }
+        ],
+        "loadAfter": [
+          6.5126953125,
+          8.806640625,
+          8.6953125
+        ],
+        "processesAfter": [
+          {
+            "pid": 410,
+            "cpuPercent": 47.4,
+            "name": "WindowServer"
+          },
+          {
+            "pid": 23310,
+            "cpuPercent": 10.2,
+            "name": "Claude Helper"
+          },
+          {
+            "pid": 23368,
+            "cpuPercent": 18.1,
+            "name": "Claude Helper (Renderer)"
+          },
+          {
+            "pid": 39748,
+            "cpuPercent": 15.2,
+            "name": "XprotectService"
+          },
+          {
+            "pid": 57416,
+            "cpuPercent": 37.5,
+            "name": "node"
+          }
+        ]
+      },
+      "acceptedAttempt": 3,
+      "sampleScope": "Separate complete condition; no rejected samples pooled"
+    }
+  ],
+  "unmeasuredConditions": [
+    {
+      "runtime": "native",
+      "case": "sankey/medium",
+      "stage": "render-source"
+    },
+    {
+      "runtime": "native",
+      "case": "sankey/medium",
+      "stage": "render-retained"
+    },
+    {
+      "runtime": "native",
+      "case": "sequence/medium",
+      "stage": "parse-public"
+    },
+    {
+      "runtime": "native",
+      "case": "sequence/medium",
+      "stage": "parse"
+    },
+    {
+      "runtime": "native",
+      "case": "sequence/medium",
+      "stage": "render-source"
+    },
+    {
+      "runtime": "native",
+      "case": "sequence/medium",
+      "stage": "render-retained"
+    },
+    {
+      "runtime": "swift",
+      "case": "sankey/medium",
+      "stage": "parseMutable"
+    },
+    {
+      "runtime": "swift",
+      "case": "sankey/medium",
+      "stage": "lifetime"
+    },
+    {
+      "runtime": "swift",
+      "case": "sankey/medium",
+      "stage": "parse"
+    },
+    {
+      "runtime": "swift",
+      "case": "sequence/medium",
+      "stage": "parseMutable"
+    },
+    {
+      "runtime": "swift",
+      "case": "sequence/medium",
+      "stage": "lifetime"
+    },
+    {
+      "runtime": "swift",
+      "case": "sequence/medium",
+      "stage": "parse"
+    }
+  ],
+  "rejectedConditionAttempts": [
+    {
+      "condition": "native-sankey-medium-parse-public",
+      "attempt": 1,
+      "log": "logs/owned-public-condition-native-sankey-medium-parse-public-attempt1.log.gz"
+    },
+    {
+      "condition": "native-sankey-medium-parse-public",
+      "attempt": 2,
+      "log": "logs/owned-public-condition-native-sankey-medium-parse-public-attempt2.log.gz"
+    },
+    {
+      "condition": "native-sankey-medium-parse",
+      "attempt": 1,
+      "log": "logs/owned-public-condition-native-sankey-medium-parse-attempt1.log.gz"
+    },
+    {
+      "condition": "native-sankey-medium-parse",
+      "attempt": 2,
+      "log": "logs/owned-public-condition-native-sankey-medium-parse-attempt2.log.gz"
+    },
+    {
+      "condition": "native-sankey-medium-render-source",
+      "attempt": 1,
+      "log": "logs/owned-public-condition-native-sankey-medium-render-source-attempt1.log.gz"
+    }
+  ],
+  "rows": {
+    "comparison": [
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": -8.652666869425607,
+        "lowerPairs": 20,
+        "controlMedianMs": 0.06304687261581421,
+        "candidateMedianMs": 0.05773437023162842,
+        "candidateOverJS": 15.081638452166398,
+        "pairedRatioMAD": 0.030145015545263498
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": 0.08130267887906939,
+        "lowerPairs": 10,
+        "controlMedianMs": 0.09609374403953552,
+        "candidateMedianMs": 0.09617187082767487,
+        "candidateOverJS": 3.996753172360536,
+        "pairedRatioMAD": 0.013664421336530674
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": -0.7199314507934207,
+        "lowerPairs": 15,
+        "controlMedianMs": 0.055820316076278687,
+        "candidateMedianMs": 0.054609380662441254,
+        "candidateOverJS": 1.9525142105467856,
+        "pairedRatioMAD": 0.013280976357347485
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": -9.687701759246414,
+        "lowerPairs": 19,
+        "controlMedianMs": 0.06062500178813934,
+        "candidateMedianMs": 0.055156245827674866,
+        "candidateOverJS": 14.708317024857099,
+        "pairedRatioMAD": 0.023626592181339445
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": 2.105259165906448,
+        "lowerPairs": 9,
+        "controlMedianMs": 0.10265625268220901,
+        "candidateMedianMs": 0.10417968779802322,
+        "candidateOverJS": 3.9278356365250295,
+        "pairedRatioMAD": 0.05878610201627499
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": 0.13642877197712622,
+        "lowerPairs": 10,
+        "controlMedianMs": 0.061054691672325134,
+        "candidateMedianMs": 0.06058593839406967,
+        "candidateOverJS": 1.8891598000559426,
+        "pairedRatioMAD": 0.025036764619865037
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "fixed",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": 0.5837349713661011,
+        "lowerPairs": 9,
+        "controlMedianMs": 0.42921876907348633,
+        "candidateMedianMs": 0.4307812452316284,
+        "candidateOverJS": 11.475547727684564,
+        "pairedRatioMAD": 0.02410274012588176
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "fixed",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": -2.7787942167516566,
+        "lowerPairs": 11,
+        "controlMedianMs": 0.40406250953674316,
+        "candidateMedianMs": 0.4026562571525574,
+        "candidateOverJS": 5.614378998056083,
+        "pairedRatioMAD": 0.05158794553749935
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": 0.738659829641497,
+        "lowerPairs": 6,
+        "controlMedianMs": 0.22078125178813934,
+        "candidateMedianMs": 0.22078125178813934,
+        "candidateOverJS": 1.9810725235705966,
+        "pairedRatioMAD": 0.008670100239876577
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "canvas",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": -0.10961156640705294,
+        "lowerPairs": 12,
+        "controlMedianMs": 0.4398437440395355,
+        "candidateMedianMs": 0.4426562488079071,
+        "candidateOverJS": 11.388943819673331,
+        "pairedRatioMAD": 0.02864232676673495
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "canvas",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": -1.1047653924851186,
+        "lowerPairs": 14,
+        "controlMedianMs": 0.42515623569488525,
+        "candidateMedianMs": 0.4164062738418579,
+        "candidateOverJS": 4.712643773143571,
+        "pairedRatioMAD": 0.02681081593193335
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": -0.8036322530399986,
+        "lowerPairs": 14,
+        "controlMedianMs": 0.2318750023841858,
+        "candidateMedianMs": 0.22859373688697815,
+        "candidateOverJS": 1.6977079945073674,
+        "pairedRatioMAD": 0.026428658938878136
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": -10.409993822805108,
+        "lowerPairs": 18,
+        "controlMedianMs": 0.23921874165534973,
+        "candidateMedianMs": 0.21242187917232513,
+        "candidateOverJS": 11.376567626871585,
+        "pairedRatioMAD": 0.05446694116407458
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": -0.19556540203899964,
+        "lowerPairs": 11,
+        "controlMedianMs": 0.4896875023841858,
+        "candidateMedianMs": 0.4950000047683716,
+        "candidateOverJS": 2.831099208505718,
+        "pairedRatioMAD": 0.034435742565409155
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": 1.1315797504625857,
+        "lowerPairs": 3,
+        "controlMedianMs": 0.2785937488079071,
+        "candidateMedianMs": 0.28398437798023224,
+        "candidateOverJS": 1.379506635872095,
+        "pairedRatioMAD": 0.011044347210369176
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": -10.890153818514337,
+        "lowerPairs": 16,
+        "controlMedianMs": 0.26640625298023224,
+        "candidateMedianMs": 0.2205468714237213,
+        "candidateOverJS": 11.40605866309909,
+        "pairedRatioMAD": 0.078543569547192
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": -0.412695748465397,
+        "lowerPairs": 11,
+        "controlMedianMs": 0.4998437464237213,
+        "candidateMedianMs": 0.4984374940395355,
+        "candidateOverJS": 2.6993864446464997,
+        "pairedRatioMAD": 0.030663657561296853
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": -0.9809091691944216,
+        "lowerPairs": 12,
+        "controlMedianMs": 0.32414063811302185,
+        "candidateMedianMs": 0.31257812678813934,
+        "candidateOverJS": 1.4340503050595879,
+        "pairedRatioMAD": 0.02272048989148434
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": -11.186911373671505,
+        "lowerPairs": 17,
+        "controlMedianMs": 0.9337500333786011,
+        "candidateMedianMs": 0.8284375071525574,
+        "candidateOverJS": 10.776422690160135,
+        "pairedRatioMAD": 0.24548616558273806
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": -0.6913929063893431,
+        "lowerPairs": 11,
+        "controlMedianMs": 1.9731249809265137,
+        "candidateMedianMs": 1.9399999380111694,
+        "candidateOverJS": 2.7634096414286478,
+        "pairedRatioMAD": 0.06048417890603164
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": 1.5984286785631463,
+        "lowerPairs": 7,
+        "controlMedianMs": 1.1418750286102295,
+        "candidateMedianMs": 1.1793749928474426,
+        "candidateOverJS": 1.4355268617308583,
+        "pairedRatioMAD": 0.04874901061658643
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "parse",
+        "trials": 21,
+        "pairedPercent": -10.500850002279705,
+        "lowerPairs": 15,
+        "controlMedianMs": 0.9534375071525574,
+        "candidateMedianMs": 0.8071874976158142,
+        "candidateOverJS": 8.910737155273885,
+        "pairedRatioMAD": 0.17101271162180487
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "render-model",
+        "trials": 21,
+        "pairedPercent": 0.2871673414201581,
+        "lowerPairs": 9,
+        "controlMedianMs": 1.9587500095367432,
+        "candidateMedianMs": 1.9712499380111694,
+        "candidateOverJS": 2.541498742625354,
+        "pairedRatioMAD": 0.045628723848686104
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 21,
+        "pairedPercent": 1.9173670408497046,
+        "lowerPairs": 3,
+        "controlMedianMs": 1.1737499833106995,
+        "candidateMedianMs": 1.1949999928474426,
+        "candidateOverJS": 1.3541076515952128,
+        "pairedRatioMAD": 0.009924188905897413
+      }
+    ],
+    "first-use": [
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": 0.0686697842731343,
+        "lowerPairs": 7,
+        "controlMedianMs": 0.05625000596046448,
+        "candidateMedianMs": 0.056132808327674866,
+        "candidateOverJS": 1.9392711508494007,
+        "pairedRatioMAD": 0.0183376367166731
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": -5.231743244990117,
+        "lowerPairs": 12,
+        "controlMedianMs": 0.20183593779802322,
+        "candidateMedianMs": 0.1860937550663948,
+        "candidateOverJS": 6.260185205839545,
+        "pairedRatioMAD": 0.028239838358750324
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": -8.541977792956668,
+        "lowerPairs": 13,
+        "controlMedianMs": 0.2731249928474426,
+        "candidateMedianMs": 0.25328125059604645,
+        "candidateOverJS": 8.955801409172398,
+        "pairedRatioMAD": 0.07584901435395175
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": 1.1627781066134713,
+        "lowerPairs": 5,
+        "controlMedianMs": 0.057499997317790985,
+        "candidateMedianMs": 0.05777343362569809,
+        "candidateOverJS": 1.908386968797253,
+        "pairedRatioMAD": 0.018452127362391435
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": -7.375177948278533,
+        "lowerPairs": 13,
+        "controlMedianMs": 0.1958593726158142,
+        "candidateMedianMs": 0.18257813155651093,
+        "candidateOverJS": 5.631324726979167,
+        "pairedRatioMAD": 0.02729492798353239
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": -0.43936620155814454,
+        "lowerPairs": 9,
+        "controlMedianMs": 0.275390625,
+        "candidateMedianMs": 0.27585937082767487,
+        "candidateOverJS": 7.934829980257874,
+        "pairedRatioMAD": 0.06879833436627292
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": 1.449787261164115,
+        "lowerPairs": 3,
+        "controlMedianMs": 0.21382811665534973,
+        "candidateMedianMs": 0.21968749165534973,
+        "candidateOverJS": 1.9936191381232056,
+        "pairedRatioMAD": 0.013377189528619216
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "fixed",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": -3.3065831017369263,
+        "lowerPairs": 10,
+        "controlMedianMs": 0.9734375476837158,
+        "candidateMedianMs": 0.9412500262260437,
+        "candidateOverJS": 8.099496023995536,
+        "pairedRatioMAD": 0.04664512996317405
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "fixed",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": 0.36754893433341707,
+        "lowerPairs": 6,
+        "controlMedianMs": 1.0834375023841858,
+        "candidateMedianMs": 1.0868750214576721,
+        "candidateOverJS": 8.53758884549217,
+        "pairedRatioMAD": 0.08224497269524489
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": 0.6273973573548863,
+        "lowerPairs": 6,
+        "controlMedianMs": 0.22679688036441803,
+        "candidateMedianMs": 0.22929687798023224,
+        "candidateOverJS": 1.8122878008358179,
+        "pairedRatioMAD": 0.017997897412437958
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "canvas",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": -0.5445941080457817,
+        "lowerPairs": 9,
+        "controlMedianMs": 0.9350000023841858,
+        "candidateMedianMs": 0.9284374713897705,
+        "candidateOverJS": 7.141826555645377,
+        "pairedRatioMAD": 0.016731410306888406
+      },
+      {
+        "case": "sequence/medium",
+        "profile": "canvas",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": -1.145041929748425,
+        "lowerPairs": 14,
+        "controlMedianMs": 1.0634375214576721,
+        "candidateMedianMs": 1.0521875023841858,
+        "candidateOverJS": 7.634920503624368,
+        "pairedRatioMAD": 0.010562881428430648
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": -1.8617820608081037,
+        "lowerPairs": 9,
+        "controlMedianMs": 0.27687498927116394,
+        "candidateMedianMs": 0.2727343738079071,
+        "candidateOverJS": 1.4705139083397656,
+        "pairedRatioMAD": 0.0283823282349559
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": 2.242153872712427,
+        "lowerPairs": 7,
+        "controlMedianMs": 0.8431249856948853,
+        "candidateMedianMs": 0.8740624785423279,
+        "candidateOverJS": 4.20917974321117,
+        "pairedRatioMAD": 0.1351026265604025
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": -3.8104133315394306,
+        "lowerPairs": 11,
+        "controlMedianMs": 1.0087500214576721,
+        "candidateMedianMs": 0.9709375500679016,
+        "candidateOverJS": 4.804020369480785,
+        "pairedRatioMAD": 0.016693544515794634
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": -2.4664881906481417,
+        "lowerPairs": 14,
+        "controlMedianMs": 0.2925781160593033,
+        "candidateMedianMs": 0.28882811963558197,
+        "candidateOverJS": 1.4132262816894385,
+        "pairedRatioMAD": 0.008799188332616836
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": -3.1752372782410054,
+        "lowerPairs": 10,
+        "controlMedianMs": 0.7934374809265137,
+        "candidateMedianMs": 0.7628124952316284,
+        "candidateOverJS": 3.7281404123179325,
+        "pairedRatioMAD": 0.05919156353585808
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": -4.724885782957755,
+        "lowerPairs": 10,
+        "controlMedianMs": 1.0740625262260437,
+        "candidateMedianMs": 1.0378124713897705,
+        "candidateOverJS": 4.397219475791635,
+        "pairedRatioMAD": 0.06335641938622882
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": -1.2714234050337558,
+        "lowerPairs": 10,
+        "controlMedianMs": 1.1337500214576721,
+        "candidateMedianMs": 1.1299999952316284,
+        "candidateOverJS": 1.4064565714686323,
+        "pairedRatioMAD": 0.013522469634217993
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": -4.533445468422426,
+        "lowerPairs": 10,
+        "controlMedianMs": 2.8837499618530273,
+        "candidateMedianMs": 2.8324999809265137,
+        "candidateOverJS": 3.4861538226787863,
+        "pairedRatioMAD": 0.046393627384566316
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": -6.381626986633837,
+        "lowerPairs": 13,
+        "controlMedianMs": 3.7562501430511475,
+        "candidateMedianMs": 3.5687499046325684,
+        "candidateOverJS": 4.528151919933109,
+        "pairedRatioMAD": 0.03309163049065866
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "trials": 15,
+        "pairedPercent": -2.1463664909969205,
+        "lowerPairs": 11,
+        "controlMedianMs": 1.2271875143051147,
+        "candidateMedianMs": 1.1859374642372131,
+        "candidateOverJS": 1.3582676496133728,
+        "pairedRatioMAD": 0.020161252600074286
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "parse-first-render",
+        "trials": 15,
+        "pairedPercent": -0.973523951337063,
+        "lowerPairs": 8,
+        "controlMedianMs": 3.015000104904175,
+        "candidateMedianMs": 3.1418750286102295,
+        "candidateOverJS": 3.700404881605037,
+        "pairedRatioMAD": 0.07477760487779495
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "parse-first-edited-render",
+        "trials": 15,
+        "pairedPercent": -2.4785194789395892,
+        "lowerPairs": 13,
+        "controlMedianMs": 3.8525002002716064,
+        "candidateMedianMs": 3.7487502098083496,
+        "candidateOverJS": 4.295023465919443,
+        "pairedRatioMAD": 0.021793231841672256
+      }
+    ]
+  },
+  "groups": {
+    "comparison": {
+      "sankey/parse": {
+        "rows": 6,
+        "pairedLowerRows": 6,
+        "medianPairedPercent": -10.455421912542405,
+        "minPairedPercent": -11.186911373671505,
+        "maxPairedPercent": -8.652666869425607,
+        "adverseRows": []
+      },
+      "sankey/render-model": {
+        "rows": 6,
+        "pairedLowerRows": 3,
+        "medianPairedPercent": -0.05713136157996512,
+        "minPairedPercent": -0.6913929063893431,
+        "maxPairedPercent": 2.105259165906448,
+        "adverseRows": [
+          {
+            "case": "sankey/small",
+            "profile": "fixed",
+            "stage": "render-model",
+            "trials": 21,
+            "pairedPercent": 0.08130267887906939,
+            "lowerPairs": 10,
+            "controlMedianMs": 0.09609374403953552,
+            "candidateMedianMs": 0.09617187082767487,
+            "candidateOverJS": 3.996753172360536,
+            "pairedRatioMAD": 0.013664421336530674
+          },
+          {
+            "case": "sankey/small",
+            "profile": "canvas",
+            "stage": "render-model",
+            "trials": 21,
+            "pairedPercent": 2.105259165906448,
+            "lowerPairs": 9,
+            "controlMedianMs": 0.10265625268220901,
+            "candidateMedianMs": 0.10417968779802322,
+            "candidateOverJS": 3.9278356365250295,
+            "pairedRatioMAD": 0.05878610201627499
+          },
+          {
+            "case": "sankey/large",
+            "profile": "canvas",
+            "stage": "render-model",
+            "trials": 21,
+            "pairedPercent": 0.2871673414201581,
+            "lowerPairs": 9,
+            "controlMedianMs": 1.9587500095367432,
+            "candidateMedianMs": 1.9712499380111694,
+            "candidateOverJS": 2.541498742625354,
+            "pairedRatioMAD": 0.045628723848686104
+          }
+        ]
+      },
+      "sankey/render-source": {
+        "rows": 6,
+        "pairedLowerRows": 2,
+        "medianPairedPercent": 0.634004261219856,
+        "minPairedPercent": -0.9809091691944216,
+        "maxPairedPercent": 1.9173670408497046,
+        "adverseRows": [
+          {
+            "case": "sankey/small",
+            "profile": "canvas",
+            "stage": "render-source",
+            "trials": 21,
+            "pairedPercent": 0.13642877197712622,
+            "lowerPairs": 10,
+            "controlMedianMs": 0.061054691672325134,
+            "candidateMedianMs": 0.06058593839406967,
+            "candidateOverJS": 1.8891598000559426,
+            "pairedRatioMAD": 0.025036764619865037
+          },
+          {
+            "case": "sankey/medium",
+            "profile": "fixed",
+            "stage": "render-source",
+            "trials": 21,
+            "pairedPercent": 1.1315797504625857,
+            "lowerPairs": 3,
+            "controlMedianMs": 0.2785937488079071,
+            "candidateMedianMs": 0.28398437798023224,
+            "candidateOverJS": 1.379506635872095,
+            "pairedRatioMAD": 0.011044347210369176
+          },
+          {
+            "case": "sankey/large",
+            "profile": "fixed",
+            "stage": "render-source",
+            "trials": 21,
+            "pairedPercent": 1.5984286785631463,
+            "lowerPairs": 7,
+            "controlMedianMs": 1.1418750286102295,
+            "candidateMedianMs": 1.1793749928474426,
+            "candidateOverJS": 1.4355268617308583,
+            "pairedRatioMAD": 0.04874901061658643
+          },
+          {
+            "case": "sankey/large",
+            "profile": "canvas",
+            "stage": "render-source",
+            "trials": 21,
+            "pairedPercent": 1.9173670408497046,
+            "lowerPairs": 3,
+            "controlMedianMs": 1.1737499833106995,
+            "candidateMedianMs": 1.1949999928474426,
+            "candidateOverJS": 1.3541076515952128,
+            "pairedRatioMAD": 0.009924188905897413
+          }
+        ]
+      },
+      "sequence/parse": {
+        "rows": 2,
+        "pairedLowerRows": 1,
+        "medianPairedPercent": 0.23706170247952407,
+        "minPairedPercent": -0.10961156640705294,
+        "maxPairedPercent": 0.5837349713661011,
+        "adverseRows": [
+          {
+            "case": "sequence/medium",
+            "profile": "fixed",
+            "stage": "parse",
+            "trials": 21,
+            "pairedPercent": 0.5837349713661011,
+            "lowerPairs": 9,
+            "controlMedianMs": 0.42921876907348633,
+            "candidateMedianMs": 0.4307812452316284,
+            "candidateOverJS": 11.475547727684564,
+            "pairedRatioMAD": 0.02410274012588176
+          }
+        ]
+      },
+      "sequence/render-model": {
+        "rows": 2,
+        "pairedLowerRows": 2,
+        "medianPairedPercent": -1.9417798046183876,
+        "minPairedPercent": -2.7787942167516566,
+        "maxPairedPercent": -1.1047653924851186,
+        "adverseRows": []
+      },
+      "sequence/render-source": {
+        "rows": 2,
+        "pairedLowerRows": 1,
+        "medianPairedPercent": -0.03248621169925081,
+        "minPairedPercent": -0.8036322530399986,
+        "maxPairedPercent": 0.738659829641497,
+        "adverseRows": [
+          {
+            "case": "sequence/medium",
+            "profile": "fixed",
+            "stage": "render-source",
+            "trials": 21,
+            "pairedPercent": 0.738659829641497,
+            "lowerPairs": 6,
+            "controlMedianMs": 0.22078125178813934,
+            "candidateMedianMs": 0.22078125178813934,
+            "candidateOverJS": 1.9810725235705966,
+            "pairedRatioMAD": 0.008670100239876577
+          }
+        ]
+      }
+    },
+    "first-use": {
+      "sankey/parse-first-edited-render": {
+        "rows": 6,
+        "pairedLowerRows": 6,
+        "medianPairedPercent": -4.267649557248593,
+        "minPairedPercent": -8.541977792956668,
+        "maxPairedPercent": -0.43936620155814454,
+        "adverseRows": []
+      },
+      "sankey/parse-first-render": {
+        "rows": 6,
+        "pairedLowerRows": 5,
+        "medianPairedPercent": -3.8543413733317156,
+        "minPairedPercent": -7.375177948278533,
+        "maxPairedPercent": 2.242153872712427,
+        "adverseRows": [
+          {
+            "case": "sankey/medium",
+            "profile": "fixed",
+            "stage": "parse-first-render",
+            "trials": 15,
+            "pairedPercent": 2.242153872712427,
+            "lowerPairs": 7,
+            "controlMedianMs": 0.8431249856948853,
+            "candidateMedianMs": 0.8740624785423279,
+            "candidateOverJS": 4.20917974321117,
+            "pairedRatioMAD": 0.1351026265604025
+          }
+        ]
+      },
+      "sankey/render-source": {
+        "rows": 6,
+        "pairedLowerRows": 4,
+        "medianPairedPercent": -1.5666027329209298,
+        "minPairedPercent": -2.4664881906481417,
+        "maxPairedPercent": 1.1627781066134713,
+        "adverseRows": [
+          {
+            "case": "sankey/small",
+            "profile": "fixed",
+            "stage": "render-source",
+            "trials": 15,
+            "pairedPercent": 0.0686697842731343,
+            "lowerPairs": 7,
+            "controlMedianMs": 0.05625000596046448,
+            "candidateMedianMs": 0.056132808327674866,
+            "candidateOverJS": 1.9392711508494007,
+            "pairedRatioMAD": 0.0183376367166731
+          },
+          {
+            "case": "sankey/small",
+            "profile": "canvas",
+            "stage": "render-source",
+            "trials": 15,
+            "pairedPercent": 1.1627781066134713,
+            "lowerPairs": 5,
+            "controlMedianMs": 0.057499997317790985,
+            "candidateMedianMs": 0.05777343362569809,
+            "candidateOverJS": 1.908386968797253,
+            "pairedRatioMAD": 0.018452127362391435
+          }
+        ]
+      },
+      "sequence/parse-first-edited-render": {
+        "rows": 2,
+        "pairedLowerRows": 1,
+        "medianPairedPercent": -0.3887464977075039,
+        "minPairedPercent": -1.145041929748425,
+        "maxPairedPercent": 0.36754893433341707,
+        "adverseRows": [
+          {
+            "case": "sequence/medium",
+            "profile": "fixed",
+            "stage": "parse-first-edited-render",
+            "trials": 15,
+            "pairedPercent": 0.36754893433341707,
+            "lowerPairs": 6,
+            "controlMedianMs": 1.0834375023841858,
+            "candidateMedianMs": 1.0868750214576721,
+            "candidateOverJS": 8.53758884549217,
+            "pairedRatioMAD": 0.08224497269524489
+          }
+        ]
+      },
+      "sequence/parse-first-render": {
+        "rows": 2,
+        "pairedLowerRows": 2,
+        "medianPairedPercent": -1.925588604891354,
+        "minPairedPercent": -3.3065831017369263,
+        "maxPairedPercent": -0.5445941080457817,
+        "adverseRows": []
+      },
+      "sequence/render-source": {
+        "rows": 2,
+        "pairedLowerRows": 0,
+        "medianPairedPercent": 1.0385923092595006,
+        "minPairedPercent": 0.6273973573548863,
+        "maxPairedPercent": 1.449787261164115,
+        "adverseRows": [
+          {
+            "case": "sequence/medium",
+            "profile": "fixed",
+            "stage": "render-source",
+            "trials": 15,
+            "pairedPercent": 1.449787261164115,
+            "lowerPairs": 3,
+            "controlMedianMs": 0.21382811665534973,
+            "candidateMedianMs": 0.21968749165534973,
+            "candidateOverJS": 1.9936191381232056,
+            "pairedRatioMAD": 0.013377189528619216
+          },
+          {
+            "case": "sequence/medium",
+            "profile": "canvas",
+            "stage": "render-source",
+            "trials": 15,
+            "pairedPercent": 0.6273973573548863,
+            "lowerPairs": 6,
+            "controlMedianMs": 0.22679688036441803,
+            "candidateMedianMs": 0.22929687798023224,
+            "candidateOverJS": 1.8122878008358179,
+            "pairedRatioMAD": 0.017997897412437958
+          }
+        ]
+      }
+    }
+  },
+  "orders": {
+    "comparison": {
+      "derivedFromFrozenHarness": true,
+      "trials": [
+        [
+          "js",
+          "control",
+          "candidate"
+        ],
+        [
+          "control",
+          "candidate",
+          "js"
+        ],
+        [
+          "candidate",
+          "js",
+          "control"
+        ],
+        [
+          "candidate",
+          "control",
+          "js"
+        ],
+        [
+          "js",
+          "candidate",
+          "control"
+        ],
+        [
+          "control",
+          "js",
+          "candidate"
+        ],
+        [
+          "js",
+          "control",
+          "candidate"
+        ],
+        [
+          "control",
+          "candidate",
+          "js"
+        ],
+        [
+          "candidate",
+          "js",
+          "control"
+        ],
+        [
+          "candidate",
+          "control",
+          "js"
+        ],
+        [
+          "js",
+          "candidate",
+          "control"
+        ],
+        [
+          "control",
+          "js",
+          "candidate"
+        ],
+        [
+          "js",
+          "control",
+          "candidate"
+        ],
+        [
+          "control",
+          "candidate",
+          "js"
+        ],
+        [
+          "candidate",
+          "js",
+          "control"
+        ],
+        [
+          "candidate",
+          "control",
+          "js"
+        ],
+        [
+          "js",
+          "candidate",
+          "control"
+        ],
+        [
+          "control",
+          "js",
+          "candidate"
+        ],
+        [
+          "js",
+          "control",
+          "candidate"
+        ],
+        [
+          "control",
+          "candidate",
+          "js"
+        ],
+        [
+          "candidate",
+          "js",
+          "control"
+        ]
+      ],
+      "controlBeforeCandidate": 11,
+      "note": "Raw report does not store per-trial orders; derived from hashed harness. Three-way positions balanced, two-side first order differs by one."
+    },
+    "first-use": {
+      "derivedFromFrozenHarness": true,
+      "trials": [
+        [
+          "js",
+          "control",
+          "candidate"
+        ],
+        [
+          "control",
+          "candidate",
+          "js"
+        ],
+        [
+          "candidate",
+          "js",
+          "control"
+        ],
+        [
+          "candidate",
+          "control",
+          "js"
+        ],
+        [
+          "js",
+          "candidate",
+          "control"
+        ],
+        [
+          "control",
+          "js",
+          "candidate"
+        ],
+        [
+          "js",
+          "control",
+          "candidate"
+        ],
+        [
+          "control",
+          "candidate",
+          "js"
+        ],
+        [
+          "candidate",
+          "js",
+          "control"
+        ],
+        [
+          "candidate",
+          "control",
+          "js"
+        ],
+        [
+          "js",
+          "candidate",
+          "control"
+        ],
+        [
+          "control",
+          "js",
+          "candidate"
+        ],
+        [
+          "js",
+          "control",
+          "candidate"
+        ],
+        [
+          "control",
+          "candidate",
+          "js"
+        ],
+        [
+          "candidate",
+          "js",
+          "control"
+        ]
+      ],
+      "controlBeforeCandidate": 8,
+      "note": "Raw report does not store per-trial orders; derived from hashed harness. Three-way positions balanced, two-side first order differs by one."
+    }
+  },
+  "allocationRows": [
+    {
+      "case": "sequence/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "control": {
+        "allocations": 2820,
+        "checksum": 8,
+        "freedBytes": 285121,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 68980,
+        "reallocations": 757,
+        "requestedBytes": 285121
+      },
+      "candidate": {
+        "allocations": 2820,
+        "checksum": 8,
+        "freedBytes": 285121,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 68588,
+        "reallocations": 757,
+        "requestedBytes": 285121
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": -392,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse",
+      "count": 1,
+      "control": {
+        "allocations": 771,
+        "checksum": 8,
+        "freedBytes": 113087,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 55897,
+        "reallocations": 18,
+        "requestedBytes": 113087
+      },
+      "candidate": {
+        "allocations": 771,
+        "checksum": 8,
+        "freedBytes": 113087,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 55897,
+        "reallocations": 18,
+        "requestedBytes": 113087
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-source",
+      "count": 1,
+      "control": {
+        "allocations": 2032,
+        "checksum": 68829427898793360,
+        "freedBytes": 316615,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 76303,
+        "reallocations": 234,
+        "requestedBytes": 316615
+      },
+      "candidate": {
+        "allocations": 2032,
+        "checksum": 68829427898793360,
+        "freedBytes": 316615,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 76303,
+        "reallocations": 234,
+        "requestedBytes": 316615
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "control": {
+        "allocations": 1261,
+        "checksum": 68829427898793360,
+        "freedBytes": 203528,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 62645,
+        "reallocations": 216,
+        "requestedBytes": 203528
+      },
+      "candidate": {
+        "allocations": 1261,
+        "checksum": 68829427898793360,
+        "freedBytes": 203528,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 62645,
+        "reallocations": 216,
+        "requestedBytes": 203528
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "control": {
+        "allocations": 1002,
+        "checksum": 6,
+        "freedBytes": 110400,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 39439,
+        "reallocations": 39,
+        "requestedBytes": 110400
+      },
+      "candidate": {
+        "allocations": 882,
+        "checksum": 6,
+        "freedBytes": 93876,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 35171,
+        "reallocations": 39,
+        "requestedBytes": 93876
+      },
+      "changes": {
+        "allocations": -120,
+        "reallocations": 0,
+        "requestedBytes": -16524,
+        "freedBytes": -16524,
+        "peakAdditionalRequestedBytes": -4268,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse",
+      "count": 1,
+      "control": {
+        "allocations": 395,
+        "checksum": 6,
+        "freedBytes": 47732,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23233,
+        "reallocations": 16,
+        "requestedBytes": 47732
+      },
+      "candidate": {
+        "allocations": 395,
+        "checksum": 6,
+        "freedBytes": 47732,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23233,
+        "reallocations": 16,
+        "requestedBytes": 47732
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-source",
+      "count": 1,
+      "control": {
+        "allocations": 2322,
+        "checksum": 70157637945155864,
+        "freedBytes": 294243,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107186,
+        "reallocations": 225,
+        "requestedBytes": 294243
+      },
+      "candidate": {
+        "allocations": 2322,
+        "checksum": 70157637945155864,
+        "freedBytes": 294243,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107186,
+        "reallocations": 225,
+        "requestedBytes": 294243
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "control": {
+        "allocations": 1927,
+        "checksum": 70157637945155864,
+        "freedBytes": 246511,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 100005,
+        "reallocations": 209,
+        "requestedBytes": 246511
+      },
+      "candidate": {
+        "allocations": 1927,
+        "checksum": 70157637945155864,
+        "freedBytes": 246511,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 100005,
+        "reallocations": 209,
+        "requestedBytes": 246511
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse-public",
+      "count": 16,
+      "control": {
+        "allocations": 45120,
+        "checksum": 128,
+        "freedBytes": 4561936,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 68980,
+        "reallocations": 12112,
+        "requestedBytes": 4561936
+      },
+      "candidate": {
+        "allocations": 45120,
+        "checksum": 128,
+        "freedBytes": 4561936,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 68588,
+        "reallocations": 12112,
+        "requestedBytes": 4561936
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": -392,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse",
+      "count": 16,
+      "control": {
+        "allocations": 12336,
+        "checksum": 128,
+        "freedBytes": 1809392,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 55897,
+        "reallocations": 288,
+        "requestedBytes": 1809392
+      },
+      "candidate": {
+        "allocations": 12336,
+        "checksum": 128,
+        "freedBytes": 1809392,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 55897,
+        "reallocations": 288,
+        "requestedBytes": 1809392
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-source",
+      "count": 16,
+      "control": {
+        "allocations": 32512,
+        "checksum": 1101270846380693800,
+        "freedBytes": 5065840,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 76303,
+        "reallocations": 3744,
+        "requestedBytes": 5065840
+      },
+      "candidate": {
+        "allocations": 32512,
+        "checksum": 1101270846380693800,
+        "freedBytes": 5065840,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 76303,
+        "reallocations": 3744,
+        "requestedBytes": 5065840
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-retained",
+      "count": 16,
+      "control": {
+        "allocations": 20176,
+        "checksum": 1101270846380693800,
+        "freedBytes": 3256448,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 62645,
+        "reallocations": 3456,
+        "requestedBytes": 3256448
+      },
+      "candidate": {
+        "allocations": 20176,
+        "checksum": 1101270846380693800,
+        "freedBytes": 3256448,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 62645,
+        "reallocations": 3456,
+        "requestedBytes": 3256448
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse-public",
+      "count": 16,
+      "control": {
+        "allocations": 16032,
+        "checksum": 96,
+        "freedBytes": 1766400,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 39439,
+        "reallocations": 624,
+        "requestedBytes": 1766400
+      },
+      "candidate": {
+        "allocations": 14112,
+        "checksum": 96,
+        "freedBytes": 1502016,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 35171,
+        "reallocations": 624,
+        "requestedBytes": 1502016
+      },
+      "changes": {
+        "allocations": -1920,
+        "reallocations": 0,
+        "requestedBytes": -264384,
+        "freedBytes": -264384,
+        "peakAdditionalRequestedBytes": -4268,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse",
+      "count": 16,
+      "control": {
+        "allocations": 6320,
+        "checksum": 96,
+        "freedBytes": 763712,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23233,
+        "reallocations": 256,
+        "requestedBytes": 763712
+      },
+      "candidate": {
+        "allocations": 6320,
+        "checksum": 96,
+        "freedBytes": 763712,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23233,
+        "reallocations": 256,
+        "requestedBytes": 763712
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-source",
+      "count": 16,
+      "control": {
+        "allocations": 37152,
+        "checksum": 1122522207122493800,
+        "freedBytes": 4707888,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107186,
+        "reallocations": 3600,
+        "requestedBytes": 4707888
+      },
+      "candidate": {
+        "allocations": 37152,
+        "checksum": 1122522207122493800,
+        "freedBytes": 4707888,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107186,
+        "reallocations": 3600,
+        "requestedBytes": 4707888
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-retained",
+      "count": 16,
+      "control": {
+        "allocations": 30832,
+        "checksum": 1122522207122493800,
+        "freedBytes": 3944176,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 100005,
+        "reallocations": 3344,
+        "requestedBytes": 3944176
+      },
+      "candidate": {
+        "allocations": 30832,
+        "checksum": 1122522207122493800,
+        "freedBytes": 3944176,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 100005,
+        "reallocations": 3344,
+        "requestedBytes": 3944176
+      },
+      "changes": {
+        "allocations": 0,
+        "reallocations": 0,
+        "requestedBytes": 0,
+        "freedBytes": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "liveBytesDelta": 0
+      }
+    }
+  ],
+  "correctness": {
+    "status": "passed",
+    "elapsedTimingPerformed": false,
+    "swiftSelectedTests": 16,
+    "swiftScope": "ER+Sankey mutable corpus; 7 eager; 7 prepared/all-33 raw entries; existing nonfinite Sankey render/Codable",
+    "drawings": 12481,
+    "expectedErrors": 16572,
+    "explicitBudgetDifferences": 0,
+    "cConsumers": 3,
+    "cFlags": "-Wall -Wextra -Werror -std=c11",
+    "apiCases": 21,
+    "apiConditions": 168,
+    "sourceInputCount": 351,
+    "sourceInputSha256": "e497175b4d6bed2807a273302f2f409ce67c355ac53d07ae3c9603fbef036421",
+    "sourceAndSDKUnchangedAcrossCorrectness": true,
+    "nativeHostArchiveSha256": "ef1bdb0ef1b6660e4cc3288dde9bc8b2bec5da85f1d2e6ab7a2d1755b81308cf",
+    "candidateBinarySha256": "368ab53bad3b3fdd6daa82cce6a53932a8eed8ea922d5c7683370b4e3acbc0cf",
+    "controlBinarySha256": "554ef37b648587962511c5e9eaa7ef639c469d87be601996817a1c9d762957fa",
+    "commandsFile": "correctness-commands.json",
+    "beforeFile": "swift-correctness-before.json",
+    "afterFile": "swift-correctness-after.json"
+  },
+  "nativeTests": 32,
+  "browserTests": 51,
+  "sourceBinding": {
+    "webInputs": 657,
+    "swiftInputs": 351,
+    "nativeInputs": 277,
+    "nativeAggregate": "3459ae995ef2584a688a186281ea7b9c018d03ad50313a759d21459bc64bc9ab",
+    "nativeRecordedHead": "640deeed9ac8ba76359dca189487d13d1310ed55",
+    "actualSourceCommit": "b19f38d6368d1ea8183004d24c58af5828b3f577"
+  },
+  "limitations": [
+    "No release parity claim; historical full performance gate still fails all126 conditions",
+    "VM shared browser/GC/cache and serial warmup; no causal claim for controls",
+    "Profiles are candidate-only later samples, not paired before/after cost attribution",
+    "Allocation counters count requested bytes in scoped operations, not RSS or process footprint",
+    "First-use Sankey fixture covers unchanged/edited render, not a Sankey method/callback timing",
+    "Package physical recheck is local; report records VM input hashes but no additional independent remote rehash is claimed"
+  ]
+}
