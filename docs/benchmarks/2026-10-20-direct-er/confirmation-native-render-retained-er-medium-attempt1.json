@@ -1,0 +1,556 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T04:21:42.218Z",
+  "mode": "native-three-way-diagnostic",
+  "artifacts": {
+    "control": {
+      "binarySHA256": "fa70a5a879a3b87dba39cd1b8f45eeb2c511b51ca1588ba2ee3ef506ffce78f2",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "e1fed0dceb8b988b7f5b01a25a5a70e8e80d6231b23c051db1432ac6940f0ed4",
+        "revision": "4e9faeee1b802cf0fc1db2e4a04b0a81817618b3",
+        "builtAt": "2026-10-20T03:50:36.723Z",
+        "binaries": {
+          "pele-perf": "fa70a5a879a3b87dba39cd1b8f45eeb2c511b51ca1588ba2ee3ef506ffce78f2",
+          "pele-perf-alloc": "99b41789d10d97a7fb30d74327c2b74cd5bfebfb9c434a6911a7260bc185abf5"
+        }
+      }
+    },
+    "candidate": {
+      "binarySHA256": "9e3772a3a8a59df1fda0c7932f53331d03160105ffbc13255678f656ddb9e174",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "a81c89b02eccb359b288c4af2de85b8d465c9f770c4979033a958c91c69376a9",
+        "revision": "175daa8fd76fc1e25f488e4957b6970b4b6d4fe2",
+        "builtAt": "2026-10-20T04:07:26.697Z",
+        "binaries": {
+          "pele-perf": "9e3772a3a8a59df1fda0c7932f53331d03160105ffbc13255678f656ddb9e174",
+          "pele-perf-alloc": "c527c1e523433880b85d290906c032e45c40807e23c083fbaf78f1a2da2e1038"
+        }
+      }
+    }
+  },
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "settings": {
+    "trials": 15,
+    "warmupMs": 1000,
+    "matchedNativeBatchCounts": true,
+    "balancedCyclicAndReverseOrder": true,
+    "nativeTypedDocumentRetainedAcrossBatches": true,
+    "nativePublicStateFreshPerBatch": true,
+    "jsRetainedModelFreshPerBatch": true,
+    "stages": [
+      "render-retained"
+    ],
+    "selectedCases": [
+      "er/medium"
+    ],
+    "separateAllocationBinaries": false,
+    "fixedBatchCount": 16
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "loadBefore": [
+      5.28466796875,
+      5.71337890625,
+      6.85888671875
+    ],
+    "processesBefore": [
+      {
+        "pid": 410,
+        "cpuPercent": 46.1,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 14.7,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 69848,
+        "cpuPercent": 48.2,
+        "name": "Google Chrome Helper (Renderer)"
+      }
+    ],
+    "loadAfter": [
+      5.1015625,
+      5.66796875,
+      6.8359375
+    ],
+    "processesAfter": [
+      {
+        "pid": 410,
+        "cpuPercent": 39.7,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 8453,
+        "cpuPercent": 29,
+        "name": "node"
+      },
+      {
+        "pid": 8488,
+        "cpuPercent": 16.1,
+        "name": "pele-perf"
+      },
+      {
+        "pid": 8489,
+        "cpuPercent": 18.6,
+        "name": "pele-perf"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 10.5,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 69848,
+        "cpuPercent": 47,
+        "name": "Google Chrome Helper (Renderer)"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "er/medium",
+      "family": "er",
+      "scale": "medium",
+      "units": 48,
+      "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "jsRetainedBeforeVerified": true
+    }
+  ],
+  "rows": [
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1017073792,
+          "operations": 1382
+        },
+        "control": {
+          "elapsedNs": 1003458249,
+          "operations": 1094
+        },
+        "candidate": {
+          "elapsedNs": 1012042711,
+          "operations": 1318
+        }
+      },
+      "samples": {
+        "js": [
+          0.72103125,
+          0.7661640625,
+          0.703609375,
+          0.69466925,
+          0.66739325,
+          0.700841125,
+          0.67919275,
+          0.683359375,
+          0.6650365,
+          0.6750859375,
+          0.702921875,
+          0.6970520625,
+          0.6893515625,
+          0.6819010625,
+          0.6950181875
+        ],
+        "control": [
+          0.7451301875,
+          0.74146875,
+          0.72578125,
+          0.723083375,
+          0.7189921875,
+          0.726997375,
+          0.740559875,
+          0.7384765625,
+          0.745604125,
+          0.755828125,
+          0.7224166875,
+          0.7288489375,
+          0.7284921875,
+          0.720203125,
+          0.7355755625
+        ],
+        "candidate": [
+          0.7216015625,
+          0.7239323125,
+          0.7437056875,
+          0.7496614375,
+          0.7318775625,
+          0.7304948125,
+          0.738979125,
+          0.7286458125,
+          0.729802125,
+          0.78348175,
+          0.7340625,
+          0.7328568125,
+          0.723487,
+          0.7219453125,
+          0.7514635625
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 11536500,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 12258625,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11257750,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11114708,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10678292,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11213458,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10867084,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10933750,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10640584,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10801375,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11246750,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11152833,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11029625,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10910417,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11120291,
+            "count": 16,
+            "checksum": 1274848
+          }
+        ],
+        "control": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11922083,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11863500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11612500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11569334,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11503875,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11631958,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11848958,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11815625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11929666,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12093250,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11558667,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11661583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11655875,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11523250,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11769209,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11545625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11582917,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11899291,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11994583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11710041,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11687917,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11823666,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11658333,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11676834,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12535708,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11745000,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11725709,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11575792,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11551125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12023417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.69466925,
+        "control": 0.7288489375,
+        "candidate": 0.7318775625
+      },
+      "candidateOverControl": 1.0041553535227594,
+      "candidateOverJS": 1.0535626307051882,
+      "jsRetainedPostBatchVerified": true
+    }
+  ],
+  "allocationRows": [],
+  "completedAt": "2026-10-20T04:21:47.122Z",
+  "succeeded": true
+}

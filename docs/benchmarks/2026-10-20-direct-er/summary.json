@@ -1,0 +1,133 @@
+{
+  "rows": [
+    {
+      "category": "swift",
+      "case": "sequence/small",
+      "stage": "parseMutable",
+      "controlMs": 0.0684251328125,
+      "candidateMs": 0.069875328125,
+      "jsMs": null,
+      "pairedPercent": 1.2511396806123898,
+      "fasterPairs": 6,
+      "report": "swift-single-parseMutable-sequence-small-attempt3.json"
+    },
+    {
+      "category": "swift",
+      "case": "er/medium",
+      "stage": "parseMutable",
+      "controlMs": 0.3524674375,
+      "candidateMs": 0.289611328125,
+      "jsMs": null,
+      "pairedPercent": -17.912476539013067,
+      "fasterPairs": 15,
+      "report": "swift-single-parseMutable-er-medium-attempt1.json"
+    },
+    {
+      "category": "swift",
+      "case": "sequence/small",
+      "stage": "lifetime",
+      "controlMs": 0.229071609375,
+      "candidateMs": 0.229654296875,
+      "jsMs": null,
+      "pairedPercent": 0.7722338812889751,
+      "fasterPairs": 6,
+      "report": "swift-single-lifetime-sequence-small-attempt1.json"
+    },
+    {
+      "category": "swift",
+      "case": "er/medium",
+      "stage": "lifetime",
+      "controlMs": 2.469171875,
+      "candidateMs": 2.382401,
+      "jsMs": null,
+      "pairedPercent": -3.228126551882371,
+      "fasterPairs": 11,
+      "report": "swift-single-lifetime-er-medium-attempt2.json"
+    },
+    {
+      "category": "swift",
+      "case": "sequence/small",
+      "stage": "parse",
+      "controlMs": 0.0622747421875,
+      "candidateMs": 0.0613180390625,
+      "jsMs": null,
+      "pairedPercent": -1.3627950080316364,
+      "fasterPairs": 11,
+      "report": "swift-single-parse-sequence-small-attempt3.json"
+    },
+    {
+      "category": "swift",
+      "case": "er/medium",
+      "stage": "parse",
+      "controlMs": 0.62151953125,
+      "candidateMs": 0.6185495,
+      "jsMs": null,
+      "pairedPercent": -1.3655192352412526,
+      "fasterPairs": 11,
+      "report": "swift-single-parse-er-medium-attempt1.json"
+    },
+    {
+      "category": "native",
+      "case": "er/medium",
+      "stage": "parse",
+      "controlMs": 0.17688025,
+      "candidateMs": 0.18225,
+      "jsMs": 0.219776,
+      "pairedPercent": -0.26989366908395374,
+      "fasterPairs": 9,
+      "report": "native-parse-er-medium-attempt1.json"
+    },
+    {
+      "category": "native",
+      "case": "er/medium",
+      "stage": "parse-public",
+      "controlMs": 0.3310416875,
+      "candidateMs": 0.2684765625,
+      "jsMs": 0.225252625,
+      "pairedPercent": -18.502500358560038,
+      "fasterPairs": 15,
+      "report": "native-parse-public-er-medium-attempt1.json"
+    },
+    {
+      "category": "native",
+      "case": "er/medium",
+      "stage": "render-source",
+      "controlMs": 0.905971375,
+      "candidateMs": 0.9229036875,
+      "jsMs": 0.8960025625,
+      "pairedPercent": 2.4002335545805,
+      "fasterPairs": 3,
+      "report": "native-render-source-er-medium-attempt1.json"
+    },
+    {
+      "category": "native",
+      "case": "er/medium",
+      "stage": "render-retained",
+      "controlMs": 0.7273854375,
+      "candidateMs": 0.743489625,
+      "jsMs": 0.6867291875,
+      "pairedPercent": 2.229010805567566,
+      "fasterPairs": 6,
+      "report": "native-render-retained-er-medium-attempt1.json"
+    },
+    {
+      "category": "native",
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "controlMs": 0.1543046875,
+      "candidateMs": 0.1601145625,
+      "jsMs": 0.0843359375,
+      "pairedPercent": 4.984637312840778,
+      "fasterPairs": 1,
+      "report": "native-parse-public-gantt-medium-attempt1.json"
+    }
+  ],
+  "swiftAcceptedWindows": 6,
+  "swiftCompilerInterruptedExcluded": 5,
+  "nativeAcceptedWindows": 5,
+  "nativeCompilerInterruptedExcluded": 0,
+  "swiftFirstSideOrder": {
+    "control": 45,
+    "candidate": 45
+  }
+}

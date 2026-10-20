@@ -176,11 +176,11 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 ## Performance
 
 **All 126 measured WASM conditions still trail Pele JS. 0.3 remains unreleased.**
-Latest complete matrix: [static policy checkpoint](docs/benchmarks/2026-10-20-projection-policy/),
-source `ce559f1`.
-Source render takes **1.64–5.11×** the Pele JS time.
-Median ratios across all sizes/resources are **2.39× source**, **11.34× parse**
-and **4.19× retained mutable render**. These describe this artifact; differences
+Latest complete matrix: [direct ER checkpoint](docs/benchmarks/2026-10-20-direct-er/),
+source `175daa8`.
+Source render takes **1.58–5.00×** the Pele JS time.
+Median ratios across all sizes/resources are **2.40× source**, **10.94× parse**
+and **4.03× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
 The [direct-parse architecture checkpoint](docs/benchmarks/2026-10-20-direct-parse/)
@@ -235,6 +235,15 @@ parse falls from 0.8484 to 0.6219 ms (25.67% paired, 15/15 faster). Local contro
 medians are slightly slower and VM results remain mixed; this change does not
 remove mutable web graph construction. ER corpus and current API checks pass.
 
+The [direct ER construction layer](docs/benchmarks/2026-10-20-direct-er/)
+avoids a complete typed model and conversion during eligible mutable parsing.
+ER-medium Swift mutable parse improves 17.9% paired; native public parse improves
+18.5%, confirmed in a second window, but still trails JS. VM ER parse paired
+medians improve 0.9–7.4% across six size/resource conditions. Controls and first
+use remain mixed, including slower rows. Native, Swift and three-browser checks
+pass, while a newly reproduced live resource-callback mismatch remains an open
+API parity blocker. No full parity or release readiness claim follows.
+
 [Earlier checkpoints](docs/PERFORMANCE.md) preserve their own matched controls,
 raw samples and tradeoffs; gains are not combined. Recent
 [rejected text/identity experiments](docs/benchmarks/2026-10-20-parse-candidates/)
@@ -248,13 +257,13 @@ Source-render measurements with cached Canvas metrics:
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| flowchart | 1.377 ms | 2.476 ms | 1.80× |
-| sequence | 0.502 ms | 0.977 ms | 1.95× |
-| er | 2.815 ms | 6.197 ms | 2.20× |
-| pie | 0.278 ms | 0.626 ms | 2.25× |
-| sankey | 0.865 ms | 1.450 ms | 1.68× |
-| gantt | 0.686 ms | 2.579 ms | 3.76× |
-| railroad | 0.815 ms | 1.924 ms | 2.36× |
+| Flowchart | 1.358 ms | 2.404 ms | 1.77× |
+| Sequence | 0.511 ms | 1.010 ms | 1.98× |
+| Er | 2.811 ms | 6.272 ms | 2.23× |
+| Pie | 0.277 ms | 0.628 ms | 2.27× |
+| Sankey | 0.858 ms | 1.510 ms | 1.76× |
+| Gantt | 0.689 ms | 2.506 ms | 3.64× |
+| Railroad | 0.771 ms | 1.845 ms | 2.39× |
 
 A separate [native-only comparison](docs/benchmarks/2026-10-20-native-core/)
 before the latest root rewrite removes WASM/Swift entirely: typed retained native/JS medians are 0.80× Flowchart,

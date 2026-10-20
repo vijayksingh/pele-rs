@@ -7,22 +7,22 @@ run locally on macOS because the VM cannot supply the macOS/AppKit SDK.
 No release, language choice or GPU availability implies otherwise. The target of
 matching or beating Pele JS remains open. Measured results, raw samples, artifact
 hashes, reproduction steps and unshipped compiler/schema experiments are in the
-[current static-policy report](benchmarks/2026-10-20-projection-policy/README.md).
+[current direct ER report](benchmarks/2026-10-20-direct-er/README.md).
 The latest complete gate still fails all 126 measured conditions. Source,
-parse and retained medians across the matrix are 2.39×, 11.34× and 4.19× JS.
+parse and retained medians across the matrix are 2.40×, 10.94× and 4.03× JS.
 Earlier direct Gantt construction improves scoped parse costs; current normalized
 projection improves Swift Gantt parse. VM diagnostics remain mixed, with control
 slowdowns disclosed. No 0.3 release.
 
 | Large workload | Pele JS | Rust/WASM | WASM / JS |
 | --- | ---: | ---: | ---: |
-| Flowchart | 1.377 ms | 2.476 ms | 1.80× |
-| Sequence | 0.502 ms | 0.977 ms | 1.95× |
-| ER | 2.815 ms | 6.197 ms | 2.20× |
-| Pie | 0.278 ms | 0.626 ms | 2.25× |
-| Sankey | 0.865 ms | 1.450 ms | 1.68× |
-| Gantt | 0.686 ms | 2.579 ms | 3.76× |
-| Railroad | 0.815 ms | 1.924 ms | 2.36× |
+| Flowchart | 1.358 ms | 2.404 ms | 1.77× |
+| Sequence | 0.511 ms | 1.010 ms | 1.98× |
+| Er | 2.811 ms | 6.272 ms | 2.23× |
+| Pie | 0.277 ms | 0.628 ms | 2.27× |
+| Sankey | 0.858 ms | 1.510 ms | 1.76× |
+| Gantt | 0.689 ms | 2.506 ms | 3.64× |
+| Railroad | 0.771 ms | 1.845 ms | 2.39× |
 
 The [earlier eager Swift checkpoint](benchmarks/2026-10-20-swift-eager/README.md)
 compares frozen Rust-backed Swift executables on this Mac. Sequence-small parse
@@ -56,6 +56,17 @@ faster in all 15 pairs. Controls are 0.2–2.1% slower by paired medians. Native
 ER Swift corpus, 168 API conditions and nine browser corpus checks pass.
 Independent VM results stay mixed; mutable web parse does not use this path.
 No new complete gate or release acceptance follows.
+
+The [direct ER construction](benchmarks/2026-10-20-direct-er/README.md) avoids
+its complete temporary typed model during eligible mutable parsing. ER-medium
+Swift mutable parse improves 17.912% paired, lifecycle 3.228%, and native public
+parse 18.503% (15/15 faster), repeated at 18.343% in a separate window. Native
+public parse remains about 1.19 times JS in the original window. Some controls
+regress; the separate identical-binary A/A window does not erase them. VM ER
+parse paired improvements range 0.856–7.354%; first-use results remain mixed,
+including +41.167% ER-medium Canvas first-invoke. All 126 complete gate conditions
+still fail. The resource-callback model mutation mismatch is separately
+reproduced and remains a correctness/release blocker.
 
 [Rejected parse candidates](benchmarks/2026-10-20-parse-candidates/README.md)
 retain raw first-use and live-heap evidence. Lower map count and alternate string

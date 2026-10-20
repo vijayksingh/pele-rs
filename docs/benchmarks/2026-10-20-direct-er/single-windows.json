@@ -1,0 +1,101 @@
+[
+  {
+    "stage": "parseMutable",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-sequence-small-attempt1.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "parseMutable",
+    "workload": "sequence/small",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-sequence-small-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-sequence-small-attempt2.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "parseMutable",
+    "workload": "sequence/small",
+    "attempt": 3,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-sequence-small-attempt3.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-sequence-small-attempt3.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "parseMutable",
+    "workload": "er/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-er-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parseMutable-er-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "lifetime",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-lifetime-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-lifetime-sequence-small-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "lifetime",
+    "workload": "er/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-lifetime-er-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-lifetime-er-medium-attempt1.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "lifetime",
+    "workload": "er/medium",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-lifetime-er-medium-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-lifetime-er-medium-attempt2.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "parse",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-sequence-small-attempt1.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "parse",
+    "workload": "sequence/small",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-sequence-small-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-sequence-small-attempt2.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "parse",
+    "workload": "sequence/small",
+    "attempt": 3,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-sequence-small-attempt3.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-sequence-small-attempt3.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "parse",
+    "workload": "er/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-er-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/direct-er/swift-single-parse-er-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  }
+]

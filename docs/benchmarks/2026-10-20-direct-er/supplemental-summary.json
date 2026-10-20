@@ -1,0 +1,70 @@
+{
+  "rows": [
+    {
+      "category": "identical-binary-aa",
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "mediansMs": {
+        "js": 0.0872995,
+        "control": 0.155421875,
+        "candidate": 0.1589323125
+      },
+      "pairedPercent": 2.9748512574371277,
+      "fasterPairs": 4,
+      "report": "native-aa-gantt-public.json"
+    },
+    {
+      "category": "confirmation",
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "mediansMs": {
+        "js": 0.0832056875,
+        "control": 0.15639325,
+        "candidate": 0.1597943125
+      },
+      "pairedPercent": 2.9316727059341963,
+      "fasterPairs": 6,
+      "report": "confirmation-native-parse-public-gantt-medium-attempt1.json"
+    },
+    {
+      "category": "confirmation",
+      "case": "er/medium",
+      "stage": "render-source",
+      "mediansMs": {
+        "js": 0.9132708125,
+        "control": 0.9226328125,
+        "candidate": 0.9288203125
+      },
+      "pairedPercent": 0.0038961254202218853,
+      "fasterPairs": 7,
+      "report": "confirmation-native-render-source-er-medium-attempt1.json"
+    },
+    {
+      "category": "confirmation",
+      "case": "er/medium",
+      "stage": "render-retained",
+      "mediansMs": {
+        "js": 0.69466925,
+        "control": 0.7288489375,
+        "candidate": 0.7318775625
+      },
+      "pairedPercent": 0.4810797975715042,
+      "fasterPairs": 6,
+      "report": "confirmation-native-render-retained-er-medium-attempt1.json"
+    },
+    {
+      "category": "confirmation",
+      "case": "er/medium",
+      "stage": "parse-public",
+      "mediansMs": {
+        "js": 0.217002625,
+        "control": 0.3290495,
+        "candidate": 0.2726171875
+      },
+      "pairedPercent": -18.343311296212327,
+      "fasterPairs": 15,
+      "report": "confirmation-native-parse-public-er-medium-attempt1.json"
+    }
+  ],
+  "scope": "Separate windows; no pooling or outcome-based selection. A/A is not an A/B speed estimate."
+}

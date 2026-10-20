@@ -1,0 +1,42 @@
+{
+  "baselineCommit": "ce559f1be92a751576d241440140a28bb728c508",
+  "currentCompatibleCommit": "4e9faeee1b802cf0fc1db2e4a04b0a81817618b3",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/er/direct_parse.rs",
+      "originalSha256": null,
+      "candidateSha256": "e11adad951fb5d64c3601ec2d5bcd18dd932a99b8624678a2b8fdcc71a2321df"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/er/mod.rs",
+      "originalSha256": "2fa40b3b9dd542939bb4ac92f31928565038cba3d14f0be962fa55c213b312e1",
+      "candidateSha256": "dccbe8ded875081985cb3e10a7adcb41bfc9e8fac9f8f013eb4659d174eacc60"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/er/parser.rs",
+      "originalSha256": "3dda37805729c68fa08ad344aa0207b7e6528ea4a7010fa70ddaaea42dd7f23c",
+      "candidateSha256": "61bbad2a127617630d399f7634e1c484c9d9413cc699117c6ef5d2356f0e0abc"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/er/public_model.rs",
+      "originalSha256": "8625e3ef1a303b0824e052c270400ca355bc521cecb658e8c123c7ca8d1a17b9",
+      "candidateSha256": "4a01f198f33cda52b1a57a5ffd99efda36c8882f5f58bbf98a0f06fe81e7593c"
+    },
+    {
+      "path": "crates/pele/tests/public_er_direct_parse.rs",
+      "originalSha256": null,
+      "candidateSha256": "40afd1b72f6838c08e962e18c4ea61ec63321fcaaf6cdc56454afdcc7811edd7"
+    }
+  ],
+  "patchSha256": "cc5f44892fc5e7dfca393b7b6afd7d9c1937462a253012a2e39f797b3edac083",
+  "scope": "Private direct public ER construction only; exact graph order; conservative fallback. No build or test execution.",
+  "profile": {
+    "path": "../projection-policy/profile-summary.json",
+    "sha256": "d0378bbe400786a4fd38423923edeb9aaf9654324a0f0aa5a3c5f25fc32818e4"
+  },
+  "checks": [
+    "Private source/test rustfmt completed",
+    "Original hashes still match production ER source bytes",
+    "git apply --check candidate.patch passed against current compatible production bytes"
+  ]
+}
