@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T18:44:23.023Z",
+  "roots": {
+    "control": "/home/admin/pele-perf.jL9wzP/parse-architecture/svg-append-e148/candidate-package",
+    "candidate": "/home/admin/pele-perf.jL9wzP/parse-architecture/source-sparse-ingress-runtime/candidate-package"
+  },
+  "checks": [
+    {
+      "runtime": "control",
+      "case": "sankey/small",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "flowchart/medium",
+      "modelType": "flowchart",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/medium",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/large",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/small",
+      "modelType": "sankey",
+      "expected": "PLCSRC02",
+      "actual": "PLCSRC02",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC02",
+        "layoutId": "1",
+        "revision": "0",
+        "canonicalBytes": 1172,
+        "recipeBytes": 1224,
+        "type": "sankey"
+      },
+      "update": {
+        "capability": "PLCSRU01",
+        "layoutId": "1",
+        "revision": "1",
+        "canonicalBytes": 1172,
+        "recipeBytes": 53
+      },
+      "updateCalls": 1,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "flowchart/medium",
+      "modelType": "flowchart",
+      "expected": null,
+      "actual": null,
+      "calls": 1,
+      "metadata": {
+        "capability": null
+      },
+      "update": null,
+      "updateCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/medium",
+      "modelType": "sankey",
+      "expected": "PLCSRC02",
+      "actual": "PLCSRC02",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC02",
+        "layoutId": "2",
+        "revision": "0",
+        "canonicalBytes": 5804,
+        "recipeBytes": 3736,
+        "type": "sankey"
+      },
+      "update": {
+        "capability": "PLCSRU01",
+        "layoutId": "2",
+        "revision": "1",
+        "canonicalBytes": 5804,
+        "recipeBytes": 53
+      },
+      "updateCalls": 1,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/large",
+      "modelType": "sankey",
+      "expected": "PLCSRC02",
+      "actual": "PLCSRC02",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC02",
+        "layoutId": "3",
+        "revision": "0",
+        "canonicalBytes": 23836,
+        "recipeBytes": 13712,
+        "type": "sankey"
+      },
+      "update": {
+        "capability": "PLCSRU01",
+        "layoutId": "3",
+        "revision": "1",
+        "canonicalBytes": 23836,
+        "recipeBytes": 53
+      },
+      "updateCalls": 1,
+      "publicRetainedRender": true
+    }
+  ],
+  "selectors": false,
+  "directParseSPI": false,
+  "probeInsideTimer": false,
+  "browser": "156.0.8078.4",
+  "prototypesRestored": true,
+  "retainedUpdateIdentitiesVerified": true,
+  "succeeded": true,
+  "browserClosedBeforeTiming": true,
+  "completedAt": "2026-10-20T18:44:23.746Z"
+}
