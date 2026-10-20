@@ -28,8 +28,8 @@ and WebKit, plus 54 focused checks. Control and candidate used identical WASM
 built from `365ec6d`. Later native admission/core changes were not in that WASM.
 
 The independent VM comparison measured 42 rows with 21 paired trials and 1,000 ms
-warmup. Median paired changes were parse -0.158%, retained render +0.232% and
-source render +0.158%. A separate 40-row first-use run used 15 paired trials and
+warmup. Median paired changes were parse -0.19%, retained render +0.22% and
+source render +0.14% (conventional medians across row medians). A separate 40-row first-use run used 15 paired trials and
 1,000 ms warmup; every row was within 5% of its control. These descriptive results
 do not establish speedup or performance neutrality. The earlier per-operation
 backend abstraction was rejected after a +9.16% retained-render row; its evidence

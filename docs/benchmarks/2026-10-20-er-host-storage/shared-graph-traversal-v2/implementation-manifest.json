@@ -1,0 +1,26 @@
+{
+  "baseCommit": "3818fc7692a26049c4cb0950310a7a59fdbc7017",
+  "baseState": "3818fc7 Rust + applied uncommitted traversal v1 4ce4d35f; patch is incremental on that exact JS",
+  "patchSha256": "7108f42f1a2613e29c0993b2f5b86136a13b3722413fc3e4968833afa5254458",
+  "files": [
+    {
+      "path": "bindings/web/graph.js",
+      "originalSha256": "701c99ffd7a096ca85f15f23fdfe48a40b269902bf734ec542e9c8ea73c62c8f",
+      "candidateSha256": "2df5494ff26a13dae6de9c8bff2c1651e1bd443631757377ce41d3ebf3c1267a"
+    },
+    {
+      "path": "bindings/web/graph-storage.js",
+      "originalSha256": "cdcffd672b0fa81e19784fa424f4d2048a182383e4e707da98402360dea9d009",
+      "candidateSha256": "ebcbadefe360ca5c876ef409c0cd2214fd9cb866e867ed8e73bf69bd1242c181"
+    }
+  ],
+  "unchangedPackageManifestSha256": "2acd242ecd5a478eb8f154cde806de2f6358d8ffad36b51e0dda41658c845ef2",
+  "validation": {
+    "nodeSyntax": "both JS files passed",
+    "normalizedLoopBodies": "all three exact vs v1 after signature/backend-binding move",
+    "productionEdits": "none",
+    "buildsTestsTimings": "not run",
+    "performance": "unproven; compare against original nested control with same WASM bytes",
+    "gitApplyCheck": "passed against current production"
+  }
+}

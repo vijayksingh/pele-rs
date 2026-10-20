@@ -180,10 +180,15 @@ complete release-gate run, historical source `0b32797`, fails all 126 conditions
 New scoped diagnostics do not replace that gate.
 
 The first [shared traversal attempt](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-rejected/)
-was rejected: its same-WASM 42-condition VM comparison showed Flowchart/medium
-fixed retained render **9.16% slower** (4/21 lower pairs). The separate 40-condition
-first-use run does not cancel that regression. A revised abstraction is being
-evaluated; this rejected experiment is not an accepted performance improvement.
+was rejected after Flowchart/medium fixed retained render measured **9.16% slower**
+(4/21 lower pairs). The revised [shared traversal](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-v2/),
+source `e48ea33`, passed full 417 and focused 54 browser tests but has **mixed timing,
+not a neutrality or speedup claim**: its 42-row same-WASM diagnostic has median paired
+changes of −0.19% for parse, +0.22% for retained render and +0.14% for source
+render; 40 first-use rows also retain
+adverse conditions. Both packages use identical `365ec6d` WASM. These results cover
+only the browser traversal preparation, not the later native graphless Sankey owner
+and not the 126-condition release gate.
 
 An earlier [storage preparation](docs/benchmarks/2026-10-20-er-host-storage/shared-public-primitives/),
 source `1906d68`, separates construction and projection from native graph storage.
