@@ -179,7 +179,9 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 complete release-gate run, historical source `0b32797`, fails all 126 conditions.
 New scoped diagnostics do not replace that gate.
 
-The default Sankey renderer now appends SVG directly into existing paint buffers,
+The latest source-backed mutable-model candidate, [`ee114c0`](docs/benchmarks/2026-10-20-er-host-storage/source-logical-batching/), is **rejected for performance**: Sankey parse is 18.78–28.91% slower than the preceding best checkpoint and 7.03–17.82× JS; retained rendering is 36.39–46.87% slower. All 24 rows, adverse controls and fresh Swift/C/API checks are recorded. The [initial source-backed candidate](docs/benchmarks/2026-10-20-er-host-storage/source-canonical-rejected/) and its CPU profiles are preserved too. Work continues on repeated native validation and publication costs.
+
+The preceding default checkpoint appends Sankey SVG directly into existing paint buffers,
 sharing exact numeric/escaping rules with the other renderers. [Matched VM and
 local evidence](docs/benchmarks/2026-10-20-er-host-storage/svg-append/), `e148605`:
 
@@ -196,15 +198,15 @@ rows and adverse controls remain visible: five warm Sankey parse rows increase
 establish overall parity or neutrality. Parse still measures6.44–15.06×JS in
 this window; percentages are not compounded with earlier measurements.
 
-Current correctness:24native feature integrations;12focused browser checks
+For that SVG checkpoint:24native feature integrations;12focused browser checks
 across Chromium, Firefox and WebKit; fresh arm64 SDK Swift16, strict C3 and
 API168, covering12,481drawings and16,572expected errors. No new Swift timing
 claim. Intel SDK and AppKit activation remain release checks.
 
 The preceding [indexed source ownership](docs/benchmarks/2026-10-20-er-host-storage/indexed-sankey/)
 reduced cloned endpoint records while preserving public models and helpers.
-Work now targets source-backed canonical storage and publication to address the
-larger mutable-parse cost. No GPU or all33diagram speedup is claimed. VM and Swift
+Source-backed storage still needs validation and publication corrections to address
+the larger mutable-parse cost. No GPU or all33diagram speedup is claimed. VM and Swift
 use different machines; their timings cannot be subtracted to estimate bridge cost.
 
 <details>

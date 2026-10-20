@@ -1,0 +1,61 @@
+{
+  "status": "executed-approved-nine-windows",
+  "files": {
+    "files/scripts/perf/cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "files/scripts/perf/profile-source-canonical.mjs": "33961b5106205c3ceaac081258c24799131ca3bec60d89985d23666d8af6841a",
+    "files/scripts/perf/source-canonical-inputs.json": "7c339247652b9aa46d78a06be53d3ea9f32a16a120c4d1d755c5e3cae7a20dfd"
+  },
+  "baseProfiler": {
+    "path": "dist/perf-patches/parse-architecture/native-record-profiler/files/scripts/perf/profile-native-record-sankey.mjs",
+    "sha256": "e89923f827c83994a1d69fee9cd0667d52061dbd9863ba889c330082fb216bb4"
+  },
+  "sourcePins": {
+    "control": {
+      "commit": "e1486055d596d4e0ac25e4c78f1d5d95a73f781a",
+      "freezeManifestSHA256": "f5756e08f99b31b7e9381e420510611d0fbb743f3414122383d53d0406972354",
+      "packageFiles": 113
+    },
+    "candidate": {
+      "commit": "d35ca5bbc6398c75b7b92a9f8ffa429ee41369ef",
+      "freezeManifestSHA256": "2d3abe85e5841b5cac2eef153d58dac5916eb7231e8ab00fb3cb46d27b0207c6",
+      "packageFiles": 115
+    }
+  },
+  "settings": {
+    "profiles": 9,
+    "windowMs": 2000,
+    "intervalUs": 250,
+    "case": "sankey/medium",
+    "resource": "fixed",
+    "defaultPublicAPI": true
+  },
+  "validation": {
+    "syntax": "node --check passed",
+    "browser": "not run",
+    "VM": "not run",
+    "frozenPackageMaps": "113 control / 115 candidate files matched existing package.json freezes offline",
+    "execution": "VM exit0; nine raw profiles; before/after hashes equal; wholeSVG/dimensions and capability checks pass; models disposed/browser closed"
+  },
+  "runtimeFiles": {
+    "runtime/cpu-profile.log": "adcdfb7bd8ffc4eb6a7f500bf4c0c78ae53295e041221bea533aedbb0cdb3472",
+    "runtime/cpu-profiles/sankey-medium-fixed-parse-candidate.cpuprofile": "8b2bbb6ef9754b4a591984b2cbf1d4ad63ed19ce23001cf86d33713966c82e40",
+    "runtime/cpu-profiles/sankey-medium-fixed-parse-control.cpuprofile": "624f5332e174e8e12c2c31a42affb82e3644f245e346ebcbf110736937cc2d7a",
+    "runtime/cpu-profiles/sankey-medium-fixed-parse-js.cpuprofile": "cd6a38e856a1fc0fd045a422b62ad9a06c2d8be66b3baff4087d5d7922edbd6a",
+    "runtime/cpu-profiles/sankey-medium-fixed-render-model-candidate.cpuprofile": "155e5bcdc8709e8fc32e5a225e6d6fd5860ae430a3d9885c167df363d9bdf6c1",
+    "runtime/cpu-profiles/sankey-medium-fixed-render-model-control.cpuprofile": "42e87cab59e97f9b4000ad76a1262b62070e6948fe9bda9cbce417c47e113913",
+    "runtime/cpu-profiles/sankey-medium-fixed-render-model-js.cpuprofile": "b516be039c1ef609124a2055bce4757c99dc6c5eff3749f3b100c27efb131d47",
+    "runtime/cpu-profiles/sankey-medium-fixed-render-source-candidate.cpuprofile": "26eb8b59983d114f9a283059f73966035f857f78b0dbd97ef866d8aed329e500",
+    "runtime/cpu-profiles/sankey-medium-fixed-render-source-control.cpuprofile": "10460a10c40dc46e91e4e7ef305fab301375d3d1de2b1c208be9251c52dfb7e1",
+    "runtime/cpu-profiles/sankey-medium-fixed-render-source-js.cpuprofile": "b8035b461d975e2587786e0b7561f65cd97e49d27abb5dd23a096ac196ec2098",
+    "runtime/cpu-profiles/summary.json": "d5a2ad503dc10625a8c2a7a008f7d29253191f1c233a5607c080651e4bdfb4de",
+    "runtime/cpu-profiles/summary.partial.json": "d257c4a86a5ca4abe7e3ed171b990a0b68466d4714d3e2eb9db3e96aa70b4d38",
+    "runtime/cpu-runner/._profile-source-canonical.mjs": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+    "runtime/cpu-runner/cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "runtime/cpu-runner/profile-source-canonical.mjs": "33961b5106205c3ceaac081258c24799131ca3bec60d89985d23666d8af6841a",
+    "runtime/cpu-runner/source-canonical-inputs.json": "7c339247652b9aa46d78a06be53d3ea9f32a16a120c4d1d755c5e3cae7a20dfd"
+  },
+  "analysisFiles": {
+    "analyze.mjs": "bcda9ac45f9a8929ae38cb3796b4a9017ce62d6bffe67fed949a21ae01d0b889",
+    "ATTRIBUTION.json": "8304a6d29c5ff68cbaa0039d366e4b47938bcbf105c5e83f0806585f2639774c"
+  }
+}

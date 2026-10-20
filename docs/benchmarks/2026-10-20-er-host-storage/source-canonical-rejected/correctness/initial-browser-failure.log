@@ -1,0 +1,178 @@
+[WebServer] (node:73326) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 57 tests using 1 worker
+
+(node:73329) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/web/additional-diagrams.spec.js:4:3 › sankey pinned corpus through WASM source and owned model APIs (5.0s)
+  ✓   2 [chromium] › tests/web/binary-graphs.spec.js:3:1 › binary WASM consumers retain edited graph identities and reject malformed exchanges (264ms)
+  ✓   3 [chromium] › tests/web/binary-graphs.spec.js:30:1 › binary graph publication preserves descriptors, special keys and cyclic references (193ms)
+  ✓   4 [chromium] › tests/web/diagram-entries.spec.js:3:1 › all 33 packed low-level entries preserve prepared models, raw rendering and native registration (576ms)
+  ✓   5 [chromium] › tests/web/diagram-entries.spec.js:40:1 › prepared entries keep raw parse/render policies, methods, partial state and host recovery (277ms)
+  ✓   6 [chromium] › tests/web/diagram-entries.spec.js:63:1 › canonical built-in objects retain live handlers and sections across registry replacement and close (258ms)
+  ✓   7 [chromium] › tests/web/model-graph-comparison.spec.js:3:1 › acknowledged public binary graphs compare exact retained host state and reject edits (191ms)
+  ✓   8 [chromium] › tests/web/public-models.spec.js:3:1 › mutable Pie models preserve edits, collection identity and retained render provenance (275ms)
+  ✓   9 [chromium] › tests/web/public-models.spec.js:55:1 › mutable Info metadata and Sankey aliases keep pinned render behavior (267ms)
+  ✓  10 [chromium] › tests/web/public-models.spec.js:93:1 › native model methods preserve prototypes, aliases and partial errors through WASM (272ms)
+  ✓  11 [chromium] › tests/web/public-models.spec.js:145:1 › host callback throws match pinned guard behavior and recover (243ms)
+  ✓  12 [chromium] › tests/web/public-models.spec.js:164:1 › outline timeline graph and architecture methods keep pinned shared identities and mutable renders (299ms)
+  ✓  13 [chromium] › tests/web/public-models.spec.js:243:1 › imported outline helpers retain ordinary function construction and shared prototypes (239ms)
+  ✓  14 [chromium] › tests/web/public-models.spec.js:268:1 › seven additional mutable codecs preserve native prototypes, aliases and edited SVGs (297ms)
+  ✓  15 [chromium] › tests/web/sankey-first-render.spec.js:4:1 › fresh public Sankey first render preserves thrown values, recovery and helper aliases (342ms)
+  ✓  16 [chromium] › tests/web/source-layout.spec.js:36:1 › source layouts publish complete accepted Sankey state before original result-factory throws (313ms)
+  ✘  17 [chromium] › tests/web/source-layout.spec.js:80:1 › source layouts consume canonical operation frames without losing sparse state, helpers or recovery (378ms)
+(node:73412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  18 [chromium] › tests/web/svg-number-boundaries.spec.js:3:1 › railroad complete SVG preserves coordinate rounding boundaries (386ms)
+  ✓  19 [chromium] › tests/web/svg-root.spec.js:3:1 › SVG root output preserves pinned icons, radius, aliases, fonts and accessibility (274ms)
+(node:73437) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  20 [firefox] › tests/web/additional-diagrams.spec.js:4:3 › sankey pinned corpus through WASM source and owned model APIs (7.3s)
+  ✓  21 [firefox] › tests/web/binary-graphs.spec.js:3:1 › binary WASM consumers retain edited graph identities and reject malformed exchanges (359ms)
+  ✓  22 [firefox] › tests/web/binary-graphs.spec.js:30:1 › binary graph publication preserves descriptors, special keys and cyclic references (197ms)
+  ✓  23 [firefox] › tests/web/diagram-entries.spec.js:3:1 › all 33 packed low-level entries preserve prepared models, raw rendering and native registration (705ms)
+  ✓  24 [firefox] › tests/web/diagram-entries.spec.js:40:1 › prepared entries keep raw parse/render policies, methods, partial state and host recovery (342ms)
+  ✓  25 [firefox] › tests/web/diagram-entries.spec.js:63:1 › canonical built-in objects retain live handlers and sections across registry replacement and close (334ms)
+  ✓  26 [firefox] › tests/web/model-graph-comparison.spec.js:3:1 › acknowledged public binary graphs compare exact retained host state and reject edits (195ms)
+  ✓  27 [firefox] › tests/web/public-models.spec.js:3:1 › mutable Pie models preserve edits, collection identity and retained render provenance (312ms)
+  ✓  28 [firefox] › tests/web/public-models.spec.js:55:1 › mutable Info metadata and Sankey aliases keep pinned render behavior (299ms)
+  ✓  29 [firefox] › tests/web/public-models.spec.js:93:1 › native model methods preserve prototypes, aliases and partial errors through WASM (744ms)
+  ✓  30 [firefox] › tests/web/public-models.spec.js:145:1 › host callback throws match pinned guard behavior and recover (302ms)
+  ✓  31 [firefox] › tests/web/public-models.spec.js:164:1 › outline timeline graph and architecture methods keep pinned shared identities and mutable renders (335ms)
+  ✓  32 [firefox] › tests/web/public-models.spec.js:243:1 › imported outline helpers retain ordinary function construction and shared prototypes (292ms)
+  ✓  33 [firefox] › tests/web/public-models.spec.js:268:1 › seven additional mutable codecs preserve native prototypes, aliases and edited SVGs (327ms)
+  ✓  34 [firefox] › tests/web/sankey-first-render.spec.js:4:1 › fresh public Sankey first render preserves thrown values, recovery and helper aliases (402ms)
+  ✓  35 [firefox] › tests/web/source-layout.spec.js:36:1 › source layouts publish complete accepted Sankey state before original result-factory throws (365ms)
+  ✓  36 [firefox] › tests/web/source-layout.spec.js:80:1 › source layouts consume canonical operation frames without losing sparse state, helpers or recovery (403ms)
+  ✓  37 [firefox] › tests/web/svg-number-boundaries.spec.js:3:1 › railroad complete SVG preserves coordinate rounding boundaries (287ms)
+  ✓  38 [firefox] › tests/web/svg-root.spec.js:3:1 › SVG root output preserves pinned icons, radius, aliases, fonts and accessibility (319ms)
+(node:73486) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  39 [webkit] › tests/web/additional-diagrams.spec.js:4:3 › sankey pinned corpus through WASM source and owned model APIs (5.0s)
+  ✓  40 [webkit] › tests/web/binary-graphs.spec.js:3:1 › binary WASM consumers retain edited graph identities and reject malformed exchanges (311ms)
+  ✓  41 [webkit] › tests/web/binary-graphs.spec.js:30:1 › binary graph publication preserves descriptors, special keys and cyclic references (203ms)
+  ✓  42 [webkit] › tests/web/diagram-entries.spec.js:3:1 › all 33 packed low-level entries preserve prepared models, raw rendering and native registration (633ms)
+  ✓  43 [webkit] › tests/web/diagram-entries.spec.js:40:1 › prepared entries keep raw parse/render policies, methods, partial state and host recovery (337ms)
+  ✓  44 [webkit] › tests/web/diagram-entries.spec.js:63:1 › canonical built-in objects retain live handlers and sections across registry replacement and close (305ms)
+  ✓  45 [webkit] › tests/web/model-graph-comparison.spec.js:3:1 › acknowledged public binary graphs compare exact retained host state and reject edits (203ms)
+  ✓  46 [webkit] › tests/web/public-models.spec.js:3:1 › mutable Pie models preserve edits, collection identity and retained render provenance (330ms)
+  ✓  47 [webkit] › tests/web/public-models.spec.js:55:1 › mutable Info metadata and Sankey aliases keep pinned render behavior (312ms)
+  ✓  48 [webkit] › tests/web/public-models.spec.js:93:1 › native model methods preserve prototypes, aliases and partial errors through WASM (319ms)
+  ✓  49 [webkit] › tests/web/public-models.spec.js:145:1 › host callback throws match pinned guard behavior and recover (307ms)
+  ✓  50 [webkit] › tests/web/public-models.spec.js:164:1 › outline timeline graph and architecture methods keep pinned shared identities and mutable renders (374ms)
+  ✓  51 [webkit] › tests/web/public-models.spec.js:243:1 › imported outline helpers retain ordinary function construction and shared prototypes (309ms)
+  ✓  52 [webkit] › tests/web/public-models.spec.js:268:1 › seven additional mutable codecs preserve native prototypes, aliases and edited SVGs (348ms)
+  ✓  53 [webkit] › tests/web/sankey-first-render.spec.js:4:1 › fresh public Sankey first render preserves thrown values, recovery and helper aliases (385ms)
+  ✓  54 [webkit] › tests/web/source-layout.spec.js:36:1 › source layouts publish complete accepted Sankey state before original result-factory throws (343ms)
+  ✓  55 [webkit] › tests/web/source-layout.spec.js:80:1 › source layouts consume canonical operation frames without losing sparse state, helpers or recovery (393ms)
+  ✓  56 [webkit] › tests/web/svg-number-boundaries.spec.js:3:1 › railroad complete SVG preserves coordinate rounding boundaries (314ms)
+  ✓  57 [webkit] › tests/web/svg-root.spec.js:3:1 › SVG root output preserves pinned icons, radius, aliases, fonts and accessibility (384ms)
+
+
+  1) [chromium] › tests/web/source-layout.spec.js:80:1 › source layouts consume canonical operation frames without losing sparse state, helpers or recovery 
+
+    Error: true
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 6
+    + Received  + 6
+
+    @@ -361,11 +361,11 @@
+                  Array [
+                    "data",
+                    true,
+                    Array [
+                      "number",
+    -                 "7ff8000000000000",
+    +                 "fff8000000000042",
+                    ],
+                  ],
+                ],
+                Array [
+                  "zero",
+    @@ -1161,11 +1161,11 @@
+                  Array [
+                    "data",
+                    true,
+                    Array [
+                      "number",
+    -                 "7ff8000000000000",
+    +                 "fff8000000000042",
+                    ],
+                  ],
+                ],
+                Array [
+                  "zero",
+    @@ -1961,11 +1961,11 @@
+                  Array [
+                    "data",
+                    true,
+                    Array [
+                      "number",
+    -                 "7ff8000000000000",
+    +                 "fff8000000000042",
+                    ],
+                  ],
+                ],
+                Array [
+                  "zero",
+    @@ -2517,11 +2517,11 @@
+        },
+        "fired": true,
+        "identity": true,
+        "initialNumeric": Object {
+          "infinity": "7ff0000000000000",
+    -     "nan": "7ff8000000000000",
+    +     "nan": "fff8000000000042",
+          "zero": "8000000000000000",
+        },
+        "invalid": Object {
+          "error": Object {
+            "code": "semantic",
+    @@ -2897,11 +2897,11 @@
+                  Array [
+                    "data",
+                    true,
+                    Array [
+                      "number",
+    -                 "7ff8000000000000",
+    +                 "fff8000000000042",
+                    ],
+                  ],
+                ],
+                Array [
+                  "zero",
+    @@ -3377,11 +3377,11 @@
+            "width": "4083400000000000",
+          },
+        },
+        "numeric": Object {
+          "infinity": "7ff0000000000000",
+    -     "nan": "7ff8000000000000",
+    +     "nan": "fff8000000000042",
+          "zero": "8000000000000000",
+        },
+        "recovery": Object {
+          "ok": true,
+          "trace": Array [
+
+      140 |   expect(report.fatal).toBeUndefined();expect(report.restored).toBe(true);expect(report.rows).toHaveLength(2);
+      141 |   for(const row of report.rows){
+    > 142 |     expect(row.recipe.fatal,`${row.raw}/recipe`).toBeUndefined();expect(row.canonical.fatal,`${row.raw}/canonical`).toBeUndefined();expect(row.canonical,row.raw+'').toEqual(row.recipe);
+          |                                                                                                                                                                      ^
+      143 |     expect(row.canonical).toMatchObject({fired:true,restored:true,identity:true,numeric:{zero:'8000000000000000',infinity:'7ff0000000000000'}});
+      144 |     expect(row.canonical.numeric).toEqual(row.canonical.initialNumeric);
+      145 |     const nan=BigInt('0x'+row.canonical.numeric.nan);expect((nan&0x7ff0000000000000n)===0x7ff0000000000000n&&(nan&0xfffffffffffffn)!==0n).toBe(true);
+        at /Users/vijaysingh/unlocalhosted/pele-rs/tests/web/source-layout.spec.js:142:166
+
+    attachment #1: source-layout-canonical-fallback.json (application/json) ────────────────────────
+    dist/evidence/source-canonical-web-results/source-layout-source-layou-4d01e-e-state-helpers-or-recovery-chromium/attachments/source-layout-canonical-fallback-json-18761c3e96a9d44ae69e28b19792cf5da8b223c7.json
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: dist/evidence/source-canonical-web-results/source-layout-source-layou-4d01e-e-state-helpers-or-recovery-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/web/source-layout.spec.js:80:1 › source layouts consume canonical operation frames without losing sparse state, helpers or recovery 
+  56 passed (43.5s)
