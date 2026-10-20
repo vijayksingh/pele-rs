@@ -22,7 +22,7 @@ redirect it to a builtin of the same name. An opt-in implementation must preserv
 parse errors and admission and must not publish state or invoke host code before
 returning `None`.
 
-Gantt is the only builtin opting in. Its grammar runs through the private
+Gantt opts in through its private construction target. Its grammar runs through the private
 `parser::Target` interface. Both `GanttModel` and the arena construction target
 use the same token traversal and borrowed `TaskDeclaration` validation. The
 immutable/source-render path still creates a typed model. Raw prepared parsing,

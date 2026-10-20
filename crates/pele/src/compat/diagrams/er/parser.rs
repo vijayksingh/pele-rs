@@ -121,7 +121,7 @@ impl<D: Target> Reader<'_, '_, D> {
         self.tokens.get(self.i).map_or(T::END, |t| t.kind)
     }
     fn take(&mut self) -> String {
-        let s = self.tokens[self.i].text.clone();
+        let s = std::mem::take(&mut self.tokens[self.i].text);
         self.i += 1;
         s
     }

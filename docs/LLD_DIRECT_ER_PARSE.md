@@ -106,3 +106,14 @@ addEntity calls are rejected by the native busy guard. Direct construction does
 not change rendering or fix that failure. Callback acceptance stays blocked;
 passing parse/graph/SVG corpus slices do not establish universal API parity.
 The failing assertion remains in the first-use comparator.
+
+## Consumed token ownership
+
+The shared ER reader transfers each consumed token String into its existing
+consumer instead of cloning it. Its cursor is monotonic: no backtracking,
+consumed-token lookup or vector replay occurs. Error reporting observes the
+current unconsumed token and unchanged original source; terminal sentinels are
+not consumed through this operation. A direct-target fallback drops the reader
+and tokenizes the prepared source afresh. Any future rewind/token-reuse design
+must revisit this ownership invariant. Lexer and destination allocations remain;
+this removes a copy without changing the parser or public contracts.
