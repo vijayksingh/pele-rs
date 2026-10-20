@@ -1,6 +1,13 @@
 //! Hidden captured Sankey owner boundary. No host values or native graph mirror.
+pub use super::public::flat_store::{
+    FlatEpoch, FlatStringHistory, FlatWorking, NativeObservation, NativeSourceWriter,
+    ObservedCapture,
+};
 pub use super::public::{
-    captured_admission::{AdmissionKind, AdmissionRead, Extent, Header as AdmissionHeader},
+    captured_admission::{
+        AdmissionKind, AdmissionRead, Extent, Header as AdmissionHeader, ScalarAtomRef,
+        ScalarPropertyRef,
+    },
     captured_read::{
         CapturedRead, NodeHeader, NodeKind, PropertyPrefix, PROPERTY_CHUNK, STRING_CHUNK,
     },

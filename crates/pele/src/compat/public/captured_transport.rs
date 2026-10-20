@@ -71,7 +71,7 @@ pub fn canonical_frame_bytes<S: AdmissionRead>(
         out.count(header.properties)?;
         admission::properties(store, node, header.properties, |property| {
             out.put(5)?;
-            out.atom(&property.value)
+            property.value.with_atom(|value| out.atom(value))
         })?;
     }
     out.put(metadata_bytes)?;

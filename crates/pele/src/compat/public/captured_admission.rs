@@ -29,6 +29,34 @@ pub struct Header {
     pub properties: usize,
     pub kind: AdmissionKind,
 }
+/// A borrowed arena atom or one decoded stack scalar; neither variant allocates.
+pub struct ScalarAtomRef<'a>(ScalarAtom<'a>);
+enum ScalarAtom<'a> {
+    Borrowed(&'a Atom),
+    #[cfg(feature = "web-host-sankey")]
+    Owned(Atom),
+}
+impl<'a> ScalarAtomRef<'a> {
+    fn borrowed(value: &'a Atom) -> Self {
+        Self(ScalarAtom::Borrowed(value))
+    }
+    #[cfg(feature = "web-host-sankey")]
+    pub(crate) fn owned(value: Atom) -> Self {
+        Self(ScalarAtom::Owned(value))
+    }
+    pub fn with_atom<R>(&self, visit: impl FnOnce(&Atom) -> R) -> R {
+        match &self.0 {
+            ScalarAtom::Borrowed(v) => visit(v),
+            #[cfg(feature = "web-host-sankey")]
+            ScalarAtom::Owned(v) => visit(v),
+        }
+    }
+}
+pub struct ScalarPropertyRef<'a> {
+    pub key: u32,
+    pub flags: u8,
+    pub value: ScalarAtomRef<'a>,
+}
 // Static dispatch is intentional. The caller's closure owns validation policy;
 // storage only lends records. Flat adapters may lend bounded scratch batches,
 // while the arena lends its entire remaining slice with no copy or allocation.
@@ -61,6 +89,55 @@ pub trait AdmissionRead {
         start: usize,
         visit: impl FnOnce(&[Atom]) -> Result<R, PeleError>,
     ) -> Result<R, PeleError>;
+    fn visit_properties(
+        &mut self,
+        node: usize,
+        start: usize,
+        remaining: usize,
+        mut visit: impl FnMut(ScalarPropertyRef<'_>) -> Result<(), PeleError>,
+    ) -> Result<usize, PeleError> {
+        self.with_properties(node, start, |values| {
+            next(0, values.len(), remaining)?;
+            for p in values {
+                visit(ScalarPropertyRef {
+                    key: p.key,
+                    flags: p.flags,
+                    value: ScalarAtomRef::borrowed(&p.value),
+                })?;
+            }
+            Ok(values.len())
+        })
+    }
+    fn visit_map_entries(
+        &mut self,
+        node: usize,
+        start: usize,
+        remaining: usize,
+        mut visit: impl FnMut(ScalarAtomRef<'_>, ScalarAtomRef<'_>) -> Result<(), PeleError>,
+    ) -> Result<usize, PeleError> {
+        self.with_map_entries(node, start, |values| {
+            next(0, values.len(), remaining)?;
+            for (k, v) in values {
+                visit(ScalarAtomRef::borrowed(k), ScalarAtomRef::borrowed(v))?;
+            }
+            Ok(values.len())
+        })
+    }
+    fn visit_set_values(
+        &mut self,
+        node: usize,
+        start: usize,
+        remaining: usize,
+        mut visit: impl FnMut(ScalarAtomRef<'_>) -> Result<(), PeleError>,
+    ) -> Result<usize, PeleError> {
+        self.with_set_values(node, start, |values| {
+            next(0, values.len(), remaining)?;
+            for v in values {
+                visit(ScalarAtomRef::borrowed(v))?;
+            }
+            Ok(values.len())
+        })
+    }
 }
 
 pub(super) struct ArenaAdmission<'g>(pub(super) &'g ModelGraph);
@@ -164,17 +241,12 @@ pub(super) fn properties<S: AdmissionRead>(
     store: &mut S,
     node: usize,
     total: usize,
-    mut check: impl FnMut(&Property) -> Result<(), PeleError>,
+    mut check: impl FnMut(ScalarPropertyRef<'_>) -> Result<(), PeleError>,
 ) -> Result<(), PeleError> {
     let mut start = 0;
     while start < total {
-        start = store.with_properties(node, start, |values| {
-            let end = next(start, values.len(), total)?;
-            for property in values {
-                check(property)?;
-            }
-            Ok(end)
-        })?;
+        let count = store.visit_properties(node, start, total - start, &mut check)?;
+        start = next(start, count, total)?;
     }
     Ok(())
 }
@@ -188,26 +260,20 @@ pub(super) fn items<S: AdmissionRead>(
         AdmissionKind::Map(total) => {
             let mut start = 0;
             while start < total {
-                start = store.with_map_entries(node, start, |entries| {
-                    let end = next(start, entries.len(), total)?;
-                    for (key, value) in entries {
-                        check(key)?;
-                        check(value)?;
-                    }
-                    Ok(end)
+                let count = store.visit_map_entries(node, start, total - start, |key, value| {
+                    key.with_atom(&mut check)?;
+                    value.with_atom(&mut check)
                 })?;
+                start = next(start, count, total)?;
             }
         }
         AdmissionKind::Set(total) => {
             let mut start = 0;
             while start < total {
-                start = store.with_set_values(node, start, |values| {
-                    let end = next(start, values.len(), total)?;
-                    for value in values {
-                        check(value)?;
-                    }
-                    Ok(end)
+                let count = store.visit_set_values(node, start, total - start, |value| {
+                    value.with_atom(&mut check)
                 })?;
+                start = next(start, count, total)?;
             }
         }
         _ => {}
@@ -269,7 +335,7 @@ pub(crate) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError>
             if property.key as usize >= extent.strings || property.flags & !7 != 0 {
                 return Err(invalid("Invalid public property"));
             }
-            atom(extent, &property.value)
+            property.value.with_atom(|value| atom(extent, value))
         })?;
         items(store, node, header.kind, |value| atom(extent, value))?;
     }
@@ -299,7 +365,7 @@ pub(crate) fn validate_schema_ids<S: AdmissionRead>(
             }
         }
         properties(store, node, header.properties, |property| {
-            check(&property.value)
+            property.value.with_atom(check)
         })?;
         items(store, node, header.kind, check)?;
     }

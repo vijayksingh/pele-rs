@@ -36,6 +36,9 @@ policy behind an opt-in feature.
 [Experimental captured web storage](LLD_CAPTURED_WEB_STORAGE.md) implements that
 boundary with shared traversal and bounded column imports. Its initial VM result
 rejects default activation; profiling and a coarser boundary remain necessary.
+[Native canonical storage](LLD_NATIVE_CANONICAL_STORAGE.md) moves the generic
+tables into Rust-owned POD pages, uses direct native admission and bounded host
+observation, and defines pinned page leases for the shared browser publisher.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.

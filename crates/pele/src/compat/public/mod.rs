@@ -41,3 +41,6 @@ pub(crate) use engine::CapturedSankeyRegistration;
 #[cfg(feature = "web-host-sankey")]
 #[doc(hidden)]
 pub use engine::HostSankeyEntrySelection;
+
+#[cfg(feature = "web-host-sankey")]
+pub(crate) mod flat_store;
