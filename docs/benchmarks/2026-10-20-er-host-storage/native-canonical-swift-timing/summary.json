@@ -1,0 +1,174 @@
+{
+  "scope": "One shared-host default-native Swift attempt; no speedup, neutrality, WASM or release claim",
+  "control": {
+    "directory": "dist/perf-patches/parse-architecture/captured-native-core/candidate-swift",
+    "revision": "25d87cb49bb451d3e7c1e70c2856ccb6fef4abd0",
+    "manifestSha256": "0c784216ffbe5ed236aa189724bf93bb76876d2d3096f85e3743847d36c89adb",
+    "binarySha256": "9c1d267539a7eaa1b94243dc64cc1dabfafbd0c795a73dd265d5b3f843d56888",
+    "sourceInputSha256": "0bffad4be2e139643262e136f1663487ac98c0a5f8cdbbe3edecd81d88132b0d",
+    "nativeHostArchiveSha256": "869d20000dfd58de5f4cd2a3805a24df9731462b13151b29c25ac9db96b489ca"
+  },
+  "candidate": {
+    "directory": "dist/perf-patches/parse-architecture/native-canonical-correctness/candidate-swift",
+    "revision": "3166b3dd18569ad0bc20f173a8941dd628609ddc",
+    "manifestSha256": "caf8690b372572812d39fdbf0cff3094b363568dd214857933bbd96c233ab9f4",
+    "binarySha256": "c9fb8ab770594cf4395d0f035f8f7cc0f56cf98641a6a5c74b2ee623ec66082a",
+    "sourceInputSha256": "1f89890b534bf1fe2958ed9b03bbc91470cae260a615925e1b15df752cb157ee",
+    "nativeHostArchiveSha256": "3e89155e3283ef2d77abf2b707e4a6831088f6339ddddf8dab17d5dd8b16c1dd"
+  },
+  "continuityCommit": "5db9f35b475a3ee479c925513d78ab237a6cda0e",
+  "sourceInputCount": 362,
+  "changedInputs": [
+    {
+      "path": "CPele/macos-arm64/libpele_ffi.a",
+      "control": "869d20000dfd58de5f4cd2a3805a24df9731462b13151b29c25ac9db96b489ca",
+      "candidate": "3e89155e3283ef2d77abf2b707e4a6831088f6339ddddf8dab17d5dd8b16c1dd"
+    },
+    {
+      "path": "root/crates/pele/src/compat/host_sankey.rs",
+      "control": "4e47bfa55ce06091552d1b3b40ed1f15c23230624c184c76196668c547c199c4",
+      "candidate": "78720f6520b4bab7659ba55929392f9e03468591ba286c35ddd394c2dce5897d"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/captured_admission.rs",
+      "control": "e6310c87ebec52ddf7da92e3f98a7295c1d6f244e2e4999b7d427c605493367c",
+      "candidate": "30c3294386a3eae79b6d8cea781101ae6e4e93fd06f322a3277429a70aa140b0"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/captured_transport.rs",
+      "control": "b05a5b404e8df3c411a1390ba4be67847d0a0fe01468f112129cfc0e82b35120",
+      "candidate": "eb218df7e8460a5fd32ea5b24ac8cb2b23310cc6dca47849860cee6f0233450d"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/engine.rs",
+      "control": "eadb4c1789b0d99a13ab44d84b438d25a398d8bba1eba6be049f56e1dccc4963",
+      "candidate": "e0451e5f41fa7325c3c950688a54b85fd68ce825bd658498ed484b4d5d352ed2"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/flat_store/mod.rs",
+      "control": null,
+      "candidate": "c7d9e1d246e816769331402aa9535939b824cee89cfc66b6f9f52f7769d225eb"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/flat_store/observation.rs",
+      "control": null,
+      "candidate": "a868c0b6ad05ecc8b9b135958bdbc8740d12830e444954ac79f55417d13cb9a1"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/flat_store/pages.rs",
+      "control": null,
+      "candidate": "7b21cfc381d8a1d5c9513f3c240fbd39481cf524a516f166d7818a8d03e23487"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/flat_store/read.rs",
+      "control": null,
+      "candidate": "3f7936f31d89b344f4b8efbc0e3ee60e09dd903e94eeaf802aae320cdfa850b4"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/flat_store/write.rs",
+      "control": null,
+      "candidate": "e9e0809a09805c5585d98ed0289578d3cb5a45aa535da26bf8d1ecb2a64c51d8"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/mod.rs",
+      "control": "b180db81fa5f3a90bd49efeb565aef3205d1fe716ad73615d827d9e6ff2d0577",
+      "candidate": "96cab9301bc700c6cd5c52d4a9863a728f7c36e3a88c470a8389dc1b6dd4e5b5"
+    }
+  ],
+  "elapsedWallMs": 40179.886290999995,
+  "completeConditions": 4,
+  "pairs": 60,
+  "orderCounts": {
+    "control": 30,
+    "candidate": 30
+  },
+  "warmupMsPerSidePerCondition": 1000,
+  "retries": 0,
+  "pooling": false,
+  "rows": [
+    {
+      "case": "sankey/medium",
+      "stage": "parseMutable",
+      "pairs": 15,
+      "count": 128,
+      "controlMedianMs": 0.069853515625,
+      "candidateMedianMs": 0.0697467421875,
+      "pairedMedianPercent": -0.29900913347741254,
+      "ratioOfMedians": 0.9984714665175451,
+      "candidateLowerPairs": 10,
+      "pairedPercentRange": [
+        -7.027619497184734,
+        37.30042869850683
+      ],
+      "orderCounts": {
+        "control": 8,
+        "candidate": 7
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse",
+      "pairs": 15,
+      "count": 64,
+      "controlMedianMs": 0.268408859375,
+      "candidateMedianMs": 0.266056640625,
+      "pairedMedianPercent": -0.12500842355077646,
+      "ratioOfMedians": 0.9912364340153407,
+      "candidateLowerPairs": 8,
+      "pairedPercentRange": [
+        -9.891978537812163,
+        16.38334904135221
+      ],
+      "orderCounts": {
+        "control": 7,
+        "candidate": 8
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render",
+      "pairs": 15,
+      "count": 64,
+      "controlMedianMs": 0.356890625,
+      "candidateMedianMs": 0.36071028125,
+      "pairedMedianPercent": 1.3284863208554043,
+      "ratioOfMedians": 1.0107025962085723,
+      "candidateLowerPairs": 5,
+      "pairedPercentRange": [
+        -2.867217852067472,
+        3.4151396397080536
+      ],
+      "orderCounts": {
+        "control": 8,
+        "candidate": 7
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "lifetime",
+      "pairs": 15,
+      "count": 32,
+      "controlMedianMs": 0.60660028125,
+      "candidateMedianMs": 0.5914830625,
+      "pairedMedianPercent": -0.33725595151532506,
+      "ratioOfMedians": 0.9750787805128471,
+      "candidateLowerPairs": 8,
+      "pairedPercentRange": [
+        -82.42820980602504,
+        95.8139757221551
+      ],
+      "orderCounts": {
+        "control": 7,
+        "candidate": 8
+      }
+    }
+  ],
+  "limitations": [
+    "One Sankey medium fixture, four separate complete condition windows; no cross-window compounding.",
+    "Render paired median is adverse. Lifetime has large bidirectional outliers, all retained; these data do not establish neutrality or a causal speedup.",
+    "Strict global compiler/Pele-test guard was unchanged. Passing its checks does not imply an idle or load-free host; process and per-pair load records are retained.",
+    "Control25d87cb to candidate3166b3d includes the recorded native source and SDK delta; it does not isolate the opt-in WASM native-canonical backend. JS-only cursor5db9f35 has the same native inputs.",
+    "Archived executables, SDKs and source trees are omitted. Portable verification checks recorded identities and arithmetic, not a fresh rebuild or physical binary rehash.",
+    "No retries, sample exclusions, pooling, additional timings or statistical equivalence test."
+  ]
+}

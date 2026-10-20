@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "3166b3dd18569ad0bc20f173a8941dd628609ddc",
+  "scope": "default native/Swift/C correctness only; no browser or timing claim",
+  "origins": {
+    "proof/attempt-started.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/attempt-started.json",
+      "sourceSha256": "60496ce15d67a00b149cfc5c52dc813ee4ce8244946f8e280cad0bf64d43cf77",
+      "sourceBytes": 120
+    },
+    "proof/before-sdk.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/before-sdk.json",
+      "sourceSha256": "afa8dcd1a37a691780e71d93b733afe2e580681404bfb58d004574e3220e31db",
+      "sourceBytes": 189962
+    },
+    "proof/after-sdk.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/after-sdk.json",
+      "sourceSha256": "a20fbc1978b1cabd74d4b68dcd5e1d198642514d022f4b0b00a9e4b59656348a",
+      "sourceBytes": 52477
+    },
+    "proof/before-correctness.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/before-correctness.json",
+      "sourceSha256": "de9ad9136615cfb5c49a977c0b81e85bc9e87e15feb6482627b6c211881d62e2",
+      "sourceBytes": 99741
+    },
+    "proof/after-correctness.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/after-correctness.json",
+      "sourceSha256": "bf69eebe8a4c6ee755914ed2e46269c4319ab55180993b0842eab7857da3e07a",
+      "sourceBytes": 100426
+    },
+    "proof/correctness-commands.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/correctness-commands.json",
+      "sourceSha256": "6d0c8e6bc46b4e72889b23ce8af2991ae486cda73ad23839df1a2d1f252efd1d",
+      "sourceBytes": 6644
+    },
+    "proof/c-consumers.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/c-consumers.json",
+      "sourceSha256": "1e23f2a11baa5eac63f07000a6ea368e1ffaf7977ce0d9a434b6436f58b03576",
+      "sourceBytes": 2834
+    },
+    "proof/swift-build-manifest.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/candidate-swift/swift-build-manifest.json",
+      "sourceSha256": "caf8690b372572812d39fdbf0cff3094b363568dd214857933bbd96c233ab9f4",
+      "sourceBytes": 46308
+    },
+    "proof/swift-api.json.gz": {
+      "source": "dist/evidence/native-canonical-correctness-swift-api.json",
+      "sourceSha256": "5940b31cb1ed9bcb0d30cc81b8602e63d3db7eee6b76ecf6f5f9cdbf0dc87d65",
+      "sourceBytes": 235892
+    },
+    "execution/freeze.mjs": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/freeze.mjs",
+      "sourceSha256": "77ade93d1285010dd381a0cef35e8e2ec4fd52d9718427fc2f3139ebe28eab71",
+      "sourceBytes": 7463
+    },
+    "execution/run-correctness.py": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/runtime/run-correctness.py",
+      "sourceSha256": "6a151f32aaf547d90cf1ab96f2d152bf777ce383453f8432b340a4a67d683274",
+      "sourceBytes": 2735
+    },
+    "execution/swift-build.mjs": {
+      "source": "3166b3dd18569ad0bc20f173a8941dd628609ddc:scripts/perf/swift/build.mjs",
+      "sourceSha256": "c6d23dc6f051bb181e25a7290c958970a2b1e2d67b24f3550ed928c355ea0cb5",
+      "sourceBytes": 6517
+    },
+    "execution/swift-run.mjs": {
+      "source": "3166b3dd18569ad0bc20f173a8941dd628609ddc:scripts/perf/swift/run.mjs",
+      "sourceSha256": "d69cc871f08bc486ebfc624abb416b3bd1859cebb749c2a49cb8c2bd0abbeb59",
+      "sourceBytes": 8798
+    },
+    "logs/native-canonical-correctness-freeze-before-sdk.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-freeze-before-sdk.log",
+      "sourceSha256": "452f0af9798c2e014ff4a7b18b274df6558d7772955a85903e6a9140b37dd942",
+      "sourceBytes": 179
+    },
+    "logs/native-canonical-correctness-sdk-build.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-sdk-build.log",
+      "sourceSha256": "01e3a0c6856ac3d62365dff054c67f21e7403b80d1e2df195e7962c3c67e0221",
+      "sourceBytes": 356
+    },
+    "logs/native-canonical-correctness-freeze-after-sdk.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-freeze-after-sdk.log",
+      "sourceSha256": "bccef13d5501c6d49641719f5d574925aec200ea2c4253f4cbf3c0c3b62fb9f9",
+      "sourceBytes": 267
+    },
+    "logs/native-canonical-correctness-swift-build.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-swift-build.log",
+      "sourceSha256": "c75da1515660fdbba05178ea83751a6a1392c638fc5cd9315071ed10406f868f",
+      "sourceBytes": 371
+    },
+    "logs/native-canonical-correctness-freeze-before-correctness.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-freeze-before-correctness.log",
+      "sourceSha256": "410ef3056c27678801a70dcd245a022a750e5080adb0062c9e4ffc4cadf5f75d",
+      "sourceBytes": 358
+    },
+    "logs/native-canonical-correctness-swift-corpus.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-swift-corpus.log",
+      "sourceSha256": "903d6059eeefaa797ba90eeb119be00ed0383754136ea007bb9b05ee7df1985b",
+      "sourceBytes": 5688
+    },
+    "logs/native-canonical-correctness-ffi-compile.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-ffi-compile.log",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceBytes": 0
+    },
+    "logs/native-canonical-correctness-ffi-run.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-ffi-run.log",
+      "sourceSha256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+      "sourceBytes": 97
+    },
+    "logs/native-canonical-correctness-ffi-public-compile.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-ffi-public-compile.log",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceBytes": 0
+    },
+    "logs/native-canonical-correctness-ffi-public-run.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-ffi-public-run.log",
+      "sourceSha256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+      "sourceBytes": 36
+    },
+    "logs/native-canonical-correctness-ffi-parse-limits-compile.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-ffi-parse-limits-compile.log",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceBytes": 0
+    },
+    "logs/native-canonical-correctness-ffi-parse-limits-run.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-ffi-parse-limits-run.log",
+      "sourceSha256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
+      "sourceBytes": 104
+    },
+    "logs/native-canonical-correctness-swift-api.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-swift-api.log",
+      "sourceSha256": "f2deab5f70521f726c2ebe42824c195e3db43bff0aa6f409224b9b8ae023d1d5",
+      "sourceBytes": 564
+    },
+    "logs/native-canonical-correctness-freeze-after-correctness.log.gz": {
+      "source": "dist/evidence/native-canonical-correctness-freeze-after-correctness.log",
+      "sourceSha256": "b743bb31d84bd50b4b9038a7b61d7a182ebb2648ff7df199bca7c884f8f7678e",
+      "sourceBytes": 941
+    },
+    "proof/immutable-commit-mapping.json.gz": {
+      "source": "packaging-time immutable Git verification",
+      "sourceSha256": "0c0e4487eed57b6c823c3409b1f8f74bd27954d0d0abd567e781294f4e3d18cf",
+      "sourceBytes": 112861
+    }
+  }
+}

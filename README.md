@@ -179,19 +179,44 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 complete release-gate run, historical source `0b32797`, fails all 126 conditions.
 New scoped diagnostics do not replace that gate.
 
-The opt-in [captured Sankey experiment](docs/benchmarks/2026-10-20-er-host-storage/captured-backend-rejected/)
-is **rejected for activation**: identical-package VM tests measure parse at
-5.3–6.5× current arena latency and retained render at 3.7–4.0×. Six CPU profiles
-locate the dominant boundary in repeated native admission through JS column
-imports; raw parsing is a small share. All 18 rows, negative controls and raw
-profiles are retained. The selector stays disabled. Work now moves canonical
-storage into Rust/WASM memory with bulk observation and direct native reads;
-that replacement has no measured speedup yet.
+The native canonical Sankey backend puts its model tables in Rust-owned POD
+pages, streams bounded host observations and shares browser publication and
+matching. Its [first runtime](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-rejected/)
+still regressed against the arena. Profiling located repeated memory-view
+refreshes and buffer getters, rather than the grammar, as a major cost.
 
-The separate [correctness checkpoint](docs/benchmarks/2026-10-20-er-host-storage/captured-web-validation/)
-at `00d2411` passes **450/450 browser tests**, including 33 selected-backend
-checks. All 408 source inputs and 112 packed files are pinned and unchanged.
-That correctness result does not approve the rejected backend's performance.
+The [bounded row reader](docs/benchmarks/2026-10-20-er-host-storage/native-pod-cursor/),
+source `5db9f35`, improves **all 12 affected VM conditions** against that native
+runtime: paired parse medians fall **22.19–29.78%**, retained render
+**32.98–37.70%**. Source controls vary **−0.20% to +1.04%**. A separate matched
+arena comparison remains adverse:
+
+| Current opt-in native backend | Cost versus arena | Cost versus pinned JS |
+| --- | ---: | ---: |
+| Parse, six size/resource conditions | 1.41–1.54× | 15.90–23.02× |
+| Retained render, six conditions | 1.36–1.52× | 2.89–4.93× |
+
+Both comparisons retain all 36 rows, 21 paired samples per row and adverse
+controls. The packages differ only in the reader module and use identical WASM.
+No cross-window gains are compounded. **The backend stays disabled.** The next
+layer tests operation-scoped bounded read sessions; it has no measured result yet.
+
+[Browser correctness at `3166b3d`](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-browser/)
+passes **468/468 checks**, 156 per engine, with all 586 source inputs and 113
+packed files pinned and unchanged. This includes the selected native backend,
+memory growth, callback restoration and failure recovery. The subsequent reader
+passes **54 focused checks** across Chromium, Firefox and WebKit, including long
+UTF16 publication. [Fresh local SDK correctness](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-correctness/)
+passes 16 Swift integrations, three C consumers and 168 API conditions;
+its corpus covers 12,481 drawings and 16,572
+expected errors with zero explicit budget differences. All 362 native/SDK inputs
+remain unchanged through the JS-only reader change. These checks establish
+neither performance parity nor release readiness.
+
+The previous [JS-column backend](docs/benchmarks/2026-10-20-er-host-storage/captured-backend-rejected/)
+also remains rejected: parse was 5.3–6.5× arena latency and retained render
+3.7–4.0×. Its separate 450-test correctness result belongs to `00d2411` and is
+not relabeled as the native backend's validation.
 
 The first [shared traversal attempt](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-rejected/)
 was rejected after Flowchart/medium fixed retained render measured **9.16% slower**
@@ -229,12 +254,13 @@ latency and RSS. [Earlier checkpoints](docs/PERFORMANCE_CHECKPOINTS.md) retain t
 full measurement history, native-core comparisons, compiler tradeoffs and rejected
 experiments.
 
-Latest local Swift timing, core `365ec6d` versus `1906d68`, completed three
-Sankey/medium conditions: mutable parse **−0.92%**, immutable parse **+0.05%**,
-render **+1.02%**, each with 15 pairs and recorded shared-host load. External
-compiler activity interrupted lifetime; its entire incomplete condition is
-excluded. This measures the native helper-storage change, independently of the
-rejected JS traversal experiment. It establishes no substantial speedup.
+Latest [local Swift timing](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-swift-timing/),
+`25d87cb` → `3166b3d`, completed all four Sankey/medium conditions with 15 pairs
+each: mutable parse **−0.299%**, immutable parse **−0.125%**, render **+1.328%**,
+lifetime **−0.337%**. The strict compiler/test guard passed, but the shared host
+was not idle; lifetime pairs range **−82.43% to +95.81%**. Every sample is retained.
+This is neither a general speedup nor a neutrality claim, and it does not measure
+the opt-in browser backend.
 
 Correctness is pinned separately from performance:
 
@@ -257,9 +283,9 @@ Correctness is pinned separately from performance:
   [Exact logs, source bindings and portable verifier](docs/benchmarks/2026-10-20-er-host-storage/captured-native-core/README.md).
   These overlapping checks do not establish captured-browser validation or latency.
 
-Work now targets complete captured Sankey storage, preserving an eager render
-projection and full callback restoration while removing the persistent native
-generic graph and initial binary round trip. Intel SDK and AppKit activation
+Work now targets the remaining publication/read boundaries and native
+construction costs, preserving eager projection and full callback restoration.
+Intel SDK and AppKit activation
 verification remain release checks. No GPU acceleration or all-33 JS speedup is
 claimed. Timings exclude startup, downloads and SVG painting; Swift and VM figures
 use different machines and cannot be subtracted to estimate bridge cost.

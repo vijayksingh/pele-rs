@@ -1,0 +1,446 @@
+{
+  "packageFiles": 113,
+  "benchmarkRows": 18,
+  "benchmarkUntimedProbes": 48,
+  "profileWindows": 6,
+  "profileUntimedProbes": 24,
+  "notes": [
+    "Original executed summary retained unchanged. Supplemental group matching normalizes Rust crate hashes, fixing the original native-wrapper regex coverage.",
+    "Language/self roles are disjoint; inclusive groups and unions overlap. No predicted gain or invocation counts.",
+    "All get-buffer self percentages distinguish those occurring below memory-refresh."
+  ],
+  "profiles": [
+    {
+      "stage": "parse",
+      "runtime": "control",
+      "samples": 5900,
+      "weightedUs": 2068952,
+      "selfLanguage": {
+        "engine-or-profiler": 4.796824672587861,
+        "javascript": 39.897445663311665,
+        "wasm": 41.76119117311566,
+        "gc": 13.544538490984808
+      },
+      "groups": {
+        "memory-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-admission": {
+          "selfUs": 77010,
+          "inclusiveUs": 77010,
+          "selfPercent": 3.722174318205546,
+          "inclusivePercent": 3.722174318205546
+        },
+        "native-flat-store": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-wrapper-and-leases": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "sankey-parser": {
+          "selfUs": 61178,
+          "inclusiveUs": 164196,
+          "selfPercent": 2.9569559854457714,
+          "inclusivePercent": 7.936191849786752
+        },
+        "sankey-render-layout": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "shared-publication": {
+          "selfUs": 444551,
+          "inclusiveUs": 462690,
+          "selfPercent": 21.486772046910705,
+          "inclusivePercent": 22.363496108174573
+        },
+        "shared-observation-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-storage-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        }
+      },
+      "getBufferSelfPercent": 0.0,
+      "getBufferSelfInsideRefreshPercent": 0.0,
+      "deduplicatedBoundaryUnionPercent": 26.08567042638012,
+      "refreshPlusBufferDisjointSelfPercent": 0.0
+    },
+    {
+      "stage": "parse",
+      "runtime": "candidate",
+      "samples": 5875,
+      "weightedUs": 2039630,
+      "selfLanguage": {
+        "engine-or-profiler": 14.9484955604693,
+        "javascript": 49.67852012374794,
+        "wasm": 30.65433436456612,
+        "gc": 4.718649951216642
+      },
+      "groups": {
+        "memory-refresh": {
+          "selfUs": 606355,
+          "inclusiveUs": 853855,
+          "selfPercent": 29.728676279521284,
+          "inclusivePercent": 41.86323009565461
+        },
+        "native-admission": {
+          "selfUs": 83175,
+          "inclusiveUs": 133365,
+          "selfPercent": 4.077945509724803,
+          "inclusivePercent": 6.538685938135838
+        },
+        "native-flat-store": {
+          "selfUs": 336811,
+          "inclusiveUs": 479307,
+          "selfPercent": 16.513338203497693,
+          "inclusivePercent": 23.499703377573383
+        },
+        "native-wrapper-and-leases": {
+          "selfUs": 6950,
+          "inclusiveUs": 167278,
+          "selfPercent": 0.34074807685707703,
+          "inclusivePercent": 8.201389467697572
+        },
+        "sankey-parser": {
+          "selfUs": 27158,
+          "inclusiveUs": 76885,
+          "selfPercent": 1.3315160102567623,
+          "inclusivePercent": 3.7695562430440814
+        },
+        "sankey-render-layout": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "shared-publication": {
+          "selfUs": 240939,
+          "inclusiveUs": 1177297,
+          "selfPercent": 11.812877825880184,
+          "inclusivePercent": 57.72110627908003
+        },
+        "shared-observation-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-storage-js": {
+          "selfUs": 692586,
+          "inclusiveUs": 990577,
+          "selfPercent": 33.95645288606267,
+          "inclusivePercent": 48.56650470918745
+        }
+      },
+      "getBufferSelfPercent": 12.134553816133318,
+      "getBufferSelfInsideRefreshPercent": 12.134553816133318,
+      "deduplicatedBoundaryUnionPercent": 83.22107441055485,
+      "refreshPlusBufferDisjointSelfPercent": 41.8632300956546
+    },
+    {
+      "stage": "render-model",
+      "runtime": "candidate",
+      "samples": 5904,
+      "weightedUs": 2026472,
+      "selfLanguage": {
+        "engine-or-profiler": 20.61089420431173,
+        "javascript": 52.44257014160571,
+        "wasm": 26.829929058975402,
+        "gc": 0.1166065951071616
+      },
+      "groups": {
+        "memory-refresh": {
+          "selfUs": 770842,
+          "inclusiveUs": 1088822,
+          "selfPercent": 38.03862081489406,
+          "inclusivePercent": 53.72993063807445
+        },
+        "native-admission": {
+          "selfUs": 62623,
+          "inclusiveUs": 111218,
+          "selfPercent": 3.090247484297834,
+          "inclusivePercent": 5.4882574247263225
+        },
+        "native-flat-store": {
+          "selfUs": 104057,
+          "inclusiveUs": 110142,
+          "selfPercent": 5.134884666553498,
+          "inclusivePercent": 5.435160219336858
+        },
+        "native-wrapper-and-leases": {
+          "selfUs": 5821,
+          "inclusiveUs": 109885,
+          "selfPercent": 0.28724798566178067,
+          "inclusivePercent": 5.422478080131381
+        },
+        "sankey-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "sankey-render-layout": {
+          "selfUs": 80388,
+          "inclusiveUs": 420557,
+          "selfPercent": 3.9668941885207394,
+          "inclusivePercent": 20.753161158900788
+        },
+        "shared-publication": {
+          "selfUs": 83499,
+          "inclusiveUs": 690690,
+          "selfPercent": 4.120412223805707,
+          "inclusivePercent": 34.083372481830494
+        },
+        "shared-observation-match": {
+          "selfUs": 68046,
+          "inclusiveUs": 637530,
+          "selfPercent": 3.3578554255869313,
+          "inclusivePercent": 31.460094193258037
+        },
+        "native-storage-js": {
+          "selfUs": 842828,
+          "inclusiveUs": 1193942,
+          "selfPercent": 41.59090281040152,
+          "inclusivePercent": 58.917271001030365
+        }
+      },
+      "getBufferSelfPercent": 15.691309823180385,
+      "getBufferSelfInsideRefreshPercent": 15.691309823180385,
+      "deduplicatedBoundaryUnionPercent": 75.31976755662058,
+      "refreshPlusBufferDisjointSelfPercent": 53.72993063807444
+    },
+    {
+      "stage": "render-model",
+      "runtime": "control",
+      "samples": 5788,
+      "weightedUs": 2037692,
+      "selfLanguage": {
+        "engine-or-profiler": 8.538876336561168,
+        "wasm": 59.15864615457095,
+        "javascript": 31.828460827249653,
+        "gc": 0.47401668161822297
+      },
+      "groups": {
+        "memory-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-admission": {
+          "selfUs": 54628,
+          "inclusiveUs": 56096,
+          "selfPercent": 2.6808762070028247,
+          "inclusivePercent": 2.752918497986938
+        },
+        "native-flat-store": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-wrapper-and-leases": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "sankey-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "sankey-render-layout": {
+          "selfUs": 190544,
+          "inclusiveUs": 1011739,
+          "selfPercent": 9.350971589425683,
+          "inclusivePercent": 49.6512230503923
+        },
+        "shared-publication": {
+          "selfUs": 253146,
+          "inclusiveUs": 263409,
+          "selfPercent": 12.423172883831315,
+          "inclusivePercent": 12.926830944028833
+        },
+        "shared-observation-match": {
+          "selfUs": 108324,
+          "inclusiveUs": 146600,
+          "selfPercent": 5.316014392754155,
+          "inclusivePercent": 7.194414072391706
+        },
+        "native-storage-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        }
+      },
+      "getBufferSelfPercent": 0.0,
+      "getBufferSelfInsideRefreshPercent": 0.0,
+      "deduplicatedBoundaryUnionPercent": 22.874163514407478,
+      "refreshPlusBufferDisjointSelfPercent": 0.0
+    },
+    {
+      "stage": "render-source",
+      "runtime": "control",
+      "samples": 5813,
+      "weightedUs": 2060035,
+      "selfLanguage": {
+        "engine-or-profiler": 13.190358416240501,
+        "wasm": 81.87919137296211,
+        "javascript": 4.815015278866621,
+        "gc": 0.11543493193076816
+      },
+      "groups": {
+        "memory-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-flat-store": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-wrapper-and-leases": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "sankey-parser": {
+          "selfUs": 52209,
+          "inclusiveUs": 145432,
+          "selfPercent": 2.5343744159686605,
+          "inclusivePercent": 7.059685879123413
+        },
+        "sankey-render-layout": {
+          "selfUs": 276021,
+          "inclusiveUs": 1479156,
+          "selfPercent": 13.398850019538504,
+          "inclusivePercent": 71.80246937552032
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "shared-observation-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-storage-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        }
+      },
+      "getBufferSelfPercent": 0.0,
+      "getBufferSelfInsideRefreshPercent": 0.0,
+      "deduplicatedBoundaryUnionPercent": 0.0,
+      "refreshPlusBufferDisjointSelfPercent": 0.0
+    },
+    {
+      "stage": "render-source",
+      "runtime": "candidate",
+      "samples": 5807,
+      "weightedUs": 2041817,
+      "selfLanguage": {
+        "engine-or-profiler": 12.20359121312047,
+        "wasm": 82.85762142248791,
+        "javascript": 4.855038429007105,
+        "gc": 0.08374893538451292
+      },
+      "groups": {
+        "memory-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-flat-store": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-wrapper-and-leases": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "sankey-parser": {
+          "selfUs": 58196,
+          "inclusiveUs": 142221,
+          "selfPercent": 2.850206458267318,
+          "inclusivePercent": 6.965413648725621
+        },
+        "sankey-render-layout": {
+          "selfUs": 282727,
+          "inclusiveUs": 1475698,
+          "selfPercent": 13.846833482138702,
+          "inclusivePercent": 72.27376400529528
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "shared-observation-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        },
+        "native-storage-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0.0,
+          "inclusivePercent": 0.0
+        }
+      },
+      "getBufferSelfPercent": 0.0,
+      "getBufferSelfInsideRefreshPercent": 0.0,
+      "deduplicatedBoundaryUnionPercent": 0.0,
+      "refreshPlusBufferDisjointSelfPercent": 0.0
+    }
+  ]
+}

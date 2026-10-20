@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "3166b3dd18569ad0bc20f173a8941dd628609ddc",
+  "origins": {
+    "proof/source.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-runtime/source.json",
+      "sourceSha256": "5fe2e060d96dc2eb65993b6348d79784550132d2926fd34f8c819702f6d3ca21",
+      "sourceBytes": 68347
+    },
+    "proof/package.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-runtime/package.json",
+      "sourceSha256": "c7d35b8b50b4800cce1f980353479b995acd7b38cb27573469a99bb9ed0e7e50",
+      "sourceBytes": 78881
+    },
+    "proof/after.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-runtime/after.json",
+      "sourceSha256": "5030e09243fcb76aaf9fd36ad0fd39e117e98550361a152c3ffd7eaa8db4e916",
+      "sourceBytes": 78907
+    },
+    "proof/after-full-browser.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-runtime/after-full-browser.json",
+      "sourceSha256": "5030e09243fcb76aaf9fd36ad0fd39e117e98550361a152c3ffd7eaa8db4e916",
+      "sourceBytes": 78907
+    },
+    "execution/freeze.mjs": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-runtime/freeze.mjs",
+      "sourceSha256": "358e2e98ee9d4f1a72958a0d51e9a909c8a25aaa86543c0f5b37f933bf1a147f",
+      "sourceBytes": 2722
+    },
+    "logs/native-canonical-full-web.log.gz": {
+      "source": "dist/evidence/native-canonical-full-web.log",
+      "sourceSha256": "f1bb67cc73325d19eee00fb28e6e6db96d554b02163a167af1a2377a201043c8",
+      "sourceBytes": 77346
+    },
+    "logs/native-canonical-core.log.gz": {
+      "source": "dist/evidence/native-canonical-core.log",
+      "sourceSha256": "a3855906956669b8216b5f42a04cfe0500000881f415f494d72910e4d0fbb834",
+      "sourceBytes": 3504
+    },
+    "logs/native-canonical-corpus.log.gz": {
+      "source": "dist/evidence/native-canonical-corpus.log",
+      "sourceSha256": "2f5dbc985d314836b62562758f32f78ad51bf891e309d373ca57012195161be0",
+      "sourceBytes": 889
+    },
+    "logs/native-canonical-default.log.gz": {
+      "source": "dist/evidence/native-canonical-default.log",
+      "sourceSha256": "3b4056c8a338622ff2984f870b02cd2a2f08b980344b848ae41e7b48e959ae31",
+      "sourceBytes": 1697
+    },
+    "logs/native-canonical-wasm-check.log.gz": {
+      "source": "dist/evidence/native-canonical-wasm-check.log",
+      "sourceSha256": "a699b36a61f664def72333602ea2d459174dfe6b9f543dcd5e8f8c7994cc984b",
+      "sourceBytes": 161
+    },
+    "logs/native-canonical-wasm-build.log.gz": {
+      "source": "dist/evidence/native-canonical-wasm-build.log",
+      "sourceSha256": "2897786f6372d064e8600969578b48b5988a079e4af242d6e330829de627ece7",
+      "sourceBytes": 266
+    },
+    "logs/native-canonical-runtime-proof.log.gz": {
+      "source": "dist/evidence/native-canonical-runtime-proof.log",
+      "sourceSha256": "fa0f340c991b81b76a11ecc3d338dbc0ef7b2ee9c4b2fef3fd87407dbac166db",
+      "sourceBytes": 206
+    },
+    "scope/public_native_flat_store.rs.gz": {
+      "source": "3166b3dd18569ad0bc20f173a8941dd628609ddc:crates/pele/tests/public_native_flat_store.rs",
+      "sourceSha256": "f8c4541b0a4cc07def0510d71ebb3c7b95f2b0737ac0486ad1fb869a4323d57b",
+      "sourceBytes": 21583
+    },
+    "scope/captured-native-memory.spec.js.gz": {
+      "source": "3166b3dd18569ad0bc20f173a8941dd628609ddc:tests/web/captured-native-memory.spec.js",
+      "sourceSha256": "0dceb2b993d2c502b41d8263fc1a2951b463b64dbc2f05b10180db42b6b5571b",
+      "sourceBytes": 6286
+    },
+    "scope/captured-sankey.spec.js.gz": {
+      "source": "3166b3dd18569ad0bc20f173a8941dd628609ddc:tests/web/captured-sankey.spec.js",
+      "sourceSha256": "e9c9e1f7a4d2b42c6ab00cab95266fa3f8ec8373ec67052236998cade6b42d4c",
+      "sourceBytes": 11557
+    },
+    "proof/immutable-commit-mapping.json.gz": {
+      "source": "packaging-time immutable Git read",
+      "sourceSha256": "c542ab9d1bf0a81e6daf5f9701dbcfefac00791ceeaecc4460d15e31755bad82",
+      "sourceBytes": 128989
+    },
+    "proof/frozen-package-rehash.json.gz": {
+      "source": "packaging-time independent frozen package rehash",
+      "sourceSha256": "8b5752d91283f8df4646af2541cab98044346fbd1b506743bd379b5bd9d9ef70",
+      "sourceBytes": 10787
+    }
+  }
+}

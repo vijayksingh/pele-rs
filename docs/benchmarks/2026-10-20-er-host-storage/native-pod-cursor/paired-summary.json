@@ -1,0 +1,424 @@
+{
+  "native": {
+    "rows": [
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": -22.185555712694406,
+        "lowerPairs": 21,
+        "overControl": 0.7862345547125682,
+        "overJS": 22.03062269123125
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": -33.68841652261726,
+        "lowerPairs": 21,
+        "overControl": 0.6771653579440818,
+        "overJS": 5.009708650967562
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": -0.20296875354886001,
+        "lowerPairs": 11,
+        "overControl": 0.9979703124645114,
+        "overJS": 2.060055361046889
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": -24.93783500139951,
+        "lowerPairs": 20,
+        "overControl": 0.7506216499860049,
+        "overJS": 21.783519709610882
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": -32.98222269025813,
+        "lowerPairs": 21,
+        "overControl": 0.6710555218015349,
+        "overJS": 4.503681266636629
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": 1.0394983739291597,
+        "lowerPairs": 7,
+        "overControl": 1.0115020343975727,
+        "overJS": 1.9340234991287388
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": -29.78231817343435,
+        "lowerPairs": 19,
+        "overControl": 0.7023270577619009,
+        "overJS": 17.99585911841002
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": -36.51567265775751,
+        "lowerPairs": 21,
+        "overControl": 0.634514205800039,
+        "overJS": 3.3461271958544074
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": 0.6754902524979567,
+        "lowerPairs": 7,
+        "overControl": 1.0067549025249796,
+        "overJS": 1.4972791939603873
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": -26.371445743148968,
+        "lowerPairs": 20,
+        "overControl": 0.743103421967605,
+        "overJS": 17.846790540340425
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": -36.632345580927684,
+        "lowerPairs": 21,
+        "overControl": 0.6332330535165935,
+        "overJS": 3.1606173666272412
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": 0.25799891867701596,
+        "lowerPairs": 8,
+        "overControl": 1.0057864100659044,
+        "overJS": 1.4584286037684902
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": -29.659812670242868,
+        "lowerPairs": 20,
+        "overControl": 0.6989691140594543,
+        "overJS": 10.538860469105243
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": -37.698140459990434,
+        "lowerPairs": 21,
+        "overControl": 0.6263850650370899,
+        "overJS": 3.188367551591281
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": 0.05007625812778471,
+        "lowerPairs": 10,
+        "overControl": 1.0012619696113443,
+        "overJS": 1.5077917476830716
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": -29.650545856519038,
+        "lowerPairs": 17,
+        "overControl": 0.7024764995954784,
+        "overJS": 15.366715846611328
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": -37.08518755508179,
+        "lowerPairs": 21,
+        "overControl": 0.6301835780913716,
+        "overJS": 3.0024293212460456
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": 0.6253201070619996,
+        "lowerPairs": 8,
+        "overControl": 1.0069605193101958,
+        "overJS": 1.4090908277727563
+      }
+    ],
+    "ranges": {
+      "parse": {
+        "pairedPercent": [
+          -29.78231817343435,
+          -22.185555712694406
+        ],
+        "overControl": [
+          0.6989691140594543,
+          0.7862345547125682
+        ],
+        "overJS": [
+          10.538860469105243,
+          22.03062269123125
+        ]
+      },
+      "render-model": {
+        "pairedPercent": [
+          -37.698140459990434,
+          -32.98222269025813
+        ],
+        "overControl": [
+          0.6263850650370899,
+          0.6771653579440818
+        ],
+        "overJS": [
+          3.0024293212460456,
+          5.009708650967562
+        ]
+      },
+      "render-source": {
+        "pairedPercent": [
+          -0.20296875354886001,
+          1.0394983739291597
+        ],
+        "overControl": [
+          0.9979703124645114,
+          1.0115020343975727
+        ],
+        "overJS": [
+          1.4090908277727563,
+          2.060055361046889
+        ]
+      }
+    },
+    "untimedProbes": 48
+  },
+  "arena": {
+    "rows": [
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": 42.68127314878234,
+        "lowerPairs": 1,
+        "overControl": 1.4129554020181345,
+        "overJS": 21.587642731718443
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": 49.90009761585237,
+        "lowerPairs": 0,
+        "overControl": 1.5161451430781576,
+        "overJS": 4.930534285754783
+      },
+      {
+        "case": "sankey/small",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": 0.8971778479552217,
+        "lowerPairs": 9,
+        "overControl": 0.9943741268046038,
+        "overJS": 1.9859550042580483
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": 46.71378649152309,
+        "lowerPairs": 3,
+        "overControl": 1.4731109945725611,
+        "overJS": 23.021264896079995
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": 47.03557591610454,
+        "lowerPairs": 0,
+        "overControl": 1.4773845092909632,
+        "overJS": 4.45845729449096
+      },
+      {
+        "case": "sankey/small",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": 2.750348245804246,
+        "lowerPairs": 3,
+        "overControl": 1.028631137862531,
+        "overJS": 1.8860431436812066
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": 48.953690032614674,
+        "lowerPairs": 3,
+        "overControl": 1.493701912106999,
+        "overJS": 17.67701913390575
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": 41.06645147706802,
+        "lowerPairs": 0,
+        "overControl": 1.427667877393223,
+        "overJS": 3.348319745187061
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": 0.7745225062757655,
+        "lowerPairs": 7,
+        "overControl": 1.0062965434845481,
+        "overJS": 1.4559006377968582
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": 51.92802620163317,
+        "lowerPairs": 4,
+        "overControl": 1.5192802620163317,
+        "overJS": 17.3096282025908
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": 39.25954564352161,
+        "lowerPairs": 0,
+        "overControl": 1.3914036250943245,
+        "overJS": 3.152768803617724
+      },
+      {
+        "case": "sankey/medium",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": 1.3266985577323531,
+        "lowerPairs": 10,
+        "overControl": 0.9989119395360079,
+        "overJS": 1.4293499594140868
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "parse",
+        "pairedPercent": 52.015660713797814,
+        "lowerPairs": 7,
+        "overControl": 1.4983522840168582,
+        "overJS": 16.944099678120104
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "render-model",
+        "pairedPercent": 40.414718493319924,
+        "lowerPairs": 0,
+        "overControl": 1.3952305994197276,
+        "overJS": 3.0149945798670914
+      },
+      {
+        "case": "sankey/large",
+        "profile": "fixed",
+        "stage": "render-source",
+        "pairedPercent": -0.027962359805611126,
+        "lowerPairs": 11,
+        "overControl": 0.995617643209831,
+        "overJS": 1.4254902110380285
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "parse",
+        "pairedPercent": 53.80139085515878,
+        "lowerPairs": 3,
+        "overControl": 1.5426805549743712,
+        "overJS": 15.904429397055676
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "render-model",
+        "pairedPercent": 36.16138039104675,
+        "lowerPairs": 0,
+        "overControl": 1.3580154789708283,
+        "overJS": 2.8938854316262175
+      },
+      {
+        "case": "sankey/large",
+        "profile": "canvas",
+        "stage": "render-source",
+        "pairedPercent": 0.5282589867051879,
+        "lowerPairs": 9,
+        "overControl": 1.009198433337387,
+        "overJS": 1.400437618952785
+      }
+    ],
+    "ranges": {
+      "parse": {
+        "pairedPercent": [
+          42.68127314878234,
+          53.80139085515878
+        ],
+        "overControl": [
+          1.4129554020181345,
+          1.5426805549743712
+        ],
+        "overJS": [
+          15.904429397055676,
+          23.021264896079995
+        ]
+      },
+      "render-model": {
+        "pairedPercent": [
+          36.16138039104675,
+          49.90009761585237
+        ],
+        "overControl": [
+          1.3580154789708283,
+          1.5161451430781576
+        ],
+        "overJS": [
+          2.8938854316262175,
+          4.930534285754783
+        ]
+      },
+      "render-source": {
+        "pairedPercent": [
+          -0.027962359805611126,
+          2.750348245804246
+        ],
+        "overControl": [
+          0.9943741268046038,
+          1.028631137862531
+        ],
+        "overJS": [
+          1.400437618952785,
+          1.9859550042580483
+        ]
+      }
+    },
+    "untimedProbes": 48
+  }
+}

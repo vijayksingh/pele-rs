@@ -1,0 +1,33 @@
+{
+  "scope": "default native/Swift/C correctness only; no latency or opt-in browser-backend proof",
+  "sourceCommit": "3166b3dd18569ad0bc20f173a8941dd628609ddc",
+  "swift": {
+    "tests": 16,
+    "drawings": 12481,
+    "expectedErrors": 16572,
+    "explicitBudgetDifferences": 0,
+    "apiCases": 21,
+    "apiConditions": 168,
+    "cConsumers": 3
+  },
+  "freshness": {
+    "inputs": 362,
+    "gitMappedBuildInputs": 349,
+    "additionalGitMappedCorrectnessInputs": 34,
+    "sourceInputSha256": "1f89890b534bf1fe2958ed9b03bbc91470cae260a615925e1b15df752cb157ee",
+    "binarySha256": "c9fb8ab770594cf4395d0f035f8f7cc0f56cf98641a6a5c74b2ee623ec66082a",
+    "nativeHostArchiveSha256": "3e89155e3283ef2d77abf2b707e4a6831088f6339ddddf8dab17d5dd8b16c1dd",
+    "changedDuringSDK": [
+      "CPele/macos-arm64/libpele_ffi.a"
+    ],
+    "unchangedThroughCorrectness": true,
+    "previousControlCommit": "25d87cb49bb451d3e7c1e70c2856ccb6fef4abd0",
+    "previousControlBinarySha256": "9c1d267539a7eaa1b94243dc64cc1dabfafbd0c795a73dd265d5b3f843d56888"
+  },
+  "limitations": [
+    "This proves default native/FFI/Swift consumers, not the opt-in native-canonical WASM/JS owner.",
+    "No browser-suite result, latency, Intel SDK, release or complete JS parity claim.",
+    "Binaries and source trees are omitted. Portable verification checks captured records, output checks and hashes; it is not a rebuild or fresh binary rehash.",
+    "Command durations are correctness execution metadata and are not performance measurements."
+  ]
+}

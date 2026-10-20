@@ -1,0 +1,210 @@
+{
+  "rows": [
+    {
+      "case": "sankey/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "pairedPercent": 89.02779126240918,
+      "lowerPairs": 1,
+      "overArena": 1.8852798945277018,
+      "overJS": 28.4166924953707
+    },
+    {
+      "case": "sankey/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "pairedPercent": 125.3935904369475,
+      "lowerPairs": 0,
+      "overArena": 2.241584107745176,
+      "overJS": 7.326860590722508
+    },
+    {
+      "case": "sankey/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "pairedPercent": -0.9239457255597716,
+      "lowerPairs": 14,
+      "overArena": 1.0110420876424737,
+      "overJS": 1.8198759014888695
+    },
+    {
+      "case": "sankey/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "pairedPercent": 83.60767277432495,
+      "lowerPairs": 3,
+      "overArena": 1.8525597335388322,
+      "overJS": 25.60373983798354
+    },
+    {
+      "case": "sankey/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "pairedPercent": 119.75071338128464,
+      "lowerPairs": 0,
+      "overArena": 2.2038462420187086,
+      "overJS": 6.791111133716725
+    },
+    {
+      "case": "sankey/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "pairedPercent": -1.2345569188548788,
+      "lowerPairs": 17,
+      "overArena": 0.9842789094032814,
+      "overJS": 1.8798955490051659
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "pairedPercent": 111.25539314499484,
+      "lowerPairs": 2,
+      "overArena": 2.0959381623711923,
+      "overJS": 22.04787971691154
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "pairedPercent": 126.96629363980927,
+      "lowerPairs": 0,
+      "overArena": 2.253390376806859,
+      "overJS": 5.539811290047941
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "pairedPercent": -0.8705404679276163,
+      "lowerPairs": 15,
+      "overArena": 0.9957995067386128,
+      "overJS": 1.451428627481266
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "pairedPercent": 112.82610480411388,
+      "lowerPairs": 2,
+      "overArena": 2.092526776868435,
+      "overJS": 21.1131068074201
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "pairedPercent": 117.91605149669672,
+      "lowerPairs": 0,
+      "overArena": 2.1736526638349583,
+      "overJS": 5.022049420120252
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "pairedPercent": -0.9164373563961825,
+      "lowerPairs": 14,
+      "overArena": 0.9871897637834957,
+      "overJS": 1.3953224991231306
+    },
+    {
+      "case": "sankey/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "pairedPercent": 127.63466872062762,
+      "lowerPairs": 0,
+      "overArena": 2.2462007383004594,
+      "overJS": 22.35160800487906
+    },
+    {
+      "case": "sankey/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "pairedPercent": 124.11677076757898,
+      "lowerPairs": 0,
+      "overArena": 2.228989755318223,
+      "overJS": 5.028919328774194
+    },
+    {
+      "case": "sankey/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "pairedPercent": 3.650836982060346,
+      "lowerPairs": 1,
+      "overArena": 1.031750402533751,
+      "overJS": 1.5160243982779233
+    },
+    {
+      "case": "sankey/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "pairedPercent": 121.91457673155273,
+      "lowerPairs": 0,
+      "overArena": 2.2553193088332946,
+      "overJS": 22.907453134229925
+    },
+    {
+      "case": "sankey/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "pairedPercent": 117.31930168053518,
+      "lowerPairs": 0,
+      "overArena": 2.179640681802867,
+      "overJS": 4.648044748864182
+    },
+    {
+      "case": "sankey/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "pairedPercent": 0.10336154188688162,
+      "lowerPairs": 10,
+      "overArena": 0.9986999678041923,
+      "overJS": 1.3811578779226894
+    }
+  ],
+  "stageRanges": {
+    "parse": {
+      "pairedPercent": [
+        83.60767277432495,
+        127.63466872062762
+      ],
+      "overArena": [
+        1.8525597335388322,
+        2.2553193088332946
+      ],
+      "overJS": [
+        21.1131068074201,
+        28.4166924953707
+      ]
+    },
+    "render-model": {
+      "pairedPercent": [
+        117.31930168053518,
+        126.96629363980927
+      ],
+      "overArena": [
+        2.1736526638349583,
+        2.253390376806859
+      ],
+      "overJS": [
+        4.648044748864182,
+        7.326860590722508
+      ]
+    },
+    "render-source": {
+      "pairedPercent": [
+        -1.2345569188548788,
+        3.650836982060346
+      ],
+      "overArena": [
+        0.9842789094032814,
+        1.031750402533751
+      ],
+      "overJS": [
+        1.3811578779226894,
+        1.8798955490051659
+      ]
+    }
+  }
+}

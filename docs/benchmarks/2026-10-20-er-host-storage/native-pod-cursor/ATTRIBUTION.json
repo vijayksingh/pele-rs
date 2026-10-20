@@ -1,0 +1,1303 @@
+{
+  "validation": {
+    "filesPerPackage": 113,
+    "onlyDifference": "native-storage.js",
+    "sameWasm": true,
+    "untimedProbes": 24,
+    "rawProfiles": 6,
+    "executedHarnessHash": "be8284baebba213a6db37b1dd0658bd2b700459c41cadf16c78d8d8fb1d531e2"
+  },
+  "rows": [
+    {
+      "stage": "parse",
+      "runtime": "control",
+      "rawSHA256": "8bfa5b80b79ac8641a52c3ee3149a4765930ea96590491fb930560d93b4b165d",
+      "samples": 5727,
+      "weightedUs": 2053091,
+      "selfLanguagePercent": {
+        "engine-or-profiler": 4.126071372384371,
+        "wasm": 41.457977264524565,
+        "javascript": 42.141239720986555,
+        "gc": 12.274711642104515
+      },
+      "refreshSelfPercent": 0.0,
+      "bufferGetterSelfBelowRefreshPercent": 0.0,
+      "refreshInclusivePercent": 0.0,
+      "deduplicatedObservationPublicationPercent": 24.116563756794026,
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 84712,
+          "percent": 4.126071372384371
+        },
+        "wasm-other": {
+          "weightedUs": 563595,
+          "percent": 27.45104820000672
+        },
+        "allocator": {
+          "weightedUs": 73904,
+          "percent": 3.5996456075254337
+        },
+        "js-observer-publisher": {
+          "weightedUs": 495850,
+          "percent": 24.151389295457435
+        },
+        "native-projection": {
+          "weightedUs": 51545,
+          "percent": 2.5106047418258615
+        },
+        "native-parse": {
+          "weightedUs": 62151,
+          "percent": 3.027191683174297
+        },
+        "legacy-graph-boundary": {
+          "weightedUs": 294789,
+          "percent": 14.358301702165175
+        },
+        "javascript-other": {
+          "weightedUs": 45795,
+          "percent": 2.2305392211061275
+        },
+        "admission": {
+          "weightedUs": 75305,
+          "percent": 3.6678841804868854
+        },
+        "js-owner-transport": {
+          "weightedUs": 45507,
+          "percent": 2.2165115915466
+        },
+        "gc": {
+          "weightedUs": 252011,
+          "percent": 12.274711642104515
+        },
+        "native-svg-json": {
+          "weightedUs": 7927,
+          "percent": 0.3861007622165798
+        }
+      },
+      "groups": {
+        "native-admission": {
+          "selfUs": 75305,
+          "inclusiveUs": 75663,
+          "selfPercent": 3.6678841804868854,
+          "inclusivePercent": 3.6853213033421315
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 2543,
+          "inclusiveUs": 7663,
+          "selfPercent": 0.1238620207287451,
+          "inclusivePercent": 0.37324210178701284
+        },
+        "sankey-raw-parser": {
+          "selfUs": 62151,
+          "inclusiveUs": 156006,
+          "selfPercent": 3.027191683174297,
+          "inclusivePercent": 7.598591587026585
+        },
+        "sankey-render-layout": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "initial-native-construction": {
+          "selfUs": 30217,
+          "inclusiveUs": 350164,
+          "selfPercent": 1.4717808416675149,
+          "inclusivePercent": 17.05545443431392
+        },
+        "native-svg-and-json": {
+          "selfUs": 7927,
+          "inclusiveUs": 11291,
+          "selfPercent": 0.3861007622165798,
+          "inclusivePercent": 0.5499512685993948
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 472861,
+          "inclusiveUs": 495135,
+          "selfPercent": 23.031662990096397,
+          "inclusivePercent": 24.116563756794026
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 132072,
+          "inclusiveUs": 485771,
+          "selfPercent": 6.432837122173347,
+          "inclusivePercent": 23.66047096792105
+        },
+        "allocator": {
+          "selfUs": 73904,
+          "inclusiveUs": 86278,
+          "selfPercent": 3.5996456075254337,
+          "inclusivePercent": 4.2023466081143015
+        }
+      },
+      "unions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 75663,
+          "percent": 3.6853213033421315,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 570798,
+          "percent": 27.801885060136154,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 163669,
+          "percent": 7.971833688813598,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "parse",
+      "runtime": "candidate",
+      "rawSHA256": "66de9021420454650e9200b5b0fc662e5994eb3981e5f972b33059f18998c359",
+      "samples": 5795,
+      "weightedUs": 2069611,
+      "selfLanguagePercent": {
+        "engine-or-profiler": 5.52722226544022,
+        "wasm": 44.62316831520513,
+        "javascript": 41.57515591094172,
+        "gc": 8.274453508412934
+      },
+      "refreshSelfPercent": 13.808826876161753,
+      "bufferGetterSelfBelowRefreshPercent": 1.4342791954623357,
+      "refreshInclusivePercent": 15.243106071624087,
+      "deduplicatedObservationPublicationPercent": 38.00129589570214,
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 114392,
+          "percent": 5.52722226544022
+        },
+        "wasm-other": {
+          "weightedUs": 267539,
+          "percent": 12.92701865229746
+        },
+        "flat-native-storage": {
+          "weightedUs": 394568,
+          "percent": 19.064838754722505
+        },
+        "js-observer-publisher": {
+          "weightedUs": 345971,
+          "percent": 16.71671632978371
+        },
+        "js-storage-adapter": {
+          "weightedUs": 425408,
+          "percent": 20.554973857406054
+        },
+        "native-parse": {
+          "weightedUs": 45219,
+          "percent": 2.1849033465709256
+        },
+        "admission": {
+          "weightedUs": 116158,
+          "percent": 5.612552310554979
+        },
+        "allocator": {
+          "weightedUs": 83186,
+          "percent": 4.019402680020545
+        },
+        "js-owner-transport": {
+          "weightedUs": 51560,
+          "percent": 2.49128942588728
+        },
+        "javascript-other": {
+          "weightedUs": 37505,
+          "percent": 1.8121762978646712
+        },
+        "native-svg-json": {
+          "weightedUs": 8269,
+          "percent": 0.3995436823634973
+        },
+        "native-wrapper-or-leases": {
+          "weightedUs": 6135,
+          "percent": 0.29643251799492754
+        },
+        "gc": {
+          "weightedUs": 171249,
+          "percent": 8.274453508412934
+        },
+        "native-projection": {
+          "weightedUs": 2452,
+          "percent": 0.11847637068028727
+        }
+      },
+      "groups": {
+        "native-admission": {
+          "selfUs": 116158,
+          "inclusiveUs": 205944,
+          "selfPercent": 5.612552310554979,
+          "inclusivePercent": 9.950855498931924
+        },
+        "native-flat-storage": {
+          "selfUs": 496703,
+          "inclusiveUs": 704399,
+          "selfPercent": 23.999824121537817,
+          "inclusivePercent": 34.03533320996071
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 27542,
+          "inclusiveUs": 443048,
+          "selfPercent": 1.3307814850230308,
+          "inclusivePercent": 21.4073079433768
+        },
+        "native-flat-page-cow": {
+          "selfUs": 141025,
+          "inclusiveUs": 142070,
+          "selfPercent": 6.814082453175983,
+          "inclusivePercent": 6.864575033665747
+        },
+        "native-lease-directories": {
+          "selfUs": 2475,
+          "inclusiveUs": 60162,
+          "selfPercent": 0.11958769063365048,
+          "inclusivePercent": 2.906923088445123
+        },
+        "native-owner-wrapper": {
+          "selfUs": 6135,
+          "inclusiveUs": 236875,
+          "selfPercent": 0.29643251799492754,
+          "inclusivePercent": 11.445387563170083
+        },
+        "sankey-import-projection": {
+          "selfUs": 2452,
+          "inclusiveUs": 5497,
+          "selfPercent": 0.11847637068028727,
+          "inclusivePercent": 0.26560546885380876
+        },
+        "sankey-raw-parser": {
+          "selfUs": 45219,
+          "inclusiveUs": 117035,
+          "selfPercent": 2.1849033465709256,
+          "inclusivePercent": 5.6549274235593066
+        },
+        "sankey-render-layout": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "initial-native-construction": {
+          "selfUs": 27542,
+          "inclusiveUs": 443048,
+          "selfPercent": 1.3307814850230308,
+          "inclusivePercent": 21.4073079433768
+        },
+        "native-svg-and-json": {
+          "selfUs": 8269,
+          "inclusiveUs": 11584,
+          "selfPercent": 0.3995436823634973,
+          "inclusivePercent": 0.5597187104243261
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 425408,
+          "inclusiveUs": 519983,
+          "selfPercent": 20.554973857406054,
+          "inclusivePercent": 25.124673187376757
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 341406,
+          "inclusiveUs": 786479,
+          "selfPercent": 16.496143478170534,
+          "inclusivePercent": 38.00129589570214
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 23403,
+          "inclusiveUs": 880404,
+          "selfPercent": 1.1307922116764937,
+          "inclusivePercent": 42.53958835742562
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 83186,
+          "inclusiveUs": 85284,
+          "selfPercent": 4.019402680020545,
+          "inclusivePercent": 4.120774387070807
+        }
+      },
+      "unions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 731829,
+          "percent": 35.360703049993454,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 1575275,
+          "percent": 76.11454519714091,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 122532,
+          "percent": 5.9205328924131155,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-model",
+      "runtime": "candidate",
+      "rawSHA256": "73f79926355d57dfdae143ac02b4211ddf526292fea4985f0562adcd8f818394",
+      "samples": 5920,
+      "weightedUs": 2042891,
+      "selfLanguagePercent": {
+        "engine-or-profiler": 10.026477183559965,
+        "wasm": 48.062182465926966,
+        "javascript": 41.633254050265045,
+        "gc": 0.2780863002480308
+      },
+      "refreshSelfPercent": 18.989314652617296,
+      "bufferGetterSelfBelowRefreshPercent": 1.9394573670352457,
+      "refreshInclusivePercent": 20.92877201965254,
+      "deduplicatedObservationPublicationPercent": 39.43054230499816,
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 204830,
+          "percent": 10.026477183559965
+        },
+        "native-render-layout": {
+          "weightedUs": 138313,
+          "percent": 6.770454223940484
+        },
+        "js-storage-adapter": {
+          "weightedUs": 503394,
+          "percent": 24.641255945618244
+        },
+        "admission": {
+          "weightedUs": 110010,
+          "percent": 5.385015646943474
+        },
+        "js-observer-publisher": {
+          "weightedUs": 279007,
+          "percent": 13.657458963792
+        },
+        "wasm-other": {
+          "weightedUs": 415812,
+          "percent": 20.35409622931424
+        },
+        "flat-native-storage": {
+          "weightedUs": 91132,
+          "percent": 4.460933060060473
+        },
+        "native-svg-json": {
+          "weightedUs": 140621,
+          "percent": 6.883431372501029
+        },
+        "js-owner-transport": {
+          "weightedUs": 23932,
+          "percent": 1.1714770881070014
+        },
+        "allocator": {
+          "weightedUs": 79553,
+          "percent": 3.8941382579883115
+        },
+        "javascript-other": {
+          "weightedUs": 44189,
+          "percent": 2.1630620527477973
+        },
+        "gc": {
+          "weightedUs": 5681,
+          "percent": 0.2780863002480308
+        },
+        "native-wrapper-or-leases": {
+          "weightedUs": 6417,
+          "percent": 0.31411367517894984
+        }
+      },
+      "groups": {
+        "native-admission": {
+          "selfUs": 110010,
+          "inclusiveUs": 196129,
+          "selfPercent": 5.385015646943474,
+          "inclusivePercent": 9.60056116552474
+        },
+        "native-flat-storage": {
+          "selfUs": 184317,
+          "inclusiveUs": 199501,
+          "selfPercent": 9.022360958073632,
+          "inclusivePercent": 9.765621366974548
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 31225,
+          "inclusiveUs": 31225,
+          "selfPercent": 1.5284711714917731,
+          "inclusivePercent": 1.5284711714917731
+        },
+        "native-lease-directories": {
+          "selfUs": 3026,
+          "inclusiveUs": 8477,
+          "selfPercent": 0.148123419213262,
+          "inclusivePercent": 0.4149511647953807
+        },
+        "native-owner-wrapper": {
+          "selfUs": 6417,
+          "inclusiveUs": 204312,
+          "selfPercent": 0.31411367517894984,
+          "inclusivePercent": 10.001120960442824
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-render-layout": {
+          "selfUs": 138313,
+          "inclusiveUs": 745323,
+          "selfPercent": 6.770454223940484,
+          "inclusivePercent": 36.48373799678984
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 140621,
+          "inclusiveUs": 287391,
+          "selfPercent": 6.883431372501029,
+          "inclusivePercent": 14.067857756483336
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 503394,
+          "inclusiveUs": 598009,
+          "selfPercent": 24.641255945618244,
+          "inclusivePercent": 29.27268268351077
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 133603,
+          "inclusiveUs": 408483,
+          "selfPercent": 6.539898604477674,
+          "inclusivePercent": 19.995339937373068
+        },
+        "shared-observation-and-match": {
+          "selfUs": 105989,
+          "inclusiveUs": 397040,
+          "selfPercent": 5.188186741240722,
+          "inclusivePercent": 19.435202367625095
+        },
+        "owner-transport-gates": {
+          "selfUs": 21944,
+          "inclusiveUs": 1965192,
+          "selfPercent": 1.0741640156033778,
+          "inclusivePercent": 96.19661548266647
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 79553,
+          "inclusiveUs": 81647,
+          "selfPercent": 3.8941382579883115,
+          "inclusivePercent": 3.9966400556857904
+        }
+      },
+      "unions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 343959,
+          "percent": 16.8368748014456,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 1970320,
+          "percent": 96.44763230147863,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 745323,
+          "percent": 36.48373799678984,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-model",
+      "runtime": "control",
+      "rawSHA256": "139b8db10ced91c8054cff12f40334791e5c6873d2156d30412aa4a852acdd4d",
+      "samples": 5842,
+      "weightedUs": 2016676,
+      "selfLanguagePercent": {
+        "engine-or-profiler": 7.936376492803008,
+        "wasm": 60.308101053416614,
+        "javascript": 31.275723021447174,
+        "gc": 0.4797994323332057
+      },
+      "refreshSelfPercent": 0.0,
+      "bufferGetterSelfBelowRefreshPercent": 0.0,
+      "refreshInclusivePercent": 0.0,
+      "deduplicatedObservationPublicationPercent": 20.014271008332525,
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 160051,
+          "percent": 7.936376492803008
+        },
+        "allocator": {
+          "weightedUs": 105411,
+          "percent": 5.226967544613017
+        },
+        "wasm-other": {
+          "weightedUs": 667582,
+          "percent": 33.103086465054375
+        },
+        "js-observer-publisher": {
+          "weightedUs": 408961,
+          "percent": 20.278963998183148
+        },
+        "js-owner-transport": {
+          "weightedUs": 21574,
+          "percent": 1.069780172918208
+        },
+        "native-svg-json": {
+          "weightedUs": 197206,
+          "percent": 9.778764660262729
+        },
+        "native-render-layout": {
+          "weightedUs": 187588,
+          "percent": 9.30184124767687
+        },
+        "legacy-graph-boundary": {
+          "weightedUs": 125157,
+          "percent": 6.206103508942438
+        },
+        "javascript-other": {
+          "weightedUs": 80249,
+          "percent": 3.9792708397382626
+        },
+        "admission": {
+          "weightedUs": 53221,
+          "percent": 2.6390456374747355
+        },
+        "gc": {
+          "weightedUs": 9676,
+          "percent": 0.4797994323332057
+        }
+      },
+      "groups": {
+        "native-admission": {
+          "selfUs": 53221,
+          "inclusiveUs": 53567,
+          "selfPercent": 2.6390456374747355,
+          "inclusivePercent": 2.656202582864079
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-render-layout": {
+          "selfUs": 187588,
+          "inclusiveUs": 1021345,
+          "selfPercent": 9.30184124767687,
+          "inclusivePercent": 50.644972221616165
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 197206,
+          "inclusiveUs": 1410310,
+          "selfPercent": 9.778764660262729,
+          "inclusivePercent": 69.93240361862789
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 248304,
+          "inclusiveUs": 258541,
+          "selfPercent": 12.312538057675106,
+          "inclusivePercent": 12.820155543081784
+        },
+        "shared-observation-and-match": {
+          "selfUs": 145082,
+          "inclusiveUs": 145082,
+          "selfPercent": 7.194115465250739,
+          "inclusivePercent": 7.194115465250739
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 36461,
+          "inclusiveUs": 222237,
+          "selfPercent": 1.8079751035862974,
+          "inclusivePercent": 11.01996552743227
+        },
+        "allocator": {
+          "selfUs": 105411,
+          "inclusiveUs": 105411,
+          "selfPercent": 5.226967544613017,
+          "inclusivePercent": 5.226967544613017
+        }
+      },
+      "unions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 53567,
+          "percent": 2.656202582864079,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 457190,
+          "percent": 22.670473591196604,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 1021345,
+          "percent": 50.644972221616165,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-source",
+      "runtime": "control",
+      "rawSHA256": "af2b297c12cd3dd32acd137218413acfbc4f64972c7942dbe0c613e33336af02",
+      "samples": 5962,
+      "weightedUs": 2054827,
+      "selfLanguagePercent": {
+        "engine-or-profiler": 12.776160718152916,
+        "wasm": 81.60249013663925,
+        "javascript": 5.518810099341696,
+        "gc": 0.10253904586614834
+      },
+      "refreshSelfPercent": 0.0,
+      "bufferGetterSelfBelowRefreshPercent": 0.0,
+      "refreshInclusivePercent": 0.0,
+      "deduplicatedObservationPublicationPercent": 0.0,
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 262528,
+          "percent": 12.776160718152916
+        },
+        "wasm-other": {
+          "weightedUs": 900747,
+          "percent": 43.83566110431681
+        },
+        "native-parse": {
+          "weightedUs": 60119,
+          "percent": 2.9257450870559905
+        },
+        "native-svg-json": {
+          "weightedUs": 282206,
+          "percent": 13.7338082476043
+        },
+        "javascript-other": {
+          "weightedUs": 87027,
+          "percent": 4.235247054861553
+        },
+        "native-render-layout": {
+          "weightedUs": 272842,
+          "percent": 13.278100784153605
+        },
+        "allocator": {
+          "weightedUs": 163205,
+          "percent": 7.942517788602155
+        },
+        "js-owner-transport": {
+          "weightedUs": 24046,
+          "percent": 1.1702201693865226
+        },
+        "gc": {
+          "weightedUs": 2107,
+          "percent": 0.10253904586614834
+        }
+      },
+      "groups": {
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 60119,
+          "inclusiveUs": 150748,
+          "selfPercent": 2.9257450870559905,
+          "inclusivePercent": 7.336286704428159
+        },
+        "sankey-render-layout": {
+          "selfUs": 272842,
+          "inclusiveUs": 1462943,
+          "selfPercent": 13.278100784153605,
+          "inclusivePercent": 71.19543397084037
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 282206,
+          "inclusiveUs": 1932628,
+          "selfPercent": 13.7338082476043,
+          "inclusivePercent": 94.05307600104534
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 163205,
+          "inclusiveUs": 163205,
+          "selfPercent": 7.942517788602155,
+          "inclusivePercent": 7.942517788602155
+        }
+      },
+      "unions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 1613691,
+          "percent": 78.53172067526853,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-source",
+      "runtime": "candidate",
+      "rawSHA256": "b79476bc83b066f472ee165443fca634f4ad8afcf8672d77910c7471c3b3329c",
+      "samples": 5959,
+      "weightedUs": 2042748,
+      "selfLanguagePercent": {
+        "engine-or-profiler": 12.784885849845404,
+        "wasm": 82.30814569393777,
+        "javascript": 4.8421048509165106,
+        "gc": 0.06486360530031116
+      },
+      "refreshSelfPercent": 0.0,
+      "bufferGetterSelfBelowRefreshPercent": 0.0,
+      "refreshInclusivePercent": 0.0,
+      "deduplicatedObservationPublicationPercent": 0.0,
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 261163,
+          "percent": 12.784885849845404
+        },
+        "wasm-other": {
+          "weightedUs": 918766,
+          "percent": 44.97696240554391
+        },
+        "javascript-other": {
+          "weightedUs": 78199,
+          "percent": 3.82812760066342
+        },
+        "native-svg-json": {
+          "weightedUs": 283422,
+          "percent": 13.874545465226253
+        },
+        "native-parse": {
+          "weightedUs": 56116,
+          "percent": 2.7470838302130267
+        },
+        "native-render-layout": {
+          "weightedUs": 284652,
+          "percent": 13.934758472410694
+        },
+        "allocator": {
+          "weightedUs": 140998,
+          "percent": 6.902368769911903
+        },
+        "js-owner-transport": {
+          "weightedUs": 18107,
+          "percent": 0.8864040008850822
+        },
+        "gc": {
+          "weightedUs": 1325,
+          "percent": 0.06486360530031116
+        }
+      },
+      "groups": {
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 56116,
+          "inclusiveUs": 137452,
+          "selfPercent": 2.7470838302130267,
+          "inclusivePercent": 6.728779076028957
+        },
+        "sankey-render-layout": {
+          "selfUs": 284652,
+          "inclusiveUs": 1495398,
+          "selfPercent": 13.934758472410694,
+          "inclusivePercent": 73.2052118029243
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 283422,
+          "inclusiveUs": 1944114,
+          "selfPercent": 13.874545465226253,
+          "inclusivePercent": 95.17150426778046
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 140998,
+          "inclusiveUs": 140998,
+          "selfPercent": 6.902368769911903,
+          "inclusivePercent": 6.902368769911903
+        }
+      },
+      "unions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 1632850,
+          "percent": 79.93399087895325,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        }
+      }
+    }
+  ],
+  "run": {
+    "uploadSession": 70926,
+    "runSession": 51842,
+    "runExit": 0,
+    "fetchSession": 38592,
+    "fetchExit": 0,
+    "harnessFetchSession": 90977,
+    "harnessFetchExit": 0,
+    "failedLaunches": 0
+  },
+  "interpretation": "Disjoint leaf percentages may be added; ancestor groups overlap and are not additive. No cross-window speedup or allocation/call counts inferred."
+}
