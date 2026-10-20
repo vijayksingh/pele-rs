@@ -1,7 +1,8 @@
 //! Opt-in native ClassDb/ClassMember codec, Pele 458322a5 (MIT, kepano).
 //! Object identity belongs to the arena; render imports the existing concrete
 //! ClassModel without reparsing. Namespace maps and tag Sets retain live aliases.
-//! Constructor calls and overridden callbacks need separate dispatch capability.
+//! Root construction uses a captured factory; ClassMember construction and
+//! overridden callbacks need separate dispatch capabilities.
 //! Own readonly Array length is represented by an additional flags0 property;
 //! default writable flags2 is implicit alongside scalar Array.length.
 use super::model::RelationType;
@@ -11,7 +12,8 @@ use crate::compat::{
         ActiveModel, Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString,
         MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema, ModelDelta, ModelGraph,
         ModelSchema, Node, Property, PrototypeId, PrototypeParent, PrototypeSchema,
-        PublicDiagramModule, PublicError, RecordId, RecordKind, RecordSchema,
+        PublicConstructorFactory, PublicDiagramModule, PublicError, RecordId, RecordKind,
+        RecordSchema,
     },
     ErrorCode,
 };
@@ -1491,10 +1493,20 @@ fn initial(m: &ClassModel) -> Result<ModelGraph, PeleError> {
     graph.validate()?;
     Ok(graph)
 }
+fn construct_default() -> Result<ClassPublicState, PeleError> {
+    Class.create_public(&ClassModel::new(None))
+}
 impl PublicDiagramModule for Class {
     type PublicState = ClassPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO)
+            .then(|| PublicConstructorFactory::ignoring_arguments::<Self>(PROTO, construct_default))
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
