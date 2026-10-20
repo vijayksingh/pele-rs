@@ -1,0 +1,15 @@
+{
+  "status": "source review only; no browser execution",
+  "continuitySHA256": "ca4df47b5a31146f625a0e23aac3bed0aecccf1ad49fb9422627bf4ccf432de4",
+  "corrected": "Actual post-readonly helper has one source apply plus invoke; probe counts and validates both revisions.",
+  "checks": [
+    "exact original document descriptors restored",
+    "dynamic job and Ack descriptors restored",
+    "full03 nonzero identity and no render recipe",
+    "one prepare/run/finish/materialize; combined byte bounds",
+    "post-render actual source apply then helper update01 same identity",
+    "control and Flowchart remain non-detached",
+    "all probe browsers close before timing"
+  ],
+  "timedHarnessesUnchanged": true
+}
