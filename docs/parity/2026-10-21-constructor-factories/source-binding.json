@@ -1,0 +1,49 @@
+{
+  "eight": {
+    "native": {
+      "before": "raw/direct-constructors-native-before-build.json.gz",
+      "after": "raw/direct-constructors-native-after-build.json.gz",
+      "inputCount": 355,
+      "gitCommit": "6cab12aaf859941c2995750239e43194b6444e01",
+      "allInputsMatchGit": true
+    },
+    "web": {
+      "before": "raw/direct-constructors-web-before-build.json.gz",
+      "after": "raw/direct-constructors-web-after-build.json.gz",
+      "inputCount": 434,
+      "gitCommit": "6cab12aaf859941c2995750239e43194b6444e01",
+      "allInputsMatchGit": true
+    },
+    "controlPackage": {
+      "origin": "dist/package-web/constructor-control-eight",
+      "files": 117,
+      "matchesEightAfterMap": true
+    }
+  },
+  "fifteen": {
+    "native": {
+      "before": "raw/next-constructors-native-before-build.json.gz",
+      "after": "raw/next-constructors-native-after-build.json.gz",
+      "inputCount": 355,
+      "gitCommit": "129503bf0f1cd6e7d3bb1dc9fb011fd30f828a2d",
+      "allInputsMatchGit": true,
+      "artifactCount": 13,
+      "currentArtifactMatchesAfter": true
+    },
+    "web": {
+      "before": "raw/next-constructors-web-before-build.json.gz",
+      "after": "raw/next-constructors-web-after-build.json.gz",
+      "inputCount": 434,
+      "gitCommit": "129503bf0f1cd6e7d3bb1dc9fb011fd30f828a2d",
+      "allInputsMatchGit": true,
+      "artifactCount": 117,
+      "currentArtifactMatchesAfter": true
+    },
+    "testInputs": {
+      "record": "raw/next-constructors-final-test-inputs.json.gz",
+      "count": 237,
+      "gitCommit": "129503bf0f1cd6e7d3bb1dc9fb011fd30f828a2d",
+      "allInputsMatchGit": true
+    }
+  }
+}
