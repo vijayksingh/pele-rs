@@ -1,0 +1,157 @@
+{
+  "complete": true,
+  "reportSha256": "1174fcd524f6b8d47be2cfeca32e7bb370875195246b3f5e1fde85fef7f20380",
+  "startedAt": "2026-10-20T08:24:41.735Z",
+  "completedAt": "2026-10-20T08:25:32.353Z",
+  "attemptsExecuted": 1,
+  "rowCount": 6,
+  "pairs": 90,
+  "firstOrderCounts": {
+    "control": 45,
+    "candidate": 45
+  },
+  "measuredRequestGuardsVerified": 180,
+  "rows": [
+    {
+      "case": "sequence/small",
+      "stage": "parseMutable",
+      "controlMedianMs": 0.0680169296875,
+      "candidateMedianMs": 0.0673170546875,
+      "pairedPercent": 0.198015073922031,
+      "candidateFasterPairs": 7,
+      "count": 128
+    },
+    {
+      "case": "sequence/small",
+      "stage": "lifetime",
+      "controlMedianMs": 0.22206640625,
+      "candidateMedianMs": 0.2209921875,
+      "pairedPercent": -1.543215612574289,
+      "candidateFasterPairs": 9,
+      "count": 64
+    },
+    {
+      "case": "sequence/small",
+      "stage": "parse",
+      "controlMedianMs": 0.06044759375,
+      "candidateMedianMs": 0.0605501328125,
+      "pairedPercent": 0.3506776154802438,
+      "candidateFasterPairs": 6,
+      "count": 128
+    },
+    {
+      "case": "er/medium",
+      "stage": "parseMutable",
+      "controlMedianMs": 0.261300125,
+      "candidateMedianMs": 0.20180859375,
+      "pairedPercent": -22.688509137258972,
+      "candidateFasterPairs": 15,
+      "count": 64
+    },
+    {
+      "case": "er/medium",
+      "stage": "lifetime",
+      "controlMedianMs": 2.274578125,
+      "candidateMedianMs": 2.16997925,
+      "pairedPercent": -3.5008567438176263,
+      "candidateFasterPairs": 12,
+      "count": 8
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "controlMedianMs": 0.58485025,
+      "candidateMedianMs": 0.52471875,
+      "pairedPercent": -9.444506924808016,
+      "candidateFasterPairs": 14,
+      "count": 32
+    }
+  ],
+  "controlSource": "0b32797d5e5f6ded562c61de7acbd35ca4643839",
+  "candidateSource": "31edd859f0bcaf84d0bcfc1ab4ada33490dcaa71",
+  "candidateBinarySha256": "f85a25d8cfbebad2419cf42a1cdba2d603cda74ea2a254a728551d8a2c0a1f42",
+  "candidateSourceInputSha256": "ee5e9dfc671379d3a6065e8633bc8c6488cee7107343a74380ce73aca0bd5f2b",
+  "changedInputs": [
+    {
+      "path": "CPele/macos-arm64/libpele_ffi.a",
+      "control": "56447aa9699a85f1e36d526b7b81bd594171f6852d090d9da69a553bdf0885f2",
+      "candidate": "4bfd4da820bfb7fcf980db7d0bb58c75a0ceedf995d871494c3f763cadc895c3"
+    },
+    {
+      "path": "root/crates/pele/Cargo.toml",
+      "control": "e4d8c0bd93a25f758b7820002f06f89ef19129beb10680374cc6924fe125a2d1",
+      "candidate": "341e1dbede29a242c7ea93e955d97a1e5b537118972ca136403e69b9c2c25dda"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/direct_parse.rs",
+      "control": "e11adad951fb5d64c3601ec2d5bcd18dd932a99b8624678a2b8fdcc71a2321df",
+      "candidate": "f7e6165e1376981c2d371ea8184ada79eba3417da164cceeec2386f5106df685"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/graph.rs",
+      "control": "b4107c46d6a8b1c6d0e2bab3b64551b6bfc8a7dc01d3afa4240b98126e5f0546",
+      "candidate": "893f866f91f80b92a994af1b2de76be39cacc5677c2f31497168558829e8953b"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/host_initial.rs",
+      "control": null,
+      "candidate": "06ecd9c73c91e1884996caf4ce6d8165eeceb51d9d598b99999d39811cbc467a"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/lexer.rs",
+      "control": "674ce8c3b824923285fee3a86bd209e5fb8af69b2b1eba05877f50cb0cc68fa5",
+      "candidate": "9776d9d2b8de5740837abe7b469a4c18d839dbe4186d0f130ae30b04e7f81027"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/live_read.rs",
+      "control": null,
+      "candidate": "bc8cf87aab30c752c918e60c006e85d07be04cbb3bf0354ef9efb5cace27f3fa"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/mod.rs",
+      "control": "dccbe8ded875081985cb3e10a7adcb41bfc9e8fac9f8f013eb4659d174eacc60",
+      "candidate": "a1d3db6284146d4f98a5bb59915047f32b6e74d5e480c67304adc09e6a0a1337"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/public_model.rs",
+      "control": "4a01f198f33cda52b1a57a5ffd99efda36c8882f5f58bbf98a0f06fe81e7593c",
+      "candidate": "21dbde5cf31247ccba1f96bc53128aba37af0b5f26137c4ff6a249a10c1d9309"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/render.rs",
+      "control": "2c917eb75960b75b5157042699f3a92e24fffd12b51f5aae011f458a2a61c60a",
+      "candidate": "d6f926e1e946ebf50337d59b66f80380475db11cfcc95d81d37541cdc3cdc5a9"
+    },
+    {
+      "path": "root/crates/pele/src/compat/engine.rs",
+      "control": "d0d02bd0d3b772e1447854e63914aed21a9919ee48d4a74af121f9622bbd4c85",
+      "candidate": "a8c393bdb8fc44c09dcd854331ebf38535c3bd836d88e98f8afd86b24be49b76"
+    },
+    {
+      "path": "root/crates/pele/src/compat/host_er.rs",
+      "control": null,
+      "candidate": "08b6d215b539c4adcf8cf4a92205e5e72cc7eaf35c902852e2dd3c97e0df1216"
+    },
+    {
+      "path": "root/crates/pele/src/compat/mod.rs",
+      "control": "cea799f3cbec5a74e4b139d70a3bd1263961027dd270de53d77a8e53f083c8c2",
+      "candidate": "a49a7045f16601354392cb9889b2c333cc5e85c931645e2b264e1297f32b44b2"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/engine.rs",
+      "control": "f5d13520f0089ecf4b6886cc8aebf616d1fbe0e85ef809b6c003ace160d70f9c",
+      "candidate": "100b3c55f912d62962b94088b8821173df0ecbd8bdac1c0b815ad3d76fb68dc9"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/mod.rs",
+      "control": "e09af282cda1d5a184deab297b6a4f80bf49ba71b2a8c046a65b0a90c5cf5437",
+      "candidate": "633f4b872e6af272f8ecd8a82f6028d4cdd9d4bd6c8bb7b86ff90450ce768bee"
+    }
+  ],
+  "limitations": [
+    "Combined changes versus frozen0b baseline; not isolated record-layout causality.",
+    "Guard rejects compiler and Pele test processes at any recorded CPU; other host activity remains shared-host load.",
+    "No pooling, retry or partial report selection.",
+    "Exact comparator output validation and source/SDK/binary before-after validation completed."
+  ]
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "consumer": "ffi",
+    "phase": "compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/er-record-layout-ffi"
+    ],
+    "log": "dist/evidence/er-record-layout-ffi-compile.log",
+    "startedAt": "2026-10-20T08:14:20.954738+00:00",
+    "endedAt": "2026-10-20T08:14:21.277729+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi",
+    "phase": "run",
+    "command": [
+      "dist/evidence/er-record-layout-ffi"
+    ],
+    "log": "dist/evidence/er-record-layout-ffi-run.log",
+    "startedAt": "2026-10-20T08:14:21.278170+00:00",
+    "endedAt": "2026-10-20T08:14:21.979940+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-public",
+    "phase": "compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/er-record-layout-ffi-public"
+    ],
+    "log": "dist/evidence/er-record-layout-ffi-public-compile.log",
+    "startedAt": "2026-10-20T08:14:21.980274+00:00",
+    "endedAt": "2026-10-20T08:14:22.146448+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-public",
+    "phase": "run",
+    "command": [
+      "dist/evidence/er-record-layout-ffi-public"
+    ],
+    "log": "dist/evidence/er-record-layout-ffi-public-run.log",
+    "startedAt": "2026-10-20T08:14:22.146866+00:00",
+    "endedAt": "2026-10-20T08:14:22.731049+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-parse-limits",
+    "phase": "compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/er-record-layout-ffi-parse-limits"
+    ],
+    "log": "dist/evidence/er-record-layout-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T08:14:22.731675+00:00",
+    "endedAt": "2026-10-20T08:14:22.913542+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-parse-limits",
+    "phase": "run",
+    "command": [
+      "dist/evidence/er-record-layout-ffi-parse-limits"
+    ],
+    "log": "dist/evidence/er-record-layout-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T08:14:22.914164+00:00",
+    "endedAt": "2026-10-20T08:14:23.509152+00:00",
+    "exitCode": 0
+  }
+]

@@ -183,6 +183,13 @@ Median ratios across all sizes/resources are **2.38× source**, **11.06× parse*
 and **4.02× retained mutable render**. These describe this artifact; differences
 from historical runs are not causal speedup percentages.
 
+The [ordered ER record publisher](docs/benchmarks/2026-10-20-er-host-storage/record-layout/)
+improves VM parse by 7.67–17.15% paired against the preceding artifact, while all
+six source-render controls are slower. Full browser correctness passes 390 checks;
+fresh local Swift passes 168 API conditions and its ER corpus. Combined native
+changes improve Swift ER mutable parse 22.69% against frozen `0b32797`; this is
+not an isolated record-publisher result. Web parse still takes 5.07–10.53× JS time.
+
 The [entry read frame](docs/benchmarks/2026-10-20-er-host-storage/entry-frame/)
 improves retained ER rendering by 11.02–14.37% paired against the lexer artifact.
 The subsequent [error-brand allocation removal](docs/benchmarks/2026-10-20-er-host-storage/error-brands/)
