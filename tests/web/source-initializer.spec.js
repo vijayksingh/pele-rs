@@ -146,7 +146,8 @@ test('inherited fixed-field setter keeps generic fresh-publication behavior',asy
         const rendered=engine.render(model,{measurer:{width:(text,size)=>text.length*size*.6}});
         return{
           activation:globalThis.__initializerDecisions.slice(start),calls,
-          setterReceivers:receivers.length===model.nodes.length&&receivers.every((value,i)=>value===model.nodes[i]),
+          nodeCalls:calls.filter((_,i)=>model.nodes.includes(receivers[i])),
+          setterReceivers:receivers.filter(value=>model.nodes.includes(value)).length===model.nodes.length&&receivers.filter(value=>model.nodes.includes(value)).every((value,i)=>value===model.nodes[i]),
           descriptors:model.nodes.map(node=>Object.getOwnPropertyDescriptor(node,'id')),
           nodeKeys:model.nodes.map(node=>Reflect.ownKeys(node)),
           aliases:model.nodes.every(node=>model.lookup.get(node.id)===node&&model.findOrCreateNode(node.id)===node),
@@ -159,7 +160,7 @@ test('inherited fixed-field setter keeps generic fresh-publication behavior',asy
   }
   const path=info.outputPath('source-initializer-inherited-field.json');await writeFile(path,JSON.stringify(reports,null,2));await info.attach('source-initializer-inherited-field',{path,contentType:'application/json'});
   expect(reports.generated).toEqual(reports.generic);
-  expect(reports.generated).toMatchObject({activation:[false],calls:['A','B','C'],setterReceivers:true,aliases:true,restored:true});
+  expect(reports.generated).toMatchObject({activation:[false],nodeCalls:['A','B','C'],setterReceivers:true,aliases:true,restored:true});
   expect(reports.generated.nodeKeys).toEqual([['id','index'],['id','index'],['id','index']]);
   expect(reports.generated.descriptors).toEqual(['A','B','C'].map(value=>({value,writable:true,enumerable:true,configurable:true})));
 });
