@@ -1,4 +1,5 @@
 import {LayoutGraph,LayoutStorage,applyLayoutDelta} from './layout-storage.js';
+import {tryInitializeSourceLayout} from './source-initializer.js';
 import {getGraphTraversal,numberValue, reconcileNestedGraph as reconcileGraph, matchesNestedGraph as matchesGraph, snapshotNestedGraph as snapshotGraph} from './graph-storage.js';
 export {stringValue} from './graph-storage.js';
 const layoutTraversal=getGraphTraversal(LayoutStorage);
@@ -101,7 +102,7 @@ export class ModelBridge {
     this.hostValues = [];
     this.objects = [];
     if(graph instanceof LayoutGraph)Object.assign(this,layoutMethods);
-    this.reconcile(graph);
+    if (!(graph instanceof LayoutGraph && tryInitializeSourceLayout(this,graph))) this.reconcile(graph);
   }
   reconcile(graph, changed) {
     return reconcileGraph(this, graph, changed);

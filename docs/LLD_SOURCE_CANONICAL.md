@@ -87,6 +87,17 @@ its cursor, and values are copied before descriptor or Proxy actions can reenter
 another document. Generic mutation/restoration policy, fresh assignment,
 canonical IDs and non-layout storage behavior remain shared and unchanged.
 
+Fresh source publication can use a generated initializer compiled offline from
+Rust's actual RecordSchema and source recipe. It creates the same public objects
+with fixed field sites and registers every object in both identity ledgers.
+Runtime eligibility checks the full schema, recipe structure, scalar tags, earlier
+references, dense keys and ordinary inherited field descriptors before creating
+any object. Unknown layouts, edits, non-finite values and negative zero retain
+generic publication. The accepted layout remains the original bridge baseline;
+helpers, capture and recovery keep the shared path. No grammar, helper policy,
+layout algorithm or native pointer lifetime moves into this initializer. The
+checked-in output must reproduce exactly from the built native schema/recipe.
+
 ## Bounds and compatibility
 
 Canonical structural/schema admission and the full logical `PELGBIN1` frame
