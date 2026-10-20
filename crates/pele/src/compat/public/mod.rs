@@ -1,10 +1,10 @@
 //! Mutable host documents augment the immutable typed Rust API.
 //! Public codecs are opt-in; an unimplemented codec never silently ignores edits.
-mod engine;
-mod graph;
-mod captured_admission;
+pub(crate) mod captured_admission;
 pub(crate) mod captured_read;
 pub(crate) mod captured_write;
+mod engine;
+mod graph;
 mod initial_store;
 #[doc(hidden)]
 pub use initial_store::InitialWriter;
@@ -33,3 +33,11 @@ pub use binary::{
 };
 
 pub(crate) use engine::create_prepared_edge_public;
+
+#[cfg(feature = "web-host-sankey")]
+pub(crate) mod captured_transport;
+#[cfg(feature = "web-host-sankey")]
+pub(crate) use engine::CapturedSankeyRegistration;
+#[cfg(feature = "web-host-sankey")]
+#[doc(hidden)]
+pub use engine::HostSankeyEntrySelection;

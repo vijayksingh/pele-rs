@@ -296,6 +296,8 @@ type State = Box<dyn Any + Send>;
 trait Erased: Send + Sync {
     #[cfg(feature = "web-host-er")]
     fn is_host_er(&self) -> bool;
+    #[cfg(feature = "web-host-sankey")]
+    fn is_host_sankey(&self) -> bool;
     fn try_parse_public(
         &self,
         context: ParseContext<'_>,
@@ -349,6 +351,11 @@ trait Erased: Send + Sync {
 }
 struct Codec<D>(Arc<D>);
 impl<D: PublicDiagramModule> Erased for Codec<D> {
+    #[cfg(feature = "web-host-sankey")]
+    fn is_host_sankey(&self) -> bool {
+        TypeId::of::<D>() == TypeId::of::<crate::compat::diagrams::sankey::Sankey>()
+    }
+
     #[cfg(feature = "web-host-er")]
     fn is_host_er(&self) -> bool {
         std::any::TypeId::of::<D>() == std::any::TypeId::of::<crate::compat::diagrams::er::Er>()
@@ -1432,5 +1439,204 @@ impl PublicDocument {
                     .render(&mut self.state, &self.config, settings, session)
             },
         )
+    }
+}
+
+#[cfg(feature = "web-host-sankey")]
+#[derive(Clone)]
+pub(crate) struct CapturedSankeyRegistration(Arc<Registration>);
+#[cfg(feature = "web-host-sankey")]
+impl CapturedSankeyRegistration {
+    pub(crate) fn descriptor(&self) -> &ModuleDescriptor {
+        &self.0.descriptor
+    }
+    pub(crate) fn schema(&self) -> ModelSchemaView {
+        ModelSchemaView {
+            model: self.0.schema,
+            shared_functions: self.0.shared_functions,
+            function_shapes: self.0.function_shapes,
+        }
+    }
+    pub(crate) fn validate<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+    ) -> Result<(), PeleError> {
+        let schema = self.0.compiled_schema()?;
+        super::captured_admission::validate(store)?;
+        super::captured_admission::validate_schema_ids(store, schema.methods(), schema.prototypes())
+    }
+    pub(crate) fn validate_uncached<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+    ) -> Result<(), PeleError> {
+        self.0.schema.validate()?;
+        super::captured_admission::validate(store)?;
+        let methods = self.0.schema.methods.iter().map(|m| m.id).collect();
+        let prototypes = self.0.schema.prototypes.iter().map(|p| p.id).collect();
+        super::captured_admission::validate_schema_ids(store, &methods, &prototypes)
+    }
+    pub(crate) fn validate_call<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+        call: &MethodCall,
+    ) -> Result<(), PeleError> {
+        self.validate(store)?;
+        super::schema::validate_call_after_graph(
+            call,
+            store.extent()?,
+            self.0.compiled_schema()?.methods(),
+        )
+    }
+    pub(crate) fn validate_return<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+        value: &Atom,
+    ) -> Result<(), PeleError> {
+        super::captured_admission::atom(store.extent()?, value)?;
+        if let Atom::BuiltinFunction(id) = value {
+            if self.0.schema.method(super::MethodId(*id)).is_none() {
+                return Err(PeleError::new(
+                    "Unknown public builtin function",
+                    ErrorCode::Semantic,
+                ));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Captured concrete Sankey policy; registry replacement never reselects it.
+#[cfg(feature = "web-host-sankey")]
+#[derive(Clone)]
+#[doc(hidden)]
+pub struct HostSankeyEntrySelection {
+    registration: CapturedSankeyRegistration,
+}
+#[cfg(feature = "web-host-sankey")]
+impl HostSankeyEntrySelection {
+    pub fn schema(&self) -> ModelSchemaView {
+        self.registration.schema()
+    }
+    pub fn bind<
+        S: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    >(
+        &self,
+        config: Object,
+        store: &mut S,
+    ) -> Result<crate::compat::host_sankey::Document, PeleError> {
+        // Registry create_from_graph admission, then the concrete codec's own
+        // validate_schema before its eager (possibly latent-error) projection.
+        self.registration.validate(store)?;
+        self.registration.validate_uncached(store)?;
+        let model = crate::compat::diagrams::sankey::imported_from(store);
+        Ok(crate::compat::host_sankey::Document::captured(
+            self.registration.clone(),
+            config,
+            model,
+        ))
+    }
+}
+
+#[cfg(feature = "web-host-sankey")]
+impl PublicEngine {
+    #[doc(hidden)]
+    pub fn select_host_sankey_entry(
+        &self,
+        id: &DiagramId,
+    ) -> Result<Option<HostSankeyEntrySelection>, PeleError> {
+        let registration = self.graph_registration(id)?;
+        Ok(registration
+            .codec
+            .is_host_sankey()
+            .then(|| HostSankeyEntrySelection {
+                registration: CapturedSankeyRegistration(registration),
+            }))
+    }
+    fn create_host_sankey<W>(
+        document: crate::compat::ParsedDocument,
+        registration: Arc<Registration>,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        let policy = CapturedSankeyRegistration(registration);
+        let schema = policy.schema();
+        schema.validate()?;
+        let ((storage, model), config) = document
+            .into_public_state::<crate::compat::diagrams::sankey::SankeyModel, _>(
+                |model, prepared, _edge| {
+                    let mut storage =
+                        crate::compat::diagrams::sankey::initial_into(make(schema)?, &model)?;
+                    // Independent native admission at the original GraphWriter.finish
+                    // boundary. A sink's finish() is never a validation certificate.
+                    super::captured_admission::validate(&mut storage)?;
+                    let projection = if prepared {
+                        crate::compat::diagrams::sankey::imported_from(&mut storage)
+                    } else {
+                        crate::compat::diagrams::sankey::normalized_source(model)
+                    };
+                    Ok((storage, projection))
+                },
+            )?;
+        Ok(crate::compat::host_sankey::Parsed::Captured {
+            document: crate::compat::host_sankey::Document::captured(policy, config, model),
+            storage,
+        })
+    }
+    #[doc(hidden)]
+    pub fn parse_host_sankey_with_limits<W>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        let plan =
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Limits(limits))?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|r| r.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        if !registration.codec.is_host_sankey() {
+            return self
+                .parse_plan(plan)
+                .map(crate::compat::host_sankey::Parsed::Arena);
+        }
+        Self::create_host_sankey(plan.parse()?, registration, make)
+    }
+    #[doc(hidden)]
+    pub fn parse_prepared_host_sankey_as<W>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        limit: EdgeLimit,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        let plan = self.engine.prepare_prepared_as(id, context, limit)?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|r| r.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        let document = plan.parse()?;
+        if !registration.codec.is_host_sankey() {
+            return Self::create_document_registered(document, registration)
+                .map(crate::compat::host_sankey::Parsed::Arena);
+        }
+        Self::create_host_sankey(document, registration, make)
     }
 }

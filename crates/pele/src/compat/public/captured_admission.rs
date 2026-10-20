@@ -1,31 +1,38 @@
 //! Ordered admission over immutable captured storage. Arena slices stay borrowed.
-use super::{Atom, MethodId, ModelGraph, Node, Property, PrototypeId};
+use super::{Atom, ErrorObjectKind, MethodId, ModelGraph, Node, Property, PrototypeId};
 use crate::compat::{ErrorCode, PeleError};
 use std::collections::HashSet;
 
 #[derive(Clone, Copy)]
-pub(super) struct Extent {
-    pub(super) version: u32,
-    pub(super) nodes: usize,
-    pub(super) strings: usize,
+pub struct Extent {
+    pub version: u32,
+    pub nodes: usize,
+    pub strings: usize,
 }
 #[derive(Clone, Copy)]
-pub(super) enum Collection {
-    None,
+// Auxiliary payloads are consumed by the opt-in canonical frame counter.
+#[cfg_attr(not(feature = "web-host-sankey"), allow(dead_code))]
+pub enum AdmissionKind {
+    Object,
+    Instance(PrototypeId),
+    Array(u32),
     Map(usize),
     Set(usize),
+    Date(u64),
+    Error(ErrorObjectKind),
+    /// Observed scalar encoding markers: size counting must precede rejection.
+    InvalidArray,
+    InvalidError,
 }
 #[derive(Clone, Copy)]
-pub(super) struct Header {
-    pub(super) properties: usize,
-    pub(super) prototype: Option<PrototypeId>,
-    pub(super) collection: Collection,
+pub struct Header {
+    pub properties: usize,
+    pub kind: AdmissionKind,
 }
-
 // Static dispatch is intentional. The caller's closure owns validation policy;
 // storage only lends records. Flat adapters may lend bounded scratch batches,
 // while the arena lends its entire remaining slice with no copy or allocation.
-pub(super) trait AdmissionRead {
+pub trait AdmissionRead {
     fn extent(&mut self) -> Result<Extent, PeleError>;
     fn with_root<R>(
         &mut self,
@@ -84,14 +91,14 @@ impl AdmissionRead for ArenaAdmission<'_> {
         let node = self.0.nodes.get(node).ok_or_else(protocol)?;
         Ok(Header {
             properties: node.properties().len(),
-            prototype: match node {
-                Node::Instance { prototype, .. } => Some(*prototype),
-                _ => None,
-            },
-            collection: match node {
-                Node::Map { entries, .. } => Collection::Map(entries.len()),
-                Node::Set { values, .. } => Collection::Set(values.len()),
-                _ => Collection::None,
+            kind: match node {
+                Node::Object { .. } => AdmissionKind::Object,
+                Node::Instance { prototype, .. } => AdmissionKind::Instance(*prototype),
+                Node::Array { length, .. } => AdmissionKind::Array(*length),
+                Node::Map { entries, .. } => AdmissionKind::Map(entries.len()),
+                Node::Set { values, .. } => AdmissionKind::Set(values.len()),
+                Node::Date { milliseconds, .. } => AdmissionKind::Date(milliseconds.to_bits()),
+                Node::Error { error_type, .. } => AdmissionKind::Error(*error_type),
             },
         })
     }
@@ -142,7 +149,7 @@ fn next(start: usize, count: usize, total: usize) -> Result<usize, PeleError> {
         .filter(|end| *end <= total)
         .ok_or_else(protocol)
 }
-fn atom(extent: Extent, atom: &Atom) -> Result<(), PeleError> {
+pub(super) fn atom(extent: Extent, atom: &Atom) -> Result<(), PeleError> {
     match atom {
         Atom::Ref(id) if *id as usize >= extent.nodes => {
             Err(invalid("Invalid public object reference"))
@@ -153,7 +160,7 @@ fn atom(extent: Extent, atom: &Atom) -> Result<(), PeleError> {
         _ => Ok(()),
     }
 }
-fn properties<S: AdmissionRead>(
+pub(super) fn properties<S: AdmissionRead>(
     store: &mut S,
     node: usize,
     total: usize,
@@ -171,15 +178,14 @@ fn properties<S: AdmissionRead>(
     }
     Ok(())
 }
-fn items<S: AdmissionRead>(
+pub(super) fn items<S: AdmissionRead>(
     store: &mut S,
     node: usize,
-    collection: Collection,
+    collection: AdmissionKind,
     mut check: impl FnMut(&Atom) -> Result<(), PeleError>,
 ) -> Result<(), PeleError> {
     match collection {
-        Collection::None => {}
-        Collection::Map(total) => {
+        AdmissionKind::Map(total) => {
             let mut start = 0;
             while start < total {
                 start = store.with_map_entries(node, start, |entries| {
@@ -192,7 +198,7 @@ fn items<S: AdmissionRead>(
                 })?;
             }
         }
-        Collection::Set(total) => {
+        AdmissionKind::Set(total) => {
             let mut start = 0;
             while start < total {
                 start = store.with_set_values(node, start, |values| {
@@ -204,11 +210,12 @@ fn items<S: AdmissionRead>(
                 })?;
             }
         }
+        _ => {}
     }
     Ok(())
 }
 
-pub(super) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError> {
+pub(crate) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError> {
     let extent = store.extent()?;
     if extent.version != 1 {
         return Err(invalid("Unsupported public graph version"));
@@ -238,10 +245,16 @@ pub(super) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError>
     let mut work = 0usize;
     for node in 0..extent.nodes {
         let header = store.header(node)?;
-        let references = match header.collection {
-            Collection::None => 0,
-            Collection::Map(count) => count.saturating_mul(2),
-            Collection::Set(count) => count,
+        if matches!(
+            header.kind,
+            AdmissionKind::InvalidArray | AdmissionKind::InvalidError
+        ) {
+            return Err(protocol());
+        }
+        let references = match header.kind {
+            AdmissionKind::Map(count) => count.saturating_mul(2),
+            AdmissionKind::Set(count) => count,
+            _ => 0,
         };
         work = work
             .saturating_add(header.properties)
@@ -258,12 +271,12 @@ pub(super) fn validate<S: AdmissionRead>(store: &mut S) -> Result<(), PeleError>
             }
             atom(extent, &property.value)
         })?;
-        items(store, node, header.collection, |value| atom(extent, value))?;
+        items(store, node, header.kind, |value| atom(extent, value))?;
     }
     Ok(())
 }
 
-pub(super) fn validate_schema_ids<S: AdmissionRead>(
+pub(crate) fn validate_schema_ids<S: AdmissionRead>(
     store: &mut S,
     methods: &HashSet<MethodId>,
     prototypes: &HashSet<PrototypeId>,
@@ -280,7 +293,7 @@ pub(super) fn validate_schema_ids<S: AdmissionRead>(
     store.with_root(check)?;
     for node in 0..extent.nodes {
         let header = store.header(node)?;
-        if let Some(prototype) = header.prototype {
+        if let AdmissionKind::Instance(prototype) = header.kind {
             if !prototypes.contains(&prototype) {
                 return Err(invalid("Unknown public instance prototype"));
             }
@@ -288,7 +301,7 @@ pub(super) fn validate_schema_ids<S: AdmissionRead>(
         properties(store, node, header.properties, |property| {
             check(&property.value)
         })?;
-        items(store, node, header.collection, check)?;
+        items(store, node, header.kind, check)?;
     }
     Ok(())
 }

@@ -248,7 +248,7 @@ pub(crate) struct PreparedParsePlan<'a> {
     edge_limit: EdgeLimit,
 }
 impl PreparedParsePlan<'_> {
-    #[cfg(feature = "web-host-er")]
+    #[cfg(any(feature = "web-host-er", feature = "web-host-sankey"))]
     pub(crate) fn diagram_type(&self) -> &DiagramId {
         &self.registration.descriptor.id
     }

@@ -5,23 +5,23 @@ use super::{
 };
 use crate::compat::PeleError;
 
-pub(crate) struct GraphCounts {
+pub struct GraphCounts {
     pub nodes: usize,
     pub strings: usize,
     pub units: usize,
     pub work: usize,
 }
 #[derive(Default)]
-pub(crate) struct OwnQuery {
+pub struct OwnQuery {
     pub first_slot: Option<u32>,
     pub any_nonwritable: bool,
 }
-pub(crate) struct MapMatch {
+pub struct MapMatch {
     pub slot: u32,
     pub value: Atom,
 }
 
-pub(crate) trait CapturedWrite: CapturedRead<Value = Atom> {
+pub trait CapturedWrite: CapturedRead<Value = Atom> {
     fn counts(&mut self) -> Result<GraphCounts, PeleError>;
     fn find_strings(&mut self, names: &[&str], out: &mut [Option<u32>]) -> Result<(), PeleError>;
     fn intern(&mut self, text: &str) -> Result<u32, PeleError>;

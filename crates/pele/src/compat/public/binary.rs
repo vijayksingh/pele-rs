@@ -4,9 +4,9 @@ use super::{Atom, ErrorObjectKind, JsString, ModelGraph, Node, Property, Prototy
 use crate::compat::{ErrorCode, PeleError};
 
 const MAGIC: &[u8; 8] = b"PELGBIN1";
-const MAX_TABLE: usize = 1_000_000;
-const MAX_UNITS: usize = 16_000_000;
-const MAX_ENTRIES: usize = 8_000_000;
+pub(super) const MAX_TABLE: usize = 1_000_000;
+pub(super) const MAX_UNITS: usize = 16_000_000;
+pub(super) const MAX_ENTRIES: usize = 8_000_000;
 /// Per-exchange byte ceiling, separate from the engine's graph work ceilings.
 pub const DEFAULT_BINARY_BUDGET: usize = 64 * 1024 * 1024;
 /// Metadata is caller-owned UTF-8/JSON or another negotiated format; the graph
@@ -17,14 +17,36 @@ pub struct BinaryExchange {
     pub graph: ModelGraph,
     pub metadata: Vec<u8>,
 }
-fn invalid() -> PeleError {
+pub(super) fn invalid() -> PeleError {
     PeleError::new("Invalid public binary graph transport", ErrorCode::Semantic)
 }
-fn limit() -> PeleError {
+pub(super) fn limit() -> PeleError {
     PeleError::new(
         "Public binary graph exceeds transport budget",
         ErrorCode::Limit,
     )
+}
+pub(super) fn check_count(n: usize, max: usize) -> Result<(), PeleError> {
+    if n > max {
+        Err(limit())
+    } else {
+        Ok(())
+    }
+}
+pub(super) fn add_bounded(total: &mut usize, n: usize, max: usize) -> Result<(), PeleError> {
+    *total = total.checked_add(n).ok_or_else(limit)?;
+    check_count(*total, max)
+}
+pub(super) fn check_bytes(
+    current: usize,
+    additional: usize,
+    budget: usize,
+) -> Result<(), PeleError> {
+    if additional > budget.saturating_sub(current) {
+        Err(limit())
+    } else {
+        Ok(())
+    }
 }
 struct Writer {
     bytes: Vec<u8>,
@@ -32,9 +54,7 @@ struct Writer {
 }
 impl Writer {
     fn put(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
-        if bytes.len() > self.budget.saturating_sub(self.bytes.len()) {
-            return Err(limit());
-        }
+        check_bytes(self.bytes.len(), bytes.len(), self.budget)?;
         self.bytes.extend_from_slice(bytes);
         Ok(())
     }
@@ -196,20 +216,14 @@ impl<'a> Reader<'a> {
     // before allocating. A malicious length cannot reserve unbacked memory.
     fn count(&mut self, max: usize, min_bytes: usize) -> Result<usize, PeleError> {
         let n = self.u32()? as usize;
-        if n > max {
-            return Err(limit());
-        }
+        check_count(n, max)?;
         if n > self.bytes.len().saturating_sub(self.offset) / min_bytes {
             return Err(invalid());
         }
         Ok(n)
     }
     fn work(&mut self, n: usize) -> Result<(), PeleError> {
-        self.entries = self.entries.checked_add(n).ok_or_else(limit)?;
-        if self.entries > MAX_ENTRIES {
-            return Err(limit());
-        }
-        Ok(())
+        add_bounded(&mut self.entries, n, MAX_ENTRIES)
     }
     fn atom(&mut self) -> Result<Atom, PeleError> {
         Ok(match self.byte()? {
@@ -332,10 +346,7 @@ pub fn decode_binary_exchange(
     let mut strings = Vec::with_capacity(count);
     for _ in 0..count {
         let n = r.count(MAX_UNITS, 2)?;
-        r.units = r.units.checked_add(n).ok_or_else(limit)?;
-        if r.units > MAX_UNITS {
-            return Err(limit());
-        }
+        add_bounded(&mut r.units, n, MAX_UNITS)?;
         let raw = r.take(n.checked_mul(2).ok_or_else(limit)?)?;
         strings.push(JsString(
             raw.chunks_exact(2)

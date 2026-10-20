@@ -160,16 +160,16 @@ fn invalid(message: &str) -> PeleError {
 impl ModelGraph {
     /// Validate an atom naming this arena. Builtin IDs need validate_schema.
     pub fn validate_atom(&self, a: &Atom) -> Result<(), PeleError> {
-        match a {
-            Atom::Ref(id) if *id as usize >= self.nodes.len() => {
-                Err(invalid("Invalid public object reference"))
-            }
-            Atom::String(id) if *id as usize >= self.strings.len() => {
-                Err(invalid("Invalid public string reference"))
-            }
-            _ => Ok(()),
-        }
+        super::captured_admission::atom(
+            super::captured_admission::Extent {
+                version: self.version,
+                nodes: self.nodes.len(),
+                strings: self.strings.len(),
+            },
+            a,
+        )
     }
+
     /// Schema checks cover native instance/function identities, not generic JS
     /// value coercion or family field validation. Codecs own those operations.
     pub fn validate_schema(&self, schema: &ModelSchema) -> Result<(), PeleError> {

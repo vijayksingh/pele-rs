@@ -364,7 +364,7 @@ fn index<R: CapturedRead>(reader: &mut R, id: u32, length: usize) -> Result<usiz
 fn imported(graph: &ModelGraph) -> Result<SankeyModel, PeleError> {
     imported_from(&mut ArenaRead::new(graph))
 }
-fn imported_from<R: CapturedRead>(reader: &mut R) -> Result<SankeyModel, PeleError> {
+pub(crate) fn imported_from<R: CapturedRead>(reader: &mut R) -> Result<SankeyModel, PeleError> {
     let mut scratch: [PropertyPrefix<R::Value>; PROPERTY_CHUNK] =
         std::array::from_fn(|_| PropertyPrefix::default());
     let array_nodes = array(reader, "nodes", &mut scratch)?;
@@ -480,7 +480,10 @@ fn array_node(
 fn initial_graph(model: &SankeyModel) -> Result<ModelGraph, PeleError> {
     initial_into(GraphWriter::default(), model)
 }
-fn initial_into<W: InitialWriter>(mut out: W, model: &SankeyModel) -> Result<W::Output, PeleError> {
+pub(crate) fn initial_into<W: InitialWriter>(
+    mut out: W,
+    model: &SankeyModel,
+) -> Result<W::Output, PeleError> {
     let node_objects: Vec<_> = model
         .nodes
         .iter()
@@ -584,36 +587,9 @@ impl PublicDiagramModule for Sankey {
         if !parsed.is_from_module::<Self>() || parsed.is_prepared() {
             return parsed.create_legacy(self);
         }
-        let mut model = parsed.into_model();
+        let model = parsed.into_model();
         let graph = initial_graph(&model)?;
-        // The canonical parser has unique labels, dense nodes[i].index == i,
-        // and endpoint copies drawn from those exact nodes. Graph admission
-        // bounds indexes to an exactly representable f64 range. Preserve the
-        // importer’s per-source-node text budget and latent error boundary.
-        let mut text_bytes = 0usize;
-        let mut error = None;
-        for node in &model.nodes {
-            text_bytes = text_bytes.saturating_add(node.id.len().saturating_mul(2));
-            if text_bytes > 128 * 1024 * 1024 {
-                error = Some(PeleError::new(
-                    "Sankey imported text exceeds native allocation budget",
-                    ErrorCode::Limit,
-                ));
-                break;
-            }
-        }
-        let model = match error {
-            Some(error) => Err(error),
-            None => {
-                // These labels are deliberately absent from the render
-                // projection. Drop their allocations, not only their lengths.
-                for link in &mut model.links {
-                    drop(std::mem::take(&mut link.source.id));
-                    drop(std::mem::take(&mut link.target.id));
-                }
-                Ok(model)
-            }
-        };
+        let model = normalized_source(model);
         Ok(SankeyPublicState { graph, model })
     }
     fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
@@ -824,7 +800,10 @@ fn record<W: CapturedWrite>(store: &mut W, fields: Vec<(&str, Atom)>) -> Result<
 fn invoke_graph(graph: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
     invoke_store(&mut ArenaWrite::new(graph), call)
 }
-fn invoke_store<W: CapturedWrite>(store: &mut W, call: MethodCall) -> Result<Atom, PublicError> {
+pub(crate) fn invoke_store<W: CapturedWrite>(
+    store: &mut W,
+    call: MethodCall,
+) -> Result<Atom, PublicError> {
     let arg = |i| call.arguments.get(i).cloned().unwrap_or(Atom::Undefined);
     match call.method.0 {
         1 => {
@@ -882,5 +861,37 @@ fn invoke_store<W: CapturedWrite>(store: &mut W, call: MethodCall) -> Result<Ato
             Ok(Atom::Undefined)
         }
         _ => Err(invalid("Sankey public method is unavailable").into()),
+    }
+}
+
+// Only paired ordinary source creation may call this canonical normalization.
+pub(crate) fn normalized_source(mut model: SankeyModel) -> Result<SankeyModel, PeleError> {
+    // The canonical parser has unique labels, dense nodes[i].index == i,
+    // and endpoint copies drawn from those exact nodes. Graph admission
+    // bounds indexes to an exactly representable f64 range. Preserve the
+    // importer’s per-source-node text budget and latent error boundary.
+    let mut text_bytes = 0usize;
+    let mut error = None;
+    for node in &model.nodes {
+        text_bytes = text_bytes.saturating_add(node.id.len().saturating_mul(2));
+        if text_bytes > 128 * 1024 * 1024 {
+            error = Some(PeleError::new(
+                "Sankey imported text exceeds native allocation budget",
+                ErrorCode::Limit,
+            ));
+            break;
+        }
+    }
+    match error {
+        Some(error) => Err(error),
+        None => {
+            // These labels are deliberately absent from the render
+            // projection. Drop their allocations, not only their lengths.
+            for link in &mut model.links {
+                drop(std::mem::take(&mut link.source.id));
+                drop(std::mem::take(&mut link.target.id));
+            }
+            Ok(model)
+        }
     }
 }

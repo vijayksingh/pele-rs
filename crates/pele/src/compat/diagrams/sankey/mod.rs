@@ -4,6 +4,8 @@ mod model;
 mod parser;
 mod public_model;
 pub use public_model::SankeyPublicState;
+#[cfg(feature = "web-host-sankey")]
+pub(crate) use public_model::{imported_from, initial_into, invoke_store, normalized_source};
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,

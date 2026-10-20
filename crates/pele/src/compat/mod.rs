@@ -244,3 +244,7 @@ pub fn success_envelope_len<T: Serialize>(result: &T) -> usize {
 #[cfg(feature = "web-host-er")]
 #[doc(hidden)]
 pub mod host_er;
+
+#[cfg(feature = "web-host-sankey")]
+#[doc(hidden)]
+pub mod host_sankey;

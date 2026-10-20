@@ -3,11 +3,11 @@ use super::{Atom, JsString, ModelGraph, Node};
 use crate::compat::{ErrorCode, PeleError};
 use std::borrow::Borrow;
 
-pub(crate) const PROPERTY_CHUNK: usize = 128;
-pub(crate) const STRING_CHUNK: usize = 1024;
+pub const PROPERTY_CHUNK: usize = 128;
+pub const STRING_CHUNK: usize = 1024;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub(crate) enum NodeKind {
+pub enum NodeKind {
     Object,
     Instance,
     Array,
@@ -16,12 +16,12 @@ pub(crate) enum NodeKind {
     Date,
     Error,
 }
-pub(crate) struct NodeHeader {
+pub struct NodeHeader {
     pub kind: NodeKind,
     pub property_count: u32,
     pub array_length: Option<u32>,
 }
-pub(crate) struct PropertyPrefix<V> {
+pub struct PropertyPrefix<V> {
     pub key_units: u32,
     pub prefix: [u16; 10],
     pub value: Option<V>,
@@ -36,7 +36,7 @@ impl<V> Default for PropertyPrefix<V> {
     }
 }
 
-pub(crate) trait CapturedRead {
+pub trait CapturedRead {
     // Arena values borrow the immutable graph, not this reader's mutable query
     // borrow. A host implementation can return owned scalar Atoms instead.
     type Value: Borrow<Atom> + Clone;

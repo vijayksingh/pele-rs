@@ -30,6 +30,9 @@ validation over borrowed storage without changing public graph admission order.
 [Shared browser graph traversal](LLD_SHARED_GRAPH_STORAGE.md) binds storage once
 and shares host observation, publication and comparison without selecting a new
 document backend.
+[Captured Sankey ownership](LLD_CAPTURED_SANKEY_OWNER.md) retains native render
+state without a generic graph and preserves shared admission, helper and render
+policy behind an opt-in feature.
 
 [Eager Swift projection](LLD_SWIFT_EAGER_PROJECTION.md) transfers normalized
 immutable model events without a second full model JSON decode in Foundation.

@@ -391,32 +391,48 @@ impl MethodCall {
         g: &ModelGraph,
         methods: &HashSet<MethodId>,
     ) -> Result<(), PeleError> {
-        if !methods.contains(&self.method) {
-            return Err(invalid("Public model method is unavailable"));
-        }
-        if self.arguments.len() > 1_000_000 {
-            return Err(PeleError::new(
-                "Public method arguments exceed work budget",
-                ErrorCode::Limit,
-            ));
-        }
-        g.validate_atom(&self.receiver)?;
-        for a in &self.arguments {
-            g.validate_atom(a)?;
-            if let Atom::BuiltinFunction(id) = a {
-                if !methods.contains(&MethodId(*id)) {
-                    return Err(invalid("Unknown public builtin function"));
-                }
-            }
-        }
-        if let Atom::BuiltinFunction(id) = self.receiver {
-            if !methods.contains(&MethodId(id)) {
+        validate_call_after_graph(
+            self,
+            super::captured_admission::Extent {
+                version: g.version,
+                nodes: g.nodes.len(),
+                strings: g.strings.len(),
+            },
+            methods,
+        )
+    }
+}
+pub(super) fn validate_call_after_graph(
+    call: &MethodCall,
+    extent: super::captured_admission::Extent,
+    methods: &HashSet<MethodId>,
+) -> Result<(), PeleError> {
+    if !methods.contains(&call.method) {
+        return Err(invalid("Public model method is unavailable"));
+    }
+    if call.arguments.len() > 1_000_000 {
+        return Err(PeleError::new(
+            "Public method arguments exceed work budget",
+            ErrorCode::Limit,
+        ));
+    }
+    super::captured_admission::atom(extent, &call.receiver)?;
+    for a in &call.arguments {
+        super::captured_admission::atom(extent, a)?;
+        if let Atom::BuiltinFunction(id) = a {
+            if !methods.contains(&MethodId(*id)) {
                 return Err(invalid("Unknown public builtin function"));
             }
         }
-        Ok(())
     }
+    if let Atom::BuiltinFunction(id) = call.receiver {
+        if !methods.contains(&MethodId(id)) {
+            return Err(invalid("Unknown public builtin function"));
+        }
+    }
+    Ok(())
 }
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum JavaScriptErrorKind {
     Error,
