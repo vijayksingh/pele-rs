@@ -75,6 +75,13 @@ identity graph; neither lane times its NDJSON pipe or graph serialization.
 Use typed parse as a negative control for graph-construction changes. All
 rendering output checks still run before/after a parsing comparison.
 
+`--stages render-mutable-publish --batch-count 16` fixes every runtime to the
+same bounded count (1–128). Native resets and warms before each batch; recorded
+before/after node counts expose retained-history growth. JS still does not
+return the extra native graph/revision. Compare native control/candidate at the
+same history, never label this indefinitely steady-state latency. Allocation-only
+runs honor the same fixed count and record it explicitly.
+
 Native typed documents remain retained across batches; only native public state
 is reset. JS retained models are reparsed and warmed for each batch. Historical
 reports' `freshRetainedStatePerBatch` field was too broad; their implementation

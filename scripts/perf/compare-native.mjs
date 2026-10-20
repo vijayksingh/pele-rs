@@ -13,6 +13,8 @@ import {cases,now} from './cases.mjs';
 import {guardQuiet,systemProcesses} from './swift/build.mjs';
 const args=process.argv.slice(2),arg=(n,d)=>{const i=args.indexOf(n);return i<0?d:args[i+1]};
 const allocationOnly=args.includes('--allocation-only');
+const fixedBatchCount=args.includes('--batch-count')?Number(arg('--batch-count',0)):null;
+assert(fixedBatchCount===null||(Number.isInteger(fixedBatchCount)&&fixedBatchCount>=1&&fixedBatchCount<=128),'Invalid fixed batch count');
 assert(args.includes('--quiet-run')||allocationOnly,'Explicit coordinated --quiet-run required for timings');
 assert(global.gc||allocationOnly,'Start timed Node runs with --expose-gc');
 const trials=Number(arg('--trials',15)),warmupMs=Number(arg('--warmup-ms',500));
@@ -20,7 +22,7 @@ const allocations=args.includes('--allocations')||allocationOnly;
 const checkQuiet=()=>{if(!allocationOnly)guardQuiet()};
 assert(trials>=15&&trials<=30&&trials%3===0&&warmupMs>=500&&warmupMs<=1000);
 const names=['js','control','candidate'],stages=arg('--stages','render-source,render-retained').split(',');
-assert(stages.length&&new Set(stages).size===stages.length&&stages.every(s=>['parse','parse-public','render-source','render-retained'].includes(s)));
+assert(stages.length&&new Set(stages).size===stages.length&&stages.every(s=>['parse','parse-public','render-source','render-retained','render-mutable-publish'].includes(s)));
 const ids=arg('--cases','').split(',').filter(Boolean),selected=cases().filter(c=>c.scale==='medium'&&(!ids.length||ids.includes(c.id)));
 assert(selected.length&&ids.every(id=>selected.some(c=>c.id===id)),'Unknown medium workload');
 const sha=b=>createHash('sha256').update(b).digest('hex');
@@ -70,10 +72,11 @@ const oracleSHA256=sha(await readFile('node_modules/pele/dist/pele.js'));
 assert.equal(oracleSHA256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d');
 const report={schemaVersion:1,startedAt:new Date().toISOString(),mode:'native-three-way-diagnostic',artifacts,oracleSHA256,harnessSHA256:sha(await readFile(new URL(import.meta.url))),casesSHA256:sha(await readFile(new URL('./cases.mjs',import.meta.url))),settings:{trials,warmupMs,matchedNativeBatchCounts:true,balancedCyclicAndReverseOrder:true,nativeTypedDocumentRetainedAcrossBatches:true,nativePublicStateFreshPerBatch:true,jsRetainedModelFreshPerBatch:true,stages,selectedCases:selected.map(c=>c.id)},host:{platform:platform(),arch:arch(),cpu:cpus()[0]?.model,loadBefore:loadavg(),processesBefore:systemProcesses().filter(p=>p.cpuPercent>=10)},cases:[],rows:[]};
 report.settings.separateAllocationBinaries=allocations;report.allocationRows=[];
+if(fixedBatchCount!==null)report.settings.fixedBatchCount=fixedBatchCount;
 if(allocationOnly){
   report.mode='native-allocations-only';
   for(const key of ['trials','warmupMs','matchedNativeBatchCounts','balancedCyclicAndReverseOrder'])delete report.settings[key];
-  Object.assign(report.settings,{operationsPerCondition:1,timingRequested:false});
+  Object.assign(report.settings,{operationsPerCondition:fixedBatchCount??1,timingRequested:false});
 }
 let native={},allocationNative={};
 try{
@@ -98,8 +101,8 @@ try{
     report.cases.push({...c,sourceSHA256:sha(Buffer.from(c.source)),output:expected,jsRetainedBeforeVerified:true});
     for(const stage of stages){
       if(allocationOnly){
-        const measured={};for(const name of names.slice(1))measured[name]=await allocationNative[name].send({op:'allocations',case:c.id,stage,count:1});
-        report.allocationRows.push({case:c.id,stage,...measured});
+        const count=fixedBatchCount??1,measured={};for(const name of names.slice(1))measured[name]=await allocationNative[name].send({op:'allocations',case:c.id,stage,count});
+        report.allocationRows.push({case:c.id,stage,count,...measured});
         continue;
       }
       const batch=async(name,count)=>{
@@ -116,8 +119,8 @@ try{
         checkQuiet();let elapsedNs=0,operations=0;
         for(let i=0;i<6||elapsedNs<warmupMs*1e6;i++){const r=await batch(name,i<6?1:32);elapsedNs+=r.elapsedNs;operations+=r.count;}
         warmups[name]={elapsedNs,operations};const calibrations=[];
-        for(let j=0;j<3;j++){let count=1;while(count<128&&(await batch(name,count)).elapsedNs<12e6)count*=2;calibrations.push(count);}
-        counts[name]=median(calibrations);
+        if(fixedBatchCount===null)for(let j=0;j<3;j++){let count=1;while(count<128&&(await batch(name,count)).elapsedNs<12e6)count*=2;calibrations.push(count);}
+        counts[name]=fixedBatchCount??median(calibrations);
       }
       counts.control=counts.candidate=Math.min(counts.control,counts.candidate);
       const samples=Object.fromEntries(names.map(n=>[n,[]])),raw=Object.fromEntries(names.map(n=>[n,[]]));
@@ -129,8 +132,8 @@ try{
       verifyJSRetained(counts.js);
       report.rows.push({case:c.id,stage,counts,warmups,samples,raw,medians,candidateOverControl:medians.candidate/medians.control,candidateOverJS:medians.candidate/medians.js,jsRetainedPostBatchVerified:true});
       if(allocations){
-        const measured={};for(const name of names.slice(1))measured[name]=await allocationNative[name].send({op:'allocations',case:c.id,stage,count:1});
-        report.allocationRows.push({case:c.id,stage,...measured});
+        const count=fixedBatchCount??1,measured={};for(const name of names.slice(1))measured[name]=await allocationNative[name].send({op:'allocations',case:c.id,stage,count});
+        report.allocationRows.push({case:c.id,stage,count,...measured});
       }
     }
     for(const name of names.slice(1))for(const output of(await native[name].send({op:'verify',case:c.id})).outputs)assert.deepEqual(output,expected,name+' post-run '+c.id);
