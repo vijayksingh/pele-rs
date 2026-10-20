@@ -136,6 +136,22 @@ surrogate decoder. Public CapturedRead implementations keep that decoder. Array
 membership, first-property matching, index interpretation, latent import errors
 and text-budget charge order remain in one importer body.
 
+Full source recipes use version PLCSRC03 homogeneous scalar columns: string and
+node IDs remain raw u32 values; numeric columns carry raw low/high IEEE words.
+The native writer checks count, width and alignment padding against the existing
+recipe budget before emission. PLCSRC01/02 readers and PLCSRU01 updates remain
+supported, and canonical overflow keeps its existing fallback.
+
+The JS decoder validates physical column spans, then eagerly copies their payloads
+into one compact owned buffer. It retains neither the caller's packet nor a WASM
+memory view, and performs no first-render expansion into tagged triples. Explicit
+little-endian reads cover unaligned input packets and big-endian hosts. A shared
+column interface serves legacy and typed recipes, generic semantic cursors and
+the schema-generated publisher; admission, identity maps, eager public objects
+and exact number bits retain their existing contracts. Packet and compact copy
+overlap during decoding, so smaller payloads alone establish no memory or speed
+claim.
+
 ## Bounds and compatibility
 
 Canonical structural/schema admission and the full logical `PELGBIN1` frame

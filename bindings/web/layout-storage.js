@@ -36,6 +36,35 @@ class Reader{
     return{kind,lo,hi,properties,items};
   }
 }
+// Source columns own their storage. Legacy packets keep tagged triples; typed
+// packets share one compact payload-only copy, never the caller's packet buffer.
+const littleEndian=new Uint8Array(new Uint32Array([1]).buffer)[0]===1;
+class SourceColumn{
+  constructor(length,tag,words,view){this.length=length;this.fixedTag=tag;this.stride=tag===null?3:tag===4?2:1;this.words=words;this.view=view;}
+  tagAt(index){return this.fixedTag===null?this.words[index*3]:this.fixedTag;}
+  loAt(index){const at=index*this.stride+(this.fixedTag===null?1:0);return this.words?this.words[at]:this.view.getUint32(at*4,true);}
+  hiAt(index){if(this.stride===1)return 0;const at=index*this.stride+(this.fixedTag===null?2:1);return this.words?this.words[at]:this.view.getUint32(at*4,true);}
+}
+function readColumns(r,typed){
+  const columns=[];
+  if(!typed){for(let n=r.count(4);n;n--){const size=r.count(9),words=new Uint32Array(size*3);for(let i=0;i<size;i++)r.atom(words,i*3,true);columns.push(new SourceColumn(size,null,words,null));}return columns;}
+  const spans=[];let total=0;
+  for(let n=r.count(5);n;n--){
+    const tag=r.u8();if(tag!==4&&tag!==5&&tag!==6)invalid();const size=r.u32();
+    while(r.at%4)if(r.u8()!==0)invalid();
+    const bytes=size*(tag===4?8:4);r.need(bytes);
+    if(!Number.isSafeInteger(total+bytes)||total+bytes>BUDGET)limit();
+    spans.push({tag,size,start:r.at,bytes});total+=bytes;r.at+=bytes;
+  }
+  const owned=new Uint8Array(total);let offset=0;
+  for(const span of spans){
+    owned.set(r.bytes.subarray(span.start,span.start+span.bytes),offset);
+    const words=littleEndian?new Uint32Array(owned.buffer,offset,span.bytes/4):null;
+    const view=words?null:new DataView(owned.buffer,offset,span.bytes);
+    columns.push(new SourceColumn(span.size,span.tag,words,view));offset+=span.bytes;
+  }
+  return columns;
+}
 // One expression interpreter serves canonical-word output and semantic cursors.
 // The latter keeps numeric affine expressions as numbers until raw bits are needed.
 function evaluate(expr,local,item,columns,out,at){
@@ -43,7 +72,7 @@ function evaluate(expr,local,item,columns,out,at){
   switch(expr.op){
     case 0:break;
     case 1:case 2:lo=expr.a+(expr.op===1?local:item)*expr.b;if(!u32(lo))invalid();hi=0;break;
-    case 3:case 4:{const column=columns[expr.a],index=expr.b+(expr.op===3?local:item);if(!column||!u32(index)||index>=column.length/3)invalid();tag=column[index*3];lo=column[index*3+1];hi=column[index*3+2];break;}
+    case 3:case 4:{const column=columns[expr.a],index=expr.b+(expr.op===3?local:item);if(!column||!u32(index)||index>=column.length)invalid();tag=column.tagAt(index);lo=column.loAt(index);hi=column.hiAt(index);break;}
     case 5:numeric=expr.a+local*expr.b;if(!u32(numeric))invalid();tag=4;lo=hi=0;break;
     default:invalid();
   }
@@ -140,8 +169,8 @@ function readCatalog(r){
   for(let id=0;id<count;id++){const text=readText(r);units+=text.length;if(units>16000000)limit();strings.push(text);unitPrefix[id+1]=units;}
   return{strings,unitPrefix};
 }
-function readLayoutBase(r){
-  const columns=[];for(let n=r.count(4);n;n--){const size=r.count(9),column=new Uint32Array(size*3);for(let i=0;i<size;i++)r.atom(column,i*3,true);columns.push(column);}
+function readLayoutBase(r,typed){
+  const columns=readColumns(r,typed);
   const groups=[];let previousEnd=0;
   for(let n=r.count(25);n;n--){
     const first=r.u32(),count=r.u32(),kind=r.u8(),lo=r.u32(),hi=r.u32();if(kind>6||first<previousEnd||!u32(first+count))invalid();if(count)previousEnd=first+count;
@@ -175,7 +204,7 @@ export function decodeSourceLayout(bytes,baseline){
   if(!(bytes instanceof Uint8Array))invalid();if(bytes.length>BUDGET)limit();
   if(bytes[0]===80&&bytes[1]===69)return decodeCanonicalLayout(bytes,baseline);
   const r=new Reader(bytes);let magic='';for(let i=0;i<8;i++)magic+=String.fromCharCode(r.u8());
-  const legacy=magic==='PLCSRC01',full=magic==='PLCSRC02',update=magic==='PLCSRU01';if(!legacy&&!full&&!update)invalid();
+  const legacy=magic==='PLCSRC01',typed=magic==='PLCSRC03',full=typed||magic==='PLCSRC02',update=magic==='PLCSRU01';if(!legacy&&!full&&!update)invalid();
   const layoutId=legacy?undefined:r.u64();if(!legacy&&layoutId==='0')invalid();
   const revision=r.u64();if(r.u32()!==1)invalid();const root=new Uint32Array(3);r.atom(root,0,true);
   const stringCount=r.u32(),nodeCount=r.u32();if(stringCount>1000000||nodeCount>1000000)limit();
@@ -185,7 +214,7 @@ export function decodeSourceLayout(bytes,baseline){
     base=baseline.base;strings=readStringPatches(r,base,stringCount);
   }else{
     const catalog=readCatalog(r);if(legacy&&catalog.strings.length!==stringCount)invalid();
-    base=readLayoutBase(r);
+    base=readLayoutBase(r,typed);
     if(full){base.layoutId=layoutId;base.originalStrings=catalog.strings;base.unitPrefix=catalog.unitPrefix;strings=readStringPatches(r,base,stringCount);}
     else strings=catalog.strings;
   }

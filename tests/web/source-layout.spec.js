@@ -77,7 +77,7 @@ test('source layouts publish complete accepted Sankey state before original resu
   }
 });
 
-test('source layouts consume canonical operation frames without losing sparse state, helpers or recovery',async({page},info)=>{
+test('typed source columns own packet bytes across legacy and canonical lifecycle recovery',async({page},info)=>{
   test.setTimeout(120000);await prepare(page);
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),wasm=await import('/dist/package-web/package/pkg/pele.js');
@@ -85,22 +85,43 @@ test('source layouts consume canonical operation frames without losing sparse st
     const prototype=wasm.MutableDocument.prototype,parent=Object.getPrototypeOf(prototype),prototypeKeys=Reflect.ownKeys(prototype);
     const names=['snapshot_source_layout','invoke_source_layout_with_functions','render_numbers_operation_source_layout_with_functions','render_raw_operation_source_layout_with_functions'];
     const descriptors=new Map(names.map(name=>[name,Object.getOwnPropertyDescriptor(prototype,name)]));
+    // Rewrite the real native03 packet into the established02 format. All
+    // non-column fields stay byte-identical; no second parse or model fixture.
+    const legacyColumns=bytes=>{
+      const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);let at=45;
+      const need=n=>{if(!Number.isSafeInteger(n)||n<0||n>bytes.length-at)throw Error('Truncated source column fixture');};
+      const word=()=>{need(4);const n=view.getUint32(at,true);at+=4;return n;};
+      for(let n=word();n;n--){const size=word()*2;need(size);at+=size;}
+      const columnCount=word(),prefix=bytes.slice(0,at),parts=[prefix];prefix[7]=50;
+      for(let c=0;c<columnCount;c++){
+        need(1);const tag=view.getUint8(at++),count=word();if(![4,5,6].includes(tag))throw Error('Unexpected typed source column');
+        while(at%4){need(1);if(bytes[at++]!==0)throw Error('Nonzero source padding');}
+        const stride=tag===4?8:4;need(count*stride);
+        const old=new Uint8Array(4+count*9),out=new DataView(old.buffer);out.setUint32(0,count,true);
+        for(let i=0;i<count;i++){const dst=4+i*9,src=at+i*stride;out.setUint8(dst,tag);out.setUint32(dst+1,view.getUint32(src,true),true);out.setUint32(dst+5,tag===4?view.getUint32(src+4,true):0,true);}
+        at+=count*stride;parts.push(old);
+      }
+      parts.push(bytes.subarray(at));const out=new Uint8Array(parts.reduce((n,p)=>n+p.length,0));let offset=0;
+      for(const part of parts){out.set(part,offset);offset+=part.length;}return out;
+    };
     const restore=()=>{for(const[name,descriptor]of descriptors)Object.defineProperty(prototype,name,descriptor);};
     const report={rows:[],restored:false};
     if([...descriptors.values()].some(value=>typeof value?.value!=='function'))return{...report,fatal:{message:'Expected all source layout capabilities'}};
     try{
       for(const raw of [false,true]){
         const row={raw};
-        for(const mode of ['recipe','canonical','full']){
-          restore();const engine=await loadRenderer();let model;const packets={snapshot:[],methods:0,renders:0,canonical:0,full:0,updates:0};
+        for(const mode of ['recipe','legacy02','canonical','full']){
+          restore();const engine=await loadRenderer();let model;const packets={snapshot:[],methods:0,renders:0,canonical:0,full:0,updates:0,legacy:0,copied:0,poisoned:0};const borrowed=[];
+          const poison=()=>{for(const bytes of borrowed){bytes.fill(0xa5);packets.poisoned++;}borrowed.length=0;};
+          const ownedInput=packet=>{const bytes=packet[2],magic=String.fromCharCode(...bytes.subarray(0,8));const transformed=mode==='legacy02'&&magic==='PLCSRC03'?legacyColumns(bytes):bytes;if(transformed!==bytes)packets.legacy++;const unaligned=new Uint8Array(transformed.length+1).subarray(1);unaligned.set(transformed);packet[2]=unaligned;borrowed.push(unaligned);packets.copied++;return packet;};
           try{
             for(const[name,descriptor]of descriptors)Object.defineProperty(prototype,name,{...descriptor,value:function(...args){
               const packet=Reflect.apply(descriptor.value,this,args);
               if(!Array.isArray(packet)||(packet.length!==4&&packet.length!==6)||packet[0]!==1)throw Error('Expected source layout outcome');
-              const magic=String.fromCharCode(...packet[2].subarray(0,8));if(!['PLCSRC01','PLCSRC02','PLCSRU01'].includes(magic))throw Error('Small source fixture must retain real source recipe');
-              if(name==='snapshot_source_layout'){packets.snapshot.push({magic,type:JSON.parse(packet[3]).type});return packet;}
+              const magic=String.fromCharCode(...packet[2].subarray(0,8));if(!['PLCSRC01','PLCSRC02','PLCSRC03','PLCSRU01'].includes(magic))throw Error('Small source fixture must retain real source recipe');
+              if(name==='snapshot_source_layout'){packets.snapshot.push({magic,type:JSON.parse(packet[3]).type});return ownedInput(packet);}
               if(magic==='PLCSRU01')packets.updates++;if(name==='invoke_source_layout_with_functions')packets.methods++;else packets.renders++;
-              if(mode==='full'){const full=Reflect.apply(descriptors.get('snapshot_source_layout').value,this,[]);if(!Array.isArray(full)||full[1]!==packet[1]||String.fromCharCode(...full[2].subarray(0,8))!=='PLCSRC02')throw Error('Expected full snapshot retaining original source catalog');packet[2]=full[2];packets.full++;}
+              if(mode==='full'){const full=Reflect.apply(descriptors.get('snapshot_source_layout').value,this,[]);if(!Array.isArray(full)||full[1]!==packet[1]||String.fromCharCode(...full[2].subarray(0,8))!=='PLCSRC03')throw Error('Expected full snapshot retaining original source catalog');packet[2]=full[2];packets.full++;}
               if(mode==='canonical'){
                 // This forces only the physical fallback decoder. It does not
                 // claim to execute the native 64 MiB recipe-overflow branch.
@@ -109,16 +130,17 @@ test('source layouts consume canonical operation frames without losing sparse st
                 if(graph.byteLength!==packet[1])throw Error('Canonical frame count mismatch');
                 packet[2]=graph;packets.canonical++;
               }
-              return packet;
+              return ownedInput(packet);
             }});
-            model=engine.parse(source);const nodes=model.nodes,links=model.links,lookup=model.lookup,first=nodes[0];
+            model=engine.parse(source);poison();const nodes=model.nodes,links=model.links,lookup=model.lookup,first=nodes[0];
+            const firstHelper=model.findOrCreateNode('A');poison();
             const extra={text:'漢😀\ud800',nan:number('fff8000000000042'),zero:-0,infinity:Infinity};extra.self=extra;
             const initialNumeric={nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)},numericHistory=[];
-            const trackNumeric=stage=>numericHistory.push({stage,nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)});
+            const trackNumeric=stage=>{poison();numericHistory.push({stage,nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)});};
             extra.map=new Map([[NaN,extra],[-0,first]]);extra.set=new Set([extra,first]);
             Object.defineProperty(extra,'hidden',{value:'non-enumerable 漢😀',writable:false,enumerable:false,configurable:true});
             model.extra=extra;model.detached=[extra,first];const detached=model.detached;
-            const draw=mutate=>{const trace=[];let fired=false;const options={measurer:{width(text,size,style){trace.push([text,bits(size),style]);if(mutate&&!fired){fired=true;mutate();}return text.length*size*.6;}}};try{const value=raw?engine.renderRaw('sankey',model,{},options):engine.render(model,options);return{ok:true,value:output(value),trace};}catch(value){return{ok:false,error:error(value),trace};}};
+            const draw=mutate=>{const trace=[];let fired=false;const options={measurer:{width(text,size,style){trace.push([text,bits(size),style]);if(mutate&&!fired){fired=true;mutate();}return text.length*size*.6;}}};try{const value=raw?engine.renderRaw('sankey',model,{},options):engine.render(model,options);return{ok:true,value:output(value),trace};}catch(value){return{ok:false,error:error(value),trace};}finally{poison();}};
             const seed=draw();trackNumeric('seed');delete model.detached;const detachedSeed=draw();trackNumeric('detached seed');
             first.id='Accepted replacement 漢😀';const stringOverride=draw();trackNumeric('accepted label replacement');
             first.id='A';const stringReset=draw();trackNumeric('reset original label');
@@ -130,9 +152,9 @@ test('source layouts consume canonical operation frames without losing sparse st
             const accepted=snapshot([model,detached]);trackNumeric('callback restoration');
             first.id=42;const invalid=draw(),invalidState=snapshot([model,detached]).signature;trackNumeric('invalid edit');
             first.id='A';const recovery=draw();trackNumeric('repair');const next=draw(),after=snapshot([model,detached]);trackNumeric('next');
-            row[mode]={seed,detachedSeed,stringOverride,stringReset,edited,before:before.signature,callback,accepted:accepted.signature,invalid,invalidState,recovery,next,after:after.signature,fired,restored:stable(before.objects,accepted.objects),identity:model.nodes===nodes&&model.links===links&&model.lookup===lookup&&hit===first&&lookup.get('A')===first&&added===nodes.at(-1)&&lookup.get('漢😀')===added&&links.at(-1).target===added&&model.extra===extra&&extra.self===extra&&detached[0]===extra&&detached[1]===first,initialNumeric,numericHistory,numeric:{nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)}};
+            row[mode]={seed,detachedSeed,stringOverride,stringReset,edited,before:before.signature,callback,accepted:accepted.signature,invalid,invalidState,recovery,next,after:after.signature,fired,restored:stable(before.objects,accepted.objects),identity:firstHelper===first&&model.nodes===nodes&&model.links===links&&model.lookup===lookup&&hit===first&&lookup.get('A')===first&&added===nodes.at(-1)&&lookup.get('漢😀')===added&&links.at(-1).target===added&&model.extra===extra&&extra.self===extra&&detached[0]===extra&&detached[1]===first,initialNumeric,numericHistory,numeric:{nan:bits(extra.nan),zero:bits(extra.zero),infinity:bits(extra.infinity)}};
           }catch(value){row[mode]={fatal:error(value)};}
-          finally{if(model)engine.dispose(model);engine.close();restore();row[mode+'Packets']=packets;}
+          finally{poison();if(model)engine.dispose(model);engine.close();restore();row[mode+'Packets']=packets;}
         }
         report.rows.push(row);
       }
@@ -144,7 +166,7 @@ test('source layouts consume canonical operation frames without losing sparse st
   await save(info,'source-layout-canonical-fallback.json',report);
   expect(report.fatal).toBeUndefined();expect(report.restored).toBe(true);expect(report.rows).toHaveLength(2);
   for(const row of report.rows){
-    expect(row.recipe.fatal,`${row.raw}/recipe`).toBeUndefined();expect(row.canonical.fatal,`${row.raw}/canonical`).toBeUndefined();expect(row.full.fatal,`${row.raw}/full`).toBeUndefined();
+    expect(row.recipe.fatal,`${row.raw}/recipe`).toBeUndefined();expect(row.legacy02.fatal,`${row.raw}/legacy02`).toBeUndefined();expect(row.canonical.fatal,`${row.raw}/canonical`).toBeUndefined();expect(row.full.fatal,`${row.raw}/full`).toBeUndefined();
     // Engines can box the freshly created fixture NaN differently between
     // iterations. Prove exact original bits in EACH lane before comparing
     // that one input field symbolically across independently created models.
@@ -161,16 +183,19 @@ test('source layouts consume canonical operation frames without losing sparse st
       copy.initialNumeric.nan=copy.numeric.nan='original fixture NaN';for(const numeric of copy.numericHistory)numeric.nan='original fixture NaN';return copy;
     };
     expect(comparable(row.canonical),row.raw+'').toEqual(comparable(row.recipe));
+    expect(comparable(row.legacy02),row.raw+'/legacy02').toEqual(comparable(row.recipe));
     expect(comparable(row.full),row.raw+'/full').toEqual(comparable(row.recipe));
     expect(row.canonical).toMatchObject({fired:true,restored:true,identity:true,numeric:{zero:'8000000000000000',infinity:'7ff0000000000000'}});
     expect(row.canonical.numeric).toEqual(row.canonical.initialNumeric);
     const nan=BigInt('0x'+row.canonical.numeric.nan);expect((nan&0x7ff0000000000000n)===0x7ff0000000000000n&&(nan&0xfffffffffffffn)!==0n).toBe(true);
     expect(row.canonical.accepted).toEqual(row.canonical.before);expect(row.canonical.callback).toEqual(row.canonical.edited);
     expect(row.canonical.invalid.ok).toBe(false);expect(row.canonical.recovery.ok).toBe(true);expect(row.canonical.next).toEqual(row.canonical.recovery);
-    for(const mode of ['recipe','canonical','full']){expect(row[mode+'Packets'].snapshot).toEqual([{magic:'PLCSRC02',type:'sankey'}]);expect(row[mode+'Packets'].methods).toBe(3);expect(row[mode+'Packets'].renders).toBeGreaterThanOrEqual(6);}
+    for(const mode of ['recipe','legacy02','canonical','full']){expect(row[mode+'Packets'].snapshot).toEqual([{magic:'PLCSRC03',type:'sankey'}]);expect(row[mode+'Packets'].methods).toBe(4);expect(row[mode+'Packets'].renders).toBeGreaterThanOrEqual(6);}
     expect(row.canonicalPackets.methods).toBe(row.recipePackets.methods);expect(row.canonicalPackets.renders).toBe(row.recipePackets.renders);
     expect(row.canonicalPackets.canonical).toBe(row.canonicalPackets.methods+row.canonicalPackets.renders);expect(row.recipePackets.canonical).toBe(0);
-    for(const mode of ['recipe','canonical','full'])expect(row[mode+'Packets'].updates).toBe(row[mode+'Packets'].methods+row[mode+'Packets'].renders);
+    for(const mode of ['recipe','legacy02','canonical','full'])expect(row[mode+'Packets'].updates).toBe(row[mode+'Packets'].methods+row[mode+'Packets'].renders);
+    for(const mode of ['recipe','legacy02','canonical','full']){const p=row[mode+'Packets'];expect(p.copied).toBe(1+p.methods+p.renders);expect(p.poisoned).toBe(p.copied);}
+    expect(row.legacy02Packets.legacy).toBe(1);expect(row.recipePackets.legacy).toBe(0);
     expect(row.fullPackets.full).toBe(row.fullPackets.updates);expect(row.recipe.stringOverride.ok).toBe(true);expect(row.recipe.stringReset).toEqual(row.recipe.detachedSeed);
   }
 });

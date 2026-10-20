@@ -39,9 +39,9 @@ const value=(e,site,index='i')=>{
  if(e.op===0)return`literal(${site},bridge)`;
  if(e.op===2)return`objects[${site}.a+${index}*${e.b}]`;
  if(e.op===5)return`${e.a}+${index}*${e.b}`;
- const at=`(${index}+${e.b})*3`,col=`c${e.a}`;
- if(e.field?.kind==='number')return`number(${col}[${at}+1],${col}[${at}+2])`;
- return`${e.field?.kind==='record'?'objects':'strings'}[${col}[${at}+1]]`;
+ const at=`${index}+${e.b}`,col=`c${e.a}`;
+ if(e.field?.kind==='number')return`number(${col}.loAt(${at}),${col}.hiAt(${at}))`;
+ return`${e.field?.kind==='record'?'objects':'strings'}[${col}.loAt(${at})]`;
 };
 let body='';
 for(let n=0;n<groups.length;n++){
@@ -70,8 +70,8 @@ function expression(e,s,count,limit,graph){
  if(s.op===2)return e.tag===6&&Number.isInteger(e.a)&&e.a>=0&&e.a+(count-1)*e.b<limit;
  if(e.a!==s.a)return false;
  if(s.op===5)return Number.isSafeInteger(e.a+Math.max(0,count-1)*e.b)&&e.a+Math.max(0,count-1)*e.b<=0xffffffff;
- const col=graph.base.columns[e.a];if(!col||count+e.b>col.length/3)return false;
- if(COLUMN_TAGS[e.a]===6)for(let i=0;i<count;i++)if(col[(i+e.b)*3+1]>=limit)return false;
+ const col=graph.base.columns[e.a];if(!col||count+e.b>col.length)return false;
+ if(COLUMN_TAGS[e.a]===6)for(let i=0;i<count;i++)if(col.loAt(i+e.b)>=limit)return false;
  return true;
 }
 function eligible(bridge,graph){
@@ -84,7 +84,7 @@ function eligible(bridge,graph){
  const groups=graph.base.groups,columns=graph.base.columns;if(groups.length!==SHAPES.length||columns.length!==COLUMN_TAGS.length)return false;
  // Examine source columns once before creating any object. Unsupported numeric
  // representations conservatively retain the existing generic publication.
- for(let c=0;c<columns.length;c++){const words=columns[c],tag=COLUMN_TAGS[c];if(words.length%3)return false;for(let i=0;i<words.length;i+=3){if(words[i]!==tag)return false;if(tag===4){const n=number(words[i+1],words[i+2]);if(!Number.isFinite(n)||Object.is(n,-0))return false;}else if(words[i+2]!==0||(tag===5&&words[i+1]>=graph.strings.length)||(tag===6&&words[i+1]>=graph.nodeCount))return false;}}
+ for(let c=0;c<columns.length;c++){const column=columns[c],tag=COLUMN_TAGS[c];for(let i=0;i<column.length;i++){if(column.tagAt(i)!==tag)return false;const lo=column.loAt(i),hi=column.hiAt(i);if(tag===4){const n=number(lo,hi);if(!Number.isFinite(n)||Object.is(n,-0))return false;}else if(hi!==0||(tag===5&&lo>=graph.strings.length)||(tag===6&&lo>=graph.nodeCount))return false;}}
  let end=0;
  for(let n=0;n<groups.length;n++){
   const g=groups[n],s=SHAPES[n];if(g.first!==end||!Number.isInteger(g.count)||g.count<1||g.kind!==s.kind||g.hi!==0||g.properties.length!==s.properties.length||g.dynamic.length!==s.dynamic.length||g.collections.length!==s.collections.length)return false;end+=g.count;if(end>graph.nodeCount)return false;
@@ -94,7 +94,7 @@ function eligible(bridge,graph){
   if(g.kind===3&&g.lo!==0)return false;
   let properties=0,items=0;
   for(let j=0;j<s.properties.length;j++){const p=g.properties[j],q=s.properties[j];if(p.count!==1||p.flags!==q.flags||p.key.op!==0||p.key.tag!==5||p.key.b!==0||graph.strings[p.key.a]!==q.name||!expression(p.value,q.value,g.count,g.first,graph))return false;properties++;}
-  for(let j=0;j<s.dynamic.length;j++){const p=g.dynamic[j],q=s.dynamic[j];if(p.flags!==7||p.count!==g.lo||!expression(p.key,q.key,p.count,g.first,graph)||!expression(p.value,q.value,p.count,g.first,graph))return false;const col=columns[p.key.a];for(let i=0;i<p.count;i++)if(graph.strings[col[(i+p.key.b)*3+1]]!==String(i))return false;properties+=p.count;}
+  for(let j=0;j<s.dynamic.length;j++){const p=g.dynamic[j],q=s.dynamic[j];if(p.flags!==7||p.count!==g.lo||!expression(p.key,q.key,p.count,g.first,graph)||!expression(p.value,q.value,p.count,g.first,graph))return false;const col=columns[p.key.a];for(let i=0;i<p.count;i++)if(graph.strings[col.loAt(i+p.key.b)]!==String(i))return false;properties+=p.count;}
   for(let j=0;j<s.collections.length;j++){const c=g.collections[j],q=s.collections[j];if(!expression(c.key,q.key,c.count,g.first,graph)||!expression(c.value,q.value,c.count,g.first,graph))return false;items+=c.count*2;}
   if(properties!==g.propertyCount||items!==g.itemAtoms)return false;
  }

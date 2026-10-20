@@ -1074,6 +1074,62 @@ fn atom9(w: &mut crate::compat::public::binary::Writer, a: &Atom) -> Result<(), 
     w.u32(lo)?;
     w.u32(hi)
 }
+// Homogeneous scalar transport, independent of record/group semantics. IDs
+// are already u32; numbers arrive as raw IEEE bits and never round-trip through
+// an intermediate floating-point value here. Legacy fixed atoms share this
+// exact source iterator, retaining the identity-exhaustion wire unchanged.
+#[derive(Clone, Copy)]
+enum ColumnKind {
+    String,
+    Reference,
+    Number,
+}
+impl ColumnKind {
+    fn tag(self) -> u8 {
+        match self {
+            Self::String => 5,
+            Self::Reference => 6,
+            Self::Number => 4,
+        }
+    }
+    fn width(self) -> usize {
+        if matches!(self, Self::Number) {
+            8
+        } else {
+            4
+        }
+    }
+}
+fn column(
+    w: &mut crate::compat::public::binary::Writer,
+    typed: bool,
+    kind: ColumnKind,
+    values: impl ExactSizeIterator<Item = u64>,
+) -> Result<(), PeleError> {
+    let count = values.len();
+    if typed {
+        w.byte(kind.tag())?;
+    }
+    w.count(count)?;
+    if typed {
+        let padding = (4 - w.bytes.len() % 4) % 4;
+        w.put(&[0; 3][..padding])?;
+    }
+    let width = if typed { kind.width() } else { 9 };
+    // The recipe writer is capped at 64MiB. Overflow maps to a size guaranteed
+    // to fail the same existing byte-limit predicate, without allocating it.
+    w.check_additional(count.checked_mul(width).unwrap_or(usize::MAX))?;
+    for value in values {
+        if !typed {
+            w.byte(kind.tag())?;
+        }
+        w.u32(value as u32)?;
+        if !typed || matches!(kind, ColumnKind::Number) {
+            w.u32((value >> 32) as u32)?;
+        }
+    }
+    Ok(())
+}
 fn expr(w: &mut crate::compat::public::binary::Writer, e: Expr) -> Result<(), PeleError> {
     w.byte(e.op)?;
     w.byte(e.tag)?;
@@ -1132,7 +1188,7 @@ impl SourceCanonical {
         };
         let update = update && self.layout_id.is_some();
         if let Some(id) = self.layout_id {
-            w.put(if update { b"PLCSRU01" } else { b"PLCSRC02" })?;
+            w.put(if update { b"PLCSRU01" } else { b"PLCSRC03" })?;
             w.put(&id.to_le_bytes())?;
         } else {
             w.put(b"PLCSRC01")?;
@@ -1167,28 +1223,45 @@ impl SourceCanonical {
                 }
             }
             // Five scalar columns: labels, source, target, value, decimal-key IDs.
+            // Only full packets with a layout identity use the typed03 ABI.
+            let typed = self.layout_id.is_some();
             w.count(5)?;
-            w.count(self.labels.len())?;
-            for id in &self.labels {
-                atom9(&mut w, &Atom::String(*id))?;
-            }
-            for col in 0..3 {
-                w.count(self.source.links.len())?;
-                for l in &self.source.links {
-                    atom9(
-                        &mut w,
-                        &match col {
-                            0 => Atom::Ref(l.source as u32),
-                            1 => Atom::Ref(l.target as u32),
-                            _ => Atom::Number(l.value),
-                        },
-                    )?;
-                }
-            }
-            w.count(self.indices.len())?;
-            for id in &self.indices {
-                atom9(&mut w, &Atom::String(*id))?;
-            }
+            column(
+                &mut w,
+                typed,
+                ColumnKind::String,
+                self.labels.iter().map(|id| u64::from(*id)),
+            )?;
+            column(
+                &mut w,
+                typed,
+                ColumnKind::Reference,
+                self.source
+                    .links
+                    .iter()
+                    .map(|link| u64::from(link.source as u32)),
+            )?;
+            column(
+                &mut w,
+                typed,
+                ColumnKind::Reference,
+                self.source
+                    .links
+                    .iter()
+                    .map(|link| u64::from(link.target as u32)),
+            )?;
+            column(
+                &mut w,
+                typed,
+                ColumnKind::Number,
+                self.source.links.iter().map(|link| link.value.to_bits()),
+            )?;
+            column(
+                &mut w,
+                typed,
+                ColumnKind::String,
+                self.indices.iter().map(|id| u64::from(*id)),
+            )?;
             let n = self.source.nodes.len();
             let m = self.source.links.len();
             let key = |k: &str| Expr::literal(&Atom::String(self.key(k)));

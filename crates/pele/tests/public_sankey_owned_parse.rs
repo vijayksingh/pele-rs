@@ -1008,6 +1008,7 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
         strings: usize,
         original: Vec<JsString>,
         immutable: &'a [u8],
+        columns: Vec<Vec<(u8, u64)>>,
         patches: Vec<(usize, JsString)>,
         overrides: &'a [u8],
     }
@@ -1027,13 +1028,14 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
         JsString(units)
     }
     fn packet(bytes: &[u8], full: bool) -> Packet<'_> {
-        assert_eq!(&bytes[..8], if full { b"PLCSRC02" } else { b"PLCSRU01" });
+        assert_eq!(&bytes[..8], if full { b"PLCSRC03" } else { b"PLCSRU01" });
         assert_ne!(u64::from_le_bytes(bytes[8..16].try_into().unwrap()), 0);
         let mut pos = 37;
         let strings = u32_at(bytes, &mut pos);
         let _nodes = u32_at(bytes, &mut pos);
         let base_start = pos;
         let mut original = Vec::new();
+        let mut column_values = Vec::new();
         if full {
             let count = u32_at(bytes, &mut pos);
             for _ in 0..count {
@@ -1041,8 +1043,25 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
             }
             let columns = u32_at(bytes, &mut pos);
             for _ in 0..columns {
+                let tag = bytes[pos];
+                pos += 1;
+                assert!([4, 5, 6].contains(&tag));
                 let count = u32_at(bytes, &mut pos);
-                pos += count * 9;
+                while pos % 4 != 0 {
+                    assert_eq!(bytes[pos], 0);
+                    pos += 1;
+                }
+                let mut values = Vec::new();
+                for _ in 0..count {
+                    let lo = u32_at(bytes, &mut pos) as u64;
+                    let hi = if tag == 4 {
+                        u32_at(bytes, &mut pos) as u64
+                    } else {
+                        0
+                    };
+                    values.push((tag, lo | (hi << 32)));
+                }
+                column_values.push(values);
             }
             let groups = u32_at(bytes, &mut pos);
             for _ in 0..groups {
@@ -1071,6 +1090,7 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
             strings,
             original,
             immutable: &bytes[base_start..base_end],
+            columns: column_values,
             patches,
             overrides: &bytes[pos..],
         }
@@ -1090,6 +1110,7 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
         assert_eq!(&full.header[..8], &base.header[..8]);
         assert_eq!(full.immutable, base.immutable);
         assert_eq!(full.original, base.original);
+        assert_eq!(full.columns, base.columns);
         assert_eq!(full.patches, update.patches);
         assert_eq!(full.overrides, update.overrides);
         let mut restored: Vec<_> = (0..update.strings)
@@ -1120,6 +1141,49 @@ fn source_layout_updates_preserve_original_base_and_complete_current_state() {
                 .unwrap()
                 == encoded
         );
+    }
+    // Compare source column contents with the independent legacy provider's
+    // canonical public records, not private writer helpers or column counters.
+    // Unicode/alignment shifts, numeric spelling, and catalog
+    // collisions keep their public meaning and exact IEEE bits.
+    for source in [
+        "sankey\nA,B,1",
+        "---\ntitle: λ 😀\n---\nsankey-beta\n\"0\",\"B label\",-0\n\"B label\",C,Infinity\nC,\"0\",NaN",
+        "sankey\nA,B,5e-324\nA,C,-2.5",
+    ] {
+        let actual = PublicEngine::with_builtins().parse(source, &Default::default()).unwrap();
+        let expected = legacy_engine().parse(source, &Default::default()).unwrap();
+        let graph = expected.snapshot().unwrap();
+        let view = actual.snapshot_read().unwrap();
+        let raw = view.source_layout(0).unwrap().unwrap();
+        let full = packet(&raw, true);
+        let field = |id: usize, name: &str| -> &Atom {
+            &graph.nodes[id].properties().iter().find(|p| graph.strings[p.key as usize].is(name)).unwrap().value
+        };
+        let Atom::Ref(root) = graph.root else { panic!("root") };
+        let Atom::Ref(nodes) = field(root as usize, "nodes") else { panic!("nodes") };
+        let Atom::Ref(links) = field(root as usize, "links") else { panic!("links") };
+        let node_ids: Vec<_> = graph.nodes[*nodes as usize].properties().iter().map(|p| match p.value { Atom::Ref(id) => id as usize, _ => panic!("node ref") }).collect();
+        let link_ids: Vec<_> = graph.nodes[*links as usize].properties().iter().map(|p| match p.value { Atom::Ref(id) => id as usize, _ => panic!("link ref") }).collect();
+        let mut columns = vec![Vec::new(); 5];
+        for id in &node_ids {
+            let Atom::String(value) = field(*id, "id") else { panic!("label") };
+            columns[0].push((5, u64::from(*value)));
+        }
+        for id in &link_ids {
+            let Atom::Ref(source) = field(*id, "source") else { panic!("source") };
+            let Atom::Ref(target) = field(*id, "target") else { panic!("target") };
+            let Atom::Number(value) = field(*id, "value") else { panic!("value") };
+            columns[1].push((6, u64::from(*source)));
+            columns[2].push((6, u64::from(*target)));
+            columns[3].push((4, value.to_bits()));
+        }
+        for index in 0..node_ids.len().max(link_ids.len()) {
+            let value = graph.strings.iter().position(|text| text.is(&index.to_string())).unwrap();
+            columns[4].push((5, value as u64));
+        }
+        assert_eq!(full.columns, columns, "{source}");
+        verify(&actual, &expected, &raw);
     }
     let source = "---\ntitle: original 😀\n---\nsankey\nA,B,2\nA,C,3";
     let mut actual = PublicEngine::with_builtins()

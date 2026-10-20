@@ -53,8 +53,11 @@ pub(crate) struct Writer {
     pub(crate) budget: usize,
 }
 impl Writer {
+    pub(crate) fn check_additional(&self, count: usize) -> Result<(), PeleError> {
+        check_bytes(self.bytes.len(), count, self.budget)
+    }
     pub(crate) fn put(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
-        check_bytes(self.bytes.len(), bytes.len(), self.budget)?;
+        self.check_additional(bytes.len())?;
         self.bytes.extend_from_slice(bytes);
         Ok(())
     }
