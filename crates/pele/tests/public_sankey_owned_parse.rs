@@ -481,3 +481,139 @@ fn sankey_owned_parse_keeps_source_limits_and_prepared_publication() {
         "prepared legacy path",
     );
 }
+
+#[test]
+fn sankey_indexed_source_keeps_first_helper_latent_errors_and_raw_recovery() {
+    let mut actual = PublicEngine::with_builtins()
+        .parse(SOURCE, &Default::default())
+        .unwrap();
+    let mut expected = legacy_engine().parse(SOURCE, &Default::default()).unwrap();
+    let initial = actual.snapshot().unwrap();
+    let existing = initial.strings.iter().position(|s| s.is("A")).unwrap() as u32;
+    // No intervening apply: the first helper starts from the direct source state.
+    for argument in [Atom::String(existing), Atom::Number(123.)] {
+        let invoke = |document: &mut PublicDocument| {
+            let method = document
+                .model_schema()
+                .methods
+                .iter()
+                .find(|m| m.name == "findOrCreateNode")
+                .unwrap()
+                .id;
+            document
+                .invoke(
+                    document.revision(),
+                    MethodCall {
+                        method,
+                        receiver: document.snapshot().unwrap().root,
+                        arguments: vec![argument.clone()],
+                    },
+                    &mut MetricsResources,
+                )
+                .unwrap()
+                .result
+        };
+        assert_eq!(
+            serde_json::to_vec(&invoke(&mut actual)).unwrap(),
+            serde_json::to_vec(&invoke(&mut expected)).unwrap()
+        );
+        assert!(bytes(&actual) == bytes(&expected));
+    }
+    // A numeric ID is accepted by the helper but invalid for the render
+    // projection. The node/Map mutation must survive that latent error.
+    let before = bytes(&actual);
+    let error = actual
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err();
+    assert_eq!(
+        error,
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap_err()
+    );
+    assert_eq!(error.message, "Expected a public string");
+    assert!(bytes(&actual) == before);
+    assert!(bytes(&actual) == bytes(&expected));
+    for document in [&mut actual, &mut expected] {
+        document
+            .apply(document.revision(), initial.clone())
+            .unwrap();
+    }
+    let mut raw = PublicDocument::from_graph(
+        Sankey,
+        actual.snapshot().unwrap(),
+        actual.retained_config().clone(),
+    )
+    .unwrap();
+    let rendered = actual
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap();
+    assert_eq!(
+        rendered,
+        expected
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap()
+    );
+    assert_eq!(
+        rendered,
+        raw.render(&Default::default(), &mut MetricsResources)
+            .unwrap()
+    );
+}
+
+#[test]
+fn sankey_indexed_source_preserves_resource_order_and_public_typed_projection() {
+    struct Trace {
+        calls: Vec<(String, u64, u8)>,
+        reject_at: Option<usize>,
+    }
+    impl RenderResources for Trace {
+        fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
+            self.calls
+                .push((request.text.into(), request.size.to_bits(), request.style));
+            if self.reject_at == Some(self.calls.len()) {
+                return Err(PeleError::new(
+                    "indexed source host rejection",
+                    ErrorCode::Semantic,
+                ));
+            }
+            MetricsResources.text_width(request)
+        }
+    }
+    let source = "---\ntitle: λ 😀\n---\nsankey\n\"A label\",B,-0\nB,C,2.5";
+    let typed = Engine::with_builtins()
+        .parse(source, &Default::default())
+        .unwrap();
+    let model = typed.model::<SankeyModel>().unwrap();
+    assert_eq!(model.links[0].source.id, model.nodes[0].id);
+    assert_eq!(model.links[0].target.id, model.nodes[1].id);
+    assert_eq!(model.links[0].value.to_bits(), (-0.0f64).to_bits());
+    let json = serde_json::to_value(model).unwrap();
+    assert_eq!(json["links"][0]["source"], json["nodes"][0]);
+    assert_eq!(json["links"][0]["target"], json["nodes"][1]);
+
+    let mut actual = PublicEngine::with_builtins()
+        .parse(source, &Default::default())
+        .unwrap();
+    let mut expected = legacy_engine().parse(source, &Default::default()).unwrap();
+    for reject_at in [None, Some(1), Some(2), None] {
+        let mut a = Trace {
+            calls: Vec::new(),
+            reject_at,
+        };
+        let mut b = Trace {
+            calls: Vec::new(),
+            reject_at,
+        };
+        let result = actual.render(&Default::default(), &mut a);
+        assert_eq!(result, expected.render(&Default::default(), &mut b));
+        assert_eq!(a.calls, b.calls);
+        assert!(a.calls.len() >= reject_at.unwrap_or(1));
+        if reject_at.is_none() {
+            assert!(result.is_ok());
+        } else {
+            assert_eq!(result.unwrap_err().message, "indexed source host rejection");
+        }
+        assert!(bytes(&actual) == bytes(&expected));
+    }
+}

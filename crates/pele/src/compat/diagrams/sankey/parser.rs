@@ -1,4 +1,5 @@
 //! Pele sankey/{lexer,parser}.ts RFC4180 ASCII scanner, 458322a5 (MIT, kepano).
+use super::indexed::{IndexedSankey, Link};
 use super::model::*;
 use crate::compat::{source::space, ParseContext, PeleError};
 use std::collections::HashMap;
@@ -247,14 +248,59 @@ impl Reader<'_> {
         Ok(self.field()?.trim_matches(space).replace("\"\"", "\""))
     }
 }
+trait Target: Sized {
+    fn new(title: Option<&str>) -> Self;
+    fn node(&mut self, id: String, index: usize);
+    fn link(&mut self, source: usize, target: usize, value: f64);
+}
+impl Target for SankeyModel {
+    fn new(title: Option<&str>) -> Self {
+        SankeyModel::new(title)
+    }
+    fn node(&mut self, id: String, index: usize) {
+        self.nodes.push(SankeyNode { id, index });
+    }
+    fn link(&mut self, source: usize, target: usize, value: f64) {
+        self.links.push(SankeyLink {
+            source: self.nodes[source].clone(),
+            target: self.nodes[target].clone(),
+            value,
+        });
+    }
+}
+impl Target for IndexedSankey {
+    fn new(title: Option<&str>) -> Self {
+        Self {
+            nodes: Vec::new(),
+            links: Vec::new(),
+            title: title.map(str::to_owned),
+        }
+    }
+    fn node(&mut self, id: String, index: usize) {
+        self.nodes.push(SankeyNode { id, index });
+    }
+    fn link(&mut self, source: usize, target: usize, value: f64) {
+        self.links.push(Link {
+            source,
+            target,
+            value,
+        });
+    }
+}
 pub(super) fn parse(c: ParseContext<'_>) -> Result<SankeyModel, PeleError> {
+    parse_into(c)
+}
+pub(super) fn parse_indexed(c: ParseContext<'_>) -> Result<IndexedSankey, PeleError> {
+    parse_into(c)
+}
+fn parse_into<M: Target>(c: ParseContext<'_>) -> Result<M, PeleError> {
     let src = prepare(c.source);
     let mut r = Reader {
         tokens: tokenize(&src),
         src: &src,
         i: 0,
     };
-    let mut db = SankeyModel::new(c.title);
+    let mut db = M::new(c.title);
     let mut lookup: HashMap<String, usize> = HashMap::new();
     r.expect(T::SANKEY, "")?;
     r.expect(T::NEWLINE, "")?;
@@ -269,20 +315,13 @@ pub(super) fn parse(c: ParseContext<'_>) -> Result<SankeyModel, PeleError> {
             ids[k] = if let Some(i) = lookup.get(&id) {
                 *i
             } else {
-                let i = db.nodes.len();
-                db.nodes.push(SankeyNode {
-                    id: id.clone(),
-                    index: i,
-                });
+                let i = lookup.len();
+                db.node(id.clone(), i);
                 lookup.insert(id, i);
                 i
             }
         }
-        db.links.push(SankeyLink {
-            source: db.nodes[ids[0]].clone(),
-            target: db.nodes[ids[1]].clone(),
-            value,
-        });
+        db.link(ids[0], ids[1], value);
         if r.t() != T::NEWLINE {
             break;
         }

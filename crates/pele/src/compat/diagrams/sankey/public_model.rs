@@ -4,7 +4,10 @@
 //! `lookup` Map share object IDs. Direct edits do not refresh that Map or
 //! renumber nodes. The existing Sankey renderer consumes a concrete typed
 //! projection imported at the edit boundary; rendering never reparses source.
-use super::{Sankey, SankeyLink, SankeyModel, SankeyNode};
+use super::{
+    indexed::{IndexedSankey, Input},
+    Sankey, SankeyLink, SankeyModel, SankeyNode,
+};
 use crate::compat::public::captured_read::{
     ArenaRead, CapturedRead, NodeKind, PropertyPrefix, PROPERTY_CHUNK, STRING_CHUNK,
 };
@@ -16,8 +19,8 @@ use crate::compat::{
         Node, Property, PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule,
         PublicError, RecordId, RecordKind, RecordSchema,
     },
-    DiagramModule, DiagramType, ErrorCode, Object, PeleError, RenderResources, RenderSettings,
-    Rendered,
+    DiagramModule, DiagramType, EdgeLimit, ErrorCode, Object, ParseContext, PeleError,
+    RenderResources, RenderSettings, Rendered,
 };
 use std::{borrow::Borrow, collections::HashMap};
 
@@ -189,7 +192,11 @@ static SCHEMA: ModelSchema = ModelSchema {
 };
 pub struct SankeyPublicState {
     graph: ModelGraph,
-    model: Result<SankeyModel, PeleError>,
+    model: Result<Projection, PeleError>,
+}
+enum Projection {
+    Legacy(SankeyModel),
+    Indexed(IndexedSankey),
 }
 fn invalid(message: &str) -> PeleError {
     let mut error = PeleError::new(message, ErrorCode::Semantic);
@@ -481,45 +488,62 @@ fn initial_graph(model: &SankeyModel) -> Result<ModelGraph, PeleError> {
     initial_into(GraphWriter::default(), model)
 }
 pub(crate) fn initial_into<W: InitialWriter>(
-    mut out: W,
+    out: W,
     model: &SankeyModel,
 ) -> Result<W::Output, PeleError> {
+    initial_from(out, model, Some(model))
+}
+fn initial_from<W: InitialWriter>(
+    mut out: W,
+    model: &impl Input,
+    legacy: Option<&SankeyModel>,
+) -> Result<W::Output, PeleError> {
     let node_objects: Vec<_> = model
-        .nodes
+        .nodes()
         .iter()
         .map(|n| node(&mut out, n))
         .collect::<Result<_, _>>()?;
     let mut original_nodes = HashMap::new();
-    for (record, object) in model.nodes.iter().zip(&node_objects) {
-        original_nodes
-            .entry((record.index, record.id.as_str()))
-            .or_insert(*object);
+    if legacy.is_some() {
+        for (record, object) in model.nodes().iter().zip(&node_objects) {
+            original_nodes
+                .entry((record.index, record.id.as_str()))
+                .or_insert(*object);
+        }
     }
     let nodes = array_node(&mut out, node_objects.iter().copied().map(Atom::Ref))?;
-    let mut link_objects = Vec::with_capacity(model.links.len());
-    for link in &model.links {
-        let mut endpoint = |endpoint: &SankeyNode| {
-            // The source parser's records are owned value copies in the
-            // immutable API. Recover its guaranteed index/record alias
-            // once here; all subsequent edits use arena IDs exclusively.
-            original_nodes
-                .get(&(endpoint.index, endpoint.id.as_str()))
-                .copied()
-                .map(Ok)
-                .unwrap_or_else(|| node(&mut out, endpoint))
+    let mut link_objects = Vec::with_capacity(model.link_count());
+    for i in 0..model.link_count() {
+        let (source_index, target_index, value) = model.link(i);
+        let (source, target) = if let Some(legacy) = legacy {
+            let mut endpoint = |endpoint: &SankeyNode| {
+                // Arbitrary public DTOs may contain detached endpoint records.
+                // Keep their original index/content alias recovery unchanged.
+                original_nodes
+                    .get(&(endpoint.index, endpoint.id.as_str()))
+                    .copied()
+                    .map(Ok)
+                    .unwrap_or_else(|| node(&mut out, endpoint))
+            };
+            (
+                endpoint(&legacy.links[i].source)?,
+                endpoint(&legacy.links[i].target)?,
+            )
+        } else {
+            // Only the private grammar target reaches this branch. Each index
+            // names the first-mention node inserted by the same parse.
+            (node_objects[source_index], node_objects[target_index])
         };
-        let source = endpoint(&link.source)?;
-        let target = endpoint(&link.target)?;
         let properties = vec![
             out.property("source", Atom::Ref(source))?,
             out.property("target", Atom::Ref(target))?,
-            out.property("value", Atom::Number(link.value))?,
+            out.property("value", Atom::Number(value))?,
         ];
         link_objects.push(out.node(Node::Object { properties })?);
     }
     let links = array_node(&mut out, link_objects.into_iter().map(Atom::Ref))?;
     let entries = model
-        .nodes
+        .nodes()
         .iter()
         .zip(&node_objects)
         .map(|(n, id)| Ok((Atom::String(out.string(n.id.as_str())?), Atom::Ref(*id))))
@@ -535,12 +559,12 @@ pub(crate) fn initial_into<W: InitialWriter>(
         out.property("links", Atom::Ref(links))?,
     ];
     for (key, text) in [
-        ("title", &model.title),
-        ("accTitle", &model.acc_title),
-        ("accDescr", &model.acc_descr),
+        ("title", model.title()),
+        ("accTitle", model.acc_title()),
+        ("accDescr", model.acc_descr()),
     ] {
         let value = match text {
-            Some(text) => Atom::String(out.string(text.as_str())?),
+            Some(text) => Atom::String(out.string(text)?),
             None => Atom::Undefined,
         };
         properties.push(out.property(key, value)?);
@@ -557,6 +581,20 @@ impl PublicDiagramModule for Sankey {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn try_parse_public(
+        &self,
+        context: ParseContext<'_>,
+        _: Option<EdgeLimit>,
+    ) -> Option<Result<Self::PublicState, PeleError>> {
+        // Complete grammar first: construction/admission must not hide a later
+        // syntax error. Sankey's existing parser ignores the edge-limit policy.
+        Some((|| {
+            let model = super::parser::parse_indexed(context)?;
+            let graph = initial_from(GraphWriter::default(), &model, None)?;
+            let model = source_text_budget(&model.nodes).map(|()| Projection::Indexed(model));
+            Ok(SankeyPublicState { graph, model })
+        })())
+    }
     fn invoke_public(
         &self,
         s: &mut Self::PublicState,
@@ -567,17 +605,17 @@ impl PublicDiagramModule for Sankey {
         let result = invoke_graph(&mut s.graph, call);
         // lookup.set precedes nodes.push: a throwing call can leave a cached
         // node absent from the array. Never rebuild that cache or roll it back.
-        s.model = imported(&s.graph);
+        s.model = imported(&s.graph).map(Projection::Legacy);
         result
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
-        let model = imported(&graph);
+        let model = imported(&graph).map(Projection::Legacy);
         Ok(SankeyPublicState { graph, model })
     }
     fn create_public(&self, model: &SankeyModel) -> Result<Self::PublicState, PeleError> {
         let graph = initial_graph(model)?;
-        let model = imported(&graph);
+        let model = imported(&graph).map(Projection::Legacy);
         Ok(SankeyPublicState { graph, model })
     }
     fn create_public_parsed(
@@ -589,7 +627,7 @@ impl PublicDiagramModule for Sankey {
         }
         let model = parsed.into_model();
         let graph = initial_graph(&model)?;
-        let model = normalized_source(model);
+        let model = normalized_source(model).map(Projection::Legacy);
         Ok(SankeyPublicState { graph, model })
     }
     fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
@@ -607,7 +645,7 @@ impl PublicDiagramModule for Sankey {
         graph: ModelGraph,
     ) -> Result<(), PeleError> {
         graph.validate()?;
-        let model = imported(&graph);
+        let model = imported(&graph).map(Projection::Legacy);
         state.graph = graph;
         state.model = model;
         Ok(())
@@ -619,12 +657,10 @@ impl PublicDiagramModule for Sankey {
         options: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        self.render(
-            state.model.as_ref().map_err(Clone::clone)?,
-            config,
-            options,
-            host,
-        )
+        match state.model.as_ref().map_err(Clone::clone)? {
+            Projection::Legacy(model) => self.render(model, config, options, host),
+            Projection::Indexed(model) => super::render::render(model, config, options, host),
+        }
     }
 }
 
@@ -870,28 +906,25 @@ pub(crate) fn normalized_source(mut model: SankeyModel) -> Result<SankeyModel, P
     // and endpoint copies drawn from those exact nodes. Graph admission
     // bounds indexes to an exactly representable f64 range. Preserve the
     // importer’s per-source-node text budget and latent error boundary.
+    source_text_budget(&model.nodes)?;
+    // These labels are deliberately absent from the render projection.
+    // Drop their allocations, not only their lengths.
+    for link in &mut model.links {
+        drop(std::mem::take(&mut link.source.id));
+        drop(std::mem::take(&mut link.target.id));
+    }
+    Ok(model)
+}
+fn source_text_budget(nodes: &[SankeyNode]) -> Result<(), PeleError> {
     let mut text_bytes = 0usize;
-    let mut error = None;
-    for node in &model.nodes {
+    for node in nodes {
         text_bytes = text_bytes.saturating_add(node.id.len().saturating_mul(2));
         if text_bytes > 128 * 1024 * 1024 {
-            error = Some(PeleError::new(
+            return Err(PeleError::new(
                 "Sankey imported text exceeds native allocation budget",
                 ErrorCode::Limit,
             ));
-            break;
         }
     }
-    match error {
-        Some(error) => Err(error),
-        None => {
-            // These labels are deliberately absent from the render
-            // projection. Drop their allocations, not only their lengths.
-            for link in &mut model.links {
-                drop(std::mem::take(&mut link.source.id));
-                drop(std::mem::take(&mut link.target.id));
-            }
-            Ok(model)
-        }
-    }
+    Ok(())
 }

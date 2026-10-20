@@ -1,4 +1,5 @@
 //! Sankey diagrams, direct Pele sankey/* 458322a5 translation (MIT, kepano).
+mod indexed;
 mod layout;
 mod model;
 mod parser;

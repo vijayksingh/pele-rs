@@ -10,6 +10,20 @@ source rendering. The public identity graph remains authoritative for edits,
 methods, snapshots and host publication. Parsing, graph semantics and rendering
 remain in Rust.
 
+Ordinary builtin Sankey public parsing also has a private indexed grammar target.
+It keeps each node label once and stores link endpoint indexes, then constructs
+the same arena directly through the existing `try_parse_public` hook. Grammar
+finishes before graph admission. The resulting private render projection stays
+indexed; a borrowed input interface feeds the single renderer/layout without
+reconstructing public endpoint records. The public `SankeyModel` fields, typed
+parser/downcast and serialization remain unchanged. Arbitrary typed adaptation
+still recovers detached endpoint identities by index/content; raw/apply/helper
+paths keep their existing eager importer and latent errors. A first helper may
+replace the indexed projection with that ordinary imported projection at the
+same existing refresh boundary, never through a new deferred graph conversion.
+This removes source endpoint copies and source-only identity-recovery work;
+it neither removes the public arena/publication nor claims JS performance parity.
+
 ## Cost and evidence
 
 Many public codecs build a canonical graph from a typed parser result, then

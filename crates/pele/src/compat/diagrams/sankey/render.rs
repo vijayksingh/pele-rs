@@ -1,8 +1,8 @@
 //! Pele sankey/render.ts measured labels, bands, configuration and responsive fit.
 //! 458322a5 (MIT, kepano).
 use super::{
+    indexed::Input,
     layout::{self, max, min, Alignment, Options},
-    SankeyModel,
 };
 use crate::compat::number_math::round;
 use crate::compat::{
@@ -43,7 +43,7 @@ fn fill(v: Option<&Value>) -> String {
     }
 }
 pub(super) fn render(
-    m: &SankeyModel,
+    m: &impl Input,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
@@ -74,7 +74,7 @@ pub(super) fn render(
     Ok(result)
 }
 fn draw(
-    m: &SankeyModel,
+    m: &impl Input,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
@@ -113,7 +113,7 @@ fn draw(
         Some(Value::Object(v)) => Some(v),
         _ => None,
     };
-    let node_style = |i: usize| fill(custom.and_then(|v| v.get(&m.nodes[i].id)));
+    let node_style = |i: usize| fill(custom.and_then(|v| v.get(&m.nodes()[i].id)));
     let (mut central, mut most) = (0, 0.);
     for n in &nodes {
         if n.value > most {
@@ -124,7 +124,7 @@ fn draw(
     let (mut min_x, mut max_x, mut min_y, mut max_y) = (0., chart_width, 0., chart_height);
     let (mut labels_out, mut nodes_out) = (String::new(), String::new());
     for (i, n) in nodes.iter().enumerate() {
-        let id = &m.nodes[i].id;
+        let id = &m.nodes()[i].id;
         let height = max(n.height, 1.);
         nodes_out.push_str(&format!("<rect class=\"pele-sankey-node\" data-id=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{}\" fill=\"{}\"{}/>",esc_text(id)?,num(n.x),num(n.y),num(node_width),num(height),num(min(2.,height/2.)),series_color(i),node_style(i)));
         let value = if show {
@@ -201,15 +201,15 @@ fn draw(
         let x0 = nodes[link.source].x + node_width;
         let x1 = nodes[link.target].x;
         let mid = num((x0 + x1) / 2.);
-        let from = esc_text(&m.nodes[link.source].id)?;
-        let to = esc_text(&m.nodes[link.target].id)?;
+        let from = esc_text(&m.nodes()[link.source].id)?;
+        let to = esc_text(&m.nodes()[link.target].id)?;
         links_out.push_str(&format!("<path class=\"pele-sankey-link\" data-id=\"{from}-&gt;{to}\" d=\"M{},{}C{mid},{} {mid},{} {},{}L{},{}C{mid},{} {mid},{} {},{}Z\" fill=\"{}\"{}><title>{from} → {to}: {}{}{}</title></path>",num(x0),num(link.source_y-half),num(link.source_y-half),num(link.target_y-half),num(x1),num(link.target_y-half),num(x1),num(link.target_y+half),num(link.target_y+half),num(link.source_y+half),num(x0),num(link.source_y+half),series_color(end),if fixed.is_empty(){node_style(end)}else{fixed.clone()},esc_text(&prefix)?,js_num(rounded(link.value)),esc_text(&suffix)?));
     }
     let room = o
         .max_width
         .filter(|v| *v > 0.)
         .map_or(4000., |v| max(80., v - 2. * pad));
-    let title = layout_label(m.title.as_deref(), false, r, o, size, room, 1)?;
+    let title = layout_label(m.title(), false, r, o, size, room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
@@ -227,8 +227,8 @@ fn draw(
         height,
         size,
         o,
-        m.acc_title.as_deref(),
-        m.acc_descr.as_deref(),
+        m.acc_title(),
+        m.acc_descr(),
         &body,
     )?;
     Ok(Rendered {
