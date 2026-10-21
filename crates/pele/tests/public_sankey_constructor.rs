@@ -319,6 +319,10 @@ fn captured_constructor_survives_replacement_without_authorizing_forwarded_provi
         .unwrap();
     assert!(!parsed.is_constructor_created());
     let factory = parsed.capture_constructor(PrototypeId(1)).unwrap();
+    let reflection = factory.reflection().unwrap();
+    assert_eq!(reflection.identity, "sankey");
+    assert_eq!(reflection.monolith_name, "Xc");
+    assert_eq!(reflection.module_name, "B");
     engine.register(Delegate);
     assert!(engine
         .capture_constructor(&DiagramType::Sankey.into(), PrototypeId(1))

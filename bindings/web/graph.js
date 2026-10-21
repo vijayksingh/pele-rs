@@ -1,3 +1,4 @@
+import {namedConstructor} from './constructor-shells.js';
 import {createHostLedger,LiveFieldBindings} from './host-values.js';
 import {LayoutGraph,LayoutStorage,applyLayoutDelta} from './layout-storage.js';
 import {tryInitializeSourceLayout} from './source-initializer.js';
@@ -11,18 +12,45 @@ const layoutMethods={
   snapshot(values=[],delta=false){return layoutTraversal.snapshotGraph(this,values,delta);},
   hostReferenceId(value){if(!this.hostIds.has(value)){if(this.hostValues.length>=1_000_000)throw new RangeError('Host reference budget exceeded');this.hostIds.set(value,this.hostValues.length);this.hostValues.push(value);}return this.hostIds.get(value);}
 };
-/** Schema functions/prototypes share identity across documents of one renderer. */
+// Shared reflection scopes are owned by full.js, never selected by caller
+// metadata. Public ModelRegistry instances remain local unless given that
+// private scope and one of its schema-bound, single-use tickets.
 export class ModelRegistry {
-  constructor() { this.schemas = new Map(); this.owners = new WeakMap(); this.sharedFunctions = new Map(); }
-  registration(schema) {
-    const key = `${schema.id}:${schema.version}`;
+  #reflectionScope;
+  constructor(scope) {
+    this.#reflectionScope=scope;
+    this.schemas=new Map();this.registrations=new WeakSet();this.sharedFunctions=new Map();
+    const localOwners=new WeakMap();
+    this.owners={
+      get:value=>localOwners.get(value),
+      set:(value,bridge)=>{
+        localOwners.set(value,bridge);
+        if(scope&&bridge.registry===this&&this.registrations.has(bridge.registration)&&scope.authenticated.has(bridge.registration))scope.owners.set(value,bridge);
+        return this.owners;
+      }
+    };
+  }
+  registration(schema, ticket) {
+    const scope=this.#reflectionScope;
+    const proof=ticket&&scope?.tickets.get(ticket);
+    if(proof)scope.tickets.delete(ticket);
+    const authenticated=!!proof&&proof.schema===schema;
+    const reflection=authenticated?proof.reflection:undefined;
+    const identity=authenticated?JSON.stringify(reflection.map(entry=>[entry.prototype,entry.identity])):null;
+    const key = `${schema.id}:${schema.version}:${identity??'local'}`;
     if (this.schemas.has(key)) {
       const known=this.schemas.get(key);
       if (JSON.stringify(known.schema)!==JSON.stringify(schema)) throw new TypeError('Conflicting native model schema identity');
       return known;
     }
+    if(authenticated&&scope.registrations.has(identity)){
+      const known=scope.registrations.get(identity);
+      if(JSON.stringify(known.schema)!==JSON.stringify(schema))throw new TypeError('Conflicting authenticated native class schema');
+      this.schemas.set(key,known);this.registrations.add(known);return known;
+    }
     const registration = {schema, functions: new Map(), functionIds: new WeakMap(), prototypes: new Map(), prototypeIds: new WeakMap(), documents: [], constructors: new Map(), sharedIds: new Map((schema.sharedFunctions??[]).map(entry=>[entry.identity,entry.method]))};
-    this.schemas.set(key, registration);
+    this.schemas.set(key, registration);this.registrations.add(registration);
+    const sharedFunctions=authenticated?scope.sharedFunctions:this.sharedFunctions;
     const aliases=new Map((schema.sharedFunctions??[]).map(entry=>[entry.method,entry.identity]));
     const shapes=new Map((schema.functionShapes??[]).map(entry=>[entry.method,entry.constructible]));
     const live=registration=>{
@@ -31,12 +59,12 @@ export class ModelRegistry {
     };
     for (const method of schema.methods) {
       const registry = this, identity=aliases.get(method.id), constructible=shapes.get(method.id)??false;
-      let shared=identity&&this.sharedFunctions.get(identity);
+      let shared=identity&&sharedFunctions.get(identity);
       if(shared&&(shared.name!==method.name||shared.arity!==method.arity||shared.constructible!==constructible))throw new TypeError('Conflicting shared native function descriptor');
-      if(identity&&!shared){shared={name:method.name,arity:method.arity,constructible,registrations:new Set(),callable:null};this.sharedFunctions.set(identity,shared);}
+      if(identity&&!shared){shared={name:method.name,arity:method.arity,constructible,registrations:new Set(),callable:null};sharedFunctions.set(identity,shared);}
       if(shared)shared.registrations.add(registration);
       const dispatch=(receiver,argumentsValue)=>{
-        const direct=receiver&&registry.owners.get(receiver);
+        const direct=receiver&&(authenticated?scope.owners:registry.owners).get(receiver);
         let owner;
         if(shared) {
           if(direct&&!direct.disposed&&direct.registration.sharedIds.has(identity))owner=direct;
@@ -63,12 +91,14 @@ export class ModelRegistry {
       // Shell owns JavaScript newTarget/receiver semantics. Only a captured
       // native capability can install initialization; unimplemented classes
       // retain the explicit construction error. Arguments are not inspected.
-      const constructor = class { constructor() {
+      const initialize=(receiver,args)=>{
         const construct=registration.constructors.get(prototype.id);
         if(!construct)throw new TypeError('Public model construction is unavailable');
-        construct(this,arguments);
-      }};
-      Object.defineProperty(constructor, 'name', {value: prototype.name, configurable: true});
+        construct(receiver,args);
+      };
+      const reflected=authenticated?reflection.find(entry=>entry.prototype===prototype.id):undefined;
+      const constructor=reflected?namedConstructor(scope.name==='monolith'?reflected.monolithName:reflected.moduleName,initialize):class {constructor(){initialize(this,arguments);}};
+      if(!reflected)Object.defineProperty(constructor,'name',{value:prototype.name,configurable:true});
       const value=constructor.prototype;
       registration.prototypes.set(prototype.id, value);
       registration.prototypeIds.set(value, prototype.id);
@@ -89,6 +119,7 @@ export class ModelRegistry {
       }
     }
     registration.prototypeBaseline = [...registration.prototypes.values()].map(value => ({value, parent:Object.getPrototypeOf(value), descriptors:Object.getOwnPropertyDescriptors(value)}));
+    if(authenticated){scope.registrations.set(identity,registration);scope.authenticated.add(registration);}
     return registration;
   }
 }
@@ -96,7 +127,7 @@ export class ModelBridge {
   constructor(graph, schema, registry, invoke, prevalidatedRegistration, rootBinding, hostLedger, liveDefinitions, deferLiveBinding=false) {
     const publication=invalidateBridgeObservation(this);
     this.registry = registry;
-    if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || registry.schemas.get(`${schema.id}:${schema.version}`) !== prevalidatedRegistration)) throw new TypeError('Invalid prevalidated model registration');
+    if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || !registry.registrations.has(prevalidatedRegistration))) throw new TypeError('Invalid prevalidated model registration');
     this.registration = prevalidatedRegistration ?? registry.registration(schema);
     if(this.registration.documents.length>256)this.registration.documents=this.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
     this.registration.documents.push(new WeakRef(this));

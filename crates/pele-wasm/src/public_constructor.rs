@@ -62,6 +62,15 @@ impl PublicConstructor {
     pub fn arity(&self) -> u32 {
         self.inner.arity()
     }
+    /// Captured builtin identity only; arbitrary schemas cannot supply it.
+    pub fn reflection(&self) -> Option<String> {
+        self.inner.reflection().map(|value| {
+            super::public_result(
+                &serde_json::json!({"reflection":value,"schema":self.inner.schema_view()}),
+            )
+        })
+    }
+
     pub fn argument_transfers(&self) -> Vec<u32> {
         self.inner
             .argument_transfers()

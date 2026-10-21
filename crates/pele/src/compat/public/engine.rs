@@ -746,6 +746,12 @@ impl CapturedPublicConstructor {
     pub fn arity(&self) -> u32 {
         self.constructor.arity
     }
+    /// Names and shared host identity selected only after creator authentication.
+    #[doc(hidden)]
+    pub fn reflection(&self) -> Option<super::ConstructorReflection> {
+        super::ConstructorReflection::for_class(self.constructor.class, self.prototype)
+    }
+
     pub fn argument_count(&self) -> u32 {
         self.argument_transfers().len() as u32
     }
@@ -1053,6 +1059,20 @@ impl PublicEngine {
         edge_limit: EdgeLimit,
         make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
     ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        self.parse_prepared_host_er_with_constructor(id, context, edge_limit, |schema, _| {
+            make(schema)
+        })
+    }
+    /// Selected creator capability is available before any host publication.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_prepared_host_er_with_constructor<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        edge_limit: EdgeLimit,
+        make: impl FnOnce(ModelSchemaView, Option<CapturedPublicConstructor>) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
         let plan = self.engine.prepare_prepared_as(id, context, edge_limit)?;
         let registration = self
             .modules
@@ -1075,7 +1095,10 @@ impl PublicEngine {
             .model::<crate::compat::diagrams::er::ErModel>()
             .expect("captured builtin ER model");
         crate::compat::diagrams::er::admit_host_initial(model)?;
-        let output = crate::compat::diagrams::er::publish_host_initial(make(schema)?, model)?;
+        let output = crate::compat::diagrams::er::publish_host_initial(
+            make(schema, registration.capture_constructor(PrototypeId(1)))?,
+            model,
+        )?;
         let policy = crate::compat::host_er::Policy::captured(
             registration.descriptor.clone(),
             document.config().clone(),
@@ -1219,7 +1242,19 @@ impl PublicEngine {
         source: &str,
         options: &ParseOptions,
         limits: ParseLimits,
-        make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
+        mut make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        self.parse_host_er_with_constructor(source, options, limits, |schema, _| make(schema))
+    }
+    /// Retains the exact selected registration through direct/fallback publication.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_host_er_with_constructor<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        make: impl FnMut(ModelSchemaView, Option<CapturedPublicConstructor>) -> Result<W, PeleError>,
     ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
         let plan =
             self.engine
@@ -1241,14 +1276,14 @@ impl PublicEngine {
     fn parse_host_er_plan<W: super::InitialWriter>(
         plan: ParsePlan,
         registration: Arc<Registration>,
-        mut make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
+        mut make: impl FnMut(ModelSchemaView, Option<CapturedPublicConstructor>) -> Result<W, PeleError>,
     ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
         let schema = ModelSchemaView {
             model: registration.schema,
             shared_functions: registration.shared_functions,
             function_shapes: registration.function_shapes,
         };
-        let writer = make(schema)?;
+        let writer = make(schema, registration.capture_constructor(PrototypeId(1)))?;
         match crate::compat::diagrams::er::parse_host_into(plan.context(), writer) {
             Some(result) => {
                 let output = result?;
@@ -1271,8 +1306,10 @@ impl PublicEngine {
                 // Preserve legacy GraphWriter/facade admission before host
                 // primitives can reject a partial large publication earlier.
                 crate::compat::diagrams::er::admit_host_initial(model)?;
-                let output =
-                    crate::compat::diagrams::er::publish_host_initial(make(schema)?, model)?;
+                let output = crate::compat::diagrams::er::publish_host_initial(
+                    make(schema, registration.capture_constructor(PrototypeId(1)))?,
+                    model,
+                )?;
                 let policy = crate::compat::host_er::Policy::captured(
                     registration.descriptor.clone(),
                     document.config().clone(),
@@ -2428,7 +2465,7 @@ impl PublicEngine {
         source: &str,
         options: &ParseOptions,
         limits: ParseLimits,
-        make_er: impl FnMut(ModelSchemaView) -> Result<E, PeleError>,
+        mut make_er: impl FnMut(ModelSchemaView) -> Result<E, PeleError>,
         make_sankey: impl FnOnce(ModelSchemaView) -> Result<S, PeleError>,
     ) -> Result<crate::compat::host_sankey::CombinedParsed<E::Output, S::Output>, PeleError>
     where
@@ -2447,7 +2484,7 @@ impl PublicEngine {
             .expect("paired public registration")
             .clone();
         if registration.codec.is_host_er() {
-            return Self::parse_host_er_plan(plan, registration, make_er).map(
+            return Self::parse_host_er_plan(plan, registration, |schema, _| make_er(schema)).map(
                 |parsed| match parsed {
                     host_er::Parsed::Host { policy, output } => {
                         host_sankey::CombinedParsed::Er { policy, output }

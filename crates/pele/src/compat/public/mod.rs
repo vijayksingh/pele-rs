@@ -73,7 +73,8 @@ pub use source_input::SourceIngress;
 mod detached_invocation;
 #[doc(hidden)]
 pub use constructor::{
-    ConstructorArgument, ConstructorArgumentTransfer, LiveConstructorField, PublicHostValue,
+    ConstructorArgument, ConstructorArgumentTransfer, ConstructorReflection, LiveConstructorField,
+    PublicHostValue,
 };
 #[doc(hidden)]
 pub use detached_invocation::{

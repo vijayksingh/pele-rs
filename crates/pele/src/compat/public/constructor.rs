@@ -234,3 +234,80 @@ impl<S> PublicConstructorFactory<S> {
         }
     }
 }
+
+/// Reflection metadata for an authenticated pinned builtin class. Names are
+/// observations of the two shipped oracle artifacts, never dispatch authority.
+/// Custom providers cannot construct this capability or join its host identity.
+#[doc(hidden)]
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ConstructorReflection {
+    pub prototype: PrototypeId,
+    pub identity: &'static str,
+    pub monolith_name: &'static str,
+    pub module_name: &'static str,
+}
+impl ConstructorReflection {
+    pub(super) fn for_class(class: TypeId, prototype: PrototypeId) -> Option<Self> {
+        use crate::compat::diagrams;
+        let (identity, monolith_name, module_name) = if prototype == PrototypeId(2)
+            && class == TypeId::of::<diagrams::class_diagram::Class>()
+        {
+            ("class-member", "oo", "ue")
+        } else if prototype == PrototypeId(1) {
+            if class == TypeId::of::<diagrams::venn::Venn>() {
+                ("venn", "Ml", "U")
+            } else if class == TypeId::of::<diagrams::ishikawa::Ishikawa>() {
+                ("ishikawa", "yc", "D")
+            } else if class == TypeId::of::<diagrams::flowchart::Flowchart>() {
+                ("flowchart", "tc", "Ee")
+            } else if class == TypeId::of::<diagrams::agentflow::AgentFlow>() {
+                ("agentflow", "oa", "ye")
+            } else if class == TypeId::of::<diagrams::requirement::RequirementDiagram>() {
+                ("requirement", "Yc", "ee")
+            } else if class == TypeId::of::<diagrams::block::Block>() {
+                ("block", "wa", "Se")
+            } else if class == TypeId::of::<diagrams::railroad::Railroad>() {
+                ("railroad", "mf", "Ie")
+            } else if class == TypeId::of::<diagrams::c4::C4>() {
+                ("c4", "Ca", "xe")
+            } else if class == TypeId::of::<diagrams::architecture::Architecture>() {
+                ("architecture", "xa", "Kt")
+            } else if class == TypeId::of::<diagrams::sankey::Sankey>() {
+                ("sankey", "Xc", "B")
+            } else if class == TypeId::of::<diagrams::state::State>() {
+                ("state", "rl", "At")
+            } else if class == TypeId::of::<diagrams::gantt::Gantt>() {
+                ("gantt", "ac", "be")
+            } else if class == TypeId::of::<diagrams::sequence::Sequence>() {
+                ("sequence", "Zc", "Ue")
+            } else if class == TypeId::of::<diagrams::xychart::XyChart>() {
+                ("xychart", "Pl", "$t")
+            } else if class == TypeId::of::<diagrams::class_diagram::Class>() {
+                ("class", "va", "Ce")
+            } else if class == TypeId::of::<diagrams::er::Er>() {
+                ("er", "ja", "Ae")
+            } else if class == TypeId::of::<diagrams::kanban::Kanban>() {
+                ("kanban", "Mc", "E")
+            } else if class == TypeId::of::<diagrams::mindmap::Mindmap>() {
+                ("mindmap", "$c", "nt")
+            } else if class == TypeId::of::<diagrams::timeline::Timeline>() {
+                ("timeline", "cl", "Q")
+            } else if class == TypeId::of::<diagrams::journey::Journey>() {
+                ("journey", "xc", "st")
+            } else if class == TypeId::of::<diagrams::quadrant_chart::QuadrantChart>() {
+                ("quadrantChart", "Oc", "dt")
+            } else {
+                return None;
+            }
+        } else {
+            return None;
+        };
+        Some(Self {
+            prototype,
+            identity,
+            monolith_name,
+            module_name,
+        })
+    }
+}

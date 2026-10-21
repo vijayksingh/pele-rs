@@ -1546,11 +1546,25 @@ impl ConstructionTransport for ErConstructionTransport {
         Ok(())
     }
 }
+#[cfg(any(feature = "captured-sankey", feature = "native-canonical-sankey"))]
 pub(super) fn host_construction(
     schema: pele::compat::public::ModelSchemaView,
     make: &Function,
     capture: &Function,
 ) -> Result<HostConstruction<ErConstructionTransport>, PeleError> {
+    host_construction_captured(schema, None, make, capture)
+}
+fn host_construction_captured(
+    schema: pele::compat::public::ModelSchemaView,
+    constructor: Option<pele::compat::public::CapturedPublicConstructor>,
+    make: &Function,
+    capture: &Function,
+) -> Result<HostConstruction<ErConstructionTransport>, PeleError> {
+    // One selected native factory survives the schema-cache retry unchanged.
+    let constructor = constructor
+        .map(super::public_constructor::PublicConstructor::captured)
+        .map(JsValue::from)
+        .unwrap_or(JsValue::UNDEFINED);
     // Reuse the facade's existing validated immutable-schema cache.
     // On wasm these are static linear-memory offsets, not host addresses.
     #[cfg(target_arch = "wasm32")]
@@ -1565,11 +1579,16 @@ pub(super) fn host_construction(
     #[cfg(not(target_arch = "wasm32"))]
     let key = String::from("native-host-er");
     let factory = |json: &JsValue| {
-        make.call2(&JsValue::UNDEFINED, &JsValue::from_str(&key), json)
-            .map_err(|error| {
-                let _ = capture.call1(&JsValue::UNDEFINED, &error);
-                pele(invalid("Host construction factory failed"))
-            })
+        make.call3(
+            &JsValue::UNDEFINED,
+            &JsValue::from_str(&key),
+            json,
+            &constructor,
+        )
+        .map_err(|error| {
+            let _ = capture.call1(&JsValue::UNDEFINED, &error);
+            pele(invalid("Host construction factory failed"))
+        })
     };
     let cached = factory(&JsValue::UNDEFINED)?;
     let primitive = if cached.is_undefined() {
@@ -1670,8 +1689,8 @@ impl NativeRegistry {
         )
         .map_err(native_failure)?;
         let parsed = engine
-            .parse_host_er_with_limits(source, &options, limits, |schema| {
-                host_construction(schema, &make, &capture)
+            .parse_host_er_with_constructor(source, &options, limits, |schema, constructor| {
+                host_construction_captured(schema, constructor, &make, &capture)
             })
             .map_err(native_failure)?;
         Ok(host_parsed(parsed))
@@ -1703,7 +1722,7 @@ impl NativeRegistry {
         .map_err(native_failure)?;
         let parsed = input
             .engine
-            .parse_prepared_host_er_as(
+            .parse_prepared_host_er_with_constructor(
                 &input.id,
                 pele::compat::ParseContext {
                     source,
@@ -1713,7 +1732,9 @@ impl NativeRegistry {
                     max_edges: pele::compat::DEFAULT_MAX_EDGES,
                 },
                 input.limit,
-                |schema| host_construction(schema, &make, &capture),
+                |schema, constructor| {
+                    host_construction_captured(schema, constructor, &make, &capture)
+                },
             )
             .map_err(native_failure)?;
         Ok(host_parsed(parsed))

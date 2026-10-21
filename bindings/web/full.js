@@ -21,6 +21,12 @@ import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
 import {bridgeObservationToken,completedObservationToken,completedPublicationToken,releaseBridgeObservation} from './graph-storage.js';
 import { defaultMeasurer } from './resources.js';
 export { canvasMeasurer, metricsMeasurer, forgetTextWidths } from './resources.js';
+// These scopes and tickets never escape this module. JSON returned by an
+// arbitrary provider or passed to exported ModelRegistry cannot select them.
+const reflectionRealms=new Map(['esm','monolith'].map(name=>[name,{name,registrations:new Map(),sharedFunctions:new Map(),owners:new WeakMap(),authenticated:new WeakSet(),tickets:new WeakMap()}]));
+const nativeConstructorReflection=nativeCapabilities.PublicConstructor?.prototype.reflection;
+const nativeConstructorFree=nativeCapabilities.PublicConstructor?.prototype.free;
+const nativeReflectionSources=[nativeCapabilities.MutableDocument,nativeCapabilities.HostErDocument].filter(Boolean).map(type=>({type,capture:type.prototype.capture_constructor}));
 function result(json) {
   const envelope = JSON.parse(json);
   if (envelope.version !== 2) throw new Error('Unsupported compatibility contract');
@@ -163,15 +169,17 @@ export async function loadRenderer(moduleOrPath) {
   await initialize(moduleOrPath === undefined ? undefined : { module_or_path: moduleOrPath });
   const [{allDiagramEntries},{loadDiagramEntries}] = await Promise.all([import('./all-diagram-entries.js'),import('./diagram-entries.js')]);
   await loadDiagramEntries(moduleOrPath);
-  return createRenderer(new NativeRegistry(true),allDiagramEntries);
+  return createRenderer(new NativeRegistry(true),allDiagramEntries,'monolith');
 }
 
 // Internal host factory: one native registration owner, independent model lifetimes.
-export function createRenderer(nativeRegistry, canonicalProviders = []) {
+export function createRenderer(nativeRegistry, canonicalProviders = [], reflectionRealm = 'esm') {
   const capturedSankey=capturedSankeyAvailable(nativeRegistry,nativeCapabilities);
   const liveProviders=new Map(canonicalProviders.map(provider=>[provider.type,{provider,native:true}]));
   function syncProviders(){for(const [type,entry] of liveProviders){const native=builtinDiagramType(entry.provider)===type;if(native!==entry.native){if(native)registryCall(()=>nativeValue(()=>{nativeRegistry.register_builtin(type);return '{"version":2,"ok":true,"result":null}';}));else registryCall(()=>foreignValue(()=>nativeRegistry.register_foreign(type,entry.provider)));entry.native=native;}}}
-  const documents = new WeakMap(), constructedDocuments = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry();
+  const reflectionScope=reflectionRealms.get(reflectionRealm);
+  if(!reflectionScope)throw new TypeError('Unknown native reflection realm');
+  const documents = new WeakMap(), constructedDocuments = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry(reflectionScope);
   const rawConstructors = new Map();
   // Native keys identify captured immutable metadata, scoped to this renderer.
   const schemaRegistrations = new Map();
@@ -384,6 +392,31 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       catch(error){mutable.free();throw error;}
     };
   }
+  function reflectedRegistration(mutable, schema) {
+    const source=nativeReflectionSources.find(source=>mutable instanceof source.type);
+    if(!source?.capture||!nativeConstructorReflection)return registry.registration(schema);
+    return reflectedRegistrationWith(schema,id=>Reflect.apply(source.capture,mutable,[id]));
+  }
+  function reflectedRegistrationWith(schema,capture){
+    const reflection=[];
+    for(const prototype of schema.prototypes){
+      // Use captured generated methods, not provider-supplied reflection JSON.
+      const capability=capture(prototype.id);
+      if(!capability)return registry.registration(schema);
+      try{
+        if(!(capability instanceof nativeCapabilities.PublicConstructor))return registry.registration(schema);
+        const encoded=Reflect.apply(nativeConstructorReflection,capability,[]);
+        if(encoded==null)return registry.registration(schema);
+        const proof=result(encoded);
+        if(JSON.stringify(proof.schema)!==JSON.stringify(schema)||proof.reflection.prototype!==prototype.id)return registry.registration(schema);
+        reflection.push(proof.reflection);
+      }finally{Reflect.apply(nativeConstructorFree,capability,[]);}
+    }
+    if(!reflection.length)return registry.registration(schema);
+    const ticket=Object.freeze({});
+    reflectionScope.tickets.set(ticket,{schema,reflection});
+    return registry.registration(schema,ticket);
+  }
   function installConstructors(mutable, registration, rawType) {
     const ownedDefinitions=[];
     if(typeof mutable.capture_constructor!=='function')return ownedDefinitions;
@@ -486,12 +519,14 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           // Raw-model adoption already has a bridge. Validate its native metadata
           // afresh before reusing it; never trust a cache hit on this path.
           const schemaKey = existingBridge ? undefined : mutable.schema_cache_key?.();
-          let registration = typeof schemaKey === 'string' ? schemaRegistrations.get(schemaKey) : undefined;
-          if(!registration) {
-            registration = registry.registration(result(mutable.schema()));
-            if(existingBridge && registration !== existingBridge.registration) throw new TypeError('Conflicting native model schema identity');
-            if(typeof schemaKey === 'string') schemaRegistrations.set(schemaKey,registration);
-          }
+          // Re-check the captured creator on every document. A provider may
+          // forward the same schema pointers without owning its class factory.
+          const cached=typeof schemaKey==='string'?schemaRegistrations.get(schemaKey):undefined;
+          const incomingSchema=cached?.schema??result(mutable.schema());
+          const registration=construction?.registration??(existingBridge?registry.registration(incomingSchema):reflectedRegistration(mutable,incomingSchema));
+          if(JSON.stringify(registration.schema)!==JSON.stringify(incomingSchema))throw new TypeError('Conflicting native constructor schema identity');
+          if(existingBridge&&registration!==existingBridge.registration)throw new TypeError('Conflicting native model schema identity');
+          if(typeof schemaKey==='string')schemaRegistrations.set(schemaKey,registration);
           if(construction&&registration!==construction.registration)throw new TypeError('Conflicting native constructor schema identity');
           const schema = registration.schema;
           let rootBinding;
@@ -590,9 +625,12 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         let owner,failed=false,original,parsed;
         const capture=error=>{if(!failed){failed=true;original=error;}};
         try{
-          parsed=registryCall(()=>nativeRegistry.parse_prepared_with_host_er(type,source,finiteConfigJSON(config),title,lineOffset,limits.edgeKind,limits.edgeValue,(key,schema)=>{
+          parsed=registryCall(()=>nativeRegistry.parse_prepared_with_host_er(type,source,finiteConfigJSON(config),title,lineOffset,limits.edgeKind,limits.edgeValue,(key,schema,capability)=>{
             let registration=schemaRegistrations.get(key);
-            if(!registration){if(schema===undefined)return undefined;registration=registry.registration(result(schema));schemaRegistrations.set(key,registration);}
+            if(!registration&&schema===undefined)return undefined;
+            const incoming=registration?.schema??result(schema);
+            registration=capability?reflectedRegistrationWith(incoming,()=>capability):registry.registration(incoming);
+            schemaRegistrations.set(key,registration);
             owner=new HostErOwner(registration,registry,undefined,()=>{throw new TypeError('Public model construction is incomplete');});
             return owner.primitive.bind(owner);
           },capture));
@@ -752,9 +790,12 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             let owner,failed=false,original;
             const capture=error=>{if(!failed){failed=true;original=error;}};
             let parsed;
-            const make=(key,schema)=>{
+            const make=(key,schema,capability)=>{
               let registration=schemaRegistrations.get(key);
-              if(!registration){if(schema===undefined)return undefined;registration=registry.registration(result(schema));schemaRegistrations.set(key,registration);}
+              if(!registration&&schema===undefined)return undefined;
+              const incoming=registration?.schema??result(schema);
+              registration=capability?reflectedRegistrationWith(incoming,()=>capability):registry.registration(incoming);
+              schemaRegistrations.set(key,registration);
               owner=new HostErOwner(registration,registry,undefined,()=>{throw new TypeError('Public model construction is incomplete');});
               return owner.primitive.bind(owner);
             };
