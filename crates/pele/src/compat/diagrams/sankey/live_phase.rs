@@ -38,10 +38,40 @@ pub enum LiveCallArgument<V> {
     /// own data properties. Values are retained without inspection.
     Record(Vec<(JsString, V)>),
 }
+/// Fixed failures over native-computed geometry. No caller operand is read or coerced.
+#[doc(hidden)]
+#[derive(Clone, Copy)]
+pub enum LiveGeometryError {
+    PolygonPoint,
+    IndexedPoint,
+    FirstCurvePoint,
+    IndexedLabel,
+    IndexedName,
+}
+impl LiveGeometryError {
+    pub fn native_error(self) -> PublicError {
+        let key = match self {
+            Self::IndexedLabel => "label",
+            Self::IndexedName => "name",
+            _ => "x",
+        };
+        PublicError::JavaScript {
+            name: JavaScriptErrorKind::TypeError,
+            message: JsString::from(
+                format!("Cannot read properties of undefined (reading '{key}')").as_str(),
+            ),
+        }
+    }
+}
 /// Scalar operations only. Rust owns field selection, ordering and layout.
 #[doc(hidden)]
 pub trait LiveRenderRead {
     type Value: Clone;
+    /// Native has already detected a missing computed point. Hosts may produce
+    /// their engine's exact intrinsic diagnostic without observing public data.
+    fn geometry_error(&mut self, site: LiveGeometryError) -> PublicError {
+        site.native_error()
+    }
     /// Invoke the already-captured function with its exact receiver. No member
     /// lookup or callback may occur while a document guard is held.
     fn call(

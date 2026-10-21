@@ -1,6 +1,6 @@
 //! Mutable Radar's plain objects/arrays. Import concrete values, retain the exact identity graph.
 //! This native codec does not provide JavaScript prototype dispatch or TypeError identity.
-//! Sparse active arrays, active lone surrogates and unsupported numeric coercions report gaps.
+//! Sparse axes retain holes through public phase reads; other unsupported coercions report gaps.
 //! Independent geometry/text work budgets do not reapply the parser's 32-tick clamp.
 use super::{Radar, RadarAxis, RadarCurve, RadarModel, RadarOptions};
 use crate::compat::{
@@ -312,6 +312,28 @@ impl PublicDiagramModule for Radar {
             super::RadarDetachedInput::new(state.model.as_ref().err().cloned()),
         ))
     }
+    fn render_public_operation(
+        &self,
+        state: &mut RadarPublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, crate::compat::public::PublicError> {
+        // Keep existing typed projection on its supported domain. Sparse/empty
+        // geometry requires phase-local failures rather than eager DTO errors.
+        if let Ok(model) = &state.model {
+            return self
+                .render(model, config, options, host)
+                .map_err(Into::into);
+        }
+        super::live_phase::render_graph(
+            &state.graph,
+            &super::RadarDetachedInput::new(state.model.as_ref().err().cloned()),
+            config,
+            options,
+            host,
+        )
+    }
     fn render_public(
         &self,
         state: &mut RadarPublicState,
@@ -319,11 +341,18 @@ impl PublicDiagramModule for Radar {
         options: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        self.render(
-            state.model.as_ref().map_err(Clone::clone)?,
-            config,
-            options,
-            host,
-        )
+        self.render_public_operation(state, config, options, host)
+            .map_err(|error| {
+                use crate::compat::public::PublicError;
+                match error {
+                    PublicError::Pele(error) => error,
+                    PublicError::JavaScript { name, message } => {
+                        let mut error = invalid(&message.well_formed().unwrap_or_default());
+                        error.name = format!("{name:?}");
+                        error
+                    }
+                    _ => invalid("Radar host exception requires operation API"),
+                }
+            })
     }
 }

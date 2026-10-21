@@ -2,6 +2,7 @@
 use super::RadarModel;
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
+    public::LiveGeometryError,
     svg::{self, esc_text, js_num, label_svg, num, series_color},
     text::layout_label,
     Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
@@ -54,6 +55,7 @@ fn closed_round_curve(points: &[Point], tension: f64) -> String {
 }
 pub(super) struct Geometry {
     pub count: usize,
+    pub present: Vec<bool>,
     pub ticks: f64,
     pub circle: bool,
     pub min: f64,
@@ -61,6 +63,7 @@ pub(super) struct Geometry {
 }
 pub(super) trait PhaseInput {
     type Error: From<PeleError>;
+    fn missing_point(&mut self, site: LiveGeometryError) -> Self::Error;
     fn begin_draw(&mut self) -> Result<Geometry, Self::Error>;
     fn axis_label(&mut self, index: usize) -> Result<Option<String>, Self::Error>;
     fn axis_name(&mut self, index: usize) -> Result<String, Self::Error>;
@@ -75,6 +78,14 @@ pub(super) trait PhaseInput {
 struct Typed<'a>(&'a RadarModel);
 impl PhaseInput for Typed<'_> {
     type Error = PeleError;
+    fn missing_point(&mut self, _site: LiveGeometryError) -> PeleError {
+        let mut error = PeleError::new(
+            "Cannot read properties of undefined (reading 'x')",
+            crate::compat::ErrorCode::Semantic,
+        );
+        error.name = "TypeError".into();
+        error
+    }
     fn begin_draw(&mut self) -> Result<Geometry, PeleError> {
         let max = self.0.options.max.unwrap_or_else(|| {
             let mut max = f64::NEG_INFINITY;
@@ -89,6 +100,7 @@ impl PhaseInput for Typed<'_> {
         });
         Ok(Geometry {
             count: self.0.axes.len(),
+            present: vec![true; self.0.axes.len()],
             ticks: self.0.options.ticks,
             circle: self.0.options.graticule == "circle",
             min: self.0.options.min,
@@ -204,6 +216,7 @@ fn draw<P: PhaseInput>(
     let radius = width.js_min(height) / 2.;
     let Geometry {
         count,
+        present,
         ticks,
         circle,
         min,
@@ -231,19 +244,28 @@ fn draw<P: PhaseInput>(
         if circle {
             grid.push_str(&format!("<circle r=\"{}\"/>", num(r)))
         } else {
-            let points: Vec<_> = unit
+            let points = unit
                 .iter()
-                .map(|u| Point {
-                    x: u.x * r,
-                    y: u.y * r,
+                .enumerate()
+                .map(|(index, u)| {
+                    if !present[index] {
+                        return Err(input.missing_point(LiveGeometryError::PolygonPoint));
+                    }
+                    Ok(Point {
+                        x: u.x * r,
+                        y: u.y * r,
+                    })
                 })
-                .collect();
+                .collect::<Result<Vec<_>, P::Error>>()?;
             grid.push_str(&format!("<polygon points=\"{}\"/>", polygon(&points)))
         }
         i += 1
     }
     let (mut spokes, mut labels) = (String::new(), String::new());
     for (i, u) in unit.iter().enumerate() {
+        if !present[i] {
+            continue;
+        }
         let reach = radius * axis_scale;
         spokes.push_str(&format!("M0,0L{},{}", num(u.x * reach), num(u.y * reach)));
         let label_text = input.axis_label(i)?;
@@ -296,18 +318,25 @@ fn draw<P: PhaseInput>(
             .map(|(i, value)| {
                 let r = relative_radius(*value, min, max, radius);
                 let safe = if r.is_finite() { r } else { 0. };
-                Point {
-                    x: unit[i].x * safe,
-                    y: unit[i].y * safe,
+                if !present[i] {
+                    return Err(input.missing_point(LiveGeometryError::IndexedPoint));
                 }
+                let u = unit[i];
+                Ok(Point {
+                    x: u.x * safe,
+                    y: u.y * safe,
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>, P::Error>>()?;
         let color = series_color(index);
         let attrs = format!(
             " class=\"pele-curve\" data-id=\"{}\" fill=\"{color}\" stroke=\"{color}\"",
             esc_text(&input.curve_name(index)?)?
         );
         shapes.push_str(&if circle {
+            if points.is_empty() {
+                return Err(input.missing_point(LiveGeometryError::FirstCurvePoint));
+            }
             format!(
                 "<path{attrs} d=\"{}\"/>",
                 closed_round_curve(&points, tension)

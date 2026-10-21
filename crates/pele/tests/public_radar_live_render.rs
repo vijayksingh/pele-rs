@@ -80,6 +80,22 @@ impl LiveRenderRead for Read {
     }
     fn get(&mut self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
         self.reads.borrow_mut().push(json!(key));
+        if matches!(receiver, Value::Atom(Atom::Undefined | Atom::Null)) {
+            return Err(PublicError::JavaScript {
+                name: JavaScriptErrorKind::TypeError,
+                message: JsString::from(
+                    format!(
+                        "Cannot read properties of {} (reading '{key}')",
+                        if matches!(receiver, Value::Atom(Atom::Null)) {
+                            "null"
+                        } else {
+                            "undefined"
+                        }
+                    )
+                    .as_str(),
+                ),
+            });
+        }
         Ok(match receiver {
             Value::Atom(atom) => self.own(field(&self.graph.borrow(), atom, key)),
             _ => Value::Atom(Atom::Undefined),
@@ -87,6 +103,17 @@ impl LiveRenderRead for Read {
     }
     fn index(&mut self, receiver: &Value, index: usize) -> Result<Value, PublicError> {
         self.get(receiver, &index.to_string())
+    }
+    fn has_index(&mut self, receiver: &Value, index: usize) -> Result<bool, PublicError> {
+        let Value::Atom(Atom::Ref(id)) = receiver else {
+            return Ok(false);
+        };
+        let graph = self.graph.borrow();
+        let key = index.to_string();
+        Ok(graph.nodes[*id as usize]
+            .properties()
+            .iter()
+            .any(|p| graph.strings[p.key as usize].is(&key)))
     }
     fn kind(&self, value: &Value) -> LiveValueKind {
         match value {
@@ -358,6 +385,10 @@ impl RenderResources for Callback<'_> {
                     set_text(&mut g, b, "label", "Saved Beta");
                 }
                 "nested" => set_text(&mut g, root, "title", "Nested title"),
+                "callback-hole" | "callback-throw" => {
+                    remove_index(&mut g, axes, 1);
+                    set_text(&mut g, root, "title", "Kept mutation");
+                }
                 "baseline" => {}
                 _ => panic!("mode"),
             }
@@ -365,7 +396,7 @@ impl RenderResources for Callback<'_> {
                 self.doc.apply(self.doc.revision(), g).unwrap();
                 *self.graph.borrow_mut() = self.doc.snapshot().unwrap();
             }
-            if self.mode == "throw" {
+            if self.mode == "throw" || self.mode == "callback-throw" {
                 return Err(PeleError::new(
                     "Radar callback sentinel",
                     ErrorCode::Semantic,
@@ -473,6 +504,190 @@ fn radar_live_phases_preserve_captured_arrays_late_fields_errors_and_recovery() 
                     .rendered
             ),
             case["recovery"]
+        );
+    }
+}
+
+fn remove_index(g: &mut ModelGraph, node: u32, index: u32) {
+    let key = index.to_string();
+    let strings = &g.strings;
+    g.nodes[node as usize]
+        .properties_mut()
+        .retain(|p| !strings[p.key as usize].is(&key));
+}
+fn truncate(g: &mut ModelGraph, node: u32, count: u32) {
+    for i in count..match g.nodes[node as usize] {
+        Node::Array { length, .. } => length,
+        _ => panic!("array"),
+    } {
+        remove_index(g, node, i);
+    }
+    let Node::Array { length, .. } = &mut g.nodes[node as usize] else {
+        panic!("array")
+    };
+    *length = count;
+}
+#[test]
+fn radar_sparse_axes_and_empty_curves_preserve_failure_phases_and_repair() {
+    let fixture: Json = serde_json::from_str(include_str!(
+        "../../../fixtures/public-radar-runtime-shapes.json"
+    ))
+    .unwrap();
+    for case in fixture["rows"].as_array().unwrap() {
+        let mode = case["mode"].as_str().unwrap();
+        let raw = case["raw"].as_bool().unwrap();
+        let mut engine = PublicEngine::with_builtins();
+        let mut doc = engine
+            .parse(fixture["source"].as_str().unwrap(), &Default::default())
+            .unwrap();
+        let original = doc.snapshot().unwrap();
+        let mut g = original.clone();
+        let axes = id(&field(&g, &g.root, "axes"));
+        let curves = id(&field(&g, &g.root, "curves"));
+        let options = id(&field(&g, &g.root, "options"));
+        if mode.starts_with("hole-") {
+            remove_index(&mut g, axes, 1);
+        }
+        if mode == "all-holes" {
+            for i in 0..3 {
+                remove_index(&mut g, axes, i);
+            }
+        }
+        if mode.contains("polygon") {
+            set_text(&mut g, options, "graticule", "polygon");
+        }
+        if mode == "hole-polygon-no-grid" {
+            set(&mut g, options, "ticks", Atom::Number(0.));
+        }
+        if mode == "hole-skipped-curves" {
+            for i in 0..2 {
+                let curve = id(&field(&g, &Atom::Ref(curves), &i.to_string()));
+                let entries = input(&mut g, &json!([1, 2]));
+                set(&mut g, curve, "entries", entries);
+            }
+        }
+        if mode == "hole-no-curves" {
+            truncate(&mut g, curves, 0);
+        }
+        if mode.starts_with("empty-") {
+            truncate(&mut g, axes, 0);
+            truncate(&mut g, curves, 1);
+            if mode != "empty-circle-skipped" {
+                let curve = id(&field(&g, &Atom::Ref(curves), "0"));
+                let entries = input(&mut g, &json!([]));
+                set(&mut g, curve, "entries", entries);
+            }
+        }
+        if mode == "empty-circle-no-legend" {
+            set(&mut g, options, "showLegend", Atom::Bool(false));
+        }
+        doc.apply(doc.revision(), g).unwrap();
+        // Public normal/raw operation surfaces exercise the same graph phases.
+        if !mode.starts_with("callback-") {
+            let mut direct = engine
+                .create_from_graph_as(
+                    &DiagramId::from(DiagramType::Radar),
+                    doc.snapshot().unwrap(),
+                    Object::default(),
+                )
+                .unwrap();
+            let mut metrics = Plain::default();
+            let result = if raw {
+                direct
+                    .render_raw_operation(
+                        direct.revision(),
+                        &Object::default(),
+                        &RenderSettings::default(),
+                        &mut metrics,
+                    )
+                    .unwrap()
+                    .result
+            } else {
+                direct
+                    .render_operation(direct.revision(), &RenderOptions::default(), &mut metrics)
+                    .unwrap()
+                    .result
+                    .map(|v| v.rendered)
+            };
+            check_shape_result(result, case);
+            assert_json(&json!(metrics.trace), &case["trace"]);
+        }
+        let graph = Rc::new(RefCell::new(doc.snapshot().unwrap()));
+        let mut reader = Read {
+            graph: graph.clone(),
+            reads: Rc::new(RefCell::new(vec![])),
+        };
+        let job = doc
+            .prepare_detached_render(doc.revision(), request(raw, false))
+            .unwrap()
+            .unwrap();
+        let mut host = Callback {
+            doc: &mut doc,
+            graph: graph.clone(),
+            mode: if mode.starts_with("callback-") {
+                mode
+            } else {
+                "baseline"
+            },
+            fired: false,
+            plain: Plain::default(),
+            nested: None,
+        };
+        let done = job.run(&mut reader, &mut host);
+        assert_eq!(host.fired, case["fired"].as_bool().unwrap(), "{mode}");
+        assert_json(&json!(host.plain.trace), &case["trace"]);
+        drop(host);
+        let result = doc
+            .finish_detached_render(done)
+            .unwrap()
+            .result
+            .map(rendered);
+        check_shape_result(result, case);
+        let after = doc.snapshot().unwrap();
+        assert_json(&state(&after), &case["after"]);
+        assert_json(&output(&after, &Atom::Ref(axes)), &case["oldAxes"]);
+        assert_json(&output(&after, &Atom::Ref(curves)), &case["oldCurves"]);
+        assert_eq!(id(&field(&after, &after.root, "axes")), axes);
+        assert_eq!(id(&field(&after, &after.root, "curves")), curves);
+        doc.apply(doc.revision(), original).unwrap();
+        *graph.borrow_mut() = doc.snapshot().unwrap();
+        let job = doc
+            .prepare_detached_render(doc.revision(), request(raw, false))
+            .unwrap()
+            .unwrap();
+        let mut metrics = Plain::default();
+        let done = job.run(&mut reader, &mut metrics);
+        let result = rendered(doc.finish_detached_render(done).unwrap().result.unwrap());
+        for key in ["svg", "width", "height"] {
+            assert_eq!(drawing(&result)[key], case["recovery"][key], "{mode}/{key}");
+        }
+        assert_json(&json!(metrics.trace), &case["recoveryTrace"]);
+    }
+}
+fn check_shape_result(result: Result<Rendered, PublicError>, case: &Json) {
+    let mode = case["mode"].as_str().unwrap();
+    if case["first"]["ok"] == true {
+        let result = result.unwrap();
+        for key in ["svg", "width", "height"] {
+            assert_eq!(drawing(&result)[key], case["first"][key], "{mode}/{key}");
+        }
+        assert_eq!(
+            serde_json::to_value(result.links).unwrap(),
+            case["first"]["links"]
+        );
+    } else if mode == "callback-throw" {
+        let PublicError::Pele(e) = result.err().unwrap() else {
+            panic!("original native callback")
+        };
+        assert_eq!(e.message, "Radar callback sentinel");
+    } else {
+        let PublicError::JavaScript { name, message } = result.err().unwrap() else {
+            panic!("{mode}: expected TypeError")
+        };
+        assert_eq!(name, JavaScriptErrorKind::TypeError);
+        assert_eq!(
+            message.well_formed().unwrap(),
+            case["first"]["error"]["message"]
         );
     }
 }

@@ -4,8 +4,8 @@ use super::{prepared_entries, render_numbers, render_packet, MutableDocument};
 use pele::compat::{
     public::{
         DetachedRenderCompletion, DetachedRenderJob, DetachedRenderRequest, DetachedRenderValue,
-        JsString, LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind, PublicError,
-        DEFAULT_BINARY_BUDGET,
+        JsString, LiveCallArgument, LiveGeometryError, LiveRenderRead, LiveStringUse,
+        LiveValueKind, PublicError, DEFAULT_BINARY_BUDGET,
     },
     ErrorCode, PeleError,
 };
@@ -47,6 +47,7 @@ enum ReadCommand {
     ToNumber = 18,
     RetainValue = 19,
     RetainedValue = 20,
+    GeometryError = 21,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -454,6 +455,23 @@ impl LiveRenderRead for Reader {
             return Err(invalid("Invalid live Map values count").into());
         }
         Ok(values.iter().collect())
+    }
+    fn geometry_error(&mut self, site: LiveGeometryError) -> PublicError {
+        let context = match site {
+            LiveGeometryError::PolygonPoint => 0,
+            LiveGeometryError::IndexedPoint => 1,
+            LiveGeometryError::FirstCurvePoint => 2,
+            LiveGeometryError::IndexedLabel => 3,
+            LiveGeometryError::IndexedName => 4,
+        };
+        self.primitive(
+            ReadCommand::GeometryError,
+            &JsValue::UNDEFINED,
+            &JsValue::UNDEFINED,
+            context,
+        )
+        .err()
+        .unwrap_or_else(|| site.native_error())
     }
     fn kind(&self, value: &JsValue) -> LiveValueKind {
         if value.is_undefined() {

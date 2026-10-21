@@ -139,6 +139,18 @@ export function liveRenderRead(capture, bridge) {
           return values.get(key);
         }
         case 18: return +value;
+        case 21: {
+          // Proven missing native-computed coordinates. Fresh local operands
+          // only; no public getter, iterator, callback, or coercion is replayed.
+          switch (context) {
+            case 0: { const n = undefined; return n.x; }
+            case 1: { const S = [], M = 0; return S[M].x; }
+            case 2: { const t = []; return t[0].x; }
+            case 3: { const k = [], l = 0; return k[l].label; }
+            case 4: { const k = [], l = 0; return k[l].name; }
+            default: throw new TypeError('Invalid native geometry error context');
+          }
+        }
         case 12: return Array.isArray(value);
         case 10: {
           const keys = Object.keys(value);

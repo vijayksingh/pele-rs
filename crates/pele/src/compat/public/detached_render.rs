@@ -17,7 +17,7 @@ use std::{
 };
 
 pub use crate::compat::diagrams::sankey::{
-    LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind,
+    LiveCallArgument, LiveGeometryError, LiveRenderRead, LiveStringUse, LiveValueKind,
 };
 
 #[derive(Clone, Copy, PartialEq, Eq)]

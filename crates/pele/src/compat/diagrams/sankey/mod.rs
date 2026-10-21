@@ -39,4 +39,6 @@ mod source_store;
 mod live_phase;
 pub(crate) use live_phase::{render_detached, SankeyDetachedInput};
 #[doc(hidden)]
-pub use live_phase::{LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind};
+pub use live_phase::{
+    LiveCallArgument, LiveGeometryError, LiveRenderRead, LiveStringUse, LiveValueKind,
+};

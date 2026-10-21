@@ -150,4 +150,61 @@ private final class RadarCallbackFailure: Error {}
             XCTAssertTrue(NSArray(array: recovery.trace).isEqual(to: try XCTUnwrap(row["recoveryTrace"] as? [[Any]])), mode + " recovery trace")
         }
     }
+    private static func removeIndex(_ graph: inout Pele.PublicGraph, _ node: UInt32, _ index: UInt32) throws {
+        guard case .array(let length, let properties) = graph.nodes[Int(node)] else { throw PeleError(code: "test", message: "Expected Array") }
+        let keys=graph.strings
+        graph.nodes[Int(node)] = .array(length: length, properties: properties.filter { keys[Int($0.key)].stringIfWellFormed != String(index) })
+    }
+    private static func truncate(_ graph: inout Pele.PublicGraph, _ node: UInt32, _ count: UInt32) throws {
+        guard case .array(_, let properties) = graph.nodes[Int(node)] else { throw PeleError(code: "test", message: "Expected Array") }
+        let keys=graph.strings
+        graph.nodes[Int(node)] = .array(length: count, properties: properties.filter { property in
+            guard let key=keys[Int(property.key)].stringIfWellFormed, let i=UInt32(key) else { return true }; return i<count
+        })
+    }
+    func testRadarSparseAxesEmptyCurvesAndRecoveryMatch24OracleRows() throws {
+        var path=URL(fileURLWithPath:#filePath); for _ in 0..<5 {path.deleteLastPathComponent()}
+        let fixture=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:path.appendingPathComponent("fixtures/public-radar-runtime-shapes.json"))) as? [String:Any])
+        XCTAssertEqual(fixture["oracleSHA256"] as? String,"d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d")
+        let rows=try XCTUnwrap(fixture["rows"] as? [[String:Any]]),source=try XCTUnwrap(fixture["source"] as? String);XCTAssertEqual(rows.count,24)
+        for row in rows {
+            let mode=try XCTUnwrap(row["mode"] as? String),raw=try XCTUnwrap(row["raw"] as? Bool),engine=Pele.Engine()
+            let document:RadarCallbackDocument=try raw ? .prepared(engine.parsePrepared("radar",source:source)) : .normal(engine.parseMutable(source))
+            defer {try? document.close()}
+            let initial=try document.snapshot().graph;var graph=initial
+            let axes=try Self.ref(graph.field("axes")),curves=try Self.ref(graph.field("curves")),options=try Self.ref(graph.field("options"))
+            if mode.hasPrefix("hole-"){try Self.removeIndex(&graph,axes,1)}
+            if mode=="all-holes"{for i:UInt32 in 0..<3 {try Self.removeIndex(&graph,axes,i)}}
+            if mode.contains("polygon"){try Self.setText(&graph,"graticule","polygon",on:options)}
+            if mode=="hole-polygon-no-grid"{try graph.setField("ticks",value:.number(0),on:options)}
+            if mode=="hole-skipped-curves"{for i in 0..<2 {let c=try Self.ref(graph.field(String(i),on:curves)),entries=try Self.input(&graph,[1,2]);try graph.setField("entries",value:entries,on:c)}}
+            if mode=="hole-no-curves"{try Self.truncate(&graph,curves,0)}
+            if mode.hasPrefix("empty-"){try Self.truncate(&graph,axes,0);try Self.truncate(&graph,curves,1);if mode != "empty-circle-skipped"{let c=try Self.ref(graph.field("0",on:curves)),entries=try Self.input(&graph,[Any]());try graph.setField("entries",value:entries,on:c)}}
+            if mode=="empty-circle-no-legend"{try graph.setField("showLegend",value:.bool(false),on:options)}
+            try document.apply(graph)
+            let observed=RadarCallbackState();var host=pure()
+            host.textWidth={ request in try MainActor.assumeIsolated {
+                observed.trace.append([request.text,String(format:"%016llx",request.size.bitPattern),Int(request.style)])
+                if !observed.fired {observed.fired=true;if mode.hasPrefix("callback-"){var current=try document.snapshot().graph;try Self.removeIndex(&current,axes,1);try Self.setText(&current,"title","Kept mutation");try document.apply(current);if mode=="callback-throw"{throw observed.failure}}}
+                return Double(request.text.utf16.count)*request.size*0.6
+            }}
+            let first=try XCTUnwrap(row["first"] as? [String:Any])
+            if first["ok"] as? Bool == true {try compare(document.render(host),first)}
+            else if mode=="callback-throw" {XCTAssertThrowsError(try document.render(host)){XCTAssertTrue(($0 as AnyObject) === observed.failure)}}
+            else {let expected=try XCTUnwrap(first["error"] as? [String:Any]);XCTAssertThrowsError(try document.render(host)){error in
+                guard let failure=error as? Pele.PublicOperationFailure, case .javaScript(let name,let message)=failure.value else {return XCTFail("Expected TypeError: \(error)")}
+                XCTAssertEqual(name,expected["name"] as? String);XCTAssertEqual(message.stringIfWellFormed,expected["message"] as? String)
+            }}
+            XCTAssertEqual(observed.fired,row["fired"] as? Bool);XCTAssertTrue(NSArray(array:observed.trace).isEqual(to:try XCTUnwrap(row["trace"] as? [[Any]])),mode)
+            let after=try document.snapshot().graph
+            XCTAssertTrue(NSDictionary(dictionary:try Self.state(after)).isEqual(to:try XCTUnwrap(row["after"] as? [String:Any])),mode)
+            XCTAssertEqual(try Self.ref(after.field("axes")),axes);XCTAssertEqual(try Self.ref(after.field("curves")),curves)
+            XCTAssertTrue(NSArray(array:try XCTUnwrap(Self.value(after,.ref(axes)) as? [Any])).isEqual(to:try XCTUnwrap(row["oldAxes"] as? [Any])))
+            XCTAssertTrue(NSArray(array:try XCTUnwrap(Self.value(after,.ref(curves)) as? [Any])).isEqual(to:try XCTUnwrap(row["oldCurves"] as? [Any])))
+            try document.apply(initial)
+            let recovery=RadarCallbackState();var plain=pure();plain.textWidth={request in MainActor.assumeIsolated{recovery.trace.append([request.text,String(format:"%016llx",request.size.bitPattern),Int(request.style)]);return Double(request.text.utf16.count)*request.size*0.6}}
+            try compare(document.render(plain),XCTUnwrap(row["recovery"] as? [String:Any]));XCTAssertTrue(NSArray(array:recovery.trace).isEqual(to:try XCTUnwrap(row["recoveryTrace"] as? [[Any]])))
+        }
+    }
+
 }

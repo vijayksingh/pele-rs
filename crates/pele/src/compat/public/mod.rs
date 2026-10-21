@@ -15,7 +15,7 @@ mod engine;
 pub use detached_render::{
     live_number_string, DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion,
     DetachedRenderJob, DetachedRenderOutcome, DetachedRenderRequest, DetachedRenderValue,
-    LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind,
+    LiveCallArgument, LiveGeometryError, LiveRenderRead, LiveStringUse, LiveValueKind,
 };
 mod graph;
 pub(crate) mod graph_read;

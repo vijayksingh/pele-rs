@@ -1,7 +1,7 @@
 //! Owned Radar phases retain current-draw arrays while reading their live fields.
 use super::render::{Geometry, PhaseInput};
 use crate::compat::{
-    public::{LiveRenderRead, LiveStringUse, LiveValueKind, PublicError},
+    public::{LiveGeometryError, LiveRenderRead, LiveStringUse, LiveValueKind, PublicError},
     ErrorCode, Object, PeleError, RenderResources, RenderSettings, Rendered,
 };
 use std::collections::HashMap;
@@ -114,6 +114,14 @@ impl<R: LiveRenderRead> HostPhase<'_, R> {
         .expect("begin_draw initializes arrays")
         .clone();
         let object = self.read.index(&array, index)?;
+        if axes && self.read.kind(&object) == LiveValueKind::Undefined {
+            let site = if key == "label" {
+                LiveGeometryError::IndexedLabel
+            } else {
+                LiveGeometryError::IndexedName
+            };
+            return Err(self.read.geometry_error(site));
+        }
         self.read.get(&object, key)
     }
     fn label(&mut self, axes: bool, index: usize) -> Result<Option<String>, PublicError> {
@@ -127,6 +135,9 @@ impl<R: LiveRenderRead> HostPhase<'_, R> {
 }
 impl<R: LiveRenderRead> PhaseInput for HostPhase<'_, R> {
     type Error = PublicError;
+    fn missing_point(&mut self, site: LiveGeometryError) -> PublicError {
+        self.read.geometry_error(site)
+    }
     fn begin_draw(&mut self) -> Result<Geometry, PublicError> {
         self.text_lengths.clear();
         self.text_units = 0;
@@ -143,6 +154,16 @@ impl<R: LiveRenderRead> PhaseInput for HostPhase<'_, R> {
         let min = self.read.get(&options, "min")?;
         let min = self.number(&min)?;
         let count = self.length(&axes)?;
+        // Array.map performs HasProperty and Get in index order, preserving
+        // holes in its computed geometry even if callbacks later edit axes.
+        let mut present = Vec::with_capacity(count);
+        for index in 0..count {
+            let has = self.read.has_index(&axes, index)?;
+            if has {
+                let _ = self.read.index(&axes, index)?;
+            }
+            present.push(has);
+        }
         // Root options is read again at the source's max access.
         let max_options = self.root_field("options")?;
         let max_value = self.read.get(&max_options, "max")?;
@@ -184,6 +205,7 @@ impl<R: LiveRenderRead> PhaseInput for HostPhase<'_, R> {
         }
         Ok(Geometry {
             count,
+            present,
             ticks,
             circle,
             min,
@@ -212,9 +234,6 @@ impl<R: LiveRenderRead> PhaseInput for HostPhase<'_, R> {
     fn curve_entries(&mut self, i: usize) -> Result<Vec<f64>, PublicError> {
         let entries = self.array_field(false, i, "entries")?;
         let length = self.length(&entries)?;
-        if self.count == 0 && length == 0 && self.circle {
-            return Err(invalid("Radar circle curves require at least one axis"));
-        }
         let mut values = Vec::with_capacity(length);
         for i in 0..length {
             let value = self.read.index(&entries, i)?;
@@ -272,4 +291,127 @@ pub(crate) fn render_detached<R: LiveRenderRead>(
         text_units: 0,
     };
     super::render::render_phases(&mut input, config, settings, resources)
+}
+
+/// Borrowed public data uses the same phase schedule as detached host values.
+/// In particular, sparse axes cannot be eagerly projected into a dense DTO.
+pub(super) fn render_graph(
+    graph: &crate::compat::public::ModelGraph,
+    seed: &RadarDetachedInput,
+    config: &Object,
+    settings: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, PublicError> {
+    use crate::compat::public::{Atom, JavaScriptErrorKind, JsString, ModelGraph, Node};
+    struct Read<'a>(&'a ModelGraph);
+    fn type_error(message: String) -> PublicError {
+        PublicError::JavaScript {
+            name: JavaScriptErrorKind::TypeError,
+            message: JsString::from(message.as_str()),
+        }
+    }
+    impl LiveRenderRead for Read<'_> {
+        type Value = Atom;
+        fn root(&self) -> Atom {
+            self.0.root.clone()
+        }
+        fn get(&mut self, receiver: &Atom, key: &str) -> Result<Atom, PublicError> {
+            match receiver {
+                Atom::Undefined | Atom::Null => {
+                    return Err(type_error(format!(
+                        "Cannot read properties of {} (reading '{key}')",
+                        if matches!(receiver, Atom::Null) {
+                            "null"
+                        } else {
+                            "undefined"
+                        }
+                    )))
+                }
+                Atom::Ref(id) => {
+                    let node = &self.0.nodes[*id as usize];
+                    if let Node::Array { length, .. } = node {
+                        if key == "length" {
+                            return Ok(Atom::Number(f64::from(*length)));
+                        }
+                    }
+                    return Ok(node
+                        .properties()
+                        .iter()
+                        .find(|p| self.0.strings[p.key as usize].is(key))
+                        .map_or(Atom::Undefined, |p| p.value.clone()));
+                }
+                _ => {}
+            }
+            Ok(Atom::Undefined)
+        }
+        fn index(&mut self, receiver: &Atom, index: usize) -> Result<Atom, PublicError> {
+            self.get(receiver, &index.to_string())
+        }
+        fn has_index(&mut self, receiver: &Atom, index: usize) -> Result<bool, PublicError> {
+            let Atom::Ref(id) = receiver else {
+                return Err(invalid("Radar collections must be Arrays"));
+            };
+            let key = index.to_string();
+            Ok(self.0.nodes[*id as usize]
+                .properties()
+                .iter()
+                .any(|p| self.0.strings[p.key as usize].is(&key)))
+        }
+        fn kind(&self, value: &Atom) -> LiveValueKind {
+            match value {
+                Atom::Undefined => LiveValueKind::Undefined,
+                Atom::Null => LiveValueKind::Null,
+                Atom::Bool(_) => LiveValueKind::Boolean,
+                Atom::Number(_) => LiveValueKind::Number,
+                Atom::String(_) => LiveValueKind::String,
+                Atom::BuiltinFunction(_) => LiveValueKind::Function,
+                _ => LiveValueKind::Object,
+            }
+        }
+        fn number(&self, value: &Atom) -> Option<f64> {
+            if let Atom::Number(v) = value {
+                Some(*v)
+            } else {
+                None
+            }
+        }
+        fn truthy(&self, value: &Atom) -> bool {
+            match value {
+                Atom::Undefined | Atom::Null | Atom::Bool(false) => false,
+                Atom::Number(n) => *n != 0. && !n.is_nan(),
+                Atom::String(id) => !self.0.strings[*id as usize].0.is_empty(),
+                _ => true,
+            }
+        }
+        fn string_units(&self, value: &Atom) -> Result<Option<JsString>, PublicError> {
+            Ok(if let Atom::String(id) = value {
+                Some(self.0.strings[*id as usize].clone())
+            } else {
+                None
+            })
+        }
+        fn to_string(&mut self, value: &Atom) -> Result<JsString, PublicError> {
+            self.require_string(
+                value,
+                LiveStringUse {
+                    method: "includes",
+                    expression_receiver: "e",
+                },
+            )
+        }
+        fn require_string(
+            &mut self,
+            value: &Atom,
+            site: LiveStringUse,
+        ) -> Result<JsString, PublicError> {
+            if let Some(s) = self.string_units(value)? {
+                return Ok(s);
+            }
+            Err(type_error(format!(
+                "{}.{} is not a function",
+                site.expression_receiver, site.method
+            )))
+        }
+    }
+    render_detached(seed, config, settings, &mut Read(graph), resources)
 }
