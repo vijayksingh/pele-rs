@@ -36,6 +36,9 @@ private final class KanbanCallbackFailure: Error {}
     private static func pure() -> Pele.HostResources {
         var host = Pele.HostResources(); host.textWidth = { Double($0.text.utf16.count) * $0.size * 0.6 }; host.icon = { _ in .init(trustedMarkup: "<path d=\"M0 0h4v4z\"/>") }; return host
     }
+    private static func sameRef(_ a:Pele.PublicGraph.Atom?,_ b:Pele.PublicGraph.Atom?)->Bool {
+        if case (.some(.ref(let x)),.some(.ref(let y))) = (a,b) { return x == y }; return false
+    }
     private static func ref(_ atom: Pele.PublicGraph.Atom?) throws -> UInt32 {
         guard case .ref(let id) = atom else { throw PeleError(code: "test", message: "Kanban reference missing") }; return id
     }
@@ -149,7 +152,7 @@ private final class KanbanCallbackFailure: Error {}
             XCTAssertTrue(NSDictionary(dictionary: try Self.state(after.graph)).isEqual(to: try XCTUnwrap(row["after"] as? [String: Any])), mode + " state")
             let currentSections=try Self.ref(after.graph.field("sections")), currentSection=try Self.ref(after.graph.field("0",on:currentSections)), currentItems=try Self.ref(after.graph.field("items",on:currentSection))
             XCTAssertEqual(currentSections==sections,row["sectionsCurrent"] as? Bool);XCTAssertEqual(currentItems==items,row["itemsCurrent"] as? Bool)
-            XCTAssertEqual(after.graph.field("0",on:currentItems) == .ref(original),row["itemCurrent"] as? Bool)
+            XCTAssertEqual(try Self.sameRef(after.graph.field("0",on:currentItems),.ref(original)),row["itemCurrent"] as? Bool)
             for(name,node)in[("originalSections",sections),("originalItems",items)]{XCTAssertTrue(NSArray(array:try XCTUnwrap(Self.value(after.graph,.ref(node)) as? [Any])).isEqual(to:try XCTUnwrap(row[name] as? [Any])),mode+name)}
             XCTAssertTrue(NSDictionary(dictionary:try XCTUnwrap(Self.value(after.graph,.ref(original)) as? [String:Any])).isEqual(to:try XCTUnwrap(row["originalItem"] as? [String:Any])),mode+" original item")
             if mode == "nested" { try compare(XCTUnwrap(observed.nested), XCTUnwrap(row["nested"] as? [String: Any])); XCTAssertGreaterThan(document.revision, try XCTUnwrap(observed.nestedRevision)) }

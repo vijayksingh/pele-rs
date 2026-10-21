@@ -145,17 +145,18 @@ private final class ErCallbackFailure: Error {}
         let engine = Pele.Engine(), document = try engine.parseMutable("erDiagram\nA { int id PK }")
         defer { try? document.close() }
         let original = try document.render(resources: Self.resources()), state = ErCallbackState()
+        let owner = ErCallbackDocument.normal(document)
         var host = Self.resources()
         host.textWidth = { request in try MainActor.assumeIsolated {
             if !state.fired {
                 state.fired = true
-                var graph = try document.snapshot().graph
+                var graph = try owner.snapshot().graph
                 let entity = try Self.entity(graph,"A"), rows = try Self.ref(graph.field("attributes",on:entity)), row = try Self.ref(graph.field("0",on:rows)), shared = try graph.intern(String(repeating:"x",count:8192)), keys = try Self.array(&graph,Array(repeating:.string(shared),count:2049))
-                try graph.setField("keys",value:.ref(keys),on:row); _ = try document.apply(graph,expectedRevision:document.revision)
+                try graph.setField("keys",value:.ref(keys),on:row); try owner.apply(graph)
             }
             return Double(request.text.utf16.count)*request.size*0.6
         }}
-        XCTAssertThrowsError(try document.render(resources:host)) { XCTAssertEqual(($0 as? PeleError)?.code,"limit") }
+        XCTAssertThrowsError(try document.render(resources:host)) { XCTAssertEqual(($0 as? CompatibilityError)?.code,"limit") }
         XCTAssertTrue(state.fired)
         var graph = try document.snapshot().graph
         let entity = try Self.entity(graph,"A"), rows = try Self.ref(graph.field("attributes",on:entity)), row = try Self.ref(graph.field("0",on:rows)), oldKeys = try Self.ref(graph.field("keys",on:row))

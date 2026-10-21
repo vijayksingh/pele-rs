@@ -70,7 +70,7 @@ private final class WardleyCallbackFailure: Error {}
             let node = graph.nodes[Int(id)]
             if case .array(let length, _) = node { return try (0..<length).map { try value(graph, graph.field(String($0), on: id) ?? .undefined) } }
             var object: [String: Any] = [:]
-            for property in node.properties where property.value != .undefined { object[try XCTUnwrap(graph.strings[Int(property.key)].stringIfWellFormed)] = try value(graph, property.value) }
+            for property in node.properties { if case .undefined = property.value { continue }; object[try XCTUnwrap(graph.strings[Int(property.key)].stringIfWellFormed)] = try value(graph, property.value) }
             return object
         default: throw PeleError(code: "test", message: "Unexpected Wardley fixture atom")
         }
@@ -134,8 +134,8 @@ private final class WardleyCallbackFailure: Error {}
             XCTAssertTrue(NSArray(array: observed.trace).isEqual(to: try XCTUnwrap(row["trace"] as? [[Any]])), "\(mode)/\(raw)/\(responsive) trace")
             let after = try document.snapshot(); XCTAssertEqual(after.revision, document.revision)
             XCTAssertTrue(NSDictionary(dictionary: try Self.state(after.graph)).isEqual(to: try XCTUnwrap(row["after"] as? [String: Any])), mode + " state")
-            let currentNodes=try Self.ref(after.graph.field("nodes")),currentFirst=after.graph.field("0",on:currentNodes) ?? .undefined
-            XCTAssertEqual(currentNodes==nodes,row["nodesCurrent"] as? Bool);XCTAssertEqual(currentFirst == .ref(original),row["firstCurrent"] as? Bool);XCTAssertEqual(after.graph.field("stages",on:axes)==stages,row["stagesCurrent"] as? Bool)
+            let currentNodes=try Self.ref(after.graph.field("nodes")),currentFirst=try after.graph.field("0",on:currentNodes) ?? .undefined
+            XCTAssertEqual(currentNodes==nodes,row["nodesCurrent"] as? Bool);var firstCurrent = false; if case .ref(let id) = currentFirst { firstCurrent = id == original }; XCTAssertEqual(firstCurrent,row["firstCurrent"] as? Bool); XCTAssertEqual(try Self.ref(after.graph.field("stages",on:axes)) == Self.ref(stages),row["stagesCurrent"] as? Bool)
             for(name,value)in[("originalNodes",Pele.PublicGraph.Atom.ref(nodes)),("originalLinks",.ref(links)),("originalAnnotations",.ref(annotations)),("originalNotes",.ref(notes)),("originalStages",stages)]{XCTAssertTrue(NSArray(array:try XCTUnwrap(Self.value(after.graph,value) as? [Any])).isEqual(to:try XCTUnwrap(row[name] as? [Any])),mode+name)}
             for(name,value)in[("originalFirst",Pele.PublicGraph.Atom.ref(original)),("originalLink",.ref(link)),("originalAnnotation",.ref(annotation)),("originalNote",.ref(note))]{XCTAssertTrue(NSDictionary(dictionary:try XCTUnwrap(Self.value(after.graph,value) as? [String:Any])).isEqual(to:try XCTUnwrap(row[name] as? [String:Any])),mode+name)}
             if mode == "nested" { try compare(XCTUnwrap(observed.nested), XCTUnwrap(row["nested"] as? [String: Any])); XCTAssertGreaterThan(document.revision, try XCTUnwrap(observed.nestedRevision)) }
