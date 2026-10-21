@@ -54,4 +54,9 @@ for p in ordered:
 for p in members:
  row=json.loads(gzip.decompress(p.read_bytes()));assert row['candidate']==row['oracle']
  assert row['candidate']['cases']==row['fixture']['cases'] and row['candidate']['arity']==2 and len(row['candidate']['virtual'])==6
+audit=json.loads(gzip.decompress((root/'runtime-audit.json.gz').read_bytes()))
+assert audit['package']==final['package'] and audit['summary']['families']==33
+assert audit['summary']['classRoots']==22 and not audit['summary']['nativeClassConstructionFailures']
+assert audit['summary']['callbackMatches']==2 and len(audit['summary']['callbackMismatches'])==31
+assert {row['type'] for row in audit['rows'] if row['callbackMatches']}=={'sankey','er'}
 print(f"Verified {len(m['files'])} lossless records; native24, Swift8+1, 99 entry cases, C17/C18 and web51 checkpoint. Known failures preserved.")

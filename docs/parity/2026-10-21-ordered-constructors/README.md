@@ -44,6 +44,11 @@ exact diagnostics. Raw reports retain both candidate and oracle observations.
 ## Remaining work
 
 The resource-callback mutation audit still has unresolved cases in 31 families.
+The refreshed public probe against this exact 118-file package confirms 22/22
+class-root constructions succeed, while only Sankey and ER match the title-edit
+then-throw case. `runtime-audit.json.gz` retains all 33 observations and input
+hashes. Reproduce with `node scripts/parity/audit-runtime.mjs PACKAGE_DIRECTORY`;
+the probe verifies the pinned oracle/fixture and unchanged package bytes.
 Active malformed UTF-16 drawing, sparse/coercion domains, advanced overrides,
 constructor reflection and cross-registry identity remain separate gaps.
 Configured Agentflow graph-build diagnostic callbacks and Gantt scheduler
