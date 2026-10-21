@@ -497,6 +497,15 @@ impl<'a> Arena<'a> {
         let Node::Array { length, .. } = self.g.nodes[id as usize] else {
             return Err(ty("AgentFlow collection push is not a function"));
         };
+        if self.g.nodes[id as usize]
+            .properties()
+            .iter()
+            .any(|p| self.g.strings[p.key as usize].is("length") && p.flags & 2 == 0)
+        {
+            return Err(ty(
+                "Cannot assign to read only property 'length' of object '[object Array]'",
+            ));
+        }
         if length as usize >= MAX_ITEMS {
             return Err(limit().into());
         }
@@ -505,6 +514,11 @@ impl<'a> Arena<'a> {
             unreachable!()
         };
         *len = length + 1;
+        for property in self.g.nodes[id as usize].properties_mut() {
+            if self.g.strings[property.key as usize].is("length") {
+                property.value = Atom::Number((length + 1) as f64);
+            }
+        }
         Ok(())
     }
     fn map(&mut self) -> Result<u32, PublicError> {
@@ -3235,7 +3249,7 @@ impl PublicDiagramModule for AgentFlow {
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         if s.base.is_none() {
-            let (base, bindings) = fresh_render_model(&s.graph, c)?;
+            let (base, bindings) = fresh_render_model(&mut s.graph, c)?;
             s.projected = project_render(&s.graph, &base, &bindings);
             s.style_bindings = bindings;
             s.base = Some(base);
@@ -3263,11 +3277,11 @@ fn native_db_method(g: &ModelGraph, root: u32, name: &str, method: u32) -> bool 
 // DB-only helpers. Missing helper calls must fail at graph construction, rather
 // than silently inheriting a database prototype or a parser-created graph cache.
 fn fresh_render_model(
-    g: &ModelGraph,
+    g: &mut ModelGraph,
     config: &Object,
 ) -> Result<(AgentflowModel, Vec<Option<u32>>), PublicError> {
     use super::model::{AgentClassDef, AgentDb, AgentEdge, AgentNode, AgentSubgraph};
-    use crate::compat::diagrams::flowchart::{Flowchart, LabelType as FlowLabel};
+    use crate::compat::diagrams::flowchart::LabelType as FlowLabel;
     fn label(v: FlowLabel) -> super::model::LabelType {
         match v {
             FlowLabel::Text => super::model::LabelType::Text,
@@ -3275,8 +3289,9 @@ fn fresh_render_model(
             FlowLabel::Markdown => super::model::LabelType::Markdown,
         }
     }
-    let common = Flowchart.create_public_from_graph(g.clone())?;
-    let common = common.render_model()?.clone();
+    // The enclosing AgentFlow document already admitted this graph against its
+    // own schema. Reuse field projection, not a foreign registration's schema.
+    let common = crate::compat::diagrams::flowchart::import_public_graph(g)?;
     let root = reference(&g.root)?;
     let raw_nodes = entries(g, get(g, root, "nodes"))?;
     let mut styles = std::collections::HashMap::new();
@@ -3404,14 +3419,39 @@ fn fresh_render_model(
     };
     let mut db = AgentDb::from_render_model(model);
     let graph = super::graph::build(&mut db, config);
-    if let Some(diagnostic) = db.model.diagnostics.first() {
-        return Err(ty(if diagnostic.severity == "error" {
-            "t.emitError is not a function"
-        } else if diagnostic.id == super::model::DiagnosticId::ContainmentViolation {
-            "n.emitWarning is not a function"
-        } else {
-            "t.emitWarning is not a function"
-        }));
+    // The graph builder selects diagnostics in native normalization order. A
+    // fresh database inherits the emit helpers; a plain authored model does not.
+    // Reuse the public helper body so reported deduplication, mapping aliases,
+    // descriptor failures and diagnostic-before-log effects stay identical.
+    if !db.model.diagnostics.is_empty() {
+        let mut arena = Arena::new(g);
+        for diagnostic in &db.model.diagnostics {
+            let (name, method, missing) = if diagnostic.severity == "error" {
+                ("emitError", 34, "t.emitError is not a function")
+            } else if diagnostic.id == DiagnosticId::ContainmentViolation {
+                ("emitWarning", 33, "n.emitWarning is not a function")
+            } else {
+                ("emitWarning", 33, "t.emitWarning is not a function")
+            };
+            if !native_db_method(arena.g, root, name, method) {
+                return Err(ty(missing));
+            }
+            if !native_db_method(arena.g, root, "emit", 32) {
+                return Err(ty("this.emit is not a function"));
+            }
+            let id = arena.string(diagnostic_id(diagnostic.id))?;
+            let severity = arena.string(diagnostic.severity.as_str())?;
+            let message = arena.string(diagnostic.message.as_str())?;
+            let mut fields = Vec::new();
+            if let Some(node) = &diagnostic.node_id {
+                fields.push(("nodeId", arena.string(node.as_str())?));
+            }
+            if let Some(edge) = &diagnostic.edge_id {
+                fields.push(("edgeId", arena.string(edge.as_str())?));
+            }
+            let ctx = Atom::Ref(arena.record(fields)?);
+            arena.emit(root, id, severity, message, ctx)?;
+        }
     }
     let connectors: std::collections::HashSet<_> = db
         .model

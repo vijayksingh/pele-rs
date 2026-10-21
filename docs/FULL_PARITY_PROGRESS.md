@@ -9,6 +9,13 @@ web inputs (442) and package files (118) remain bound to their recorded artifact
 See the [ordered constructor checkpoint](parity/2026-10-21-ordered-constructors/README.md).
 These checks do not establish full callback, coercion or reflection parity.
 
+The next native slice ports Agentflow's inherited raw diagnostic dispatch for
+default options. Five integrations pass, including nine pinned cases, readonly
+diagnostic-array failure/repair, shared mapping aliases and copied-helper errors.
+The projection now reads the already admitted Agentflow graph directly instead
+of validating it again as a Flowchart instance. Fresh platform verification is
+pending this layer; configured logging callbacks still require owned rendering.
+
 The earlier fifteen-factory checkpoint covered Sankey, Venn, Ishikawa,
 Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
 Journey, QuadrantChart and State. The latest seven-family extension passes nine

@@ -338,7 +338,7 @@ impl Reader<'_> {
         }
     }
 }
-fn imported(g: &ModelGraph) -> Result<FlowchartModel, PeleError> {
+pub(crate) fn imported(g: &ModelGraph) -> Result<FlowchartModel, PeleError> {
     let root = reference(&g.root)?;
     let mut r = Reader {
         g,

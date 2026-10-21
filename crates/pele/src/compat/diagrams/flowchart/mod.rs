@@ -68,6 +68,7 @@ impl DiagramModule for Flowchart {
 }
 
 mod public_model;
+pub(crate) use public_model::imported as import_public_graph;
 pub use public_model::{FlowchartPublicOrigin, FlowchartPublicState};
 
 pub(crate) use public_model::{
