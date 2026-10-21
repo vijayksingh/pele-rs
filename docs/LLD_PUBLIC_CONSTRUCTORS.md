@@ -251,3 +251,50 @@ functional parity, not complete diagnostic or constructor-reflection parity.
 No host-engine failure witness or error-message normalization was added to the
 runtime. Arbitrary Proxy producer arguments and advanced Class shared-enum
 mutation/getter behavior remain outside this feature's acceptance scope.
+
+## Web owned constructor bodies
+
+Captured factories expose immutable argument-transfer metadata separately from
+intrinsic arity. The shell passes its arguments object without enumeration. Only
+native-declared positions are read: retained values become owner-local opaque
+references; value positions transfer scalars and exact UTF-16 strings while
+objects remain opaque. Ignored positions are never inspected. ClassMember uses
+two value positions and arity two; options constructors retain one position while
+keeping their native arity zero. No host diagram-name dispatch selects this.
+
+A `PublicConstructorJob` owns provisional native state. The web bridge binds that
+state to JavaScript's already allocated receiver, retaining `newTarget` and its
+prototype. The same host-operation loop used by detached helpers drives the body.
+Each suspension publishes partial state, executes the requested host operation
+without a native borrow, observes edits, and resumes. Inherited native helpers
+called by ClassMember's virtual parser dispatch operate through the provisional
+job's ordinary invocation API. There is no second helper implementation.
+
+Completion returns the owned document and its bounded canonical result frame.
+The adapter swaps the handle inside the existing owner entry and finalizer; it
+does not replace the public receiver or aliases. A throwing virtual parser can
+therefore expose a partial receiver whose helpers remain usable. The per-job
+original-error channel wins over subsequent observation or transport failures.
+A transport failure that cannot supply the final document retires its provisional
+bridge rather than leaving an escaped receiver bound to freed native memory.
+Constructed owners never enter the parsed-document map.
+
+The provisional API supports ordinary helper invocation. Nested detached helper
+jobs or raw rendering during the constructor itself are not exposed by this
+carrier. General arbitrary Proxy/accessor reflection, modified String prototype
+methods and cross-registry constructor identity remain separate gaps. The public
+feature tests compare native argument reads, declared models and raw output with
+live pinned Pele, and exercise ClassMember's actual overridden parser calls,
+original throws, subclass identity and escaped-receiver recovery.
+
+Web acceptance uses the packed artifact (118 files, WASM
+`39801cab676c1ed541b09d1bc0e27047e34f3613c2de3993f2d71fed6e4cffc8`).
+The first focused run found Block's newly assigned warning function hidden by a
+mask bound before constructor completion. Deferring receiver mask binding until
+completion fixed that generic timing error; opaque ledger membership remains
+active throughout the body. The original failing report is preserved. The final
+51 checks pass in Chromium, Firefox and WebKit, including the new exact body
+comparisons, existing constructor semantic checks, all 33 prepared entries and
+source-initializer regressions. Runtime source (442 paths) and package hashes
+match the after-tests proof; the mask fix changed only full.js and graph.js,
+without rebuilding WASM. Existing diagnostic/reflection gaps remain explicit.

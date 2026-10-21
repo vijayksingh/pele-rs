@@ -59,6 +59,41 @@ impl PublicConstructor {
             dispatcher,
         )
     }
+    pub fn arity(&self) -> u32 {
+        self.inner.arity()
+    }
+    pub fn argument_transfers(&self) -> Vec<u32> {
+        self.inner
+            .argument_transfers()
+            .iter()
+            .map(|mode| match mode {
+                pele::compat::public::ConstructorArgumentTransfer::Retain => 0,
+                pele::compat::public::ConstructorArgumentTransfer::Value => 1,
+            })
+            .collect()
+    }
+    pub fn begin_construct(
+        &self,
+        first_tag: u32,
+        first: JsValue,
+        second_tag: u32,
+        second: JsValue,
+    ) -> Result<super::constructor_body::PublicConstructorJob, JsValue> {
+        let run = || -> Result<_, pele::compat::PeleError> {
+            let schema = super::public_result(&self.inner.schema_view());
+            let diagram_type = self.inner.diagram_type().as_str().to_owned();
+            let inner = self.inner.begin_construct_with_arguments([
+                super::detached_invocation::host_value(first_tag, &first)?,
+                super::detached_invocation::host_value(second_tag, &second)?,
+            ])?;
+            Ok(super::constructor_body::PublicConstructorJob::new(
+                inner,
+                schema,
+                diagram_type,
+            ))
+        };
+        run().map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))
+    }
     pub fn prototype_id(&self) -> u32 {
         self.inner.prototype().0
     }

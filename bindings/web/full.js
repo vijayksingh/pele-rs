@@ -360,10 +360,26 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     const tags={number:4,string:5,ref:6,builtinFunction:7,hostReference:8};return owner.value([tags[atom.kind],atom.value]);
   }
   function capturedConstructorFactory(capability, registration, rawType, liveDefinitions) {
-    return (receiver,first)=>{
-      const hostLedger=createHostLedger();
+    const transfers=typeof capability.argument_transfers==='function'?Array.from(capability.argument_transfers()):null;
+    if(transfers&&(transfers.length>2||transfers.some(mode=>mode!==0&&mode!==1)))throw new TypeError('Invalid native constructor argument metadata');
+    return (receiver,args)=>{
+      const hostLedger=createHostLedger(),construction={receiver,prototypeId:capability.prototype_id(),registration,hostLedger,liveDefinitions,deferLiveBinding:!!transfers};
+      if(transfers&&typeof capability.begin_construct==='function'){
+        const values=[[0,undefined],[0,undefined]];
+        for(let index=0;index<transfers.length;index++){
+          const value=args[index];
+          values[index]=transfers[index]===0&&value!==undefined?[5,retainHostValue(hostLedger,value)]:hostReply({hostLedger},value);
+        }
+        const job=foreignValue(()=>capability.begin_construct(...values[0],...values[1]));
+        let model;
+        try{model=adoptMutable(job,rawType,undefined,construction);}
+        catch(error){job.free();throw error;}
+        const entry=constructedDocuments.get(model);
+        return nativeModelCall(entry,()=>runDetachedInvocation(entry,job,true));
+      }
+      const first=capability.ignores_arguments()?undefined:args[0];
       const mutable=foreignValue(()=>capability.ignores_arguments()?capability.construct():capability.construct_with_host_reference(first===undefined?undefined:retainHostValue(hostLedger,first)));
-      try{return adoptMutable(mutable,rawType,undefined,{receiver,prototypeId:capability.prototype_id(),registration,hostLedger,liveDefinitions});}
+      try{return adoptMutable(mutable,rawType,undefined,construction);}
       catch(error){mutable.free();throw error;}
     };
   }
@@ -385,10 +401,14 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       rawFactories.set(prototype.id,capability);
       if(registration.constructors.has(prototype.id))continue;
       registration.constructors.set(prototype.id,capturedConstructorFactory(capability,registration,rawType,liveDefinitions));
+      if(typeof capability.arity==='function'){
+        const constructor=Object.getOwnPropertyDescriptor(registration.prototypes.get(prototype.id),'constructor').value;
+        Object.defineProperty(constructor,'length',{value:capability.arity(),configurable:true});
+      }
     }
     return ownedDefinitions;
   }
-  function runDetachedInvocation(entry,job){
+  function runDetachedInvocation(entry,job,construction=false){
     let replyState=0,valueTag=0,value,original,originalFailed=false,observationFailed=false,finishedGraph;
     const temporaryValues=new Set();
     const bridge=entry.bridge;
@@ -401,7 +421,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     acceptedBaselines.delete(entry);
     try{
       for(;;){
-        const outcome=binaryResult(()=>entry.handle.resume_detached_invocation(job,replyState,valueTag,value));
+        const outcome=binaryResult(()=>construction?job.resume(replyState,valueTag,value):entry.handle.resume_detached_invocation(job,replyState,valueTag,value));
         entry.revision=outcome.revision;
         if(outcome.result?.complete===true)break;
         const operation=outcome.result?.host;
@@ -417,16 +437,38 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         if(failed)retainFailure(thrown);
         else {replyState=1;[valueTag,value]=operation.kind==='call'&&operation.result==='retain'?[5,retainJobValue(bridge.hostLedger,returned,temporaryValues)]:hostReply(bridge,returned);}
       }
-      const outcome=binaryResult(()=>entry.handle.finish_detached_invocation(job));
+      let outcome;
+      if(construction){
+        const packet=foreignValue(()=>job.finish());
+        if(!Array.isArray(packet)||packet.length!==2||!packet[0]||typeof packet[0].snapshot_binary!=='function')throw new TypeError('Invalid native constructor completion');
+        try{outcome=binaryResult(()=>packet[1]);}catch(error){packet[0].free();throw error;}
+        // Keep the provisional receiver/owner: callbacks may already retain it.
+        // Future helpers resolve the completed handle through this same entry.
+        finalizer?.unregister(bridge.root);
+        entry.handle=packet[0];
+        finalizer?.register(bridge.root,entry.handle,bridge.root);
+        entry.unchangedApplyIsNoop=entry.handle.unchanged_public_graph_is_noop?.()===true;
+        installConstructors(entry.handle,bridge.registration,entry.rawType);
+      }else outcome=binaryResult(()=>entry.handle.finish_detached_invocation(job));
       finishedGraph=outcome.graph;
       entry.revision=outcome.revision;
       if(!observationFailed)unlocked(()=>publishMutableOutcome(entry,outcome));
       else acceptedBaselines.delete(entry);
+      if(construction)bridge.liveFields?.bind(bridge.root);
       if(originalFailed)throw original;
       if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,bridge);
-      return bridge.value(outcome.result.Ok);
+      return construction?bridge.root:bridge.value(outcome.result.Ok);
     }catch(error){if(originalFailed)throw original;throw error;}
-    finally{entry.confirmedGraph=false;entry.detachedDepth--;try{job.free();}finally{releaseJobValues(bridge.hostLedger,temporaryValues,finishedGraph);}}
+    finally{
+      entry.confirmedGraph=false;entry.detachedDepth--;
+      if(construction&&entry.handle===job){
+        // A transport failure cannot leave an escaped receiver calling freed WASM.
+        finalizer?.unregister(bridge.root);acceptedBaselines.delete(entry);
+        constructedDocuments.delete(bridge.root);rawDisposed.add(bridge.root);
+        entry.disposed=true;bridge.disposed=true;releaseDisposedBridge(bridge);
+      }
+      try{job.free();}finally{if(bridge.hostLedger)releaseJobValues(bridge.hostLedger,temporaryValues,finishedGraph);}
+    }
   }
   function adoptMutable(mutable, preparedType, existingBridge, construction) {
           let sourceSnapshot;
@@ -455,6 +497,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           entry.sourceIngressIdentity=snapshot.graph instanceof LayoutGraph&&typeof mutable.apply_source_input==='function'
             ?mutable.source_ingress_identity?.():undefined;
           const invoke = (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
+            const mutable=entry.handle;
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             bridge.liveFields?.bind(receiver,method);
             const input = prepareMutableInput(entry, [receiver, ...argumentsValue]);
@@ -471,7 +514,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
           });
-          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration,rootBinding,construction?.hostLedger,construction?.liveDefinitions);
+          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration,rootBinding,construction?.hostLedger,construction?.liveDefinitions,construction?.deferLiveBinding);
           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
           entry.confirmedGraph = true;

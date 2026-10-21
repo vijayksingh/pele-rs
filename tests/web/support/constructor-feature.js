@@ -3,10 +3,11 @@ const view=new DataView(new ArrayBuffer(8));
 const bits=n=>{view.setFloat64(0,n);return view.getBigUint64(0).toString(16).padStart(16,'0');};
 const error=e=>e?.name==='PeleError'?{name:e.name,message:e.message,code:e.code,type:e.type??null,line:e.line??0,column:e.column??0,snippet:e.snippet??''}:{name:e?.name,message:e?.message};
 const caught=run=>{try{run();return null;}catch(e){return error(e);}};
-const arg=v=>v&&typeof v==='object'?v.array?v.array.map(arg):Object.fromEntries(v.object.map(([k,x])=>[k,arg(x)])):v;
-function graph(root,prototype,result){
+const arg=v=>v&&typeof v==='object'?v.undefined?undefined:v.array?v.array.map(arg):Object.fromEntries(v.object.map(([k,x])=>[k,arg(x)])):v;
+function graph(root,prototype,result,opaque){
   const nodes=[],ids=new Map();
   function atom(v){
+    if(opaque!==undefined&&v===opaque)return ['host','options'];
     if(v===undefined)return['undefined'];if(v===null)return['null'];if(typeof v==='string')return['string',v];if(typeof v==='number')return['number',bits(v)];if(typeof v==='boolean')return['bool',v];if(typeof v==='function')return['function',v.length];
     if(ids.has(v))return['ref',ids.get(v)];if(typeof v!=='object')throw Error('Unexpected constructor graph atom');
     const id=nodes.length;ids.set(v,id);const n={kind:Array.isArray(v)?'array':v instanceof Map?'map':v instanceof Set?'set':Object.getPrototypeOf(v)!==Object.prototype&&Object.getPrototypeOf(v)!==null?'instance':'object',properties:[]};nodes.push(n);

@@ -24,7 +24,7 @@ fn token(value: &JsValue) -> Result<u32, PeleError> {
     }
     Ok(n as u32)
 }
-fn host_value(tag: u32, value: &JsValue) -> Result<PublicHostValue, PeleError> {
+pub(super) fn host_value(tag: u32, value: &JsValue) -> Result<PublicHostValue, PeleError> {
     Ok(match tag {
         0 => PublicHostValue::Undefined,
         1 => PublicHostValue::Null,
@@ -95,44 +95,11 @@ impl MutableDocument {
         value: JsValue,
     ) -> Result<Vec<u8>, JsValue> {
         let mut run = || -> Result<Vec<u8>, PeleError> {
-            let reply = match reply_state {
-                0 => None,
-                1 => Some(Ok(host_value(value_tag, &value)?)),
-                2 => Some(Err(PublicError::HostException(HostExceptionToken(token(
-                    &value,
-                )?)))),
-                _ => return Err(invalid("Invalid host reply state")),
-            };
+            let reply = host_reply(reply_state, value_tag, &value)?;
             let step = self
                 .inner
                 .resume_detached_invocation(&mut job.inner, reply)?;
-            let metadata = match step {
-                DetachedInvocationStep::Complete => serde_json::json!({"complete":true}),
-                DetachedInvocationStep::Host(PublicHostOperation::GreaterEqual { left, right }) => {
-                    serde_json::json!({"host":{"kind":"greaterEqual","left":left,"right":right}})
-                }
-                DetachedInvocationStep::Host(PublicHostOperation::StrictEqual { left, right }) => {
-                    serde_json::json!({"host":{"kind":"strictEqual","left":left,"right":right}})
-                }
-                DetachedInvocationStep::Host(PublicHostOperation::ToString { value }) => {
-                    serde_json::json!({"host":{"kind":"toString","value":value}})
-                }
-                DetachedInvocationStep::Host(PublicHostOperation::Truthy { value }) => {
-                    serde_json::json!({"host":{"kind":"truthy","value":value}})
-                }
-                DetachedInvocationStep::Host(PublicHostOperation::Get { receiver, key }) => {
-                    serde_json::json!({"host":{"kind":"get","receiver":receiver,"key":key}})
-                }
-                DetachedInvocationStep::Host(PublicHostOperation::Call {
-                    function,
-                    receiver,
-                    arguments,
-                    not_callable_error,
-                    result,
-                }) => {
-                    serde_json::json!({"host":{"kind":"call","function":function,"receiver":receiver,"arguments":arguments,"notCallableError":not_callable_error,"result":match result {PublicHostResult::Discard=>"discard",PublicHostResult::Retain=>"retain",PublicHostResult::Value=>"value"}}})
-                }
-            };
+            let metadata = step_metadata(step);
             let metadata = render_numbers::encode(&metadata)?;
             let graph = self.inner.snapshot_read()?.into_model()?;
             pele::compat::public::encode_binary_exchange(
@@ -160,5 +127,52 @@ impl MutableDocument {
             )
         };
         run().map_err(failure)
+    }
+}
+
+pub(super) fn host_reply(
+    reply_state: u32,
+    value_tag: u32,
+    value: &JsValue,
+) -> Result<Option<Result<PublicHostValue, PublicError>>, PeleError> {
+    let reply = match reply_state {
+        0 => None,
+        1 => Some(Ok(host_value(value_tag, value)?)),
+        2 => Some(Err(PublicError::HostException(HostExceptionToken(token(
+            value,
+        )?)))),
+        _ => return Err(invalid("Invalid host reply state")),
+    };
+
+    Ok(reply)
+}
+
+pub(super) fn step_metadata(step: DetachedInvocationStep) -> serde_json::Value {
+    match step {
+        DetachedInvocationStep::Complete => serde_json::json!({"complete":true}),
+        DetachedInvocationStep::Host(PublicHostOperation::GreaterEqual { left, right }) => {
+            serde_json::json!({"host":{"kind":"greaterEqual","left":left,"right":right}})
+        }
+        DetachedInvocationStep::Host(PublicHostOperation::StrictEqual { left, right }) => {
+            serde_json::json!({"host":{"kind":"strictEqual","left":left,"right":right}})
+        }
+        DetachedInvocationStep::Host(PublicHostOperation::ToString { value }) => {
+            serde_json::json!({"host":{"kind":"toString","value":value}})
+        }
+        DetachedInvocationStep::Host(PublicHostOperation::Truthy { value }) => {
+            serde_json::json!({"host":{"kind":"truthy","value":value}})
+        }
+        DetachedInvocationStep::Host(PublicHostOperation::Get { receiver, key }) => {
+            serde_json::json!({"host":{"kind":"get","receiver":receiver,"key":key}})
+        }
+        DetachedInvocationStep::Host(PublicHostOperation::Call {
+            function,
+            receiver,
+            arguments,
+            not_callable_error,
+            result,
+        }) => {
+            serde_json::json!({"host":{"kind":"call","function":function,"receiver":receiver,"arguments":arguments,"notCallableError":not_callable_error,"result":match result {PublicHostResult::Discard=>"discard",PublicHostResult::Retain=>"retain",PublicHostResult::Value=>"value"}}})
+        }
     }
 }

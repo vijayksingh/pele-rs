@@ -66,7 +66,7 @@ export class ModelRegistry {
       const constructor = class { constructor() {
         const construct=registration.constructors.get(prototype.id);
         if(!construct)throw new TypeError('Public model construction is unavailable');
-        construct(this,arguments[0]);
+        construct(this,arguments);
       }};
       Object.defineProperty(constructor, 'name', {value: prototype.name, configurable: true});
       const value=constructor.prototype;
@@ -93,7 +93,7 @@ export class ModelRegistry {
   }
 }
 export class ModelBridge {
-  constructor(graph, schema, registry, invoke, prevalidatedRegistration, rootBinding, hostLedger, liveDefinitions) {
+  constructor(graph, schema, registry, invoke, prevalidatedRegistration, rootBinding, hostLedger, liveDefinitions, deferLiveBinding=false) {
     const publication=invalidateBridgeObservation(this);
     this.registry = registry;
     if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || registry.schemas.get(`${schema.id}:${schema.version}`) !== prevalidatedRegistration)) throw new TypeError('Invalid prevalidated model registration');
@@ -113,7 +113,7 @@ export class ModelBridge {
     if(graph instanceof LayoutGraph)Object.assign(this,layoutMethods);
     if (graph instanceof LayoutGraph && tryInitializeSourceLayout(this,graph)) completeBridgePublication(this,graph,publication);
     else this.reconcile(graph);
-    if(liveDefinitions?.length){this.liveFields=new LiveFieldBindings(this,liveDefinitions);this.liveFields.bind(this.root);}
+    if(liveDefinitions?.length){this.liveFields=new LiveFieldBindings(this,liveDefinitions);if(!deferLiveBinding)this.liveFields.bind(this.root);}
   }
   reconcile(graph, changed) {
     return reconcileGraph(this, graph, changed);
