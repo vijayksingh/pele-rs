@@ -34,6 +34,7 @@ enum ReadCommand {
     ShallowCopy = 6,
     MapGet = 7,
     ObjectIdentity = 8,
+    ArrayJoin = 9,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -130,6 +131,23 @@ impl LiveRenderRead for Reader {
     }
     fn map_get(&mut self, receiver: &JsValue, key: &JsValue) -> Result<JsValue, PublicError> {
         self.call(ReadCommand::MapGet, receiver, key, 0)
+    }
+    fn map_get_text(&mut self, receiver: &JsValue, key: &str) -> Result<JsValue, PublicError> {
+        self.call(ReadCommand::MapGet, receiver, &JsValue::from_str(key), 0)
+    }
+    fn array_join(&mut self, receiver: &JsValue, separator: &str) -> Result<JsString, PublicError> {
+        let result = self.call(
+            ReadCommand::ArrayJoin,
+            receiver,
+            &JsValue::from_str(separator),
+            0,
+        )?;
+        if result.is_null() {
+            return Err(
+                PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        Self::units(&result)?.ok_or_else(|| invalid("Invalid live array join reply").into())
     }
     fn object_identity(&mut self, value: &JsValue) -> Result<Option<u64>, PublicError> {
         let identity = self.call(ReadCommand::ObjectIdentity, value, &JsValue::UNDEFINED, 0)?;

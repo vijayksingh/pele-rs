@@ -2,6 +2,39 @@
 // and render phase; this adapter supplies ordinary JavaScript value operations.
 // Typed operands avoid converting the same control strings on every property
 // read. The callback itself remains job-local and owns original thrown values.
+// Native live-read scope: ordinary arrays with scalar own data entries. Check
+// retained UTF-16 size before joining; repeated references to one large string
+// must not create an unchecked product allocation. Exotic joins/accessors are
+// explicit unsupported cases, never invoked as part of this preflight.
+const intrinsicArrayJoin = Array.prototype.join;
+function boundedOrdinaryJoin(value, separator) {
+  const unsupported = () => { throw new TypeError('Live array join requires ordinary scalar data entries'); };
+  if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype ||
+      Object.getOwnPropertyDescriptor(value, 'join') !== undefined ||
+      Object.getOwnPropertyDescriptor(Array.prototype, 'join')?.value !== intrinsicArrayJoin ||
+      typeof separator !== 'string') unsupported();
+  const length = Object.getOwnPropertyDescriptor(value, 'length')?.value;
+  if (!Number.isSafeInteger(length) || length < 0) unsupported();
+  if (length > 1_000_000) return null;
+  const parts = [];
+  let units = 0;
+  for (let index = 0; index < length; index++) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, index);
+    if (descriptor !== undefined && !Object.hasOwn(descriptor, 'value')) unsupported();
+    // A hole is empty only without inherited indexed data/accessors.
+    if (descriptor === undefined && index in value) unsupported();
+    const item = descriptor?.value;
+    let text;
+    if (item === undefined || item === null) text = '';
+    else if (typeof item === 'string') text = item;
+    else if (typeof item === 'number' || typeof item === 'boolean') text = `${item}`;
+    else unsupported();
+    units += (index === 0 ? 0 : separator.length) + text.length;
+    if (units > 16_000_000) return null;
+    parts.push(text);
+  }
+  return Reflect.apply(intrinsicArrayJoin, parts, [separator]);
+}
 export function executeLiveRead(read, operation, value, key, context) {
   return read(operation, value, key, context);
 }
@@ -16,6 +49,7 @@ export function liveRenderRead(capture) {
         case 5: return key in value;
         case 6: return {...value};
         case 7: return value.get(key);
+        case 9: return boundedOrdinaryJoin(value, key);
         case 8: {
           if ((typeof value !== 'object' || value === null) && typeof value !== 'function') return undefined;
           const existing = identities.get(value);
@@ -37,7 +71,16 @@ export function liveRenderRead(capture) {
           if (typeof value === 'string') return value;
           // Run the pinned first string operation in this engine. In particular,
           // do not stringify a missing or numeric label and hide its TypeError.
-          if (key !== 'includes') throw new TypeError('Unknown live string operation');
+          const receiver = value;
+          switch (key) {
+            case 'trim': return receiver.trim();
+            case 'split': return receiver.split(" ");
+            case 'toLowerCase': return receiver.toLowerCase();
+            case 'indexOf': return receiver.indexOf(":");
+            case 'replace': return receiver.replace("", "");
+            case 'includes': break;
+            default: throw new TypeError('Unknown live string operation');
+          }
           if (context === 1) { const t = value; t.includes("&"); }
           else { const e = value, vx = "¶ß"; e.includes(vx); }
           return value;

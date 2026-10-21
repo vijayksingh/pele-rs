@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Er,
     Mindmap,
     Treemap,
     Kanban,
@@ -42,6 +43,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn er() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::er::Er>(),
+            kind: Kind::Er,
+        }
+    }
+
     pub(crate) fn mindmap() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::mindmap::Mindmap>(),
@@ -147,6 +155,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Er(crate::compat::diagrams::er::ErDetachedInput),
     Mindmap(crate::compat::diagrams::mindmap::MindmapDetachedInput),
     Treemap(crate::compat::diagrams::treemap::TreemapDetachedInput),
     Kanban(crate::compat::diagrams::kanban::KanbanDetachedInput),
@@ -163,6 +172,13 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn er(input: crate::compat::diagrams::er::ErDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::er::Er>(),
+            body: Body::Er(input),
+        }
+    }
+
     pub(crate) fn mindmap(input: crate::compat::diagrams::mindmap::MindmapDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::mindmap::Mindmap>(),
@@ -266,6 +282,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Er(_) => Kind::Er,
             Body::Mindmap(_) => Kind::Mindmap,
             Body::Treemap(_) => Kind::Treemap,
             Body::Kanban(_) => Kind::Kanban,
@@ -294,6 +311,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Er(input) => crate::compat::diagrams::er::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Mindmap(input) => crate::compat::diagrams::mindmap::render_detached(
                 input, config, settings, read, resources,
             ),

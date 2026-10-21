@@ -10,10 +10,10 @@
 //! capabilities rather than an embedded JavaScript runtime.
 use super::*;
 use crate::compat::public::{
-    Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString, MemberKind,
-    MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property,
-    PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId,
-    RecordKind, RecordSchema,
+    Atom, DetachedPublicRender, DetachedRenderCapability, FieldKind, FieldSchema, GraphWriter,
+    JavaScriptErrorKind, JsString, MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema,
+    ModelGraph, ModelSchema, Node, Property, PrototypeId, PrototypeParent, PrototypeSchema,
+    PublicDiagramModule, PublicError, RecordId, RecordKind, RecordSchema,
 };
 use crate::compat::ErrorCode;
 use std::collections::{HashMap, HashSet};
@@ -772,6 +772,19 @@ impl PublicDiagramModule for Er {
         let result = Context::new(&mut s.graph).invoke(c);
         s.model.take();
         result
+    }
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::er())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::er(super::ErDetachedInput::new(
+            state
+                .model
+                .get_or_init(|| imported(&state.graph))
+                .as_ref()
+                .err()
+                .cloned(),
+        )))
     }
     fn render_public(
         &self,

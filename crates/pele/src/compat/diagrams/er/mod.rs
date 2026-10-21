@@ -39,7 +39,9 @@ impl DiagramModule for Er {
 mod public_model;
 pub use public_model::ErPublicState;
 
+mod live_phase;
 mod live_read;
+pub(crate) use live_phase::{render_detached, ErDetachedInput};
 #[cfg(feature = "web-host-er")]
 #[doc(hidden)]
 pub use live_read::{render_store, RenderStore};

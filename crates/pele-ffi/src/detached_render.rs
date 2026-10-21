@@ -184,6 +184,78 @@ impl LiveRenderRead for Reader {
     fn index(&mut self, value: &Value, index: usize) -> Result<Value, PublicError> {
         self.field(value, &index.to_string())
     }
+    fn map_get_text(&mut self, value: &Value, key: &str) -> Result<Value, PublicError> {
+        self.map_get(value, &Value::String(Arc::new(JsString::from(key))))
+    }
+    fn array_join(&mut self, value: &Value, separator: &str) -> Result<JsString, PublicError> {
+        let length = match value {
+            Value::Sequence(values) => values.len(),
+            Value::Atom(Atom::Ref(id)) => {
+                // The guard ends before scalar conversion/index operations.
+                let document = unsafe { public::document(self.owner) }?;
+                let graph = document.snapshot_read()?;
+                let read = graph.reader();
+                let header = read.header(*id as usize)?;
+                let GraphNodeKind::Array(length) = header.kind else {
+                    return Err(type_error("value.join is not a function".into()));
+                };
+                let mut start = 0;
+                while start < header.properties {
+                    let mut count = 0;
+                    let mut shadowed = false;
+                    read.properties(*id as usize, start, &mut |properties| {
+                        count = properties.len();
+                        for property in properties {
+                            if string(read, property.key)?.is("join") {
+                                shadowed = true;
+                                break;
+                            }
+                        }
+                        Ok(())
+                    })?;
+                    if shadowed {
+                        return Err(
+                            invalid("Native live Array join override is not implemented").into(),
+                        );
+                    }
+                    if count == 0 || count > header.properties - start {
+                        return Err(invalid("Invalid captured property batch").into());
+                    }
+                    start += count;
+                }
+                length as usize
+            }
+            _ => return Err(type_error("value.join is not a function".into())),
+        };
+        if length > 1_000_000 || separator.len() > 16_000_000 {
+            return Err(
+                PeleError::new("Live array join exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        let separator = JsString::from(separator);
+        let mut units = Vec::new();
+        for index in 0..length {
+            let value = self.index(value, index)?;
+            let text = if matches!(value, Value::Atom(Atom::Undefined | Atom::Null)) {
+                JsString(vec![])
+            } else {
+                self.to_string(&value)?
+            };
+            let sep = if index == 0 { 0 } else { separator.0.len() };
+            if units.len().saturating_add(sep).saturating_add(text.0.len()) > 16_000_000 {
+                return Err(PeleError::new(
+                    "Live array join exceeds work budget",
+                    ErrorCode::Limit,
+                )
+                .into());
+            }
+            if index != 0 {
+                units.extend_from_slice(&separator.0);
+            }
+            units.extend_from_slice(&text.0);
+        }
+        Ok(JsString(units))
+    }
     fn object_identity(&mut self, value: &Value) -> Result<Option<u64>, PublicError> {
         let key = match value {
             Value::Atom(Atom::Ref(id)) => return Ok(Some(u64::from(*id))),

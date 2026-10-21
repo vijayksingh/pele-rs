@@ -8,21 +8,20 @@ use super::{
     graph::{self, Edge, Node},
     model::{ErAttribute, ErModel},
 };
-use crate::compat::PeleError;
 #[cfg(feature = "web-host-er")]
+use crate::compat::ErrorCode;
+use crate::compat::PeleError;
 use crate::compat::{
     public::{Atom, JsString},
     source::space,
-    ErrorCode, Object, RenderResources, RenderSettings, Rendered,
+    Object, RenderResources, RenderSettings, Rendered,
 };
 use std::borrow::Cow;
-#[cfg(feature = "web-host-er")]
 use std::collections::{HashMap, HashSet};
 
 /// Private browser-store vocabulary, exported only through the hidden adapter.
 /// No primitive may retain a Rust borrow/guard while invoking JavaScript.
 /// Collection/string primitives must check bounds before allocating results.
-#[cfg(feature = "web-host-er")]
 pub trait RenderStore {
     fn root(&self) -> Atom;
     fn field(&self, receiver: &Atom, key: &str) -> Result<Atom, PeleError>;
@@ -53,7 +52,6 @@ pub(super) enum CellField {
     Name,
     Comment,
 }
-#[cfg(feature = "web-host-er")]
 impl CellField {
     fn key(self) -> &'static str {
         match self {
@@ -179,13 +177,11 @@ impl<'m> ErRead for TypedRead<'m> {
     }
 }
 
-#[cfg(feature = "web-host-er")]
 #[derive(Clone)]
 pub(super) enum HostScalar {
     Captured(Atom),
     Text(String),
 }
-#[cfg(feature = "web-host-er")]
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub(super) enum RenderKey {
     Undefined,
@@ -197,12 +193,10 @@ pub(super) enum RenderKey {
     Function(u32),
     Host(u32),
 }
-#[cfg(feature = "web-host-er")]
 struct HostRead<'a, S: RenderStore + ?Sized> {
     store: &'a S,
     root: Atom,
 }
-#[cfg(feature = "web-host-er")]
 impl<S: RenderStore + ?Sized> HostRead<'_, S> {
     fn atom_key(&self, value: &Atom) -> Result<RenderKey, PeleError> {
         Ok(match value {
@@ -319,7 +313,6 @@ impl<S: RenderStore + ?Sized> HostRead<'_, S> {
     }
 }
 
-#[cfg(feature = "web-host-er")]
 impl<S: RenderStore + ?Sized> ErRead for HostRead<'_, S> {
     type Attributes = Atom;
     type Styles = Atom;
@@ -564,6 +557,16 @@ pub fn render_store<S: RenderStore + ?Sized>(
             ErrorCode::Semantic,
         ));
     }
+    render_owned_store(store, config, options, resources)
+}
+/// Internal native entry. Uses the existing renderer's presentation policy;
+/// the old browser export above still refuses native presentation capture.
+pub(super) fn render_owned_store<S: RenderStore + ?Sized>(
+    store: &S,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, PeleError> {
     let input = HostRead {
         store,
         root: store.root(),

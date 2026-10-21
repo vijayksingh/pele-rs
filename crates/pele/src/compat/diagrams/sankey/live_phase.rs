@@ -66,6 +66,26 @@ pub trait LiveRenderRead {
     ) -> Result<Self::Value, PublicError> {
         Err(PeleError::new("Live map lookup is not implemented", ErrorCode::Semantic).into())
     }
+    /// Dynamic map.get with a native string key, without diagram interpretation.
+    fn map_get_text(
+        &mut self,
+        _receiver: &Self::Value,
+        _key: &str,
+    ) -> Result<Self::Value, PublicError> {
+        Err(PeleError::new(
+            "Live string-key map lookup is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    /// Ordinary Array.join, bounded before retaining the resulting UTF16 value.
+    fn array_join(
+        &mut self,
+        _receiver: &Self::Value,
+        _separator: &str,
+    ) -> Result<JsString, PublicError> {
+        Err(PeleError::new("Live array join is not implemented", ErrorCode::Semantic).into())
+    }
     /// Stable opaque identity within this job; no coercion or object traversal.
     /// Native graph references retain the existing graph-coordinate domain.
     fn object_identity(&mut self, value: &Self::Value) -> Result<Option<u64>, PublicError> {
