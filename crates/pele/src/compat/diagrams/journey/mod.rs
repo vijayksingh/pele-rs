@@ -1,4 +1,6 @@
 //! Pele diagrams/journey/{index,db,lexer,parser,render}.ts, 458322a5 (MIT, kepano).
+mod live_phase;
+pub(crate) use live_phase::{render_detached, JourneyDetachedInput};
 mod parser;
 mod public_model;
 pub use public_model::JourneyPublicState;

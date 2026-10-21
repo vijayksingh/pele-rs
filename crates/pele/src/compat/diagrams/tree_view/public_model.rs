@@ -405,6 +405,14 @@ impl PublicDiagramModule for TreeView {
         s.graph = g;
         Ok(())
     }
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::tree_view())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::tree_view(
+            super::TreeViewDetachedInput::new(state.cache.as_ref().err().cloned()),
+        ))
+    }
     fn render_public(
         &self,
         s: &mut TreeViewPublicState,

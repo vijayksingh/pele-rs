@@ -20,6 +20,8 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    TreeView,
+    Journey,
     Timeline,
     Ishikawa,
     Venn,
@@ -37,6 +39,19 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn tree_view() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::tree_view::TreeView>(),
+            kind: Kind::TreeView,
+        }
+    }
+
+    pub(crate) fn journey() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::journey::Journey>(),
+            kind: Kind::Journey,
+        }
+    }
     pub(crate) fn timeline() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::timeline::Timeline>(),
@@ -108,6 +123,8 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    TreeView(crate::compat::diagrams::tree_view::TreeViewDetachedInput),
+    Journey(crate::compat::diagrams::journey::JourneyDetachedInput),
     Timeline(crate::compat::diagrams::timeline::TimelineDetachedInput),
     Ishikawa(IshikawaDetachedInput),
     Venn(crate::compat::diagrams::venn::VennDetachedInput),
@@ -119,6 +136,21 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn tree_view(
+        input: crate::compat::diagrams::tree_view::TreeViewDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::tree_view::TreeView>(),
+            body: Body::TreeView(input),
+        }
+    }
+
+    pub(crate) fn journey(input: crate::compat::diagrams::journey::JourneyDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::journey::Journey>(),
+            body: Body::Journey(input),
+        }
+    }
     pub(crate) fn timeline(
         input: crate::compat::diagrams::timeline::TimelineDetachedInput,
     ) -> Self {
@@ -186,8 +218,10 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::TreeView(_) => Kind::TreeView,
             Body::Timeline(_) => Kind::Timeline,
             Body::Ishikawa(_) => Kind::Ishikawa,
+            Body::Journey(_) => Kind::Journey,
             Body::Venn(_) => Kind::Venn,
             Body::Quadrant(_) => Kind::Quadrant,
             Body::Radar(_) => Kind::Radar,
@@ -209,7 +243,13 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::TreeView(input) => crate::compat::diagrams::tree_view::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Timeline(input) => crate::compat::diagrams::timeline::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Journey(input) => crate::compat::diagrams::journey::render_detached(
                 input, config, settings, read, resources,
             ),
             Body::Ishikawa(input) => crate::compat::diagrams::ishikawa::render_detached(
