@@ -1,5 +1,8 @@
 # Library architecture
 
+[Owned runtime completion](LLD_OWNED_RUNTIME_COMPLETION.md) consolidates the
+shared callback phases and [native opaque host access](LLD_NATIVE_OPAQUE_HOST_ACCESS.md).
+
 The engine implements all 33 pinned Pele diagram families. The old standalone
 flowchart renderer and its v1 JSON, C, Swift and web APIs have been removed.
 

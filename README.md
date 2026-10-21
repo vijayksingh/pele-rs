@@ -18,21 +18,21 @@ v1-only engine and wrappers are removed. A new release remains on hold while the
 web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
-**The full API port is unfinished.** All 33 families now have owned callback
-render paths, and the fresh web edit/throw audit matches **33/33** cases. All 22
-class-root factories plus ClassMember have Rust, Swift and web feature proof.
-Constructed-model logging, iterable edge cases, constructor reflection and exact
-browser error expressions remain active API work. See the
-[constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md).
+**Functional port verified in Rust, Swift and packed WebAssembly.** The current
+checkpoint passes **99 Swift integration tests**, **seven strict C clients** and
+**387 browser checks** (129 each in Chromium, Firefox and WebKit). The public
+runtime audit matches Pele for **33/33 families**; all 22 class-root constructors
+and ClassMember are implemented. Packed type exports cover all 33 model names.
 
-The latest checkpoint verifies 55 native features, 44 distinct Swift features and
-four strict C clients against fresh artifacts. Browsers pass 201 distinct checks
-across 207 attempted; six exact TypeError-message checks remain. The new matrices
-record 987 paired browser cases, with two WebKit warning rows differing only in
-error text. [Evidence, repairs and retained failures](docs/parity/2026-10-21-owned-remaining-families/README.md).
-These counts describe scoped behavior, not full API parity. Passing tests also
-include explicit unsupported-behavior checks; see the
-[remaining-work audit](docs/parity/2026-10-21-runtime-audit/README.md).
+Constructors, mutable helpers, live callbacks, original errors, retained iterables,
+calendar resources and native presentation use shared Rust operations. The latest
+batch also fixes XYChart's NaN loop termination. [Results, source/artifact hashes
+and retained failures](docs/parity/2026-10-21-api-completion/README.md) include
+scope and limitations. Firefox's unstable intrinsic constructor key order is
+recorded separately; names, arity, descriptors, class identity and original errors
+remain checked. General JavaScript metaprogramming is outside this acceptance.
+See the [constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md) and
+[owned runtime contract](docs/LLD_OWNED_RUNTIME_COMPLETION.md).
 
 Native normal/prepared Sankey resource callbacks support same-document helpers,
 edits and nested rendering. [Scoped verification](docs/parity/2026-10-21-native-sankey-callbacks/README.md)

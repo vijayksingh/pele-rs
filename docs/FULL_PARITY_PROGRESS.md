@@ -1,4 +1,17 @@
-# Current functional parity — incomplete (2026-10-21)
+# Current functional parity checkpoint (2026-10-21)
+
+All 33 diagram modules are implemented for native Rust, Swift and WebAssembly.
+Fresh coordinated acceptance passes 99 Swift features across 55 classes, seven
+strict C clients and 387 browser checks (129 per engine). Package type exports
+and the 33/33 public runtime audit pass. Constructor/helper/callback/resource
+work is implemented; XYChart's NaN iteration bug is corrected in shared Rust.
+
+[Current evidence](parity/2026-10-21-api-completion/README.md) preserves original
+failures, exact source/SDK/package hashes and the Firefox intrinsic-order scope.
+This is declared functional API acceptance, not universal JavaScript behavior or
+performance parity. Version 0.3 remains unreleased pending the performance gate.
+
+## Previous owned-family checkpoint
 
 All 33 families now expose owned callback rendering. The fresh edit/throw audit
 matches 33/33 cases; all 22 class-root factories construct. Current checkpoint:

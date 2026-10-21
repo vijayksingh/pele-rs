@@ -9,6 +9,50 @@ Fresh Rust, Swift/C and three-browser verification is recorded in the
 [ordered constructor checkpoint](parity/2026-10-21-ordered-constructors/README.md).
 Factory coverage does not establish full public API parity.
 
+## Current source status
+
+Source `0eeba91` implements the ordinary constructor and owned-operation slices
+described below. Fresh-artifact acceptance passes 99 Swift features, seven C
+clients and 387 browser checks; [exact evidence](parity/2026-10-21-api-completion/README.md)
+records platform identities and limitations. The earlier sections
+retain checkpoint-specific evidence and limitations; this status supersedes
+their claims that constructor reflection, cross-renderer class sharing,
+constructed Agentflow logging or original clock exceptions are unimplemented.
+
+The authenticated native factory catalog supplies artifact-specific names, arity
+and class identity. Thin web shells preserve the allocated receiver, subclass
+`newTarget` and the pinned artifact realm. Reflection registrations are sealed
+and bound to the captured native schema; copied schema/name metadata cannot
+grant builtin authority. Default ER publication receives the capability from its
+selected retained registration before creating public objects.
+
+Constructed Agentflow uses the shared staged graph builder and commits a cache
+only after successful completion. Diagnostic callbacks retain partial edits; a
+completed nested cache survives an outer failure. C20 lets the native owned
+renderer read and call Swift opaque constructor values without enumerating them
+or holding a document borrow. Gantt parse/today and scheduler callbacks use the
+same owned Resource operation and allocate returned Dates in the latest graph.
+
+Firefox can expose different intrinsic constructor property orders for identical
+pinned Pele copies. Only that constructor ordering is excluded there; other
+reflection checks and Chromium/WebKit ordering remain strict. Raw upstream
+controls are retained in the checkpoint.
+
+These additions preserve the existing constructed-owner/raw-render distinction: a
+constructed model does not become a parsed core document. General Proxy/accessor
+metaprogramming, modified String prototype behavior, advanced mutable Class enum
+semantics, and raw rendering inside a provisional constructor body are not
+blanket compatibility claims. Native graph coordinates cannot reconstruct
+JavaScript deletion/reinsertion history absent from an applied snapshot.
+
+See [owned runtime completion](LLD_OWNED_RUNTIME_COMPLETION.md),
+[detached rendering](LLD_DETACHED_RENDER.md), and
+[native opaque host access](LLD_NATIVE_OPAQUE_HOST_ACCESS.md). Final acceptance
+counts and artifact hashes must come from the new platform logs, not earlier
+constructor checkpoints.
+
+## Factory contract
+
 `PublicEngine::capture_constructor(&DiagramId, PrototypeId)` returns an optional
 `CapturedPublicConstructor`. `PublicDocument::capture_constructor(PrototypeId)`
 captures from that document's retained registration. Both use concrete creator
