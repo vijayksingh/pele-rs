@@ -20,6 +20,7 @@ pub(super) enum Flag {
 /// Public storage writes immediately, including writes preceding an error.
 pub(super) trait Store {
     type Task: Clone;
+    type TaskIterator;
     type Date: Clone;
     type Token: Clone;
     type Error: From<PeleError>;
@@ -48,6 +49,11 @@ pub(super) trait Store {
     fn date_format(&mut self) -> Result<String, Self::Error>;
     fn inclusive(&mut self) -> Result<bool, Self::Error>;
     fn tasks(&mut self) -> Result<Vec<Self::Task>, Self::Error>;
+    fn task_iterator(&mut self) -> Result<Self::TaskIterator, Self::Error>;
+    fn next_task(
+        &mut self,
+        iterator: &mut Self::TaskIterator,
+    ) -> Result<Option<Self::Task>, Self::Error>;
     fn previous(&mut self, task: &Self::Task) -> Result<Option<Self::Task>, Self::Error>;
     fn lookup(&mut self, id: &str) -> Result<Option<Self::Task>, Self::Error>;
     fn raw_start(&mut self, task: &Self::Task) -> Result<Option<String>, Self::Error>;
@@ -82,34 +88,46 @@ pub(super) fn spend<S: Store>(s: &mut S, units: f64) -> Result<(), S::Error> {
     }
     Ok(())
 }
+pub(super) fn parse_request<S: Store>(
+    s: &mut S,
+    text: String,
+    template: String,
+) -> Result<CalendarRequest, S::Error> {
+    s.method("parse")?;
+    spend(
+        s,
+        (template.encode_utf16().count() + 1) as f64 * (text.encode_utf16().count() + 1) as f64,
+    )?;
+    Ok(CalendarRequest::Parse {
+        text,
+        template,
+        now: s.now()?,
+    })
+}
+pub(super) fn today_request<S: Store>(s: &mut S) -> Result<CalendarRequest, S::Error> {
+    s.method("today")?;
+    Ok(CalendarRequest::Today(s.now()?))
+}
 pub(super) fn parse<S: Store>(
     s: &mut S,
     text: &str,
     template: &str,
     cal: &mut Calendar<'_>,
 ) -> Result<Option<S::Date>, S::Error> {
-    s.method("parse")?;
-    spend(
-        s,
-        (template.encode_utf16().count() + 1) as f64 * (text.encode_utf16().count() + 1) as f64,
-    )?;
-    let now = s.now()?;
-    let parsed = cal.parse_strict(text, template, now);
-    cal.check().map_err(S::Error::from)?;
+    let request = parse_request(s, text.to_owned(), template.to_owned())?;
+    let parsed = request.run(cal).map_err(S::Error::from)?.number();
     parsed.map(|ms| s.date(ms)).transpose()
 }
 pub(super) fn today<S: Store>(s: &mut S, cal: &mut Calendar<'_>) -> Result<S::Date, S::Error> {
-    s.method("today")?;
-    let now = s.now()?;
-    let value = cal.today(now);
-    cal.check().map_err(S::Error::from)?;
+    let request = today_request(s)?;
+    let value = request
+        .run(cal)
+        .map_err(S::Error::from)?
+        .number()
+        .expect("today returns a date");
     s.date(value)
 }
-pub(super) fn schedule<S: Store>(
-    s: &mut S,
-    now: f64,
-    cal: &mut Calendar<'_>,
-) -> Result<(), S::Error> {
+fn prepare_schedule<S: Store>(s: &mut S, now: f64) -> Result<(), S::Error> {
     s.method("getTasks")?;
     s.set_now(now)?;
     s.set_work(0.)?;
@@ -148,68 +166,48 @@ pub(super) fn schedule<S: Store>(
         s.set_flag(&task, Flag::ManualEnd, false)?;
         s.set_flag(&task, Flag::Processed, false)?;
     }
-    let mut all = compile_tasks(s, cal)?;
-    for _ in 0..10 {
-        if all {
-            break;
-        }
-        all = compile_tasks(s, cal)?;
-    }
     Ok(())
+}
+pub(super) fn schedule<S: Store>(
+    s: &mut S,
+    now: f64,
+    cal: &mut Calendar<'_>,
+) -> Result<(), S::Error> {
+    let mut program = Schedule::new(now);
+    let mut reply = None;
+    loop {
+        match program.advance(s, reply.take())? {
+            Step::Resource(op) => reply = Some(op.run(cal).map_err(S::Error::from)?),
+            Step::Warning(w) => s.warn(w.message())?,
+            Step::Complete(v) => return Ok(v),
+        }
+    }
 }
 pub(super) fn invalid<S: Store>(
     s: &mut S,
     date: &S::Date,
     cal: &mut Calendar<'_>,
 ) -> Result<Option<bool>, S::Error> {
-    s.method("isInvalidDate")?;
-    let milliseconds = s.milliseconds(date)?;
-    let day = cal.fields(milliseconds).map(|f| f.weekday as usize);
-    cal.check().map_err(S::Error::from)?;
-    let weekday = s.excluded_day(day)?;
-    if !s.dated_tokens()? {
-        return Ok(weekday);
-    }
-    let template = s.date_format()?;
-    let template = trimmed(&template);
-    let date_only = if milliseconds.is_finite() {
-        cal.iso(milliseconds)
-    } else {
-        "0NaN-NaN-NaN".into()
-    };
-    cal.check().map_err(S::Error::from)?;
-    spend(s, 200.)?;
-    let formatted = if template != "YYYY-MM-DD" {
-        spend(s, 400. + template.encode_utf16().count() as f64 * 8.)?;
-        let formatted = cal.format(milliseconds, template);
-        cal.check().map_err(S::Error::from)?;
-        formatted
-    } else {
-        Some(date_only.clone())
-    };
-    let mut listed = |include| -> Result<bool, S::Error> {
-        if s.contains(include, &date_only)? {
-            return Ok(true);
+    let mut program = tasks::Invalid::new(date.clone());
+    let mut reply = None;
+    loop {
+        match program.advance(s, reply.take())? {
+            Step::Resource(op) => reply = Some(op.run(cal).map_err(S::Error::from)?),
+            Step::Warning(w) => s.warn(w.message())?,
+            Step::Complete(v) => return Ok(v),
         }
-        if let Some(f) = &formatted {
-            s.contains(include, f)
-        } else {
-            Ok(false)
-        }
-    };
-    if listed(true)? {
-        return Ok(Some(false));
     }
-    if weekday == Some(true) {
-        return Ok(Some(true));
-    }
-    Ok(Some(listed(false)?))
 }
-pub(super) fn references<S: Store>(
+pub(super) struct ReferenceLookup<'a, T> {
+    pub found: Vec<T>,
+    pub unknown: Vec<&'a str>,
+}
+// Resolve once before warning evaluation. The returned task handles remain the
+// same objects even when a warning getter or callback edits the lookup table.
+pub(super) fn lookup_references<'a, S: Store>(
     s: &mut S,
-    keyword: &str,
-    list: &str,
-) -> Result<Vec<S::Task>, S::Error> {
+    list: &'a str,
+) -> Result<ReferenceLookup<'a, S::Task>, S::Error> {
     s.method("references")?;
     let mut found = vec![];
     let mut unknown = vec![];
@@ -220,6 +218,14 @@ pub(super) fn references<S: Store>(
             unknown.push(id)
         }
     }
+    Ok(ReferenceLookup { found, unknown })
+}
+pub(super) fn references<S: Store>(
+    s: &mut S,
+    keyword: &str,
+    list: &str,
+) -> Result<Vec<S::Task>, S::Error> {
+    let ReferenceLookup { found, unknown } = lookup_references(s, list)?;
     if !unknown.is_empty() {
         s.warn(format!(
             "Gantt: \"{keyword}\" refers to task ids that do not exist: {}.",
@@ -228,60 +234,30 @@ pub(super) fn references<S: Store>(
     }
     Ok(found)
 }
+mod end;
+mod program;
+mod tasks;
+pub(super) use tasks::{Invalid, Schedule, Task, Tasks};
+mod start;
+pub(super) use end::End;
+pub(super) use program::{CalendarReply, CalendarRequest, Step, Warning};
+pub(super) use start::Start;
 pub(super) fn start<S: Store>(
     s: &mut S,
     raw: &str,
     cal: &mut Calendar<'_>,
 ) -> Result<Option<S::Date>, S::Error> {
-    s.method("getStartDate")?;
-    let text = trimmed(raw);
-    let template = s.date_format()?;
-    let template = trimmed(&template);
-    if matches!(template, "x" | "X") && patterns()[6].is_match(text) {
-        let ms = super::dates::clip(text.parse().unwrap_or(f64::NAN));
-        return checked(s, ms, text).map(Some);
-    }
-    if let Some(c) = patterns()[2].captures(text) {
-        let mut latest: Option<S::Task> = None;
-        for task in references(s, "after", &c[1])? {
-            let later = if let Some(prior) = &latest {
-                let current = s.time(&task, Time::End)?;
-                let before = s.time(prior, Time::End)?;
-                match (current, before) {
-                    (Some(a), Some(b)) => s.milliseconds(&a)? > s.milliseconds(&b)?,
-                    _ => false,
-                }
-            } else {
-                true
-            };
-            if later {
-                latest = Some(task)
+    let mut program = Start::new(raw.to_owned());
+    let mut reply = None;
+    loop {
+        match program.advance(s, reply.take())? {
+            Step::Resource(operation) => {
+                reply = Some(operation.run(cal).map_err(S::Error::from)?);
             }
+            Step::Warning(warning) => s.warn(warning.message())?,
+            Step::Complete(value) => return Ok(value),
         }
-        return if let Some(task) = latest {
-            s.time(&task, Time::End)
-        } else {
-            today(s, cal).map(Some)
-        };
     }
-    if let Some(date) = parse(s, text, template, cal)? {
-        return Ok(Some(date));
-    }
-    let date = cal
-        .resources
-        .parse_date(text)
-        .map_err(S::Error::from)?
-        .unwrap_or(f64::NAN);
-    let fields = if date.is_finite() {
-        cal.fields(date)
-    } else {
-        None
-    };
-    cal.check().map_err(S::Error::from)?;
-    if !date.is_finite() || fields.is_none_or(|f| !(-10000..=10000).contains(&f.civil.year)) {
-        return Err(error(format!("Invalid date:{text}"), ErrorCode::Semantic).into());
-    }
-    s.date(date).map(Some)
 }
 pub(super) fn checked<S: Store>(
     s: &mut S,
@@ -300,144 +276,54 @@ pub(super) fn end<S: Store>(
     raw: &str,
     cal: &mut Calendar<'_>,
 ) -> Result<Option<S::Date>, S::Error> {
-    s.method("getEndDate")?;
-    let text = trimmed(raw);
-    if let Some(c) = patterns()[3].captures(text) {
-        let mut earliest: Option<S::Task> = None;
-        for task in references(s, "until", &c[1])? {
-            let earlier = if let Some(prior) = &earliest {
-                let current = s.time(&task, Time::Start)?;
-                let before = s.time(prior, Time::Start)?;
-                match (current, before) {
-                    (Some(a), Some(b)) => s.milliseconds(&a)? < s.milliseconds(&b)?,
-                    _ => false,
-                }
-            } else {
-                true
-            };
-            if earlier {
-                earliest = Some(task)
-            }
+    let mut program = End::new(start.clone(), raw.to_owned());
+    let mut reply = None;
+    loop {
+        match program.advance(s, reply.take())? {
+            Step::Resource(operation) => reply = Some(operation.run(cal).map_err(S::Error::from)?),
+            Step::Warning(warning) => s.warn(warning.message())?,
+            Step::Complete(value) => return Ok(value),
         }
-        return if let Some(task) = earliest {
-            s.time(&task, Time::Start)
-        } else {
-            today(s, cal).map(Some)
-        };
     }
-    let template = s.date_format()?;
-    let template = trimmed(&template);
-    if let Some(parsed) = parse(s, text, template, cal)? {
-        return if s.inclusive()? {
-            let ms = s.milliseconds(&parsed)?;
-            let end = cal.add_days(ms, 1.);
-            cal.check().map_err(S::Error::from)?;
-            s.date(end).map(Some)
-        } else {
-            Ok(Some(parsed))
-        };
-    }
-    let milliseconds = s.milliseconds(start)?;
-    let Some(c) = patterns()[4].captures(text) else {
-        s.warn(format!("Gantt: \"{text}\" is neither a date in the \"{template}\" format nor a duration such as \"3d\", so the task gets no duration."))?;
-        return s.date(milliseconds).map(Some);
-    };
-    let value = c[1].parse().unwrap_or(f64::NAN);
-    let end = cal.add(milliseconds, value, &c[2]);
-    cal.check().map_err(S::Error::from)?;
-    s.date(if end.is_finite() { end } else { milliseconds })
-        .map(Some)
 }
 pub(super) fn compile_tasks<S: Store>(s: &mut S, cal: &mut Calendar<'_>) -> Result<bool, S::Error> {
-    s.method("compileTasks")?;
-    let mut all = true;
-    for task in s.tasks()? {
-        compile_task(s, &task, cal)?;
-        all = all && s.processed(&task)?;
+    let mut program = Tasks::new();
+    let mut reply = None;
+    loop {
+        match program.advance(s, reply.take())? {
+            Step::Resource(op) => reply = Some(op.run(cal).map_err(S::Error::from)?),
+            Step::Warning(w) => s.warn(w.message())?,
+            Step::Complete(v) => return Ok(v),
+        }
     }
-    Ok(all)
 }
 pub(super) fn compile_task<S: Store>(
     s: &mut S,
     task: &S::Task,
     cal: &mut Calendar<'_>,
 ) -> Result<(), S::Error> {
-    s.method("compileTask")?;
-    if let Some(raw) = s.raw_start(task)? {
-        if let Some(date) = start(s, &raw, cal)? {
-            s.set_time(task, Time::Start, Some(date))?;
+    let mut program = Task::new(task.clone());
+    let mut reply = None;
+    loop {
+        match program.advance(s, reply.take())? {
+            Step::Resource(op) => reply = Some(op.run(cal).map_err(S::Error::from)?),
+            Step::Warning(w) => s.warn(w.message())?,
+            Step::Complete(v) => return Ok(v),
         }
-    } else {
-        let date = if let Some(previous) = s.previous(task)? {
-            s.time(&previous, Time::End)?
-        } else {
-            Some(today(s, cal)?)
-        };
-        s.set_time(task, Time::Start, date)?;
     }
-    let Some(start) = s.time(task, Time::Start)?.filter(|d| s.date_truth(d)) else {
-        return Ok(());
-    };
-    let raw = s.raw_end(task)?;
-    let date = end(s, &start, &raw, cal)?;
-    let truth = date.as_ref().is_some_and(|d| s.date_truth(d));
-    s.set_time(task, Time::End, date)?;
-    if !truth {
-        return Ok(());
-    }
-    s.set_flag(task, Flag::Processed, true)?;
-    let raw = s.raw_end(task)?;
-    let manual = parse(s, &raw, "YYYY-MM-DD", cal)?.is_some();
-    s.set_flag(task, Flag::ManualEnd, manual)?;
-    check_dates(s, task, cal)
 }
 pub(super) fn check_dates<S: Store>(
     s: &mut S,
     task: &S::Task,
     cal: &mut Calendar<'_>,
 ) -> Result<(), S::Error> {
-    s.method("checkTaskDates")?;
-    // This accessor reads the actual manualEndTime without changing processed.
-    if s.token_length(false)? == 0. || s.manual(task)? {
-        return Ok(());
-    }
-    let start = s.time(task, Time::Start)?;
-    let milliseconds = if let Some(start) = start {
-        s.milliseconds(&start)?
-    } else {
-        f64::NAN
-    };
-    let mut cursor = cal.add_days(milliseconds, 1.);
-    cal.check().map_err(S::Error::from)?;
-    let end = s.time(task, Time::End)?;
-    let mut end = if let Some(end) = end {
-        s.milliseconds(&end)?
-    } else {
-        f64::NAN
-    };
-    let max = cal.add_days(end, 10000.);
-    cal.check().map_err(S::Error::from)?;
-    let mut bad = false;
-    let mut render = None;
-    while cursor <= end {
-        spend(s, 400.)?;
-        if !bad {
-            render = Some(end)
+    let mut program = tasks::Check::new(task.clone());
+    let mut reply = None;
+    loop {
+        match program.advance(s, reply.take())? {
+            Step::Resource(op) => reply = Some(op.run(cal).map_err(S::Error::from)?),
+            Step::Warning(w) => s.warn(w.message())?,
+            Step::Complete(v) => return Ok(v),
         }
-        let date = s.date(cursor)?;
-        bad = invalid(s, &date, cal)? == Some(true);
-        if bad {
-            end = cal.add_days(end, 1.);
-            cal.check().map_err(S::Error::from)?;
-            if end > max {
-                return Err(error("Failed to find a valid date that was not excluded by `excludes` after 10,000 iterations.",ErrorCode::Semantic).into());
-            }
-        }
-        cursor = cal.add_days(cursor, 1.);
-        cal.check().map_err(S::Error::from)?;
     }
-    let end = s.date(end)?;
-    s.set_time(task, Time::End, Some(end))?;
-    let render = render.map(|ms| s.date(ms)).transpose()?;
-    s.set_time(task, Time::RenderEnd, render)
 }

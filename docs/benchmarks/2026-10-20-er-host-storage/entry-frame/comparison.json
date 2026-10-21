@@ -1,0 +1,2926 @@
+{
+  "schemaVersion": 1,
+  "diagnostic": true,
+  "startedAt": "2026-10-20T07:42:05.764Z",
+  "oracleRevision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "7d632fa69ddfbd18fe716388f6e277e6b48ed267fa378b9f73d4ff74f7e1a808",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "runtimeHashes": {
+    "control": {
+      "all-diagram-entries.js": "2198ccdbf3586d74e9770006fb05c820e445a0968a6256a2ab0d6627f92cd424",
+      "builtin-entries.js": "c613f773cdfcd8d9922737c6a88dab17db3c070903e14bce2f198e369d02aba3",
+      "core.d.ts": "9ecbec2091a240664457e687e8b6083ace52a620a64ef65a876bf8fc606a4441",
+      "core.js": "b4189751676890c646ec76fb831eb16c141279b27f44dd665f3f03813f23754a",
+      "diagram-entries.d.ts": "97b2290e3dbfd3aa735dfea383a63c0da0ed1ca445dfa68db4669bf24ecb9c47",
+      "diagram-entries.js": "649ddeffc62753190854d0440dde259011400f826852b4aa20a14bb6507f2008",
+      "diagrams/agentflow.d.ts": "ed966aa366e4f443ebc04f7766bcb326c033fcf1b5198802a3d3262ac4fd1640",
+      "diagrams/agentflow.js": "76b816c01cf6b17ef9eebf6943e44dfc217839f04ad1e556ebcc60871d6bab63",
+      "diagrams/architecture.d.ts": "685d1aad08763ed184576061f1af57ebd020e97275a35ee28c743bed76491d65",
+      "diagrams/architecture.js": "f6797d1af08dd37c49d99cec1dcd76dd45390a635d3f57af5eb43400f176bc38",
+      "diagrams/block.d.ts": "4bb13f66ae9d1ea73e1e73bb382ffdd2d5396ed2a442fc35b3feed09f486929d",
+      "diagrams/block.js": "9ec59c1ae0c9ebca58d3d5facf7c2e10a66b7d1aa9fe5a2a9d47def7d6def9cd",
+      "diagrams/c4.d.ts": "8bbe330bc5e9233c3b4f2b08ea3ff801111962bef52b66b0bf412da82929c9f9",
+      "diagrams/c4.js": "4648be6d26ce54747289b95972989f1d57b8cb01cb7015e1d1c150c40b1b5470",
+      "diagrams/class.d.ts": "0663430c12f41c282d2025e332341c869d93570bcd3e5657029dcc18e9de7847",
+      "diagrams/class.js": "d2d07b788987e4107ab9f4c76e46ce35001598530d1cc4a6317d73060ef58802",
+      "diagrams/cynefin.d.ts": "b251614dde7430ff521e12c769cf8e083edd793a6d63b31678ffb1df55a431a3",
+      "diagrams/cynefin.js": "dda906572a81cf956d584fb2a1beb54662f0d9f8c8b8c0e15159a26bb62f1701",
+      "diagrams/er.d.ts": "cfe808613977d282727b2f2375f3b2fe781bc9cad5e02e023f753a2f6cf851cc",
+      "diagrams/er.js": "4f58c75060c6965e255f9dc43d5e4c71700bd15fd41408bc6c210df2c7f1c414",
+      "diagrams/eventmodeling.d.ts": "a20be3600f375bb9358120f3b8b8588856ce46b365e2b7e7d0c9f276f3b56a24",
+      "diagrams/eventmodeling.js": "2bd0d3ae5ee0cc85c81638fa225601001fa984d338b28d617e4f4625b0b211f6",
+      "diagrams/flowchart.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/flowchart.js": "1d8357752cfc2560c778b6b8e8677b28e31bb33b738b83e50cda2fe60b10c6d6",
+      "diagrams/gantt.d.ts": "6cfab071c62f397e4ea63e8622637f9e307c47868fe38ac370fb1dffbdcb76f5",
+      "diagrams/gantt.js": "084cd1ef3df8e755d4be23a4697f7a09e9eef2f9242669b7ba089108f7be86b3",
+      "diagrams/gitGraph.d.ts": "e893045bf79909c866b514bb924ee048fd01f8bc2caa2f023b225e89b5ac41de",
+      "diagrams/gitGraph.js": "bd51ef5f4b2d158e3b47c95eef52c5575bb4d77cf6becdbd57ed20071f771bc1",
+      "diagrams/info.d.ts": "318d29ac48e33d7a5ff62ad5832803ab30c1759273cb700f4f81e90a7a772f5a",
+      "diagrams/info.js": "4973c7dd85283de9615c3ede99cae84b077ae53c897a219c42ac56627fb7bf12",
+      "diagrams/ishikawa.d.ts": "3c3d832ac347626f6ecd4ec520eb1c57ba47ada2b3aa3c68aac8ff9b42e96577",
+      "diagrams/ishikawa.js": "11e6631b6d577db24d85b51e9f0a7ba1e05601b1f3ce18891bc24bf225f78b03",
+      "diagrams/journey.d.ts": "d9364c99a6013ccf33cbbf7753b6606c80dc24a9543c3f764045c70ada30c553",
+      "diagrams/journey.js": "a618aa5122dff51245d6f1d24a19df278eb81de128d2a442408445ced8200115",
+      "diagrams/kanban.d.ts": "887e9f8e63e1e20e4d34228705bc9f276424bf0606b407a99e29be9a1a7ba61b",
+      "diagrams/kanban.js": "d55dd426f18681396dbdd3294fd7afcec3d4df189cb4769c961367647b010770",
+      "diagrams/mindmap.d.ts": "b73b90c318ead5a5aa869d4cba49e357ea1b90182669e0e139f0b6def47828af",
+      "diagrams/mindmap.js": "93c4922666ee8e0cac9822bb4b9af6bf22471f63bbb352fe5818e4d57451b7ab",
+      "diagrams/packet.d.ts": "c5a09be592cd97ee1c86e8c2281d7c87b677b55cdeeac9a99e6d2111010b054e",
+      "diagrams/packet.js": "ada87c921a18dd72d3c52f14c7a53b8cd628fc0275bf232ac9d1201b967cb7bb",
+      "diagrams/pie.d.ts": "7a3ccf3e6b762089d37cafe61d1aab941c8de69072301b78a3f14afda3915a02",
+      "diagrams/pie.js": "e31a8fe275411e76361094ed3a3b03bb58e1ab50edae051371f0838b876d2c43",
+      "diagrams/quadrantChart.d.ts": "45d683e54a3f1c28c46de448930329f5344d2d673308c41ad6dbc61871942f69",
+      "diagrams/quadrantChart.js": "8877ba13ccfdb408fadd9e63929625864544e1c95f07bb0674d9770dfa6874d5",
+      "diagrams/radar.d.ts": "e963a59434fd12ff343b2ed389c30b3d03e32e8e299f8555c0d1af864415594b",
+      "diagrams/radar.js": "dc956214601d6084d77c96108ca00a2be58640df1a9d3e6251045250e99b7604",
+      "diagrams/railroad.d.ts": "23c4cb03d8c1abea156392964bd5b0e6f8d7087ab3d0bce66e3348438e84f773",
+      "diagrams/railroad.js": "d0d30c37203c93db5b127b6e8e34affbf095996403e362990b20aa70baeb2a81",
+      "diagrams/requirement.d.ts": "1398a66ab6c04298e009433e681091b0b024bff2d7d48a45057360b3666322e1",
+      "diagrams/requirement.js": "bf9651beff933c6a3db084e1ab2567a8d1487aa935822e04dbcf66de4eb60de1",
+      "diagrams/sankey.d.ts": "8ecb9af4bb2f44e5712842315c53b133937c2b028881d939d54628b63d5a9421",
+      "diagrams/sankey.js": "c6fcc9edcd50910cbe5b0773e4d6a683b6befda044dcca92f115c72d987187ef",
+      "diagrams/sequence.d.ts": "cecc8a8a1c16cf47bf3e43e9dded18cfc96c1777f9ad85f825db8d6851a2a5e3",
+      "diagrams/sequence.js": "b87558078379f8183a95f613064e2cae76bb5b3fe6bf91f64e085e99a382a6ad",
+      "diagrams/state.d.ts": "7bfba0476f781b60a6313af1dd7ff28d6e592249e0a57e59d51d466b6a8644ef",
+      "diagrams/state.js": "d627791aeac455514abbde4a4c74089209d9a21cb0fbe6d1c53ff8346b718163",
+      "diagrams/swimlane.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/swimlane.js": "2ad18d6a0e9bf45d20161539843a305235efbf34ea83b5080fb8f722e8329dc0",
+      "diagrams/timeline.d.ts": "ffdce40a2ca1cabfd08a5e5fae52cb14056f4057153184e4dc2480a63e9b3875",
+      "diagrams/timeline.js": "449a69e40593627605fd8ad5818cae1da8ca075529f61cd92dcb340dc72f58fc",
+      "diagrams/treemap.d.ts": "f326b681722b56667c012c82c6250717deac5c41b26c06706dd1f23d83d66f19",
+      "diagrams/treemap.js": "8487c58c79eb01ce6a8ba9b1eb7f4cc05940316aa649365dacff76062832c37f",
+      "diagrams/treeView.d.ts": "3a1ff6d58f50f61387906e6ad1d6a8fa389cbf0d1bf71458d38cddfc78cb18c9",
+      "diagrams/treeView.js": "06c583a03010f7f26aacc1cbc8a5a3982e47890339e6115f8fbc6486b279f497",
+      "diagrams/usecase.d.ts": "35d802519f837262075c97f2fb868a5d9cbe1e11d1c7d6fe6b6f4fc5accaa85c",
+      "diagrams/usecase.js": "de333bea8f335fea2117c273f272bc51902c77c839f19bf9915a6ac00a402e65",
+      "diagrams/venn.d.ts": "9449b3af69edba6a5913152ed172e2aa9e07275d144f7de0a6f83f0e0f0c4708",
+      "diagrams/venn.js": "7bab9528e3c06dabfb2cc6c41ca717717a5d44091777d74a1d8570770bf64d57",
+      "diagrams/wardley.d.ts": "76f8a09179ba84a8fd08009928c1b2d78b03c00667de33d5b6bd74425a698865",
+      "diagrams/wardley.js": "8757dec7935fc53e299fa212589d6fc9f544905c1986a6d988cf15ef8d0952c5",
+      "diagrams/xychart.d.ts": "e280a1e33debe14d03128c02f426da021b21f5c9b365b2738dd376783b8d7050",
+      "diagrams/xychart.js": "bcb6d5fb732fbd5567cc72167e2e38d405a733020aed6b8fc6b788eb884fa89f",
+      "errors.js": "b7ecbd71b53235f2e83825571145db878f65059e5d6d3d814de348d634ab4a98",
+      "FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "full.d.ts": "6bd357541b024665c872be6f1cf2433059c22b0b17bbccd682cdb981b96a6307",
+      "full.js": "99d53d183509e4211a076803e440c0eb51ffb5f5330900166e0082238008bee7",
+      "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+      "graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+      "host-er-store.js": "367b12d31775547bb37f89efc3277442878438aded6ecd80ff1d4132297cf433",
+      "host-functions.js": "f86795a2710cb9e4ea70604c122f8685d0d994acb29b1f8b8afe954ffbc53b06",
+      "index.d.ts": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+      "lazy.d.ts": "b5252f51d93719e01ec2221ce14686d5a79ca69fdbfa545ba7fad83fca253503",
+      "lazy.js": "9c18e4d7da1c6bba736a4f739a43179b7af514493ba6d97364d31e80429cbb93",
+      "LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+      "MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "mount.js": "61bf88521d76030f64fc8457ebe80137dedc61a6a93db6ec2d6ac8324863a07b",
+      "NOTICE": "b29bd5d01e4cd9cf1a6cd96ffdb12ed6548ab290c01e0a374f12d7212c3baf01",
+      "package.json": "42b3141f8f64a819fb957d7c00900cc7201069f8119940da1019742e3ef64a0c",
+      "parse-limits.js": "643293e8fe70ff35a9ecc431601f5cfa8430c3ad91e9f8681a5c8f3fcc0043c9",
+      "PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "pkg/pele_bg.wasm": "f26b9cce79af198b0a67b567dc16b6d9d8b30c71862753636f2bb2c3b9d3d52c",
+      "pkg/pele_bg.wasm.d.ts": "d00d9778cffefd5b4400ab5aa8554a36beb5a3adce96f107c2a7e0bc974a4d70",
+      "pkg/pele.d.ts": "1629e8f2165e84f2469a1cb6e4a4e0b88ed3048fd1a6508d12fbaf50f83cd05f",
+      "pkg/pele.js": "5a319bf6680b3a49475a231f3c1205ed95b34435729d6fa9530787511769115f",
+      "README.md": "8fc9239e13d6c39ab7d5b3232e7e9d79f715cbc958fab0ea221b34e4f3e153f3",
+      "registry.d.ts": "251873bffdbc0e1608e5050f321790178cb48270ede48c728ae4ea3af8019199",
+      "registry.js": "0b6fd01dd8228ae286b1827ffa7ef280f169d4fbb43be6034de8d739aaee9855",
+      "REGISTRY.md": "b618e3039b3f50a2553ef124508adc458fd34e8ee9f4b3ffff96f7a75b702054",
+      "render-numbers.js": "c47561036e06abe9795f766863a2f3600e44f6312888077e3ba0c09ec47cb102",
+      "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+      "V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "window.js": "10838164b41efcdf3252a2fadcbbf799a49be9b9197f795a2cda2e0bc8e7d3d0",
+      "zoom.js": "c5d293c1f157b04e37344318de97b4c066a18d95d730f5a7ce76655020d72734"
+    },
+    "candidate": {
+      "all-diagram-entries.js": "2198ccdbf3586d74e9770006fb05c820e445a0968a6256a2ab0d6627f92cd424",
+      "builtin-entries.js": "c613f773cdfcd8d9922737c6a88dab17db3c070903e14bce2f198e369d02aba3",
+      "core.d.ts": "9ecbec2091a240664457e687e8b6083ace52a620a64ef65a876bf8fc606a4441",
+      "core.js": "b4189751676890c646ec76fb831eb16c141279b27f44dd665f3f03813f23754a",
+      "diagram-entries.d.ts": "97b2290e3dbfd3aa735dfea383a63c0da0ed1ca445dfa68db4669bf24ecb9c47",
+      "diagram-entries.js": "649ddeffc62753190854d0440dde259011400f826852b4aa20a14bb6507f2008",
+      "diagrams/agentflow.d.ts": "ed966aa366e4f443ebc04f7766bcb326c033fcf1b5198802a3d3262ac4fd1640",
+      "diagrams/agentflow.js": "76b816c01cf6b17ef9eebf6943e44dfc217839f04ad1e556ebcc60871d6bab63",
+      "diagrams/architecture.d.ts": "685d1aad08763ed184576061f1af57ebd020e97275a35ee28c743bed76491d65",
+      "diagrams/architecture.js": "f6797d1af08dd37c49d99cec1dcd76dd45390a635d3f57af5eb43400f176bc38",
+      "diagrams/block.d.ts": "4bb13f66ae9d1ea73e1e73bb382ffdd2d5396ed2a442fc35b3feed09f486929d",
+      "diagrams/block.js": "9ec59c1ae0c9ebca58d3d5facf7c2e10a66b7d1aa9fe5a2a9d47def7d6def9cd",
+      "diagrams/c4.d.ts": "8bbe330bc5e9233c3b4f2b08ea3ff801111962bef52b66b0bf412da82929c9f9",
+      "diagrams/c4.js": "4648be6d26ce54747289b95972989f1d57b8cb01cb7015e1d1c150c40b1b5470",
+      "diagrams/class.d.ts": "0663430c12f41c282d2025e332341c869d93570bcd3e5657029dcc18e9de7847",
+      "diagrams/class.js": "d2d07b788987e4107ab9f4c76e46ce35001598530d1cc4a6317d73060ef58802",
+      "diagrams/cynefin.d.ts": "b251614dde7430ff521e12c769cf8e083edd793a6d63b31678ffb1df55a431a3",
+      "diagrams/cynefin.js": "dda906572a81cf956d584fb2a1beb54662f0d9f8c8b8c0e15159a26bb62f1701",
+      "diagrams/er.d.ts": "cfe808613977d282727b2f2375f3b2fe781bc9cad5e02e023f753a2f6cf851cc",
+      "diagrams/er.js": "4f58c75060c6965e255f9dc43d5e4c71700bd15fd41408bc6c210df2c7f1c414",
+      "diagrams/eventmodeling.d.ts": "a20be3600f375bb9358120f3b8b8588856ce46b365e2b7e7d0c9f276f3b56a24",
+      "diagrams/eventmodeling.js": "2bd0d3ae5ee0cc85c81638fa225601001fa984d338b28d617e4f4625b0b211f6",
+      "diagrams/flowchart.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/flowchart.js": "1d8357752cfc2560c778b6b8e8677b28e31bb33b738b83e50cda2fe60b10c6d6",
+      "diagrams/gantt.d.ts": "6cfab071c62f397e4ea63e8622637f9e307c47868fe38ac370fb1dffbdcb76f5",
+      "diagrams/gantt.js": "084cd1ef3df8e755d4be23a4697f7a09e9eef2f9242669b7ba089108f7be86b3",
+      "diagrams/gitGraph.d.ts": "e893045bf79909c866b514bb924ee048fd01f8bc2caa2f023b225e89b5ac41de",
+      "diagrams/gitGraph.js": "bd51ef5f4b2d158e3b47c95eef52c5575bb4d77cf6becdbd57ed20071f771bc1",
+      "diagrams/info.d.ts": "318d29ac48e33d7a5ff62ad5832803ab30c1759273cb700f4f81e90a7a772f5a",
+      "diagrams/info.js": "4973c7dd85283de9615c3ede99cae84b077ae53c897a219c42ac56627fb7bf12",
+      "diagrams/ishikawa.d.ts": "3c3d832ac347626f6ecd4ec520eb1c57ba47ada2b3aa3c68aac8ff9b42e96577",
+      "diagrams/ishikawa.js": "11e6631b6d577db24d85b51e9f0a7ba1e05601b1f3ce18891bc24bf225f78b03",
+      "diagrams/journey.d.ts": "d9364c99a6013ccf33cbbf7753b6606c80dc24a9543c3f764045c70ada30c553",
+      "diagrams/journey.js": "a618aa5122dff51245d6f1d24a19df278eb81de128d2a442408445ced8200115",
+      "diagrams/kanban.d.ts": "887e9f8e63e1e20e4d34228705bc9f276424bf0606b407a99e29be9a1a7ba61b",
+      "diagrams/kanban.js": "d55dd426f18681396dbdd3294fd7afcec3d4df189cb4769c961367647b010770",
+      "diagrams/mindmap.d.ts": "b73b90c318ead5a5aa869d4cba49e357ea1b90182669e0e139f0b6def47828af",
+      "diagrams/mindmap.js": "93c4922666ee8e0cac9822bb4b9af6bf22471f63bbb352fe5818e4d57451b7ab",
+      "diagrams/packet.d.ts": "c5a09be592cd97ee1c86e8c2281d7c87b677b55cdeeac9a99e6d2111010b054e",
+      "diagrams/packet.js": "ada87c921a18dd72d3c52f14c7a53b8cd628fc0275bf232ac9d1201b967cb7bb",
+      "diagrams/pie.d.ts": "7a3ccf3e6b762089d37cafe61d1aab941c8de69072301b78a3f14afda3915a02",
+      "diagrams/pie.js": "e31a8fe275411e76361094ed3a3b03bb58e1ab50edae051371f0838b876d2c43",
+      "diagrams/quadrantChart.d.ts": "45d683e54a3f1c28c46de448930329f5344d2d673308c41ad6dbc61871942f69",
+      "diagrams/quadrantChart.js": "8877ba13ccfdb408fadd9e63929625864544e1c95f07bb0674d9770dfa6874d5",
+      "diagrams/radar.d.ts": "e963a59434fd12ff343b2ed389c30b3d03e32e8e299f8555c0d1af864415594b",
+      "diagrams/radar.js": "dc956214601d6084d77c96108ca00a2be58640df1a9d3e6251045250e99b7604",
+      "diagrams/railroad.d.ts": "23c4cb03d8c1abea156392964bd5b0e6f8d7087ab3d0bce66e3348438e84f773",
+      "diagrams/railroad.js": "d0d30c37203c93db5b127b6e8e34affbf095996403e362990b20aa70baeb2a81",
+      "diagrams/requirement.d.ts": "1398a66ab6c04298e009433e681091b0b024bff2d7d48a45057360b3666322e1",
+      "diagrams/requirement.js": "bf9651beff933c6a3db084e1ab2567a8d1487aa935822e04dbcf66de4eb60de1",
+      "diagrams/sankey.d.ts": "8ecb9af4bb2f44e5712842315c53b133937c2b028881d939d54628b63d5a9421",
+      "diagrams/sankey.js": "c6fcc9edcd50910cbe5b0773e4d6a683b6befda044dcca92f115c72d987187ef",
+      "diagrams/sequence.d.ts": "cecc8a8a1c16cf47bf3e43e9dded18cfc96c1777f9ad85f825db8d6851a2a5e3",
+      "diagrams/sequence.js": "b87558078379f8183a95f613064e2cae76bb5b3fe6bf91f64e085e99a382a6ad",
+      "diagrams/state.d.ts": "7bfba0476f781b60a6313af1dd7ff28d6e592249e0a57e59d51d466b6a8644ef",
+      "diagrams/state.js": "d627791aeac455514abbde4a4c74089209d9a21cb0fbe6d1c53ff8346b718163",
+      "diagrams/swimlane.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/swimlane.js": "2ad18d6a0e9bf45d20161539843a305235efbf34ea83b5080fb8f722e8329dc0",
+      "diagrams/timeline.d.ts": "ffdce40a2ca1cabfd08a5e5fae52cb14056f4057153184e4dc2480a63e9b3875",
+      "diagrams/timeline.js": "449a69e40593627605fd8ad5818cae1da8ca075529f61cd92dcb340dc72f58fc",
+      "diagrams/treemap.d.ts": "f326b681722b56667c012c82c6250717deac5c41b26c06706dd1f23d83d66f19",
+      "diagrams/treemap.js": "8487c58c79eb01ce6a8ba9b1eb7f4cc05940316aa649365dacff76062832c37f",
+      "diagrams/treeView.d.ts": "3a1ff6d58f50f61387906e6ad1d6a8fa389cbf0d1bf71458d38cddfc78cb18c9",
+      "diagrams/treeView.js": "06c583a03010f7f26aacc1cbc8a5a3982e47890339e6115f8fbc6486b279f497",
+      "diagrams/usecase.d.ts": "35d802519f837262075c97f2fb868a5d9cbe1e11d1c7d6fe6b6f4fc5accaa85c",
+      "diagrams/usecase.js": "de333bea8f335fea2117c273f272bc51902c77c839f19bf9915a6ac00a402e65",
+      "diagrams/venn.d.ts": "9449b3af69edba6a5913152ed172e2aa9e07275d144f7de0a6f83f0e0f0c4708",
+      "diagrams/venn.js": "7bab9528e3c06dabfb2cc6c41ca717717a5d44091777d74a1d8570770bf64d57",
+      "diagrams/wardley.d.ts": "76f8a09179ba84a8fd08009928c1b2d78b03c00667de33d5b6bd74425a698865",
+      "diagrams/wardley.js": "8757dec7935fc53e299fa212589d6fc9f544905c1986a6d988cf15ef8d0952c5",
+      "diagrams/xychart.d.ts": "e280a1e33debe14d03128c02f426da021b21f5c9b365b2738dd376783b8d7050",
+      "diagrams/xychart.js": "bcb6d5fb732fbd5567cc72167e2e38d405a733020aed6b8fc6b788eb884fa89f",
+      "errors.js": "b7ecbd71b53235f2e83825571145db878f65059e5d6d3d814de348d634ab4a98",
+      "FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "full.d.ts": "6bd357541b024665c872be6f1cf2433059c22b0b17bbccd682cdb981b96a6307",
+      "full.js": "55f8e877f0fed9b22793f080cd8ef0c9d37e9b57067e38c71c78a5f48d65a879",
+      "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+      "graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+      "host-er-store.js": "7f82bb76b428dcd786d9720e3b9077e3be48081b276d2831648e6b42f95ff955",
+      "host-functions.js": "f86795a2710cb9e4ea70604c122f8685d0d994acb29b1f8b8afe954ffbc53b06",
+      "index.d.ts": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+      "lazy.d.ts": "b5252f51d93719e01ec2221ce14686d5a79ca69fdbfa545ba7fad83fca253503",
+      "lazy.js": "9c18e4d7da1c6bba736a4f739a43179b7af514493ba6d97364d31e80429cbb93",
+      "LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+      "MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "mount.js": "61bf88521d76030f64fc8457ebe80137dedc61a6a93db6ec2d6ac8324863a07b",
+      "NOTICE": "b29bd5d01e4cd9cf1a6cd96ffdb12ed6548ab290c01e0a374f12d7212c3baf01",
+      "package.json": "42b3141f8f64a819fb957d7c00900cc7201069f8119940da1019742e3ef64a0c",
+      "parse-limits.js": "643293e8fe70ff35a9ecc431601f5cfa8430c3ad91e9f8681a5c8f3fcc0043c9",
+      "PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "pkg/pele_bg.wasm": "1036593e94ae9113a848aaf1a0cbb118e05991d6abdc3c6e977fec17bb4d66f2",
+      "pkg/pele_bg.wasm.d.ts": "998aedab75f54e0d384efaff681a0946bad9eda6fa078a6dbc077e6693701c9b",
+      "pkg/pele.d.ts": "418271694d980899dac54c9994553c9a4396e5577be20d7404417d6cbcb0aa9b",
+      "pkg/pele.js": "6dc4a06603bec09da769538e6e58813d27214b710877af50d08130c89b17f928",
+      "README.md": "8fc9239e13d6c39ab7d5b3232e7e9d79f715cbc958fab0ea221b34e4f3e153f3",
+      "registry.d.ts": "251873bffdbc0e1608e5050f321790178cb48270ede48c728ae4ea3af8019199",
+      "registry.js": "0b6fd01dd8228ae286b1827ffa7ef280f169d4fbb43be6034de8d739aaee9855",
+      "REGISTRY.md": "b618e3039b3f50a2553ef124508adc458fd34e8ee9f4b3ffff96f7a75b702054",
+      "render-numbers.js": "c47561036e06abe9795f766863a2f3600e44f6312888077e3ba0c09ec47cb102",
+      "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+      "V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "window.js": "10838164b41efcdf3252a2fadcbbf799a49be9b9197f795a2cda2e0bc8e7d3d0",
+      "zoom.js": "c5d293c1f157b04e37344318de97b4c066a18d95d730f5a7ce76655020d72734"
+    }
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "AMD EPYC-Genoa Processor",
+    "logicalCPUs": 8,
+    "totalMemory": 16366505984
+  },
+  "hostBefore": {
+    "loadAverage": [
+      0.26,
+      0.37,
+      0.4
+    ],
+    "freeMemory": 12372488192
+  },
+  "settings": {
+    "trials": 21,
+    "warmupMs": 1000,
+    "batchTargetMs": 12,
+    "maxBatch": 128,
+    "balancedThreeWayOrder": true,
+    "matchedWasmBatchCounts": true,
+    "calibrationMedianOfThree": true,
+    "freshRetainedModelPerBatch": true,
+    "crossOriginIsolated": true,
+    "observedClockResolutionMs": 0.0049991607666015625
+  },
+  "scope": "One browser/page holds independent control and candidate WASM instances and pinned JS. Balanced cyclic/reverse order; whole SVG and exact dimensions before/after. Shared heaps/GC/cache pressure differ from the release harness. Diagnostic, never a replacement release gate.",
+  "rows": [
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.008046872913837433,
+        "control": 0.12839844077825546,
+        "candidate": 0.12828125059604645
+      },
+      "candidateOverControl": 0.9990872927934429,
+      "candidateOverJS": 15.941751779806728,
+      "controlOverJS": 15.956315223701498,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 90270,
+          "elapsedMs": 1000.039999961853
+        },
+        "control": {
+          "operations": 6264,
+          "elapsedMs": 1000.1049995422363
+        },
+        "candidate": {
+          "operations": 6505,
+          "elapsedMs": 1000.0449991226196
+        }
+      },
+      "samples": {
+        "js": [
+          0.011210940778255463,
+          0.008476562798023224,
+          0.0078125,
+          0.06035155802965164,
+          0.008867189288139343,
+          0.008046872913837433,
+          0.008085936307907104,
+          0.026992186903953552,
+          0.008476562798023224,
+          0.011796876788139343,
+          0.0146484375,
+          0.007734373211860657,
+          0.007773436605930328,
+          0.007890619337558746,
+          0.007851555943489075,
+          0.007734373211860657,
+          0.007382817566394806,
+          0.007773436605930328,
+          0.007578127086162567,
+          0.008750006556510925,
+          0.007617183029651642
+        ],
+        "control": [
+          0.19144531339406967,
+          0.123046875,
+          0.12601562589406967,
+          0.12703125178813934,
+          0.22773437947034836,
+          0.16816406697034836,
+          0.12687500566244125,
+          0.12453125417232513,
+          0.14121093600988388,
+          0.1336328089237213,
+          0.13968750089406967,
+          0.13132812827825546,
+          0.12023437768220901,
+          0.1284765601158142,
+          0.12839844077825546,
+          0.12671874463558197,
+          0.12816406041383743,
+          0.1259765625,
+          0.1325390562415123,
+          0.3582421913743019,
+          0.12726562470197678
+        ],
+        "candidate": [
+          0.12773437052965164,
+          0.12460937350988388,
+          0.12363281100988388,
+          0.12632812559604645,
+          0.15019531548023224,
+          0.1262499988079071,
+          0.1272265687584877,
+          0.6076562479138374,
+          0.13996093720197678,
+          0.12828125059604645,
+          0.15074218809604645,
+          0.15976562350988388,
+          0.12335937470197678,
+          0.12414062768220901,
+          0.1226171925663948,
+          0.1813671886920929,
+          0.1293359324336052,
+          0.13117187470197678,
+          0.13054687529802322,
+          0.14421875029802322,
+          0.12421875447034836
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.026992186903953552,
+        "control": 0.22773437947034836,
+        "candidate": 0.1813671886920929
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.017265625298023224,
+        "control": 0.15199218690395355,
+        "candidate": 0.13675781339406967
+      },
+      "candidateOverControl": 0.8997687064038973,
+      "candidateOverJS": 7.92081439469947,
+      "controlOverJS": 8.803167234340215,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 55382,
+          "elapsedMs": 1000
+        },
+        "control": {
+          "operations": 7617,
+          "elapsedMs": 1000.0249996185303
+        },
+        "candidate": {
+          "operations": 7954,
+          "elapsedMs": 1000.045000076294
+        }
+      },
+      "samples": {
+        "js": [
+          0.016914062201976776,
+          0.017460934817790985,
+          0.01753906160593033,
+          0.016953125596046448,
+          0.016718752682209015,
+          0.017265625298023224,
+          0.017109379172325134,
+          0.01703125238418579,
+          0.018632814288139343,
+          0.019062496721744537,
+          0.019414067268371582,
+          0.01910156011581421,
+          0.016953125596046448,
+          0.016757816076278687,
+          0.017070315778255463,
+          0.016953125596046448,
+          0.016718752682209015,
+          0.018867194652557373,
+          0.019296877086162567,
+          0.01898437738418579,
+          0.018984369933605194
+        ],
+        "control": [
+          0.11988281458616257,
+          0.12000000476837158,
+          0.11695311963558197,
+          0.11011718958616257,
+          0.11562500149011612,
+          0.1279296875,
+          0.1296093761920929,
+          0.2133203148841858,
+          0.15199218690395355,
+          0.15800781548023224,
+          0.1579296812415123,
+          0.16117187589406967,
+          0.13660156726837158,
+          0.16289062052965164,
+          0.12816406041383743,
+          0.11226562410593033,
+          0.1574999988079071,
+          0.15273437649011612,
+          0.15703125298023224,
+          0.15292968600988388,
+          0.1658593714237213
+        ],
+        "candidate": [
+          0.12433593720197678,
+          0.13242187350988388,
+          0.12730468064546585,
+          0.13683594018220901,
+          0.12566406279802322,
+          0.11382812261581421,
+          0.1220703125,
+          0.24101562798023224,
+          0.13675781339406967,
+          0.16207031160593033,
+          0.1494140625,
+          0.15285156667232513,
+          0.18464843928813934,
+          0.11949218809604645,
+          0.11484375596046448,
+          0.11058594286441803,
+          0.11308594048023224,
+          0.15292968600988388,
+          0.1653124988079071,
+          0.1552734375,
+          0.14363281428813934
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.019296877086162567,
+        "control": 0.1658593714237213,
+        "candidate": 0.18464843928813934
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.025195308029651642,
+        "control": 0.07531250268220901,
+        "candidate": 0.07539062947034836
+      },
+      "candidateOverControl": 1.001037368104324,
+      "candidateOverJS": 2.9922487703513396,
+      "controlOverJS": 2.989147923636253,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 35641,
+          "elapsedMs": 1000
+        },
+        "control": {
+          "operations": 12703,
+          "elapsedMs": 1000.085000038147
+        },
+        "candidate": {
+          "operations": 13087,
+          "elapsedMs": 1000.0650005340576
+        }
+      },
+      "samples": {
+        "js": [
+          0.025156252086162567,
+          0.025507815182209015,
+          0.02499999850988388,
+          0.025859370827674866,
+          0.025117188692092896,
+          0.025859378278255463,
+          0.02597656100988388,
+          0.03605468571186066,
+          0.024687498807907104,
+          0.025156252086162567,
+          0.02515624463558197,
+          0.025273434817790985,
+          0.02480468899011612,
+          0.025273434817790985,
+          0.024726562201976776,
+          0.028632812201976776,
+          0.02499999850988388,
+          0.02558593451976776,
+          0.02558593451976776,
+          0.025195308029651642,
+          0.025078125298023224
+        ],
+        "control": [
+          0.07843749970197678,
+          0.07535155862569809,
+          0.07835937291383743,
+          0.07597656548023224,
+          0.08460937440395355,
+          0.07531250268220901,
+          0.08316406607627869,
+          0.07648437470197678,
+          0.07398437708616257,
+          0.07386718690395355,
+          0.07355468720197678,
+          0.0715624988079071,
+          0.07406250387430191,
+          0.07375000417232513,
+          0.07398436963558197,
+          0.07554687559604645,
+          0.07402344048023224,
+          0.07371094077825546,
+          0.07445312291383743,
+          0.07621093839406967,
+          0.07792968302965164
+        ],
+        "candidate": [
+          0.07585937529802322,
+          0.07671874761581421,
+          0.07730469107627869,
+          0.08089843392372131,
+          0.07371094077825546,
+          0.07496093213558197,
+          0.07535155862569809,
+          0.07238281518220901,
+          0.07378906011581421,
+          0.07355468720197678,
+          0.07269531488418579,
+          0.07652343809604645,
+          0.08660156279802322,
+          0.07476562261581421,
+          0.07125000655651093,
+          0.07605469226837158,
+          0.07566406577825546,
+          0.09679687768220901,
+          0.07671874761581421,
+          0.07539062947034836,
+          0.0751953125
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.028632812201976776,
+        "control": 0.08316406607627869,
+        "candidate": 0.08660156279802322
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.008320316672325134,
+        "control": 0.13347656279802322,
+        "candidate": 0.13386718928813934
+      },
+      "candidateOverControl": 1.0029265549091733,
+      "candidateOverJS": 16.08919402471851,
+      "controlOverJS": 16.04224551236015,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 97093,
+          "elapsedMs": 1000
+        },
+        "control": {
+          "operations": 7482,
+          "elapsedMs": 1000.0950002670288
+        },
+        "candidate": {
+          "operations": 7067,
+          "elapsedMs": 1000.0650005340576
+        }
+      },
+      "samples": {
+        "js": [
+          0.009687498211860657,
+          0.008359372615814209,
+          0.008828125894069672,
+          0.008867181837558746,
+          0.007929690182209015,
+          0.01285155862569809,
+          0.008281253278255463,
+          0.00839843600988388,
+          0.00820312649011612,
+          0.008242189884185791,
+          0.007968753576278687,
+          0.008359372615814209,
+          0.008242182433605194,
+          0.00863281637430191,
+          0.008124999701976776,
+          0.0087890625,
+          0.008124999701976776,
+          0.008281253278255463,
+          0.008242189884185791,
+          0.009453125298023224,
+          0.008320316672325134
+        ],
+        "control": [
+          0.22636719048023224,
+          0.1431249976158142,
+          0.12433593720197678,
+          0.13359375298023224,
+          0.17539062350988388,
+          0.20769531279802322,
+          0.19945313036441803,
+          0.12894531339406967,
+          0.13066405802965164,
+          0.18312499672174454,
+          0.12484375387430191,
+          0.1300390586256981,
+          0.1319921910762787,
+          0.13347656279802322,
+          0.12980469316244125,
+          0.13746093213558197,
+          0.12851563096046448,
+          0.17781250178813934,
+          0.1213671863079071,
+          0.12902343273162842,
+          0.19554687291383743
+        ],
+        "candidate": [
+          0.13097655773162842,
+          0.13566406071186066,
+          0.18464843928813934,
+          0.22218749672174454,
+          0.13429687172174454,
+          0.1755078136920929,
+          0.1271093711256981,
+          0.12593749910593033,
+          0.13410156220197678,
+          0.13386718928813934,
+          0.12605468183755875,
+          0.13136719167232513,
+          0.13597656041383743,
+          0.18605468422174454,
+          0.12589844316244125,
+          0.13441406190395355,
+          0.1506640613079071,
+          0.12628906220197678,
+          0.1290625035762787,
+          0.13117187470197678,
+          0.13035155832767487
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.009687498211860657,
+        "control": 0.20769531279802322,
+        "candidate": 0.18605468422174454
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.019843749701976776,
+        "control": 0.1169140636920929,
+        "candidate": 0.11675781011581421
+      },
+      "candidateOverControl": 0.9986635177039933,
+      "candidateOverJS": 5.883858235935275,
+      "controlOverJS": 5.891732432023483,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 48448,
+          "elapsedMs": 1000.0149993896484
+        },
+        "control": {
+          "operations": 7955,
+          "elapsedMs": 1000.0500001907349
+        },
+        "candidate": {
+          "operations": 6960,
+          "elapsedMs": 1000
+        }
+      },
+      "samples": {
+        "js": [
+          0.02289062738418579,
+          0.02046874910593033,
+          0.019882813096046448,
+          0.019765622913837433,
+          0.01957031339406967,
+          0.019804686307907104,
+          0.019843749701976776,
+          0.020742185413837433,
+          0.019882813096046448,
+          0.01957031339406967,
+          0.01953125,
+          0.01992187649011612,
+          0.019765622913837433,
+          0.01957031339406967,
+          0.01953125,
+          0.019843749701976776,
+          0.020664066076278687,
+          0.019882813096046448,
+          0.01968749612569809,
+          0.01957031339406967,
+          0.02164062112569809
+        ],
+        "control": [
+          0.1208203136920929,
+          0.1174609363079071,
+          0.11652343720197678,
+          0.11191406100988388,
+          0.11714843660593033,
+          0.1254296898841858,
+          0.11554687470197678,
+          0.12308593839406967,
+          0.11601562798023224,
+          0.1176171824336052,
+          0.12605468928813934,
+          0.1116015613079071,
+          0.11640624701976776,
+          0.11539062857627869,
+          0.12691406160593033,
+          0.11925781518220901,
+          0.1169140636920929,
+          0.11605469137430191,
+          0.13917969167232513,
+          0.11636719107627869,
+          0.11265625059604645
+        ],
+        "candidate": [
+          0.11585937440395355,
+          0.12347656488418579,
+          0.11761718988418579,
+          0.12957030534744263,
+          0.11863280832767487,
+          0.11507812887430191,
+          0.11675781011581421,
+          0.11632812768220901,
+          0.11558593809604645,
+          0.11675781011581421,
+          0.11683593690395355,
+          0.11499999463558197,
+          0.12503906339406967,
+          0.11460937559604645,
+          0.1188671886920929,
+          0.11492187529802322,
+          0.12300781905651093,
+          0.11660156399011612,
+          0.11234375089406967,
+          0.11500000208616257,
+          0.1254296898841858
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.02164062112569809,
+        "control": 0.12691406160593033,
+        "candidate": 0.1254296898841858
+      }
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.028359368443489075,
+        "control": 0.07457031309604645,
+        "candidate": 0.07363281399011612
+      },
+      "candidateOverControl": 0.9874279848507163,
+      "candidateOverJS": 2.5964193856024043,
+      "controlOverJS": 2.629477212958414,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 33956,
+          "elapsedMs": 1000.1200008392334
+        },
+        "control": {
+          "operations": 13176,
+          "elapsedMs": 1000.045000076294
+        },
+        "candidate": {
+          "operations": 13572,
+          "elapsedMs": 1000.0499992370605
+        }
+      },
+      "samples": {
+        "js": [
+          0.028671875596046448,
+          0.028437502682209015,
+          0.028242193162441254,
+          0.02835937589406967,
+          0.02792968600988388,
+          0.028359368443489075,
+          0.02808593213558197,
+          0.03492186963558197,
+          0.028164058923721313,
+          0.0283203125,
+          0.02789062261581421,
+          0.028671875596046448,
+          0.030781246721744537,
+          0.029726557433605194,
+          0.028359368443489075,
+          0.02847655862569809,
+          0.027890630066394806,
+          0.036796875298023224,
+          0.02792968600988388,
+          0.031718745827674866,
+          0.028203129768371582
+        ],
+        "control": [
+          0.07457031309604645,
+          0.07675781100988388,
+          0.07433594018220901,
+          0.07386718690395355,
+          0.0735156238079071,
+          0.07214844226837158,
+          0.07820312678813934,
+          0.0735156238079071,
+          0.07425781339406967,
+          0.07402344048023224,
+          0.0744921863079071,
+          0.07289062440395355,
+          0.08261718600988388,
+          0.07539062201976776,
+          0.07464843988418579,
+          0.07562500238418579,
+          0.07542968541383743,
+          0.07601562142372131,
+          0.07480468600988388,
+          0.07480469346046448,
+          0.07437499612569809
+        ],
+        "candidate": [
+          0.07312500476837158,
+          0.0735156238079071,
+          0.07328125089406967,
+          0.07933593541383743,
+          0.0783984363079071,
+          0.0764453187584877,
+          0.07390625029802322,
+          0.07269531488418579,
+          0.07304687798023224,
+          0.07304687052965164,
+          0.07562500238418579,
+          0.07421875,
+          0.07429687678813934,
+          0.07277344167232513,
+          0.08578125387430191,
+          0.07343749701976776,
+          0.07503906637430191,
+          0.07363281399011612,
+          0.07343750447034836,
+          0.07554687559604645,
+          0.0735156238079071
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.03492186963558197,
+        "control": 0.07820312678813934,
+        "candidate": 0.07933593541383743
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.011835940182209015,
+        "control": 0.1349218785762787,
+        "candidate": 0.14441406726837158
+      },
+      "candidateOverControl": 1.0703532206359434,
+      "candidateOverJS": 12.201317769875606,
+      "controlOverJS": 11.399337652878994,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 69779,
+          "elapsedMs": 1000.045000076294
+        },
+        "control": {
+          "operations": 6819,
+          "elapsedMs": 1009.039999961853
+        },
+        "candidate": {
+          "operations": 6704,
+          "elapsedMs": 1000.1349992752075
+        }
+      },
+      "samples": {
+        "js": [
+          0.037812501192092896,
+          0.012773431837558746,
+          0.012265630066394806,
+          0.011640623211860657,
+          0.01132812350988388,
+          0.011835940182209015,
+          0.012656256556510925,
+          0.012382812798023224,
+          0.011406250298023224,
+          0.01148436963558197,
+          0.011445313692092896,
+          0.011445306241512299,
+          0.011210933327674866,
+          0.011523440480232239,
+          0.01449219137430191,
+          0.04640624672174454,
+          0.01898437738418579,
+          0.011679686605930328,
+          0.011640623211860657,
+          0.012148439884185791,
+          0.011875003576278687
+        ],
+        "control": [
+          0.15160156041383743,
+          0.13472656160593033,
+          0.13343749940395355,
+          0.13144531100988388,
+          0.13089843839406967,
+          0.12992187589406967,
+          0.14347656071186066,
+          0.31996093690395355,
+          0.13535156100988388,
+          0.13039062917232513,
+          0.13871093839406967,
+          0.1349218785762787,
+          0.2923828139901161,
+          0.14582031220197678,
+          0.14195312559604645,
+          0.9130468741059303,
+          0.1368749961256981,
+          0.1315625011920929,
+          0.13371093571186066,
+          0.13195312768220901,
+          0.13304687291383743
+        ],
+        "candidate": [
+          0.13886718451976776,
+          0.1368750035762787,
+          0.23078124970197678,
+          0.1339453160762787,
+          0.13593750447034836,
+          0.21003906428813934,
+          0.15226562321186066,
+          0.13972655683755875,
+          0.14003906399011612,
+          0.2228124961256981,
+          0.14441406726837158,
+          0.14183594286441803,
+          0.26066406071186066,
+          0.15601562708616257,
+          0.1462109386920929,
+          0.5923046916723251,
+          0.25589843839406967,
+          0.13800781220197678,
+          0.13636718690395355,
+          0.1746484339237213,
+          0.1271093711256981
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.037812501192092896,
+        "control": 0.31996093690395355,
+        "candidate": 0.26066406071186066
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.08218749612569809,
+        "control": 0.5232812464237213,
+        "candidate": 0.4529687464237213
+      },
+      "candidateOverControl": 0.8656315308822186,
+      "candidateOverJS": 5.5114070603994065,
+      "controlOverJS": 6.366920408712922,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 10106,
+          "elapsedMs": 1000.0300006866455
+        },
+        "control": {
+          "operations": 1859,
+          "elapsedMs": 1000.085000038147
+        },
+        "candidate": {
+          "operations": 1941,
+          "elapsedMs": 1000.1999998092651
+        }
+      },
+      "samples": {
+        "js": [
+          0.08082031458616257,
+          0.08199218660593033,
+          0.09523437172174454,
+          0.11605468392372131,
+          0.08703125268220901,
+          0.09777343273162842,
+          0.07824219018220901,
+          0.09781250357627869,
+          0.07933593541383743,
+          0.0793749988079071,
+          0.09246093779802322,
+          0.07992187142372131,
+          0.09289062768220901,
+          0.08722656220197678,
+          0.08871093392372131,
+          0.09058593213558197,
+          0.07804687321186066,
+          0.08218749612569809,
+          0.07730468362569809,
+          0.08160156011581421,
+          0.08210936933755875
+        ],
+        "control": [
+          0.5057812333106995,
+          0.581250011920929,
+          0.5293750166893005,
+          0.8284375071525574,
+          0.5131250023841858,
+          0.5296874940395355,
+          0.539843738079071,
+          0.5024999976158142,
+          0.5548437237739563,
+          0.5134374797344208,
+          0.5125000178813934,
+          0.5534374713897705,
+          0.5048437416553497,
+          0.5146875083446503,
+          0.5151562690734863,
+          0.5232812464237213,
+          0.54296875,
+          0.5120312571525574,
+          0.5171875059604645,
+          0.5850000083446503,
+          0.5678125023841858
+        ],
+        "candidate": [
+          0.43843749165534973,
+          0.45781248807907104,
+          0.44578126072883606,
+          0.5529687404632568,
+          0.4428125023841858,
+          0.46046873927116394,
+          0.4529687464237213,
+          0.4440625011920929,
+          0.4698437452316284,
+          0.460625022649765,
+          0.4520312547683716,
+          0.44734373688697815,
+          0.4465624988079071,
+          0.49796873331069946,
+          0.43421876430511475,
+          0.43562501668930054,
+          0.45109376311302185,
+          0.4870312511920929,
+          0.47265625,
+          0.46015626192092896,
+          0.49796876311302185
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.09781250357627869,
+        "control": 0.5850000083446503,
+        "candidate": 0.49796876311302185
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.09609375149011612,
+        "control": 0.24242188036441803,
+        "candidate": 0.24101562798023224
+      },
+      "candidateOverControl": 0.9941991523946937,
+      "candidateOverJS": 2.5081300734212912,
+      "controlOverJS": 2.522764244346863,
+      "counts": {
+        "js": 128,
+        "control": 64,
+        "candidate": 64
+      },
+      "warmups": {
+        "js": {
+          "operations": 9654,
+          "elapsedMs": 1000.045000076294
+        },
+        "control": {
+          "operations": 4149,
+          "elapsedMs": 1000.1800003051758
+        },
+        "candidate": {
+          "operations": 4152,
+          "elapsedMs": 1000.2150001525879
+        }
+      },
+      "samples": {
+        "js": [
+          0.09609375149011612,
+          0.0930468738079071,
+          0.10429687798023224,
+          0.09199219197034836,
+          0.10460937023162842,
+          0.10539062321186066,
+          0.09105468541383743,
+          0.10843750089406967,
+          0.10363281518220901,
+          0.09242187440395355,
+          0.10191406309604645,
+          0.09343750029802322,
+          0.09488280862569809,
+          0.10554687678813934,
+          0.09171875566244125,
+          0.09375,
+          0.10257812589406967,
+          0.09125000238418579,
+          0.10363281518220901,
+          0.10410156846046448,
+          0.09031250327825546
+        ],
+        "control": [
+          0.2423437535762787,
+          0.2575000077486038,
+          0.24578124284744263,
+          0.2514062523841858,
+          0.24242188036441803,
+          0.24867188930511475,
+          0.24031250178813934,
+          0.2439843714237213,
+          0.24250000715255737,
+          0.2400781214237213,
+          0.23859374225139618,
+          0.23593750596046448,
+          0.23789063096046448,
+          0.24335937201976776,
+          0.24671874940395355,
+          0.26304687559604645,
+          0.2428906261920929,
+          0.23015624284744263,
+          0.23765625059604645,
+          0.23484376072883606,
+          0.23671874403953552
+        ],
+        "candidate": [
+          0.24257813394069672,
+          0.23734374344348907,
+          0.23554687201976776,
+          0.24507813155651093,
+          0.24953125417232513,
+          0.25,
+          0.2368749976158142,
+          0.24765625596046448,
+          0.24851562082767487,
+          0.23710937798023224,
+          0.2364843785762787,
+          0.26343749463558197,
+          0.23671874403953552,
+          0.2466406226158142,
+          0.2403906136751175,
+          0.24156248569488525,
+          0.24101562798023224,
+          0.25414063036441803,
+          0.24015626311302185,
+          0.2332812398672104,
+          0.23390625417232513
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.10554687678813934,
+        "control": 0.2575000077486038,
+        "candidate": 0.25414063036441803
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.01195313036441803,
+        "control": 0.14156249910593033,
+        "candidate": 0.14042969048023224
+      },
+      "candidateOverControl": 0.9919978198120788,
+      "candidateOverJS": 11.748360989876097,
+      "controlOverJS": 11.843131865049536,
+      "counts": {
+        "js": 128,
+        "control": 128,
+        "candidate": 128
+      },
+      "warmups": {
+        "js": {
+          "operations": 61708,
+          "elapsedMs": 1000.0050001144409
+        },
+        "control": {
+          "operations": 6700,
+          "elapsedMs": 1000.125
+        },
+        "candidate": {
+          "operations": 6513,
+          "elapsedMs": 1000.1050004959106
+        }
+      },
+      "samples": {
+        "js": [
+          0.012148432433605194,
+          0.012031249701976776,
+          0.011835940182209015,
+          0.014765620231628418,
+          0.011757813394069672,
+          0.011914059519767761,
+          0.012148432433605194,
+          0.01210937649011612,
+          0.01195313036441803,
+          0.012070313096046448,
+          0.011562496423721313,
+          0.012109369039535522,
+          0.01187499612569809,
+          0.11992187798023224,
+          0.01171875,
+          0.012070313096046448,
+          0.011835940182209015,
+          0.011796876788139343,
+          0.011835940182209015,
+          0.012226566672325134,
+          0.011914059519767761
+        ],
+        "control": [
+          0.2515234425663948,
+          0.13941406458616257,
+          0.14124999940395355,
+          0.2537500038743019,
+          0.13957031071186066,
+          0.13707031309604645,
+          0.14070312678813934,
+          0.23488281667232513,
+          0.14167968183755875,
+          0.14085937291383743,
+          0.2325781285762787,
+          0.13468750566244125,
+          0.14152344316244125,
+          0.14234375208616257,
+          0.14156249910593033,
+          0.5774218812584877,
+          0.1438281238079071,
+          0.2649218738079071,
+          0.1374218761920929,
+          0.13835937529802322,
+          0.25535156577825546
+        ],
+        "candidate": [
+          0.13828124850988388,
+          0.13968750089406967,
+          0.13863281160593033,
+          0.14226562529802322,
+          0.13738281279802322,
+          0.14195312559604645,
+          0.14042969048023224,
+          0.13648436963558197,
+          0.13976562023162842,
+          0.14066406339406967,
+          0.14378906041383743,
+          0.1410546898841858,
+          0.14406249672174454,
+          0.14128906279802322,
+          0.14390624314546585,
+          0.14917968958616257,
+          0.14792968332767487,
+          0.13523437082767487,
+          0.14023437350988388,
+          0.13972655683755875,
+          0.13917969167232513
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.014765620231628418,
+        "control": 0.2649218738079071,
+        "candidate": 0.14792968332767487
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.09855468571186066,
+        "control": 0.5220312476158142,
+        "candidate": 0.44624999165534973
+      },
+      "candidateOverControl": 0.8548338699904124,
+      "candidateOverJS": 4.527942922572228,
+      "controlOverJS": 5.296868878888727,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 10085,
+          "elapsedMs": 1000.0550003051758
+        },
+        "control": {
+          "operations": 1621,
+          "elapsedMs": 1033.005000114441
+        },
+        "candidate": {
+          "operations": 2088,
+          "elapsedMs": 1000.1299991607666
+        }
+      },
+      "samples": {
+        "js": [
+          0.16414062678813934,
+          0.09660156816244125,
+          0.10691406577825546,
+          0.10515625029802322,
+          0.10046875476837158,
+          0.10113281011581421,
+          0.09246093779802322,
+          0.10082031786441803,
+          0.09230468422174454,
+          0.09253906458616257,
+          0.09585937857627869,
+          0.0930468738079071,
+          0.09875000268220901,
+          0.09378906339406967,
+          0.09937499463558197,
+          0.09855468571186066,
+          0.09386718273162842,
+          0.09925781190395355,
+          0.0932031199336052,
+          0.10249999910593033,
+          0.09230469167232513
+        ],
+        "control": [
+          0.5301562547683716,
+          0.5528124868869781,
+          0.5239062309265137,
+          0.539374977350235,
+          0.5239062607288361,
+          0.5178124904632568,
+          0.5450000166893005,
+          0.5171875059604645,
+          0.5529687702655792,
+          0.515625,
+          0.5146875083446503,
+          0.5478124916553497,
+          0.5234375,
+          0.5220312476158142,
+          0.5209375023841858,
+          0.5212499797344208,
+          0.5189062654972076,
+          0.5196875035762787,
+          0.5307812392711639,
+          0.5132812559604645,
+          0.5215624868869781
+        ],
+        "candidate": [
+          0.44046875834465027,
+          0.44453126192092896,
+          0.4481250047683716,
+          0.4443749785423279,
+          0.4678124785423279,
+          0.44624999165534973,
+          0.4478124976158142,
+          0.44609376788139343,
+          0.4439062476158142,
+          0.4481250047683716,
+          0.4584375023841858,
+          0.4454687535762787,
+          0.4399999976158142,
+          0.46968749165534973,
+          0.44609373807907104,
+          0.4403125047683716,
+          0.46140626072883606,
+          0.44718748331069946,
+          0.44624999165534973,
+          0.4440625011920929,
+          0.45140624046325684
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.10691406577825546,
+        "control": 0.5528124868869781,
+        "candidate": 0.4678124785423279
+      }
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.1201171875,
+        "control": 0.2744531184434891,
+        "candidate": 0.27195312082767487
+      },
+      "candidateOverControl": 0.9908909848429033,
+      "candidateOverJS": 2.2640650059149516,
+      "controlOverJS": 2.2848779941962016,
+      "counts": {
+        "js": 128,
+        "control": 64,
+        "candidate": 64
+      },
+      "warmups": {
+        "js": {
+          "operations": 8595,
+          "elapsedMs": 1000.0500001907349
+        },
+        "control": {
+          "operations": 3864,
+          "elapsedMs": 1000.0649995803833
+        },
+        "candidate": {
+          "operations": 3841,
+          "elapsedMs": 1000.2700004577637
+        }
+      },
+      "samples": {
+        "js": [
+          0.12984374910593033,
+          0.1169140636920929,
+          0.11949218809604645,
+          0.12828125059604645,
+          0.11554687470197678,
+          0.1201171875,
+          0.13207031041383743,
+          0.11578124761581421,
+          0.11972656846046448,
+          0.13488281518220901,
+          0.11449218541383743,
+          0.11937500536441803,
+          0.12921874970197678,
+          0.12218749523162842,
+          0.1148046925663948,
+          0.1346093714237213,
+          0.12292968481779099,
+          0.12113281339406967,
+          0.1554296836256981,
+          0.1194140613079071,
+          0.11015625298023224
+        ],
+        "control": [
+          0.2744531184434891,
+          0.2720312476158142,
+          0.27195312082767487,
+          0.27492187917232513,
+          0.28718750178813934,
+          0.28578124940395355,
+          0.2727343738079071,
+          0.2717968821525574,
+          0.27421873807907104,
+          0.271484375,
+          0.2732812464237213,
+          0.29148437082767487,
+          0.28757813572883606,
+          0.27906249463558197,
+          0.2821093648672104,
+          0.2796093821525574,
+          0.2947656214237213,
+          0.2716406136751175,
+          0.3128125071525574,
+          0.251953125,
+          0.2512499988079071
+        ],
+        "candidate": [
+          0.2703906297683716,
+          0.2691406309604645,
+          0.28101561963558197,
+          0.2713281214237213,
+          0.2862499952316284,
+          0.2721875011920929,
+          0.27015624940395355,
+          0.2698437422513962,
+          0.29078125953674316,
+          0.2741406261920929,
+          0.2731249928474426,
+          0.28578124940395355,
+          0.28617188334465027,
+          0.2703906297683716,
+          0.27195312082767487,
+          0.2766406238079071,
+          0.2926562577486038,
+          0.27171875536441803,
+          0.259765625,
+          0.25148437917232513,
+          0.2557031214237213
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.13488281518220901,
+        "control": 0.2947656214237213,
+        "candidate": 0.29078125953674316
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.06945312768220901,
+        "control": 0.651562511920929,
+        "candidate": 0.6748437583446503
+      },
+      "candidateOverControl": 1.0357314087255938,
+      "candidateOverJS": 9.71653517797611,
+      "controlOverJS": 9.381327143425853,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 11061,
+          "elapsedMs": 1000.0350008010864
+        },
+        "control": {
+          "operations": 1353,
+          "elapsedMs": 1055.5299997329712
+        },
+        "candidate": {
+          "operations": 1348,
+          "elapsedMs": 1000.1799993515015
+        }
+      },
+      "samples": {
+        "js": [
+          0.2605859413743019,
+          0.1918359398841858,
+          0.07035156339406967,
+          0.17503906041383743,
+          0.06699218600988388,
+          0.16675781458616257,
+          0.07124999910593033,
+          0.19175781309604645,
+          0.06828125566244125,
+          0.06945312768220901,
+          0.06660155951976776,
+          0.17093750089406967,
+          0.06703124940395355,
+          0.09675780683755875,
+          0.06648437678813934,
+          0.06816406548023224,
+          0.06687500327825546,
+          0.06761718541383743,
+          0.06644531339406967,
+          0.06640625,
+          0.16398437321186066
+        ],
+        "control": [
+          0.7407812774181366,
+          0.6432812511920929,
+          0.8509374856948853,
+          0.6728124916553497,
+          0.651562511920929,
+          0.6306250095367432,
+          0.6642187535762787,
+          0.6376562416553497,
+          0.65625,
+          1.1039062440395355,
+          0.6379687488079071,
+          0.6390624940395355,
+          0.6393750011920929,
+          1.015625,
+          1.0739062428474426,
+          0.6345312595367432,
+          1.0014062523841858,
+          0.6104687750339508,
+          1.0103124976158142,
+          0.6360937356948853,
+          0.6384374797344208
+        ],
+        "candidate": [
+          0.6976562440395355,
+          0.6626562476158142,
+          0.7545312643051147,
+          0.6845312416553497,
+          0.6776562631130219,
+          0.711718738079071,
+          0.6748437583446503,
+          0.6510937511920929,
+          0.6951562464237213,
+          0.6876562535762787,
+          0.6429687440395355,
+          0.6518749892711639,
+          0.6557812392711639,
+          0.7512499988079071,
+          0.949999988079071,
+          0.6292187571525574,
+          0.6464062631130219,
+          0.6823437511920929,
+          0.6467187404632568,
+          0.6553125083446503,
+          0.6453125178813934
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.1918359398841858,
+        "control": 1.0739062428474426,
+        "candidate": 0.7545312643051147
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.48828125,
+        "control": 2.6875,
+        "candidate": 2.2581249475479126
+      },
+      "candidateOverControl": 0.8402325386224792,
+      "candidateOverJS": 4.624639892578125,
+      "controlOverJS": 5.504,
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 1986,
+          "elapsedMs": 1000.164999961853
+        },
+        "control": {
+          "operations": 354,
+          "elapsedMs": 1001.2650003433228
+        },
+        "candidate": {
+          "operations": 436,
+          "elapsedMs": 1001
+        }
+      },
+      "samples": {
+        "js": [
+          0.47859376668930054,
+          0.48359376192092896,
+          0.48375001549720764,
+          0.51171875,
+          0.5382812321186066,
+          0.48828125,
+          0.48124998807907104,
+          0.4790624976158142,
+          0.5004687607288361,
+          0.5178125202655792,
+          0.5243749916553497,
+          0.4884375035762787,
+          0.487968772649765,
+          0.47984373569488525,
+          0.49703124165534973,
+          0.5170312523841858,
+          0.5395312309265137,
+          0.4776562452316284,
+          0.4820312261581421,
+          0.47953125834465027,
+          0.5278125107288361
+        ],
+        "control": [
+          2.7312499284744263,
+          2.5362499952316284,
+          2.671875,
+          2.556874990463257,
+          2.549999952316284,
+          2.7356250286102295,
+          2.6962499618530273,
+          2.544374942779541,
+          2.7356250286102295,
+          2.605625033378601,
+          2.5393749475479126,
+          2.690000057220459,
+          2.6875,
+          2.5818750858306885,
+          2.711250066757202,
+          2.5387500524520874,
+          4.206249952316284,
+          3.151249885559082,
+          2.7012500762939453,
+          2.5843749046325684,
+          2.693125009536743
+        ],
+        "candidate": [
+          2.2412500381469727,
+          2.365000009536743,
+          2.452500104904175,
+          2.2387501001358032,
+          2.2581249475479126,
+          2.3874999284744263,
+          2.2899999618530273,
+          2.421875,
+          2.56125009059906,
+          2.253124952316284,
+          2.25,
+          2.3949999809265137,
+          2.25,
+          2.38937509059906,
+          2.2206249237060547,
+          2.2412500381469727,
+          3.2112499475479126,
+          2.411875009536743,
+          2.2543749809265137,
+          2.2337499856948853,
+          2.2318750619888306
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.5382812321186066,
+        "control": 3.151249885559082,
+        "candidate": 2.56125009059906
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.5775000154972076,
+        "control": 1.2940624952316284,
+        "candidate": 1.2799999713897705
+      },
+      "candidateOverControl": 0.9891330411833466,
+      "candidateOverJS": 2.2164501074302736,
+      "controlOverJS": 2.2408007974120747,
+      "counts": {
+        "js": 32,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "operations": 1519,
+          "elapsedMs": 1000.3249998092651
+        },
+        "control": {
+          "operations": 775,
+          "elapsedMs": 1001.085000038147
+        },
+        "candidate": {
+          "operations": 780,
+          "elapsedMs": 1000.0299997329712
+        }
+      },
+      "samples": {
+        "js": [
+          0.5696875154972076,
+          0.5757812261581421,
+          0.5940625071525574,
+          0.5685937404632568,
+          0.596875011920929,
+          0.5885937511920929,
+          0.5334374904632568,
+          0.5881249904632568,
+          0.5423437356948853,
+          0.5560937523841858,
+          0.5918750166893005,
+          0.5735937654972076,
+          0.5773437321186066,
+          0.614062488079071,
+          0.6315625011920929,
+          0.5832812488079071,
+          0.5667187571525574,
+          0.5959375202655792,
+          0.5775000154972076,
+          0.5995312333106995,
+          0.5418750047683716
+        ],
+        "control": [
+          1.2856250405311584,
+          1.2743749618530273,
+          1.290624976158142,
+          1.2771875262260437,
+          1.287500023841858,
+          1.267187476158142,
+          1.3449999690055847,
+          1.2946875095367432,
+          1.2959375381469727,
+          1.3340625166893005,
+          1.2871875166893005,
+          1.2715624570846558,
+          1.2893750071525574,
+          1.3003125190734863,
+          1.3028125166893005,
+          1.3103125095367432,
+          1.2940624952316284,
+          1.3128125071525574,
+          1.31312495470047,
+          1.2878125309944153,
+          1.370312511920929
+        ],
+        "candidate": [
+          1.270312488079071,
+          1.2637500166893005,
+          1.2678124904632568,
+          1.2799999713897705,
+          1.2868749499320984,
+          1.2809374928474426,
+          1.2706249952316284,
+          1.2696874737739563,
+          1.2778125405311584,
+          1.3990625143051147,
+          1.2971874475479126,
+          1.2778124809265137,
+          1.2837499976158142,
+          1.2809374928474426,
+          1.308437466621399,
+          1.2687499523162842,
+          1.2803124785423279,
+          1.3046875,
+          1.2734375,
+          1.3243749737739563,
+          1.2690625190734863
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.614062488079071,
+        "control": 1.3449999690055847,
+        "candidate": 1.3243749737739563
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.07292968779802322,
+        "control": 0.6153125166893005,
+        "candidate": 0.6409375071525574
+      },
+      "candidateOverControl": 1.0416454887040696,
+      "candidateOverJS": 8.788430699547437,
+      "controlOverJS": 8.437065004218745,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 10884,
+          "elapsedMs": 1000.0550003051758
+        },
+        "control": {
+          "operations": 1330,
+          "elapsedMs": 1003.0200004577637
+        },
+        "candidate": {
+          "operations": 1432,
+          "elapsedMs": 1000.0900001525879
+        }
+      },
+      "samples": {
+        "js": [
+          0.12046875059604645,
+          0.07238281518220901,
+          0.07339843362569809,
+          0.07011719048023224,
+          0.07074218988418579,
+          0.07027343660593033,
+          0.07269531488418579,
+          0.07078125327825546,
+          0.07359375059604645,
+          0.07292968779802322,
+          0.0710156187415123,
+          0.07214844226837158,
+          0.15367187559604645,
+          0.09183593839406967,
+          0.16968750208616257,
+          0.07316406071186066,
+          0.1717187464237213,
+          0.07046874612569809,
+          0.16207031160593033,
+          0.16273437440395355,
+          0.07035156339406967
+        ],
+        "control": [
+          0.6898437440395355,
+          0.6107812523841858,
+          0.6103124916553497,
+          0.5889062583446503,
+          0.6181249916553497,
+          0.9145312607288361,
+          0.6095312535762787,
+          0.5925000011920929,
+          0.9689062237739563,
+          0.6198437511920929,
+          0.6067187488079071,
+          0.5935937464237213,
+          0.628125011920929,
+          0.6731249988079071,
+          0.613593727350235,
+          0.6159375011920929,
+          0.6220312416553497,
+          0.6153125166893005,
+          0.5920312404632568,
+          0.5931249856948853,
+          0.6376562416553497
+        ],
+        "candidate": [
+          0.7018750011920929,
+          1.1495312452316284,
+          0.6159375011920929,
+          1.0762499868869781,
+          0.6478124856948853,
+          0.6215624809265137,
+          0.9618749916553497,
+          0.6362499892711639,
+          0.6310937702655792,
+          0.6303125023841858,
+          0.9814062714576721,
+          0.6476562321186066,
+          0.6753124892711639,
+          0.9081249833106995,
+          0.6598437428474426,
+          0.6409375071525574,
+          0.6349999904632568,
+          0.6365624964237213,
+          0.6278125047683716,
+          0.6179687678813934,
+          0.6326562464237213
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.16968750208616257,
+        "control": 0.9145312607288361,
+        "candidate": 1.0762499868869781
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 0.6099999845027924,
+        "control": 2.7793750762939453,
+        "candidate": 2.4399999380111694
+      },
+      "candidateOverControl": 0.8778951638526948,
+      "candidateOverJS": 4,
+      "controlOverJS": 4.556352699843753,
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 1731,
+          "elapsedMs": 1000.4950008392334
+        },
+        "control": {
+          "operations": 372,
+          "elapsedMs": 1001.5600004196167
+        },
+        "candidate": {
+          "operations": 411,
+          "elapsedMs": 1001.170000076294
+        }
+      },
+      "samples": {
+        "js": [
+          0.5784375071525574,
+          0.7084375023841858,
+          0.7681249976158142,
+          0.6390624940395355,
+          0.606249988079071,
+          0.6343749761581421,
+          0.5995312333106995,
+          0.6306249797344208,
+          0.6118749976158142,
+          0.6142187416553497,
+          0.5526562631130219,
+          0.5951562523841858,
+          0.6099999845027924,
+          0.621406227350235,
+          0.6107812523841858,
+          0.5970312356948853,
+          0.625781238079071,
+          0.5929687321186066,
+          0.5751562416553497,
+          0.585156261920929,
+          0.5803124904632568
+        ],
+        "control": [
+          2.8125,
+          2.8762500286102295,
+          3.8918750286102295,
+          4.126874923706055,
+          2.7943750619888306,
+          2.691249966621399,
+          2.7481250762939453,
+          2.8543750047683716,
+          2.7793750762939453,
+          2.8037500381469727,
+          2.6656250953674316,
+          2.664375066757202,
+          2.7081249952316284,
+          2.6712499856948853,
+          2.6881250143051147,
+          2.774999976158142,
+          2.727500081062317,
+          2.858750104904175,
+          2.8431249856948853,
+          2.7106250524520874,
+          2.865625023841858
+        ],
+        "candidate": [
+          2.3487499952316284,
+          3.1999999284744263,
+          2.559375047683716,
+          2.7987500429153442,
+          2.3618749380111694,
+          2.4399999380111694,
+          2.4550000429153442,
+          2.398750066757202,
+          2.4706250429153442,
+          2.378749966621399,
+          2.4668750762939453,
+          2.3993749618530273,
+          2.4250000715255737,
+          2.3768749237060547,
+          2.428125023841858,
+          2.393125057220459,
+          2.721250057220459,
+          2.524999976158142,
+          2.378124952316284,
+          2.5487500429153442,
+          2.5625
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.7084375023841858,
+        "control": 3.8918750286102295,
+        "candidate": 2.7987500429153442
+      }
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.6965624988079071,
+        "control": 1.4037500023841858,
+        "candidate": 1.3912500143051147
+      },
+      "candidateOverControl": 0.9910952890059906,
+      "candidateOverJS": 1.9973082339145327,
+      "controlOverJS": 2.0152534837671494,
+      "counts": {
+        "js": 32,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "operations": 1274,
+          "elapsedMs": 1000.5099992752075
+        },
+        "control": {
+          "operations": 707,
+          "elapsedMs": 1001.1450004577637
+        },
+        "candidate": {
+          "operations": 713,
+          "elapsedMs": 1001.1950006484985
+        }
+      },
+      "samples": {
+        "js": [
+          0.7317187488079071,
+          0.7253125011920929,
+          0.7164062559604645,
+          0.8292187750339508,
+          0.9920312464237213,
+          0.6910937428474426,
+          0.6496874988079071,
+          0.6965624988079071,
+          0.6942187249660492,
+          0.7126562297344208,
+          0.6649999916553497,
+          0.6742187440395355,
+          0.7128125131130219,
+          0.653124988079071,
+          0.7049999833106995,
+          0.686718761920929,
+          0.6864062249660492,
+          0.7015624940395355,
+          0.6909374892711639,
+          0.7142187654972076,
+          0.6945312321186066
+        ],
+        "control": [
+          1.4593749642372131,
+          1.4021875262260437,
+          1.4503124952316284,
+          1.42125004529953,
+          1.4325000047683716,
+          1.4931249618530273,
+          1.504687488079071,
+          1.3887499570846558,
+          1.464062511920929,
+          1.3965625166893005,
+          1.3840624690055847,
+          1.4390625357627869,
+          1.4037500023841858,
+          1.3884375095367432,
+          1.3850000500679016,
+          1.4053124785423279,
+          1.3834375143051147,
+          1.3690624833106995,
+          1.3924999833106995,
+          1.418125033378601,
+          1.3887500166893005
+        ],
+        "candidate": [
+          1.3868749737739563,
+          1.3918749690055847,
+          1.402187466621399,
+          1.4159374833106995,
+          1.8706250190734863,
+          1.4271875023841858,
+          1.4793750047683716,
+          1.3659375309944153,
+          1.3875000476837158,
+          1.3849999904632568,
+          1.389062523841858,
+          1.3909374475479126,
+          1.3912500143051147,
+          1.4340625405311584,
+          1.3978124856948853,
+          1.3837500214576721,
+          1.3909375071525574,
+          1.4028124809265137,
+          1.377500057220459,
+          1.4046874642372131,
+          1.3740625381469727
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.8292187750339508,
+        "control": 1.4931249618530273,
+        "candidate": 1.4793750047683716
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.29468750953674316,
+        "control": 2.4262501001358032,
+        "candidate": 2.552500009536743
+      },
+      "candidateOverControl": 1.0520349939991238,
+      "candidateOverJS": 8.66171767357681,
+      "controlOverJS": 8.233298058509282,
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 2580,
+          "elapsedMs": 1000.079999923706
+        },
+        "control": {
+          "operations": 360,
+          "elapsedMs": 1002.0199995040894
+        },
+        "candidate": {
+          "operations": 316,
+          "elapsedMs": 1002.4499998092651
+        }
+      },
+      "samples": {
+        "js": [
+          0.44078123569488525,
+          0.3006249964237213,
+          0.32468751072883606,
+          0.31203126907348633,
+          0.28593751788139343,
+          0.2860937714576721,
+          0.6971875131130219,
+          0.29468750953674316,
+          0.42265623807907104,
+          0.6778125166893005,
+          0.280937522649765,
+          0.6021874845027924,
+          0.28578126430511475,
+          0.28328126668930054,
+          0.28453123569488525,
+          0.28953126072883606,
+          0.28218749165534973,
+          0.2823437452316284,
+          0.5745312571525574,
+          0.29109373688697815,
+          0.6240625083446503
+        ],
+        "control": [
+          5.883124947547913,
+          5.015625,
+          5.335624933242798,
+          2.8912500143051147,
+          2.491249918937683,
+          2.409374952316284,
+          2.5618749856948853,
+          2.5075000524520874,
+          2.46875,
+          2.3774999380111694,
+          2.424999952316284,
+          2.384374976158142,
+          2.4375,
+          2.387500047683716,
+          2.4262501001358032,
+          2.4087499380111694,
+          3.353124976158142,
+          2.3206249475479126,
+          2.3799999952316284,
+          2.3787500858306885,
+          2.3768750429153442
+        ],
+        "candidate": [
+          2.869374990463257,
+          2.6018749475479126,
+          2.681249976158142,
+          3.3143749237060547,
+          4.120625019073486,
+          2.552500009536743,
+          2.632499933242798,
+          2.5962499380111694,
+          6.668125033378601,
+          2.474375009536743,
+          2.5206249952316284,
+          2.5162500143051147,
+          2.466249942779541,
+          3.8237500190734863,
+          2.4243749380111694,
+          3.8156250715255737,
+          2.475000023841858,
+          2.4975000619888306,
+          2.5231250524520874,
+          2.494374990463257,
+          2.481874942779541
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.6778125166893005,
+        "control": 5.335624933242798,
+        "candidate": 4.120625019073486
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 2.0737500190734863,
+        "control": 10.462500095367432,
+        "candidate": 9.05750036239624
+      },
+      "candidateOverControl": 0.8657108989090194,
+      "candidateOverJS": 4.36769151493147,
+      "controlOverJS": 5.045207956184558,
+      "counts": {
+        "js": 8,
+        "control": 2,
+        "candidate": 2
+      },
+      "warmups": {
+        "js": {
+          "operations": 488,
+          "elapsedMs": 1001.0100002288818
+        },
+        "control": {
+          "operations": 95,
+          "elapsedMs": 1004.045000076294
+        },
+        "candidate": {
+          "operations": 106,
+          "elapsedMs": 1004.2200002670288
+        }
+      },
+      "samples": {
+        "js": [
+          2.2387499809265137,
+          2.134999990463257,
+          2.330625057220459,
+          2.0149999856948853,
+          2.1637500524520874,
+          2.224375009536743,
+          1.9950000047683716,
+          2.1137501001358032,
+          2.159999966621399,
+          1.8650000095367432,
+          2.2112499475479126,
+          2.090000033378601,
+          1.9962499141693115,
+          1.8718749284744263,
+          1.8662500381469727,
+          1.9581249952316284,
+          2.113124966621399,
+          2.049375057220459,
+          2.0737500190734863,
+          1.8637499809265137,
+          1.8650000095367432
+        ],
+        "control": [
+          11.137500286102295,
+          11.125,
+          10.289999961853027,
+          10.244999885559082,
+          10.275000095367432,
+          10.315000057220459,
+          10.59749984741211,
+          10.71999979019165,
+          11.384999752044678,
+          10.462500095367432,
+          10.862500190734863,
+          10.417500019073486,
+          10.369999885559082,
+          10.40749979019165,
+          11.209999561309814,
+          12.22249984741211,
+          10.302499771118164,
+          10.507500171661377,
+          10.957499980926514,
+          10.232500076293945,
+          10.21500015258789
+        ],
+        "candidate": [
+          8.974999904632568,
+          10.337500095367432,
+          9.489999771118164,
+          9.974999904632568,
+          16.677500247955322,
+          9.05750036239624,
+          9.207499980926514,
+          9.047500133514404,
+          9.015000343322754,
+          9.054999828338623,
+          9.235000133514404,
+          9.052500247955322,
+          10.070000171661377,
+          9.887499809265137,
+          10.467499732971191,
+          9.005000114440918,
+          9.047500133514404,
+          8.982499599456787,
+          9.612500190734863,
+          8.90500020980835,
+          8.947500228881836
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 2.2387499809265137,
+        "control": 11.384999752044678,
+        "candidate": 10.467499732971191
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 2.3956249952316284,
+        "control": 5.383749961853027,
+        "candidate": 5.355000019073486
+      },
+      "candidateOverControl": 0.9946598666388203,
+      "candidateOverJS": 2.2353248232642193,
+      "controlOverJS": 2.247325842971714,
+      "counts": {
+        "js": 8,
+        "control": 4,
+        "candidate": 4
+      },
+      "warmups": {
+        "js": {
+          "operations": 324,
+          "elapsedMs": 1000.0699996948242
+        },
+        "control": {
+          "operations": 173,
+          "elapsedMs": 1003.625
+        },
+        "candidate": {
+          "operations": 183,
+          "elapsedMs": 1004.1999998092651
+        }
+      },
+      "samples": {
+        "js": [
+          2.5006250143051147,
+          2.524375081062317,
+          2.253749966621399,
+          2.4637500047683716,
+          2.383750081062317,
+          2.2056249380111694,
+          2.4231250286102295,
+          2.5456249713897705,
+          2.5049999952316284,
+          2.234375,
+          2.325000047683716,
+          2.3956249952316284,
+          2.2043750286102295,
+          2.288749933242798,
+          2.3431249856948853,
+          2.528749942779541,
+          2.153749942779541,
+          2.400624990463257,
+          2.398750066757202,
+          2.4418749809265137,
+          2.2237499952316284
+        ],
+        "control": [
+          5.53125,
+          5.3424999713897705,
+          5.3999998569488525,
+          5.357500076293945,
+          5.457499980926514,
+          5.25,
+          5.450000047683716,
+          5.383749961853027,
+          5.5325000286102295,
+          5.426249980926514,
+          5.375,
+          5.3500001430511475,
+          5.702499866485596,
+          5.421249866485596,
+          5.351249933242798,
+          5.387500047683716,
+          5.383749961853027,
+          5.37250018119812,
+          5.351249933242798,
+          5.362500190734863,
+          5.460000038146973
+        ],
+        "candidate": [
+          5.322499990463257,
+          5.230000019073486,
+          5.3424999713897705,
+          5.556250095367432,
+          5.4337499141693115,
+          5.278749942779541,
+          5.3062498569488525,
+          5.309999942779541,
+          5.357500076293945,
+          5.355000019073486,
+          5.4049999713897705,
+          5.3087499141693115,
+          5.461250066757202,
+          5.315000057220459,
+          5.356250047683716,
+          5.267499923706055,
+          5.384999990463257,
+          5.37375020980835,
+          5.377500057220459,
+          5.3062498569488525,
+          5.375
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 2.528749942779541,
+        "control": 5.5325000286102295,
+        "candidate": 5.461250066757202
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "medianMs": {
+        "js": 0.4764062613248825,
+        "control": 2.800624966621399,
+        "candidate": 2.7518749237060547
+      },
+      "candidateOverControl": 0.9825931556362025,
+      "candidateOverJS": 5.7763198074960425,
+      "controlOverJS": 5.8786485274834135,
+      "counts": {
+        "js": 64,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 2441,
+          "elapsedMs": 1000.1599998474121
+        },
+        "control": {
+          "operations": 321,
+          "elapsedMs": 1001.7449998855591
+        },
+        "candidate": {
+          "operations": 347,
+          "elapsedMs": 1000.2249994277954
+        }
+      },
+      "samples": {
+        "js": [
+          0.6876562386751175,
+          0.5569531172513962,
+          0.4673437476158142,
+          0.4467187523841858,
+          0.30882811546325684,
+          0.30601562559604645,
+          0.8024218827486038,
+          0.30367186665534973,
+          0.49460937082767487,
+          0.4623437523841858,
+          0.4764062613248825,
+          0.5302343815565109,
+          0.3070312440395355,
+          0.5473437458276749,
+          0.3095312565565109,
+          0.40687499940395355,
+          0.666015625,
+          0.4786718785762787,
+          0.4490624964237213,
+          0.4950000047683716,
+          0.5583593845367432
+        ],
+        "control": [
+          3.0731250047683716,
+          3.0893748998641968,
+          2.4643750190734863,
+          2.4399999380111694,
+          2.455625057220459,
+          3.9012500047683716,
+          2.800624966621399,
+          2.62375009059906,
+          2.7312499284744263,
+          2.596874952316284,
+          2.9043749570846558,
+          2.9443750381469727,
+          4.042500019073486,
+          2.9718750715255737,
+          2.6043750047683716,
+          4.905624985694885,
+          2.6237499713897705,
+          2.4731249809265137,
+          2.9574999809265137,
+          2.57937490940094,
+          4.738750100135803
+        ],
+        "candidate": [
+          3.1568750143051147,
+          2.762500047683716,
+          2.4831249713897705,
+          2.5674999952316284,
+          2.5737500190734863,
+          2.5700000524520874,
+          2.7768748998641968,
+          3.977500081062317,
+          2.659999966621399,
+          2.721250057220459,
+          2.8262500762939453,
+          2.890625,
+          2.7762500047683716,
+          2.65749990940094,
+          5.373124957084656,
+          17.288749933242798,
+          2.572499990463257,
+          2.7518749237060547,
+          2.740000009536743,
+          2.6118749380111694,
+          3.0337499380111694
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.6876562386751175,
+        "control": 4.738750100135803,
+        "candidate": 5.373124957084656
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "medianMs": {
+        "js": 2.6606249809265137,
+        "control": 11.769999980926514,
+        "candidate": 10.162500381469727
+      },
+      "candidateOverControl": 0.8634239930278872,
+      "candidateOverJS": 3.8195914322095943,
+      "controlOverJS": 4.42377263436346,
+      "counts": {
+        "js": 8,
+        "control": 2,
+        "candidate": 2
+      },
+      "warmups": {
+        "js": {
+          "operations": 404,
+          "elapsedMs": 1002.1999998092651
+        },
+        "control": {
+          "operations": 88,
+          "elapsedMs": 1011.7750005722046
+        },
+        "candidate": {
+          "operations": 101,
+          "elapsedMs": 1000.8450002670288
+        }
+      },
+      "samples": {
+        "js": [
+          2.519374966621399,
+          2.6606249809265137,
+          2.721250057220459,
+          2.7887500524520874,
+          2.62375009059906,
+          2.79812490940094,
+          3.0268750190734863,
+          2.5149999856948853,
+          2.5981249809265137,
+          2.617500066757202,
+          2.2949999570846558,
+          2.481250047683716,
+          2.491249918937683,
+          2.718125104904175,
+          2.908750057220459,
+          2.9450000524520874,
+          3.1431249380111694,
+          2.816249966621399,
+          2.974375009536743,
+          2.528749942779541,
+          2.490000009536743
+        ],
+        "control": [
+          12.539999961853027,
+          12.494999885559082,
+          11.057499885559082,
+          11.125,
+          12.077499866485596,
+          11.920000076293945,
+          12.487500190734863,
+          11.492499828338623,
+          11.34749984741211,
+          12.272500038146973,
+          11.455000400543213,
+          12.227499961853027,
+          12.042500019073486,
+          11.885000228881836,
+          11.492499828338623,
+          11.769999980926514,
+          12.09749984741211,
+          10.987500190734863,
+          11.697500228881836,
+          11.457499980926514,
+          11.309999942779541
+        ],
+        "candidate": [
+          10.625,
+          10.112500190734863,
+          9.787499904632568,
+          9.767499923706055,
+          9.885000228881836,
+          10.44249963760376,
+          10.207499980926514,
+          11.56749963760376,
+          11.1850004196167,
+          10.162500381469727,
+          10.752500057220459,
+          11.005000114440918,
+          9.857500076293945,
+          9.84749984741211,
+          10.107500076293945,
+          10.079999923706055,
+          10.022500038146973,
+          10.092499732971191,
+          10.210000038146973,
+          10.732499599456787,
+          10.477499961853027
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 3.0268750190734863,
+        "control": 12.494999885559082,
+        "candidate": 11.1850004196167
+      }
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 3.1712499856948853,
+        "control": 5.9725000858306885,
+        "candidate": 5.914999961853027
+      },
+      "candidateOverControl": 0.9903725201923268,
+      "candidateOverJS": 1.8651951087220677,
+      "controlOverJS": 1.883326799455071,
+      "counts": {
+        "js": 8,
+        "control": 4,
+        "candidate": 4
+      },
+      "warmups": {
+        "js": {
+          "operations": 338,
+          "elapsedMs": 1001.4400005340576
+        },
+        "control": {
+          "operations": 164,
+          "elapsedMs": 1003.875
+        },
+        "candidate": {
+          "operations": 169,
+          "elapsedMs": 1001.8099994659424
+        }
+      },
+      "samples": {
+        "js": [
+          3.3100000619888306,
+          3.363124966621399,
+          2.8600000143051147,
+          3.0575000047683716,
+          3.1712499856948853,
+          3.2743749618530273,
+          4.266249895095825,
+          2.978124976158142,
+          2.9768749475479126,
+          3.2237499952316284,
+          2.8506250381469727,
+          2.875,
+          5.778124928474426,
+          5.268124938011169,
+          3.226875066757202,
+          2.659999966621399,
+          6.772499918937683,
+          2.8762500286102295,
+          3.1631250381469727,
+          3.3168749809265137,
+          2.7100000381469727
+        ],
+        "control": [
+          6.1937501430511475,
+          6.06000018119812,
+          6.081249952316284,
+          6.322499990463257,
+          6.351249933242798,
+          6.0375001430511475,
+          5.914999961853027,
+          6.5299999713897705,
+          6.038750171661377,
+          5.974999904632568,
+          5.9725000858306885,
+          5.90874981880188,
+          7.1875,
+          5.681250095367432,
+          5.776249885559082,
+          5.730000019073486,
+          5.8475000858306885,
+          5.734999895095825,
+          5.816249847412109,
+          5.662499904632568,
+          5.945000171661377
+        ],
+        "candidate": [
+          5.9437501430511475,
+          6.0662500858306885,
+          6.116250038146973,
+          5.971250057220459,
+          6.233750104904175,
+          7.767499923706055,
+          5.880000114440918,
+          6.1524999141693115,
+          5.9024999141693115,
+          5.815000057220459,
+          6.166249990463257,
+          5.836250066757202,
+          5.703749895095825,
+          5.613749980926514,
+          8.826249837875366,
+          5.716249942779541,
+          5.914999961853027,
+          5.72124981880188,
+          5.658750057220459,
+          5.643749952316284,
+          12.62625002861023
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 5.778124928474426,
+        "control": 6.5299999713897705,
+        "candidate": 8.826249837875366
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "sequence/small",
+      "sourceSHA256": "761e97cb09258622eb0e4b26b51a78b927bfecc75f05dad9ec97b7a982bc6bc6",
+      "sourceBytes": 228,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 4404
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 4421
+        }
+      ],
+      "checksum": 1476572468
+    },
+    {
+      "id": "er/small",
+      "sourceSHA256": "5a6e7a2ba89f903cdb22547387e4f04df621bae730a0a6a172bcfa1a0345790d",
+      "sourceBytes": 405,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 11874
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 12117
+        }
+      ],
+      "checksum": 1151735638
+    },
+    {
+      "id": "er/medium",
+      "sourceSHA256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "sourceBytes": 2598,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 70404
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 71927
+        }
+      ],
+      "checksum": 1372465584
+    },
+    {
+      "id": "er/large",
+      "sourceSHA256": "4969b249e415d09f27b830d3e67b339add055118255d2d65c7d4cbe0bfc3a50d",
+      "sourceBytes": 11257,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 296039
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 302426
+        }
+      ],
+      "checksum": 1386575931
+    }
+  ],
+  "browser": "156.0.8078.4",
+  "completedAt": "2026-10-20T07:43:53.696Z",
+  "hostAfter": {
+    "loadAverage": [
+      1.21,
+      0.73,
+      0.54
+    ],
+    "freeMemory": 11950870528
+  },
+  "succeeded": true
+}

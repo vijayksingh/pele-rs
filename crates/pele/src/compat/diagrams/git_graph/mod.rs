@@ -1,11 +1,14 @@
 //! Full Pele GitGraph source/model/render module, pinned 458322a5 (MIT, kepano).
+mod live_phase;
 mod model;
 mod parser;
+mod phase;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, Engine, ModuleDescriptor, Object, ParseContext, ParseOptions,
     PeleError, RenderResources, RenderSettings, Rendered,
 };
+pub(crate) use live_phase::{render_detached, GitGraphDetachedInput};
 pub use model::{GitCommit, GitModel};
 #[derive(Default)]
 pub struct GitGraph;

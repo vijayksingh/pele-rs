@@ -1,0 +1,102 @@
+{
+  "baseHead": "b6ee249c0b2c5b13d71fc4ee90090795915c1e8a",
+  "patchSha256": "6be935ddcb38a0544a18354165aa371903c78c01aa1296b9056d6fe20dc7c7b9",
+  "fileCount": 12,
+  "files": [
+    {
+      "path": "bindings/web/full.js",
+      "originalSha256": "a03ee9d8b13ef0008071837f0cb5efbe967b5293df139dd057bfe045cc05a06b",
+      "candidateSha256": "85ec323928b815cdf323c4d99a15e2108d1b3e7068fc7fca37aa5bba5453ce14"
+    },
+    {
+      "path": "bindings/web/layout-storage.js",
+      "originalSha256": "bff7722d727aae490ab96343e7e569f4dd13cd0a720bce7ec17bedf9612de819",
+      "candidateSha256": "d0adfce8fd4c2afcad9fa2aada01f47138a65476d9dbe87c8d7d4d46bb42d284"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/public_model.rs",
+      "originalSha256": "3f9a96e2c0560989c7a5b5e8ec577b110471877897e0391f75511436a5045518",
+      "candidateSha256": "c0569900debf0365e80df4ab71534111b05bc00c9dab2eea60925d042b301754"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/source_store.rs",
+      "originalSha256": "c10145534c9c97b05ac7a1ee4768b259a801de73160db302c82b967821d49bc0",
+      "candidateSha256": "fc11f9e69657b0bbbd79eeed6956d8b9f9f2347de24eecaf82ec982558d93cb5"
+    },
+    {
+      "path": "crates/pele/src/compat/public/binary.rs",
+      "originalSha256": "254bef3360c5140a47ee4c1bd0703752c9125449f34468737e7ecc6bf3de71ba",
+      "candidateSha256": "9208d30b60e7033da9f5eefc4b4771cff8891634dab8b7600c0a9a5d3eb7798e"
+    },
+    {
+      "path": "crates/pele/src/compat/public/captured_transport.rs",
+      "originalSha256": "5b8eca30c47f38b37520e1dfeb8fb1be3bca126c2a7c7e26cb40fab8e67fdc85",
+      "candidateSha256": "6b34c870d9dc29a44644e2773af2abf86cca1e2fbe8547bb42fdd65c2f450c4d"
+    },
+    {
+      "path": "crates/pele/src/compat/public/engine.rs",
+      "originalSha256": "883cbd6cc5af4890399e8e896a3d68237f867bede6318a913b4a94a2a23a3911",
+      "candidateSha256": "6486ca8fe4d15f0f3ea68a97aac6f46cd34ff1e6bc39171aea14bcc0547f62a5"
+    },
+    {
+      "path": "crates/pele/src/compat/public/mod.rs",
+      "originalSha256": "682f2a3ec93c56a3882263d7f74af06fc1ea8cfa72736b64ddc5ae707eac99ab",
+      "candidateSha256": "4b71f747dee67c88f4f9da3dfa47a20f5c3306b488ad9e5a29ddb1dc2adcfa1a"
+    },
+    {
+      "path": "crates/pele/src/compat/public/source_input.rs",
+      "originalSha256": null,
+      "candidateSha256": "cbf8159ad6529d51b9bde9fa8fb5d051ae39bd1ed6bfbfff5c866e9927dd9892"
+    },
+    {
+      "path": "crates/pele/tests/public_source_ingress.rs",
+      "originalSha256": null,
+      "candidateSha256": "b5435b6dd4b07a8b22b52263b38a3935170a98f744ac9ece4f36f74c34bfc31d"
+    },
+    {
+      "path": "crates/pele-wasm/src/lib.rs",
+      "originalSha256": "c7954248f151966f7e4b8e9b11c5bb5c6a6ace17cc8ba9f66c8631d3ee3fe728",
+      "candidateSha256": "4866029cbd39a27f16f7c21324a712b0cc94f033e1dba2ac072ce9b361804569"
+    },
+    {
+      "path": "tests/web/source-layout.spec.js",
+      "originalSha256": "db231d9165d29a841eac9a190ebe748ee1191140502c407852aada43edd1c259",
+      "candidateSha256": "ec5ce0fe5bb9bdd8b7778345e66aa86c4a36f510b25ad05e14428e0c0fa6109b"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "check-borrowed.log",
+      "sha256": "efb4808462101612ca09d921309ad430405de9f9d9f3adac06537c33684632e2"
+    },
+    {
+      "path": "check-wasm.log",
+      "sha256": "fae507c7439fcf1c004716a1c05e3252a912880f3b3ebde1d9ff4d82815565f5"
+    },
+    {
+      "path": "test-borrowed.log",
+      "sha256": "4904df4441eb8937d83332688273433ddb99e3bd668a362f31f293678893a246"
+    },
+    {
+      "path": "check-borrowed-source.json",
+      "sha256": "b088cffd22ebc16d94cf71539a3b618230ce595de01563f7d97d82176d20c172"
+    },
+    {
+      "path": "RESOURCE_PROOF.md",
+      "sha256": "bb738ed0f0c4634c6d2a6014d6c92b359fbaf0a3bf31314f82d938f5d0e946ad"
+    },
+    {
+      "path": "IMPLEMENTATION_PLAN.md",
+      "sha256": "84570d803552e89377c938ce0e5d9ee3b7a8511081382c19a92c05ecdff751b2"
+    }
+  ],
+  "checks": {
+    "isolatedNativeIntegrationCheck": "pass",
+    "isolatedWasmLibraryHostCheck": "pass",
+    "isolatedPublicFeatureTests": "5/5 pass",
+    "browser": "not run",
+    "wasm32Build": "not run",
+    "benchmark": "not run"
+  },
+  "scope": "Private only; no root source edits; bounded borrowed sparse source ingress"
+}

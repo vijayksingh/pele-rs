@@ -1,0 +1,13 @@
+# One canonical host string index: source finding
+
+Read-only finding, separate from dense-array and record-literal work. No implementation or measurement.
+
+`HostErOwner.firstStrings` and `lastStrings` are invariant-equal under the established ordinary-intrinsic contract. Constructor and disposeConstruction initialize two empty Maps. The only string-array append is intern(text,first): it looks up one selected Map, then appends one string and writes the same(text,id) to both Maps. No other setter imports raw string-table duplicates, and no operation replaces an individual map. Discard replaces both; dispose/abandon null both. Therefore induction from empty state proves every existing string has the same first/last ID and strings contains no duplicate text.
+
+Caller-root adoption does not import an arbitrary ModelGraph string table: its audit traverses actual caller values and uses the same intern. Method internText and construction addString likewise call intern; findString uses firstStrings while observedString uses lastStrings. Neither changes the invariant. Construction canonical ordering and owner history remain append-only. Scope is HostErOwner only: ModelBridge accepts graph tables with duplicate strings and must retain its existing distinct semantics.
+
+Temporary observation strings remain a different structure. observedString first checks the outer operation's temporary stringsIds, preserving stable handles when nested admission adds the same text permanently. A single permanent Map cannot replace that temporary table or change its lookup preference. Existing limits charge only newly admitted canonical text, so both limits and numeric IDs remain identical with one permanent Map.
+
+A narrowly valid future change would initialize/reset one canonical map; intern, findString and observedString query it; insert once after admitted append; disposal nulls it. No deferred index creation, copy-on-write, first-method work, alias rewrite or canonical ID change is necessary. All consumers are internal to host-er-store.js; the root facade never accesses firstStrings/lastStrings.
+
+Current medium source has181 unique strings. Removing the redundant index avoids181 duplicate Map.set calls/entries and one Map allocation on parse (plus corresponding reset/cleanup where used). Existing intern4.25% self includes lookup, validation, string pool append and both writes; it is not evidence that the duplicate map alone costs4.25%. Neither a CPU nor RSS reduction is proved. Changed Map intrinsics and recovery after allocation failure are not expanded into new parity guarantees. Parent should measure this independently if pursued, keeping native/WASM artifacts fixed and full callback/raw/temporary-ID lifecycle coverage.

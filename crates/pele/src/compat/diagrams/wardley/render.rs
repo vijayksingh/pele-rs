@@ -1,5 +1,8 @@
 //! Actual Wardley map projection, pipelines, links and responsive sizing, Pele 458322a5 (MIT).
-use super::model::*;
+use super::{
+    model::*,
+    phase::{PhaseInput, Typed},
+};
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{
@@ -173,23 +176,26 @@ impl Drawing<'_> {
         self.plot_h - p / 100. * self.plot_h
     }
 }
-struct Placed {
-    node: usize,
+struct Placed<N> {
+    node: N,
+    identity: u64,
     x: f64,
     y: f64,
 }
-fn reach(
-    at: &Placed,
-    node: &WardleyNode,
+fn reach<P: PhaseInput>(
+    input: &mut P,
+    at: &Placed<P::Value>,
     ux: f64,
     uy: f64,
     d: &mut Drawing<'_>,
-    labels: &mut HashMap<usize, Label>,
-) -> Result<f64, PeleError> {
-    if node.class_name.as_deref() == Some("anchor") {
-        if !labels.contains_key(&at.node) {
+    labels: &mut HashMap<u64, Label>,
+) -> Result<f64, P::Error> {
+    if input.field_text(&at.node, "className")?.as_deref() == Some("anchor") {
+        if !labels.contains_key(&at.identity) {
+            let text = input.field_text(&at.node, "label")?.unwrap_or_default();
+            input.keep_label(text.encode_utf16().count())?;
             let label = d.text(
-                &node.label,
+                &text,
                 d.small,
                 Some(if d.tight {
                     64f64.js_max(d.plot_w / 2.)
@@ -198,20 +204,18 @@ fn reach(
                 }),
                 1,
             )?;
-            labels.insert(at.node, label);
+            labels.insert(at.identity, label);
         }
-        let label = &labels[&at.node];
+        let label = &labels[&at.identity];
         Ok(1. / (ux / (label.width / 2. + 5.)).hypot(uy / (d.small * 0.8)))
-    } else if node.is_pipeline_parent == Some(true) {
+    } else if input.field_truth(&at.node, "isPipelineParent")? {
         Ok(10. / std::f64::consts::SQRT_2)
     } else {
-        Ok(
-            if node.source_strategy.as_ref().is_some_and(|s| !s.is_empty()) {
-                12.
-            } else {
-                6.
-            },
-        )
+        Ok(if input.field_truth(&at.node, "sourceStrategy")? {
+            12.
+        } else {
+            6.
+        })
     }
 }
 fn occupy(taken: &mut [u8], i: usize, ux: f64, uy: f64) {
@@ -236,8 +240,23 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let natural = dimension(c, model.size.as_ref().map(|s| s.width), "width", 900.);
-    let mut result = draw(model, c, o, r, natural, natural, false)?;
+    render_phases(&mut Typed(model), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let root = input.root();
+    let given = input.get(&root, "size")?;
+    let width = if input.nullish(&given) {
+        None
+    } else {
+        input.field_number(&given, "width")?
+    };
+    let natural = dimension(c, width, "width", 900.);
+    let mut result = draw(input, c, o, r, natural, natural, false)?;
     let Some(available) = o.max_width.filter(|n| *n > 0.) else {
         return Ok(result);
     };
@@ -246,31 +265,38 @@ pub(super) fn render(
     }
     let floor = 160f64.js_min(natural);
     let mut plot = natural;
-    result = draw(model, c, o, r, plot, natural, true)?;
+    result = draw(input, c, o, r, plot, natural, true)?;
     for _ in 0..3 {
         if !(result.width > available && plot > floor) {
             break;
         }
         plot = floor.js_max(plot - (result.width - available));
-        result = draw(model, c, o, r, plot, natural, true)?;
+        result = draw(input, c, o, r, plot, natural, true)?;
     }
     Ok(result)
 }
-fn draw(
-    model: &WardleyModel,
+fn draw<P: PhaseInput>(
+    input: &mut P,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     plot_w: f64,
     natural_w: f64,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
+    input.begin_draw();
+    let root = input.root();
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.8125);
     let tiny = round(size * 0.6875);
     let pad = o.padding.unwrap_or(8.);
-    let plot_h = dimension(c, model.size.as_ref().map(|s| s.height), "height", 600.)
-        * 0.75f64.js_max(plot_w / natural_w);
+    let given = input.get(&root, "size")?;
+    let height = if input.nullish(&given) {
+        None
+    } else {
+        input.field_number(&given, "height")?
+    };
+    let plot_h = dimension(c, height, "height", 600.) * 0.75f64.js_max(plot_w / natural_w);
     let show_grid = matches!(
         c.get("wardley-beta")
             .and_then(Value::as_object)
@@ -289,41 +315,63 @@ fn draw(
         max_x: plot_w,
         max_y: plot_h,
     };
-    let defaults = [
-        "Genesis".into(),
-        "Custom Built".into(),
-        "Product".into(),
-        "Commodity".into(),
-    ];
-    let stages = model
-        .axes
-        .stages
-        .as_deref()
-        .filter(|s| !s.is_empty())
-        .unwrap_or(&defaults);
-    let bounds = model.axes.stage_boundaries.as_deref();
-    let custom = bounds.is_some_and(|b| b.len() == stages.len());
+    let defaults = ["Genesis", "Custom Built", "Product", "Commodity"];
+    let axes = input.get(&root, "axes")?;
+    let stage_value = input.get(&axes, "stages")?;
+    let stages = if input.truthy(&stage_value) && input.count(&stage_value)? > 0 {
+        Some(input.get(&axes, "stages")?)
+    } else {
+        None
+    };
+    let bounds = input.get(&axes, "stageBoundaries")?;
+    let stage_count = if let Some(v) = &stages {
+        input.count(v)?
+    } else {
+        defaults.len()
+    };
+    let custom = !input.nullish(&bounds) && input.count(&bounds)? == stage_count;
     let mut frame = String::new();
     let mut stage_labels = String::new();
     let mut stage_bottom = plot_h;
     let mut previous = 0.;
-    for (i, stage) in stages.iter().enumerate() {
+    for i in 0..stage_count {
+        if let Some(v) = &stages {
+            if !input.has_index(v, i)? {
+                continue;
+            }
+        }
+        input.work(1)?;
+        let stage = if let Some(v) = &stages {
+            let v = input.index(v, i)?;
+            input.text(&v)?
+        } else {
+            defaults[i].into()
+        };
+        let current_count = if let Some(v) = &stages {
+            input.count(v)?
+        } else {
+            defaults.len()
+        };
         let start = if custom {
             previous
         } else {
-            i as f64 / stages.len() as f64
+            i as f64 / current_count as f64
         };
         let end = if custom {
-            clamp(bounds.unwrap()[i], 0., 1.)
+            {
+                let v = input.index(&bounds, i)?;
+                clamp(input.number(&v).unwrap_or(f64::NAN), 0., 1.)
+            }
         } else {
-            (i + 1) as f64 / stages.len() as f64
+            (i + 1) as f64 / current_count as f64
         };
         previous = end;
         if i > 0 {
             frame+=&format!("<path class=\"pele-wardley-stage\" d=\"M{},0V{}\" stroke=\"var(--_b)\" stroke-dasharray=\"4 4\"/>",num(start*plot_w),num(plot_h));
         }
+        input.keep_label(stage.encode_utf16().count())?;
         let label = d.text(
-            stage,
+            &stage,
             small,
             Some(48f64.js_max((end - start).abs() * plot_w - 12.)),
             0,
@@ -349,18 +397,18 @@ fn draw(
         num(plot_h),
         num(plot_w)
     );
-    let x_title = d.text(
-        model.axes.x_label.as_deref().unwrap_or("Evolution"),
-        small,
-        None,
-        0,
-    )?;
-    let y_title = d.text(
-        model.axes.y_label.as_deref().unwrap_or("Visibility"),
-        small,
-        None,
-        0,
-    )?;
+    let axes = input.get(&root, "axes")?;
+    let x_text = input
+        .field_text(&axes, "xLabel")?
+        .unwrap_or_else(|| "Evolution".into());
+    input.keep_label(x_text.encode_utf16().count())?;
+    let x_title = d.text(&x_text, small, None, 0)?;
+    let axes = input.get(&root, "axes")?;
+    let y_text = input
+        .field_text(&axes, "yLabel")?
+        .unwrap_or_else(|| "Visibility".into());
+    input.keep_label(y_text.encode_utf16().count())?;
+    let y_title = d.text(&y_text, small, None, 0)?;
     let attrs = format!(
         " class=\"pele-wardley-axis-label\" font-size=\"{}\" font-weight=\"var(--_hw)\"",
         svg::js_num(small)
@@ -378,33 +426,61 @@ fn draw(
     );
     d.grow(-16. - y_title.height / 2., 0., 0., 0.);
     let legend_top = stage_bottom + 6. + x_title.height + 10.;
-    let mut positions = Vec::new();
-    let mut indices = HashMap::new();
-    for (i, node) in model.nodes.iter().enumerate() {
+    let mut positions: Vec<Placed<P::Value>> = Vec::new();
+    let mut indices: HashMap<String, usize> = HashMap::new();
+    let node_list = input.get(&root, "nodes")?;
+    let mut ni = 0;
+    while ni < input.count(&node_list)? {
+        input.work(1)?;
+        let node = input.index(&node_list, ni)?;
+        ni += 1;
+        let id = input.field_text(&node, "id")?.unwrap_or_default();
+        let x = input.field_number(&node, "x")?.unwrap_or(f64::NAN);
+        let y = input.field_number(&node, "y")?.unwrap_or(f64::NAN);
         let at = Placed {
-            node: i,
-            x: d.x(node.x),
-            y: d.y(node.y),
+            identity: input.identity(&node)?,
+            node,
+            x: d.x(x),
+            y: d.y(y),
         };
-        if let Some(&p) = indices.get(&node.id) {
-            positions[p] = at
+        if let Some(&i) = indices.get(&id) {
+            positions[i] = at
         } else {
-            indices.insert(node.id.clone(), positions.len());
+            indices.insert(id, positions.len());
             positions.push(at)
         }
     }
     let mut pipelines = String::new();
-    let mut members: HashMap<&str, HashSet<&str>> = HashMap::new();
-    for pipeline in &model.pipelines {
-        members.insert(
-            &pipeline.node_id,
-            pipeline.component_ids.iter().map(String::as_str).collect(),
-        );
-        let mut parts: Vec<_> = pipeline
-            .component_ids
-            .iter()
-            .filter_map(|id| indices.get(id).copied())
-            .collect();
+    let mut members: HashMap<String, HashSet<String>> = HashMap::new();
+    let pipeline_list = input.get(&root, "pipelines")?;
+    let mut pi = 0;
+    while pi < input.count(&pipeline_list)? {
+        input.work(1)?;
+        let pipeline = input.index(&pipeline_list, pi)?;
+        pi += 1;
+        let id = input.field_text(&pipeline, "nodeId")?.unwrap_or_default();
+        let ids = input.get(&pipeline, "componentIds")?;
+        let mut member_set = HashSet::new();
+        let mut ci = 0;
+        while ci < input.count(&ids)? {
+            input.work(1)?;
+            let v = input.index(&ids, ci)?;
+            ci += 1;
+            member_set.insert(input.text(&v)?);
+        }
+        members.insert(id, member_set);
+        let ids = input.get(&pipeline, "componentIds")?;
+        let mut parts = Vec::new();
+        let mut ci = 0;
+        while ci < input.count(&ids)? {
+            input.work(1)?;
+            let v = input.index(&ids, ci)?;
+            ci += 1;
+            let id = input.text(&v)?;
+            if let Some(i) = indices.get(&id) {
+                parts.push(*i)
+            }
+        }
         if parts.is_empty() {
             continue;
         }
@@ -418,24 +494,32 @@ fn draw(
         let right = positions[*parts.last().unwrap()].x;
         let y = positions[parts[0]].y;
         let top = y - 12.;
-        if let Some(&p) = indices.get(&pipeline.node_id) {
-            positions[p].x = (left + right) / 2.;
-            positions[p].y = top - 10. / 6.;
+        let id = input.field_text(&pipeline, "nodeId")?.unwrap_or_default();
+        if let Some(&i) = indices.get(&id) {
+            positions[i].x = (left + right) / 2.;
+            positions[i].y = top - 10. / 6.;
         }
         d.grow(left - 15., top, right + 15., top + 24.);
-        pipelines+=&format!("<g class=\"pele-wardley-pipeline\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"24\" rx=\"{RADIUS}\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{}</g>",esc_text(&pipeline.node_id)?,num(left-15.),num(top),num(right-left+30.),if parts.len()>1{format!("<path d=\"M{},{}H{}\" stroke=\"{LINE}\" stroke-dasharray=\"4 4\"/>",num(left),num(y),num(right))}else{String::new()});
+        pipelines+=&format!("<g class=\"pele-wardley-pipeline\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"24\" rx=\"{RADIUS}\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{}</g>",esc_text(&id)?,num(left-15.),num(top),num(right-left+30.),if parts.len()>1{format!("<path d=\"M{},{}H{}\" stroke=\"{LINE}\" stroke-dasharray=\"4 4\"/>",num(left),num(y),num(right))}else{String::new()});
     }
     let mut anchor_labels = HashMap::new();
     let mut taken = vec![0; positions.len()];
     let mut links = String::new();
-    for link in &model.links {
-        let (Some(&fi), Some(&ti)) = (indices.get(&link.source), indices.get(&link.target)) else {
+    let link_list = input.get(&root, "links")?;
+    let mut li = 0;
+    while li < input.count(&link_list)? {
+        input.work(1)?;
+        let link = input.index(&link_list, li)?;
+        li += 1;
+        let source = input.field_text(&link, "source")?.unwrap_or_default();
+        let target = input.field_text(&link, "target")?.unwrap_or_default();
+        let (Some(&fi), Some(&ti)) = (indices.get(&source), indices.get(&target)) else {
             continue;
         };
         if fi == ti
             || members
-                .get(link.target.as_str())
-                .is_some_and(|m| m.contains(link.source.as_str()))
+                .get(target.as_str())
+                .is_some_and(|m| m.contains(source.as_str()))
         {
             continue;
         }
@@ -449,22 +533,8 @@ fn draw(
         }
         let ux = dx / distance;
         let uy = dy / distance;
-        let start = reach(
-            from,
-            &model.nodes[from.node],
-            ux,
-            uy,
-            &mut d,
-            &mut anchor_labels,
-        )?;
-        let end = reach(
-            to,
-            &model.nodes[to.node],
-            ux,
-            uy,
-            &mut d,
-            &mut anchor_labels,
-        )?;
+        let start = reach(input, from, ux, uy, &mut d, &mut anchor_labels)?;
+        let end = reach(input, to, ux, uy, &mut d, &mut anchor_labels)?;
         if start + end >= distance {
             continue;
         }
@@ -475,19 +545,26 @@ fn draw(
         let mut x2 = to.x - ux * end;
         let mut y2 = to.y - uy * end;
         let mut heads = String::new();
-        if matches!(link.flow.as_deref(), Some("forward" | "bidirectional")) {
+        if matches!(
+            input.field_text(&link, "flow")?.as_deref(),
+            Some("forward" | "bidirectional")
+        ) {
             heads += &marker("arrow_point", x2, y2, ux, uy, LINE);
             x2 -= ux * marker_trim("arrow_point");
             y2 -= uy * marker_trim("arrow_point");
         }
-        if matches!(link.flow.as_deref(), Some("backward" | "bidirectional")) {
+        if matches!(
+            input.field_text(&link, "flow")?.as_deref(),
+            Some("backward" | "bidirectional")
+        ) {
             heads += &marker("arrow_point", x1, y1, -ux, -uy, LINE);
             x1 += ux * marker_trim("arrow_point");
             y1 += uy * marker_trim("arrow_point");
         }
         let mut caption = String::new();
-        if let Some(text) = link.label.as_deref().filter(|s| !s.is_empty()) {
-            let label = d.text(text, tiny + 1., Some(200.), 0)?;
+        if let Some(text) = input.field_text(&link, "label")?.filter(|s| !s.is_empty()) {
+            input.keep_label(text.encode_utf16().count())?;
+            let label = d.text(&text, tiny + 1., Some(200.), 0)?;
             let side = if ux >= 0. { 1. } else { -1. };
             let px = uy * side;
             let py = -ux * side;
@@ -502,24 +579,30 @@ fn draw(
                 ),
             )?;
         }
-        links+=&format!("<g class=\"pele-edge{}\" data-id=\"{}-{}\"><path d=\"M{},{}L{},{}\" stroke=\"{LINE}\"{}/>{heads}{caption}</g>",if link.dashed{" pele-wardley-dashed"}else{""},esc_text(&link.source)?,esc_text(&link.target)?,num(x1),num(y1),num(x2),num(y2),if link.dashed{" stroke-dasharray=\"6 6\""}else{""});
+        links+=&format!("<g class=\"pele-edge{}\" data-id=\"{}-{}\"><path d=\"M{},{}L{},{}\" stroke=\"{LINE}\"{}/>{heads}{caption}</g>",if input.field_truth(&link,"dashed")?{" pele-wardley-dashed"}else{""},esc_text(&input.field_text(&link,"source")?.unwrap_or_default())?,esc_text(&input.field_text(&link,"target")?.unwrap_or_default())?,num(x1),num(y1),num(x2),num(y2),if input.field_truth(&link,"dashed")?{" stroke-dasharray=\"6 6\""}else{""});
     }
     let mut trends = String::new();
-    for trend in &model.trends {
-        let Some(&i) = indices.get(&trend.node_id) else {
+    let trend_list = input.get(&root, "trends")?;
+    let mut ti = 0;
+    while ti < input.count(&trend_list)? {
+        input.work(1)?;
+        let trend = input.index(&trend_list, ti)?;
+        ti += 1;
+        let trend_id = input.field_text(&trend, "nodeId")?.unwrap_or_default();
+        let Some(&i) = indices.get(&trend_id) else {
             continue;
         };
         let origin = &positions[i];
-        let tx = d.x(trend.target_x);
-        let ty = d.y(trend.target_y);
+        let tx = d.x(input.field_number(&trend, "targetX")?.unwrap_or(f64::NAN));
+        let ty = d.y(input.field_number(&trend, "targetY")?.unwrap_or(f64::NAN));
         let dx = tx - origin.x;
         let dy = ty - origin.y;
         let distance = dx.hypot(dy);
         let mut arrow = String::new();
         let start = if distance > 0. {
             reach(
+                input,
                 origin,
-                &model.nodes[origin.node],
                 dx / distance,
                 dy / distance,
                 &mut d,
@@ -543,17 +626,20 @@ fn draw(
             );
         }
         d.grow(tx - 6., ty - 6., tx + 6., ty + 6.);
-        trends+=&format!("<g class=\"pele-wardley-trend\" data-id=\"{}\">{arrow}<circle cx=\"{}\" cy=\"{}\" r=\"6\" fill=\"var(--_bg)\" stroke=\"{ACCENT}\"/></g>",esc_text(&trend.node_id)?,num(tx),num(ty));
+        trends+=&format!("<g class=\"pele-wardley-trend\" data-id=\"{}\">{arrow}<circle cx=\"{}\" cy=\"{}\" r=\"6\" fill=\"var(--_bg)\" stroke=\"{ACCENT}\"/></g>",esc_text(&input.field_text(&trend,"nodeId")?.unwrap_or_default())?,num(tx),num(ty));
     }
     let mut nodes = String::new();
     let tri = 1.2 * 6.;
     let dot = 0.7 * 6.;
     for (i, at) in positions.iter().enumerate() {
-        let node = &model.nodes[at.node];
+        let node = &at.node;
         let (x, y) = (at.x, at.y);
-        let anchor = node.class_name.as_deref() == Some("anchor");
-        let strategy = node.source_strategy.as_deref().filter(|s| !s.is_empty());
-        let parent = node.is_pipeline_parent == Some(true);
+        let anchor = input.field_text(node, "className")?.as_deref() == Some("anchor");
+        let strategy_value = input
+            .field_text(node, "sourceStrategy")?
+            .filter(|s| !s.is_empty());
+        let strategy = strategy_value.as_deref();
+        let parent = input.field_truth(node, "isPipelineParent")?;
         let mut shape = String::new();
         if let Some(strategy) = strategy {
             let fill = match strategy {
@@ -592,19 +678,25 @@ fn draw(
                 num(y)
             );
         }
-        if node.inertia == Some(true) {
+        if input.field_truth(node, "inertia")? {
             let offset =
                 if parent { 5. } else { 6. } + 10. + if strategy.is_some() { 10. } else { 0. };
             shape+=&format!("<rect class=\"pele-wardley-inertia\" x=\"{}\" y=\"{}\" width=\"4\" height=\"12\" fill=\"{LINE}\"/>",num(x+offset),num(y-6.));
         }
-        let ox = node.label_offset_x.map(|x| clamp(x, -5000., 5000.));
-        let oy = node.label_offset_y.map(|y| clamp(y, -5000., 5000.));
+        let ox = input
+            .field_number(node, "labelOffsetX")?
+            .map(|x| clamp(x, -5000., 5000.));
+        let oy = input
+            .field_number(node, "labelOffsetY")?
+            .map(|y| clamp(y, -5000., 5000.));
         let caption = if anchor {
-            let label = if let Some(l) = anchor_labels.get(&at.node) {
+            let label = if let Some(l) = anchor_labels.get(&at.identity) {
                 l.clone()
             } else {
+                let text = input.field_text(node, "label")?.unwrap_or_default();
+                input.keep_label(text.encode_utf16().count())?;
                 d.text(
-                    &node.label,
+                    &text,
                     small,
                     Some(if tight {
                         64f64.js_max(plot_w / 2.)
@@ -624,7 +716,9 @@ fn draw(
                 ),
             )?
         } else {
-            let label = d.text(&node.label, small, None, 0)?;
+            let text = input.field_text(node, "label")?.unwrap_or_default();
+            input.keep_label(text.encode_utf16().count())?;
+            let label = d.text(&text, small, None, 0)?;
             let attrs = format!(" class=\"pele-label\" font-size=\"{}\"", svg::js_num(small));
             let lift = 8. + if strategy.is_some() { 10. } else { 0. };
             if ox.is_some() || oy.is_some() {
@@ -634,7 +728,7 @@ fn draw(
                     y + oy.unwrap_or(-lift),
                     &attrs,
                 )
-            } else if node.in_pipeline == Some(true) {
+            } else if input.field_truth(node, "inPipeline")? {
                 d.centered(&label, x, y + 12. + 4. + label.height / 2., &attrs)?
             } else {
                 let busy = taken[i];
@@ -672,23 +766,38 @@ fn draw(
             "<g class=\"pele-node pele-wardley-{}\" data-id=\"{}\">{shape}{caption}</g>",
             if anchor {
                 "anchor"
-            } else if parent {
+            } else if input.field_truth(node, "isPipelineParent")? {
                 "pipeline-parent"
-            } else if node.in_pipeline == Some(true) {
+            } else if input.field_truth(node, "inPipeline")? {
                 "pipeline-component"
             } else {
                 "component"
             },
-            esc_text(&node.id)?
+            esc_text(&input.field_text(node, "id")?.unwrap_or_default())?
         );
     }
     let mut annotations = String::new();
-    for a in &model.annotations {
-        let label = d.text(&svg::js_num(a.number), tiny, Some(4000.), 1)?;
+    let annotation_list = input.get(&root, "annotations")?;
+    let mut ai = 0;
+    while ai < input.count(&annotation_list)? {
+        input.work(1)?;
+        let a = input.index(&annotation_list, ai)?;
+        ai += 1;
+        let label = d.text(
+            &svg::js_num(input.field_number(&a, "number")?.unwrap_or(f64::NAN)),
+            tiny,
+            Some(4000.),
+            1,
+        )?;
         let mut marks = String::new();
-        for p in &a.coordinates {
-            let x = d.x(p.x);
-            let y = d.y(p.y);
+        let coords = input.get(&a, "coordinates")?;
+        let mut ci = 0;
+        while ci < input.count(&coords)? {
+            input.work(1)?;
+            let p = input.index(&coords, ci)?;
+            ci += 1;
+            let x = d.x(input.field_number(&p, "x")?.unwrap_or(f64::NAN));
+            let y = d.y(input.field_number(&p, "y")?.unwrap_or(f64::NAN));
             let radius = 10f64.js_max(label.width / 2. + 4.);
             d.grow(x - radius, y - radius, x + radius, y + radius);
             marks += &format!(
@@ -709,25 +818,38 @@ fn draw(
         }
         annotations += &format!(
             "<g class=\"pele-wardley-annotation\" data-id=\"{}\">{marks}</g>",
-            esc_text(&svg::js_num(a.number))?
+            esc_text(&svg::js_num(
+                input.field_number(&a, "number")?.unwrap_or(f64::NAN)
+            ))?
         );
     }
-    let mut listed: Vec<_> = model
-        .annotations
-        .iter()
-        .filter(|a| a.text.as_ref().is_some_and(|s| !s.is_empty()))
-        .collect();
-    listed.sort_by(|a, b| {
-        a.number
-            .partial_cmp(&b.number)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
+    let list = input.get(&root, "annotations")?;
+    let mut listed = Vec::new();
+    let n = input.count(&list)?;
+    for i in 0..n {
+        input.work(1)?;
+        if !input.has_index(&list, i)? {
+            continue;
+        }
+        let a = input.index(&list, i)?;
+        if input.field_truth(&a, "text")? {
+            let number = input.field_number(&a, "number")?.unwrap_or(f64::NAN);
+            listed.push((a, number));
+        }
+    }
+    listed.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap_or(std::cmp::Ordering::Equal));
     if !listed.is_empty() {
         let mut lines = vec![];
         let (mut width, mut height) = (0f64, 0f64);
-        for a in listed {
+        for (a, _) in listed {
+            let caption = format!(
+                "{}. {}",
+                svg::js_num(input.field_number(&a, "number")?.unwrap_or(f64::NAN)),
+                input.field_text(&a, "text")?.unwrap_or_default()
+            );
+            input.keep_label(caption.encode_utf16().count())?;
             let line = d.text(
-                &format!("{}. {}", svg::js_num(a.number), a.text.as_ref().unwrap()),
+                &caption,
                 small,
                 Some(if tight {
                     80f64.js_max(plot_w - 20.)
@@ -742,10 +864,19 @@ fn draw(
         }
         width += 20.;
         height += 14.;
-        let (bx, by) = if let Some(b) = &model.annotations_box {
+        let b = input.get(&root, "annotationsBox")?;
+        let (bx, by) = if input.truthy(&b) {
             (
-                clamp(d.x(b.x), 0., 0f64.js_max(plot_w - width)),
-                clamp(d.y(b.y), 0., 0f64.js_max(plot_h - height)),
+                clamp(
+                    d.x(input.field_number(&b, "x")?.unwrap_or(f64::NAN)),
+                    0.,
+                    0f64.js_max(plot_w - width),
+                ),
+                clamp(
+                    d.y(input.field_number(&b, "y")?.unwrap_or(f64::NAN)),
+                    0.,
+                    0f64.js_max(plot_h - height),
+                ),
             )
         } else {
             (0., legend_top)
@@ -765,12 +896,19 @@ fn draw(
         annotations+=&format!("<g class=\"pele-wardley-annotations\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_bg)\" stroke=\"var(--_b)\"/>{rows}</g>",num(bx),num(by),num(width),num(height));
     }
     let mut notes = String::new();
-    for n in &model.notes {
-        let label = d.text(&n.text, small, Some(360f64.js_min(plot_w * 0.6)), 1)?;
+    let note_list = input.get(&root, "notes")?;
+    let mut ni = 0;
+    while ni < input.count(&note_list)? {
+        input.work(1)?;
+        let n = input.index(&note_list, ni)?;
+        ni += 1;
+        let note_text = input.field_text(&n, "text")?.unwrap_or_default();
+        input.keep_label(note_text.encode_utf16().count())?;
+        let label = d.text(&note_text, small, Some(360f64.js_min(plot_w * 0.6)), 1)?;
         notes += &d.starting(
             &label,
-            d.x(n.x),
-            d.y(n.y),
+            d.x(input.field_number(&n, "x")?.unwrap_or(f64::NAN)),
+            d.y(input.field_number(&n, "y")?.unwrap_or(f64::NAN)),
             &format!(
                 " class=\"pele-wardley-note\" font-size=\"{}\" font-weight=\"var(--_hw)\"",
                 svg::js_num(small)
@@ -778,10 +916,16 @@ fn draw(
         );
     }
     let mut forces = String::new();
-    for (forward, list) in [(true, &model.accelerators), (false, &model.deaccelerators)] {
-        for a in list {
-            let x = d.x(a.x);
-            let y = d.y(a.y);
+    for (forward, key) in [(true, "accelerators"), (false, "deaccelerators")] {
+        let list = input.get(&root, key)?;
+        let mut fi = 0;
+        while fi < input.count(&list)? {
+            input.work(1)?;
+            let a = input.index(&list, fi)?;
+            fi += 1;
+            let name = input.field_text(&a, "name")?.unwrap_or_default();
+            let x = d.x(input.field_number(&a, "x")?.unwrap_or(f64::NAN));
+            let y = d.y(input.field_number(&a, "y")?.unwrap_or(f64::NAN));
             let tip = if forward { x + 60. } else { x };
             let tail = if forward { x } else { x + 60. };
             let neck = if forward { x + 40. } else { x + 20. };
@@ -799,12 +943,17 @@ fn draw(
                 num(tail)
             );
             d.grow(x, y - 23., x + 60., y + 23.);
-            let label = d.text(&a.name, tiny + 1., Some(160.), 1)?;
-            forces+=&format!("<g class=\"pele-wardley-{}\" data-id=\"{}\"><path d=\"{path}\" fill=\"var(--_s)\" stroke=\"{LINE}\"/>{}</g>",if forward{"accelerator"}else{"deaccelerator"},esc_text(&a.name)?,d.centered(&label,x+30.,y+35.,&format!(" font-size=\"{}\" font-weight=\"var(--_hw)\"",svg::js_num(tiny+1.)))?);
+            input.keep_label(name.encode_utf16().count())?;
+            let label = d.text(&name, tiny + 1., Some(160.), 1)?;
+            forces+=&format!("<g class=\"pele-wardley-{}\" data-id=\"{}\"><path d=\"{path}\" fill=\"var(--_s)\" stroke=\"{LINE}\"/>{}</g>",if forward{"accelerator"}else{"deaccelerator"},esc_text(&name)?,d.centered(&label,x+30.,y+35.,&format!(" font-size=\"{}\" font-weight=\"var(--_hw)\"",svg::js_num(tiny+1.)))?);
         }
     }
+    let title_text = input.field_text(&root, "title")?;
+    if let Some(t) = &title_text {
+        input.keep_label(t.encode_utf16().count())?;
+    }
     let title = layout_label(
-        model.title.as_deref(),
+        title_text.as_deref(),
         false,
         d.r,
         o,
@@ -824,6 +973,8 @@ fn draw(
     let total_width = (right - left + 2. * pad).ceil();
     let total_height = (d.max_y - d.min_y + title_height + 2. * pad).ceil();
     let content=label_svg(&title,tx+plot_w/2.,pad+title.height/2.," class=\"pele-title\" font-weight=\"var(--_tw)\"")+&format!("<g transform=\"translate({},{})\"><g class=\"pele-wardley-frame\" fill=\"none\">{frame}</g>{stage_labels}{axis_labels}{pipelines}{}{nodes}{annotations}{notes}{forces}</g>",num(tx),num(ty),if links.is_empty(){String::new()}else{format!("<g class=\"pele-edges\" fill=\"none\">{links}</g>")}+&if trends.is_empty(){String::new()}else{format!("<g class=\"pele-wardley-trends\" fill=\"none\">{trends}</g>")});
+    let acc_title = input.field_text(&root, "accTitle")?;
+    let acc_descr = input.field_text(&root, "accDescr")?;
     Ok(Rendered {
         svg: svg::document(
             "wardley",
@@ -831,8 +982,8 @@ fn draw(
             total_height,
             size,
             o,
-            model.acc_title.as_deref(),
-            model.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width: total_width,

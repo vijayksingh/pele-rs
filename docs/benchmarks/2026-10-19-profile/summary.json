@@ -1,0 +1,2589 @@
+{
+  "browser": "156.0.8078.4",
+  "wasmSHA256": "0314e866996d2bd08934f26a1a07c375a006afb1459c72e9b9c33714ddb3a1d7",
+  "durationMs": 1500,
+  "profiles": [
+    {
+      "case": "flowchart/large",
+      "stage": "render-source",
+      "runtime": "js",
+      "operations": 818,
+      "checksum": 85069096,
+      "top": [
+        {
+          "name": "QR",
+          "percent": 8.9373500966116
+        },
+        {
+          "name": "q1",
+          "percent": 7.585888490009895
+        },
+        {
+          "name": "Ze",
+          "percent": 6.871402966209251
+        },
+        {
+          "name": "ch",
+          "percent": 6.8167513636999395
+        },
+        {
+          "name": "$1",
+          "percent": 4.911650892815516
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 4.535111712019726
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 4.408066162110639
+        },
+        {
+          "name": "yn",
+          "percent": 4.024663154459415
+        },
+        {
+          "name": "addVertex",
+          "percent": 3.871910630384219
+        },
+        {
+          "name": "z",
+          "percent": 3.8316342124211955
+        },
+        {
+          "name": "Sn",
+          "percent": 3.3120554700814853
+        },
+        {
+          "name": "width",
+          "percent": 3.204889116819743
+        },
+        {
+          "name": "W1",
+          "percent": 3.0641806662833284
+        },
+        {
+          "name": "addSingleLink",
+          "percent": 2.590835625592491
+        },
+        {
+          "name": "(program)",
+          "percent": 2.5089229749120654
+        },
+        {
+          "name": "Y",
+          "percent": 2.288891997036899
+        },
+        {
+          "name": "Dg",
+          "percent": 2.059342315881082
+        },
+        {
+          "name": "d",
+          "percent": 1.986171331478805
+        },
+        {
+          "name": "Ki",
+          "percent": 1.8461751648613507
+        },
+        {
+          "name": "bt",
+          "percent": 1.567024621712486
+        },
+        {
+          "name": "Bg",
+          "percent": 1.2405395744945373
+        },
+        {
+          "name": "wt",
+          "percent": 0.9901394004382489
+        },
+        {
+          "name": "addLink",
+          "percent": 0.9683823643681913
+        },
+        {
+          "name": "draw",
+          "percent": 0.9680585989504821
+        },
+        {
+          "name": "Hi",
+          "percent": 0.8989670588113406
+        },
+        {
+          "name": "M1",
+          "percent": 0.8841386026802597
+        },
+        {
+          "name": "De",
+          "percent": 0.8394589750363912
+        },
+        {
+          "name": "fontSet",
+          "percent": 0.8153708279588274
+        },
+        {
+          "name": "Ie",
+          "percent": 0.7697199040618314
+        },
+        {
+          "name": "w",
+          "percent": 0.733846695779653
+        },
+        {
+          "name": "_",
+          "percent": 0.6962899073253869
+        },
+        {
+          "name": "Bn",
+          "percent": 0.5937857760786569
+        },
+        {
+          "name": "je",
+          "percent": 0.5854973813853016
+        },
+        {
+          "name": "gt",
+          "percent": 0.534471951554333
+        },
+        {
+          "name": "D1",
+          "percent": 0.4936127558394331
+        }
+      ]
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "render-source",
+      "runtime": "wasm",
+      "operations": 498,
+      "checksum": 130233712,
+      "top": [
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 4.8006715965445945
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 4.309087281640437
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 4.043700414047561
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+          "percent": 3.8919304773206616
+        },
+        {
+          "name": "result",
+          "percent": 3.7635446409601343
+        },
+        {
+          "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[2887731908c91629]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+          "percent": 3.696825462629487
+        },
+        {
+          "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+          "percent": 3.615661258310748
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 3.252916211076161
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::render::draw",
+          "percent": 2.8163914122701104
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::output_limit::OutputLimit>::check",
+          "percent": 2.7014141874770043
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.10",
+          "percent": 2.515118695361527
+        },
+        {
+          "name": "(program)",
+          "percent": 2.395153726168946
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::layout::layered::layered",
+          "percent": 2.1515315614101453
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate",
+          "percent": 2.0912251973073954
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+          "percent": 1.8625014898457297
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_fwd",
+          "percent": 1.8372388883418924
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::svg::num",
+          "percent": 1.6666191643390527
+        },
+        {
+          "name": "decode",
+          "percent": 1.6574857622568961
+        },
+        {
+          "name": "width",
+          "percent": 1.5125820710669369
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 1.481230534841662
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 1.472226684562089
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_rev",
+          "percent": 1.3616542210568319
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+          "percent": 1.2663040943551689
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::slice::memchr::memchr_aligned",
+          "percent": 1.2453167023365963
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::graph::build_flow_graph",
+          "percent": 1.2285397439019967
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::layout::layered::position",
+          "percent": 1.194014188513419
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::unlink_chunk",
+          "percent": 1.1653832401424034
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::parser::Reader>::statement",
+          "percent": 1.0963969052665399
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::lexer::Lexer>::step",
+          "percent": 1.062583884792173
+        },
+        {
+          "name": "<u64 as core[ed718c3d60ebd546]::fmt::Display>::fmt",
+          "percent": 1.0194431345317738
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::layout::compound::compound_layout",
+          "percent": 0.9722215024899856
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc[508e33bd5656020b]::alloc::Global>[3]",
+          "percent": 0.8714302000798039
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::svg::esc",
+          "percent": 0.8013426748819783
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::parser::parse_with_policy",
+          "percent": 0.7738129168329249
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::model::FlowDb>::add_vertex",
+          "percent": 0.6896690210547589
+        }
+      ]
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "parse",
+      "runtime": "js",
+      "operations": 4001,
+      "checksum": 41247,
+      "top": [
+        {
+          "name": "z",
+          "percent": 17.76221694378464
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 15.437276326207442
+        },
+        {
+          "name": "addVertex",
+          "percent": 14.882280285035629
+        },
+        {
+          "name": "addSingleLink",
+          "percent": 12.499825811559779
+        },
+        {
+          "name": "Dg",
+          "percent": 8.629485352335708
+        },
+        {
+          "name": "Y",
+          "percent": 8.453903404592241
+        },
+        {
+          "name": "(program)",
+          "percent": 4.758511480601742
+        },
+        {
+          "name": "_",
+          "percent": 3.910245447347585
+        },
+        {
+          "name": "addLink",
+          "percent": 2.9772288202692003
+        },
+        {
+          "name": "w",
+          "percent": 2.692129849564529
+        },
+        {
+          "name": "y",
+          "percent": 1.6067775138558986
+        },
+        {
+          "name": "RR",
+          "percent": 1.3441646872525732
+        },
+        {
+          "name": "Pg",
+          "percent": 1.0846555819477435
+        },
+        {
+          "name": "Fl",
+          "percent": 0.645827395091053
+        },
+        {
+          "name": "Vl",
+          "percent": 0.624418052256532
+        },
+        {
+          "name": "_R",
+          "percent": 0.6184639746634996
+        },
+        {
+          "name": "I",
+          "percent": 0.572098178939034
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.2858590657165479
+        },
+        {
+          "name": "k",
+          "percent": 0.2782581155977831
+        },
+        {
+          "name": "M",
+          "percent": 0.2605859065716548
+        },
+        {
+          "name": "MS",
+          "percent": 0.19464766429136976
+        },
+        {
+          "name": "run",
+          "percent": 0.1384006334125099
+        },
+        {
+          "name": "parse",
+          "percent": 0.0656848772763262
+        },
+        {
+          "name": "vp",
+          "percent": 0.06511480601741884
+        },
+        {
+          "name": "(anonymous)",
+          "percent": 0.06422802850356295
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 0.06283452098178939
+        },
+        {
+          "name": "Zx",
+          "percent": 0.023499604117181314
+        },
+        {
+          "name": "tc",
+          "percent": 0.022042755344418054
+        },
+        {
+          "name": "now",
+          "percent": 0.020269200316706256
+        },
+        {
+          "name": "l",
+          "percent": 0.01906571654790182
+        }
+      ]
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "parse",
+      "runtime": "wasm",
+      "operations": 253,
+      "checksum": 43524,
+      "top": [
+        {
+          "name": "reconcile",
+          "percent": 20.875976258225663
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 8.88897346693511
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+          "percent": 3.4344420870105967
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 3.0318434193728594
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[ea32a956c287408e]::compat::public::graph::JsString>",
+          "percent": 2.9090188939470862
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u16>>::extend_desugared::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>",
+          "percent": 2.8696040908824076
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[ea32a956c287408e]::compat::public::schema::PrototypeId>",
+          "percent": 2.539384161442001
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::Arena>::property_position",
+          "percent": 2.147042373816185
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::get",
+          "percent": 2.0998865292330757
+        },
+        {
+          "name": "decodeGraphBinary",
+          "percent": 2.069696467311194
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::Arena>::intern",
+          "percent": 1.9928021215614455
+        },
+        {
+          "name": "(program)",
+          "percent": 1.9733850090860474
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 1.8308208277882747
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 1.5771081920216956
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u16> as alloc[508e33bd5656020b]::vec::spec_from_iter_nested::SpecFromIterNested<u16, core[ed718c3d60ebd546]::str::iter::EncodeUtf16>>::from_iter",
+          "percent": 1.2340510353965575
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[1]",
+          "percent": 1.2253423636883225
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq_by::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16, <core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>::{closure#0}>",
+          "percent": 1.2113439802758261
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::create_state",
+          "percent": 1.1698003907935792
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 1.1014211907141047
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::Arena>::ordered",
+          "percent": 1.0432988706465511
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::finish_grow[3]",
+          "percent": 0.9753712313223183
+        },
+        {
+          "name": "numberValue",
+          "percent": 0.936472497692202
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::Arena>::assign",
+          "percent": 0.9236997791867907
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::node",
+          "percent": 0.8935742259442296
+        },
+        {
+          "name": "atom",
+          "percent": 0.8297106334171731
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::put",
+          "percent": 0.7927471601666646
+        },
+        {
+          "name": "<hashbrown[ffa38be938e2ba6e]::map::HashMap<u32, std[5a6270b673d0c64d]::collections::hash::map::HashMap<u32, usize>, std[5a6270b673d0c64d]::hash::random::RandomState>>::rustc_entry",
+          "percent": 0.7615894680549795
+        },
+        {
+          "name": "properties",
+          "percent": 0.7551386001229535
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::parser::Reader>::statement",
+          "percent": 0.7478491193597643
+        },
+        {
+          "name": "<&str as core[ed718c3d60ebd546]::slice::cmp::SliceContains>::slice_contains",
+          "percent": 0.7339797533059086
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::Arena>::map_position",
+          "percent": 0.7194653004588503
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::flowchart::lexer::Lexer>::step",
+          "percent": 0.6992740838316092
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::unlink_chunk",
+          "percent": 0.6926296898616224
+        },
+        {
+          "name": "u32",
+          "percent": 0.6643748883193489
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::imported",
+          "percent": 0.6359265607391147
+        }
+      ]
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "render-model",
+      "runtime": "js",
+      "operations": 1233,
+      "checksum": 127785028,
+      "top": [
+        {
+          "name": "(program)",
+          "percent": 10.975108453317096
+        },
+        {
+          "name": "Ze",
+          "percent": 10.024912870109532
+        },
+        {
+          "name": "q1",
+          "percent": 9.967161922993999
+        },
+        {
+          "name": "QR",
+          "percent": 9.075131909086386
+        },
+        {
+          "name": "ch",
+          "percent": 7.5191140827017255
+        },
+        {
+          "name": "$1",
+          "percent": 5.939581255286432
+        },
+        {
+          "name": "yn",
+          "percent": 4.803279543015274
+        },
+        {
+          "name": "W1",
+          "percent": 4.275110111805834
+        },
+        {
+          "name": "Sn",
+          "percent": 3.368805248406074
+        },
+        {
+          "name": "width",
+          "percent": 2.896017494686913
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 2.8319879830644608
+        },
+        {
+          "name": "d",
+          "percent": 2.558396573088414
+        },
+        {
+          "name": "bt",
+          "percent": 2.355290934463633
+        },
+        {
+          "name": "Bg",
+          "percent": 2.0659438814796562
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 1.8593435701576275
+        },
+        {
+          "name": "Ki",
+          "percent": 1.840863267080657
+        },
+        {
+          "name": "wt",
+          "percent": 1.8005264517107311
+        },
+        {
+          "name": "rc",
+          "percent": 1.565139514441883
+        },
+        {
+          "name": "M1",
+          "percent": 1.5306666413944574
+        },
+        {
+          "name": "je",
+          "percent": 1.2131252798699745
+        },
+        {
+          "name": "De",
+          "percent": 1.0561611671969882
+        },
+        {
+          "name": "Hi",
+          "percent": 1.0328830931288813
+        },
+        {
+          "name": "draw",
+          "percent": 0.9276282900270334
+        },
+        {
+          "name": "Bn",
+          "percent": 0.6266718158793189
+        },
+        {
+          "name": "gt",
+          "percent": 0.5615169011848717
+        },
+        {
+          "name": "Es",
+          "percent": 0.5571337523781544
+        },
+        {
+          "name": "fontSet",
+          "percent": 0.5413188776295931
+        },
+        {
+          "name": "Ie",
+          "percent": 0.45472207282660976
+        },
+        {
+          "name": "add",
+          "percent": 0.41349678134721407
+        },
+        {
+          "name": "of",
+          "percent": 0.3611951543697624
+        },
+        {
+          "name": "k1",
+          "percent": 0.35438350419716114
+        },
+        {
+          "name": "S",
+          "percent": 0.34324793695847383
+        },
+        {
+          "name": "D1",
+          "percent": 0.3408786673332212
+        },
+        {
+          "name": "v1",
+          "percent": 0.33768015333913015
+        },
+        {
+          "name": "k",
+          "percent": 0.3178967519682707
+        }
+      ]
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "render-model",
+      "runtime": "wasm",
+      "operations": 185,
+      "checksum": 144563048,
+      "top": [
+        {
+          "name": "snapshot",
+          "percent": 11.84374837400489
+        },
+        {
+          "name": "(program)",
+          "percent": 10.994801545818769
+        },
+        {
+          "name": "reconcile",
+          "percent": 9.865887923409126
+        },
+        {
+          "name": "atom",
+          "percent": 4.987547833819752
+        },
+        {
+          "name": "decodeGraphBinary",
+          "percent": 3.2549465727570728
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 3.144792795008727
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 2.036159766140514
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 2.010498606965645
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 1.896560695145429
+        },
+        {
+          "name": "http://127.0.0.1:33475/package/full.js",
+          "percent": 1.6452114148404278
+        },
+        {
+          "name": "properties",
+          "percent": 1.5218722949354095
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::public_model::get",
+          "percent": 1.4812519807576783
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 1.4070474766920993
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+          "percent": 1.3010325955848616
+        },
+        {
+          "name": "string",
+          "percent": 1.2830579587434783
+        },
+        {
+          "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+          "percent": 1.2415507381426525
+        },
+        {
+          "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[2887731908c91629]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+          "percent": 1.215534816398545
+        },
+        {
+          "name": "http://127.0.0.1:33475/package/graph.js",
+          "percent": 1.178284746628573
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::graph::ModelGraph>::validate",
+          "percent": 1.0095360178611128
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 0.9874224843786216
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Reader>::node",
+          "percent": 0.9732319816091084
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::flowchart::render::draw",
+          "percent": 0.9647176799474005
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::output_limit::OutputLimit>::check",
+          "percent": 0.9600466394524358
+        },
+        {
+          "name": "encodeGraphBinary",
+          "percent": 0.9338533364237095
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq_by::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16, <core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>::{closure#0}>",
+          "percent": 0.8944155641434376
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate",
+          "percent": 0.8132340628828479
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::layout::layered::layered",
+          "percent": 0.8121106480802615
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.10",
+          "percent": 0.7750970866897814
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Reader>::take",
+          "percent": 0.7567676872791603
+        },
+        {
+          "name": "u32",
+          "percent": 0.7272041398426746
+        },
+        {
+          "name": "width",
+          "percent": 0.7108850616577346
+        },
+        {
+          "name": "errorKind",
+          "percent": 0.7107668074679886
+        },
+        {
+          "name": "decode",
+          "percent": 0.6762957111570463
+        },
+        {
+          "name": "render_numbers_operation_binary_with_functions",
+          "percent": 0.6690230784876708
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+          "percent": 0.6454904947282282
+        }
+      ]
+    },
+    {
+      "case": "er/large",
+      "stage": "render-source",
+      "runtime": "js",
+      "operations": 488,
+      "checksum": 168148856,
+      "top": [
+        {
+          "name": "(program)",
+          "percent": 19.487202297536065
+        },
+        {
+          "name": "q1",
+          "percent": 12.00616934950126
+        },
+        {
+          "name": "Ze",
+          "percent": 11.54084219766463
+        },
+        {
+          "name": "hg",
+          "percent": 7.990840295198443
+        },
+        {
+          "name": "width",
+          "percent": 6.9439479871103895
+        },
+        {
+          "name": "d",
+          "percent": 6.036498411842665
+        },
+        {
+          "name": "ch",
+          "percent": 3.232852750724947
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 2.9601302037139354
+        },
+        {
+          "name": "W1",
+          "percent": 2.865006894430276
+        },
+        {
+          "name": "addEntity",
+          "percent": 2.7090046672050736
+        },
+        {
+          "name": "ng",
+          "percent": 2.022562713056116
+        },
+        {
+          "name": "De",
+          "percent": 2.001608789715321
+        },
+        {
+          "name": "fontSet",
+          "percent": 1.5057885883111406
+        },
+        {
+          "name": "U",
+          "percent": 1.4764745318727395
+        },
+        {
+          "name": "Sn",
+          "percent": 1.343033945891718
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 1.1458205497430598
+        },
+        {
+          "name": "gg",
+          "percent": 0.9770101698875509
+        },
+        {
+          "name": "je",
+          "percent": 0.9712759760321414
+        },
+        {
+          "name": "Qa",
+          "percent": 0.9008579318638434
+        },
+        {
+          "name": "s",
+          "percent": 0.8795824649423714
+        },
+        {
+          "name": "D",
+          "percent": 0.8595395817468284
+        },
+        {
+          "name": "Ki",
+          "percent": 0.747374462687279
+        },
+        {
+          "name": "yn",
+          "percent": 0.727010035911059
+        },
+        {
+          "name": "gt",
+          "percent": 0.6783497740352487
+        },
+        {
+          "name": "h",
+          "percent": 0.6685962854213748
+        },
+        {
+          "name": "y",
+          "percent": 0.615809547593541
+        },
+        {
+          "name": "Ie",
+          "percent": 0.5441053291025344
+        },
+        {
+          "name": "o",
+          "percent": 0.4698823525628899
+        },
+        {
+          "name": "Cs",
+          "percent": 0.4184353796545443
+        },
+        {
+          "name": "nn",
+          "percent": 0.3907826317163085
+        },
+        {
+          "name": "ig",
+          "percent": 0.33472686748492364
+        },
+        {
+          "name": "sg",
+          "percent": 0.3294213984037505
+        },
+        {
+          "name": "Hi",
+          "percent": 0.32454465409681355
+        },
+        {
+          "name": "addAttributes",
+          "percent": 0.25868181065477525
+        },
+        {
+          "name": "a",
+          "percent": 0.23097547211975997
+        }
+      ]
+    },
+    {
+      "case": "er/large",
+      "stage": "render-source",
+      "runtime": "wasm",
+      "operations": 182,
+      "checksum": 223190388,
+      "top": [
+        {
+          "name": "(program)",
+          "percent": 21.760022812998223
+        },
+        {
+          "name": "handleError",
+          "percent": 4.73603027907037
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 4.518166146029112
+        },
+        {
+          "name": "result",
+          "percent": 4.250528198680476
+        },
+        {
+          "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[2887731908c91629]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+          "percent": 4.14449960466111
+        },
+        {
+          "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+          "percent": 3.3850860024109193
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 3.3410672853828305
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+          "percent": 3.249037576637416
+        },
+        {
+          "name": "decode",
+          "percent": 2.760113546513889
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::output_limit::OutputLimit>::check",
+          "percent": 2.4604337062048764
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::Er as pele[ea32a956c287408e]::compat::module::DiagramModule>::parse",
+          "percent": 2.402934581135206
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.10",
+          "percent": 2.3684039974594615
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 2.256153676651674
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 2.052029190268182
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::er::render::draw",
+          "percent": 1.848475028840296
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate",
+          "percent": 1.766140844340173
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::svg::num",
+          "percent": 1.5112574369078018
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_fwd",
+          "percent": 1.4453589806737612
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 1.3984886388676456
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::text::layout_label",
+          "percent": 1.3452410271033972
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::model::ErModel>::add_entity",
+          "percent": 1.3177098860646281
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+          "percent": 1.2908009177047013
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc[508e33bd5656020b]::alloc::Global>[3]",
+          "percent": 1.1690624635445697
+        },
+        {
+          "name": "decodeText",
+          "percent": 1.1212588627201907
+        },
+        {
+          "name": "<pele_wasm[2887731908c91629]::BrowserResources as pele[ea32a956c287408e]::compat::module::RenderResources>::text_width",
+          "percent": 1.0777586229244709
+        },
+        {
+          "name": "<u64 as core[ed718c3d60ebd546]::fmt::Display>::fmt",
+          "percent": 1.0330658854943033
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_rev",
+          "percent": 1.0162672231655627
+        },
+        {
+          "name": "wasm-to-js",
+          "percent": 1.0090085419124033
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 0.8395701823743665
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::svg::esc",
+          "percent": 0.6610066235466435
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::model::ErModel>::set_class",
+          "percent": 0.6472151291656405
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::unlink_chunk",
+          "percent": 0.6433265499228765
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::layout::layered::position",
+          "percent": 0.5952118627590766
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[1]",
+          "percent": 0.5759245097149671
+        },
+        {
+          "name": "ryu_js[fec93a693d864c8d]::pretty::format64",
+          "percent": 0.5197734254494549
+        }
+      ]
+    },
+    {
+      "case": "er/large",
+      "stage": "parse",
+      "runtime": "js",
+      "operations": 3594,
+      "checksum": 8150,
+      "top": [
+        {
+          "name": "ng",
+          "percent": 20.590398191977744
+        },
+        {
+          "name": "addEntity",
+          "percent": 14.556214784424371
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 14.04800060232792
+        },
+        {
+          "name": "h",
+          "percent": 11.906685904812717
+        },
+        {
+          "name": "U",
+          "percent": 7.085855743761395
+        },
+        {
+          "name": "y",
+          "percent": 5.314440487340404
+        },
+        {
+          "name": "x",
+          "percent": 4.713800124489757
+        },
+        {
+          "name": "sg",
+          "percent": 3.9693280084429756
+        },
+        {
+          "name": "S",
+          "percent": 3.589887381554616
+        },
+        {
+          "name": "D",
+          "percent": 3.586577174238279
+        },
+        {
+          "name": "(program)",
+          "percent": 2.3225972276040134
+        },
+        {
+          "name": "Fl",
+          "percent": 1.4764822751379416
+        },
+        {
+          "name": "addAttributes",
+          "percent": 1.0631607027764851
+        },
+        {
+          "name": "addRelationship",
+          "percent": 0.9541834854406048
+        },
+        {
+          "name": "_",
+          "percent": 0.892263136817359
+        },
+        {
+          "name": "f",
+          "percent": 0.7983441174695217
+        },
+        {
+          "name": "Vl",
+          "percent": 0.7318803470395389
+        },
+        {
+          "name": "k",
+          "percent": 0.6704143405969667
+        },
+        {
+          "name": "i",
+          "percent": 0.5287893922783897
+        },
+        {
+          "name": "g",
+          "percent": 0.22068048775580276
+        },
+        {
+          "name": "M",
+          "percent": 0.21762990454270784
+        },
+        {
+          "name": "parse",
+          "percent": 0.17531117571424212
+        },
+        {
+          "name": "run",
+          "percent": 0.15564464989365148
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.14623327615112458
+        },
+        {
+          "name": "MS",
+          "percent": 0.10819834502615389
+        },
+        {
+          "name": "parseEvaluationResultValue",
+          "percent": 0.025508068143538377
+        },
+        {
+          "name": "vp",
+          "percent": 0.02317145121435929
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 0.02284692108530664
+        },
+        {
+          "name": "l",
+          "percent": 0.021873330698148685
+        },
+        {
+          "name": "Zx",
+          "percent": 0.021094458388422322
+        },
+        {
+          "name": "(anonymous)",
+          "percent": 0.020964646336801264
+        },
+        {
+          "name": "isArrayBuffer",
+          "percent": 0.020899740310990733
+        },
+        {
+          "name": "now",
+          "percent": 0.02064011620774861
+        }
+      ]
+    },
+    {
+      "case": "er/large",
+      "stage": "parse",
+      "runtime": "wasm",
+      "operations": 242,
+      "checksum": 8634,
+      "top": [
+        {
+          "name": "reconcile",
+          "percent": 28.479128776261184
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 12.74563238801859
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::Er as pele[ea32a956c287408e]::compat::module::DiagramModule>::parse",
+          "percent": 4.155360592936415
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::graph::GraphWriter>::string::<&str>",
+          "percent": 2.8623169295145665
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::model::ErModel>::add_entity",
+          "percent": 2.485740835161515
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[ea32a956c287408e]::compat::public::graph::JsString>",
+          "percent": 2.2793174875739006
+        },
+        {
+          "name": "decodeGraphBinary",
+          "percent": 2.2499493709297322
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 2.2104879991196076
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u16>>::extend_desugared::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>",
+          "percent": 2.112095040695354
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 1.7296583465685211
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 1.6994436988459176
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+          "percent": 1.4907412291240552
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+          "percent": 1.3992507548778097
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::node",
+          "percent": 1.3590079697645145
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u16> as alloc[508e33bd5656020b]::vec::spec_from_iter_nested::SpecFromIterNested<u16, core[ed718c3d60ebd546]::str::iter::EncodeUtf16>>::from_iter",
+          "percent": 1.3106254627431904
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::model::ErModel>::set_class",
+          "percent": 1.1729664858346047
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate",
+          "percent": 1.1062207661887673
+        },
+        {
+          "name": "(program)",
+          "percent": 0.9989717903285777
+        },
+        {
+          "name": "u32",
+          "percent": 0.9984508481264639
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::unlink_chunk",
+          "percent": 0.9380866704565212
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::graph::ModelGraph>::validate",
+          "percent": 0.93437495726646
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String>::from_utf16",
+          "percent": 0.9109976759466009
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::finish_grow[3]",
+          "percent": 0.8773969039102573
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::atom",
+          "percent": 0.8642431133068825
+        },
+        {
+          "name": "binaryResult",
+          "percent": 0.845554311806048
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq_by::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16, <core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>::{closure#0}>",
+          "percent": 0.8305121057200106
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::er::public_model::own",
+          "percent": 0.7848645452597841
+        },
+        {
+          "name": "properties",
+          "percent": 0.7834970719792352
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::insert_large_chunk",
+          "percent": 0.7155141146033774
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 0.7032719728537018
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::public_model::Import>::text",
+          "percent": 0.6489637482833327
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::Er as pele[ea32a956c287408e]::compat::public::engine::PublicDiagramModule>::create_public",
+          "percent": 0.6487683949575399
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::put",
+          "percent": 0.647661392778048
+        },
+        {
+          "name": "u8",
+          "percent": 0.6348983088262586
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::er::lexer::Scanner>::emit",
+          "percent": 0.6315121845125186
+        }
+      ]
+    },
+    {
+      "case": "er/large",
+      "stage": "render-model",
+      "runtime": "js",
+      "operations": 578,
+      "checksum": 200206012,
+      "top": [
+        {
+          "name": "q1",
+          "percent": 15.693588013486636
+        },
+        {
+          "name": "Ze",
+          "percent": 14.405659766405114
+        },
+        {
+          "name": "(program)",
+          "percent": 12.300225263463737
+        },
+        {
+          "name": "hg",
+          "percent": 9.489303631928484
+        },
+        {
+          "name": "width",
+          "percent": 7.074007886846679
+        },
+        {
+          "name": "d",
+          "percent": 6.590692027330333
+        },
+        {
+          "name": "W1",
+          "percent": 4.124054182251619
+        },
+        {
+          "name": "ch",
+          "percent": 3.7383466560248495
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 3.638929680576292
+        },
+        {
+          "name": "De",
+          "percent": 3.2861277729839036
+        },
+        {
+          "name": "fontSet",
+          "percent": 1.728303441145909
+        },
+        {
+          "name": "je",
+          "percent": 1.6445224688782276
+        },
+        {
+          "name": "a",
+          "percent": 1.4652335219572075
+        },
+        {
+          "name": "Sn",
+          "percent": 1.3925961191206733
+        },
+        {
+          "name": "Qa",
+          "percent": 1.1751506569746784
+        },
+        {
+          "name": "gg",
+          "percent": 1.1183242872053736
+        },
+        {
+          "name": "yn",
+          "percent": 1.1093394197059148
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 1.095103655615863
+        },
+        {
+          "name": "gt",
+          "percent": 0.9355347425572916
+        },
+        {
+          "name": "Ki",
+          "percent": 0.8092215079058083
+        },
+        {
+          "name": "ig",
+          "percent": 0.6870506472313481
+        },
+        {
+          "name": "s",
+          "percent": 0.6556619542786931
+        },
+        {
+          "name": "Cs",
+          "percent": 0.5977854051912698
+        },
+        {
+          "name": "aR",
+          "percent": 0.481973963720972
+        },
+        {
+          "name": "o",
+          "percent": 0.4813321874710107
+        },
+        {
+          "name": "nn",
+          "percent": 0.3902583032719504
+        },
+        {
+          "name": "Ie",
+          "percent": 0.3465008316836767
+        },
+        {
+          "name": "Hi",
+          "percent": 0.3257306185031094
+        },
+        {
+          "name": "lu",
+          "percent": 0.28961611861892084
+        },
+        {
+          "name": "wt",
+          "percent": 0.2895577753234698
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.26435347168862416
+        },
+        {
+          "name": "V",
+          "percent": 0.26161133680242565
+        },
+        {
+          "name": "T",
+          "percent": 0.22292973191839174
+        },
+        {
+          "name": "mg",
+          "percent": 0.2092190574873993
+        },
+        {
+          "name": "S",
+          "percent": 0.15332618044531104
+        }
+      ]
+    },
+    {
+      "case": "er/large",
+      "stage": "render-model",
+      "runtime": "wasm",
+      "operations": 113,
+      "checksum": 234380150,
+      "top": [
+        {
+          "name": "(program)",
+          "percent": 12.956508892916535
+        },
+        {
+          "name": "snapshot",
+          "percent": 8.807151812182155
+        },
+        {
+          "name": "reconcile",
+          "percent": 6.758110715819281
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 3.6914470382716456
+        },
+        {
+          "name": "handleError",
+          "percent": 3.5023852595043925
+        },
+        {
+          "name": "decodeGraphBinary",
+          "percent": 3.4297841568643683
+        },
+        {
+          "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[2887731908c91629]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+          "percent": 2.6537053866799107
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+          "percent": 2.4970640527970396
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 2.090716313634464
+        },
+        {
+          "name": "decode",
+          "percent": 2.090198966109713
+        },
+        {
+          "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+          "percent": 2.0654812510382876
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::output_limit::OutputLimit>::check",
+          "percent": 1.837503441798116
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 1.7687537040645696
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.10",
+          "percent": 1.719088341688496
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 1.6541324858031217
+        },
+        {
+          "name": "atom",
+          "percent": 1.5844630191366849
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 1.5141037557705805
+        },
+        {
+          "name": "http://127.0.0.1:33475/package/full.js",
+          "percent": 1.5136438913041355
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 1.4930074733724104
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::er::render::draw",
+          "percent": 1.3468855391594712
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::svg::num",
+          "percent": 1.1316689688631518
+        },
+        {
+          "name": "http://127.0.0.1:33475/package/graph.js",
+          "percent": 1.1182754162779376
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate",
+          "percent": 1.0783821738138226
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_fwd",
+          "percent": 1.0518824839349223
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_rev",
+          "percent": 0.9684170832751318
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::text::layout_label",
+          "percent": 0.8243070561028901
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::graph::ModelGraph>::validate",
+          "percent": 0.8216628354208306
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Reader>::node",
+          "percent": 0.812465546091928
+        },
+        {
+          "name": "wasm-to-js",
+          "percent": 0.7723423713945907
+        },
+        {
+          "name": "encodeGraphBinary",
+          "percent": 0.7618804547829641
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner<_>>::reserve::do_reserve_and_handle::<alloc[508e33bd5656020b]::alloc::Global>[3]",
+          "percent": 0.7598685477422666
+        },
+        {
+          "name": "<pele_wasm[2887731908c91629]::BrowserResources as pele[ea32a956c287408e]::compat::module::RenderResources>::text_width",
+          "percent": 0.7583165051680144
+        },
+        {
+          "name": "<u64 as core[ed718c3d60ebd546]::fmt::Display>::fmt",
+          "percent": 0.7334263409216719
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 0.7287127301406093
+        },
+        {
+          "name": "properties",
+          "percent": 0.7035926336610443
+        }
+      ]
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-source",
+      "runtime": "js",
+      "operations": 1908,
+      "checksum": 110366706,
+      "top": [
+        {
+          "name": "(program)",
+          "percent": 15.877948728291768
+        },
+        {
+          "name": "Ze",
+          "percent": 15.71239527553585
+        },
+        {
+          "name": "lT",
+          "percent": 10.699291061458148
+        },
+        {
+          "name": "lb",
+          "percent": 10.299945879988034
+        },
+        {
+          "name": "addTask",
+          "percent": 6.877667483509083
+        },
+        {
+          "name": "width",
+          "percent": 6.648301718506467
+        },
+        {
+          "name": "getEndDate",
+          "percent": 5.254963522215537
+        },
+        {
+          "name": "hc",
+          "percent": 4.291504054518909
+        },
+        {
+          "name": "parse",
+          "percent": 3.3061948925499265
+        },
+        {
+          "name": "eb",
+          "percent": 2.7065048220594514
+        },
+        {
+          "name": "d",
+          "percent": 2.6561945003759266
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 2.141326063547875
+        },
+        {
+          "name": "cb",
+          "percent": 1.6257293035774112
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 1.6121152633000209
+        },
+        {
+          "name": "f",
+          "percent": 1.6106025921580887
+        },
+        {
+          "name": "compileTask",
+          "percent": 1.5597880467605867
+        },
+        {
+          "name": "De",
+          "percent": 1.4649379636757236
+        },
+        {
+          "name": "nb",
+          "percent": 1.1607229895760152
+        },
+        {
+          "name": "je",
+          "percent": 0.6705054898757481
+        },
+        {
+          "name": "fontSet",
+          "percent": 0.596776777920828
+        },
+        {
+          "name": "Ie",
+          "percent": 0.5868603782126054
+        },
+        {
+          "name": "Vl",
+          "percent": 0.40724468632242755
+        },
+        {
+          "name": "gt",
+          "percent": 0.37256529977220293
+        },
+        {
+          "name": "Fl",
+          "percent": 0.3076885152404419
+        },
+        {
+          "name": "ib",
+          "percent": 0.24297980528000662
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.21362278015509922
+        },
+        {
+          "name": "N",
+          "percent": 0.20040091387746917
+        },
+        {
+          "name": "getTasks",
+          "percent": 0.18561035160079825
+        },
+        {
+          "name": "compileTasks",
+          "percent": 0.14768152333827472
+        },
+        {
+          "name": "So",
+          "percent": 0.09143256680123837
+        },
+        {
+          "name": "Dp",
+          "percent": 0.07977939652264916
+        },
+        {
+          "name": "BT",
+          "percent": 0.05664113053679656
+        },
+        {
+          "name": "on",
+          "percent": 0.0547923102522127
+        },
+        {
+          "name": "Sp",
+          "percent": 0.054007962252692276
+        },
+        {
+          "name": "ob",
+          "percent": 0.05327963911028045
+        }
+      ]
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-source",
+      "runtime": "wasm",
+      "operations": 470,
+      "checksum": 133638286,
+      "top": [
+        {
+          "name": "(program)",
+          "percent": 15.109759306537777
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_fwd",
+          "percent": 4.6800473532283755
+        },
+        {
+          "name": "decode",
+          "percent": 3.7287568312553847
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_rev",
+          "percent": 3.563662877018527
+        },
+        {
+          "name": "wasm-to-js",
+          "percent": 3.2897083358923833
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 2.4510535867929346
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+          "percent": 2.3948765655048296
+        },
+        {
+          "name": "handleError",
+          "percent": 2.283424059880084
+        },
+        {
+          "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[2887731908c91629]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+          "percent": 2.236149715987687
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::fmt::write",
+          "percent": 2.1915799829496825
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 2.1292612411797287
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::dates::Calendar>::parse_strict",
+          "percent": 2.086945350520384
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::Gantt as pele[ea32a956c287408e]::compat::module::DiagramModule>::parse",
+          "percent": 2.058208860192467
+        },
+        {
+          "name": "result",
+          "percent": 1.8359236555971077
+        },
+        {
+          "name": "<pele_wasm[2887731908c91629]::BrowserResources as pele[ea32a956c287408e]::compat::module::RenderResources>::calendar_instant",
+          "percent": 1.749376108256557
+        },
+        {
+          "name": "<regex[a8bceb33a2b9941d]::regex::string::Regex>::captures",
+          "percent": 1.6032707760599116
+        },
+        {
+          "name": "__wbg_construct_69525de4bcbd615c",
+          "percent": 1.580845044392243
+        },
+        {
+          "name": "<regex[a8bceb33a2b9941d]::regex::string::Matches as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::next",
+          "percent": 1.5709281379261382
+        },
+        {
+          "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+          "percent": 1.4859019341911832
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+          "percent": 1.4422337381046426
+        },
+        {
+          "name": "__wbg_new_180f1022bb6ee517",
+          "percent": 1.4224562712318995
+        },
+        {
+          "name": "<regex[a8bceb33a2b9941d]::regex::string::Regex>::find",
+          "percent": 1.4068484127596779
+        },
+        {
+          "name": "<pele_wasm[2887731908c91629]::BrowserResources as pele[ea32a956c287408e]::compat::module::RenderResources>::calendar_fields",
+          "percent": 1.3076793480986304
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::gantt::render::draw",
+          "percent": 1.296128405907997
+        },
+        {
+          "name": "decodeText",
+          "percent": 1.288408995761086
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.10",
+          "percent": 1.2624334623470275
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::output_limit::OutputLimit>::check",
+          "percent": 1.0984100832400336
+        },
+        {
+          "name": "<regex_automata[aba7a53925aab34e]::meta::strategy::Core as regex_automata[aba7a53925aab34e]::meta::strategy::Strategy>::search",
+          "percent": 1.0873662555845989
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::engine::RenderSession as pele[ea32a956c287408e]::compat::module::RenderResources>::calendar_fields",
+          "percent": 1.0469097848876487
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate",
+          "percent": 1.0216667502466548
+        },
+        {
+          "name": "__wbg_get_989d0a1309644f2b",
+          "percent": 0.9741670221163918
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::dates::Calendar>::local",
+          "percent": 0.9013679132856683
+        },
+        {
+          "name": "<regex_automata[aba7a53925aab34e]::hybrid::regex::Regex>::try_search",
+          "percent": 0.8756177641094759
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+          "percent": 0.8146513277667183
+        },
+        {
+          "name": "__externref_table_alloc",
+          "percent": 0.80479076736008
+        }
+      ]
+    },
+    {
+      "case": "gantt/large",
+      "stage": "parse",
+      "runtime": "js",
+      "operations": 7184,
+      "checksum": 43245,
+      "top": [
+        {
+          "name": "(garbage collector)",
+          "percent": 29.301465626163697
+        },
+        {
+          "name": "addTask",
+          "percent": 25.87223972113046
+        },
+        {
+          "name": "(program)",
+          "percent": 18.571265184616642
+        },
+        {
+          "name": "eb",
+          "percent": 12.18265499542788
+        },
+        {
+          "name": "nb",
+          "percent": 4.469457855455946
+        },
+        {
+          "name": "f",
+          "percent": 4.28754870920934
+        },
+        {
+          "name": "c",
+          "percent": 2.4140362745050212
+        },
+        {
+          "name": "Vl",
+          "percent": 1.142569396225331
+        },
+        {
+          "name": "Fl",
+          "percent": 1.0273855655417679
+        },
+        {
+          "name": "run",
+          "percent": 0.2155157227283987
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.1880884199868067
+        },
+        {
+          "name": "MS",
+          "percent": 0.13084883165652778
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 0.053662114059636494
+        },
+        {
+          "name": "vp",
+          "percent": 0.038539154642829844
+        },
+        {
+          "name": "Zx",
+          "percent": 0.035070088683419
+        },
+        {
+          "name": "qx",
+          "percent": 0.018592025376217493
+        },
+        {
+          "name": "parse",
+          "percent": 0.01745373810828581
+        },
+        {
+          "name": "innerSerialize",
+          "percent": 0.017291125641438428
+        },
+        {
+          "name": "now",
+          "percent": 0.016315450840354125
+        }
+      ]
+    },
+    {
+      "case": "gantt/large",
+      "stage": "parse",
+      "runtime": "wasm",
+      "operations": 326,
+      "checksum": 44875,
+      "top": [
+        {
+          "name": "reconcile",
+          "percent": 23.600852322375115
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 6.5339419655652105
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[ea32a956c287408e]::compat::public::schema::PrototypeId>",
+          "percent": 6.001018058786857
+        },
+        {
+          "name": "(program)",
+          "percent": 3.9604520384371207
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+          "percent": 3.534926343256123
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 3.4634970001582377
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::public_model::Context>::set",
+          "percent": 2.8113547235830585
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u16>>::extend_desugared::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>",
+          "percent": 2.358121560794696
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[ea32a956c287408e]::compat::public::graph::JsString>",
+          "percent": 2.335307384484962
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 2.1653131738205103
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 1.8447072699692357
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::Gantt as pele[ea32a956c287408e]::compat::module::DiagramModule>::parse",
+          "percent": 1.829137706749501
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::public_model::Context>::intern",
+          "percent": 1.6780176196616257
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::graph::ModelGraph>::validate",
+          "percent": 1.5482500764179583
+        },
+        {
+          "name": "decodeGraphBinary",
+          "percent": 1.5375738044958545
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::public_model::Context>::property_index",
+          "percent": 1.4580101589811278
+        },
+        {
+          "name": "<hashbrown[ffa38be938e2ba6e]::raw::RawTable<(u32, usize)>>::reserve_rehash::<hashbrown[ffa38be938e2ba6e]::map::make_hasher<u32, usize, std[5a6270b673d0c64d]::hash::random::RandomState>::{closure#0}>",
+          "percent": 1.3964944969537674
+        },
+        {
+          "name": "snapshot_binary",
+          "percent": 1.1256476461680127
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 1.1169414006124876
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::public_model::Context>::push",
+          "percent": 1.0575864126646004
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::node",
+          "percent": 0.9564160263551398
+        },
+        {
+          "name": "<hashbrown[ffa38be938e2ba6e]::map::HashMap<u32, std[5a6270b673d0c64d]::collections::hash::map::HashMap<alloc[508e33bd5656020b]::vec::Vec<u16>, usize>, std[5a6270b673d0c64d]::hash::random::RandomState>>::get_mut::<u32>",
+          "percent": 0.8570250186993632
+        },
+        {
+          "name": "<hashbrown[ffa38be938e2ba6e]::map::HashMap<u32, usize, std[5a6270b673d0c64d]::hash::random::RandomState>>::insert",
+          "percent": 0.8539111060554162
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u16> as alloc[508e33bd5656020b]::vec::spec_from_iter_nested::SpecFromIterNested<u16, core[ed718c3d60ebd546]::str::iter::EncodeUtf16>>::from_iter",
+          "percent": 0.7865489141659512
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[1]",
+          "percent": 0.7663402565991118
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq_by::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16, <core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>::{closure#0}>",
+          "percent": 0.7272574754556957
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::put",
+          "percent": 0.6884288912628059
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_fwd",
+          "percent": 0.6879204973617534
+        },
+        {
+          "name": "result",
+          "percent": 0.6822646152125436
+        },
+        {
+          "name": "u32",
+          "percent": 0.6790236040933335
+        },
+        {
+          "name": "memcmp",
+          "percent": 0.6473125345151797
+        },
+        {
+          "name": "registration",
+          "percent": 0.6198592638583411
+        },
+        {
+          "name": "stringValue",
+          "percent": 0.6084204010846583
+        },
+        {
+          "name": "u8",
+          "percent": 0.6070858670943954
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::public::binary::encode_binary_exchange",
+          "percent": 0.5859875202007139
+        }
+      ]
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-model",
+      "runtime": "js",
+      "operations": 2403,
+      "checksum": 135321762,
+      "top": [
+        {
+          "name": "Ze",
+          "percent": 20.86524818528191
+        },
+        {
+          "name": "lT",
+          "percent": 14.475560425485662
+        },
+        {
+          "name": "(program)",
+          "percent": 11.783344251507737
+        },
+        {
+          "name": "lb",
+          "percent": 10.892303715214844
+        },
+        {
+          "name": "getEndDate",
+          "percent": 6.52105836767907
+        },
+        {
+          "name": "hc",
+          "percent": 5.712095085058944
+        },
+        {
+          "name": "width",
+          "percent": 5.180561145203886
+        },
+        {
+          "name": "parse",
+          "percent": 3.9612115942199284
+        },
+        {
+          "name": "d",
+          "percent": 3.3008921568339447
+        },
+        {
+          "name": "compileTask",
+          "percent": 3.095199626334049
+        },
+        {
+          "name": "De",
+          "percent": 2.7233550032167
+        },
+        {
+          "name": "cb",
+          "percent": 2.0894741944296746
+        },
+        {
+          "name": "http://127.0.0.1:33475/oracle.js",
+          "percent": 2.0109808437447674
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 1.6827305815617004
+        },
+        {
+          "name": "fontSet",
+          "percent": 1.3425535602551033
+        },
+        {
+          "name": "je",
+          "percent": 0.7936288780327311
+        },
+        {
+          "name": "Ie",
+          "percent": 0.7860498045010297
+        },
+        {
+          "name": "gt",
+          "percent": 0.6966284873285529
+        },
+        {
+          "name": "ib",
+          "percent": 0.4723114117933909
+        },
+        {
+          "name": "compileTasks",
+          "percent": 0.4642035656897104
+        },
+        {
+          "name": "(idle)",
+          "percent": 0.25375208204200217
+        },
+        {
+          "name": "N",
+          "percent": 0.23242492163884246
+        },
+        {
+          "name": "run",
+          "percent": 0.19082814597648137
+        },
+        {
+          "name": "getTasks",
+          "percent": 0.1008780562320254
+        },
+        {
+          "name": "So",
+          "percent": 0.09676538067218744
+        },
+        {
+          "name": "R",
+          "percent": 0.06022132069762728
+        },
+        {
+          "name": "(anonymous)",
+          "percent": 0.05986880564964117
+        },
+        {
+          "name": "BT",
+          "percent": 0.04095049807438655
+        },
+        {
+          "name": "ob",
+          "percent": 0.03801287267450229
+        },
+        {
+          "name": "IS",
+          "percent": 0.02038712027519675
+        },
+        {
+          "name": "Sp",
+          "percent": 0.019329575131238414
+        },
+        {
+          "name": "ab",
+          "percent": 0.019329575131238414
+        },
+        {
+          "name": "innerSerialize",
+          "percent": 0.017860762431296286
+        }
+      ]
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-model",
+      "runtime": "wasm",
+      "operations": 46,
+      "checksum": 137599406,
+      "top": [
+        {
+          "name": "snapshot",
+          "percent": 14.403556605248077
+        },
+        {
+          "name": "reconcile",
+          "percent": 14.115161303393942
+        },
+        {
+          "name": "(program)",
+          "percent": 10.920642087653185
+        },
+        {
+          "name": "bits",
+          "percent": 8.986680096556276
+        },
+        {
+          "name": "(garbage collector)",
+          "percent": 5.280551551673237
+        },
+        {
+          "name": "encodeGraphBinary",
+          "percent": 5.089175624750361
+        },
+        {
+          "name": "decodeGraphBinary",
+          "percent": 2.8937938859269807
+        },
+        {
+          "name": "numberBits",
+          "percent": 2.3855999166420645
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::graph::ModelGraph>::validate",
+          "percent": 1.621369732965169
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Reader>::node",
+          "percent": 1.498416778100018
+        },
+        {
+          "name": "http://127.0.0.1:33475/package/full.js",
+          "percent": 1.4266363336401369
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[ea32a956c287408e]::compat::public::schema::PrototypeId>",
+          "percent": 1.2140735981105535
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::public_model::Context>::own",
+          "percent": 1.0349698116921082
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+          "percent": 1.0046367851622875
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<pele[ea32a956c287408e]::compat::public::graph::Node> as core[ed718c3d60ebd546]::clone::Clone>::clone",
+          "percent": 0.8848676403336633
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::graph::ModelGraph>::validate_schema",
+          "percent": 0.8092087363747402
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Writer>::node",
+          "percent": 0.7807859958668357
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+          "percent": 0.7606411614539014
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+          "percent": 0.7156047213008468
+        },
+        {
+          "name": "decode",
+          "percent": 0.7068058281089905
+        },
+        {
+          "name": "atom",
+          "percent": 0.6922760768513856
+        },
+        {
+          "name": "<alloc[508e33bd5656020b]::vec::Vec<u16>>::extend_desugared::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>",
+          "percent": 0.6529126073088701
+        },
+        {
+          "name": "core[ed718c3d60ebd546]::ptr::drop_glue::<pele[ea32a956c287408e]::compat::public::graph::Node>",
+          "percent": 0.6466028746910257
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::public::binary::Reader>::take",
+          "percent": 0.6315521363365345
+        },
+        {
+          "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+          "percent": 0.5868630209147375
+        },
+        {
+          "name": "wasm-to-js",
+          "percent": 0.5613346531673121
+        },
+        {
+          "name": "pele[ea32a956c287408e]::compat::diagrams::gantt::public_model::own",
+          "percent": 0.5388743205459945
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_rev",
+          "percent": 0.5184979363122217
+        },
+        {
+          "name": "binaryResult",
+          "percent": 0.5004370502868324
+        },
+        {
+          "name": "regex_automata[aba7a53925aab34e]::hybrid::search::find_fwd",
+          "percent": 0.49540084168359877
+        },
+        {
+          "name": "<pele[ea32a956c287408e]::compat::diagrams::gantt::public_model::Context>::property_index",
+          "percent": 0.4725931843310236
+        },
+        {
+          "name": "render_numbers_operation_binary_with_functions",
+          "percent": 0.46026315637138276
+        },
+        {
+          "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[ea32a956c287408e]::compat::public::graph::JsString>",
+          "percent": 0.44781735350132273
+        },
+        {
+          "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+          "percent": 0.4274988567227596
+        },
+        {
+          "name": "<core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq_by::<core[ed718c3d60ebd546]::str::iter::EncodeUtf16, <core[ed718c3d60ebd546]::iter::adapters::copied::Copied<core[ed718c3d60ebd546]::slice::iter::Iter<u16>> as core[ed718c3d60ebd546]::iter::traits::iterator::Iterator>::eq<core[ed718c3d60ebd546]::str::iter::EncodeUtf16>::{closure#0}>",
+          "percent": 0.40521218646707075
+        }
+      ]
+    }
+  ]
+}

@@ -190,43 +190,28 @@ fn err(message: String, code: ErrorCode) -> PeleError {
 }
 impl AgentDb {
     pub fn new(context: &ParseContext<'_>) -> Self {
+        let mut model = AgentflowModel::empty();
+        model.public_origin.max_edges = context.max_edges;
+        model.public_origin.inherit_dir = context
+            .config
+            .get("flowchart")
+            .and_then(Value::as_object)
+            .and_then(|o| o.get("inheritDir"))
+            == Some(&Value::Bool(true));
+        model.public_origin.direction = context.config.get("direction").and_then(|v| {
+            if let Value::String(s) = v {
+                Some(s.clone())
+            } else {
+                None
+            }
+        });
+        model.line_offset = context.line_offset;
+        model.title = context
+            .title
+            .filter(|title| !title.is_empty())
+            .map(str::to_string);
         Self {
-            model: AgentflowModel {
-                diagram_type: DiagramType::Agentflow,
-                public_origin: super::public_model::AgentflowPublicOrigin {
-                    max_edges: context.max_edges,
-                    inherit_dir: context
-                        .config
-                        .get("flowchart")
-                        .and_then(Value::as_object)
-                        .and_then(|o| o.get("inheritDir"))
-                        == Some(&Value::Bool(true)),
-                    direction: context.config.get("direction").and_then(|v| {
-                        if let Value::String(s) = v {
-                            Some(s.clone())
-                        } else {
-                            None
-                        }
-                    }),
-                    ..Default::default()
-                },
-                direction: None,
-                connectors: vec![],
-                mappings: vec![],
-                diagnostics: vec![],
-                line_offset: context.line_offset,
-                graph: None,
-                nodes: Vec::new(),
-                edges: Vec::new(),
-                subgraphs: Vec::new(),
-                classes: Vec::new(),
-                tooltips: Vec::new(),
-                default_edge_style: None,
-                default_interpolate: None,
-                title: context.title.filter(|t| !t.is_empty()).map(str::to_string),
-                acc_title: None,
-                acc_descr: None,
-            },
+            model,
             nodes: HashMap::new(),
             classes: HashMap::new(),
             tooltips: HashMap::new(),
@@ -1460,5 +1445,30 @@ impl AgentDb {
             .iter()
             .map(|id| (id.clone(), self.model.nodes[self.connectors[id]].1.clone()))
             .collect();
+    }
+}
+
+impl AgentflowModel {
+    pub(super) fn empty() -> Self {
+        Self {
+            diagram_type: DiagramType::Agentflow,
+            public_origin: super::public_model::AgentflowPublicOrigin::default(),
+            direction: None,
+            connectors: vec![],
+            mappings: vec![],
+            diagnostics: vec![],
+            line_offset: 0,
+            graph: None,
+            nodes: vec![],
+            edges: vec![],
+            subgraphs: vec![],
+            classes: vec![],
+            tooltips: vec![],
+            default_edge_style: None,
+            default_interpolate: None,
+            title: None,
+            acc_title: None,
+            acc_descr: None,
+        }
     }
 }

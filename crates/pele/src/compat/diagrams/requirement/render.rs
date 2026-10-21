@@ -1,6 +1,7 @@
 //! Pele requirement/render.ts measured requirement tables, compound graph routing,
 //! port spreading, containment marks and responsive rotation, 458322a5 (MIT, kepano).
 use super::model::RequirementModel;
+use super::phase::{PhaseInput, Typed};
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
@@ -244,8 +245,17 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(m), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let horizontal = matches!(m.direction()?.as_str(), "LR" | "RL");
     let across = draw(m, c, o, r, false)?;
-    if !matches!(m.direction.as_str(), "LR" | "RL") {
+    if !horizontal {
         return Ok(across);
     }
     let Some(available) = o.max_width.filter(|v| *v > 0.) else {
@@ -262,56 +272,30 @@ pub(super) fn render(
         across
     })
 }
-fn draw(
-    m: &RequirementModel,
+fn draw<P: PhaseInput>(
+    m: &mut P,
     _c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     turned: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
+    let scene = m.capture()?;
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
     let mut index = HashMap::new();
     let mut views = vec![];
     let mut cnodes = vec![];
-    // Requirements precede elements, including both nodes when their names coincide.
-    let nodes = m
-        .requirements
-        .iter()
-        .map(|(_, v)| {
-            (
-                &v.name,
-                true,
-                v.requirement_type.as_str(),
-                v.css_styles.as_slice(),
-                v.classes.as_slice(),
-                vec![
-                    ("ID", v.requirement_id.as_str()),
-                    ("Text", v.text.as_str()),
-                    ("Risk", v.risk.as_str()),
-                    ("Verification", v.verify_method.as_str()),
-                ],
-            )
-        })
-        .chain(m.elements.iter().map(|(_, v)| {
-            (
-                &v.name,
-                false,
-                "Element",
-                v.css_styles.as_slice(),
-                v.classes.as_slice(),
-                vec![
-                    ("Type", v.element_type.as_str()),
-                    ("Doc Ref", v.doc_ref.as_str()),
-                ],
-            )
-        }));
-    for (id, requirement, node_kind, styles, classes, fields) in nodes {
-        let style = resolve_style(styles);
+    // Descriptor identity/classes/edges are captured before resource callbacks.
+    for node in scene.nodes {
+        let id = node.id;
+        let requirement = node.requirement;
+        let styles = m.styles(&node.styles)?;
+        let style = resolve_style(&styles);
         let base = if style.bold { 1 } else { 0 } | if style.italic { 2 } else { 0 };
         let name_size = style.font_size.unwrap_or(size);
         let body_size = style.font_size.unwrap_or(small);
+        let node_kind = m.kind(&node.record)?;
         let kind = text(
             &format!("«{node_kind}»"),
             false,
@@ -321,7 +305,8 @@ fn draw(
             r,
             o,
         )?;
-        let name = text(id, true, name_size, 280., base | 1, r, o)?;
+        let name = text(&id, true, name_size, 280., base | 1, r, o)?;
+        let fields = m.fields(&node.record)?;
         let mut rows = vec![];
         let (mut key_width, mut value_width, mut body_height) = (0_f64, 0_f64, 0.);
         for (label, raw) in fields {
@@ -329,7 +314,7 @@ fn draw(
                 continue;
             }
             let key = text(label, false, body_size, 4000., base, r, o)?;
-            let value = text(raw, true, body_size, 240., base, r, o)?;
+            let value = text(&raw, true, body_size, 240., base, r, o)?;
             let height = key.height.js_max(value.height);
             key_width = key_width.js_max(key.width);
             value_width = value_width.js_max(value.width);
@@ -354,7 +339,7 @@ fn draw(
         views.push(View {
             id: id.clone(),
             requirement,
-            classes: classes.join(" "),
+            classes: node.classes,
             style,
             kind,
             name,
@@ -369,27 +354,21 @@ fn draw(
     let root_dir = if turned {
         Dir::TB
     } else {
-        direction(Some(&m.direction))
+        direction(Some(&scene.direction))
     };
     let sideways = matches!(root_dir, Dir::LR | Dir::RL);
     let mut cedges = vec![];
     let mut edge_labels = vec![];
     let mut drawn = vec![];
-    let keys: std::collections::HashSet<&str> = m
-        .requirements
-        .iter()
-        .map(|(k, _)| k.as_str())
-        .chain(m.elements.iter().map(|(k, _)| k.as_str()))
-        .collect();
-    for (i, edge) in m.relations.iter().enumerate() {
-        if !keys.contains(edge.src.as_str()) || !keys.contains(edge.dst.as_str()) {
+    for edge in scene.edges {
+        let (Some(start), Some(end)) = (&edge.start, &edge.end) else {
             continue;
-        }
-        let (Some(&src), Some(&dst)) = (index.get(&edge.src), index.get(&edge.dst)) else {
+        };
+        let (Some(&src), Some(&dst)) = (index.get(start), index.get(end)) else {
             continue;
         };
         let label = layout_label(
-            Some(&format!("«{}»", edge.relation_type)),
+            Some(&format!("«{}»", edge.kind)),
             false,
             r,
             o,
@@ -404,10 +383,7 @@ fn draw(
                 cnodes[src].w += 2. * (26. + label.width + 12.);
             }
         }
-        drawn.push((
-            format!("{}-{}-{i}", edge.src, edge.dst),
-            edge.relation_type == "contains",
-        ));
+        drawn.push((edge.id, edge.contains));
         cedges.push(CEdge {
             src,
             dst,
@@ -436,7 +412,8 @@ fn draw(
         },
     );
     spread(&cnodes, &mut cedges, &views);
-    let title = layout_label(m.title.as_deref(), false, r, o, size, 4000., 1)?;
+    let title_text = m.metadata("title")?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, 4000., 1)?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
@@ -600,14 +577,16 @@ fn draw(
             format!("<g class=\"pele-edge-labels\" font-size=\"{}\" fill=\"var(--_m)\">{labels_out}</g>",js_num(small))
         }
     );
+    let acc_title = m.metadata("accTitle")?;
+    let acc_descr = m.metadata("accDescr")?;
     let svg = svg::document(
         "requirement",
         width,
         height,
         size,
         o,
-        m.acc_title.as_deref(),
-        m.acc_descr.as_deref(),
+        acc_title.as_deref(),
+        acc_descr.as_deref(),
         &content,
     )?;
     Ok(Rendered {

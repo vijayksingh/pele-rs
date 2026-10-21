@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "kind": "Independent read-only count16 native timing review",
+  "input": "dist/perf-patches/gantt-native/fixed-construction-fields/native-comparison-16.json",
+  "inputSHA256": "c6eae4b0381fbb4352b434f02942354c4e42cda6d8733acdb5a50862cf3206e4",
+  "count1Input": "dist/perf-patches/gantt-native/fixed-construction-fields/native-comparison-1.json",
+  "count1InputSHA256": "750d6270334b48cf3996c50ed77c41b19210d4afcce012994ed18f4462da9177",
+  "publishedCopyIdentical": true,
+  "provenance": {
+    "artifactsIdenticalToCount1": true,
+    "artifacts": {
+      "control": {
+        "binarySHA256": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+        "manifest": {
+          "schemaVersion": 1,
+          "sourceInputSha256": "bc196da8df086f9f348d79335f90ad5181f073ad614747adbf7bc72be08f9d90",
+          "revision": "d8ba90bb6c90c5ca2b43630a4d74fd1f4011327f",
+          "builtAt": "2026-10-20T00:36:34.609Z",
+          "binaries": {
+            "pele-perf": "31a436d88c71fed7d655f3c8e1114e5d982cae16440a76684540e05265a2e169",
+            "pele-perf-alloc": "121345cd78165aadff00ea10c5b7193b3556274ddb7c01fd82520eda1401cc30"
+          }
+        }
+      },
+      "candidate": {
+        "binarySHA256": "fac68f3aefc18b5382a7a25c57ad52b716188dfdfbc04046f8673822b1a7109e",
+        "manifest": {
+          "schemaVersion": 1,
+          "sourceInputSha256": "5f3eb388e501c61712ce49be0995f514fe8430b93f118f2423587a387d143cf9",
+          "revision": "7e9a72af70b3968fb3e7a94da73fcd45bb762d79",
+          "builtAt": "2026-10-20T01:13:35.625Z",
+          "binaries": {
+            "pele-perf": "fac68f3aefc18b5382a7a25c57ad52b716188dfdfbc04046f8673822b1a7109e",
+            "pele-perf-alloc": "045ea91e1a16ee61a0848d37521ca5bc6d07cc099660405cc4c5c97a9d94de59"
+          }
+        }
+      }
+    },
+    "matchingHashes": {
+      "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+      "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+      "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58"
+    },
+    "settingsDifferences": {
+      "stages": {
+        "count1": [
+          "parse",
+          "parse-public",
+          "render-source",
+          "render-retained",
+          "render-mutable-publish"
+        ],
+        "count16": [
+          "parse",
+          "parse-public",
+          "render-source"
+        ]
+      },
+      "fixedBatchCount": {
+        "count1": 1,
+        "count16": 16
+      }
+    },
+    "allLanesMatchedCount16": true,
+    "allSamplesRecomputedFromRaw": true,
+    "controlCandidateRawNonTimingFieldsEqual": true
+  },
+  "method": {
+    "trials": 15,
+    "warmupMs": 1000,
+    "pairing": "Same trial index in balanced cyclic/reverse three-way order. No discarded samples.",
+    "bootstrap": "10000 resamples of paired percentage shifts; Python Random(20261020), rows in input order, percentile positions249 and9749. Descriptive only; serial shared-host trials, no multiplicity correction.",
+    "scope": "Batch means per operation. Count16 changes temporal grouping, allocator/cache locality and scheduling exposure. Reduced stages alter run history. This is a matched follow-up, not exact replication of count1.",
+    "runtimeWorkPerformed": "None; JSON analysis only."
+  },
+  "findings": {
+    "publicParse": "Ratio-of-medians -7.70%, paired median -7.78%, 11/15 faster. Direction agrees with count1 (-8.19% ratio; 13/15 faster), but count16 paired descriptive95 interval [-11.69%,+1.95%] crosses zero. Evidence supports a directional improvement, not a statistically settled exact speedup.",
+    "negativeControls": "Unchanged typed parse shifts -1.11% ratio, -1.63% paired, 11/15 faster; descriptive interval [-5.90%,-0.18%]. This is much smaller than its count1 -8.56% ratio, but not exactly zero. Source shifts -2.21% ratio while paired median is +0.11%, interval [-3.26%,+1.86%]; ratio alone misstates paired consistency.",
+    "attribution": "Deterministic allocation reductions remain the direct mechanism proof. This follow-up strengthens the directional latency observation relative to count1 confounding, but cannot assign all measured public-parse change to removed allocations. Do not subtract typed or source shifts from public parse.",
+    "host": "Same Apple M1 Pro/darwin/arm64; different time and host process/load state. Recorded interactive/background services remain active. No claim of an otherwise idle machine.",
+    "limitations": "One medium Gantt workload; no count16 retained/mutable rows and no new browser/Swift evidence. Batching does not establish cold single-operation latency. Preserve count1 raw report and caveats."
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "loadBefore": [
+      7.2138671875,
+      10.27490234375,
+      10.1181640625
+    ],
+    "processesBefore": [
+      {
+        "pid": 410,
+        "cpuPercent": 33.9,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 12,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 42749,
+        "cpuPercent": 19.7,
+        "name": "accountsd"
+      },
+      {
+        "pid": 61001,
+        "cpuPercent": 27.3,
+        "name": "remindd"
+      },
+      {
+        "pid": 61010,
+        "cpuPercent": 22.3,
+        "name": "node"
+      }
+    ],
+    "loadAfter": [
+      6.5693359375,
+      9.98291015625,
+      10.01611328125
+    ],
+    "processesAfter": [
+      {
+        "pid": 410,
+        "cpuPercent": 33.6,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 23310,
+        "cpuPercent": 10.6,
+        "name": "Claude Helper"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 15.7,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 44246,
+        "cpuPercent": 10.5,
+        "name": "Codex (Service)"
+      },
+      {
+        "pid": 44311,
+        "cpuPercent": 14.8,
+        "name": "Codex (Renderer)"
+      },
+      {
+        "pid": 60608,
+        "cpuPercent": 23.1,
+        "name": "siriactionsd"
+      },
+      {
+        "pid": 60638,
+        "cpuPercent": 44.8,
+        "name": "BackgroundShortcutRunner"
+      },
+      {
+        "pid": 61010,
+        "cpuPercent": 33.6,
+        "name": "node"
+      },
+      {
+        "pid": 61025,
+        "cpuPercent": 10,
+        "name": "pele-perf"
+      }
+    ]
+  },
+  "rows": [
+    {
+      "stage": "parse",
+      "controlMedianMs": 0.0560989375,
+      "candidateMedianMs": 0.0554739375,
+      "ratioOfMediansChangePct": -1.1141030968723764,
+      "pairedMedianChangePct": -1.6254109779883064,
+      "pairedMedianShiftMs": -0.0009115000000000026,
+      "candidateFasterPairs": 11,
+      "pairedBootstrap95Pct": [
+        -5.898825781544104,
+        -0.18024743056377357
+      ],
+      "pairedRangePct": [
+        -13.277390659747956,
+        17.639301434047972
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.0549245,
+          0.063234375
+        ],
+        "candidate": [
+          0.05474475,
+          0.0647291875
+        ]
+      },
+      "count1Reference": {
+        "ratioOfMediansChangePct": -8.555908309789418,
+        "pairedMedianChangePct": -11.404102533918014,
+        "candidateFasterPairs": 11
+      }
+    },
+    {
+      "stage": "parse-public",
+      "controlMedianMs": 0.1795130625,
+      "candidateMedianMs": 0.1656900625,
+      "ratioOfMediansChangePct": -7.700275293336922,
+      "pairedMedianChangePct": -7.778981581798472,
+      "pairedMedianShiftMs": -0.014023437499999986,
+      "candidateFasterPairs": 11,
+      "pairedBootstrap95Pct": [
+        -11.688566621539763,
+        1.9474789192909903
+      ],
+      "pairedRangePct": [
+        -19.050514951075193,
+        5.8934601664685005
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.170828125,
+          0.203283875
+        ],
+        "candidate": [
+          0.160388,
+          0.18513025
+        ]
+      },
+      "count1Reference": {
+        "ratioOfMediansChangePct": -8.18883899935856,
+        "pairedMedianChangePct": -11.139961513790897,
+        "candidateFasterPairs": 13
+      }
+    },
+    {
+      "stage": "render-source",
+      "controlMedianMs": 0.2970833125,
+      "candidateMedianMs": 0.2905078125,
+      "ratioOfMediansChangePct": -2.2133521888746177,
+      "pairedMedianChangePct": 0.11132042401977849,
+      "pairedMedianShiftMs": 0.0003151874999999804,
+      "candidateFasterPairs": 7,
+      "pairedBootstrap95Pct": [
+        -3.260895091929761,
+        1.8568462593971269
+      ],
+      "pairedRangePct": [
+        -15.350832802512437,
+        25.900619553038062
+      ],
+      "sampleRangeMs": {
+        "control": [
+          0.2813515625,
+          0.332229125
+        ],
+        "candidate": [
+          0.2812291875,
+          0.3778854375
+        ]
+      },
+      "count1Reference": {
+        "ratioOfMediansChangePct": -1.19884482171152,
+        "pairedMedianChangePct": 0.3230315789473748,
+        "candidateFasterPairs": 7
+      }
+    }
+  ]
+}

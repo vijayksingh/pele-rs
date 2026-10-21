@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+const sha=b=>createHash('sha256').update(b).digest('hex'),pin='d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d';
+if(sha(fs.readFileSync('node_modules/pele/dist/pele.js'))!==pin)throw Error('Oracle changed');
+const support=process.argv[2]??'tests/web/support/state-direction-accessor.js',output=process.argv[3]??'fixtures/public-state-direction-accessor.json';
+const {MODES,SOURCE,runStateDirection}=await import(pathToFileURL(path.resolve(support))),core=await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/core.js'))),entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/state.js')))).default;core.register(entry);
+const rows=[];for(const raw of [false,true])for(const mode of MODES)rows.push(runStateDirection(core,entry,()=>{},raw,mode));
+fs.writeFileSync(output,JSON.stringify({oracleSHA256:pin,driverSHA256:sha(fs.readFileSync(support)),source:SOURCE,rows},null,2)+'\n');
+console.log(JSON.stringify({rows:rows.length,fired:rows.filter(r=>r.fired).length,errors:rows.filter(r=>!r.first.ok).map(r=>[r.raw,r.mode,r.first]),getters:rows.filter(r=>r.getterTrace.length).map(r=>[r.raw,r.mode,r.getterTrace.length]),nested:rows.filter(r=>r.nested).length}));

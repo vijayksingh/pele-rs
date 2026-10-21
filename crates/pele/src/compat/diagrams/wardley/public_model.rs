@@ -612,6 +612,15 @@ fn project(g: &ModelGraph) -> Result<WardleyModel, PublicError> {
 }
 impl PublicDiagramModule for Wardley {
     type PublicState = WardleyPublicState;
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::wardley())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::wardley(
+            super::WardleyDetachedInput::new(state.projected.as_ref().err()),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
@@ -624,6 +633,12 @@ impl PublicDiagramModule for Wardley {
         let graph = new_graph(m)?;
         let projected = project(&graph);
         Ok(WardleyPublicState { graph, projected })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

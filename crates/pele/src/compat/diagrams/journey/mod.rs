@@ -1,4 +1,6 @@
 //! Pele diagrams/journey/{index,db,lexer,parser,render}.ts, 458322a5 (MIT, kepano).
+mod live_phase;
+pub(crate) use live_phase::{render_detached, JourneyDetachedInput};
 mod parser;
 mod public_model;
 pub use public_model::JourneyPublicState;
@@ -65,5 +67,20 @@ impl DiagramModule for Journey {
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         render::render(m, c, o, r)
+    }
+}
+
+impl JourneyModel {
+    /// Empty class state shared by parser population and native construction.
+    pub(super) fn empty(title: Option<&str>) -> Self {
+        Self {
+            diagram_type: DiagramType::Journey,
+            title: title.map(str::to_owned),
+            acc_title: None,
+            acc_descr: None,
+            sections: Vec::new(),
+            tasks: Vec::new(),
+            current_section: String::new(),
+        }
     }
 }

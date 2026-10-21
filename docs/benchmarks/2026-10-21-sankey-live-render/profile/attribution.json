@@ -1,0 +1,599 @@
+{
+  "sourcePins": {
+    "control": "e1486055d596d4e0ac25e4c78f1d5d95a73f781a",
+    "candidate": "8175006345f3b66a6c9fd942814ed0ba5ff3014d"
+  },
+  "profiles": [
+    {
+      "label": "sankey-medium-fixed-render-model-control",
+      "sampleCount": 14575,
+      "totalUs": 5058723,
+      "disjointSelf": {
+        "wasm-other": {
+          "weightedUs": 1602110,
+          "percent": 31.670245633137057
+        },
+        "js-graph": {
+          "weightedUs": 1257714,
+          "percent": 24.862282437682396
+        },
+        "native-geometry-svg": {
+          "weightedUs": 894864,
+          "percent": 17.689523620882188
+        },
+        "js-other": {
+          "weightedUs": 484736,
+          "percent": 9.582181115668915
+        },
+        "text-decode": {
+          "weightedUs": 395216,
+          "percent": 7.812564554335156
+        },
+        "js-generated-other": {
+          "weightedUs": 172474,
+          "percent": 3.409437520101417
+        },
+        "engine-other": {
+          "weightedUs": 88978,
+          "percent": 1.758902394932476
+        },
+        "gc": {
+          "weightedUs": 68285,
+          "percent": 1.3498465917188982
+        },
+        "wasm-to-js": {
+          "weightedUs": 48036,
+          "percent": 0.9495677071071098
+        },
+        "native-source-storage-admission": {
+          "weightedUs": 46310,
+          "percent": 0.9154484244343879
+        }
+      },
+      "deduplicatedAncestor": {
+        "prepareMutableInput": {
+          "weightedUs": 463718,
+          "percent": 9.166700766181505
+        },
+        "matchesGraph": {
+          "weightedUs": 439872,
+          "percent": 8.69531698019441
+        },
+        "textDecode": {
+          "weightedUs": 395573,
+          "percent": 7.819621671319027
+        },
+        "resourceWidth": {
+          "weightedUs": 352805,
+          "percent": 6.974190917352067
+        },
+        "resultFactory": {
+          "weightedUs": 236371,
+          "percent": 4.672542853206234
+        }
+      },
+      "disjointDecodeSelfByAncestor": {
+        "result-factory": {
+          "weightedUs": 225369,
+          "percent": 4.455057135960993
+        },
+        "resource-width": {
+          "weightedUs": 169847,
+          "percent": 3.357507418374163
+        }
+      },
+      "topDecodeStacks": [
+        {
+          "stack": "decode > decodeText >  > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > mutabledocument_render_numbers_operation_packet_with_functions > mutabledocument_render_numbers_operation_packet_with_functions externref shim > mutabledocument_render_numbers_operation_packet_with_functions externref shim multivalue shim",
+          "percent": 4.384901090650743
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > Ref(String) -> Externref externref shim > <pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::indexed::IndexedSankey> > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey as pele[37270552ffd5eb7c]::compat::public::engine::PublicDiagramModule>::render_public > <pele[37270552ffd5eb7c]::compat::public::engine::Codec<pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey> as pele[37270552ffd5eb7c]::compat::public::engine::Erased>::render_operation_with_output_limit",
+          "percent": 2.6878917861286338
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > Ref(String) -> Externref externref shim > <pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::indexed::IndexedSankey> > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey as pele[37270552ffd5eb7c]::compat::public::engine::PublicDiagramModule>::render_public > <pele[37270552ffd5eb7c]::compat::public::engine::Codec<pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey> as pele[37270552ffd5eb7c]::compat::public::engine::Erased>::render_operation_with_output_limit > <pele[37270552ffd5eb7c]::compat::public::engine::PublicDocument>::render_operation_policy",
+          "percent": 0.6631910859716968
+        },
+        {
+          "stack": "decodeText >  > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > mutabledocument_render_numbers_operation_packet_with_functions > mutabledocument_render_numbers_operation_packet_with_functions externref shim > mutabledocument_render_numbers_operation_packet_with_functions externref shim multivalue shim > js-to-wasm:iiiiiiiiidiiin:iii",
+          "percent": 0.06442337325052191
+        },
+        {
+          "stack": "getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > Ref(String) -> Externref externref shim > <pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::indexed::IndexedSankey> > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey as pele[37270552ffd5eb7c]::compat::public::engine::PublicDiagramModule>::render_public > <pele[37270552ffd5eb7c]::compat::public::engine::Codec<pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey> as pele[37270552ffd5eb7c]::compat::public::engine::Erased>::render_operation_with_output_limit > <pele[37270552ffd5eb7c]::compat::public::engine::PublicDocument>::render_operation_policy > mutabledocument_render_numbers_operation_packet_with_functions",
+          "percent": 0.006424546273832349
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 >  > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > mutabledocument_render_numbers_operation_packet_with_functions > mutabledocument_render_numbers_operation_packet_with_functions externref shim",
+          "percent": 0.005732672059727327
+        }
+      ]
+    },
+    {
+      "label": "sankey-medium-fixed-render-model-candidate",
+      "sampleCount": 14519,
+      "totalUs": 5036871,
+      "disjointSelf": {
+        "text-decode": {
+          "weightedUs": 1820252,
+          "percent": 36.13854712578504
+        },
+        "wasm-other": {
+          "weightedUs": 727322,
+          "percent": 14.439956870048885
+        },
+        "js-graph": {
+          "weightedUs": 467317,
+          "percent": 9.277922742115095
+        },
+        "native-source-storage-admission": {
+          "weightedUs": 446781,
+          "percent": 8.870209302561054
+        },
+        "native-live-read": {
+          "weightedUs": 360080,
+          "percent": 7.148882709126361
+        },
+        "js-layout": {
+          "weightedUs": 334187,
+          "percent": 6.634813557861617
+        },
+        "native-geometry-svg": {
+          "weightedUs": 326293,
+          "percent": 6.478089274075115
+        },
+        "js-generated-other": {
+          "weightedUs": 189437,
+          "percent": 3.7610055925593486
+        },
+        "wasm-to-js": {
+          "weightedUs": 159775,
+          "percent": 3.172108239420863
+        },
+        "js-other": {
+          "weightedUs": 72217,
+          "percent": 1.4337671145439301
+        },
+        "engine-other": {
+          "weightedUs": 54951,
+          "percent": 1.0909749326516403
+        },
+        "gc": {
+          "weightedUs": 38173,
+          "percent": 0.7578713054195749
+        },
+        "js-live-read": {
+          "weightedUs": 37286,
+          "percent": 0.7402611661088799
+        },
+        "char-code": {
+          "weightedUs": 2800,
+          "percent": 0.0555900677226
+        }
+      },
+      "deduplicatedAncestor": {
+        "liveHostPhase": {
+          "weightedUs": 3211364,
+          "percent": 63.757122229257014
+        },
+        "textDecode": {
+          "weightedUs": 1820252,
+          "percent": 36.13854712578504
+        },
+        "prepareMutableInput": {
+          "weightedUs": 1230796,
+          "percent": 24.435726068823282
+        },
+        "liveReaderCall": {
+          "weightedUs": 1149706,
+          "percent": 22.825798000385557
+        },
+        "snapshotGraph": {
+          "weightedUs": 555093,
+          "percent": 11.020591950836144
+        },
+        "resourceWidth": {
+          "weightedUs": 101898,
+          "percent": 2.0230416859991056
+        },
+        "resultFactory": {
+          "weightedUs": 73847,
+          "percent": 1.4661284753967294
+        },
+        "charCodeAt": {
+          "weightedUs": 2800,
+          "percent": 0.0555900677226
+        }
+      },
+      "disjointDecodeSelfByAncestor": {
+        "inlined-live-phase": {
+          "weightedUs": 858385,
+          "percent": 17.042028672165717
+        },
+        "live-reader-call": {
+          "weightedUs": 834391,
+          "percent": 16.565661498974265
+        },
+        "result-factory": {
+          "weightedUs": 70465,
+          "percent": 1.3989836150260748
+        },
+        "resource-width": {
+          "weightedUs": 46259,
+          "percent": 0.9184074795641977
+        },
+        "other": {
+          "weightedUs": 10752,
+          "percent": 0.21346586005478402
+        }
+      },
+      "topDecodeStacks": [
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>",
+          "percent": 5.7372920608846245
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 5.249429655831964
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>>::strict_text > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 4.685627247551109
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 4.419191994394933
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 4.002127511306126
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>>::strict_text > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>",
+          "percent": 2.5719737511641654
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 >  > handleError > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > nativedetachedrenderack_materialize",
+          "percent": 1.3705929732963182
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 1.308848290933002
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>>::strict_text > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 1.3008472919000704
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 1.2711066056684794
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim > nativedetachedrenderjob_run externref shim multivalue shim",
+          "percent": 1.0970898401011262
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 1.085773290600454
+        }
+      ]
+    },
+    {
+      "label": "sankey-large-fixed-render-model-candidate",
+      "sampleCount": 14695,
+      "totalUs": 5019045,
+      "disjointSelf": {
+        "text-decode": {
+          "weightedUs": 1904683,
+          "percent": 37.949111833028
+        },
+        "wasm-other": {
+          "weightedUs": 674619,
+          "percent": 13.441182535721437
+        },
+        "js-graph": {
+          "weightedUs": 474144,
+          "percent": 9.446896770202299
+        },
+        "native-source-storage-admission": {
+          "weightedUs": 423436,
+          "percent": 8.436585047553868
+        },
+        "native-live-read": {
+          "weightedUs": 388668,
+          "percent": 7.743863623458248
+        },
+        "js-layout": {
+          "weightedUs": 329109,
+          "percent": 6.5572036114440095
+        },
+        "native-geometry-svg": {
+          "weightedUs": 329079,
+          "percent": 6.556605888171953
+        },
+        "js-generated-other": {
+          "weightedUs": 174690,
+          "percent": 3.480542613186373
+        },
+        "wasm-to-js": {
+          "weightedUs": 157158,
+          "percent": 3.1312331329964165
+        },
+        "js-other": {
+          "weightedUs": 52322,
+          "percent": 1.0424692346850846
+        },
+        "js-live-read": {
+          "weightedUs": 42848,
+          "percent": 0.8537082253695674
+        },
+        "gc": {
+          "weightedUs": 35990,
+          "percent": 0.7170686853773975
+        },
+        "engine-other": {
+          "weightedUs": 26740,
+          "percent": 0.5327706764932373
+        },
+        "char-code": {
+          "weightedUs": 5559,
+          "percent": 0.11075812231211316
+        }
+      },
+      "deduplicatedAncestor": {
+        "liveHostPhase": {
+          "weightedUs": 3340148,
+          "percent": 66.54947305712541
+        },
+        "textDecode": {
+          "weightedUs": 1904683,
+          "percent": 37.949111833028
+        },
+        "prepareMutableInput": {
+          "weightedUs": 1203189,
+          "percent": 23.972468866089066
+        },
+        "liveReaderCall": {
+          "weightedUs": 1152039,
+          "percent": 22.953350687232334
+        },
+        "snapshotGraph": {
+          "weightedUs": 559757,
+          "percent": 11.152659519888743
+        },
+        "resourceWidth": {
+          "weightedUs": 124118,
+          "percent": 2.4729405693712647
+        },
+        "resultFactory": {
+          "weightedUs": 84171,
+          "percent": 1.677032184409584
+        },
+        "charCodeAt": {
+          "weightedUs": 5559,
+          "percent": 0.11075812231211316
+        }
+      },
+      "disjointDecodeSelfByAncestor": {
+        "inlined-live-phase": {
+          "weightedUs": 920074,
+          "percent": 18.331654727144308
+        },
+        "live-reader-call": {
+          "weightedUs": 839367,
+          "percent": 16.723639656548208
+        },
+        "result-factory": {
+          "weightedUs": 82073,
+          "percent": 1.6352314035837494
+        },
+        "resource-width": {
+          "weightedUs": 59055,
+          "percent": 1.1766182610436846
+        },
+        "other": {
+          "weightedUs": 4114,
+          "percent": 0.08196778470804705
+        }
+      },
+      "topDecodeStacks": [
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>",
+          "percent": 5.718677557184684
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>>::strict_text > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 5.1265529597762125
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 4.823567033170653
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 4.508686413451165
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 4.507630435670531
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>>::strict_text > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>",
+          "percent": 2.837990095725382
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 >  > handleError > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > nativedetachedrenderack_materialize",
+          "percent": 1.6352314035837494
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run",
+          "percent": 1.499209510972705
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> as pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::PhaseInput>::label > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 1.3712369584253579
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim > nativedetachedrenderjob_run externref shim multivalue shim",
+          "percent": 1.3584058321852066
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>>::strict_text > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 1.3450367550002043
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > <pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>::call > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::live_phase::HostPhase<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader>> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedPublicRender>::render::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > <pele[37270552ffd5eb7c]::compat::public::detached_render::DetachedRenderJob>::run::<pele_wasm[e6e81f4f4d17d0e2]::detached_render::Reader> > nativedetachedrenderjob_run > nativedetachedrenderjob_run externref shim",
+          "percent": 1.210847880423467
+        }
+      ]
+    },
+    {
+      "label": "sankey-large-fixed-render-model-control",
+      "sampleCount": 14630,
+      "totalUs": 5027464,
+      "disjointSelf": {
+        "wasm-other": {
+          "weightedUs": 1625617,
+          "percent": 32.33473178524998
+        },
+        "js-graph": {
+          "weightedUs": 1307083,
+          "percent": 25.998853497508883
+        },
+        "native-geometry-svg": {
+          "weightedUs": 957245,
+          "percent": 19.040315355813586
+        },
+        "js-other": {
+          "weightedUs": 432368,
+          "percent": 8.600121253976159
+        },
+        "text-decode": {
+          "weightedUs": 368473,
+          "percent": 7.329202158384426
+        },
+        "js-generated-other": {
+          "weightedUs": 148576,
+          "percent": 2.95528719847621
+        },
+        "gc": {
+          "weightedUs": 53442,
+          "percent": 1.063001147298121
+        },
+        "wasm-to-js": {
+          "weightedUs": 53425,
+          "percent": 1.0626630046480692
+        },
+        "native-source-storage-admission": {
+          "weightedUs": 42975,
+          "percent": 0.8548047285868183
+        },
+        "engine-other": {
+          "weightedUs": 38260,
+          "percent": 0.7610198700577469
+        }
+      },
+      "deduplicatedAncestor": {
+        "prepareMutableInput": {
+          "weightedUs": 521597,
+          "percent": 10.374952461121552
+        },
+        "matchesGraph": {
+          "weightedUs": 501269,
+          "percent": 9.970613414636087
+        },
+        "textDecode": {
+          "weightedUs": 368742,
+          "percent": 7.334552768552893
+        },
+        "resourceWidth": {
+          "weightedUs": 368655,
+          "percent": 7.332822273814393
+        },
+        "resultFactory": {
+          "weightedUs": 207743,
+          "percent": 4.132162855865303
+        }
+      },
+      "disjointDecodeSelfByAncestor": {
+        "result-factory": {
+          "weightedUs": 203051,
+          "percent": 4.038835484451008
+        },
+        "resource-width": {
+          "weightedUs": 165422,
+          "percent": 3.2903666739334185
+        }
+      },
+      "topDecodeStacks": [
+        {
+          "stack": "decode > decodeText >  > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > mutabledocument_render_numbers_operation_packet_with_functions > mutabledocument_render_numbers_operation_packet_with_functions externref shim > mutabledocument_render_numbers_operation_packet_with_functions externref shim multivalue shim",
+          "percent": 2.672659615265271
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > Ref(String) -> Externref externref shim > <pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::indexed::IndexedSankey> > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey as pele[37270552ffd5eb7c]::compat::public::engine::PublicDiagramModule>::render_public > <pele[37270552ffd5eb7c]::compat::public::engine::Codec<pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey> as pele[37270552ffd5eb7c]::compat::public::engine::Erased>::render_operation_with_output_limit",
+          "percent": 2.4769744746058846
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 >  > handleError > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > mutabledocument_render_numbers_operation_packet_with_functions",
+          "percent": 1.2459761024643836
+        },
+        {
+          "stack": "decodeText > getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > Ref(String) -> Externref externref shim > <pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::indexed::IndexedSankey> > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey as pele[37270552ffd5eb7c]::compat::public::engine::PublicDiagramModule>::render_public > <pele[37270552ffd5eb7c]::compat::public::engine::Codec<pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey> as pele[37270552ffd5eb7c]::compat::public::engine::Erased>::render_operation_with_output_limit > <pele[37270552ffd5eb7c]::compat::public::engine::PublicDocument>::render_operation_policy",
+          "percent": 0.806490111117653
+        },
+        {
+          "stack": "decode > decodeText > getStringFromWasm0 >  > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > mutabledocument_render_numbers_operation_packet_with_functions > mutabledocument_render_numbers_operation_packet_with_functions externref shim",
+          "percent": 0.10643537178983281
+        },
+        {
+          "stack": "decodeText >  > __wbg_hostErRenderResult_7aa23217b27f6948 > wasm-to-js > pele_wasm[e6e81f4f4d17d0e2]::render_packet::render_result_packet::__wbg_hostErRenderResult_7aa23217b27f6948 externref shim > pele_wasm[e6e81f4f4d17d0e2]::render_packet::emit > mutabledocument_render_numbers_operation_packet_with_functions > mutabledocument_render_numbers_operation_packet_with_functions externref shim > mutabledocument_render_numbers_operation_packet_with_functions externref shim multivalue shim > js-to-wasm:iiiiiiiiidiiin:iii",
+          "percent": 0.013764394931520147
+        },
+        {
+          "stack": "getStringFromWasm0 > __wbindgen_generic_0000000000000003 > wasm-to-js > Ref(String) -> Externref externref shim > <pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width > pele[37270552ffd5eb7c]::compat::diagrams::sankey::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::sankey::indexed::IndexedSankey> > <pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey as pele[37270552ffd5eb7c]::compat::public::engine::PublicDiagramModule>::render_public > <pele[37270552ffd5eb7c]::compat::public::engine::Codec<pele[37270552ffd5eb7c]::compat::diagrams::sankey::Sankey> as pele[37270552ffd5eb7c]::compat::public::engine::Erased>::render_operation_with_output_limit > <pele[37270552ffd5eb7c]::compat::public::engine::PublicDocument>::render_operation_policy > mutabledocument_render_numbers_operation_packet_with_functions",
+          "percent": 0.006902088209880767
+        }
+      ]
+    }
+  ],
+  "method": "Leaf categories partition all weighted samples. Each ancestor category counts a sample once; categories overlap and must not be added. Decode subcategories are an ordered, disjoint attribution of decode/getStringFromWasm/decodeText leaf samples. Inlining may hide exact reader methods. Old automatic native-parser group matches IndexedSankey generic type names; ignore that group: no parsing occurs in these windows.",
+  "untimedCallbacks": [
+    {
+      "case": "sankey/medium",
+      "phase": "before",
+      "counts": {
+        "js": 48,
+        "control": 48,
+        "candidate": 48
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "phase": "after",
+      "counts": {
+        "js": 48,
+        "control": 48,
+        "candidate": 48
+      }
+    },
+    {
+      "case": "sankey/large",
+      "phase": "before",
+      "counts": {
+        "js": 200,
+        "control": 200,
+        "candidate": 200
+      }
+    },
+    {
+      "case": "sankey/large",
+      "phase": "after",
+      "counts": {
+        "js": 200,
+        "control": 200,
+        "candidate": 200
+      }
+    }
+  ]
+}

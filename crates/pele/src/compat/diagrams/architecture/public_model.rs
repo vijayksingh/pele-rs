@@ -1,5 +1,5 @@
 //! ArchitectureDb native public model, Pele 458322a5 (MIT kepano).
-//! Constructors, exotic coercion/descriptors and active lone UTF-16 rendering
+//! Exotic coercion/descriptors and active lone UTF-16 rendering
 //! remain explicit gaps. Retained graph values are never normalized or reparsed.
 use super::{ArchEdge, ArchGroup, ArchLayoutHint, ArchNode, Architecture, ArchitectureModel};
 use crate::compat::{
@@ -899,7 +899,7 @@ fn direction(g: &ModelGraph, a: Option<&Atom>) -> Result<char, PeleError> {
         )),
     }
 }
-fn ancestry(groups: &[(String, ArchGroup)]) -> Result<(), PeleError> {
+pub(super) fn ancestry(groups: &[(String, ArchGroup)]) -> Result<(), PeleError> {
     let ids: HashMap<_, _> = groups
         .iter()
         .enumerate()
@@ -1122,7 +1122,37 @@ fn export_string(out: &mut GraphWriter, s: &Option<String>) -> Atom {
     s.as_deref()
         .map_or(Atom::Undefined, |s| Atom::String(out.string(s)))
 }
+fn construct_default() -> Result<ArchitecturePublicState, PeleError> {
+    Architecture.create_public(&ArchitectureModel::empty(None))
+}
+
 impl PublicDiagramModule for Architecture {
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::architecture())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::architecture(
+            super::live_phase::ArchitectureDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
+
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = ArchitecturePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
@@ -1248,6 +1278,12 @@ impl PublicDiagramModule for Architecture {
         let graph = out.finish(Atom::Ref(root))?;
         let model = imported(&graph);
         Ok(ArchitecturePublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &ArchitecturePublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

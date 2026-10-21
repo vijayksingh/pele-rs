@@ -1,0 +1,2637 @@
+{
+  "sourceCommit": "4033e413faefb7f502ed874fbe39904418d6e361",
+  "factoryTestCommit": "34da2664a9846fe44469988c1a35545639f2018e",
+  "scope": "Default-disabled native Sankey read-session checkpoint; diagnostic comparison, not release parity",
+  "sourceInputs": 587,
+  "packageFiles": 113,
+  "wasmSha256": "2310934dd43dc52c20723c3e0217377f9819fef8e146d03ef3a33845e06bdcce",
+  "onlyPackageDifferences": [
+    "graph-storage.js",
+    "native-storage.js"
+  ],
+  "nativeSDKInputCount": 362,
+  "nativeSDKInputSha256": "1f89890b534bf1fe2958ed9b03bbc91470cae260a615925e1b15df752cb157ee",
+  "nativeSDKUnchanged": true,
+  "comparisonRows": 48,
+  "timing": {
+    "versus-cursor": {
+      "rows": [
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": -4.050283322970783,
+          "candidateLowerPairs": 14,
+          "pairedPercentRange": [
+            -77.77512890343478,
+            100.97446480729539
+          ],
+          "ratioOfMedians": 0.9703389324433092,
+          "candidateOverJS": 21.24739460437313
+        },
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": -6.188032362196183,
+          "candidateLowerPairs": 20,
+          "pairedPercentRange": [
+            -17.682559990975488,
+            0.06561203892367917
+          ],
+          "ratioOfMedians": 0.9371584662077175,
+          "candidateOverJS": 4.418680286550764
+        },
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.7976977926898554,
+          "candidateLowerPairs": 6,
+          "pairedPercentRange": [
+            -1.832264599686595,
+            5.6204270622962405
+          ],
+          "ratioOfMedians": 1.0108693984596089,
+          "candidateOverJS": 1.9787234560619875
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": -4.474803099733304,
+          "candidateLowerPairs": 20,
+          "pairedPercentRange": [
+            -55.416667206942684,
+            1.4545527371493172
+          ],
+          "ratioOfMedians": 0.9547809266946585,
+          "candidateOverJS": 21.11456199572039
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": -4.1695188351327905,
+          "candidateLowerPairs": 17,
+          "pairedPercentRange": [
+            -11.7087560564888,
+            15.153585835052219
+          ],
+          "ratioOfMedians": 0.9658819531509385,
+          "candidateOverJS": 4.219076786284825
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -1.5058262252723553,
+          "candidateLowerPairs": 14,
+          "pairedPercentRange": [
+            -8.787677475791112,
+            6.283073480223567
+          ],
+          "ratioOfMedians": 0.9883241701559402,
+          "candidateOverJS": 1.881045765648425
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 1.9647143569585301,
+          "candidateLowerPairs": 10,
+          "pairedPercentRange": [
+            -45.45651857379466,
+            247.77240775018302
+          ],
+          "ratioOfMedians": 0.9341963337343041,
+          "candidateOverJS": 11.951695275248813
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 0,
+          "candidateLowerPairs": 10,
+          "pairedPercentRange": [
+            -17.176534033219127,
+            15.329248582906585
+          ],
+          "ratioOfMedians": 0.9989403468787428,
+          "candidateOverJS": 3.370679515694848
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -0.2506322905556302,
+          "candidateLowerPairs": 12,
+          "pairedPercentRange": [
+            -8.662247815668977,
+            17.916213136858893
+          ],
+          "ratioOfMedians": 0.9757726899451713,
+          "candidateOverJS": 1.5826557572184723
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 2.100353694113788,
+          "candidateLowerPairs": 7,
+          "pairedPercentRange": [
+            -37.130514082937836,
+            60.126086420331106
+          ],
+          "ratioOfMedians": 1.0571761713613708,
+          "candidateOverJS": 13.364473329123959
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 0.7820875480507139,
+          "candidateLowerPairs": 8,
+          "pairedPercentRange": [
+            -28.815414550969333,
+            284.92340487506897
+          ],
+          "ratioOfMedians": 0.9814177901547597,
+          "candidateOverJS": 3.243673630468639
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -0.2576586080778043,
+          "candidateLowerPairs": 12,
+          "pairedPercentRange": [
+            -41.361603039827855,
+            50.04265096187153
+          ],
+          "ratioOfMedians": 0.9971647184527407,
+          "candidateOverJS": 1.4899386044623475
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": -8.327419966036832,
+          "candidateLowerPairs": 19,
+          "pairedPercentRange": [
+            -67.40069063150864,
+            41.65089502603816
+          ],
+          "ratioOfMedians": 0.9158856577573048,
+          "candidateOverJS": 15.922607481623803
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": -11.138616821849446,
+          "candidateLowerPairs": 21,
+          "pairedPercentRange": [
+            -14.954491009765725,
+            -6.773571351317742
+          ],
+          "ratioOfMedians": 0.8890705493886581,
+          "candidateOverJS": 3.0161811150529356
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -0.6625666945788256,
+          "candidateLowerPairs": 12,
+          "pairedPercentRange": [
+            -44.631882468016805,
+            18.884742137038636
+          ],
+          "ratioOfMedians": 1.0068624762831422,
+          "candidateOverJS": 1.4648561682790326
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": -6.36081734452858,
+          "candidateLowerPairs": 17,
+          "pairedPercentRange": [
+            -44.779583961111435,
+            44.86879626231157
+          ],
+          "ratioOfMedians": 0.9572829150983206,
+          "candidateOverJS": 16.704684930080713
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": -11.807426737395543,
+          "candidateLowerPairs": 21,
+          "pairedPercentRange": [
+            -21.458433311147374,
+            -1.331500947587938
+          ],
+          "ratioOfMedians": 0.8844194777895154,
+          "candidateOverJS": 2.8266553585318865
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -0.868620277053278,
+          "candidateLowerPairs": 15,
+          "pairedPercentRange": [
+            -6.229253566393778,
+            9.674482063455091
+          ],
+          "ratioOfMedians": 0.9902728827850527,
+          "candidateOverJS": 1.3390573070788696
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": -9.401079885182673,
+          "candidateLowerPairs": 14,
+          "pairedPercentRange": [
+            -42.83431762355392,
+            56.22853852804417
+          ],
+          "ratioOfMedians": 0.9122463904674156,
+          "candidateOverJS": 14.935467782743924
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": -15.906648583691263,
+          "candidateLowerPairs": 21,
+          "pairedPercentRange": [
+            -44.04783681473127,
+            -10.198458359735929
+          ],
+          "ratioOfMedians": 0.8443243181383288,
+          "candidateOverJS": 2.7024221389058822
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.9465483069758696,
+          "candidateLowerPairs": 6,
+          "pairedPercentRange": [
+            -5.1546412024111365,
+            8.481769855650857
+          ],
+          "ratioOfMedians": 1.0055679499586485,
+          "candidateOverJS": 1.4523522163398035
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": -11.075718002730673,
+          "candidateLowerPairs": 20,
+          "pairedPercentRange": [
+            -39.278061469819136,
+            25.49357823212508
+          ],
+          "ratioOfMedians": 0.8825990565501862,
+          "candidateOverJS": 14.45967755425609
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": -14.161459261128728,
+          "candidateLowerPairs": 21,
+          "pairedPercentRange": [
+            -18.71118324767459,
+            -5.494806542028541
+          ],
+          "ratioOfMedians": 0.8609289590290574,
+          "candidateOverJS": 2.642347985316055
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.1758344530602196,
+          "candidateLowerPairs": 9,
+          "pairedPercentRange": [
+            -4.255320977406585,
+            87.06983666203953
+          ],
+          "ratioOfMedians": 1.0087426114148614,
+          "candidateOverJS": 1.3852401117577
+        }
+      ],
+      "adverseRows": [
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.7976977926898554,
+          "candidateLowerPairs": 6,
+          "pairedPercentRange": [
+            -1.832264599686595,
+            5.6204270622962405
+          ],
+          "ratioOfMedians": 1.0108693984596089,
+          "candidateOverJS": 1.9787234560619875
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 1.9647143569585301,
+          "candidateLowerPairs": 10,
+          "pairedPercentRange": [
+            -45.45651857379466,
+            247.77240775018302
+          ],
+          "ratioOfMedians": 0.9341963337343041,
+          "candidateOverJS": 11.951695275248813
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 2.100353694113788,
+          "candidateLowerPairs": 7,
+          "pairedPercentRange": [
+            -37.130514082937836,
+            60.126086420331106
+          ],
+          "ratioOfMedians": 1.0571761713613708,
+          "candidateOverJS": 13.364473329123959
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 0.7820875480507139,
+          "candidateLowerPairs": 8,
+          "pairedPercentRange": [
+            -28.815414550969333,
+            284.92340487506897
+          ],
+          "ratioOfMedians": 0.9814177901547597,
+          "candidateOverJS": 3.243673630468639
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.9465483069758696,
+          "candidateLowerPairs": 6,
+          "pairedPercentRange": [
+            -5.1546412024111365,
+            8.481769855650857
+          ],
+          "ratioOfMedians": 1.0055679499586485,
+          "candidateOverJS": 1.4523522163398035
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.1758344530602196,
+          "candidateLowerPairs": 9,
+          "pairedPercentRange": [
+            -4.255320977406585,
+            87.06983666203953
+          ],
+          "ratioOfMedians": 1.0087426114148614,
+          "candidateOverJS": 1.3852401117577
+        }
+      ]
+    },
+    "versus-arena": {
+      "rows": [
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 42.82729357335111,
+          "candidateLowerPairs": 3,
+          "pairedPercentRange": [
+            -79.51301419304106,
+            94.50905362237305
+          ],
+          "ratioOfMedians": 1.4213091211639184,
+          "candidateOverJS": 20.826540184740427
+        },
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 40.20418366775451,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            31.752185003586675,
+            54.84343831495644
+          ],
+          "ratioOfMedians": 1.409732248177322,
+          "candidateOverJS": 4.635199890136719
+        },
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -0.3589457524319051,
+          "candidateLowerPairs": 12,
+          "pairedPercentRange": [
+            -5.6970534659733225,
+            67.15175621467837
+          ],
+          "ratioOfMedians": 0.9887561593422958,
+          "candidateOverJS": 1.9541664172102169
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 46.6762029555315,
+          "candidateLowerPairs": 1,
+          "pairedPercentRange": [
+            -21.609829516152836,
+            258.94527437172724
+          ],
+          "ratioOfMedians": 1.4674598158721048,
+          "candidateOverJS": 20.359209061936937
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 33.843120155056994,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            13.04868526516827,
+            50.2427240199653
+          ],
+          "ratioOfMedians": 1.3652464999375478,
+          "candidateOverJS": 4.206490219069439
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 1.3314549447376756,
+          "candidateLowerPairs": 10,
+          "pairedPercentRange": [
+            -9.159815935434024,
+            6.085761575601967
+          ],
+          "ratioOfMedians": 1.0089903925550612,
+          "candidateOverJS": 1.863346142369083
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 6.712486222241343,
+          "candidateLowerPairs": 2,
+          "pairedPercentRange": [
+            -70.47983976090573,
+            122.52494612252337
+          ],
+          "ratioOfMedians": 1.0758483666166314,
+          "candidateOverJS": 12.229155778027884
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 2.9122486189937735,
+          "candidateLowerPairs": 5,
+          "pairedPercentRange": [
+            -7.340995291442686,
+            10.221396721119946
+          ],
+          "ratioOfMedians": 1.0228781890463996,
+          "candidateOverJS": 3.126021805398178
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -1.0596794803331422,
+          "candidateLowerPairs": 12,
+          "pairedPercentRange": [
+            -51.40751359397804,
+            43.66629339258034
+          ],
+          "ratioOfMedians": 0.9925373008433876,
+          "candidateOverJS": 1.5552186925121079
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 3.1535024341885043,
+          "candidateLowerPairs": 4,
+          "pairedPercentRange": [
+            -60.86542343386342,
+            502.02571272387286
+          ],
+          "ratioOfMedians": 1.0388705334854735,
+          "candidateOverJS": 12.198062449961611
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 3.4811315407330845,
+          "candidateLowerPairs": 6,
+          "pairedPercentRange": [
+            -11.157025845605395,
+            146.88187333819803
+          ],
+          "ratioOfMedians": 1.066448870623097,
+          "candidateOverJS": 3.2345816174022457
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.18792376422243073,
+          "candidateLowerPairs": 10,
+          "pairedPercentRange": [
+            -57.46354987684668,
+            6.246643283834485
+          ],
+          "ratioOfMedians": 1.0005362052855238,
+          "candidateOverJS": 1.6065432976956922
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 40.389786173786256,
+          "candidateLowerPairs": 3,
+          "pairedPercentRange": [
+            -31.810486996787525,
+            283.74733221626866
+          ],
+          "ratioOfMedians": 1.4038978617378626,
+          "candidateOverJS": 16.00765935492169
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 25.195976697453126,
+          "candidateLowerPairs": 1,
+          "pairedPercentRange": [
+            -17.221670836463865,
+            151.22427741503768
+          ],
+          "ratioOfMedians": 1.2664359222162556,
+          "candidateOverJS": 3.0641859187636267
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.5910472288608526,
+          "candidateLowerPairs": 7,
+          "pairedPercentRange": [
+            -2.8665956335281018,
+            14.514318448409869
+          ],
+          "ratioOfMedians": 1.0065470432079333,
+          "candidateOverJS": 1.4065233444210927
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 39.73602267512313,
+          "candidateLowerPairs": 5,
+          "pairedPercentRange": [
+            -32.641772161666395,
+            541.6953765791
+          ],
+          "ratioOfMedians": 1.386671346876149,
+          "candidateOverJS": 15.605466490087936
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 22.461072027433016,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            15.468858877412384,
+            32.83745036204675
+          ],
+          "ratioOfMedians": 1.2114058067648594,
+          "candidateOverJS": 2.8528657158449477
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.5493017406690948,
+          "candidateLowerPairs": 7,
+          "pairedPercentRange": [
+            -36.17311510717275,
+            45.70727257103262
+          ],
+          "ratioOfMedians": 1.004617058058201,
+          "candidateOverJS": 1.3937453335894672
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 35.92592875162761,
+          "candidateLowerPairs": 2,
+          "pairedPercentRange": [
+            -23.554792579541704,
+            48.33333308103855
+          ],
+          "ratioOfMedians": 1.3573549185855522,
+          "candidateOverJS": 14.301368354642168
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 19.836000791240593,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            12.027871769660003,
+            32.05027309320769
+          ],
+          "ratioOfMedians": 1.2098039365282245,
+          "candidateOverJS": 2.829626227902135
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": -0.5874153617378752,
+          "candidateLowerPairs": 11,
+          "pairedPercentRange": [
+            -9.775193020886597,
+            20.440937059519392
+          ],
+          "ratioOfMedians": 0.990426633597611,
+          "candidateOverJS": 1.4122464877706515
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 35.65317936907402,
+          "candidateLowerPairs": 5,
+          "pairedPercentRange": [
+            -28.856229934448628,
+            134.1414952491402
+          ],
+          "ratioOfMedians": 1.2781902126245448,
+          "candidateOverJS": 12.817013854264028
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 20.427281833777002,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            6.872040026168258,
+            33.63740236074815
+          ],
+          "ratioOfMedians": 1.2049851339625077,
+          "candidateOverJS": 2.698042405737775
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.575016284251384,
+          "candidateLowerPairs": 9,
+          "pairedPercentRange": [
+            -5.734048276380954,
+            13.30128131651076
+          ],
+          "ratioOfMedians": 1.0036668252626875,
+          "candidateOverJS": 1.4145441925806879
+        }
+      ],
+      "adverseRows": [
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 42.82729357335111,
+          "candidateLowerPairs": 3,
+          "pairedPercentRange": [
+            -79.51301419304106,
+            94.50905362237305
+          ],
+          "ratioOfMedians": 1.4213091211639184,
+          "candidateOverJS": 20.826540184740427
+        },
+        {
+          "case": "sankey/small",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 40.20418366775451,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            31.752185003586675,
+            54.84343831495644
+          ],
+          "ratioOfMedians": 1.409732248177322,
+          "candidateOverJS": 4.635199890136719
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 46.6762029555315,
+          "candidateLowerPairs": 1,
+          "pairedPercentRange": [
+            -21.609829516152836,
+            258.94527437172724
+          ],
+          "ratioOfMedians": 1.4674598158721048,
+          "candidateOverJS": 20.359209061936937
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 33.843120155056994,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            13.04868526516827,
+            50.2427240199653
+          ],
+          "ratioOfMedians": 1.3652464999375478,
+          "candidateOverJS": 4.206490219069439
+        },
+        {
+          "case": "sankey/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 1.3314549447376756,
+          "candidateLowerPairs": 10,
+          "pairedPercentRange": [
+            -9.159815935434024,
+            6.085761575601967
+          ],
+          "ratioOfMedians": 1.0089903925550612,
+          "candidateOverJS": 1.863346142369083
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 6.712486222241343,
+          "candidateLowerPairs": 2,
+          "pairedPercentRange": [
+            -70.47983976090573,
+            122.52494612252337
+          ],
+          "ratioOfMedians": 1.0758483666166314,
+          "candidateOverJS": 12.229155778027884
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 2.9122486189937735,
+          "candidateLowerPairs": 5,
+          "pairedPercentRange": [
+            -7.340995291442686,
+            10.221396721119946
+          ],
+          "ratioOfMedians": 1.0228781890463996,
+          "candidateOverJS": 3.126021805398178
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 3.1535024341885043,
+          "candidateLowerPairs": 4,
+          "pairedPercentRange": [
+            -60.86542343386342,
+            502.02571272387286
+          ],
+          "ratioOfMedians": 1.0388705334854735,
+          "candidateOverJS": 12.198062449961611
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 3.4811315407330845,
+          "candidateLowerPairs": 6,
+          "pairedPercentRange": [
+            -11.157025845605395,
+            146.88187333819803
+          ],
+          "ratioOfMedians": 1.066448870623097,
+          "candidateOverJS": 3.2345816174022457
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.18792376422243073,
+          "candidateLowerPairs": 10,
+          "pairedPercentRange": [
+            -57.46354987684668,
+            6.246643283834485
+          ],
+          "ratioOfMedians": 1.0005362052855238,
+          "candidateOverJS": 1.6065432976956922
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 40.389786173786256,
+          "candidateLowerPairs": 3,
+          "pairedPercentRange": [
+            -31.810486996787525,
+            283.74733221626866
+          ],
+          "ratioOfMedians": 1.4038978617378626,
+          "candidateOverJS": 16.00765935492169
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 25.195976697453126,
+          "candidateLowerPairs": 1,
+          "pairedPercentRange": [
+            -17.221670836463865,
+            151.22427741503768
+          ],
+          "ratioOfMedians": 1.2664359222162556,
+          "candidateOverJS": 3.0641859187636267
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "fixed",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.5910472288608526,
+          "candidateLowerPairs": 7,
+          "pairedPercentRange": [
+            -2.8665956335281018,
+            14.514318448409869
+          ],
+          "ratioOfMedians": 1.0065470432079333,
+          "candidateOverJS": 1.4065233444210927
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 39.73602267512313,
+          "candidateLowerPairs": 5,
+          "pairedPercentRange": [
+            -32.641772161666395,
+            541.6953765791
+          ],
+          "ratioOfMedians": 1.386671346876149,
+          "candidateOverJS": 15.605466490087936
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 22.461072027433016,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            15.468858877412384,
+            32.83745036204675
+          ],
+          "ratioOfMedians": 1.2114058067648594,
+          "candidateOverJS": 2.8528657158449477
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.5493017406690948,
+          "candidateLowerPairs": 7,
+          "pairedPercentRange": [
+            -36.17311510717275,
+            45.70727257103262
+          ],
+          "ratioOfMedians": 1.004617058058201,
+          "candidateOverJS": 1.3937453335894672
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 35.92592875162761,
+          "candidateLowerPairs": 2,
+          "pairedPercentRange": [
+            -23.554792579541704,
+            48.33333308103855
+          ],
+          "ratioOfMedians": 1.3573549185855522,
+          "candidateOverJS": 14.301368354642168
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 19.836000791240593,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            12.027871769660003,
+            32.05027309320769
+          ],
+          "ratioOfMedians": 1.2098039365282245,
+          "candidateOverJS": 2.829626227902135
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "parse",
+          "pairs": 21,
+          "pairedMedianPercent": 35.65317936907402,
+          "candidateLowerPairs": 5,
+          "pairedPercentRange": [
+            -28.856229934448628,
+            134.1414952491402
+          ],
+          "ratioOfMedians": 1.2781902126245448,
+          "candidateOverJS": 12.817013854264028
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "render-model",
+          "pairs": 21,
+          "pairedMedianPercent": 20.427281833777002,
+          "candidateLowerPairs": 0,
+          "pairedPercentRange": [
+            6.872040026168258,
+            33.63740236074815
+          ],
+          "ratioOfMedians": 1.2049851339625077,
+          "candidateOverJS": 2.698042405737775
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "stage": "render-source",
+          "pairs": 21,
+          "pairedMedianPercent": 0.575016284251384,
+          "candidateLowerPairs": 9,
+          "pairedPercentRange": [
+            -5.734048276380954,
+            13.30128131651076
+          ],
+          "ratioOfMedians": 1.0036668252626875,
+          "candidateOverJS": 1.4145441925806879
+        }
+      ]
+    }
+  },
+  "profiles": [
+    {
+      "stage": "parse",
+      "runtime": "control",
+      "samples": 5769,
+      "weightedUs": 2056548,
+      "selfCategories": {
+        "engine-or-profiler": {
+          "weightedUs": 81154,
+          "percent": 3.9461271995596503
+        },
+        "javascript": {
+          "weightedUs": 842819,
+          "percent": 40.98221874714327
+        },
+        "wasm": {
+          "weightedUs": 875639,
+          "percent": 42.5780968885725
+        },
+        "gc": {
+          "weightedUs": 256936,
+          "percent": 12.493557164724578
+        }
+      },
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 81154,
+          "percent": 3.9461271995596503
+        },
+        "legacy-graph-boundary": {
+          "weightedUs": 271546,
+          "percent": 13.203970926037224
+        },
+        "admission": {
+          "weightedUs": 76912,
+          "percent": 3.739859220402344
+        },
+        "wasm-other": {
+          "weightedUs": 583804,
+          "percent": 28.38756985005942
+        },
+        "js-observer-publisher": {
+          "weightedUs": 479985,
+          "percent": 23.339353129613315
+        },
+        "allocator": {
+          "weightedUs": 76938,
+          "percent": 3.741123474871484
+        },
+        "native-svg-json": {
+          "weightedUs": 11522,
+          "percent": 0.5602592305163798
+        },
+        "js-owner-transport": {
+          "weightedUs": 62319,
+          "percent": 3.0302720870118276
+        },
+        "javascript-other": {
+          "weightedUs": 38990,
+          "percent": 1.8958954519904228
+        },
+        "native-projection": {
+          "weightedUs": 57548,
+          "percent": 2.7982813919247205
+        },
+        "native-parse": {
+          "weightedUs": 58894,
+          "percent": 2.8637308732886373
+        },
+        "gc": {
+          "weightedUs": 256936,
+          "percent": 12.493557164724578
+        }
+      },
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 76912,
+          "inclusiveUs": 76912,
+          "selfPercent": 3.739859220402344,
+          "inclusivePercent": 3.739859220402344
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 4361,
+          "inclusiveUs": 6697,
+          "selfPercent": 0.21205437461221424,
+          "inclusivePercent": 0.32564277614721365
+        },
+        "sankey-raw-parser": {
+          "selfUs": 58894,
+          "inclusiveUs": 153485,
+          "selfPercent": 2.8637308732886373,
+          "inclusivePercent": 7.4632345075339845
+        },
+        "sankey-render-layout": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "initial-native-construction": {
+          "selfUs": 36708,
+          "inclusiveUs": 374730,
+          "selfPercent": 1.7849328097374824,
+          "inclusivePercent": 18.22131066233319
+        },
+        "native-svg-and-json": {
+          "selfUs": 11522,
+          "inclusiveUs": 15293,
+          "selfPercent": 0.5602592305163798,
+          "inclusivePercent": 0.7436247537135043
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-window-copy": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-string-decode": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 460927,
+          "inclusiveUs": 479625,
+          "selfPercent": 22.412654603734023,
+          "inclusivePercent": 23.32184806773292
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 113820,
+          "inclusiveUs": 472443,
+          "selfPercent": 5.534517064517823,
+          "inclusivePercent": 22.972622083219065
+        },
+        "allocator": {
+          "selfUs": 76938,
+          "inclusiveUs": 92664,
+          "selfPercent": 3.741123474871484,
+          "inclusivePercent": 4.505802928013351
+        }
+      },
+      "deduplicatedAncestorUnions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 76912,
+          "percent": 3.739859220402344,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 556537,
+          "percent": 27.061707288135263,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 160182,
+          "percent": 7.788877283681198,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        },
+        "shared-observation-publication": {
+          "weightedUs": 479625,
+          "percent": 23.32184806773292,
+          "members": [
+            "shared-publication",
+            "shared-observation-and-match"
+          ]
+        },
+        "native-pod-read-windows": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-pod-refresh",
+            "native-pod-window-copy",
+            "native-pod-string-decode"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "parse",
+      "runtime": "candidate",
+      "samples": 5900,
+      "weightedUs": 2035918,
+      "selfCategories": {
+        "engine-or-profiler": {
+          "weightedUs": 59685,
+          "percent": 2.9316013709785955
+        },
+        "javascript": {
+          "weightedUs": 724617,
+          "percent": 35.591659389032365
+        },
+        "wasm": {
+          "weightedUs": 1069916,
+          "percent": 52.55201830329119
+        },
+        "gc": {
+          "weightedUs": 181700,
+          "percent": 8.924720936697843
+        }
+      },
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 59685,
+          "percent": 2.9316013709785955
+        },
+        "javascript-other": {
+          "weightedUs": 40953,
+          "percent": 2.01152502212761
+        },
+        "admission": {
+          "weightedUs": 157907,
+          "percent": 7.756058937540707
+        },
+        "js-storage-adapter": {
+          "weightedUs": 279656,
+          "percent": 13.736113144046076
+        },
+        "flat-native-storage": {
+          "weightedUs": 450746,
+          "percent": 22.139693248942248
+        },
+        "wasm-other": {
+          "weightedUs": 299955,
+          "percent": 14.733157229318666
+        },
+        "js-observer-publisher": {
+          "weightedUs": 372852,
+          "percent": 18.31370418651439
+        },
+        "js-owner-transport": {
+          "weightedUs": 30837,
+          "percent": 1.5146484288659956
+        },
+        "allocator": {
+          "weightedUs": 100002,
+          "percent": 4.911887413933174
+        },
+        "native-parse": {
+          "weightedUs": 45017,
+          "percent": 2.2111401343276103
+        },
+        "native-wrapper-or-leases": {
+          "weightedUs": 9872,
+          "percent": 0.4848918276669296
+        },
+        "native-svg-json": {
+          "weightedUs": 5432,
+          "percent": 0.26680838815708685
+        },
+        "native-projection": {
+          "weightedUs": 1304,
+          "percent": 0.06404973088307093
+        },
+        "gc": {
+          "weightedUs": 181700,
+          "percent": 8.924720936697843
+        }
+      },
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 157907,
+          "inclusiveUs": 261259,
+          "selfPercent": 7.756058937540707,
+          "inclusivePercent": 12.832491288941892
+        },
+        "native-flat-storage": {
+          "selfUs": 591304,
+          "inclusiveUs": 827915,
+          "selfPercent": 29.043605881965778,
+          "inclusivePercent": 40.665439374277355
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 25598,
+          "inclusiveUs": 492125,
+          "selfPercent": 1.2573197938227374,
+          "inclusivePercent": 24.172142492968774
+        },
+        "native-flat-page-cow": {
+          "selfUs": 176525,
+          "inclusiveUs": 178751,
+          "selfPercent": 8.670535846728601,
+          "inclusivePercent": 8.779872273834211
+        },
+        "native-lease-directories": {
+          "selfUs": 3987,
+          "inclusiveUs": 71147,
+          "selfPercent": 0.195833034532825,
+          "inclusivePercent": 3.494590646578104
+        },
+        "native-owner-wrapper": {
+          "selfUs": 9872,
+          "inclusiveUs": 297290,
+          "selfPercent": 0.4848918276669296,
+          "inclusivePercent": 14.602258047720978
+        },
+        "sankey-import-projection": {
+          "selfUs": 1304,
+          "inclusiveUs": 7266,
+          "selfPercent": 0.06404973088307093,
+          "inclusivePercent": 0.3568906016843508
+        },
+        "sankey-raw-parser": {
+          "selfUs": 45017,
+          "inclusiveUs": 123536,
+          "selfPercent": 2.2111401343276103,
+          "inclusivePercent": 6.067827879118903
+        },
+        "sankey-render-layout": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "initial-native-construction": {
+          "selfUs": 25598,
+          "inclusiveUs": 492125,
+          "selfPercent": 1.2573197938227374,
+          "inclusivePercent": 24.172142492968774
+        },
+        "native-svg-and-json": {
+          "selfUs": 5432,
+          "inclusiveUs": 8475,
+          "selfPercent": 0.26680838815708685,
+          "inclusivePercent": 0.41627413284817955
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 279656,
+          "inclusiveUs": 358523,
+          "selfPercent": 13.736113144046076,
+          "inclusivePercent": 17.60989391517733
+        },
+        "native-pod-refresh": {
+          "selfUs": 8858,
+          "inclusiveUs": 9179,
+          "selfPercent": 0.43508628540049255,
+          "inclusivePercent": 0.45085312866235283
+        },
+        "native-pod-window-copy": {
+          "selfUs": 166156,
+          "inclusiveUs": 168791,
+          "selfPercent": 8.161232426846269,
+          "inclusivePercent": 8.29065807169051
+        },
+        "native-pod-string-decode": {
+          "selfUs": 67825,
+          "inclusiveUs": 101567,
+          "selfPercent": 3.331421010079974,
+          "inclusivePercent": 4.988756914571216
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 371136,
+          "inclusiveUs": 639015,
+          "selfPercent": 18.22941788421734,
+          "inclusivePercent": 31.387069616752736
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 5878,
+          "inclusiveUs": 725822,
+          "selfPercent": 0.28871496789163414,
+          "inclusivePercent": 35.65084644862907
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 100002,
+          "inclusiveUs": 100643,
+          "selfPercent": 4.911887413933174,
+          "inclusivePercent": 4.943371982565113
+        }
+      },
+      "deduplicatedAncestorUnions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 859762,
+          "percent": 42.22969687384266,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 1544856,
+          "percent": 75.88006982599495,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 130802,
+          "percent": 6.4247184808032545,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        },
+        "shared-observation-publication": {
+          "weightedUs": 639015,
+          "percent": 31.387069616752736,
+          "members": [
+            "shared-publication",
+            "shared-observation-and-match"
+          ]
+        },
+        "native-pod-read-windows": {
+          "weightedUs": 249144,
+          "percent": 12.237428030009067,
+          "members": [
+            "native-pod-refresh",
+            "native-pod-window-copy",
+            "native-pod-string-decode"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-model",
+      "runtime": "candidate",
+      "samples": 5821,
+      "weightedUs": 2016126,
+      "selfCategories": {
+        "engine-or-profiler": {
+          "weightedUs": 143117,
+          "percent": 7.09861387631527
+        },
+        "javascript": {
+          "weightedUs": 732469,
+          "percent": 36.33051704109763
+        },
+        "wasm": {
+          "weightedUs": 1135875,
+          "percent": 56.33948473458504
+        },
+        "gc": {
+          "weightedUs": 4665,
+          "percent": 0.2313843480020594
+        }
+      },
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 143117,
+          "percent": 7.09861387631527
+        },
+        "js-owner-transport": {
+          "weightedUs": 27330,
+          "percent": 1.3555700387773384
+        },
+        "flat-native-storage": {
+          "weightedUs": 104447,
+          "percent": 5.180578991590803
+        },
+        "native-render-layout": {
+          "weightedUs": 149600,
+          "percent": 7.420171159937425
+        },
+        "js-storage-adapter": {
+          "weightedUs": 306620,
+          "percent": 15.20837487339581
+        },
+        "wasm-other": {
+          "weightedUs": 494587,
+          "percent": 24.53155209545435
+        },
+        "js-observer-publisher": {
+          "weightedUs": 339060,
+          "percent": 16.817401293371546
+        },
+        "native-svg-json": {
+          "weightedUs": 174181,
+          "percent": 8.639390593643453
+        },
+        "javascript-other": {
+          "weightedUs": 58417,
+          "percent": 2.897487557821287
+        },
+        "native-wrapper-or-leases": {
+          "weightedUs": 9706,
+          "percent": 0.4814183240531594
+        },
+        "allocator": {
+          "weightedUs": 76792,
+          "percent": 3.8088889285689485
+        },
+        "admission": {
+          "weightedUs": 127604,
+          "percent": 6.32916791906855
+        },
+        "gc": {
+          "weightedUs": 4665,
+          "percent": 0.2313843480020594
+        }
+      },
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 127604,
+          "inclusiveUs": 227604,
+          "selfPercent": 6.32916791906855,
+          "inclusivePercent": 11.28917537891977
+        },
+        "native-flat-storage": {
+          "selfUs": 216556,
+          "inclusiveUs": 233108,
+          "selfPercent": 10.741193754755407,
+          "inclusivePercent": 11.562174189509982
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 41548,
+          "inclusiveUs": 41548,
+          "selfPercent": 2.060783899418985,
+          "inclusivePercent": 2.060783899418985
+        },
+        "native-lease-directories": {
+          "selfUs": 5189,
+          "inclusiveUs": 12418,
+          "selfPercent": 0.25737478709167977,
+          "inclusivePercent": 0.6159337263643244
+        },
+        "native-owner-wrapper": {
+          "selfUs": 9706,
+          "inclusiveUs": 231413,
+          "selfPercent": 0.4814183240531594,
+          "inclusivePercent": 11.478102063065503
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-render-layout": {
+          "selfUs": 149600,
+          "inclusiveUs": 860296,
+          "selfPercent": 7.420171159937425,
+          "inclusivePercent": 42.670745776801645
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 174181,
+          "inclusiveUs": 338737,
+          "selfPercent": 8.639390593643453,
+          "inclusivePercent": 16.801380469276225
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 306620,
+          "inclusiveUs": 371647,
+          "selfPercent": 15.20837487339581,
+          "inclusivePercent": 18.43371892431326
+        },
+        "native-pod-refresh": {
+          "selfUs": 2046,
+          "inclusiveUs": 2767,
+          "selfPercent": 0.10148175262855595,
+          "inclusivePercent": 0.13724340641408325
+        },
+        "native-pod-window-copy": {
+          "selfUs": 272540,
+          "inclusiveUs": 275666,
+          "selfPercent": 13.518004331078513,
+          "inclusivePercent": 13.673054164273463
+        },
+        "native-pod-string-decode": {
+          "selfUs": 3812,
+          "inclusiveUs": 3812,
+          "selfPercent": 0.18907548436952848,
+          "inclusivePercent": 0.18907548436952848
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 163108,
+          "inclusiveUs": 344499,
+          "selfPercent": 8.090168967614128,
+          "inclusivePercent": 17.087176099112853
+        },
+        "shared-observation-and-match": {
+          "selfUs": 146791,
+          "inclusiveUs": 288360,
+          "selfPercent": 7.280844550390204,
+          "inclusivePercent": 14.302677511226976
+        },
+        "owner-transport-gates": {
+          "selfUs": 20682,
+          "inclusiveUs": 1959528,
+          "selfPercent": 1.0258287428464292,
+          "inclusivePercent": 97.1927349778734
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 76792,
+          "inclusiveUs": 76792,
+          "selfPercent": 3.8088889285689485,
+          "inclusivePercent": 3.8088889285689485
+        }
+      },
+      "deduplicatedAncestorUnions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 397798,
+          "percent": 19.730810475138956,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 1962650,
+          "percent": 97.34758641076996,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 860296,
+          "percent": 42.670745776801645,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        },
+        "shared-observation-publication": {
+          "weightedUs": 632859,
+          "percent": 31.38985361033983,
+          "members": [
+            "shared-publication",
+            "shared-observation-and-match"
+          ]
+        },
+        "native-pod-read-windows": {
+          "weightedUs": 280163,
+          "percent": 13.896105699742973,
+          "members": [
+            "native-pod-refresh",
+            "native-pod-window-copy",
+            "native-pod-string-decode"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-model",
+      "runtime": "control",
+      "samples": 5750,
+      "weightedUs": 2036666,
+      "selfCategories": {
+        "engine-or-profiler": {
+          "weightedUs": 195183,
+          "percent": 9.583456492129784
+        },
+        "wasm": {
+          "weightedUs": 1211592,
+          "percent": 59.48898837610094
+        },
+        "javascript": {
+          "weightedUs": 620016,
+          "percent": 30.44269408926157
+        },
+        "gc": {
+          "weightedUs": 9875,
+          "percent": 0.48486104250770623
+        }
+      },
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 195183,
+          "percent": 9.583456492129784
+        },
+        "wasm-other": {
+          "weightedUs": 677860,
+          "percent": 33.28282595182519
+        },
+        "js-owner-transport": {
+          "weightedUs": 23819,
+          "percent": 1.1695093844547904
+        },
+        "js-observer-publisher": {
+          "weightedUs": 409318,
+          "percent": 20.09745338705512
+        },
+        "legacy-graph-boundary": {
+          "weightedUs": 120664,
+          "percent": 5.9245845906987205
+        },
+        "native-svg-json": {
+          "weightedUs": 194145,
+          "percent": 9.53249084533252
+        },
+        "allocator": {
+          "weightedUs": 96696,
+          "percent": 4.7477593282354595
+        },
+        "native-render-layout": {
+          "weightedUs": 179797,
+          "percent": 8.828006163013473
+        },
+        "javascript-other": {
+          "weightedUs": 72063,
+          "percent": 3.5382826639223124
+        },
+        "admission": {
+          "weightedUs": 56857,
+          "percent": 2.7916703082390533
+        },
+        "gc": {
+          "weightedUs": 9875,
+          "percent": 0.48486104250770623
+        },
+        "native-projection": {
+          "weightedUs": 389,
+          "percent": 0.019099842585873186
+        }
+      },
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 56857,
+          "inclusiveUs": 57202,
+          "selfPercent": 2.7916703082390533,
+          "inclusivePercent": 2.8086097573190694
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-render-layout": {
+          "selfUs": 179797,
+          "inclusiveUs": 1028387,
+          "selfPercent": 8.828006163013473,
+          "inclusivePercent": 50.49364991608835
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 194145,
+          "inclusiveUs": 1419566,
+          "selfPercent": 9.53249084533252,
+          "inclusivePercent": 69.70048108035387
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-window-copy": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-string-decode": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 248016,
+          "inclusiveUs": 257823,
+          "selfPercent": 12.177548994287724,
+          "inclusivePercent": 12.659071246831832
+        },
+        "shared-observation-and-match": {
+          "selfUs": 109582,
+          "inclusiveUs": 145619,
+          "selfPercent": 5.380460026337161,
+          "inclusivePercent": 7.1498714074865495
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 25486,
+          "inclusiveUs": 221523,
+          "selfPercent": 1.2513588384153318,
+          "inclusivePercent": 10.876746604499706
+        },
+        "allocator": {
+          "selfUs": 96696,
+          "inclusiveUs": 96696,
+          "selfPercent": 4.7477593282354595,
+          "inclusivePercent": 4.7477593282354595
+        }
+      },
+      "deduplicatedAncestorUnions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 57202,
+          "percent": 2.8086097573190694,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 460644,
+          "percent": 22.61755241163745,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 1028387,
+          "percent": 50.49364991608835,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        },
+        "shared-observation-publication": {
+          "weightedUs": 403442,
+          "percent": 19.808942654318383,
+          "members": [
+            "shared-publication",
+            "shared-observation-and-match"
+          ]
+        },
+        "native-pod-read-windows": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-pod-refresh",
+            "native-pod-window-copy",
+            "native-pod-string-decode"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-source",
+      "runtime": "control",
+      "samples": 5793,
+      "weightedUs": 2034645,
+      "selfCategories": {
+        "engine-or-profiler": {
+          "weightedUs": 242180,
+          "percent": 11.902813512922402
+        },
+        "wasm": {
+          "weightedUs": 1700020,
+          "percent": 83.55364203583426
+        },
+        "javascript": {
+          "weightedUs": 91299,
+          "percent": 4.487220129310027
+        },
+        "gc": {
+          "weightedUs": 1146,
+          "percent": 0.05632432193331023
+        }
+      },
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 242180,
+          "percent": 11.902813512922402
+        },
+        "allocator": {
+          "weightedUs": 174182,
+          "percent": 8.56080544763337
+        },
+        "wasm-other": {
+          "weightedUs": 943931,
+          "percent": 46.39290883667667
+        },
+        "native-render-layout": {
+          "weightedUs": 283889,
+          "percent": 13.95275342873081
+        },
+        "native-svg-json": {
+          "weightedUs": 240857,
+          "percent": 11.837789884721905
+        },
+        "javascript-other": {
+          "weightedUs": 65508,
+          "percent": 3.219627994072676
+        },
+        "native-parse": {
+          "weightedUs": 57161,
+          "percent": 2.8093844380715063
+        },
+        "js-owner-transport": {
+          "weightedUs": 25791,
+          "percent": 1.267592135237351
+        },
+        "gc": {
+          "weightedUs": 1146,
+          "percent": 0.05632432193331023
+        }
+      },
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 57161,
+          "inclusiveUs": 145927,
+          "selfPercent": 2.8093844380715063,
+          "inclusivePercent": 7.172111105377105
+        },
+        "sankey-render-layout": {
+          "selfUs": 283889,
+          "inclusiveUs": 1489551,
+          "selfPercent": 13.95275342873081,
+          "inclusivePercent": 73.20938050618167
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 240857,
+          "inclusiveUs": 1946523,
+          "selfPercent": 11.837789884721905,
+          "inclusivePercent": 95.66892504589252
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-window-copy": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-string-decode": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 174182,
+          "inclusiveUs": 174182,
+          "selfPercent": 8.56080544763337,
+          "inclusivePercent": 8.56080544763337
+        }
+      },
+      "deduplicatedAncestorUnions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 1635478,
+          "percent": 80.38149161155877,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        },
+        "shared-observation-publication": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "shared-publication",
+            "shared-observation-and-match"
+          ]
+        },
+        "native-pod-read-windows": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-pod-refresh",
+            "native-pod-window-copy",
+            "native-pod-string-decode"
+          ]
+        }
+      }
+    },
+    {
+      "stage": "render-source",
+      "runtime": "candidate",
+      "samples": 5843,
+      "weightedUs": 2046499,
+      "selfCategories": {
+        "engine-or-profiler": {
+          "weightedUs": 246173,
+          "percent": 12.028982178833218
+        },
+        "wasm": {
+          "weightedUs": 1704932,
+          "percent": 83.30969133139082
+        },
+        "javascript": {
+          "weightedUs": 94046,
+          "percent": 4.5954579015186425
+        },
+        "gc": {
+          "weightedUs": 1348,
+          "percent": 0.06586858825731164
+        }
+      },
+      "disjointSelfRoles": {
+        "engine-or-profiler-other": {
+          "weightedUs": 246173,
+          "percent": 12.028982178833218
+        },
+        "native-render-layout": {
+          "weightedUs": 280707,
+          "percent": 13.71644940945488
+        },
+        "native-parse": {
+          "weightedUs": 63134,
+          "percent": 3.084975853885098
+        },
+        "wasm-other": {
+          "weightedUs": 940377,
+          "percent": 45.95052330834269
+        },
+        "native-svg-json": {
+          "weightedUs": 274878,
+          "percent": 13.43162151557367
+        },
+        "allocator": {
+          "weightedUs": 146130,
+          "percent": 7.14048724187014
+        },
+        "javascript-other": {
+          "weightedUs": 77725,
+          "percent": 3.7979495714388327
+        },
+        "js-owner-transport": {
+          "weightedUs": 16027,
+          "percent": 0.7831423323441643
+        },
+        "gc": {
+          "weightedUs": 1348,
+          "percent": 0.06586858825731164
+        }
+      },
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-storage": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-observation": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-write": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-flat-page-cow": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-lease-directories": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-owner-wrapper": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 63134,
+          "inclusiveUs": 156262,
+          "selfPercent": 3.084975853885098,
+          "inclusivePercent": 7.635576660433257
+        },
+        "sankey-render-layout": {
+          "selfUs": 280707,
+          "inclusiveUs": 1495380,
+          "selfPercent": 13.71644940945488,
+          "inclusivePercent": 73.0701554215272
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-svg-and-json": {
+          "selfUs": 274878,
+          "inclusiveUs": 1950828,
+          "selfPercent": 13.43162151557367,
+          "inclusivePercent": 95.3251381994323
+        },
+        "js-native-storage-view-or-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-refresh": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-window-copy": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "native-pod-string-decode": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "js-observation-emitter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 146130,
+          "inclusiveUs": 146130,
+          "selfPercent": 7.14048724187014,
+          "inclusivePercent": 7.14048724187014
+        }
+      },
+      "deduplicatedAncestorUnions": {
+        "native-admission-or-flat-or-wrapper": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper"
+          ]
+        },
+        "all-canonical-storage-boundary": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-admission",
+            "native-flat-storage",
+            "native-owner-wrapper",
+            "js-native-storage-view-or-emitter",
+            "shared-publication",
+            "shared-observation-and-match",
+            "owner-transport-gates"
+          ]
+        },
+        "sankey-parse-projection-layout": {
+          "weightedUs": 1651642,
+          "percent": 80.70573208196046,
+          "members": [
+            "sankey-raw-parser",
+            "sankey-import-projection",
+            "sankey-render-layout"
+          ]
+        },
+        "shared-observation-publication": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "shared-publication",
+            "shared-observation-and-match"
+          ]
+        },
+        "native-pod-read-windows": {
+          "weightedUs": 0,
+          "percent": 0,
+          "members": [
+            "native-pod-refresh",
+            "native-pod-window-copy",
+            "native-pod-string-decode"
+          ]
+        }
+      }
+    }
+  ],
+  "correctness": {
+    "focusedPassed": 84,
+    "focusedPerEngine": 28,
+    "factoryPassed": 3,
+    "factoryComparisonsPerEngine": 6,
+    "factoryInitialFixtureFailures": 3,
+    "full468BelongsToEarlierCommit": "3166b3d"
+  },
+  "limitations": [
+    "Both comparisons retain all 24 rows and 21 samples per runtime. Separate windows are not compounded; Flowchart and source-render controls include adverse results.",
+    "Recorded whole-output checks are enforced by the hashed harness; timing report stores SVG byte lengths and routing probes, not complete SVG/dimension values.",
+    "Timing order is encoded by the archived cyclic/reverse harness; per-trial order is not separately recorded in these reports.",
+    "Packages differ only in two JavaScript files and use identical WASM. Arena control disables native selection; cursor control enables it. The source freeze predates commit but maps exactly to4033e41.",
+    "Profiling compares native candidate against arena, not cursor. Inclusive groups overlap; disjoint self roles and explicitly deduplicated unions have distinct meanings. Samples are not invocation/allocation counts or latency gains.",
+    "CPU frames may use either shared compiled WASM URL; classification recognizes HTTP .wasm URLs as WASM.",
+    "Local preserved packages were independently rehashed; this is not a new physical remote rehash. Portable verification validates captured records, not a new build/browser execution.",
+    "Factory attempt1 failed an overly strict fixture property-order expectation in both backends. Setup was corrected without weakening exact ordered comparison; all original results/logs remain.",
+    "84 focused checks and three new factory tests are separate runs; the earlier468 full-suite result belongs to3166b3d. No new full-suite, SDK build, local timing or release claim."
+  ]
+}

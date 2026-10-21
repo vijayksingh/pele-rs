@@ -1,9 +1,9 @@
 //! Authoritative flat arena preserves Maps, record/array aliases, UTF-16 and IEEE values.
 //! Source provenance retains the real builder counter and pending fields. Typed factory
 //! reconstruction has no erased JS mutation history. Array scalar length's default
-//! flags2 descriptor is implicit; nondefault own length is explicit. Constructor,
-//! host callbacks/accessors, arbitrary primitive conversion and active lone-surrogate
-//! SVG text remain explicit capabilities rather than a JavaScript interpreter.
+//! flags2 descriptor is implicit; nondefault own length is explicit. Host callbacks,
+//! accessors, arbitrary primitive conversion and active lone-surrogate SVG text
+//! remain explicit capabilities rather than a JavaScript interpreter.
 use super::*;
 use crate::compat::public::{
     Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString, MemberKind,
@@ -479,10 +479,39 @@ fn initial(m: &RequirementModel) -> Result<ModelGraph, PeleError> {
     });
     w.finish(Atom::Ref(root))
 }
+fn construct_default() -> Result<RequirementPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    RequirementDiagram.create_public(&super::model::Db::new(None).finish())
+}
+
 impl PublicDiagramModule for RequirementDiagram {
     type PublicState = RequirementPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::requirement())
+    }
+    fn detached_public_render(
+        &self,
+        s: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::requirement(
+            super::RequirementDetachedInput::new(s.model.as_ref().err()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -493,6 +522,12 @@ impl PublicDiagramModule for RequirementDiagram {
         let graph = initial(m)?;
         let model = imported(&graph);
         Ok(RequirementPublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &RequirementPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

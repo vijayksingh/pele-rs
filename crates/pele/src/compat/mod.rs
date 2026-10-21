@@ -5,6 +5,7 @@ pub use calendar::{fields_at_offset, instant_in_zone, CalendarFields, CivilDateT
 pub mod diagrams;
 mod edge_limit;
 mod engine;
+mod normalized_projection;
 pub use edge_limit::{EdgeLimit, ParseLimits, MAX_PUBLIC_EDGES};
 mod error;
 mod id;
@@ -209,3 +210,41 @@ pub fn render_envelope(source: &str, options_json: &str) -> (u32, String) {
 pub fn builtin_capabilities_json() -> String {
     success_envelope(&Engine::with_builtins().capabilities())
 }
+
+/// Exact legacy envelope admission for adapters handing off an already normalized
+/// projection. Counts the same serializer without retaining a second JSON buffer.
+#[doc(hidden)]
+pub fn success_envelope_len<T: Serialize>(result: &T) -> usize {
+    struct Count(usize);
+    impl std::io::Write for Count {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            self.0 = self
+                .0
+                .checked_add(bytes.len())
+                .expect("bounded projection size");
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    let mut count = Count(0);
+    serde_json::to_writer(
+        &mut count,
+        &SuccessEnvelope {
+            version: 2,
+            ok: true,
+            result,
+        },
+    )
+    .expect("serializable engine value");
+    count.0
+}
+
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub mod host_er;
+
+#[cfg(feature = "web-host-sankey")]
+#[doc(hidden)]
+pub mod host_sankey;

@@ -1,0 +1,22 @@
+{
+  "source": "d7caf8c684ac6b6fda3918a2bcbd91c5953b92c9",
+  "verdict": "No concrete source blocker",
+  "files": [
+    {
+      "path": "bindings/web/full.js",
+      "sha256": "d3074cd910337f57122587af0f9071055130b012b9ce7eb2fe68f7d4feb51649"
+    },
+    {
+      "path": "bindings/web/graph-storage.js",
+      "sha256": "a47ccbbed35d36072bcc189a0f600e3b8f9ad42f8d209cba64903a9ac6b8d149"
+    }
+  ],
+  "scope": [
+    "Terminal release deletes observation token and completed publication without allocating a replacement token.",
+    "Busy/nativeBusy/detachedDepth reject before any receipt deletion.",
+    "Explicit disposal deletes accepted baseline before native teardown; existing registry ownership/helper fallback unchanged.",
+    "completedObservations weak input keys remain unindexed; removal of bridge token invalidates old proofs.",
+    "Disabled experimental CapturedOwner release is outside the default ModelBridge teardown scope."
+  ],
+  "execution": "Read-only source review; parent owns public correctness execution."
+}

@@ -1,0 +1,75 @@
+{
+  "baseRuntimeCommit": "ef9c9a77428c35ac69753caad3178527fbd97864",
+  "rootAtFreeze": "f9aa728a5cdb7a2343534d12ac90ea10b0cba685",
+  "patchSHA256": "ff0704f5264f47ce3c4022c8d42b5c0ea96f3c817936f9360b1af49fa47388e7",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/public_model.rs",
+      "originalSHA256": "c0569900debf0365e80df4ab71534111b05bc00c9dab2eea60925d042b301754",
+      "candidateSHA256": "89da29648854ff91cb71e11e3bd6013025d44519689bd2f4fc013307aac298b3"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/source_store.rs",
+      "originalSHA256": "fc11f9e69657b0bbbd79eeed6956d8b9f9f2347de24eecaf82ec982558d93cb5",
+      "candidateSHA256": "fe572d724e38afabf392170ba74acfdb10ef96c6a1b419b37574f95aaaeda52c"
+    },
+    {
+      "path": "crates/pele/src/compat/public/captured_transport.rs",
+      "originalSHA256": "6b34c870d9dc29a44644e2773af2abf86cca1e2fbe8547bb42fdd65c2f450c4d",
+      "candidateSHA256": "9b417ad42a635fa3298a0ceea2dfff69851f796f2d27811e8d68f0897e5681ad"
+    },
+    {
+      "path": "crates/pele/src/compat/public/engine.rs",
+      "originalSHA256": "6486ca8fe4d15f0f3ea68a97aac6f46cd34ff1e6bc39171aea14bcc0547f62a5",
+      "candidateSHA256": "77a4a275a3d2515ab47e9eb24e7dbd3371e82aa7292dbff2bd7e2547a5aefd4c"
+    },
+    {
+      "path": "crates/pele/src/compat/public/source_input.rs",
+      "originalSHA256": "cbf8159ad6529d51b9bde9fa8fb5d051ae39bd1ed6bfbfff5c866e9927dd9892",
+      "candidateSHA256": "75707222cc590f136b4678d85d2868c99727a98f71db940bc86264d90aac8c40"
+    },
+    {
+      "path": "crates/pele/tests/public_source_ingress.rs",
+      "originalSHA256": "b5435b6dd4b07a8b22b52263b38a3935170a98f744ac9ece4f36f74c34bfc31d",
+      "candidateSHA256": "22d2414a40ed57093f0b6664281a8b370b21fa5696011b1c7702fd54daf35896"
+    }
+  ],
+  "status": "frozen; isolated native tests passed; parent applied exact six files during handoff",
+  "validation": {
+    "rustfmt": "passed",
+    "applyCheck": "passed with whitespace=error-all before parent integration",
+    "public_sankey": {
+      "passed": 12,
+      "log": "test-attempt2-missing-fixture.log"
+    },
+    "public_sankey_owned_parse": {
+      "passed": 13,
+      "corpus": 11616,
+      "log": "test-final.log"
+    },
+    "public_source_ingress": {
+      "passed": 7,
+      "log": "test-final.log"
+    },
+    "uniquePublicTestsPassed": 32,
+    "warningFreeFinalCompilation": true,
+    "WASM": "not built by this agent",
+    "SDK": "not built by this agent",
+    "browser": "not run",
+    "VM": "not run"
+  },
+  "evidence": {
+    "check-source.json": "556ed03a7d45660fb9ff51e33dbb11202fe6bedd886cdffdb4abd768c229def3",
+    "check-source-attempt1.json": "9d297f266bb26e6ac8c1ce04f252017f89dfae918d8cf444691ea90fa11c62d6",
+    "test-attempt1.log": "005e34dcb70de2c771e94a8053a1f41faf73f994612db495bb5d87da6525a69c",
+    "test-attempt2-missing-fixture.log": "b7fbc637048ff3fadd87c91d85060ed8e7265eecdabe93a5eddc6ffa9c24e510",
+    "test-final.log": "d2217b432f7ff74d6477c0ebd25346d3cfb983203537b3a94c67077118b649dd"
+  },
+  "notes": [
+    "First compile: fixture From<String> corrected to From<&str>; three compile warnings resolved. No feature ran.",
+    "Attempt2: public_sankey12 passed and owned12 passed; only corpus file absent in isolated archive, ingress unreached.",
+    "Copied frozen corpus SHA6c16a7195cd557b2daedb8e7ca1d16fef12e460c3177a427868ceb29d122251d; no source bypass. Final owned13 and ingress7 passed.",
+    "CapturedRead trait and arbitrary-reader default strict conversion remain unchanged.",
+    "Private native target cache reused from source-sparse-ingress; isolated source inputs recorded. No root-current build claim."
+  ]
+}

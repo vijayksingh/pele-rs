@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "31edd859f0bcaf84d0bcfc1ab4ada33490dcaa71",
+  "runtimeCommit": "bd7df0d609778a33ef261e065017c9e171653d22",
+  "sourcePath": "bindings/web/host-er-store.js",
+  "originalSHA256": "4e06db135876b448edc153853890d4f5f284553bd9bad9e47ba462ab2b3958c7",
+  "candidateSHA256": "b5b17231f61a79d552eef95dea889e93e2fcfa953014437c1c7ea261081f46d1",
+  "patchSHA256": "7729832f92010b852b13fdd8bfdfac75eb6158a215d1e17680c09609d26c26ec",
+  "scope": "Three private object-ID map allocations only; registry/document weak ownership unchanged",
+  "runtimeValidation": "Not run; private candidate only",
+  "checks": {
+    "nodeSyntax": "passed",
+    "patchAppliesToArchivedOriginal": "passed",
+    "productionAtCompletion": "Already equals private candidate, applied externally during review",
+    "testsBuildBrowser": "not run"
+  }
+}

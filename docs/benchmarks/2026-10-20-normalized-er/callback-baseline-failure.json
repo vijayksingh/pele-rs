@@ -1,0 +1,11 @@
+{
+  "sourceControl": "ce559f1",
+  "sourceCandidate": "4e9faee",
+  "harnessSha256": "672d3321799b325116a09d10fe7b1ce6ad4335b6f75e28dfc8481118d50fe59f",
+  "command": "PLAYWRIGHT_BROWSERS_PATH=\"$PWD/browsers\" node scripts/perf/compare-first-use-web-vm.mjs --control parse-architecture/projection-policy/package --candidate parse-architecture/normalized-er/package --cases er/medium --stages parse-first-invoke,parse-first-callback --profiles fixed,canvas --trials 9 --warmup-ms 500 --output parse-architecture/normalized-er/first-use-harness-check.json",
+  "exitCode": 1,
+  "stage": "ER first measuring callback before any timing",
+  "error": "control: first edited render lost host-object identity",
+  "successfulTimingReport": false,
+  "scope": "Pinned JS passes; baseline native control fails preserving cyclic host extension assigned inside first measurer width callback. Direct ER construction not applied. Open compatibility/release blocker; no callback timing or passing claim."
+}

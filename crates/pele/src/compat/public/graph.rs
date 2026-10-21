@@ -1,17 +1,36 @@
 //! Flat host value graph. UTF-16, IEEE numbers and object identity survive JSON.
-use super::{MethodId, ModelSchema, PrototypeId};
+use super::{schema::CompiledSchema, MethodId, ModelSchema, PrototypeId};
 use crate::compat::{ErrorCode, PeleError};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct JsString(pub Vec<u16>);
+impl std::borrow::Borrow<[u16]> for JsString {
+    fn borrow(&self) -> &[u16] {
+        &self.0
+    }
+}
 impl From<&str> for JsString {
     fn from(value: &str) -> Self {
         Self(value.encode_utf16().collect())
     }
 }
 impl JsString {
+    /// UTF-8 byte length bounds UTF-16 units. Keep common property lookups on
+    /// the stack; long keys retain the ordinary owned conversion path.
+    pub(crate) fn short_utf16<'a>(value: &str, buffer: &'a mut [u16; 64]) -> Option<&'a [u16]> {
+        if value.len() > buffer.len() {
+            return None;
+        }
+        let mut len = 0;
+        for unit in value.encode_utf16() {
+            buffer[len] = unit;
+            len += 1;
+        }
+        Some(&buffer[..len])
+    }
+
     pub fn well_formed(&self) -> Option<String> {
         String::from_utf16(&self.0).ok()
     }
@@ -141,16 +160,16 @@ fn invalid(message: &str) -> PeleError {
 impl ModelGraph {
     /// Validate an atom naming this arena. Builtin IDs need validate_schema.
     pub fn validate_atom(&self, a: &Atom) -> Result<(), PeleError> {
-        match a {
-            Atom::Ref(id) if *id as usize >= self.nodes.len() => {
-                Err(invalid("Invalid public object reference"))
-            }
-            Atom::String(id) if *id as usize >= self.strings.len() => {
-                Err(invalid("Invalid public string reference"))
-            }
-            _ => Ok(()),
-        }
+        super::captured_admission::atom(
+            super::captured_admission::Extent {
+                version: self.version,
+                nodes: self.nodes.len(),
+                strings: self.strings.len(),
+            },
+            a,
+        )
     }
+
     /// Schema checks cover native instance/function identities, not generic JS
     /// value coercion or family field validation. Codecs own those operations.
     pub fn validate_schema(&self, schema: &ModelSchema) -> Result<(), PeleError> {
@@ -158,95 +177,26 @@ impl ModelGraph {
         self.validate()?;
         let methods: HashSet<_> = schema.methods.iter().map(|m| m.id).collect();
         let prototypes: HashSet<_> = schema.prototypes.iter().map(|p| p.id).collect();
-        let atom = |a: &Atom| -> Result<(), PeleError> {
-            if let Atom::BuiltinFunction(id) = a {
-                if !methods.contains(&MethodId(*id)) {
-                    return Err(invalid("Unknown public builtin function"));
-                }
-            }
-            Ok(())
-        };
-        atom(&self.root)?;
-        for n in &self.nodes {
-            if let Node::Instance { prototype, .. } = n {
-                if !prototypes.contains(prototype) {
-                    return Err(invalid("Unknown public instance prototype"));
-                }
-            }
-            for p in n.properties() {
-                atom(&p.value)?
-            }
-            match n {
-                Node::Map { entries, .. } => {
-                    for (k, v) in entries {
-                        atom(k)?;
-                        atom(v)?
-                    }
-                }
-                Node::Set { values, .. } => {
-                    for v in values {
-                        atom(v)?
-                    }
-                }
-                _ => {}
-            }
-        }
-        Ok(())
+        self.validate_schema_ids(&methods, &prototypes)
+    }
+    pub(super) fn validate_compiled(&self, schema: &CompiledSchema) -> Result<(), PeleError> {
+        // Every graph still pays its structural/reference/work validation.
+        self.validate()?;
+        self.validate_schema_ids(schema.methods(), schema.prototypes())
+    }
+    fn validate_schema_ids(
+        &self,
+        methods: &HashSet<MethodId>,
+        prototypes: &HashSet<PrototypeId>,
+    ) -> Result<(), PeleError> {
+        super::captured_admission::validate_schema_ids(
+            &mut super::captured_admission::ArenaAdmission(self),
+            methods,
+            prototypes,
+        )
     }
     pub fn validate(&self) -> Result<(), PeleError> {
-        if self.version != 1 {
-            return Err(invalid("Unsupported public graph version"));
-        }
-        let units = self
-            .strings
-            .iter()
-            .try_fold(0usize, |n, s| n.checked_add(s.0.len()))
-            .ok_or_else(|| invalid("Public graph size overflow"))?;
-        if self.nodes.len() > 1_000_000 || self.strings.len() > 1_000_000 || units > 16_000_000 {
-            return Err(PeleError::new(
-                "Public model graph exceeds work budget",
-                ErrorCode::Limit,
-            ));
-        }
-        self.validate_atom(&self.root)?;
-        let mut work = 0usize;
-        for node in &self.nodes {
-            let references = match node {
-                Node::Map { entries, .. } => entries.len().saturating_mul(2),
-                Node::Set { values, .. } => values.len(),
-                _ => 0,
-            };
-            work = work
-                .saturating_add(node.properties().len())
-                .saturating_add(references);
-            if work > 8_000_000 {
-                return Err(PeleError::new(
-                    "Public graph exceeds work budget",
-                    ErrorCode::Limit,
-                ));
-            }
-            for p in node.properties() {
-                if p.key as usize >= self.strings.len() || p.flags & !7 != 0 {
-                    return Err(invalid("Invalid public property"));
-                }
-                self.validate_atom(&p.value)?;
-            }
-            match node {
-                Node::Map { entries, .. } => {
-                    for (k, v) in entries {
-                        self.validate_atom(k)?;
-                        self.validate_atom(v)?;
-                    }
-                }
-                Node::Set { values, .. } => {
-                    for v in values {
-                        self.validate_atom(v)?;
-                    }
-                }
-                _ => {}
-            }
-        }
-        Ok(())
+        super::captured_admission::validate(&mut super::captured_admission::ArenaAdmission(self))
     }
     pub fn root_properties(&self) -> Result<&[Property], PeleError> {
         match &self.root {
@@ -300,6 +250,23 @@ impl GraphWriter {
         if let Some(id) = self.strings.get(&value) {
             return *id;
         }
+        self.insert_string(value)
+    }
+    /// Borrowed well-formed input for internal construction sinks. The public
+    /// generic conversion API above still converts exactly once on every call.
+    pub(crate) fn string_str(&mut self, value: &str) -> u32 {
+        let mut buffer = [0; 64];
+        if let Some(units) = JsString::short_utf16(value, &mut buffer) {
+            if let Some(id) = self.strings.get(units) {
+                return *id;
+            }
+            // Reuse the encoded stack units on a miss, with neither a second
+            // UTF16 traversal nor another lookup of the known-absent key.
+            return self.insert_string(JsString(units.to_vec()));
+        }
+        self.string(value)
+    }
+    fn insert_string(&mut self, value: JsString) -> u32 {
         let id = self.graph.strings.len() as u32;
         self.graph.strings.push(value.clone());
         self.strings.insert(value, id);
@@ -311,8 +278,12 @@ impl GraphWriter {
         id
     }
     pub fn property(&mut self, key: &str, value: Atom) -> Property {
+        let mut buffer = [0; 64];
+        let id = JsString::short_utf16(key, &mut buffer)
+            .and_then(|units| self.strings.get(units).copied())
+            .unwrap_or_else(|| self.string(key));
         Property {
-            key: self.string(key),
+            key: id,
             value,
             flags: 7,
         }

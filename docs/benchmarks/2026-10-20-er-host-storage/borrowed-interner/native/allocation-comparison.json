@@ -1,0 +1,1011 @@
+{
+  "kind": "allocation-only",
+  "timingSamples": false,
+  "commands": [
+    {
+      "op": "prepare",
+      "case": {
+        "id": "flowchart/medium",
+        "family": "flowchart",
+        "scale": "medium",
+        "units": 48,
+        "source": "flowchart TB\nn0[Node 0]\nn1[Node 1]\nn2[Node 2]\nn3[Node 3]\nn4[Node 4]\nn5[Node 5]\nn6[Node 6]\nn7[Node 7]\nn8[Node 8]\nn9[Node 9]\nn10[Node 10]\nn11[Node 11]\nn12[Node 12]\nn13[Node 13]\nn14[Node 14]\nn15[Node 15]\nn16[Node 16]\nn17[Node 17]\nn18[Node 18]\nn19[Node 19]\nn20[Node 20]\nn21[Node 21]\nn22[Node 22]\nn23[Node 23]\nn24[Node 24]\nn25[Node 25]\nn26[Node 26]\nn27[Node 27]\nn28[Node 28]\nn29[Node 29]\nn30[Node 30]\nn31[Node 31]\nn32[Node 32]\nn33[Node 33]\nn34[Node 34]\nn35[Node 35]\nn36[Node 36]\nn37[Node 37]\nn38[Node 38]\nn39[Node 39]\nn40[Node 40]\nn41[Node 41]\nn42[Node 42]\nn43[Node 43]\nn44[Node 44]\nn45[Node 45]\nn46[Node 46]\nn47[Node 47]\nn0 --> n1\nn1 --> n2\nn2 --> n3\nn3 --> n4\nn4 --> n5\nn5 --> n6\nn6 --> n7\nn7 --> n8\nn8 --> n9\nn9 --> n10\nn10 --> n11\nn11 --> n12\nn12 --> n13\nn13 --> n14\nn14 --> n15\nn15 --> n16\nn16 --> n17\nn17 --> n18\nn18 --> n19\nn19 --> n20\nn20 --> n21\nn21 --> n22\nn22 --> n23\nn23 --> n24\nn24 --> n25\nn25 --> n26\nn26 --> n27\nn27 --> n28\nn28 --> n29\nn29 --> n30\nn30 --> n31\nn31 --> n32\nn32 --> n33\nn33 --> n34\nn34 --> n35\nn35 --> n36\nn36 --> n37\nn37 --> n38\nn38 --> n39\nn39 --> n40\nn40 --> n41\nn41 --> n42\nn42 --> n43\nn43 --> n44\nn44 --> n45\nn45 --> n46\nn46 --> n47",
+        "options": {
+          "limit": 1000000,
+          "maxEdges": 10000,
+          "fontSize": 16,
+          "padding": 8,
+          "maxWidth": 800,
+          "now": 1704067200000
+        },
+        "resources": "fixed"
+      }
+    },
+    {
+      "op": "verify",
+      "case": "flowchart/medium"
+    },
+    {
+      "op": "allocations",
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "count": 1
+    },
+    {
+      "op": "allocations",
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "count": 16
+    },
+    {
+      "op": "verify",
+      "case": "flowchart/medium"
+    },
+    {
+      "op": "prepare",
+      "case": {
+        "id": "er/medium",
+        "family": "er",
+        "scale": "medium",
+        "units": 48,
+        "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+        "options": {
+          "limit": 1000000,
+          "maxEdges": 10000,
+          "fontSize": 16,
+          "padding": 8,
+          "maxWidth": 800,
+          "now": 1704067200000
+        },
+        "resources": "fixed"
+      }
+    },
+    {
+      "op": "verify",
+      "case": "er/medium"
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "parse-public",
+      "count": 1
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "parse-public",
+      "count": 16
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 1
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 16
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "render-source",
+      "count": 1
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "render-source",
+      "count": 16
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "render-retained",
+      "count": 1
+    },
+    {
+      "op": "allocations",
+      "case": "er/medium",
+      "stage": "render-retained",
+      "count": 16
+    },
+    {
+      "op": "verify",
+      "case": "er/medium"
+    }
+  ],
+  "runs": {
+    "control": {
+      "binarySHA256": "29127215517ccb37dfa0953db2fdbf602a7217ffd729bc7e684f06d335afe201",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "241300cb6a032946ae90ce741eaf1baa260277fbd589fd30bfa0c9776a26bfa9",
+        "revision": "31edd859f0bcaf84d0bcfc1ab4ada33490dcaa71",
+        "builtAt": "2026-10-20T08:29:26.468Z",
+        "binaries": {
+          "pele-perf": "eddb9c45cd44ea3070e2478b6a103b8f8a451ba065a5bdde628acf4d9c9731b5",
+          "pele-perf-alloc": "29127215517ccb37dfa0953db2fdbf602a7217ffd729bc7e684f06d335afe201"
+        }
+      },
+      "responses": [
+        {
+          "ok": true,
+          "value": {
+            "graphBinaryBytes": 17098,
+            "graphJsonBytes": 79779,
+            "graphNodes": 297,
+            "graphStrings": 274,
+            "graphUtf16Units": 1631,
+            "output": {
+              "heightBits": "40b1e00000000000",
+              "svgBytes": 21889,
+              "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+              "type": "flowchart",
+              "widthBits": "405e000000000000"
+            }
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 297,
+            "outputs": [
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              }
+            ]
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 3431,
+            "checksum": 9,
+            "freedBytes": 493299,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 180322,
+            "reallocations": 867,
+            "requestedBytes": 493299
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 54896,
+            "checksum": 144,
+            "freedBytes": 7892784,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 180322,
+            "reallocations": 13872,
+            "requestedBytes": 7892784
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 297,
+            "outputs": [
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              }
+            ]
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphBinaryBytes": 18382,
+            "graphJsonBytes": 92001,
+            "graphNodes": 437,
+            "graphStrings": 181,
+            "graphUtf16Units": 1070,
+            "output": {
+              "heightBits": "40c1c38000000000",
+              "svgBytes": 70404,
+              "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+              "type": "er",
+              "widthBits": "4066600000000000"
+            }
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 437,
+            "outputs": [
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              }
+            ]
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 2501,
+            "checksum": 2,
+            "freedBytes": 278808,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 119594,
+            "reallocations": 584,
+            "requestedBytes": 278808
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 40016,
+            "checksum": 32,
+            "freedBytes": 4460928,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 119594,
+            "reallocations": 9344,
+            "requestedBytes": 4460928
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 1163,
+            "checksum": 2,
+            "freedBytes": 173297,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 84274,
+            "reallocations": 17,
+            "requestedBytes": 173297
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 18608,
+            "checksum": 32,
+            "freedBytes": 2772752,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 84274,
+            "reallocations": 272,
+            "requestedBytes": 2772752
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 9689,
+            "checksum": 47186091261891330,
+            "freedBytes": 1710686,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 534732,
+            "reallocations": 2590,
+            "requestedBytes": 1710686
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 155024,
+            "checksum": 754977460190261200,
+            "freedBytes": 27370976,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 534732,
+            "reallocations": 41440,
+            "requestedBytes": 27370976
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 8526,
+            "checksum": 47186091261891330,
+            "freedBytes": 1537389,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 488228,
+            "reallocations": 2573,
+            "requestedBytes": 1537389
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 136416,
+            "checksum": 754977460190261200,
+            "freedBytes": 24598224,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 488228,
+            "reallocations": 41168,
+            "requestedBytes": 24598224
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 437,
+            "outputs": [
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              }
+            ]
+          }
+        }
+      ],
+      "stderr": ""
+    },
+    "candidate": {
+      "binarySHA256": "1ba837079b9feb0835d22581c5c62e1e780fbb0ddb100169f9e840a5d55b4c49",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "832c7a8c1de3a1ac252f5b997f7028c9f352100e3a22548e161a07528ad8c84d",
+        "revision": "31edd859f0bcaf84d0bcfc1ab4ada33490dcaa71",
+        "builtAt": "2026-10-20T08:34:08.893Z",
+        "binaries": {
+          "pele-perf": "5bec94bb9ad9be68ca8a424be5434bfe65f3dec478d98cc2815a7a3b0a58c742",
+          "pele-perf-alloc": "1ba837079b9feb0835d22581c5c62e1e780fbb0ddb100169f9e840a5d55b4c49"
+        }
+      },
+      "responses": [
+        {
+          "ok": true,
+          "value": {
+            "graphBinaryBytes": 17098,
+            "graphJsonBytes": 79779,
+            "graphNodes": 297,
+            "graphStrings": 274,
+            "graphUtf16Units": 1631,
+            "output": {
+              "heightBits": "40b1e00000000000",
+              "svgBytes": 21889,
+              "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+              "type": "flowchart",
+              "widthBits": "405e000000000000"
+            }
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 297,
+            "outputs": [
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              }
+            ]
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 3431,
+            "checksum": 9,
+            "freedBytes": 493299,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 180322,
+            "reallocations": 867,
+            "requestedBytes": 493299
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 54896,
+            "checksum": 144,
+            "freedBytes": 7892784,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 180322,
+            "reallocations": 13872,
+            "requestedBytes": 7892784
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 297,
+            "outputs": [
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              },
+              {
+                "heightBits": "40b1e00000000000",
+                "svgBytes": 21889,
+                "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+                "type": "flowchart",
+                "widthBits": "405e000000000000"
+              }
+            ]
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphBinaryBytes": 18382,
+            "graphJsonBytes": 92001,
+            "graphNodes": 437,
+            "graphStrings": 181,
+            "graphUtf16Units": 1070,
+            "output": {
+              "heightBits": "40c1c38000000000",
+              "svgBytes": 70404,
+              "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+              "type": "er",
+              "widthBits": "4066600000000000"
+            }
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 437,
+            "outputs": [
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              }
+            ]
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 1987,
+            "checksum": 2,
+            "freedBytes": 263576,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 118710,
+            "reallocations": 109,
+            "requestedBytes": 263576
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 31792,
+            "checksum": 32,
+            "freedBytes": 4217216,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 118710,
+            "reallocations": 1744,
+            "requestedBytes": 4217216
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 1163,
+            "checksum": 2,
+            "freedBytes": 173297,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 84274,
+            "reallocations": 17,
+            "requestedBytes": 173297
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 18608,
+            "checksum": 32,
+            "freedBytes": 2772752,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 84274,
+            "reallocations": 272,
+            "requestedBytes": 2772752
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 9689,
+            "checksum": 47186091261891330,
+            "freedBytes": 1710686,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 534732,
+            "reallocations": 2590,
+            "requestedBytes": 1710686
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 155024,
+            "checksum": 754977460190261200,
+            "freedBytes": 27370976,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 534732,
+            "reallocations": 41440,
+            "requestedBytes": 27370976
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 8526,
+            "checksum": 47186091261891330,
+            "freedBytes": 1537389,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 488228,
+            "reallocations": 2573,
+            "requestedBytes": 1537389
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "allocations": 136416,
+            "checksum": 754977460190261200,
+            "freedBytes": 24598224,
+            "liveBytesDelta": 0,
+            "peakAdditionalRequestedBytes": 488228,
+            "reallocations": 41168,
+            "requestedBytes": 24598224
+          }
+        },
+        {
+          "ok": true,
+          "value": {
+            "graphNodes": 437,
+            "outputs": [
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              },
+              {
+                "heightBits": "40c1c38000000000",
+                "svgBytes": 70404,
+                "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+                "type": "er",
+                "widthBits": "4066600000000000"
+              }
+            ]
+          }
+        }
+      ],
+      "stderr": ""
+    }
+  },
+  "rows": [
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "control": {
+        "allocations": 3431,
+        "checksum": 9,
+        "freedBytes": 493299,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 180322,
+        "reallocations": 867,
+        "requestedBytes": 493299
+      },
+      "candidate": {
+        "allocations": 3431,
+        "checksum": 9,
+        "freedBytes": 493299,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 180322,
+        "reallocations": 867,
+        "requestedBytes": 493299
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "count": 16,
+      "control": {
+        "allocations": 54896,
+        "checksum": 144,
+        "freedBytes": 7892784,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 180322,
+        "reallocations": 13872,
+        "requestedBytes": 7892784
+      },
+      "candidate": {
+        "allocations": 54896,
+        "checksum": 144,
+        "freedBytes": 7892784,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 180322,
+        "reallocations": 13872,
+        "requestedBytes": 7892784
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "control": {
+        "allocations": 2501,
+        "checksum": 2,
+        "freedBytes": 278808,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119594,
+        "reallocations": 584,
+        "requestedBytes": 278808
+      },
+      "candidate": {
+        "allocations": 1987,
+        "checksum": 2,
+        "freedBytes": 263576,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 118710,
+        "reallocations": 109,
+        "requestedBytes": 263576
+      },
+      "delta": {
+        "allocations": -514,
+        "freedBytes": -15232,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": -884,
+        "reallocations": -475,
+        "requestedBytes": -15232
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "count": 16,
+      "control": {
+        "allocations": 40016,
+        "checksum": 32,
+        "freedBytes": 4460928,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119594,
+        "reallocations": 9344,
+        "requestedBytes": 4460928
+      },
+      "candidate": {
+        "allocations": 31792,
+        "checksum": 32,
+        "freedBytes": 4217216,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 118710,
+        "reallocations": 1744,
+        "requestedBytes": 4217216
+      },
+      "delta": {
+        "allocations": -8224,
+        "freedBytes": -243712,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": -884,
+        "reallocations": -7600,
+        "requestedBytes": -243712
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 1,
+      "control": {
+        "allocations": 1163,
+        "checksum": 2,
+        "freedBytes": 173297,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 84274,
+        "reallocations": 17,
+        "requestedBytes": 173297
+      },
+      "candidate": {
+        "allocations": 1163,
+        "checksum": 2,
+        "freedBytes": 173297,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 84274,
+        "reallocations": 17,
+        "requestedBytes": 173297
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 16,
+      "control": {
+        "allocations": 18608,
+        "checksum": 32,
+        "freedBytes": 2772752,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 84274,
+        "reallocations": 272,
+        "requestedBytes": 2772752
+      },
+      "candidate": {
+        "allocations": 18608,
+        "checksum": 32,
+        "freedBytes": 2772752,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 84274,
+        "reallocations": 272,
+        "requestedBytes": 2772752
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "count": 1,
+      "control": {
+        "allocations": 9689,
+        "checksum": 47186091261891330,
+        "freedBytes": 1710686,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 534732,
+        "reallocations": 2590,
+        "requestedBytes": 1710686
+      },
+      "candidate": {
+        "allocations": 9689,
+        "checksum": 47186091261891330,
+        "freedBytes": 1710686,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 534732,
+        "reallocations": 2590,
+        "requestedBytes": 1710686
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "count": 16,
+      "control": {
+        "allocations": 155024,
+        "checksum": 754977460190261200,
+        "freedBytes": 27370976,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 534732,
+        "reallocations": 41440,
+        "requestedBytes": 27370976
+      },
+      "candidate": {
+        "allocations": 155024,
+        "checksum": 754977460190261200,
+        "freedBytes": 27370976,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 534732,
+        "reallocations": 41440,
+        "requestedBytes": 27370976
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "control": {
+        "allocations": 8526,
+        "checksum": 47186091261891330,
+        "freedBytes": 1537389,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 488228,
+        "reallocations": 2573,
+        "requestedBytes": 1537389
+      },
+      "candidate": {
+        "allocations": 8526,
+        "checksum": 47186091261891330,
+        "freedBytes": 1537389,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 488228,
+        "reallocations": 2573,
+        "requestedBytes": 1537389
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "count": 16,
+      "control": {
+        "allocations": 136416,
+        "checksum": 754977460190261200,
+        "freedBytes": 24598224,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 488228,
+        "reallocations": 41168,
+        "requestedBytes": 24598224
+      },
+      "candidate": {
+        "allocations": 136416,
+        "checksum": 754977460190261200,
+        "freedBytes": 24598224,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 488228,
+        "reallocations": 41168,
+        "requestedBytes": 24598224
+      },
+      "delta": {
+        "allocations": 0,
+        "freedBytes": 0,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 0,
+        "reallocations": 0,
+        "requestedBytes": 0
+      }
+    }
+  ],
+  "checks": {
+    "beforeAfterOutputEquality": true,
+    "binaryUnchanged": true,
+    "controlCandidateOutputEquality": true
+  }
+}

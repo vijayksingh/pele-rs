@@ -15,7 +15,7 @@ use crate::compat::{
 use std::collections::HashMap;
 
 const QUADRANT_PROTO: PrototypeId = PrototypeId(1);
-// Constructor call/construction remains an explicit capability gap. Every real
+// Native root construction is an explicit capability. Every real
 // instance builder method below has pinned name, arity and flags6 placement.
 static SCHEMA: ModelSchema = ModelSchema {
     id: "pele/quadrantChart@1",
@@ -672,7 +672,37 @@ fn array_node(w: &mut GraphWriter, values: Vec<Atom>) -> u32 {
         properties,
     })
 }
+fn construct_default() -> Result<QuadrantPublicState, PeleError> {
+    QuadrantChart.create_public(&QuadrantModel::empty(None))
+}
+
 impl PublicDiagramModule for QuadrantChart {
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::quadrant())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::quadrant(
+            super::QuadrantDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
+    }
+
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == QUADRANT_PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                QUADRANT_PROTO,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = QuadrantPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
@@ -763,6 +793,12 @@ impl PublicDiagramModule for QuadrantChart {
         let graph = w.finish(Atom::Ref(root))?;
         let model = imported(&graph);
         Ok(QuadrantPublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

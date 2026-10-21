@@ -14,7 +14,7 @@ static char *body(PeleResult *r){assert(r);size_t n=pele_result_len(r);assert(n<
 static void check(PeleResult *r,unsigned status,const char *part){assert(r&&pele_result_status(r)==status);char *s=body(r);if(!strstr(s,part))fprintf(stderr,"missing %s in %.1024s\n",part,s);assert(strstr(s,part));free(s);pele_result_free(r);}
 static uint32_t image(void *raw,const uint8_t *uri,size_t length,PeleBorrowedBytes *output){
  struct State *s=raw;s->calls++;assert(length==strlen("https://example.test/a.png"));assert(!memcmp(uri,"https://example.test/a.png",length));
- if(s->active)check(pele_public_snapshot_binary_v5(s->active),1,"already in use");
+ if(s->active){PeleResult *snapshot=pele_public_snapshot_binary_v5(s->active);assert(snapshot&&pele_result_status(snapshot)==0);pele_result_free(snapshot);}
  if(s->mode==1)return 1;if(s->mode==2){output->data=NULL;output->len=0;return 0;}
  output->data=png;output->len=sizeof(png);return 0;
 }

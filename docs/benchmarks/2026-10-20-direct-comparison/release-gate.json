@@ -1,0 +1,763 @@
+{
+  "passed": false,
+  "checked": 126,
+  "slowerCount": 126,
+  "slower": [
+    {
+      "case": "flowchart/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.3972503540050183
+    },
+    {
+      "case": "flowchart/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 19.274728115441423
+    },
+    {
+      "case": "flowchart/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 5.066122249681122
+    },
+    {
+      "case": "flowchart/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.7272045582043956
+    },
+    {
+      "case": "flowchart/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 18.152096960062426
+    },
+    {
+      "case": "flowchart/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 4.676363580877131
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 3.254870396276459
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 17.1010133996089
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 8.559285482343794
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.9119668147594666
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 17.26065855034314
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 7.524849943253542
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.853888335304984
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 11.152075450138657
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 4.1803207586667375
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.5127161427343565
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 15.961749320181314
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 3.9599037699043182
+    },
+    {
+      "case": "pie/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 3.080675480549875
+    },
+    {
+      "case": "pie/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 7.9677391568291265
+    },
+    {
+      "case": "pie/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 4.7661475761165955
+    },
+    {
+      "case": "pie/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.7779527932743586
+    },
+    {
+      "case": "pie/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 7.70652126589889
+    },
+    {
+      "case": "pie/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 3.8351642363113703
+    },
+    {
+      "case": "sankey/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.548746303516003
+    },
+    {
+      "case": "sankey/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 17.418375171758772
+    },
+    {
+      "case": "sankey/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 4.595812310781678
+    },
+    {
+      "case": "sankey/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.413043679748835
+    },
+    {
+      "case": "sankey/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 18.05102743858529
+    },
+    {
+      "case": "sankey/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 3.817345191476734
+    },
+    {
+      "case": "gantt/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 5.094360391689173
+    },
+    {
+      "case": "gantt/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 43.32376090894122
+    },
+    {
+      "case": "gantt/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 22.218400036695975
+    },
+    {
+      "case": "gantt/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 4.79899933393921
+    },
+    {
+      "case": "gantt/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 44.65183833034986
+    },
+    {
+      "case": "gantt/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 18.930651876121644
+    },
+    {
+      "case": "railroad/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.8504576569570395
+    },
+    {
+      "case": "railroad/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 9.542376453868977
+    },
+    {
+      "case": "railroad/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 5.9889244001810775
+    },
+    {
+      "case": "railroad/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.7424687989059344
+    },
+    {
+      "case": "railroad/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 9.733105310739852
+    },
+    {
+      "case": "railroad/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 5.366484818908425
+    },
+    {
+      "case": "flowchart/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 1.971495387202029
+    },
+    {
+      "case": "flowchart/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 13.31192076362744
+    },
+    {
+      "case": "flowchart/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 3.442605301838692
+    },
+    {
+      "case": "flowchart/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 1.8938885637861234
+    },
+    {
+      "case": "flowchart/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 13.41984737084962
+    },
+    {
+      "case": "flowchart/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 4.7461885670496935
+    },
+    {
+      "case": "sequence/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.393650648414428
+    },
+    {
+      "case": "sequence/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 12.259957598484357
+    },
+    {
+      "case": "sequence/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 4.907942368462231
+    },
+    {
+      "case": "sequence/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.1887709085503575
+    },
+    {
+      "case": "sequence/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 12.187695035841845
+    },
+    {
+      "case": "sequence/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 4.615016364427307
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.5905575710726487
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 12.397083243519642
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 3.458707394648558
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.317396247836465
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 14.322125657439583
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 2.9425953375307885
+    },
+    {
+      "case": "pie/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 1.998533784005819
+    },
+    {
+      "case": "pie/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 4.176219943573269
+    },
+    {
+      "case": "pie/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 2.5416888371889024
+    },
+    {
+      "case": "pie/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 1.6683217856975996
+    },
+    {
+      "case": "pie/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 3.705284402346659
+    },
+    {
+      "case": "pie/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 2.0092201955329205
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 1.988601718539394
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 13.128836930642711
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 3.002929931738669
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 1.8324568270688177
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 12.790224274683073
+    },
+    {
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 2.9398466351524206
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 4.380054367241489
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 35.3497526084323
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 15.33256666255127
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 4.048845401943225
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 33.43545147821616
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 14.033473270409116
+    },
+    {
+      "case": "railroad/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.815082360078819
+    },
+    {
+      "case": "railroad/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 8.030816759629099
+    },
+    {
+      "case": "railroad/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 4.8051000671856885
+    },
+    {
+      "case": "railroad/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.5813007729801587
+    },
+    {
+      "case": "railroad/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 7.2860967025816015
+    },
+    {
+      "case": "railroad/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 4.495024491836849
+    },
+    {
+      "case": "flowchart/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 1.960968335610796
+    },
+    {
+      "case": "flowchart/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 7.45320694959472
+    },
+    {
+      "case": "flowchart/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 3.575120742315582
+    },
+    {
+      "case": "flowchart/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 1.8686636636326492
+    },
+    {
+      "case": "flowchart/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 9.664074979064097
+    },
+    {
+      "case": "flowchart/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 3.4288781897858973
+    },
+    {
+      "case": "sequence/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.2829770126550537
+    },
+    {
+      "case": "sequence/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 11.125799502889643
+    },
+    {
+      "case": "sequence/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 4.716165781228109
+    },
+    {
+      "case": "sequence/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.0628778120058833
+    },
+    {
+      "case": "sequence/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 8.62751884682012
+    },
+    {
+      "case": "sequence/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 4.344647598465107
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.7405150210965115
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 8.231817049141734
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 3.263607973054257
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.457403041086982
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 5.627626404337829
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 3.3718832937410936
+    },
+    {
+      "case": "pie/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.625384805773126
+    },
+    {
+      "case": "pie/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 3.6861034323439545
+    },
+    {
+      "case": "pie/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 4.4831944122830745
+    },
+    {
+      "case": "pie/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.4027342612359326
+    },
+    {
+      "case": "pie/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 3.591255674410644
+    },
+    {
+      "case": "pie/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 3.737783278129216
+    },
+    {
+      "case": "sankey/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 1.9353010876514185
+    },
+    {
+      "case": "sankey/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 9.440918106471777
+    },
+    {
+      "case": "sankey/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 2.975726996803846
+    },
+    {
+      "case": "sankey/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 1.8773551563518585
+    },
+    {
+      "case": "sankey/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 6.060050807301058
+    },
+    {
+      "case": "sankey/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 2.667701383273629
+    },
+    {
+      "case": "gantt/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 4.098729997406591
+    },
+    {
+      "case": "gantt/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 34.91250246241703
+    },
+    {
+      "case": "gantt/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 12.908795903101753
+    },
+    {
+      "case": "gantt/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 3.743568705261957
+    },
+    {
+      "case": "gantt/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 32.353390323306506
+    },
+    {
+      "case": "gantt/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 12.906523817856593
+    },
+    {
+      "case": "railroad/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "wasmOverJS": 2.6376496184285663
+    },
+    {
+      "case": "railroad/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "wasmOverJS": 8.797776500615548
+    },
+    {
+      "case": "railroad/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "wasmOverJS": 3.8570259776723113
+    },
+    {
+      "case": "railroad/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "wasmOverJS": 2.4760032357396615
+    },
+    {
+      "case": "railroad/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "wasmOverJS": 7.035859210459237
+    },
+    {
+      "case": "railroad/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "wasmOverJS": 3.6485442005321804
+    }
+  ]
+}

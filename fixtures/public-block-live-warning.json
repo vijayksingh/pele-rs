@@ -1,0 +1,3772 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "chunkSHA256": "5fe3393e93d4c734d8d2c1d898007791b833dff22e5ab35f2a99f3de07ff7509",
+  "scriptSHA256": "a3ef5e4bc044d578d77f7b3ac92bd872860f617a780895daf23c3f1879fcc11b",
+  "cases": [
+    {
+      "mode": "normal",
+      "result": {
+        "ok": true,
+        "undefined": true
+      },
+      "trace": [
+        [
+          "warn",
+          true,
+          "Block A width 4 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block B width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 4,
+                  "label": "A",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block G width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 4,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block C width 2 exceeds configured column width 1",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 4,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ],
+              [
+                "G",
+                {
+                  "id": "G",
+                  "type": "composite",
+                  "widthInColumns": 3,
+                  "children": [],
+                  "label": "",
+                  "colorIndex": 0,
+                  "columns": 1
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 1,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [],
+                "label": "",
+                "colorIndex": 0,
+                "columns": 1
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ],
+              [
+                "G",
+                true
+              ]
+            ]
+          }
+        ]
+      ],
+      "after": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            },
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            },
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          "columns": 2
+        },
+        "blocks": [
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "edges": [],
+        "byId": [
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "firstRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 88 256\" width=\"88\" height=\"256\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-clusters\"><g class=\"pele-cluster\" data-id=\"G\"><rect x=\"8\" y=\"176\" width=\"72\" height=\"72\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rect\" data-id=\"A\" transform=\"translate(44,44)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">A</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"B\" transform=\"translate(44,128)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">B</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"C\" transform=\"translate(44,212)\"><rect x=\"-24\" y=\"-24\" width=\"48\" height=\"48\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">C</text></g></g></svg>",
+        "width": "4056000000000000",
+        "height": "4070000000000000",
+        "trace": [
+          [
+            "A",
+            "4030000000000000"
+          ],
+          [
+            "B",
+            "4030000000000000"
+          ],
+          [
+            "C",
+            "4030000000000000"
+          ]
+        ]
+      },
+      "recovered": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [],
+          "columns": 2
+        },
+        "blocks": [],
+        "edges": [],
+        "byId": [
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "recoveryRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-nodes\"></g></svg>",
+        "width": "4030000000000000",
+        "height": "4030000000000000",
+        "trace": []
+      }
+    },
+    {
+      "mode": "throw",
+      "result": {
+        "ok": false,
+        "original": true
+      },
+      "trace": [
+        [
+          "warn",
+          true,
+          "Block A width 4 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ]
+      ],
+      "after": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [],
+          "columns": 2
+        },
+        "blocks": [],
+        "edges": [],
+        "byId": [],
+        "pending": [],
+        "ids": 0,
+        "colors": 0,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "type": "column-setting",
+                "columns": 1
+              },
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2
+              }
+            ]
+          }
+        ],
+        "blocksAliasRoot": false,
+        "byIdAlias": []
+      },
+      "firstRaw": null,
+      "recovered": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            },
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            },
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          "columns": 2
+        },
+        "blocks": [
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "edges": [],
+        "byId": [
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "recoveryRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 88 256\" width=\"88\" height=\"256\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-clusters\"><g class=\"pele-cluster\" data-id=\"G\"><rect x=\"8\" y=\"176\" width=\"72\" height=\"72\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rect\" data-id=\"A\" transform=\"translate(44,44)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">A</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"B\" transform=\"translate(44,128)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">B</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"C\" transform=\"translate(44,212)\"><rect x=\"-24\" y=\"-24\" width=\"48\" height=\"48\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">C</text></g></g></svg>",
+        "width": "4056000000000000",
+        "height": "4070000000000000",
+        "trace": [
+          [
+            "A",
+            "4030000000000000"
+          ],
+          [
+            "B",
+            "4030000000000000"
+          ],
+          [
+            "C",
+            "4030000000000000"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "getter-throw",
+      "result": {
+        "ok": false,
+        "original": true
+      },
+      "trace": [
+        [
+          "get",
+          1,
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ]
+      ],
+      "after": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [],
+          "columns": 2
+        },
+        "blocks": [],
+        "edges": [],
+        "byId": [],
+        "pending": [],
+        "ids": 0,
+        "colors": 0,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "type": "column-setting",
+                "columns": 1
+              },
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2
+              }
+            ]
+          }
+        ],
+        "blocksAliasRoot": false,
+        "byIdAlias": []
+      },
+      "firstRaw": null,
+      "recovered": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            },
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            },
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          "columns": 2
+        },
+        "blocks": [
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "edges": [],
+        "byId": [
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "recoveryRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 88 256\" width=\"88\" height=\"256\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-clusters\"><g class=\"pele-cluster\" data-id=\"G\"><rect x=\"8\" y=\"176\" width=\"72\" height=\"72\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rect\" data-id=\"A\" transform=\"translate(44,44)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">A</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"B\" transform=\"translate(44,128)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">B</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"C\" transform=\"translate(44,212)\"><rect x=\"-24\" y=\"-24\" width=\"48\" height=\"48\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">C</text></g></g></svg>",
+        "width": "4056000000000000",
+        "height": "4070000000000000",
+        "trace": [
+          [
+            "A",
+            "4030000000000000"
+          ],
+          [
+            "B",
+            "4030000000000000"
+          ],
+          [
+            "C",
+            "4030000000000000"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "getter-mutate",
+      "result": {
+        "ok": true,
+        "undefined": true
+      },
+      "trace": [
+        [
+          "get",
+          1,
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block A width 9 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 9
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ],
+        [
+          "get",
+          2,
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 9,
+                  "label": "A",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 9,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block B width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 9,
+                  "label": "A",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 9,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "get",
+          3,
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 9,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 9,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block G width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 9,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 9,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "get",
+          4,
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 9,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ],
+              [
+                "G",
+                {
+                  "id": "G",
+                  "type": "composite",
+                  "widthInColumns": 3,
+                  "children": [],
+                  "label": "",
+                  "colorIndex": 0,
+                  "columns": 1
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 1,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 9,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [],
+                "label": "",
+                "colorIndex": 0,
+                "columns": 1
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ],
+              [
+                "G",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block C width 2 exceeds configured column width 1",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 9,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ],
+              [
+                "G",
+                {
+                  "id": "G",
+                  "type": "composite",
+                  "widthInColumns": 3,
+                  "children": [],
+                  "label": "",
+                  "colorIndex": 0,
+                  "columns": 1
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 1,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 9,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [],
+                "label": "",
+                "colorIndex": 0,
+                "columns": 1
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ],
+              [
+                "G",
+                true
+              ]
+            ]
+          }
+        ]
+      ],
+      "after": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 9,
+              "label": "A",
+              "children": []
+            },
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            },
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          "columns": 2
+        },
+        "blocks": [
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 9,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "edges": [],
+        "byId": [
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 9,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 9,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "firstRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 88 256\" width=\"88\" height=\"256\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-clusters\"><g class=\"pele-cluster\" data-id=\"G\"><rect x=\"8\" y=\"176\" width=\"72\" height=\"72\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rect\" data-id=\"A\" transform=\"translate(44,44)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">A</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"B\" transform=\"translate(44,128)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">B</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"C\" transform=\"translate(44,212)\"><rect x=\"-24\" y=\"-24\" width=\"48\" height=\"48\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">C</text></g></g></svg>",
+        "width": "4056000000000000",
+        "height": "4070000000000000",
+        "trace": [
+          [
+            "A",
+            "4030000000000000"
+          ],
+          [
+            "B",
+            "4030000000000000"
+          ],
+          [
+            "C",
+            "4030000000000000"
+          ]
+        ]
+      },
+      "recovered": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [],
+          "columns": 2
+        },
+        "blocks": [],
+        "edges": [],
+        "byId": [
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 9,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 9,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "recoveryRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-nodes\"></g></svg>",
+        "width": "4030000000000000",
+        "height": "4030000000000000",
+        "trace": []
+      }
+    },
+    {
+      "mode": "mutate",
+      "result": {
+        "ok": true,
+        "undefined": true
+      },
+      "trace": [
+        [
+          "warn",
+          true,
+          "Block A width 4 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block B width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 4
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "column-setting",
+                "widthInColumns": 4,
+                "columns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block G width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 4
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "Pending",
+                {
+                  "id": "Pending",
+                  "type": "na",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "Changed",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [
+              "Pending"
+            ],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "column-setting",
+                "widthInColumns": 4,
+                "columns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "Changed",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "B",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block C width 2 exceeds configured column width 1",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 4
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [
+              [
+                "Pending",
+                {
+                  "id": "Pending",
+                  "type": "na",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "Changed",
+                  "children": []
+                }
+              ],
+              [
+                "G",
+                {
+                  "id": "G",
+                  "type": "composite",
+                  "widthInColumns": 3,
+                  "children": [],
+                  "label": "",
+                  "colorIndex": 0,
+                  "columns": 1
+                }
+              ]
+            ],
+            "pending": [
+              "Pending"
+            ],
+            "ids": 0,
+            "colors": 1,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "column-setting",
+                "widthInColumns": 4,
+                "columns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "Changed",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [],
+                "label": "",
+                "colorIndex": 0,
+                "columns": 1
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": [
+              [
+                "B",
+                true
+              ],
+              [
+                "G",
+                true
+              ]
+            ]
+          }
+        ]
+      ],
+      "after": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "Changed",
+              "children": []
+            },
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          "columns": 4
+        },
+        "blocks": [
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "Changed",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "edges": [],
+        "byId": [
+          [
+            "Pending",
+            {
+              "id": "Pending",
+              "type": "na",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "Changed",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [
+          "Pending"
+        ],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "column-setting",
+            "widthInColumns": 4,
+            "columns": 4
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "Changed",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "firstRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 340 88\" width=\"340\" height=\"88\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-clusters\"><g class=\"pele-cluster\" data-id=\"G\"><rect x=\"260\" y=\"8\" width=\"72\" height=\"72\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rect\" data-id=\"B\" transform=\"translate(128,44)\"><rect x=\"-120\" y=\"-36\" width=\"240\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Changed</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"C\" transform=\"translate(296,44)\"><rect x=\"-24\" y=\"-24\" width=\"48\" height=\"48\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">C</text></g></g></svg>",
+        "width": "4075400000000000",
+        "height": "4056000000000000",
+        "trace": [
+          [
+            "Changed",
+            "4030000000000000"
+          ],
+          [
+            "C",
+            "4030000000000000"
+          ]
+        ]
+      },
+      "recovered": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [],
+          "columns": 4
+        },
+        "blocks": [],
+        "edges": [],
+        "byId": [
+          [
+            "Pending",
+            {
+              "id": "Pending",
+              "type": "na",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "Changed",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [
+          "Pending"
+        ],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "column-setting",
+            "widthInColumns": 4,
+            "columns": 4
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "Changed",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "recoveryRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-nodes\"></g></svg>",
+        "width": "4030000000000000",
+        "height": "4030000000000000",
+        "trace": []
+      }
+    },
+    {
+      "mode": "nested",
+      "result": {
+        "ok": true,
+        "undefined": true
+      },
+      "trace": [
+        [
+          "warn",
+          true,
+          "Block A width 4 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [],
+              "columns": 2
+            },
+            "blocks": [],
+            "edges": [],
+            "byId": [],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": false,
+            "byIdAlias": []
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block B width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [
+                {
+                  "id": "Nested",
+                  "type": "square",
+                  "widthInColumns": 1,
+                  "label": "Nested",
+                  "children": []
+                }
+              ],
+              "columns": 2
+            },
+            "blocks": [
+              {
+                "id": "Nested",
+                "type": "square",
+                "widthInColumns": 1,
+                "label": "Nested",
+                "children": []
+              }
+            ],
+            "edges": [],
+            "byId": [
+              [
+                "Nested",
+                {
+                  "id": "Nested",
+                  "type": "square",
+                  "widthInColumns": 1,
+                  "label": "Nested",
+                  "children": []
+                }
+              ],
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 4,
+                  "label": "A",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": true,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block G width 3 exceeds configured column width 2",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [
+                {
+                  "id": "Nested",
+                  "type": "square",
+                  "widthInColumns": 1,
+                  "label": "Nested",
+                  "children": []
+                }
+              ],
+              "columns": 2
+            },
+            "blocks": [
+              {
+                "id": "Nested",
+                "type": "square",
+                "widthInColumns": 1,
+                "label": "Nested",
+                "children": []
+              }
+            ],
+            "edges": [],
+            "byId": [
+              [
+                "Nested",
+                {
+                  "id": "Nested",
+                  "type": "square",
+                  "widthInColumns": 1,
+                  "label": "Nested",
+                  "children": []
+                }
+              ],
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 4,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 0,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [
+                  {
+                    "type": "column-setting",
+                    "columns": 1
+                  },
+                  {
+                    "id": "C",
+                    "type": "square",
+                    "widthInColumns": 2
+                  }
+                ]
+              }
+            ],
+            "blocksAliasRoot": true,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ]
+            ]
+          }
+        ],
+        [
+          "warn",
+          true,
+          "Block C width 2 exceeds configured column width 1",
+          {
+            "root": {
+              "id": "root",
+              "type": "composite",
+              "children": [
+                {
+                  "id": "Nested",
+                  "type": "square",
+                  "widthInColumns": 1,
+                  "label": "Nested",
+                  "children": []
+                }
+              ],
+              "columns": 2
+            },
+            "blocks": [
+              {
+                "id": "Nested",
+                "type": "square",
+                "widthInColumns": 1,
+                "label": "Nested",
+                "children": []
+              }
+            ],
+            "edges": [],
+            "byId": [
+              [
+                "Nested",
+                {
+                  "id": "Nested",
+                  "type": "square",
+                  "widthInColumns": 1,
+                  "label": "Nested",
+                  "children": []
+                }
+              ],
+              [
+                "A",
+                {
+                  "id": "A",
+                  "type": "square",
+                  "widthInColumns": 4,
+                  "label": "A",
+                  "children": []
+                }
+              ],
+              [
+                "B",
+                {
+                  "id": "B",
+                  "type": "square",
+                  "widthInColumns": 3,
+                  "label": "B",
+                  "children": []
+                }
+              ],
+              [
+                "G",
+                {
+                  "id": "G",
+                  "type": "composite",
+                  "widthInColumns": 3,
+                  "children": [],
+                  "label": "",
+                  "colorIndex": 0,
+                  "columns": 1
+                }
+              ]
+            ],
+            "pending": [],
+            "ids": 0,
+            "colors": 1,
+            "spaces": 0,
+            "statements": [
+              {
+                "type": "column-setting",
+                "columns": 2
+              },
+              {
+                "id": "A",
+                "type": "square",
+                "widthInColumns": 4,
+                "label": "A",
+                "children": []
+              },
+              {
+                "id": "B",
+                "type": "square",
+                "widthInColumns": 3,
+                "label": "B",
+                "children": []
+              },
+              {
+                "id": "G",
+                "type": "composite",
+                "widthInColumns": 3,
+                "children": [],
+                "label": "",
+                "colorIndex": 0,
+                "columns": 1
+              }
+            ],
+            "blocksAliasRoot": true,
+            "byIdAlias": [
+              [
+                "A",
+                true
+              ],
+              [
+                "B",
+                true
+              ],
+              [
+                "G",
+                true
+              ]
+            ]
+          }
+        ]
+      ],
+      "after": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            },
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            },
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          "columns": 2
+        },
+        "blocks": [
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "edges": [],
+        "byId": [
+          [
+            "Nested",
+            {
+              "id": "Nested",
+              "type": "square",
+              "widthInColumns": 1,
+              "label": "Nested",
+              "children": []
+            }
+          ],
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "firstRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 88 256\" width=\"88\" height=\"256\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-clusters\"><g class=\"pele-cluster\" data-id=\"G\"><rect x=\"8\" y=\"176\" width=\"72\" height=\"72\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rect\" data-id=\"A\" transform=\"translate(44,44)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">A</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"B\" transform=\"translate(44,128)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">B</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"C\" transform=\"translate(44,212)\"><rect x=\"-24\" y=\"-24\" width=\"48\" height=\"48\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">C</text></g></g></svg>",
+        "width": "4056000000000000",
+        "height": "4070000000000000",
+        "trace": [
+          [
+            "A",
+            "4030000000000000"
+          ],
+          [
+            "B",
+            "4030000000000000"
+          ],
+          [
+            "C",
+            "4030000000000000"
+          ]
+        ]
+      },
+      "recovered": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [],
+          "columns": 2
+        },
+        "blocks": [],
+        "edges": [],
+        "byId": [
+          [
+            "Nested",
+            {
+              "id": "Nested",
+              "type": "square",
+              "widthInColumns": 1,
+              "label": "Nested",
+              "children": []
+            }
+          ],
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "recoveryRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-nodes\"></g></svg>",
+        "width": "4030000000000000",
+        "height": "4030000000000000",
+        "trace": []
+      }
+    },
+    {
+      "mode": "noncallable",
+      "result": {
+        "ok": false,
+        "original": false,
+        "name": "TypeError",
+        "message": "this.warn is not a function"
+      },
+      "trace": [],
+      "after": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [],
+          "columns": 2
+        },
+        "blocks": [],
+        "edges": [],
+        "byId": [],
+        "pending": [],
+        "ids": 0,
+        "colors": 0,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "type": "column-setting",
+                "columns": 1
+              },
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2
+              }
+            ]
+          }
+        ],
+        "blocksAliasRoot": false,
+        "byIdAlias": []
+      },
+      "firstRaw": null,
+      "recovered": {
+        "root": {
+          "id": "root",
+          "type": "composite",
+          "children": [
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            },
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            },
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          "columns": 2
+        },
+        "blocks": [
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "edges": [],
+        "byId": [
+          [
+            "A",
+            {
+              "id": "A",
+              "type": "square",
+              "widthInColumns": 4,
+              "label": "A",
+              "children": []
+            }
+          ],
+          [
+            "B",
+            {
+              "id": "B",
+              "type": "square",
+              "widthInColumns": 3,
+              "label": "B",
+              "children": []
+            }
+          ],
+          [
+            "G",
+            {
+              "id": "G",
+              "type": "composite",
+              "widthInColumns": 3,
+              "children": [
+                {
+                  "id": "C",
+                  "type": "square",
+                  "widthInColumns": 2,
+                  "label": "C",
+                  "children": []
+                }
+              ],
+              "label": "",
+              "colorIndex": 0,
+              "columns": 1
+            }
+          ],
+          [
+            "C",
+            {
+              "id": "C",
+              "type": "square",
+              "widthInColumns": 2,
+              "label": "C",
+              "children": []
+            }
+          ]
+        ],
+        "pending": [],
+        "ids": 0,
+        "colors": 1,
+        "spaces": 0,
+        "statements": [
+          {
+            "type": "column-setting",
+            "columns": 2
+          },
+          {
+            "id": "A",
+            "type": "square",
+            "widthInColumns": 4,
+            "label": "A",
+            "children": []
+          },
+          {
+            "id": "B",
+            "type": "square",
+            "widthInColumns": 3,
+            "label": "B",
+            "children": []
+          },
+          {
+            "id": "G",
+            "type": "composite",
+            "widthInColumns": 3,
+            "children": [
+              {
+                "id": "C",
+                "type": "square",
+                "widthInColumns": 2,
+                "label": "C",
+                "children": []
+              }
+            ],
+            "label": "",
+            "colorIndex": 0,
+            "columns": 1
+          }
+        ],
+        "blocksAliasRoot": true,
+        "byIdAlias": [
+          [
+            "A",
+            true
+          ],
+          [
+            "B",
+            true
+          ],
+          [
+            "G",
+            true
+          ]
+        ]
+      },
+      "recoveryRaw": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-block\" viewBox=\"0 0 88 256\" width=\"88\" height=\"256\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"block\"><g class=\"pele-clusters\"><g class=\"pele-cluster\" data-id=\"G\"><rect x=\"8\" y=\"176\" width=\"72\" height=\"72\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rect\" data-id=\"A\" transform=\"translate(44,44)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">A</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"B\" transform=\"translate(44,128)\"><rect x=\"-36\" y=\"-36\" width=\"72\" height=\"72\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">B</text></g><g class=\"pele-node pele-shape-rect\" data-id=\"C\" transform=\"translate(44,212)\"><rect x=\"-24\" y=\"-24\" width=\"48\" height=\"48\" fill=\"var(--_s)\" stroke=\"var(--_b)\" style=\"rx:var(--_r)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">C</text></g></g></svg>",
+        "width": "4056000000000000",
+        "height": "4070000000000000",
+        "trace": [
+          [
+            "A",
+            "4030000000000000"
+          ],
+          [
+            "B",
+            "4030000000000000"
+          ],
+          [
+            "C",
+            "4030000000000000"
+          ]
+        ]
+      }
+    }
+  ]
+}

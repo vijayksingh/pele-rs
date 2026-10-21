@@ -1,3 +1,4 @@
+import {LayoutGraph,encodeLayoutBinary} from './layout-storage.js';
 // PELGBIN1 transports identity tables. Diagram state and behavior stay in Rust.
 import {PeleError} from './errors.js';
 const errorTypes=['error','pele','type','range','syntax','reference','eval','uri'];
@@ -7,6 +8,7 @@ const limit=()=>new PeleError('Public binary graph exceeds transport budget','li
 const atomSize=a=>a.kind==='number'?9:['string','ref','builtinFunction','hostReference'].includes(a.kind)?5:1;
 const propertiesSize=p=>4+p.reduce((n,p)=>n+5+atomSize(p.value),0);
 export function encodeGraphBinary(revision,graph,metadata=new Uint8Array()){
+  if(graph instanceof LayoutGraph)return encodeLayoutBinary(revision,graph,metadata);
   if(graph.version!==1)throw invalid();
   let size=24+atomSize(graph.root)+4+4+metadata.length;
   for(const s of graph.strings)size+=4+2*s.length;

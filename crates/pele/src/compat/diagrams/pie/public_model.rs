@@ -100,12 +100,31 @@ impl PublicDiagramModule for Pie {
             graph: out.finish(Atom::Ref(root))?,
         })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, state: &PiePublicState) -> Result<ModelGraph, PeleError> {
         Ok(state.graph.clone())
     }
     fn apply_public(&self, state: &mut PiePublicState, graph: ModelGraph) -> Result<(), PeleError> {
         state.graph = graph;
         Ok(())
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::pie())
+    }
+    fn detached_public_render(
+        &self,
+        _state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::pie(
+            super::PieDetachedInput,
+        ))
     }
     fn render_public(
         &self,

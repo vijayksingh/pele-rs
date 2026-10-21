@@ -1,0 +1,265 @@
+{
+  "control": "docs/benchmarks/2026-10-20-mutable/mutable-layers-control.json",
+  "candidate": "docs/benchmarks/2026-10-20-mutable/mutable-layers.json",
+  "stageSummary": {
+    "render-source": {
+      "conditions": 42,
+      "medianImprovementPercent": -0.00000266389479364193,
+      "improvementRange": [
+        -24.719098715631095,
+        10.377361715879562
+      ],
+      "medianWasmOverJS": 2.6841490628289395,
+      "wasmOverJSRange": [
+        1.74125869135745,
+        5.266666836208767
+      ],
+      "regressionsAbove5Percent": [
+        {
+          "case": "er/small",
+          "profile": "fixed",
+          "improvementPercent": -24.719098715631095
+        },
+        {
+          "case": "gantt/small",
+          "profile": "canvas",
+          "improvementPercent": -8.270679441313211
+        },
+        {
+          "case": "flowchart/medium",
+          "profile": "fixed",
+          "improvementPercent": -6.5116261326989555
+        },
+        {
+          "case": "er/medium",
+          "profile": "fixed",
+          "improvementPercent": -6.504066490482452
+        },
+        {
+          "case": "pie/medium",
+          "profile": "fixed",
+          "improvementPercent": -6.018519295259428
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "fixed",
+          "improvementPercent": -5.454544587568799
+        }
+      ]
+    },
+    "parse": {
+      "conditions": 42,
+      "medianImprovementPercent": 14.559899669677984,
+      "improvementRange": [
+        -23.923445412730636,
+        40.506316583672856
+      ],
+      "medianWasmOverJS": 13.08223043104485,
+      "wasmOverJSRange": [
+        3.7254899174192904,
+        68.99995549522686
+      ],
+      "regressionsAbove5Percent": [
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "improvementPercent": -16.153841752272392
+        },
+        {
+          "case": "er/large",
+          "profile": "canvas",
+          "improvementPercent": -23.923445412730636
+        },
+        {
+          "case": "railroad/large",
+          "profile": "fixed",
+          "improvementPercent": -15.540535185265725
+        }
+      ]
+    },
+    "render-model": {
+      "conditions": 42,
+      "medianImprovementPercent": 22.98319096299565,
+      "improvementRange": [
+        0.7518825566588339,
+        40.13157506728737
+      ],
+      "medianWasmOverJS": 4.794204490763209,
+      "wasmOverJSRange": [
+        2.2325582942684172,
+        22.35897771972047
+      ],
+      "regressionsAbove5Percent": []
+    }
+  },
+  "largeCanvas": [
+    {
+      "case": "flowchart/large",
+      "stage": "render-source",
+      "wasmMedianMs": 2.612499952316284,
+      "controlMs": 2.6374999284744263,
+      "improvementPercent": 0.9478664203264042,
+      "wasmOverJS": 1.953270940158409
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "parse",
+      "wasmMedianMs": 4.1499998569488525,
+      "controlMs": 5.0249998569488525,
+      "improvementPercent": 17.412935819092624,
+      "wasmOverJS": 11.350427144212432
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "render-model",
+      "wasmMedianMs": 4.4750001430511475,
+      "controlMs": 6.349999904632568,
+      "improvementPercent": 29.527555743954213,
+      "wasmOverJS": 4.045197913015742
+    },
+    {
+      "case": "sequence/large",
+      "stage": "render-source",
+      "wasmMedianMs": 1.09375,
+      "controlMs": 1.09375,
+      "improvementPercent": 0,
+      "wasmOverJS": 2.1604938525976234
+    },
+    {
+      "case": "sequence/large",
+      "stage": "parse",
+      "wasmMedianMs": 1.5625,
+      "controlMs": 1.975000023841858,
+      "improvementPercent": 20.88607690441666,
+      "wasmOverJS": 10.752687951514789
+    },
+    {
+      "case": "sequence/large",
+      "stage": "render-model",
+      "wasmMedianMs": 1.7625000476837158,
+      "controlMs": 2.475000023841858,
+      "improvementPercent": 28.787877547255647,
+      "wasmOverJS": 4.991150493264823
+    },
+    {
+      "case": "er/large",
+      "stage": "render-source",
+      "wasmMedianMs": 6.950000286102295,
+      "controlMs": 6.849999904632568,
+      "improvementPercent": -1.4598596038241984,
+      "wasmOverJS": 2.50450452153302
+    },
+    {
+      "case": "er/large",
+      "stage": "parse",
+      "wasmMedianMs": 6.474999904632568,
+      "controlMs": 5.224999904632568,
+      "improvementPercent": -23.923445412730636,
+      "wasmOverJS": 22.769231865593536
+    },
+    {
+      "case": "er/large",
+      "stage": "render-model",
+      "wasmMedianMs": 9.050000190734863,
+      "controlMs": 10.949999809265137,
+      "improvementPercent": 17.351594992016572,
+      "wasmOverJS": 3.731958914923106
+    },
+    {
+      "case": "pie/large",
+      "stage": "render-source",
+      "wasmMedianMs": 0.6937499940395355,
+      "controlMs": 0.6875,
+      "improvementPercent": -0.9090900421142578,
+      "wasmOverJS": 2.466666645473904
+    },
+    {
+      "case": "pie/large",
+      "stage": "parse",
+      "wasmMedianMs": 0.296875,
+      "controlMs": 0.29375000298023224,
+      "improvementPercent": -1.063828761893859,
+      "wasmOverJS": 3.7254899174192904
+    },
+    {
+      "case": "pie/large",
+      "stage": "render-model",
+      "wasmMedianMs": 0.793749988079071,
+      "controlMs": 0.9125000238418579,
+      "improvementPercent": 13.013702209323663,
+      "wasmOverJS": 3.735293956776396
+    },
+    {
+      "case": "sankey/large",
+      "stage": "render-source",
+      "wasmMedianMs": 1.649999976158142,
+      "controlMs": 1.6624999046325684,
+      "improvementPercent": 0.7518754400884564,
+      "wasmOverJS": 1.9411765242117933
+    },
+    {
+      "case": "sankey/large",
+      "stage": "parse",
+      "wasmMedianMs": 0.9750000238418579,
+      "controlMs": 1.324999988079071,
+      "improvementPercent": 26.41509187819906,
+      "wasmOverJS": 12.734695180363182
+    },
+    {
+      "case": "sankey/large",
+      "stage": "render-model",
+      "wasmMedianMs": 2.5500001907348633,
+      "controlMs": 3.1500000953674316,
+      "improvementPercent": 19.047615443407828,
+      "wasmOverJS": 3.000000350615572
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-source",
+      "wasmMedianMs": 2.7749998569488525,
+      "controlMs": 2.700000047683716,
+      "improvementPercent": -2.7777706644663835,
+      "wasmOverJS": 3.946666463216146
+    },
+    {
+      "case": "gantt/large",
+      "stage": "parse",
+      "wasmMedianMs": 3.3999998569488525,
+      "controlMs": 4,
+      "improvementPercent": 15.000003576278687,
+      "wasmOverJS": 24.0441973766475
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-model",
+      "wasmMedianMs": 7.900000095367432,
+      "controlMs": 9.349999904632568,
+      "improvementPercent": 15.508019508606807,
+      "wasmOverJS": 12.514851754394869
+    },
+    {
+      "case": "railroad/large",
+      "stage": "render-source",
+      "wasmMedianMs": 2.0875000953674316,
+      "controlMs": 2.087499976158142,
+      "improvementPercent": -0.000005710624706445344,
+      "wasmOverJS": 2.629921419487922
+    },
+    {
+      "case": "railroad/large",
+      "stage": "parse",
+      "wasmMedianMs": 1.625,
+      "controlMs": 1.962499976158142,
+      "improvementPercent": 17.197451223354598,
+      "wasmOverJS": 5.36082484768002
+    },
+    {
+      "case": "railroad/large",
+      "stage": "render-model",
+      "wasmMedianMs": 2.799999952316284,
+      "controlMs": 3.7249999046325684,
+      "improvementPercent": 24.832214120755136,
+      "wasmOverJS": 4.3495146098511315
+    }
+  ]
+}

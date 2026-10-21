@@ -1,0 +1,224 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-19T22:14:38.897Z",
+  "oracleRevision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "db11c20bc39cf28ffa8458263067cf28bdeef0ee185b705742867aec65f8b8eb",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "runtimeHashes": {
+    "full.js": "f4d67c8c11b08c6d39aaa3fb25d45ced7b7a8072339f3e1eeec1e5330b7a4897",
+    "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+    "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+    "graph.js": "4fc062f714c1a3d27a9d98f100186097a6d8ed8f1ba3220acb7dd5c249e108f1",
+    "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+    "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+    "pkg/pele.js": "f1e920830c811859e8df8d78b5547e25becd7b4b11c04f7732350ec5c2f3b3fc",
+    "pkg/pele_bg.wasm": "16f3230207bd69e6158ef622414f0e170c1544a8a017c464a6c46932ae5b1b9c"
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "AMD EPYC-Genoa Processor",
+    "logicalCPUs": 8,
+    "totalMemory": 16366505984
+  },
+  "hostBefore": {
+    "loadAverage": [
+      0.48,
+      0.89,
+      0.93
+    ],
+    "freeMemory": 12272312320
+  },
+  "settings": {
+    "trials": 21,
+    "batchTargetMs": 12,
+    "maxBatch": 128,
+    "minimumWarmupOperations": 6,
+    "minimumWarmupMs": 1000,
+    "alternatingPairOrder": true,
+    "freshRetainedModelPerBatch": true,
+    "crossOriginIsolated": true,
+    "observedClockResolutionMs": 0.0049991607666015625
+  },
+  "scope": "Matched browser/hardware/source/options/measurer; full SVG and dimensions exact before/after. Source render, mutable parse/dispose, retained mutable render include JS/WASM ownership and graph publication. Warm CPU work excludes startup/download, DOM/SVG painting and GPU. Shared VM services remain untouched.",
+  "rows": [
+    {
+      "case": "flowchart/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "jsMedianMs": 0.24382813274860382,
+      "wasmMedianMs": 1.1575000286102295,
+      "wasmOverJS": 4.747196377883337,
+      "jsP95BatchMeanMs": 0.27671875059604645,
+      "wasmP95BatchMeanMs": 1.2287499904632568,
+      "counts": {
+        "js": 64,
+        "wasm": 16
+      },
+      "warmups": {
+        "js": {
+          "operations": 3074,
+          "elapsedMs": 1000.1450004577637
+        },
+        "wasm": {
+          "operations": 719,
+          "elapsedMs": 1000.6350002288818
+        }
+      },
+      "samples": {
+        "js": [
+          0.2586718797683716,
+          0.27671875059604645,
+          0.24351561069488525,
+          0.26445312798023224,
+          0.23375000059604645,
+          0.26359374821186066,
+          0.24031250178813934,
+          0.2770312428474426,
+          0.2416406273841858,
+          0.24382813274860382,
+          0.23867188394069672,
+          0.25296875834465027,
+          0.23093749582767487,
+          0.26195313036441803,
+          0.22890624403953552,
+          0.2492968738079071,
+          0.24382811784744263,
+          0.2459374964237213,
+          0.2395312488079071,
+          0.25523437559604645,
+          0.23218749463558197
+        ],
+        "wasm": [
+          1.2134374976158142,
+          1.2074999809265137,
+          1.1209375262260437,
+          1.1668750047683716,
+          1.2287499904632568,
+          1.1306249499320984,
+          1.1456249952316284,
+          1.2387499809265137,
+          1.1065624952316284,
+          1.1424999833106995,
+          1.1384375095367432,
+          1.1928125023841858,
+          1.1587499976158142,
+          1.1112499833106995,
+          1.1884375214576721,
+          1.145312488079071,
+          1.142187476158142,
+          1.1603124737739563,
+          1.1103125214576721,
+          1.1850000023841858,
+          1.1575000286102295
+        ]
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "jsMedianMs": 0.271484375,
+      "wasmMedianMs": 1.1546874642372131,
+      "wasmOverJS": 4.253237278341389,
+      "jsP95BatchMeanMs": 0.33671875298023224,
+      "wasmP95BatchMeanMs": 1.2993749976158142,
+      "counts": {
+        "js": 64,
+        "wasm": 16
+      },
+      "warmups": {
+        "js": {
+          "operations": 3933,
+          "elapsedMs": 1000.204999923706
+        },
+        "wasm": {
+          "operations": 821,
+          "elapsedMs": 1000.1899995803833
+        }
+      },
+      "samples": {
+        "js": [
+          0.2835156321525574,
+          0.27101561427116394,
+          0.2710937410593033,
+          0.27757813036441803,
+          0.26148436963558197,
+          0.2764843702316284,
+          0.26343749463558197,
+          0.2503124922513962,
+          0.25414063036441803,
+          0.26218749582767487,
+          0.26195313036441803,
+          0.2721875011920929,
+          0.24703124165534973,
+          0.2739843726158142,
+          0.2525000125169754,
+          0.2777343690395355,
+          0.2721875011920929,
+          0.2724218815565109,
+          0.271484375,
+          0.5602343678474426,
+          0.33671875298023224
+        ],
+        "wasm": [
+          1.144374966621399,
+          1.1465625166893005,
+          1.1546874642372131,
+          1.1274999976158142,
+          1.1581250429153442,
+          1.1321874856948853,
+          1.1346874833106995,
+          1.2721874713897705,
+          1.1524999737739563,
+          1.3343749642372131,
+          1.2293750047683716,
+          1.1590625047683716,
+          1.2378124594688416,
+          1.1356250047683716,
+          1.2993749976158142,
+          1.2628125548362732,
+          1.168749988079071,
+          1.1268749833106995,
+          1.1346874833106995,
+          1.1434375047683716,
+          1.221875011920929
+        ]
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "flowchart/medium",
+      "sourceSHA256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "sourceBytes": 1161,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 21889,
+          "width": 120,
+          "height": 4576
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 22125,
+          "width": 113,
+          "height": 4576
+        }
+      ],
+      "checksum": 326458023
+    }
+  ],
+  "browser": "156.0.8078.4",
+  "completedAt": "2026-10-19T22:14:45.305Z",
+  "hostAfter": {
+    "loadAverage": [
+      0.52,
+      0.89,
+      0.93
+    ],
+    "freeMemory": 12054450176
+  },
+  "succeeded": true
+}

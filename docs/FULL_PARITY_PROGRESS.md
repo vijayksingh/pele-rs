@@ -1,3 +1,175 @@
+# Current functional parity checkpoint (2026-10-21)
+
+All 33 diagram modules are implemented for native Rust, Swift and WebAssembly.
+Fresh coordinated acceptance passes 99 Swift features across 55 classes, seven
+strict C clients and 387 browser checks (129 per engine). Package type exports
+and the 33/33 public runtime audit pass. Constructor/helper/callback/resource
+work is implemented; XYChart's NaN iteration bug is corrected in shared Rust.
+
+[Current evidence](parity/2026-10-21-api-completion/README.md) preserves original
+failures, exact source/SDK/package hashes and the Firefox intrinsic-order scope.
+This is declared functional API acceptance, not universal JavaScript behavior or
+performance parity. Version 0.3 remains unreleased pending the performance gate.
+
+## Previous owned-family checkpoint
+
+All 33 families now expose owned callback rendering. The fresh edit/throw audit
+matches 33/33 cases; all 22 class-root factories construct. Current checkpoint:
+native 55 distinct/final 8, Swift 44 distinct (43 together plus corrected observer),
+strict C 4, browsers 201/207 distinct. Six exact Firefox/WebKit TypeError-message
+features remain. The 987 new paired rows include 985 exact matches and two WebKit
+warning-message differences. Full API parity remains incomplete; constructed
+Agentflow, iterable tags, reflection and error expressions remain active. See
+[current evidence and retained failures](parity/2026-10-21-owned-remaining-families/README.md).
+
+## Previous checkpoints
+
+
+Flowchart, Swimlane and XYChart pass the new owned-job checkpoint: native26
+scoped features, fresh Swift36/C3 and browser30 distinct checks. All192 new rows
+pass Swift; browsers compare576 paired rows. Native C15 Array capture was fixed
+and the SDK rebuilt after the first Swift run exposed it. The fresh audit matches
+29/33 edit/throw cases; Agentflow, Gantt, Sequence and Class remain. Full API
+parity is incomplete. See [flow-family evidence](parity/2026-10-21-owned-flow-families/README.md).
+
+
+C4, Requirement, Railroad, GitGraph, Usecase, Eventmodeling, Architecture, State
+and Block pass the new nine-family checkpoint: native75 scoped/final11,
+Swift33 distinct features (32 in one run plus repaired Railroad JSON observer),
+strict C3 and browser45. All496 new rows pass Swift; browsers compare1488 paired
+rows. Fresh audit matches26/33 edit/throw cases, leaving seven mismatches:
+Flowchart, Swimlane, Agentflow, Gantt, Sequence, XYChart and Class. This does not
+certify complete modules or full API parity. See
+[nine-family evidence](parity/2026-10-21-owned-graph-families/README.md).
+
+
+Kanban, Treemap, Mindmap, ER, Cynefin and Wardley now pass the fresh owned-job
+checkpoint: native46 scoped features/final8, Swift24 distinct features (23 in
+one run plus one repaired assertion rerun), strict C3 and browser54. All318 new
+scenarios pass Swift; browsers compare954 paired rows. Fresh audit matches17/33
+edit/throw cases, leaving16 mismatches. This does not certify complete modules
+or full API parity. See [six-family evidence](parity/2026-10-21-owned-domain-families/README.md).
+
+
+Venn, Ishikawa, Timeline, Journey and TreeView now pass fresh Swift17/C3/web39
+checks, including all234 new scenarios in Swift and702 paired browser comparisons.
+Native feature slices cover45 distinct checks; final6 include callback-expanded
+text limits and repair. The web audit now matches12/33 edit/throw cases, leaving21
+mismatches. ER's existing web observer success is separate from its pending native
+owned callback route. See [current platform evidence](parity/2026-10-21-owned-tree-families/README.md).
+
+Packet, Radar and Quadrant now share typed/live geometry and owned callback
+jobs. Fresh verification passes 21 native features, 12 Swift features, three
+strict C clients and 24 browser features. All 144 new callback scenarios compare
+against actual Pele in each browser engine (432 comparisons). The refreshed
+audit matches its edit/throw case in 7/33 families; 26 remain mismatched. All 22
+class-root factories construct. These counts remain scoped, not full API parity.
+See the [chart callback checkpoint](parity/2026-10-21-chart-callbacks/README.md).
+The preceding checkpoints below retain their original counts and artifacts.
+
+All 22 class-root factories plus nested ClassMember now have Rust, Swift and web
+feature proof. The latest batch passes 24 native integrations, eight Swift
+constructor features, an additional Swift Block warning feature, two strict C
+clients, a 99-case Swift regression across all 33 entries, and 51 browser checks
+across Chromium, Firefox and WebKit. Native build inputs (366), SDK files (13),
+web inputs (442) and package files (118) remain bound to their recorded artifacts.
+See the [ordered constructor checkpoint](parity/2026-10-21-ordered-constructors/README.md).
+These checks do not establish full callback, coercion or reflection parity.
+
+The next native slice ports Agentflow's inherited raw diagnostic dispatch for
+default options. Five integrations pass, including nine pinned cases, readonly
+diagnostic-array failure/repair, shared mapping aliases and copied-helper errors.
+The projection now reads the already admitted Agentflow graph directly instead
+of validating it again as a Flowchart instance. Default raw dispatch passes the native feature checks. Configured logging
+callbacks still require owned rendering.
+
+Info now has an owned render capability using the shared typed/live geometry
+path. Six native integrations pass: existing fields/SVG/error-domain regressions
+and new normal/raw callback apply, nesting, late accessibility reads and recovery.
+Its title is captured before layout; accessibility is read after resource calls.
+Fresh Swift/web verification passes in the callback checkpoint below. The existing UTF-16 rendering gate and
+presentation/image limitations remain unchanged.
+
+Pie now shares typed/live draw and responsive-fit geometry. Its native feature
+matches 36 pinned callback scenarios; retained entries, per-label showData, late
+title/accessibility, responsive Map replacement and nested/error recovery are
+covered. The generic live-reader interface gains bounded iterable snapshots;
+C15 owns fresh pair values before releasing its short graph read. Existing Pie
+and Info regressions and C/Swift/WASM bridge compilation pass. Fresh platform execution passes in the callback checkpoint below.
+
+Gantt's `references` helper (27) now shares native task lookup and the explicit
+warning evaluation phases. Twelve oracle cases and the prior warning feature
+pass, covering lazy keyword coercion, captured warning callee, original throws,
+partial mutations and task aliases. Calendar-driven scheduling entry points
+still need their own continuation; this slice does not certify those callbacks.
+
+The [fresh callback checkpoint](parity/2026-10-21-live-render-families/README.md)
+passes nine Swift features against the current ARM64 SDK, strict C17/C18 clients,
+and 144 paired Pie/Info browser scenarios across three engines. The broader
+browser batch passes 59/60 exact checks; two WebKit Gantt diagnostic messages
+cause the remaining failure. Separate semantic Gantt checks pass 3/3 with only
+those recorded message pairs permitted. Original failures remain archived.
+
+The refreshed 33-family audit now matches the edit/throw case in Sankey, ER, Pie
+and Info: 4 match, 29 mismatch. All 22 class-root factories construct. This is
+one observer per family, not full runtime parity. No performance work ran and
+0.3 remains blocked. The older 31-mismatch audit below is historical.
+
+The earlier fifteen-factory checkpoint covered Sankey, Venn, Ishikawa,
+Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
+Journey, QuadrantChart and State. The latest seven-family extension passes nine
+native integrations, ten Swift features against a fresh ARM64 SDK and a strict
+C client exercising all fifteen factories. Six browser executions across
+Chromium, Firefox and WebKit cover 21 construction scenarios and seven retained
+registry lifetimes. State preserves its initially empty drawing cache until
+explicit extraction. Class, Flowchart, Swimlane, Agentflow, Gantt, Sequence,
+Block and ClassMember are covered by the newer checkpoint above. Constructor
+reflection/shared identities and callback mutation behavior remain work.
+See [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
+
+The earlier seven-family extension passed four native features, ten Swift
+features, a strict C client and six browser executions. A broader browser run
+passed 62 checks but failed one constructor reflection-order observer; that
+known difference remains explicit, with the original failed evidence preserved.
+
+The preceding functional slice adds captured Sankey construction through Rust, C v16,
+Swift and WebAssembly. Fresh factories own exact native defaults, helpers and
+raw rendering without parsing; captured registration and subclass receivers
+survive the relevant lifecycle operations. Two native Rust features, two strict
+C clients, two Swift constructor features and six real browser executions pass.
+The prior 31 Swift regression features passed against the new SDK. Constructor
+runtime names/diagnostics, shared prototype identity and the other 21 class-root
+families remain incomplete; see [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
+
+Native normal/prepared Sankey callback reentry is implemented and separately
+[verified](parity/2026-10-21-native-sankey-callbacks/README.md). Presentation/image
+routes and arbitrary native graph-ID lifetime remain outside that proof.
+
+All 33 diagram parsers/renderers and mutable family adapters exist. This is not
+full public API parity. The current functional audit against pinned Pele 1.6.0
+records these concrete gaps at runtime `d7caf8c`:
+
+- **31 of 33 prepared per-type entries lose callback mutations:** the first
+  width callback changes `model.title`, then throws an original object. Pele
+  retains the edit; native restores the previous title. All 33 preserve throw
+  identity and call width once. Sankey and ER retain the edit in this case.
+- **The audit found 22 constructor stubs.** Subsequent slices implement 15;
+  all 22 and nested ClassMember now have scoped native/Swift/web proof.
+  Plain-object families are separate.
+- Native codecs still explicitly reject active lone UTF-16, sparse collection,
+  dynamic coercion and overridden-dispatch cases. Some integration tests
+  deliberately assert these gaps and recovery; their passing totals must not be
+  reported as complete behavioral parity.
+- Subsequent C/Swift normal/prepared Sankey callback reentry is verified above;
+  presentation/image callbacks and arbitrary native graph-ID lifetime remain open.
+
+See the [33-family checklist and reproducible evidence](parity/2026-10-21-runtime-audit/README.md).
+Runtime behavior, fresh platform artifacts and release publication are separate
+acceptance gates. The dated checkpoints below are preserved as historical
+evidence, not current full-parity certification.
+
+---
+
 # 0.3 source checkpoint — 2026-10-19
 
 The v1-only renderer, wrappers and playground are removed. The package root now

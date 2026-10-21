@@ -1,10 +1,25 @@
+mod browser_calendar;
+#[cfg(feature = "captured-sankey")]
+mod captured_sankey;
+#[cfg(feature = "captured-sankey")]
+mod captured_store;
+mod constructor_body;
+mod detached_invocation;
+mod detached_render;
 mod foreign_provider;
+mod host_construction;
+mod host_er;
 mod host_functions;
+#[cfg(feature = "native-canonical-sankey")]
+mod native_canonical;
 mod parse_limits;
 mod prepared_entries;
+mod public_constructor;
 mod public_remaining_er;
 mod public_remaining_info;
 mod render_numbers;
+mod render_packet;
+mod source_layout;
 mod wasm_registry;
 use wasm_bindgen::prelude::*;
 
@@ -202,8 +217,26 @@ pub struct MutableDocument {
 }
 #[wasm_bindgen]
 impl MutableDocument {
+    pub fn unchanged_public_graph_is_noop(&self) -> bool {
+        self.inner.unchanged_public_graph_is_noop()
+    }
     pub fn schema(&self) -> String {
         public_result(&self.inner.schema_view())
+    }
+    /// Opaque identity of this document's immutable captured schema view.
+    /// These are WASM linear-memory offsets, never host process addresses.
+    /// Consumers must scope keys to their renderer and initialized WASM module.
+    #[cfg(target_arch = "wasm32")]
+    pub fn schema_cache_key(&self) -> String {
+        let view = self.inner.schema_view();
+        format!(
+            "1:{:x}:{:x}:{}:{:x}:{}",
+            std::ptr::from_ref(view.model) as usize,
+            view.shared_functions.as_ptr() as usize,
+            view.shared_functions.len(),
+            view.function_shapes.as_ptr() as usize,
+            view.function_shapes.len(),
+        )
     }
     /// Dispatch edits through the retained native module and return post-call
     /// graph even when the operation throws. Revision uses decimal text in JS.
@@ -325,9 +358,13 @@ impl MutableDocument {
             Err(error) => pele::compat::error_envelope(&error),
         }
     }
+    /// Optional owned source-layout publication; legacy providers are not exported.
+    pub fn snapshot_source_layout(&self) -> Result<JsValue, JsValue> {
+        source_layout::snapshot(&self.inner)
+    }
     pub fn snapshot_binary(&self) -> Result<Vec<u8>, JsValue> {
         let run = || -> Result<Vec<u8>, pele::compat::PeleError> {
-            let graph = self.inner.snapshot()?;
+            let graph = self.inner.snapshot_view()?;
             let metadata =
                 serde_json::to_vec(&serde_json::json!({"type":self.inner.diagram_type()}))
                     .expect("snapshot metadata");
@@ -339,6 +376,17 @@ impl MutableDocument {
             )
         };
         run().map_err(|error| JsValue::from_str(&pele::compat::error_envelope(&error)))
+    }
+    pub fn source_ingress_identity(&mut self) -> Option<String> {
+        self.inner
+            .source_ingress_identity()
+            .map(|id| id.to_string())
+    }
+    pub fn apply_source_input(&mut self, bytes: &[u8]) -> String {
+        match self.inner.apply_source_input(bytes) {
+            Ok(()) => public_result(&self.inner.revision().to_string()),
+            Err(error) => pele::compat::error_envelope(&error),
+        }
     }
     pub fn apply_binary(&mut self, bytes: &[u8]) -> String {
         let mut run = || -> Result<(), pele::compat::PeleError> {
@@ -471,7 +519,71 @@ fn callback_error(error: JsValue) -> pele::compat::PeleError {
         .unwrap_or_else(|| "Host callback failed".into());
     pele::compat::PeleError::new(message, pele::compat::ErrorCode::Semantic)
 }
+#[wasm_bindgen(raw_module = "../errors.js")]
+extern "C" {
+    #[wasm_bindgen(catch, js_name = primitiveJavaScriptFailure)]
+    fn primitive_javascript_failure(operation: &str, index: u32) -> Result<JsValue, JsValue>;
+}
 impl pele::compat::RenderResources for BrowserResources {
+    fn javascript_failure(
+        &mut self,
+        operation: pele::compat::JavaScriptFailure,
+    ) -> pele::compat::public::PublicError {
+        use pele::compat::{
+            public::{JavaScriptErrorKind, JsString, PublicError},
+            JavaScriptFailure,
+        };
+        let (kind, index) = match operation {
+            JavaScriptFailure::ReadonlyArrayPushLength => ("readonlyArrayPushLength", 0),
+            JavaScriptFailure::ReadonlyArrayPushIndex(index) => ("readonlyArrayPushIndex", index),
+        };
+        let reply = match primitive_javascript_failure(kind, index) {
+            Ok(value) => value,
+            Err(_) => {
+                return pele::compat::PeleError::new(
+                    "Invalid JavaScript failure response",
+                    pele::compat::ErrorCode::Semantic,
+                )
+                .into()
+            }
+        };
+        if !js_sys::Array::is_array(&reply) {
+            return pele::compat::PeleError::new(
+                "Invalid JavaScript failure response",
+                pele::compat::ErrorCode::Semantic,
+            )
+            .into();
+        }
+        let values: js_sys::Array = reply.unchecked_into();
+        let message = values.get(1);
+        if values.length() != 2
+            || values.get(0).as_string().as_deref() != Some("TypeError")
+            || !message.is_string()
+        {
+            return pele::compat::PeleError::new(
+                "Invalid JavaScript failure response",
+                pele::compat::ErrorCode::Semantic,
+            )
+            .into();
+        }
+        let text: &js_sys::JsString = message.unchecked_ref();
+        if text.length() > 4096 {
+            return pele::compat::PeleError::new(
+                "JavaScript failure response exceeds byte budget",
+                pele::compat::ErrorCode::Limit,
+            )
+            .into();
+        }
+        PublicError::JavaScript {
+            name: JavaScriptErrorKind::TypeError,
+            message: JsString(
+                (0..text.length())
+                    .map(|i| text.char_code_at(i) as u16)
+                    .collect(),
+            ),
+        }
+    }
+
     fn text_width(
         &mut self,
         r: pele::compat::TextRequest<'_>,
@@ -516,68 +628,22 @@ impl pele::compat::RenderResources for BrowserResources {
             })
     }
     fn parse_date(&mut self, input: &str) -> Result<Option<f64>, pele::compat::PeleError> {
-        let instant = js_sys::Date::parse(input);
-        Ok(instant.is_finite().then_some(instant))
+        browser_calendar::parse_date(input).map_err(callback_error)
     }
     fn calendar_fields(
         &mut self,
         instant_ms: f64,
     ) -> Result<Option<pele::compat::CalendarFields>, pele::compat::PeleError> {
-        let date = js_sys::Date::new(&instant_ms.into());
-        if !date.get_time().is_finite() {
-            return Ok(None);
-        }
-        Ok(Some(pele::compat::CalendarFields {
-            civil: pele::compat::CivilDateTime {
-                year: date.get_full_year() as i32,
-                month: (date.get_month() + 1) as u8,
-                day: date.get_date() as u8,
-                hour: date.get_hours() as u8,
-                minute: date.get_minutes() as u8,
-                second: date.get_seconds() as u8,
-                millisecond: date.get_milliseconds() as u16,
-            },
-            weekday: date.get_day() as u8,
-            utc_offset_minutes: -date.get_timezone_offset() as i32,
-        }))
+        browser_calendar::calendar_fields(instant_ms).map_err(callback_error)
     }
     fn calendar_instant(
         &mut self,
         c: pele::compat::CivilDateTime,
     ) -> Result<Option<f64>, pele::compat::PeleError> {
-        // Construct with a full 400-year cycle for years 0..99, then restore the
-        // exact year; Date's historical constructor adjustment belongs to core.
-        let year = if (0..100).contains(&c.year) {
-            c.year + 400
-        } else {
-            c.year
-        };
-        let args = js_sys::Array::new();
-        for value in [
-            year,
-            i32::from(c.month) - 1,
-            i32::from(c.day),
-            i32::from(c.hour),
-            i32::from(c.minute),
-            i32::from(c.second),
-            i32::from(c.millisecond),
-        ] {
-            args.push(&JsValue::from_f64(f64::from(value)));
-        }
-        let constructor = js_sys::Reflect::get(&js_sys::global(), &"Date".into())
-            .map_err(callback_error)?
-            .unchecked_into::<js_sys::Function>();
-        let date = js_sys::Reflect::construct(&constructor, &args)
-            .map_err(callback_error)?
-            .unchecked_into::<js_sys::Date>();
-        if (0..100).contains(&c.year) {
-            date.set_full_year(c.year as u32);
-        }
-        let instant = date.get_time();
-        Ok(instant.is_finite().then_some(instant))
+        browser_calendar::calendar_instant(c).map_err(callback_error)
     }
     fn now_millis(&mut self) -> Result<f64, pele::compat::PeleError> {
-        Ok(js_sys::Date::now())
+        browser_calendar::now_millis().map_err(callback_error)
     }
 }
 #[wasm_bindgen]

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "scope": "One completed default-native Swift timing attempt. No binaries or SDK copied.",
+  "origins": {
+    "proof/schedule.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/schedule.json",
+      "sourceSha256": "3489f0dbe53f24ef9eb119a79d49bb2b206a15803cb4b109f2d715c1365c2682",
+      "sourceBytes": 137868
+    },
+    "proof/source-before.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/source-before.json",
+      "sourceSha256": "06cb4a43c4eb797a054d318b977633e363136067f10f7ce10be387a339038f62",
+      "sourceBytes": 46853
+    },
+    "proof/source-after.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/source-after.json",
+      "sourceSha256": "06cb4a43c4eb797a054d318b977633e363136067f10f7ce10be387a339038f62",
+      "sourceBytes": 46853
+    },
+    "proof/prepared-manifest.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/prepared-manifest.json",
+      "sourceSha256": "f5ab6b57c67e4b98cf7706df5c9c6932889b28a45055ab7c8f31d37ac7d46e18",
+      "sourceBytes": 1787
+    },
+    "proof/swift-input-continuity.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/swift-input-continuity.json",
+      "sourceSha256": "4b8ba3f786083f98ee91262ec77966edf99e1b13a5577e250fbc803499b8c850",
+      "sourceBytes": 47910
+    },
+    "reports/parseMutable.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/parseMutable.json",
+      "sourceSha256": "1f7bef658dcb86c7d4374788a5ff9a7680ec22024e74a68bc4335f87350e7cd2",
+      "sourceBytes": 181329
+    },
+    "logs/parseMutable.log.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/parseMutable.log",
+      "sourceSha256": "bab187190e2fe7b357ddb6edc36e36bfee62818a018072fe5990d02639744124",
+      "sourceBytes": 205
+    },
+    "reports/parse.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/parse.json",
+      "sourceSha256": "bb22f207f35d969d31f219753173574099d21ad36f58602265e21fac5e7aa94e",
+      "sourceBytes": 184753
+    },
+    "logs/parse.log.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/parse.log",
+      "sourceSha256": "af8088ab14bc155fbc4d1693a03e68345e083e9f24319ae497cf1913efe534f3",
+      "sourceBytes": 190
+    },
+    "reports/render.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/render.json",
+      "sourceSha256": "6906b510b9e58965f3644fc27803aeb930bc6e5525ad8c15e1722cbc979ec41a",
+      "sourceBytes": 174141
+    },
+    "logs/render.log.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/render.log",
+      "sourceSha256": "a3a9f3d9a281e2eaacd6af3e72ae678871c49769ba4cb2372adb5b162378228c",
+      "sourceBytes": 191
+    },
+    "reports/lifetime.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/lifetime.json",
+      "sourceSha256": "44513618725ffcbde0c94357d72ed225c9b714537820ee92490f3dde8c9a8f93",
+      "sourceBytes": 188118
+    },
+    "logs/lifetime.log.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/attempt1/lifetime.log",
+      "sourceSha256": "c46ced518edd0fb91b9a54e8d185dc9ef1b717ff050d515bb09a0b76831d6445",
+      "sourceBytes": 196
+    },
+    "execution/bounded-swift-timing.mjs.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-swift-timing/bounded-swift-timing.mjs",
+      "sourceSha256": "1d303fa372ecbbf8acf9a1e823914d67685759e6861a02c18528365cb340d625",
+      "sourceBytes": 8444
+    },
+    "execution/compare.mjs.gz": {
+      "source": "scripts/perf/swift/compare.mjs",
+      "sourceSha256": "3f6853435e45703c2aa3b94f36026444666a963a71c03e8e04e21fb46bab4549",
+      "sourceBytes": 19284
+    },
+    "execution/build.mjs.gz": {
+      "source": "scripts/perf/swift/build.mjs",
+      "sourceSha256": "c6d23dc6f051bb181e25a7290c958970a2b1e2d67b24f3550ed928c355ea0cb5",
+      "sourceBytes": 6517
+    },
+    "proof/control-build-manifest.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/captured-native-core/candidate-swift/swift-build-manifest.json",
+      "sourceSha256": "0c784216ffbe5ed236aa189724bf93bb76876d2d3096f85e3743847d36c89adb",
+      "sourceBytes": 45655
+    },
+    "proof/candidate-build-manifest.json.gz": {
+      "source": "dist/perf-patches/parse-architecture/native-canonical-correctness/candidate-swift/swift-build-manifest.json",
+      "sourceSha256": "caf8690b372572812d39fdbf0cff3094b363568dd214857933bbd96c233ab9f4",
+      "sourceBytes": 46308
+    }
+  }
+}

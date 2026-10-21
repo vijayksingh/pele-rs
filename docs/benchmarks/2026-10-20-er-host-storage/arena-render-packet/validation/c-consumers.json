@@ -1,0 +1,98 @@
+[
+  {
+    "phase": "ffi-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/arena-render-packet-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/arena-render-packet-ffi-compile.log",
+    "startedAt": "2026-10-20T10:47:56.794928+00:00",
+    "endedAt": "2026-10-20T10:47:57.667175+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-run",
+    "command": [
+      "dist/evidence/arena-render-packet-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/arena-render-packet-ffi-run.log",
+    "startedAt": "2026-10-20T10:47:57.670563+00:00",
+    "endedAt": "2026-10-20T10:47:58.264513+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/arena-render-packet-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/arena-render-packet-ffi-public-compile.log",
+    "startedAt": "2026-10-20T10:47:58.265120+00:00",
+    "endedAt": "2026-10-20T10:47:58.414712+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-run",
+    "command": [
+      "dist/evidence/arena-render-packet-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/arena-render-packet-ffi-public-run.log",
+    "startedAt": "2026-10-20T10:47:58.415240+00:00",
+    "endedAt": "2026-10-20T10:47:58.988478+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/arena-render-packet-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/arena-render-packet-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T10:47:58.989108+00:00",
+    "endedAt": "2026-10-20T10:47:59.117923+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-run",
+    "command": [
+      "dist/evidence/arena-render-packet-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/arena-render-packet-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T10:47:59.118384+00:00",
+    "endedAt": "2026-10-20T10:47:59.719853+00:00",
+    "exitCode": 0
+  }
+]

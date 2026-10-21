@@ -1,0 +1,86 @@
+{
+  "status": "applied-test-compile-repair-v2",
+  "baseHead": "ba15a4af059a49a0ee766ae96e0fe939fc863f86",
+  "patchSha256": "a9ec1aa610c97fea331e1e64cb647b9525d7ef2f614ca322e6057acde8038e0e",
+  "files": [
+    {
+      "path": "bindings/web/full.js",
+      "originalSha256": "0adb1435b6323f2db54144a06378d9d95cec2d0702705d572047480706db6702",
+      "candidateSha256": "0e4d936d2a9654bbaf83cfae191d179a4c3fa24d9199baee63f1cd5dfcfc3af3"
+    },
+    {
+      "path": "crates/pele/src/compat/public/engine.rs",
+      "originalSha256": "ad015d3d85197a997c9eccc6b7aeb04ea0c63a333ab7d3b62645223a91f7f410",
+      "candidateSha256": "15b971f94ff82d76c57b44ed8a39e432c16db5ccc4032485ba424755083747bd"
+    },
+    {
+      "path": "crates/pele/src/compat/public/mod.rs",
+      "originalSha256": "02eabe828172c4b409d62bdb370f58c212ee97470be0b9d9e37127ceeb1c3e49",
+      "candidateSha256": "fa154208f8db7858af7e7ccf01b4925c25fb3ecb4a6e6b1161ae64435ced9172"
+    },
+    {
+      "path": "crates/pele/tests/public_render_outcome_view.rs",
+      "originalSha256": null,
+      "candidateSha256": "d77ab4e120fff25b5c2a2b4825aa8d64a24be22ca93efa169007efc6b8a8752b"
+    },
+    {
+      "path": "crates/pele-ffi/src/native_resources.rs",
+      "originalSha256": "50a41f105f406146fc819a7b55781347e39c1fff2fe0ef79c0517c5b05ffabd2",
+      "candidateSha256": "bf7aca1d69ac0cff2a707ed84440164860813bc1d7cdd5113f8527c9bce1305c"
+    },
+    {
+      "path": "crates/pele-ffi/src/prepared.rs",
+      "originalSha256": "cd056ee48b3f2e7dda559cd1939d0a13c3e3ffd17c7a1dc12e5ebfaa2972648d",
+      "candidateSha256": "85c865919fe87996200aa9bdb38d5e50ef4ef4d371be30b2caf35cc703d613b4"
+    },
+    {
+      "path": "crates/pele-ffi/src/presentation.rs",
+      "originalSha256": "7cc4d0bb21e0d18b06bc58383f5f922f38f283b996e5f94bec015fe8a9cc9f4e",
+      "candidateSha256": "cb3a5b3534b9b6370017d9e5f7f1232eebafd3ef7af40dde06ce4730a812b3f1"
+    },
+    {
+      "path": "crates/pele-ffi/src/public.rs",
+      "originalSha256": "bd3bc9bce38400b862dd5c20ff64af0a087aad7b6e39af8bbdfea94f796fd9a5",
+      "candidateSha256": "dc3adc8d88ab70cab2ed355d35952c94d51fc8ffbde11358e65bc98126ab633d"
+    },
+    {
+      "path": "crates/pele-wasm/src/host_functions.rs",
+      "originalSha256": "1143d2cb842669e247694652c6c72ef9225ee582ddd8d5172e685b359618e2dd",
+      "candidateSha256": "61c32aaa9ded0f6c437b1916e77a5cc40ad5117a9cd5bae4a306da54e2b8a59e"
+    },
+    {
+      "path": "crates/pele-wasm/src/prepared_entries.rs",
+      "originalSha256": "383b9eec56fde44eca5d98195780a8b2ec3b8b06a551f60865bf599e578faf2b",
+      "candidateSha256": "c0f29357cb2774b941278842db299d2d244b0a270cb61429f28e7ef48e0ef537"
+    },
+    {
+      "path": "crates/pele-wasm/src/render_packet.rs",
+      "originalSha256": "64d3c0dd288ae7065223ad432de20fa6dafab96312919e9339a4bd529ba14be0",
+      "candidateSha256": "da7092eaabd79718831d8901b36b57d0a6ffcbe3f427438e7caf2e676f6b33ca"
+    },
+    {
+      "path": "tests/web/arena-render-packet.spec.js",
+      "originalSha256": null,
+      "candidateSha256": "181146cda220420c9bd512def8aa11790e4db1d2f5d5e4158b70a45a8bb951ee"
+    }
+  ],
+  "validation": {
+    "rustfmt": true,
+    "nodeCheck": true,
+    "gitApplyCheck": {
+      "direction": "reverse",
+      "passed": true
+    },
+    "originalHashesMatchProduction": false,
+    "compiled": false,
+    "testsExecuted": false,
+    "benchmarksExecuted": false,
+    "originalHashesPreserved": true,
+    "candidateHashesMatchAppliedProduction": true
+  },
+  "limitations": [
+    "No execution evidence; parent owns native/WASM/SDK builds and public integrations.",
+    "Full graph transport and exact metadata counting remain; no predicted speedup."
+  ],
+  "repairProvenance": "repair-v2.json"
+}

@@ -1,5 +1,5 @@
 //! JourneyDb's real builder/getActors prototype, Pele 458322a5 (MIT, kepano).
-//! Constructors, exotic coercion/properties and active UTF-16 rendering remain explicit gaps.
+//! Exotic coercion/properties and active UTF-16 rendering remain explicit gaps.
 use super::{Journey, JourneyModel, JourneyTask};
 use crate::compat::{
     public::*, source::space, DiagramModule, DiagramType, ErrorCode, Object, PeleError,
@@ -654,8 +654,38 @@ fn array_node(out: &mut GraphWriter, values: impl IntoIterator<Item = Atom>) -> 
         properties,
     })
 }
+fn construct_default() -> Result<JourneyPublicState, PeleError> {
+    Journey.create_public(&JourneyModel::empty(None))
+}
+
 impl PublicDiagramModule for Journey {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = JourneyPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::journey())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::journey(
+            super::JourneyDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
@@ -714,6 +744,12 @@ impl PublicDiagramModule for Journey {
         let graph = out.finish(Atom::Ref(root))?;
         let model = imported(&graph);
         Ok(JourneyPublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &JourneyPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

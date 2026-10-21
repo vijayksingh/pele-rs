@@ -1,0 +1,117 @@
+{
+  "sourceCommit": "11f27516d98c3d89799a7fe2065eec0bd4e147cf",
+  "files": {
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/before-sdk.json": {
+      "sha256": "16dfd34cdf84135863303ddd47245e9e27654bbe6737666c14d77e20e9fd4515",
+      "bytes": 209988
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/after-sdk.json": {
+      "sha256": "380907103a3418e29fac6074c928dbb982d6c1607bf7ccee2cd35a6be2773a24",
+      "bytes": 66336
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/before-correctness.json": {
+      "sha256": "7f4af168fc9e7644086054ca253503c38df0d70cd05daa8c248f4facc8996ac6",
+      "bytes": 114633
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/after-correctness.json": {
+      "sha256": "9fa59e30451da41942eec133335e9323b05ad79623391ee525b3a2007be57615",
+      "bytes": 115465
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/run-correctness.py": {
+      "sha256": "cd83f65d8d3357cd1cbaf188cbc05b0a7b596595a40bc0053edbd1303c657054",
+      "bytes": 3359
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/freeze.mjs": {
+      "sha256": "ca9727e7ff17113eb23abac8627996bed83c34fb9ad568d44e3ac131e3ac8107",
+      "bytes": 9964
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/correctness-commands.json": {
+      "sha256": "72d61f342d885478912845a2e64f024447258e3d392cc75107988e336ecd83b3",
+      "bytes": 7328
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/c-consumers.json": {
+      "sha256": "9cb53bff4481eced81c266f0cea8a1f2d2ba22735d3346924bb90e7705750634",
+      "bytes": 2810
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/prior-sdk-verification.json": {
+      "sha256": "3198d4695f5111c3d180a5d730ba7b013a6fbe1b77fa093cef183c76c8d22bf6",
+      "bytes": 1804
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/native-evidence-summary.json": {
+      "sha256": "f570b1e8f4afb07465e4ccd606d65f317e1a6e99f5507fd4f52a3247b7eb4bc5",
+      "bytes": 1766
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/collect-evidence.py": {
+      "sha256": "eb8818190d75d2f96329464753e8a195eca7f1d86559cffdec82f994eb8ebd88",
+      "bytes": 5428
+    },
+    "dist/evidence/source-symbols-correctness-freeze-before-sdk.log": {
+      "sha256": "ea0793c601334e9c96ff4613c8cd478ecba7546278642ab9a34d86a8837d5698",
+      "bytes": 179
+    },
+    "dist/evidence/source-symbols-correctness-native-features.log": {
+      "sha256": "1d527bc81738e6a687b368ea811a354bd78de821f1a10a75241b361e5bfa8ee8",
+      "bytes": 7300
+    },
+    "dist/evidence/source-symbols-correctness-sdk-build.log": {
+      "sha256": "0ed6a23228aedeb92190079c35c50e03c49647028cec413f6bea0ce15c5aa70b",
+      "bytes": 356
+    },
+    "dist/evidence/source-symbols-correctness-freeze-after-sdk.log": {
+      "sha256": "2696de7f305393e3d11dc19ec72ec37774f7f26c63c86aa6eca59b808840ca5a",
+      "bytes": 267
+    },
+    "dist/evidence/source-symbols-correctness-swift-build.log": {
+      "sha256": "d1d83ba83e01e936e1109b1cc3fb96f7d14addaafe662feb5923e98af073faf4",
+      "bytes": 371
+    },
+    "dist/evidence/source-symbols-correctness-freeze-before-correctness.log": {
+      "sha256": "0373d31c9f294e3dd4321c5aba9b6f249b713d60619ec244e3e095486c224d0e",
+      "bytes": 358
+    },
+    "dist/evidence/source-symbols-correctness-swift-corpus.log": {
+      "sha256": "70cc5c4603f1d19cecf7a67c69f6988b5b4326c8bebcd0d7bab9e49911515f1e",
+      "bytes": 5688
+    },
+    "dist/evidence/source-symbols-correctness-ffi-compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "dist/evidence/source-symbols-correctness-ffi-run.log": {
+      "sha256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+      "bytes": 97
+    },
+    "dist/evidence/source-symbols-correctness-ffi-public-compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "dist/evidence/source-symbols-correctness-ffi-public-run.log": {
+      "sha256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+      "bytes": 36
+    },
+    "dist/evidence/source-symbols-correctness-ffi-parse-limits-compile.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "dist/evidence/source-symbols-correctness-ffi-parse-limits-run.log": {
+      "sha256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
+      "bytes": 104
+    },
+    "dist/evidence/source-symbols-correctness-swift-api.log": {
+      "sha256": "f30d6a334c33579183bfe8fd558da170e7cdad8bd1b6773306e20bdb292a79ba",
+      "bytes": 562
+    },
+    "dist/evidence/source-symbols-correctness-freeze-after-correctness.log": {
+      "sha256": "8aa5c16c41115a1f3da79c6d9706af58ca8b0df60ab4da0ef8c66c30ad52cb3a",
+      "bytes": 1070
+    },
+    "dist/evidence/source-symbols-correctness-swift-api.json": {
+      "sha256": "91db35b62bf218c2d6b3e8373c6f0d832c318319499fb5da579254a75a39fced",
+      "bytes": 237916
+    },
+    "dist/perf-patches/parse-architecture/source-symbols-correctness/candidate-swift/swift-build-manifest.json": {
+      "sha256": "2088d433570199d6bcf250dbfa21f3bce165abeca3dacf5713a7c013fabfa836",
+      "bytes": 47325
+    }
+  }
+}

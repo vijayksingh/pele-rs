@@ -1,6 +1,8 @@
 //! AgentFlow, complete Pele agentflow/* 458322a5 translation (MIT, kepano).
 mod graph;
+mod graph_source;
 mod lexer;
+mod live_builder;
 mod model;
 mod parser;
 mod render;
@@ -74,3 +76,7 @@ impl DiagramModule for AgentFlow {
 
 mod public_model;
 pub use public_model::{AgentflowPublicOrigin, AgentflowPublicState};
+
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{render_detached, AgentflowDetachedInput};

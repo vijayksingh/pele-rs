@@ -3,11 +3,13 @@
 mod parser;
 mod public_model;
 pub use public_model::QuadrantPublicState;
+mod live_phase;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,
     RenderSettings, Rendered, Value,
 };
+pub(crate) use live_phase::{render_detached, QuadrantDetachedInput};
 use serde::{Serialize, Serializer};
 #[derive(Clone, Debug, Serialize)]
 pub struct QuadrantText {
@@ -126,5 +128,24 @@ impl DiagramModule for QuadrantChart {
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         render::render(m, c, o, r)
+    }
+}
+
+impl QuadrantModel {
+    /// Empty class state shared by parser population and native construction.
+    pub(super) fn empty(title: Option<&str>) -> Self {
+        Self {
+            diagram_type: DiagramType::QuadrantChart,
+            title: title.map(str::to_owned),
+            acc_title: None,
+            acc_descr: None,
+            quadrants: Default::default(),
+            x_axis_left: None,
+            x_axis_right: None,
+            y_axis_bottom: None,
+            y_axis_top: None,
+            points: Vec::new(),
+            classes: Vec::new(),
+        }
     }
 }

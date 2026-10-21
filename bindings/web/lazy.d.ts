@@ -43,3 +43,5 @@ export interface LazyRegistry extends Registry {
 }
 export function withLazy(registry: Registry): LazyRegistry;
 export function loadLazy(moduleOrPath?: string | URL | Response | BufferSource | WebAssembly.Module): Promise<LazyRegistry>;
+
+export type {Diagram, DiagramType, SwimlaneModel, IconResolver, LinkInfo, RenderResult} from './full.js';

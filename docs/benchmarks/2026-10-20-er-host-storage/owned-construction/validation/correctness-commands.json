@@ -1,0 +1,147 @@
+[
+  {
+    "phase": "swift-build",
+    "command": [
+      "node",
+      "scripts/perf/swift/build.mjs"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/owned-public-construction-swift-build.log",
+    "startedAt": "2026-10-20T10:13:52.250309+00:00",
+    "endedAt": "2026-10-20T10:14:00.161881+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-corpus",
+    "command": [
+      "swift",
+      "test",
+      "-c",
+      "release",
+      "--package-path",
+      "bindings/swift",
+      "--filter",
+      "AdditionalDiagramTests/testPinnedDiagramsThroughNativeDocuments|EagerProjectionIntegrationTests|PreparedDocumentTests|NonfiniteDiagramTests/testSankeyOwnedRenderAndCodableKeepNonfiniteHeight"
+    ],
+    "environmentOverrides": {
+      "PELE_VERIFY_MUTABLE": "1",
+      "PELE_FAMILIES": "er,sankey"
+    },
+    "log": "dist/evidence/owned-public-construction-swift-corpus.log",
+    "startedAt": "2026-10-20T10:14:00.162704+00:00",
+    "endedAt": "2026-10-20T10:15:13.533640+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/owned-public-construction-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/owned-public-construction-ffi-compile.log",
+    "startedAt": "2026-10-20T10:15:13.534432+00:00",
+    "endedAt": "2026-10-20T10:15:13.961961+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-run",
+    "command": [
+      "dist/evidence/owned-public-construction-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/owned-public-construction-ffi-run.log",
+    "startedAt": "2026-10-20T10:15:13.962356+00:00",
+    "endedAt": "2026-10-20T10:15:14.575187+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/owned-public-construction-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/owned-public-construction-ffi-public-compile.log",
+    "startedAt": "2026-10-20T10:15:14.575588+00:00",
+    "endedAt": "2026-10-20T10:15:14.709880+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-run",
+    "command": [
+      "dist/evidence/owned-public-construction-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/owned-public-construction-ffi-public-run.log",
+    "startedAt": "2026-10-20T10:15:14.710273+00:00",
+    "endedAt": "2026-10-20T10:15:15.293495+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/owned-public-construction-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/owned-public-construction-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T10:15:15.293892+00:00",
+    "endedAt": "2026-10-20T10:15:15.417971+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-run",
+    "command": [
+      "dist/evidence/owned-public-construction-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/owned-public-construction-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T10:15:15.418404+00:00",
+    "endedAt": "2026-10-20T10:15:16.007247+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-api",
+    "command": [
+      "node",
+      "scripts/perf/swift/run.mjs",
+      "--output",
+      "dist/evidence/owned-public-construction-swift-api.json"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/owned-public-construction-swift-api.log",
+    "startedAt": "2026-10-20T10:15:16.008177+00:00",
+    "endedAt": "2026-10-20T10:15:18.382989+00:00",
+    "exitCode": 0
+  }
+]

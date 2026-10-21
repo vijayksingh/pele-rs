@@ -1,5 +1,5 @@
 //! IshikawaDb's actual addNode, stack aliases and flat native fishbone cache.
-//! Pele 458322a5 (MIT kepano). Constructors/exotic coercion and active lone UTF16
+//! Pele 458322a5 (MIT kepano). Exotic coercion and active lone UTF16
 //! text remain explicit gaps; cyclic/expanded workloads have native budgets.
 use super::{Ishikawa, IshikawaModel, IshikawaNode};
 use crate::compat::{
@@ -628,10 +628,40 @@ fn array_out(out: &mut GraphWriter, values: Vec<Atom>) -> u32 {
         properties,
     })
 }
+fn construct_default() -> Result<IshikawaPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    Ishikawa.create_public(&IshikawaModel::new(None))
+}
+
 impl PublicDiagramModule for Ishikawa {
     type PublicState = IshikawaPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::ishikawa())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::ishikawa(
+            super::IshikawaDetachedInput::new(state.cache.as_ref().err()),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -698,6 +728,12 @@ impl PublicDiagramModule for Ishikawa {
         graph.validate_schema(&SCHEMA)?;
         let cache = imported(&graph);
         Ok(IshikawaPublicState { graph, cache })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &IshikawaPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

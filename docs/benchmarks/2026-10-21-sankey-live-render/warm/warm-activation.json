@@ -1,0 +1,199 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T20:31:13.209Z",
+  "roots": {
+    "control": "/home/admin/pele-perf.jL9wzP/parse-architecture/svg-append-e148/candidate-package",
+    "candidate": "/home/admin/pele-perf.jL9wzP/parse-architecture/sankey-live-runtime/candidate-package"
+  },
+  "checks": [
+    {
+      "runtime": "control",
+      "case": "sankey/small",
+      "profile": "fixed",
+      "modelType": "sankey",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/small",
+      "profile": "canvas",
+      "modelType": "sankey",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "flowchart/medium",
+      "profile": "fixed",
+      "modelType": "flowchart",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "flowchart/medium",
+      "profile": "canvas",
+      "modelType": "flowchart",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "modelType": "sankey",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "modelType": "sankey",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/large",
+      "profile": "fixed",
+      "modelType": "sankey",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/large",
+      "profile": "canvas",
+      "modelType": "sankey",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/small",
+      "profile": "fixed",
+      "modelType": "sankey",
+      "initializerDecisions": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/small",
+      "profile": "canvas",
+      "modelType": "sankey",
+      "initializerDecisions": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "flowchart/medium",
+      "profile": "fixed",
+      "modelType": "flowchart",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "flowchart/medium",
+      "profile": "canvas",
+      "modelType": "flowchart",
+      "initializerDecisions": [],
+      "expected": [],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/medium",
+      "profile": "fixed",
+      "modelType": "sankey",
+      "initializerDecisions": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/medium",
+      "profile": "canvas",
+      "modelType": "sankey",
+      "initializerDecisions": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/large",
+      "profile": "fixed",
+      "modelType": "sankey",
+      "initializerDecisions": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ],
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/large",
+      "profile": "canvas",
+      "modelType": "sankey",
+      "initializerDecisions": [
+        true,
+        true
+      ],
+      "expected": [
+        true,
+        true
+      ],
+      "publicRetainedRender": true
+    }
+  ],
+  "selectors": false,
+  "directParseSPI": false,
+  "probeInsideTimer": false,
+  "instrumentationOnlyProbe": true,
+  "actualInitializerSHA256": "98a140212ec6117784f5b63b3e1a4c0c6face53d34e029be2d2da8a70e33c2c7",
+  "browser": "156.0.8078.4",
+  "succeeded": true,
+  "browserClosedBeforeTiming": true,
+  "completedAt": "2026-10-20T20:31:14.029Z"
+}

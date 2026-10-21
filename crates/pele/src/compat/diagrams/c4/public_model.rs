@@ -594,7 +594,7 @@ fn numeric(g: &ModelGraph, a: &Atom) -> Result<f64, PublicError> {
         _ => Err(invalid("C4 object-to-number coercion is not implemented").into()),
     }
 }
-fn js_number(raw: &str) -> f64 {
+pub(super) fn js_number(raw: &str) -> f64 {
     let raw = raw.trim_matches(space);
     if raw.is_empty() {
         return 0.;
@@ -2024,10 +2024,55 @@ fn operation_budget(g: &ModelGraph, c: &MethodCall) -> Result<(), PublicError> {
     }
     Ok(())
 }
+fn construct_default() -> Result<C4PublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    C4.create_public(&super::model::Db::new(None).finish())
+}
+
 impl PublicDiagramModule for C4 {
     type PublicState = C4PublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::c4())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        let helper = if let Atom::Ref(root) = state.graph.root {
+            match property(&state.graph, root, "getC4Shape") {
+                Some(Atom::BuiltinFunction(15)) => true,
+                None => matches!(
+                    state.graph.nodes[root as usize],
+                    Node::Instance {
+                        prototype: PROTO,
+                        ..
+                    }
+                ),
+                _ => false,
+            }
+        } else {
+            false
+        };
+        Some(crate::compat::public::DetachedPublicRender::c4(
+            super::C4DetachedInput::new(state.model.as_ref().err(), helper),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -2187,6 +2232,12 @@ impl PublicDiagramModule for C4 {
         graph.validate_schema(&SCHEMA)?;
         let model = imported(&graph);
         Ok(C4PublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &C4PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

@@ -1,0 +1,172 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "91e4632f114038f45ad32c0af534c4f732fe2f690500a7fa6a5c3bfcd1171728",
+  "infoChunkSHA256": "c921073a21786f65ac0d4aa33bfae085ffaea2c111e869636f448b128087dc86",
+  "textChunkSHA256": "7bcc143dde5434e48d3a09bd1b3d33f628d52e02a1e8d251a8aa89e399963b71",
+  "readOrder": [
+    "title",
+    [
+      "width",
+      "Title"
+    ],
+    [
+      "width",
+      "Pele v1.6.0"
+    ],
+    "accTitle",
+    "accTitle",
+    "accDescr",
+    "accDescr"
+  ],
+  "cases": [
+    {
+      "mode": "normal",
+      "trace": [
+        [
+          "Before",
+          "4030000000000000"
+        ],
+        [
+          "Pele v1.6.0",
+          "4030000000000000"
+        ]
+      ],
+      "result": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">Before accessible</title><desc id=\"pele-desc\">Before description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">Before</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      },
+      "after": {
+        "type": "info",
+        "title": "Before",
+        "accTitle": "Before accessible",
+        "accDescr": "Before description"
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">Before accessible</title><desc id=\"pele-desc\">Before description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">Before</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      }
+    },
+    {
+      "mode": "title-mutate",
+      "trace": [
+        [
+          "Before",
+          "4030000000000000"
+        ],
+        [
+          "Pele v1.6.0",
+          "4030000000000000"
+        ]
+      ],
+      "result": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">Before</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      },
+      "after": {
+        "type": "info",
+        "title": "After",
+        "accTitle": "After accessible",
+        "accDescr": "After description"
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">After</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      }
+    },
+    {
+      "mode": "version-mutate",
+      "trace": [
+        [
+          "Before",
+          "4030000000000000"
+        ],
+        [
+          "Pele v1.6.0",
+          "4030000000000000"
+        ]
+      ],
+      "result": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">Before</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      },
+      "after": {
+        "type": "info",
+        "title": "After",
+        "accTitle": "After accessible",
+        "accDescr": "After description"
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">After</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      }
+    },
+    {
+      "mode": "throw",
+      "trace": [
+        [
+          "Before",
+          "4030000000000000"
+        ]
+      ],
+      "result": {
+        "ok": false,
+        "original": true
+      },
+      "after": {
+        "type": "info",
+        "title": "After",
+        "accTitle": "After accessible",
+        "accDescr": "After description"
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">After</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      }
+    },
+    {
+      "mode": "nested",
+      "trace": [
+        [
+          "Before",
+          "4030000000000000"
+        ],
+        [
+          "Pele v1.6.0",
+          "4030000000000000"
+        ]
+      ],
+      "result": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">Before</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      },
+      "after": {
+        "type": "info",
+        "title": "After",
+        "accTitle": "After accessible",
+        "accDescr": "After description"
+      },
+      "nested": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">After</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-info\" viewBox=\"0 0 122 72\" width=\"122\" height=\"72\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"info\" aria-labelledby=\"pele-title\" aria-describedby=\"pele-desc\"><title id=\"pele-title\">After accessible</title><desc id=\"pele-desc\">After description</desc><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"61\" y=\"25.6\">After</tspan></text><text class=\"pele-version\" fill=\"var(--_m)\" x=\"61\" y=\"57.6\" text-anchor=\"middle\">Pele v1.6.0</text></svg>",
+        "width": "405e800000000000",
+        "height": "4052000000000000"
+      }
+    }
+  ]
+}

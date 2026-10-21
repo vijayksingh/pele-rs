@@ -9,8 +9,12 @@ publish = false
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+native-canonical-sankey = ["pele/web-host-sankey"]
+captured-sankey = ["pele/web-host-sankey"]
+
 [dependencies]
-pele.workspace = true
+pele = { workspace = true, features = ["web-host-er"] }
 serde.workspace = true
 serde_json.workspace = true
 wasm-bindgen = "=0.2.128"

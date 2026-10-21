@@ -18,6 +18,7 @@ extension Pele {
         private let document: MutableDocument
         public var type: String { document.type }
         public var revision: UInt64 { document.revision }
+        public var isConstructorCreated: Bool { document.isConstructorCreated }
         internal init(_ document: MutableDocument) { self.document = document }
         public func close() throws { try document.close() }
         public func snapshot() throws -> PublicSnapshot { try document.snapshot() }
@@ -25,6 +26,8 @@ extension Pele {
             try document.apply(graph, expectedRevision: expectedRevision)
         }
         public func schema() throws -> PublicModelSchema { try document.schema() }
+        public func retainHostValue(_ value: PublicHostValue) throws -> PublicGraph.Atom { try document.retainHostValue(value) }
+        public func resolveHostValue(_ atom: PublicGraph.Atom) throws -> PublicHostValue { try document.resolveHostValue(atom) }
         public func bindHostFunction(_ function: HostFunction) throws -> PublicGraph.Atom { try document.bindHostFunction(function) }
         public func invoke(method: UInt32, receiver: PublicGraph.Atom, arguments: [PublicGraph.Atom] = [], resources: HostResources = .init()) throws -> PublicInvocationOutcome {
             try document.invoke(method: method, receiver: receiver, arguments: arguments, resources: resources)
@@ -35,6 +38,9 @@ extension Pele {
             let config = try JSONEncoder().encode(config)
             var raw = options; raw.config = [:]; raw.limit = nil; raw.maxEdges = nil
             let settings = try RenderNumberEncoding(raw, outputLimit: .undefined)
+            if let detached = try document.renderDetached(settings: settings, resources: resources, rawConfig: config) {
+                return detached
+            }
             return try document.withHandle { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in
                     document.withHostFunctionResources(takeError) {

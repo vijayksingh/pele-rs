@@ -1,0 +1,49 @@
+{
+  "base": "a4f933d9af2cd3ccd5cda7eac46dc1048a296249",
+  "patchSha256": "190e6007216939ea8c9c498287bc42c2af9f64868f405f7b31137319a3d00757",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/indexed.rs",
+      "originalSha256": "fa15b2405408bcd38d19779473e5eed17b2fbdabf995cf7f278feeac97449af0",
+      "candidateSha256": "33a75eb4216ac138f94c9e4c89665288a0ccfb81e4ede6ee2ed111e501e30b1c"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/layout.rs",
+      "originalSha256": "106188fdf4a044c5822a701b8c71149ad2cab52d39ba7e1caaff17b1512215a9",
+      "candidateSha256": "43b2531e4a9bc8af9c390d65c4e9e095cf8f54eb791a088550f22dc76a563f75"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/parser.rs",
+      "originalSha256": "df820e5f676b872d6be076318fc38245dbc77714da5ca442eabaddd3ed5a9a13",
+      "candidateSha256": "b5f8f218331e99dc0879659e757107806f1e9ca94c2608ed63a666ddfafa90f3"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/public_model.rs",
+      "originalSha256": "347da1ce7d06169094b8feeb6ff66aaec341f263513b05b1c595f7d1841a1883",
+      "candidateSha256": "e63cb6211fe1086cb5fe81d9246721d686ce75907712532a5bc0c65d1b864888"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/render.rs",
+      "originalSha256": "1e32fc0d7c7aca349aabd9317ef491d77b604a188fbdd81cb0040c2efab1526d",
+      "candidateSha256": "61b60ca8aa6edebc2e8771f55057d7b4230cb21e83f0d844ff7800ae8f05f622"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/source_store.rs",
+      "originalSha256": "7d93eb23faac76f912c70ab4ff38b65404a0f9ae257625ac1f1604bc66144ce0",
+      "candidateSha256": "e9da99477df29a235f9b5ab52ed2e77d20a0cce6328ba94ff6edccc67f308929"
+    },
+    {
+      "path": "crates/pele/tests/public_sankey_owned_parse.rs",
+      "originalSha256": "30bc836584625c7b208aef71dadd05af07e6790d80f23c2f38e0677718715573",
+      "candidateSha256": "3b73ba6f549a630297c7258bc12e534329b4f68472d4601b8ba002fc53c7d0be"
+    }
+  ],
+  "validation": {
+    "rustfmt": "1.98.1 all seven files pass",
+    "applyCheck": "pass",
+    "whitespace": "pass",
+    "compile": "not run",
+    "runtime": "not run"
+  },
+  "scope": "Owned source catalog primitive; shared grammar and borrowed node views; no JS/protocol/admission changes"
+}

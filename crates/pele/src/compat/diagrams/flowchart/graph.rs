@@ -12,6 +12,7 @@ pub(crate) struct GraphNode {
     pub is_group: bool,
     pub parent_id: Option<String>,
     pub css_styles: Vec<String>,
+    pub css_styles_origin: Option<usize>,
     pub css_compiled_styles: Vec<String>,
     pub css_classes: String,
     pub dir: Option<String>,
@@ -84,14 +85,21 @@ fn arrows(kind: Option<&str>) -> (&str, &str) {
     }
 }
 pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&str>) -> FlowGraph {
+    finish_flow_graph(model, default_curve, super::topology::typed(model))
+}
+pub(super) fn finish_flow_graph(
+    model: &FlowchartModel,
+    default_curve: Option<&str>,
+    topology: super::topology::Topology,
+) -> FlowGraph {
+    let super::topology::Topology {
+        declaration,
+        hidden,
+        collapsed_into,
+    } = topology;
     let mut nodes = Vec::new();
     let mut edges = Vec::new();
     let subgraphs = &model.subgraphs;
-    let lookup: HashMap<_, _> = subgraphs
-        .iter()
-        .enumerate()
-        .map(|(i, s)| (s.id.as_str(), i))
-        .collect();
     let classes: HashMap<_, _> = model.classes.iter().map(|(k, v)| (k.as_str(), v)).collect();
     let compiled = |names: &[String]| {
         let mut out = Vec::new();
@@ -114,80 +122,6 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
         }
         out
     };
-    let mut sub_parent = HashMap::new();
-    for sg in subgraphs {
-        for child in &sg.nodes {
-            if lookup.contains_key(child.as_str()) {
-                sub_parent.insert(child.as_str(), sg.id.as_str());
-            }
-        }
-    }
-    let mut children: HashMap<&str, Vec<&str>> = HashMap::new();
-    for sg in subgraphs {
-        if let Some(parent) = sub_parent.get(sg.id.as_str()) {
-            children.entry(parent).or_default().push(&sg.id)
-        }
-    }
-    let mut declaration = HashMap::new();
-    let mut next = 0;
-    for sg in subgraphs {
-        if sub_parent.contains_key(sg.id.as_str()) {
-            continue;
-        }
-        let mut pending = vec![sg.id.as_str()];
-        while let Some(id) = pending.pop() {
-            if declaration.contains_key(id) {
-                continue;
-            }
-            declaration.insert(id, next);
-            next += 1;
-            if let Some(kids) = children.get(id) {
-                pending.extend(kids.iter().rev().copied())
-            }
-        }
-    }
-    let collapsed = |id: &str| {
-        lookup.get(id).is_some_and(|i| {
-            subgraphs[*i].metadata.as_ref().and_then(|m| m.get("view"))
-                == Some(&Value::String("collapsed".into()))
-        })
-    };
-    let mut outermost: HashMap<&str, Option<&str>> = HashMap::new();
-    let mut hidden = HashSet::new();
-    let mut collapsed_into = HashMap::new();
-    if subgraphs.iter().any(|sg| collapsed(&sg.id)) {
-        for sg in subgraphs {
-            let mut chain = Vec::new();
-            let mut seen = HashSet::new();
-            let mut current = Some(sg.id.as_str());
-            while let Some(id) = current {
-                if outermost.contains_key(id) || !seen.insert(id) {
-                    break;
-                }
-                chain.push(id);
-                current = sub_parent.get(id).copied()
-            }
-            let mut result = current.and_then(|id| outermost.get(id).copied().flatten());
-            for &id in chain.iter().rev() {
-                if result.is_none() && collapsed(id) {
-                    result = Some(id)
-                }
-                outermost.insert(id, result);
-            }
-            let Some(ancestor) = result else { continue };
-            if sg.id != ancestor {
-                hidden.insert(sg.id.as_str());
-                collapsed_into.insert(sg.id.as_str(), ancestor);
-            }
-            for child in &sg.nodes {
-                if child == ancestor {
-                    continue;
-                }
-                hidden.insert(child.as_str());
-                collapsed_into.insert(child.as_str(), ancestor);
-            }
-        }
-    }
     let mut parent_of = HashMap::new();
     let mut groups = HashSet::new();
     for sg in subgraphs.iter().rev() {
@@ -206,13 +140,14 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
         if hidden.contains(sg.id.as_str()) {
             continue;
         }
-        let is_collapsed = collapsed(&sg.id);
+        let is_collapsed = super::topology::collapsed(sg.metadata.as_ref());
         let node = GraphNode {
             id: sg.id.clone(),
             label: Some(sg.title.clone()),
             label_type: sg.label_type.clone(),
             parent_id: parent_of.get(sg.id.as_str()).map(|s| (*s).into()),
             css_styles: Vec::new(),
+            css_styles_origin: None,
             css_compiled_styles: compiled(&sg.classes),
             css_classes: sg.classes.join(" "),
             shape: if is_collapsed {
@@ -247,13 +182,14 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
         .iter()
         .map(|(k, v)| (k.as_str(), v))
         .collect();
-    for (_, v) in &model.nodes {
+    for (origin, (_, v)) in model.nodes.iter().enumerate() {
         if hidden.contains(v.id.as_str()) {
             continue;
         }
         if let Some(&i) = by_id.get(v.id.as_str()) {
             let node = &mut nodes[i];
             node.css_styles = v.styles.clone();
+            node.css_styles_origin = Some(origin);
             node.css_compiled_styles = compiled(&v.classes);
             node.css_classes = v.classes.join(" ");
             continue;
@@ -267,6 +203,7 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
             label_type: v.label_type.clone(),
             parent_id: parent_of.get(v.id.as_str()).map(|s| (*s).into()),
             css_styles: v.styles.clone(),
+            css_styles_origin: Some(origin),
             css_compiled_styles: compiled(&class_names),
             css_classes: format!("default {}", v.classes.join(" ")),
             dir: v.dir.clone(),
@@ -290,11 +227,11 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
     for (index, raw) in model.edges.iter().enumerate() {
         let start = collapsed_into
             .get(raw.start.as_str())
-            .copied()
+            .map(String::as_str)
             .unwrap_or(&raw.start);
         let end = collapsed_into
             .get(raw.end.as_str())
-            .copied()
+            .map(String::as_str)
             .unwrap_or(&raw.end);
         if start == end
             && (collapsed_into.contains_key(raw.start.as_str())

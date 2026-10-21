@@ -1,0 +1,28 @@
+{
+  "runtime": "d7caf8c684ac6b6fda3918a2bcbd91c5953b92c9",
+  "singleBundleOracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "originalEntryManifest": {
+    "report.json": "e214de9289b40269725e79abd6a3f3aab2996b51b8d9895706495f5ab322041f",
+    "audit.mjs": "69719f83ab8c4aba33ce1fc0ccee50cdfab0273b8161e613cbb174f2e9a1af61"
+  },
+  "files": {
+    "CHECKLIST.md": "092617b6c545df3c249ac49938da7f2b0a264c92157e92d540e9136c566e16a5",
+    "README.md": "277b10a32b1eeb44909801e6a99d900cbc38ba92d0d499254603a25a2c288762",
+    "audit-original.mjs": "69719f83ab8c4aba33ce1fc0ccee50cdfab0273b8161e613cbb174f2e9a1af61",
+    "audit-portable.mjs": "729f96894a707243738fb7da7db670fa965292f4ca6f7f5e174f28348dd82e46",
+    "oracle-probe.mjs": "20897e4d1122e950d7c7f54d39dd846b115a7319b12b6c572ae656871be8b606",
+    "oracle-report.json.gz": "0ebb0c302013378ef72b82a3c9f1c3bce703902bfbf94ad3823714851e19da5c",
+    "source-guards.json.gz": "dbb1d3bc209d5f98b290748580c84a783f40646625022f00f48ec38eac18779f",
+    "verify.py": "0cb336b57dda4eb5188e6f383d1885f00258f251168283b4708bdf403c24b35a",
+    "web-entry-report.json.gz": "4466db921406e1b254bfbed24687a2bd17da30cb92a79357d383ce5fe21d8849"
+  },
+  "uncompressed": {
+    "oracle-report.json.gz": "05f222555941aa082fedbabe8f8999d4a1991fd050633e0bc3112e46a96a6edd",
+    "source-guards.json.gz": "55569c4c5f473f84f2976902c6d2058b03e148d95e94802ff61654c126a5a1a3",
+    "web-entry-report.json.gz": "e214de9289b40269725e79abd6a3f3aab2996b51b8d9895706495f5ab322041f"
+  },
+  "oracleProbeInputs": {
+    "fixtures/pele/diagram-model-construction.json": "f52708e1ba807cc757f0f4ba7fb59e8b60d838a5e7c8e883079310255aaddf1b"
+  },
+  "validationScope": "Portable verifier plus JavaScript syntax only; original raw reports retain their own executed script identity."
+}

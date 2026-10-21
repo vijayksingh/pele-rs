@@ -1,12 +1,15 @@
 //! Full Wardley source, coordinate model and map renderer, Pele 458322a5 (MIT).
 mod lexer;
+mod live_phase;
 mod model;
 mod parser;
+mod phase;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, Engine, ModuleDescriptor, Object, ParseContext, ParseOptions,
     PeleError, RenderResources, RenderSettings, Rendered,
 };
+pub(crate) use live_phase::{render_detached, WardleyDetachedInput};
 pub use model::{
     WardleyAnnotation, WardleyAxes, WardleyForce, WardleyLink, WardleyModel, WardleyNode,
     WardleyNote, WardleyPipeline, WardleyPoint, WardleySize, WardleyTrend,

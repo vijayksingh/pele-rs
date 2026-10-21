@@ -94,6 +94,62 @@ pub struct GanttModel {
     excluded_days: Vec<bool>,
     dated_tokens: bool,
 }
+// Shared task declaration semantics; storage targets choose ownership afterward.
+pub(super) struct TaskDeclaration<'a> {
+    pub id: Option<&'a str>,
+    pub start: Option<&'a str>,
+    pub end: &'a str,
+    pub active: bool,
+    pub done: bool,
+    pub crit: bool,
+    pub milestone: bool,
+    pub vert: bool,
+}
+pub(super) fn task_declaration<'a>(
+    descr: &str,
+    data: &'a str,
+) -> Result<TaskDeclaration<'a>, PeleError> {
+    let mut fields: Vec<&str> = data.strip_prefix(':').unwrap_or(data).split(',').collect();
+    let mut active = false;
+    let mut done = false;
+    let mut crit = false;
+    let mut milestone = false;
+    let mut vert = false;
+    while let Some(tag) = fields.first().and_then(|s| patterns()[1].captures(s)) {
+        match &tag[1] {
+            "active" => active = true,
+            "done" => done = true,
+            "crit" => crit = true,
+            "milestone" => milestone = true,
+            "vert" => vert = true,
+            _ => {}
+        }
+        fields.remove(0);
+    }
+    if fields.is_empty() {
+        return Err(error(
+            format!(
+                "Task \"{}\" needs a duration or an end date.",
+                descr.trim_matches(space)
+            ),
+            ErrorCode::Semantic,
+        ));
+    }
+    if fields.len() > 3 {
+        return Err(error(format!("Task \"{}\" has too many fields. A task takes an id, a start, and an end or duration.", descr.trim_matches(space)), ErrorCode::Semantic));
+    }
+    let fields: Vec<_> = fields.iter().map(|s| s.trim_matches(space)).collect();
+    Ok(TaskDeclaration {
+        id: (fields.len() == 3).then(|| fields[0]),
+        start: (fields.len() > 1).then(|| fields[fields.len() - 2]),
+        end: fields[fields.len() - 1],
+        active,
+        done,
+        crit,
+        milestone,
+        vert,
+    })
+}
 impl Serialize for GanttModel {
     fn serialize<S: serde::Serializer>(&self, s: S) -> Result<S::Ok, S::Error> {
         let mut m = s.serialize_map(None)?;
@@ -223,9 +279,23 @@ impl GanttModel {
         self.sections.push(text)
     }
     pub fn add_task(&mut self, descr: String, data: String) -> Result<(), PeleError> {
-        let mut fields: Vec<&str> = data.strip_prefix(':').unwrap_or(&data).split(',').collect();
-        let mut task = GanttTask {
-            id: String::new(),
+        let declaration = task_declaration(&descr, &data)?;
+        let id = match declaration.id {
+            Some(id) => id.to_owned(),
+            None => {
+                self.task_count += 1;
+                format!("task{}", self.task_count)
+            }
+        };
+        let order = if declaration.vert {
+            -1
+        } else {
+            let value = self.last_order as isize;
+            self.last_order += 1;
+            value
+        };
+        let task = GanttTask {
+            id,
             task: descr,
             section: self.current_section.clone(),
             start_time: None,
@@ -233,58 +303,20 @@ impl GanttModel {
             render_end_time: None,
             manual_end_time: false,
             processed: false,
-            active: false,
-            done: false,
-            crit: false,
-            milestone: false,
-            vert: false,
-            order: -1,
+            active: declaration.active,
+            done: declaration.done,
+            crit: declaration.crit,
+            milestone: declaration.milestone,
+            vert: declaration.vert,
+            order,
             classes: vec![],
             prev_task_id: self.last_task_id.clone(),
             raw: TaskRaw {
                 data: data.clone(),
-                start: None,
-                end: String::new(),
+                start: declaration.start.map(str::to_owned),
+                end: declaration.end.to_owned(),
             },
         };
-        while let Some(tag) = fields.first().and_then(|s| patterns()[1].captures(s)) {
-            match &tag[1] {
-                "active" => task.active = true,
-                "done" => task.done = true,
-                "crit" => task.crit = true,
-                "milestone" => task.milestone = true,
-                "vert" => task.vert = true,
-                _ => {}
-            }
-            fields.remove(0);
-        }
-        if fields.is_empty() {
-            return Err(error(
-                format!(
-                    "Task \"{}\" needs a duration or an end date.",
-                    task.task.trim_matches(space)
-                ),
-                ErrorCode::Semantic,
-            ));
-        }
-        if fields.len() > 3 {
-            return Err(error(format!("Task \"{}\" has too many fields. A task takes an id, a start, and an end or duration.",task.task.trim_matches(space)),ErrorCode::Semantic));
-        }
-        let fields: Vec<_> = fields.iter().map(|s| s.trim_matches(space)).collect();
-        task.id = if fields.len() == 3 {
-            fields[0].into()
-        } else {
-            self.task_count += 1;
-            format!("task{}", self.task_count)
-        };
-        if fields.len() > 1 {
-            task.raw.start = Some(fields[fields.len() - 2].into())
-        }
-        task.raw.end = fields.last().unwrap().to_string();
-        if !task.vert {
-            task.order = self.last_order as isize;
-            self.last_order += 1
-        }
         self.last_task_id = Some(task.id.clone());
         if let Some(&at) = self.by_at.get(&task.id) {
             self.by_id[at].1 = self.tasks.len()
@@ -419,6 +451,7 @@ fn compiled_regex(pattern: &str) -> Result<Regex, regex::Error> {
 
 impl super::scheduler::Store for GanttModel {
     type Task = usize;
+    type TaskIterator = std::ops::Range<usize>;
     type Date = f64;
     type Token = String;
     type Error = PeleError;
@@ -496,6 +529,12 @@ impl super::scheduler::Store for GanttModel {
     }
     fn inclusive(&mut self) -> Result<bool, PeleError> {
         Ok(self.inclusive_end_dates)
+    }
+    fn task_iterator(&mut self) -> Result<Self::TaskIterator, PeleError> {
+        Ok(0..self.tasks.len())
+    }
+    fn next_task(&mut self, iterator: &mut Self::TaskIterator) -> Result<Option<usize>, PeleError> {
+        Ok(iterator.next())
     }
     fn tasks(&mut self) -> Result<Vec<usize>, PeleError> {
         Ok((0..self.tasks.len()).collect())

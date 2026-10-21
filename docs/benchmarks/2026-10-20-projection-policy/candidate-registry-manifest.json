@@ -1,0 +1,11 @@
+{
+  "revision": "ce559f1be92a751576d241440140a28bb728c508",
+  "files": {
+    "crates/pele/src/compat/engine.rs": "9805911042d8fac20d3343bdeba5ae720a4629c3089aa3dcd5628bcae61ce1b2",
+    "crates/pele/src/compat/normalized_projection.rs": "98bfeb89193664e351ef1fba8b5d679f3ba6c8813dae39df4a6a2a7b963ba784",
+    "crates/pele/examples/registry_allocations.rs": "c40c77ee14a14af9105834aba2e4542109fe8ca16ef06dbbb310d68e80968d91"
+  },
+  "binarySHA256": "b38c4bacb263d6ff3b9d62c09a3273a2568ef00fe7276f204903b7c27ab4419d",
+  "command": "CARGO_PROFILE_RELEASE_OPT_LEVEL=3 CARGO_PROFILE_RELEASE_LTO=off CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 CARGO_BUILD_JOBS=2 cargo build --locked --release -p pele-rs --example registry_allocations",
+  "timed": false
+}

@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T20:31:11.967Z",
+  "roots": {
+    "control": "/home/admin/pele-perf.jL9wzP/parse-architecture/svg-append-e148/candidate-package",
+    "candidate": "/home/admin/pele-perf.jL9wzP/parse-architecture/sankey-live-runtime/candidate-package"
+  },
+  "checks": [
+    {
+      "runtime": "control",
+      "case": "sankey/small",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "prepareCalls": 0,
+      "applies": [],
+      "jobs": [],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "flowchart/medium",
+      "modelType": "flowchart",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "prepareCalls": 0,
+      "applies": [],
+      "jobs": [],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/medium",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "prepareCalls": 0,
+      "applies": [],
+      "jobs": [],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/large",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null,
+      "update": null,
+      "updateCalls": 0,
+      "prepareCalls": 0,
+      "applies": [],
+      "jobs": [],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/small",
+      "modelType": "sankey",
+      "expected": "PLCSRC03",
+      "actual": "PLCSRC03",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC03",
+        "layoutId": "1",
+        "revision": "0",
+        "canonicalBytes": 1172,
+        "recipeBytes": 1084,
+        "type": "sankey"
+      },
+      "update": {
+        "capability": "PLCSRU01",
+        "layoutId": "1",
+        "revision": "3",
+        "canonicalBytes": 1172,
+        "recipeBytes": 53
+      },
+      "updateCalls": 1,
+      "prepareCalls": 1,
+      "applies": [
+        {
+          "method": "apply_source_input",
+          "revision": "2"
+        }
+      ],
+      "jobs": [
+        {
+          "runs": 1,
+          "finishes": 1,
+          "materialized": 1,
+          "revision": "1",
+          "graphBytes": 1172,
+          "metadataBytes": 4984
+        }
+      ],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "flowchart/medium",
+      "modelType": "flowchart",
+      "expected": null,
+      "actual": null,
+      "calls": 1,
+      "metadata": {
+        "capability": null
+      },
+      "update": null,
+      "updateCalls": 0,
+      "prepareCalls": 1,
+      "applies": [],
+      "jobs": [],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/medium",
+      "modelType": "sankey",
+      "expected": "PLCSRC03",
+      "actual": "PLCSRC03",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC03",
+        "layoutId": "2",
+        "revision": "0",
+        "canonicalBytes": 5804,
+        "recipeBytes": 2756,
+        "type": "sankey"
+      },
+      "update": {
+        "capability": "PLCSRU01",
+        "layoutId": "2",
+        "revision": "3",
+        "canonicalBytes": 5804,
+        "recipeBytes": 53
+      },
+      "updateCalls": 1,
+      "prepareCalls": 1,
+      "applies": [
+        {
+          "method": "apply_source_input",
+          "revision": "2"
+        }
+      ],
+      "jobs": [
+        {
+          "runs": 1,
+          "finishes": 1,
+          "materialized": 1,
+          "revision": "1",
+          "graphBytes": 5804,
+          "metadataBytes": 26768
+        }
+      ],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/large",
+      "modelType": "sankey",
+      "expected": "PLCSRC03",
+      "actual": "PLCSRC03",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC03",
+        "layoutId": "3",
+        "revision": "0",
+        "canonicalBytes": 23836,
+        "recipeBytes": 9540,
+        "type": "sankey"
+      },
+      "update": {
+        "capability": "PLCSRU01",
+        "layoutId": "3",
+        "revision": "3",
+        "canonicalBytes": 23836,
+        "recipeBytes": 53
+      },
+      "updateCalls": 1,
+      "prepareCalls": 1,
+      "applies": [
+        {
+          "method": "apply_source_input",
+          "revision": "2"
+        }
+      ],
+      "jobs": [
+        {
+          "runs": 1,
+          "finishes": 1,
+          "materialized": 1,
+          "revision": "1",
+          "graphBytes": 23836,
+          "metadataBytes": 110250
+        }
+      ],
+      "legacyRenderCalls": 0,
+      "publicRetainedRender": true
+    }
+  ],
+  "selectors": false,
+  "directParseSPI": false,
+  "probeInsideTimer": false,
+  "browser": "156.0.8078.4",
+  "prototypesRestored": true,
+  "retainedUpdateIdentitiesVerified": true,
+  "readonlyJobsVerified": true,
+  "succeeded": true,
+  "browserClosedBeforeTiming": true,
+  "completedAt": "2026-10-20T20:31:12.736Z"
+}

@@ -78,3 +78,6 @@ impl DiagramModule for Class {
 
 mod public_model;
 pub use public_model::ClassPublicState;
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, ClassDetachedInput};

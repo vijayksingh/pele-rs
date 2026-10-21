@@ -1,13 +1,67 @@
-use super::{
-    Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph, ModelSchema, ModelSchemaView,
-    PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
+use super::detached_render::{
+    self, DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion,
+    DetachedRenderJob, DetachedRenderOutcome, DetachedRenderRequest, RenderBook,
 };
+use super::graph_read::{GraphReadView, PublicGraphRead};
+use super::{
+    schema::CompiledSchema, Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph,
+    ModelSchema, ModelSchemaView, PrototypeId, PublicConstructorFactory, PublicError,
+    RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
+};
+use super::{
+    ConstructorArgument, DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation,
+};
+use crate::compat::engine::{ParseAdmission, ParsePlan};
 use crate::compat::{
     DiagramId, DiagramModule, EdgeLimit, Engine, ErrorCode, ModuleDescriptor, Object, OutputLimit,
     ParseContext, ParseLimits, ParseOptions, PeleError, RenderOptions, RenderResources,
     RenderResult, RenderSettings, Rendered, SourceLimit,
 };
-use std::{any::Any, sync::Arc};
+use std::{
+    any::{Any, TypeId},
+    borrow::Cow,
+    sync::{Arc, Mutex, OnceLock},
+};
+/// Owned output of a captured parser, with its exact public-construction policy.
+/// The engine alone creates this carrier. Model type or schema identity does not
+/// certify which module parsed it; delegates must check concrete provenance.
+pub struct ParsedPublicModel<M> {
+    model: M,
+    creator: TypeId,
+    prepared: bool,
+    edge_limit: Option<EdgeLimit>,
+}
+impl<M> ParsedPublicModel<M> {
+    pub fn model(&self) -> &M {
+        &self.model
+    }
+    pub fn is_prepared(&self) -> bool {
+        self.prepared
+    }
+    pub fn edge_limit(&self) -> Option<EdgeLimit> {
+        self.edge_limit
+    }
+    /// True only for the concrete module paired with the captured parser.
+    pub fn is_from_module<D: DiagramModule>(&self) -> bool {
+        self.creator == TypeId::of::<D>()
+    }
+    pub fn into_model(self) -> M {
+        self.model
+    }
+    /// Preserve the existing borrowed construction hooks and their dispatch order.
+    pub fn create_legacy<D>(self, module: &D) -> Result<D::PublicState, PeleError>
+    where
+        D: PublicDiagramModule<Model = M> + ?Sized,
+    {
+        if self.prepared {
+            module.create_public_prepared(&self.model, self.edge_limit.expect("prepared policy"))
+        } else if let Some(limit) = self.edge_limit {
+            module.create_public_with_edge_limit(&self.model, limit)
+        } else {
+            module.create_public(&self.model)
+        }
+    }
+}
 /// Typed codec opt-in. Parsing, geometry and rendering remain in the native module.
 pub trait PublicDiagramModule: DiagramModule {
     type PublicState: Send + 'static;
@@ -20,6 +74,46 @@ pub trait PublicDiagramModule: DiagramModule {
     fn function_shapes(&self) -> &'static [FunctionShape] {
         &[]
     }
+    /// Captured class construction is distinct from typed adaptation and parse.
+    /// Only an authentic builtin creator can authorize the opaque factory.
+    #[doc(hidden)]
+    fn public_constructor(
+        &self,
+        _prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        None
+    }
+    /// Owned builtin method phases; no mutable document borrow reaches the host.
+    #[doc(hidden)]
+    fn detached_public_invocation(&self, _call: MethodCall) -> Option<DetachedPublicInvocation> {
+        None
+    }
+    /// Optional callback-free implementation of a declared prototype getter.
+    /// The captured module owns dispatch and validates its receiver. Returning
+    /// None leaves the host's existing unsupported-accessor behavior unchanged.
+    #[doc(hidden)]
+    fn read_public_getter(
+        &self,
+        _state: &Self::PublicState,
+        _receiver: &Atom,
+        _method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>> {
+        None
+    }
+    /// Callback-free owner access used by an active host facade between yields.
+    #[doc(hidden)]
+    fn active_public_operation(
+        &self,
+        _state: &mut Self::PublicState,
+        _operation: super::PublicActiveOperation,
+        _budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError> {
+        Err(PeleError::new(
+            "Owned active model access is unavailable",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
     /// Method IDs, receiver identity and arguments come from this document's
     /// current arena. The module owns native behavior, including partial edits.
     fn invoke_public(
@@ -31,7 +125,29 @@ pub trait PublicDiagramModule: DiagramModule {
     ) -> Result<Atom, PublicError> {
         Err(PeleError::new("Public model methods are unavailable", ErrorCode::Semantic).into())
     }
+    /// Optional eager parser for fresh public state. Returning None leaves the
+    /// established typed-parse/create sequence intact. An implementation must
+    /// preserve all parse errors, admission limits and final public behavior;
+    /// it may not publish state or invoke host code before returning None.
+    /// Only ordinary textual parse calls use this hook; raw prepared input and
+    /// adaptation of existing typed models retain their existing interfaces.
+    fn try_parse_public(
+        &self,
+        _context: ParseContext<'_>,
+        _edge_limit: Option<EdgeLimit>,
+    ) -> Option<Result<Self::PublicState, PeleError>> {
+        None
+    }
     fn create_public(&self, model: &Self::Model) -> Result<Self::PublicState, PeleError>;
+    /// Consume a captured parser result. The default preserves all existing
+    /// borrowed hooks. Opt-ins must preserve eager projection admission and
+    /// normalization; arbitrary typed adaptation never calls this hook.
+    fn create_public_parsed(
+        &self,
+        parsed: ParsedPublicModel<Self::Model>,
+    ) -> Result<Self::PublicState, PeleError> {
+        parsed.create_legacy(self)
+    }
     /// Construct this module's real mutable state directly from a caller arena.
     /// No source parsing, seeded model or missing-property defaults are implied.
     fn create_public_from_graph(&self, _graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
@@ -59,6 +175,48 @@ pub trait PublicDiagramModule: DiagramModule {
         self.create_public_with_edge_limit(model, limit)
     }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError>;
+    /// Optional allocation-free export of the same graph as `export_public`.
+    /// Opt in only when export has no additional observable work or failures;
+    /// document snapshots still validate this graph against the retained schema.
+    fn has_source_layout(&self, _state: &Self::PublicState) -> bool {
+        false
+    }
+    /// Additive logical export. Existing providers retain their original export path.
+    fn borrow_public_read<'a>(
+        &self,
+        _state: &'a Self::PublicState,
+    ) -> Option<&'a dyn PublicGraphRead> {
+        None
+    }
+    fn borrow_public_graph<'a>(&self, _state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        None
+    }
+    /// Whether a host may omit reapplying its exactly acknowledged graph.
+    /// Applying identical data must have no semantic effects beyond refreshing
+    /// graph-derived caches. This never changes `PublicDocument::apply` itself
+    /// or its revision advancement; extensions conservatively remain opted out.
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        false
+    }
+    /// Optional sealed source ingress. The captured codec verifies concrete
+    /// creator provenance; default providers keep their existing apply hook.
+    #[doc(hidden)]
+    fn source_ingress<'a>(
+        &self,
+        _state: &'a mut Self::PublicState,
+    ) -> Option<super::SourceIngress<'a>> {
+        None
+    }
+    /// Sealed metadata-only builtin capability. Discovery cannot evaluate state.
+    #[doc(hidden)]
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        None
+    }
+    /// Owned render input; creator provenance is checked by the captured codec.
+    #[doc(hidden)]
+    fn detached_public_render(&self, _state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        None
+    }
     fn apply_public(
         &self,
         state: &mut Self::PublicState,
@@ -214,9 +372,47 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
 }
 type State = Box<dyn Any + Send>;
 trait Erased: Send + Sync {
-    fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError>;
+    #[cfg(feature = "web-host-er")]
+    fn is_host_er(&self) -> bool;
+    #[cfg(feature = "web-host-sankey")]
+    fn is_host_sankey(&self) -> bool;
+    fn try_parse_public(
+        &self,
+        context: ParseContext<'_>,
+        edge_limit: Option<EdgeLimit>,
+    ) -> Option<Result<State, PeleError>>;
+    fn create_owned(
+        &self,
+        doc: crate::compat::ParsedDocument,
+    ) -> Result<(State, Object), PeleError>;
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
+    fn constructor(&self, prototype: PrototypeId) -> Option<Constructor>;
+    fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation>;
+    fn read_getter(
+        &self,
+        state: &State,
+        receiver: &Atom,
+        method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>>;
+    fn active_operation(
+        &self,
+        state: &mut State,
+        operation: super::PublicActiveOperation,
+        budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError>;
+
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
+    fn borrow_graph<'a>(&self, state: &'a State) -> Option<&'a ModelGraph>;
+    fn has_source_layout(&self, state: &State) -> bool;
+    fn borrow_read<'a>(&self, state: &'a State) -> Option<&'a dyn PublicGraphRead>;
+    fn unchanged_public_graph_is_noop(&self) -> bool;
+    fn source_ingress<'a>(&self, state: &'a mut State) -> Option<super::SourceIngress<'a>>;
+    fn detached_capability(&self) -> Option<DetachedRenderCapability>;
+    fn detached_input(
+        &self,
+        state: &State,
+        capability: &DetachedRenderCapability,
+    ) -> Option<DetachedPublicRender>;
     fn apply(&self, state: &mut State, graph: ModelGraph) -> Result<(), PeleError>;
     fn invoke(
         &self,
@@ -257,25 +453,132 @@ trait Erased: Send + Sync {
 }
 struct Codec<D>(Arc<D>);
 impl<D: PublicDiagramModule> Erased for Codec<D> {
-    fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError> {
-        let model = doc.model::<D::Model>().expect("paired public codec");
-        if doc.is_prepared() {
-            return Ok(Box::new(self.0.create_public_prepared(
-                model,
-                doc.edge_limit().expect("prepared policy"),
-            )?));
-        }
-        Ok(Box::new(match doc.edge_limit() {
-            Some(limit) => self.0.create_public_with_edge_limit(model, limit)?,
-            None => self.0.create_public(model)?,
-        }))
+    #[cfg(feature = "web-host-sankey")]
+    fn is_host_sankey(&self) -> bool {
+        TypeId::of::<D>() == TypeId::of::<crate::compat::diagrams::sankey::Sankey>()
+    }
+
+    #[cfg(feature = "web-host-er")]
+    fn is_host_er(&self) -> bool {
+        std::any::TypeId::of::<D>() == std::any::TypeId::of::<crate::compat::diagrams::er::Er>()
+    }
+    fn try_parse_public(
+        &self,
+        context: ParseContext<'_>,
+        edge_limit: Option<EdgeLimit>,
+    ) -> Option<Result<State, PeleError>> {
+        self.0
+            .try_parse_public(context, edge_limit)
+            .map(|result| result.map(|state| Box::new(state) as State))
+    }
+    fn create_owned(
+        &self,
+        doc: crate::compat::ParsedDocument,
+    ) -> Result<(State, Object), PeleError> {
+        doc.into_public_state::<D::Model, _>(|model, prepared, edge_limit| {
+            self.0
+                .create_public_parsed(ParsedPublicModel {
+                    model,
+                    creator: TypeId::of::<D>(),
+                    prepared,
+                    edge_limit,
+                })
+                .map(|state| Box::new(state) as State)
+        })
     }
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError> {
         Ok(Box::new(self.0.create_public_from_graph(graph)?))
     }
+    fn constructor(&self, prototype: PrototypeId) -> Option<Constructor> {
+        let factory = self
+            .0
+            .public_constructor(prototype)?
+            .for_creator::<D>(prototype)?;
+        let factory = Arc::new(factory);
+        let synchronous = factory.clone();
+        Some(Constructor {
+            class: factory.class_id(),
+            state: TypeId::of::<D::PublicState>(),
+            ignores_arguments: factory.ignores_arguments(),
+            argument_transfers: factory.argument_transfers(),
+            arity: factory.arity(),
+            live_fields: factory.live_fields(),
+            construct: Box::new(move |argument| {
+                synchronous
+                    .construct(argument)
+                    .map(|state| Box::new(state) as State)
+            }),
+            begin: Box::new(move |argument| {
+                factory
+                    .begin_arguments(argument)
+                    .map(|(state, program)| (Box::new(state) as State, program))
+            }),
+        })
+    }
+    fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        self.0.detached_public_invocation(call)?.for_creator::<D>()
+    }
+    fn read_getter(
+        &self,
+        state: &State,
+        receiver: &Atom,
+        method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>> {
+        self.0.read_public_getter(
+            state.downcast_ref().expect("paired public state"),
+            receiver,
+            method,
+        )
+    }
+    fn active_operation(
+        &self,
+        state: &mut State,
+        operation: super::PublicActiveOperation,
+        budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError> {
+        self.0.active_public_operation(
+            state.downcast_mut().expect("paired public state"),
+            operation,
+            budget,
+        )
+    }
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
             .export_public(s.downcast_ref().expect("paired public state"))
+    }
+    fn has_source_layout(&self, s: &State) -> bool {
+        self.0
+            .has_source_layout(s.downcast_ref().expect("paired public state"))
+    }
+    fn borrow_read<'a>(&self, s: &'a State) -> Option<&'a dyn PublicGraphRead> {
+        self.0
+            .borrow_public_read(s.downcast_ref().expect("paired public state"))
+    }
+    fn borrow_graph<'a>(&self, s: &'a State) -> Option<&'a ModelGraph> {
+        self.0
+            .borrow_public_graph(s.downcast_ref().expect("paired public state"))
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        self.0.unchanged_public_graph_is_noop()
+    }
+    fn source_ingress<'a>(&self, s: &'a mut State) -> Option<super::SourceIngress<'a>> {
+        self.0
+            .source_ingress(s.downcast_mut().expect("paired public state"))?
+            .for_creator::<D>()
+    }
+    fn detached_capability(&self) -> Option<DetachedRenderCapability> {
+        self.0
+            .detached_public_render_capability()?
+            .for_creator::<D>()
+    }
+    fn detached_input(
+        &self,
+        state: &State,
+        capability: &DetachedRenderCapability,
+    ) -> Option<DetachedPublicRender> {
+        self.0
+            .detached_public_render(state.downcast_ref().expect("paired public state"))?
+            .for_creator::<D>(capability)
     }
     fn apply(&self, s: &mut State, g: ModelGraph) -> Result<(), PeleError> {
         self.0
@@ -346,12 +649,259 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .render_public(s.downcast_mut().expect("paired public state"), c, o, h)
     }
 }
-struct Registration {
-    descriptor: ModuleDescriptor,
+struct Constructor {
+    class: TypeId,
+    state: TypeId,
+    ignores_arguments: bool,
+    argument_transfers: &'static [super::ConstructorArgumentTransfer],
+    arity: u32,
+    live_fields: &'static [super::LiveConstructorField],
+    construct: Box<dyn Fn(ConstructorArgument) -> Result<State, PeleError> + Send + Sync>,
+    begin: Box<
+        dyn Fn(
+                [ConstructorArgument; 2],
+            ) -> Result<(State, Option<DetachedPublicInvocation>), PeleError>
+            + Send
+            + Sync,
+    >,
+}
+/// An authentic class factory retaining its original module registration.
+/// Registry replacement or destruction does not invalidate a captured factory.
+/// Each construction owns independent native state; it never parses source.
+pub struct CapturedPublicConstructor {
+    registration: Arc<Registration>,
+    prototype: PrototypeId,
+    constructor: Constructor,
+}
+impl CapturedPublicConstructor {
+    /// Bind this retained raw renderer only to an authentic compatible class
+    /// and the exact erased state type. The document keeps its original owner.
+    pub fn accepts_raw_document(&self, document: &PublicDocument) -> bool {
+        let Some(owner) = document.registration.codec.constructor(self.prototype) else {
+            return false;
+        };
+        if owner.class != self.constructor.class
+            || owner.state != self.constructor.state
+            || document.state.as_ref().type_id() != self.constructor.state
+        {
+            return false;
+        }
+        let Ok(view) = document.read_view() else {
+            return false;
+        };
+        let reader = view.reader();
+        let Atom::Ref(root) = reader.root() else {
+            return false;
+        };
+        matches!(reader.header(root as usize), Ok(super::captured_admission::Header {
+            kind: super::captured_admission::AdmissionKind::Instance(prototype), ..
+        }) if prototype == self.prototype)
+    }
+    pub fn render_raw_operation_view<'a>(
+        &self,
+        document: &'a mut PublicDocument,
+        revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<RawRenderOutcomeView<'a>, PeleError> {
+        if !self.accepts_raw_document(document) {
+            return Err(PeleError::new(
+                "Raw diagram render requires a model of this diagram",
+                ErrorCode::Semantic,
+            ));
+        }
+        document
+            .render_raw_with_registration(
+                revision,
+                config,
+                settings,
+                host,
+                GraphExport::Borrowed,
+                self.registration.clone(),
+            )
+            .and_then(ReadOutcome::into_raw_view)
+    }
+    pub fn prototype(&self) -> PrototypeId {
+        self.prototype
+    }
+    /// Diagram descriptor retained with this authentic registration.
+    pub fn diagram_type(&self) -> &DiagramId {
+        &self.registration.descriptor.id
+    }
+    pub fn schema_view(&self) -> ModelSchemaView {
+        ModelSchemaView {
+            model: self.registration.schema,
+            shared_functions: self.registration.shared_functions,
+            function_shapes: self.registration.function_shapes,
+        }
+    }
+    /// Creator-authenticated fields evaluated only by native-requested host reads.
+    pub fn live_fields(&self) -> &'static [super::LiveConstructorField] {
+        self.constructor.live_fields
+    }
+    pub fn ignores_arguments(&self) -> bool {
+        self.constructor.ignores_arguments
+    }
+    pub fn arity(&self) -> u32 {
+        self.constructor.arity
+    }
+    /// Names and shared host identity selected only after creator authentication.
+    #[doc(hidden)]
+    pub fn reflection(&self) -> Option<super::ConstructorReflection> {
+        super::ConstructorReflection::for_class(self.constructor.class, self.prototype)
+    }
+
+    pub fn argument_count(&self) -> u32 {
+        self.argument_transfers().len() as u32
+    }
+    /// Transfer policy without inspecting arguments or consulting host type names.
+    pub fn argument_transfers(&self) -> &'static [super::ConstructorArgumentTransfer] {
+        self.constructor.argument_transfers
+    }
+    pub fn begin_construct_with(
+        &self,
+        argument: ConstructorArgument,
+    ) -> Result<super::PublicConstructionJob, PeleError> {
+        self.begin_construct_with_arguments([argument, ConstructorArgument::Undefined])
+    }
+    pub fn begin_construct_with_arguments(
+        &self,
+        argument: [ConstructorArgument; 2],
+    ) -> Result<super::PublicConstructionJob, PeleError> {
+        self.schema_view().validate()?;
+        if argument
+            .iter()
+            .take(self.argument_count() as usize)
+            .any(|value| matches!(value, ConstructorArgument::Graph(_)))
+        {
+            return Err(PeleError::new(
+                "Graph coordinates require an existing owner",
+                ErrorCode::Semantic,
+            ));
+        }
+        let (state, program) = (self.constructor.begin)(argument)?;
+        let document = PublicDocument {
+            registration: self.registration.clone(),
+            state,
+            config: Object::default(),
+            revision: 0,
+            render_book: None,
+            constructor_created: true,
+        };
+        document.snapshot_read()?;
+        super::PublicConstructionJob::new(document, program)
+    }
+    pub fn construct(&self) -> Result<PublicDocument, PeleError> {
+        self.construct_with(ConstructorArgument::Undefined)
+    }
+    /// A foreign token belongs to the caller's retained owner ledger. It is not
+    /// an instruction to traverse or serialize the referenced object.
+    pub fn construct_with(
+        &self,
+        argument: ConstructorArgument,
+    ) -> Result<PublicDocument, PeleError> {
+        self.schema_view().validate()?;
+        if !self.ignores_arguments() && matches!(argument, ConstructorArgument::Graph(_)) {
+            return Err(PeleError::new(
+                "Graph coordinates require an existing owner",
+                ErrorCode::Semantic,
+            ));
+        }
+        let document = PublicDocument {
+            registration: self.registration.clone(),
+            state: (self.constructor.construct)(argument)?,
+            config: Object::default(),
+            revision: 0,
+            render_book: None,
+            constructor_created: true,
+        };
+        // Publication receives an admitted, ready owner, not a deferred parser
+        // or an unvalidated empty model. Wire-size admission remains at export.
+        document.snapshot_read()?;
+        Ok(document)
+    }
+}
+
+pub(super) struct Registration {
+    pub(super) descriptor: ModuleDescriptor,
     schema: &'static ModelSchema,
+    compiled_schema: OnceLock<Result<CompiledSchema, PeleError>>,
     shared_functions: &'static [SharedFunction],
     function_shapes: &'static [FunctionShape],
     codec: Box<dyn Erased>,
+}
+impl Registration {
+    fn capture_constructor(
+        self: &Arc<Self>,
+        prototype: PrototypeId,
+    ) -> Option<CapturedPublicConstructor> {
+        let constructor = self.codec.constructor(prototype)?;
+        Some(CapturedPublicConstructor {
+            registration: self.clone(),
+            prototype,
+            constructor,
+        })
+    }
+    fn compiled_schema(&self) -> Result<&CompiledSchema, PeleError> {
+        // Register stays infallible. Cache validation (including its error) only
+        // where this captured schema would already have been checked.
+        self.compiled_schema
+            .get_or_init(|| CompiledSchema::new(self.schema))
+            .as_ref()
+            .map_err(Clone::clone)
+    }
+    fn validate_read(&self, graph: &GraphReadView<'_>) -> Result<(), PeleError> {
+        match graph {
+            GraphReadView::Arena(g) => self.validate_graph(g),
+            GraphReadView::Logical(g) => {
+                let schema = self.compiled_schema()?;
+                super::graph_read::validate_schema(*g, self.schema, schema)
+            }
+        }
+    }
+    fn validate_graph(&self, graph: &ModelGraph) -> Result<(), PeleError> {
+        graph.validate_compiled(self.compiled_schema()?)
+    }
+}
+// Retains the authentic selected registration, without retaining a model or
+// consulting the current registry when a host-created class is later captured.
+#[cfg(feature = "web-host-er")]
+pub(crate) struct HostErConstructorRegistration(Arc<Registration>);
+#[cfg(feature = "web-host-er")]
+impl HostErConstructorRegistration {
+    pub(crate) fn capture_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<CapturedPublicConstructor> {
+        self.0.capture_constructor(prototype)
+    }
+}
+/// Captured builtin-only raw entry policy. Contains no host values or model.
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub struct HostErEntrySelection {
+    registration: Arc<Registration>,
+}
+#[cfg(feature = "web-host-er")]
+impl HostErEntrySelection {
+    pub fn schema(&self) -> ModelSchemaView {
+        ModelSchemaView {
+            model: self.registration.schema,
+            shared_functions: self.registration.shared_functions,
+            function_shapes: self.registration.function_shapes,
+        }
+    }
+    /// Called after the adapter's structural admission and config decoding.
+    /// No registration lookup or drawable import occurs at this boundary.
+    pub fn bind(&self, config: Object) -> Result<crate::compat::host_er::Policy, PeleError> {
+        self.registration.compiled_schema()?;
+        Ok(crate::compat::host_er::Policy::captured(
+            self.registration.descriptor.clone(),
+            config,
+            HostErConstructorRegistration(self.registration.clone()),
+        ))
+    }
 }
 #[derive(Default)]
 pub struct PublicEngine {
@@ -441,6 +991,7 @@ impl PublicEngine {
         let registration = Arc::new(Registration {
             descriptor,
             schema,
+            compiled_schema: OnceLock::new(),
             shared_functions,
             function_shapes,
             codec: Box::new(Codec(shared)),
@@ -456,7 +1007,10 @@ impl PublicEngine {
         }
     }
     pub fn parse(&self, source: &str, options: &ParseOptions) -> Result<PublicDocument, PeleError> {
-        self.create_document(self.engine.parse(source, options)?)
+        self.parse_plan(
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Legacy)?,
+        )
     }
     /// Parse through the retained native codec with an exact number-valued
     /// source limit. Only the legacy source limit is overridden.
@@ -466,10 +1020,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limit: SourceLimit,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(
-            self.engine
-                .parse_with_source_limit(source, options, limit)?,
-        )
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            None,
+            ParseAdmission::Source(limit),
+        )?)
     }
     pub fn parse_with_limits(
         &self,
@@ -477,7 +1033,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limits: ParseLimits,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(self.engine.parse_with_limits(source, options, limits)?)
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            None,
+            ParseAdmission::Limits(limits),
+        )?)
     }
     pub fn parse_prepared_as(
         &self,
@@ -486,6 +1047,64 @@ impl PublicEngine {
         edge_limit: EdgeLimit,
     ) -> Result<PublicDocument, PeleError> {
         self.create_document(self.engine.parse_prepared_as(id, context, edge_limit)?)
+    }
+    /// Facade-only prepared publication. Input is parsed verbatim once; the
+    /// low-level prepared API continues to return a public arena document.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_prepared_host_er_as<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        edge_limit: EdgeLimit,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        self.parse_prepared_host_er_with_constructor(id, context, edge_limit, |schema, _| {
+            make(schema)
+        })
+    }
+    /// Selected creator capability is available before any host publication.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_prepared_host_er_with_constructor<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        edge_limit: EdgeLimit,
+        make: impl FnOnce(ModelSchemaView, Option<CapturedPublicConstructor>) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        let plan = self.engine.prepare_prepared_as(id, context, edge_limit)?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        let document = plan.parse()?;
+        if !registration.codec.is_host_er() {
+            return Self::create_document_registered(document, registration)
+                .map(crate::compat::host_er::Parsed::Arena);
+        }
+        let schema = ModelSchemaView {
+            model: registration.schema,
+            shared_functions: registration.shared_functions,
+            function_shapes: registration.function_shapes,
+        };
+        schema.validate()?;
+        let model = document
+            .model::<crate::compat::diagrams::er::ErModel>()
+            .expect("captured builtin ER model");
+        crate::compat::diagrams::er::admit_host_initial(model)?;
+        let output = crate::compat::diagrams::er::publish_host_initial(
+            make(schema, registration.capture_constructor(PrototypeId(1)))?,
+            model,
+        )?;
+        let policy = crate::compat::host_er::Policy::captured(
+            registration.descriptor.clone(),
+            document.config().clone(),
+            HostErConstructorRegistration(registration.clone()),
+        );
+        Ok(crate::compat::host_er::Parsed::Host { policy, output })
     }
     /// Render source through this registry with exact parse limits, without
     /// exporting or importing a public model graph solely to produce SVG.
@@ -511,10 +1130,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limits: ParseLimits,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(
-            self.engine
-                .parse_as_with_limits(id, source, options, limits)?,
-        )
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            Some(id),
+            ParseAdmission::Limits(limits),
+        )?)
     }
     /// Select an extension language without changing the built-in source detector.
     pub fn parse_as(
@@ -523,7 +1144,12 @@ impl PublicEngine {
         source: &str,
         options: &ParseOptions,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(self.engine.parse_as(id, source, options)?)
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            Some(id),
+            ParseAdmission::Legacy,
+        )?)
     }
     /// Select an extension while keeping the public byte budget and exact
     /// source comparison, without changing the extension's ParseContext shape.
@@ -534,10 +1160,12 @@ impl PublicEngine {
         options: &ParseOptions,
         limit: SourceLimit,
     ) -> Result<PublicDocument, PeleError> {
-        self.create_document(
-            self.engine
-                .parse_as_with_source_limit(id, source, options, limit)?,
-        )
+        self.parse_plan(self.engine.prepare_parse(
+            source,
+            options,
+            Some(id),
+            ParseAdmission::Source(limit),
+        )?)
     }
     /// Schema for an explicitly selected registered provider, without parsing.
     pub fn schema_for(&self, id: &DiagramId) -> Result<ModelSchemaView, PeleError> {
@@ -547,6 +1175,19 @@ impl PublicEngine {
             shared_functions: registration.shared_functions,
             function_shapes: registration.function_shapes,
         })
+    }
+    /// Private browser adoption selects by captured concrete codec identity.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn select_host_er_entry(
+        &self,
+        id: &DiagramId,
+    ) -> Result<Option<HostErEntrySelection>, PeleError> {
+        let registration = self.graph_registration(id)?;
+        Ok(registration
+            .codec
+            .is_host_er()
+            .then_some(HostErEntrySelection { registration }))
     }
     fn graph_registration(&self, id: &DiagramId) -> Result<Arc<Registration>, PeleError> {
         self.modules
@@ -562,6 +1203,16 @@ impl PublicEngine {
                 error
             })
     }
+    /// Capture a concrete builtin class factory, without parsing or creating a
+    /// document. Extensions with copied schemas or forwarded factories cannot
+    /// acquire builtin constructor authority.
+    pub fn capture_constructor(
+        &self,
+        id: &DiagramId,
+        prototype: PrototypeId,
+    ) -> Result<Option<CapturedPublicConstructor>, PeleError> {
+        Ok(self.graph_registration(id)?.capture_constructor(prototype))
+    }
     /// Construct an owned native model from supplied graph data. Registration
     /// selection is explicit and remains retained across replacement or drop.
     pub fn create_from_graph_as(
@@ -571,14 +1222,135 @@ impl PublicEngine {
         config: Object,
     ) -> Result<PublicDocument, PeleError> {
         let registration = self.graph_registration(id)?;
-        graph.validate_schema(registration.schema)?;
+        registration.validate_graph(&graph)?;
         let state = registration.codec.create_graph(graph)?;
         Ok(PublicDocument {
             registration,
             state,
             config,
             revision: 0,
+            render_book: None,
+            constructor_created: false,
         })
+    }
+    /// Captured builtin-only browser construction; fallback consumes the same
+    /// prepared plan once. Existing low-level parse methods remain arena-based.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_host_er_with_limits<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        mut make: impl FnMut(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        self.parse_host_er_with_constructor(source, options, limits, |schema, _| make(schema))
+    }
+    /// Retains the exact selected registration through direct/fallback publication.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_host_er_with_constructor<W: crate::compat::host_er::InitialWriter>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        make: impl FnMut(ModelSchemaView, Option<CapturedPublicConstructor>) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        let plan =
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Limits(limits))?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        if !registration.codec.is_host_er() {
+            return self
+                .parse_plan(plan)
+                .map(crate::compat::host_er::Parsed::Arena);
+        }
+        Self::parse_host_er_plan(plan, registration, make)
+    }
+    #[cfg(feature = "web-host-er")]
+    fn parse_host_er_plan<W: super::InitialWriter>(
+        plan: ParsePlan,
+        registration: Arc<Registration>,
+        mut make: impl FnMut(ModelSchemaView, Option<CapturedPublicConstructor>) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_er::Parsed<W::Output>, PeleError> {
+        let schema = ModelSchemaView {
+            model: registration.schema,
+            shared_functions: registration.shared_functions,
+            function_shapes: registration.function_shapes,
+        };
+        let writer = make(schema, registration.capture_constructor(PrototypeId(1)))?;
+        match crate::compat::diagrams::er::parse_host_into(plan.context(), writer) {
+            Some(result) => {
+                let output = result?;
+                schema.validate()?;
+                let policy = crate::compat::host_er::Policy::captured(
+                    registration.descriptor.clone(),
+                    plan.into_config(),
+                    HostErConstructorRegistration(registration.clone()),
+                );
+                Ok(crate::compat::host_er::Parsed::Host { policy, output })
+            }
+            None => {
+                // Direct construction has discarded its unpublished owner. Keep
+                // the captured plan and run the existing grammar exactly once.
+                let document = plan.parse()?;
+                schema.validate()?;
+                let model = document
+                    .model::<crate::compat::diagrams::er::ErModel>()
+                    .expect("captured builtin ER model");
+                // Preserve legacy GraphWriter/facade admission before host
+                // primitives can reject a partial large publication earlier.
+                crate::compat::diagrams::er::admit_host_initial(model)?;
+                let output = crate::compat::diagrams::er::publish_host_initial(
+                    make(schema, registration.capture_constructor(PrototypeId(1)))?,
+                    model,
+                )?;
+                let policy = crate::compat::host_er::Policy::captured(
+                    registration.descriptor.clone(),
+                    document.config().clone(),
+                    HostErConstructorRegistration(registration.clone()),
+                );
+                // The typed model is transient; neither the policy nor output
+                // retains it, a public graph, or a later conversion obligation.
+                Ok(crate::compat::host_er::Parsed::Host { policy, output })
+            }
+        }
+    }
+    fn parse_plan(&self, plan: ParsePlan) -> Result<PublicDocument, PeleError> {
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        match registration
+            .codec
+            .try_parse_public(plan.context(), plan.edge_limit())
+        {
+            Some(result) => {
+                let state = result?;
+                ModelSchemaView {
+                    model: registration.schema,
+                    shared_functions: registration.shared_functions,
+                    function_shapes: registration.function_shapes,
+                }
+                .validate()?;
+                Ok(PublicDocument {
+                    registration,
+                    state,
+                    config: plan.into_config(),
+                    revision: 0,
+                    render_book: None,
+                    constructor_created: false,
+                })
+            }
+            None => self.create_document(plan.parse()?),
+        }
     }
     fn create_document(
         &self,
@@ -590,18 +1362,26 @@ impl PublicEngine {
             .find(|m| m.descriptor.id == *document.diagram_type())
             .expect("paired public registration")
             .clone();
+        Self::create_document_registered(document, registration)
+    }
+    fn create_document_registered(
+        document: crate::compat::ParsedDocument,
+        registration: Arc<Registration>,
+    ) -> Result<PublicDocument, PeleError> {
         ModelSchemaView {
             model: registration.schema,
             shared_functions: registration.shared_functions,
             function_shapes: registration.function_shapes,
         }
         .validate()?;
-        let state = registration.codec.create(&document)?;
+        let (state, config) = registration.codec.create_owned(document)?;
         Ok(PublicDocument {
             registration,
             state,
-            config: document.config().clone(),
+            config,
             revision: 0,
+            render_book: None,
+            constructor_created: false,
         })
     }
 }
@@ -611,14 +1391,182 @@ pub struct RawRenderOutcome {
     pub graph: ModelGraph,
     pub result: Result<Rendered, PublicError>,
 }
+/// Validated post-render graph view. The graph stays borrowed only when the
+/// captured module supports borrowed export; extension fallback remains owned.
+#[derive(Debug)]
+pub struct RenderOutcomeView<'a> {
+    pub revision: u64,
+    pub graph: Cow<'a, ModelGraph>,
+    pub result: Result<RenderResult, PublicError>,
+}
+impl RenderOutcomeView<'_> {
+    fn into_owned(self) -> RenderOutcome {
+        RenderOutcome {
+            revision: self.revision,
+            graph: self.graph.into_owned(),
+            result: self.result,
+        }
+    }
+}
+/// Raw low-level render equivalent of RenderOutcomeView.
+#[derive(Debug)]
+pub struct RawRenderOutcomeView<'a> {
+    pub revision: u64,
+    pub graph: Cow<'a, ModelGraph>,
+    pub result: Result<Rendered, PublicError>,
+}
+impl RawRenderOutcomeView<'_> {
+    fn into_owned(self) -> RawRenderOutcome {
+        RawRenderOutcome {
+            revision: self.revision,
+            graph: self.graph.into_owned(),
+            result: self.result,
+        }
+    }
+}
+/// Validated logical post-state. Its borrow is independent of resources.
+#[derive(Debug)]
+pub struct ReadOutcome<'a, T> {
+    pub revision: u64,
+    pub graph: GraphReadView<'a>,
+    pub result: Result<T, PublicError>,
+}
+impl<'a> ReadOutcome<'a, RenderResult> {
+    fn into_render_view(self) -> Result<RenderOutcomeView<'a>, PeleError> {
+        Ok(RenderOutcomeView {
+            revision: self.revision,
+            graph: self.graph.into_model()?,
+            result: self.result,
+        })
+    }
+}
+impl<'a> ReadOutcome<'a, Rendered> {
+    fn into_raw_view(self) -> Result<RawRenderOutcomeView<'a>, PeleError> {
+        Ok(RawRenderOutcomeView {
+            revision: self.revision,
+            graph: self.graph.into_model()?,
+            result: self.result,
+        })
+    }
+}
+#[derive(Clone, Copy)]
+enum GraphExport {
+    Owned,
+    Borrowed,
+    Logical,
+}
+impl GraphExport {
+    fn finish(self, graph: GraphReadView<'_>) -> Result<GraphReadView<'_>, PeleError> {
+        match self {
+            Self::Logical => Ok(graph),
+            Self::Borrowed => Ok(GraphReadView::Arena(graph.into_model()?)),
+            Self::Owned => Ok(GraphReadView::Arena(Cow::Owned(
+                graph.into_model()?.into_owned(),
+            ))),
+        }
+    }
+}
 /// One serialized mutable operation stream. This type is deliberately not Sync.
 pub struct PublicDocument {
     registration: Arc<Registration>,
     state: State,
     config: Object,
     revision: u64,
+    render_book: Option<Arc<Mutex<RenderBook>>>,
+    constructor_created: bool,
 }
 impl PublicDocument {
+    /// Distinguishes class-created owners from parse/adaptation. Low-level
+    /// document operations remain available; a host core-render facade must not
+    /// treat this as proof that its public parse operation returned the model.
+    pub fn is_constructor_created(&self) -> bool {
+        self.constructor_created
+    }
+    pub fn capture_constructor(&self, prototype: PrototypeId) -> Option<CapturedPublicConstructor> {
+        self.registration.capture_constructor(prototype)
+    }
+    fn next_revision(&self) -> Result<u64, PeleError> {
+        detached_render::next_revision(self.revision, self.render_book.as_ref())
+    }
+    /// Metadata-only discovery; arbitrary forwarded provider capabilities fail.
+    #[doc(hidden)]
+    pub fn has_detached_public_render(&self) -> bool {
+        self.registration.codec.detached_capability().is_some()
+    }
+    /// Creator-authenticated getter metadata for the owned live-reader lane.
+    /// Merely forwarding a builtin schema or another provider's token grants none.
+    #[doc(hidden)]
+    pub fn detached_public_accessors(&self) -> &'static [(PrototypeId, super::MethodId)] {
+        self.registration
+            .codec
+            .detached_capability()
+            .map_or(&[], |capability| capability.live_accessors())
+    }
+    #[doc(hidden)]
+    pub fn has_active_detached_render(&self) -> bool {
+        detached_render::has_active(self.render_book.as_ref())
+    }
+    /// Create an owned job, ending this document borrow before host callbacks.
+    #[doc(hidden)]
+    pub fn prepare_detached_render(
+        &mut self,
+        expected_revision: u64,
+        request: DetachedRenderRequest,
+    ) -> Result<Option<DetachedRenderJob>, PeleError> {
+        let Some(capability) = self.registration.codec.detached_capability() else {
+            return Ok(None);
+        };
+        if expected_revision != self.revision {
+            return Err(PeleError::new(
+                "Stale public model revision",
+                ErrorCode::Semantic,
+            ));
+        }
+        self.next_revision()?;
+        self.snapshot_read()?;
+        let Some(input) = self
+            .registration
+            .codec
+            .detached_input(&self.state, &capability)
+        else {
+            return Ok(None);
+        };
+        let owner = self
+            .render_book
+            .get_or_insert_with(|| Arc::new(Mutex::new(RenderBook::new())));
+        DetachedRenderJob::new(
+            owner,
+            self.revision,
+            self.registration.clone(),
+            self.config.clone(),
+            request,
+            input,
+        )
+        .map(Some)
+    }
+    /// Finish against the latest revision after any nested operations. This
+    /// readonly outcome does not authorize replacing live callback mutations.
+    #[doc(hidden)]
+    pub fn finish_detached_render(
+        &mut self,
+        completion: DetachedRenderCompletion,
+    ) -> Result<DetachedRenderOutcome<'_>, PeleError> {
+        let owner = self.render_book.as_ref().ok_or_else(|| {
+            PeleError::new(
+                "Public render job belongs to another document",
+                ErrorCode::Semantic,
+            )
+        })?;
+        let (next, result, presentation) = completion.finish(owner, self.revision)?;
+        self.revision = next;
+        let graph = self.snapshot_read()?;
+        Ok(DetachedRenderOutcome {
+            revision: next,
+            graph,
+            result,
+            presentation,
+        })
+    }
     /// Adapt an existing typed model without parsing its source again.
     /// The document owns the exact module and effective config supplied here.
     pub fn from_module<D: PublicDiagramModule>(
@@ -641,6 +1589,7 @@ impl PublicDocument {
             registration: Arc::new(Registration {
                 descriptor,
                 schema,
+                compiled_schema: OnceLock::new(),
                 shared_functions,
                 function_shapes,
                 codec: Box::new(Codec(Arc::new(module))),
@@ -648,6 +1597,8 @@ impl PublicDocument {
             state,
             config,
             revision: 0,
+            render_book: None,
+            constructor_created: false,
         })
     }
     /// Construct a concrete provider directly from an arena, without parsing.
@@ -672,6 +1623,7 @@ impl PublicDocument {
             registration: Arc::new(Registration {
                 descriptor,
                 schema,
+                compiled_schema: OnceLock::new(),
                 shared_functions,
                 function_shapes,
                 codec: Box::new(Codec(Arc::new(module))),
@@ -679,6 +1631,8 @@ impl PublicDocument {
             state,
             config,
             revision: 0,
+            render_book: None,
+            constructor_created: false,
         })
     }
     /// Effective parse configuration owned by this retained document.
@@ -687,6 +1641,43 @@ impl PublicDocument {
     }
     pub fn diagram_type(&self) -> &DiagramId {
         &self.registration.descriptor.id
+    }
+    /// Read a native getter selected from this document's prototype schema.
+    /// No state writes, revision advance, publication, or host callback occurs.
+    /// The returned string owns its UTF-16; graph atoms retain current IDs.
+    #[doc(hidden)]
+    pub fn read_declared_getter(
+        &self,
+        receiver: &Atom,
+        method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>> {
+        self.registration
+            .codec
+            .read_getter(&self.state, receiver, method)
+    }
+    /// Each access is callback-free; a host may release its owner guard on return.
+    /// Mutating failures retain their partial edits and current revision.
+    #[doc(hidden)]
+    pub fn active_operation(
+        &mut self,
+        operation: super::PublicActiveOperation,
+        budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError> {
+        let mutates = operation.mutates();
+        let next = if mutates {
+            Some(self.next_revision()?)
+        } else {
+            None
+        };
+        let result = self
+            .registration
+            .codec
+            .active_operation(&mut self.state, operation, budget);
+        if let Some(next) = next {
+            self.revision = next;
+        }
+        self.snapshot_read()?;
+        result
     }
     pub fn model_schema(&self) -> &'static ModelSchema {
         self.registration.schema
@@ -701,10 +1692,83 @@ impl PublicDocument {
     pub fn revision(&self) -> u64 {
         self.revision
     }
-    pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
-        let graph = self.registration.codec.graph(&self.state)?;
-        graph.validate_schema(self.registration.schema)?;
+    pub fn unchanged_public_graph_is_noop(&self) -> bool {
+        self.registration.codec.unchanged_public_graph_is_noop()
+    }
+    fn graph_view(&self) -> Result<Cow<'_, ModelGraph>, PeleError> {
+        match self.registration.codec.borrow_graph(&self.state) {
+            Some(graph) => Ok(Cow::Borrowed(graph)),
+            None => self.registration.codec.graph(&self.state).map(Cow::Owned),
+        }
+    }
+    /// A validated view, borrowed when the retained module supports it.
+    /// The document cannot mutate while this view is retained. Extensions that
+    /// only implement owned export retain that export and its original errors.
+    pub fn snapshot_view(&self) -> Result<Cow<'_, ModelGraph>, PeleError> {
+        self.snapshot_read()?.into_model()
+    }
+    pub fn has_source_layout(&self) -> bool {
+        self.registration.codec.has_source_layout(&self.state)
+    }
+    fn read_view(&self) -> Result<GraphReadView<'_>, PeleError> {
+        Ok(match self.registration.codec.borrow_read(&self.state) {
+            Some(g) => GraphReadView::Logical(g),
+            None => GraphReadView::Arena(self.graph_view()?),
+        })
+    }
+    pub fn snapshot_read(&self) -> Result<GraphReadView<'_>, PeleError> {
+        let graph = self.read_view()?;
+        self.registration.validate_read(&graph)?;
         Ok(graph)
+    }
+    pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
+        self.snapshot_view().map(Cow::into_owned)
+    }
+    /// Discovery is state-specific and provenance checked, never schema based.
+    #[doc(hidden)]
+    pub fn source_ingress_identity(&mut self) -> Option<u64> {
+        self.registration
+            .codec
+            .source_ingress(&mut self.state)?
+            .layout_id()
+    }
+    /// Internal complete source overlay. Legacy binary apply remains unchanged.
+    #[doc(hidden)]
+    pub fn apply_source_input(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
+        let input = super::source_input::BorrowedOverlay::decode(bytes)?;
+        let revision = self.revision;
+        let render_book = self.render_book.as_ref();
+        let registration = &self.registration;
+        let ingress = registration
+            .codec
+            .source_ingress(&mut self.state)
+            .ok_or_else(|| {
+                PeleError::new("Source model ingress is unavailable", ErrorCode::Semantic)
+            })?;
+        if ingress.layout_id() != Some(input.layout_id) {
+            return Err(super::binary::invalid());
+        }
+        // No replacement maps, UTF16 vectors, or Node/Atom vectors are
+        // allocated until complete virtual decoder allocation gates pass.
+        let prepared = ingress.prepare(input)?;
+        let mut next = revision;
+        let admitted = prepared.admit(&mut |candidate| {
+            if candidate.revision() != revision {
+                return Err(PeleError::new(
+                    "Stale public model revision",
+                    ErrorCode::Semantic,
+                ));
+            }
+            next = detached_render::next_revision(revision, render_book)?;
+            let compiled = registration.compiled_schema()?;
+            // The exact candidate already passed structure before revision.
+            // Reuse that scoped proof for registration and module structure;
+            // schema IDs still run here, after compilation, in original order.
+            candidate.validate_schema(compiled)
+        })?;
+        admitted.commit();
+        self.revision = next;
+        Ok(())
     }
     pub fn apply(&mut self, expected_revision: u64, graph: ModelGraph) -> Result<(), PeleError> {
         if expected_revision != self.revision {
@@ -713,67 +1777,218 @@ impl PublicDocument {
                 ErrorCode::Semantic,
             ));
         }
-        let next_revision = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        graph.validate_schema(self.registration.schema)?;
+        let next_revision = self.next_revision()?;
+        self.registration.validate_graph(&graph)?;
         self.registration.codec.apply(&mut self.state, graph)?;
         self.revision = next_revision;
         Ok(())
+    }
+    pub(super) fn finish_constructor_body(&mut self) {
+        debug_assert!(self.constructor_created);
+        // These phases belong to unpublished initialization. A completed new
+        // owner starts at revision zero, just like synchronous construction.
+        self.revision = 0;
+        self.render_book = None;
+    }
+    pub(super) fn prepare_constructor_body(
+        &mut self,
+        program: DetachedPublicInvocation,
+    ) -> Result<DetachedInvocationJob, PeleError> {
+        self.next_revision()?;
+        let book = self
+            .render_book
+            .get_or_insert_with(|| Arc::new(Mutex::new(RenderBook::new())));
+        DetachedInvocationJob::new(book, self.revision, program)
     }
     /// Dispatch through the retained module, then publish every prior mutation
     /// even if the operation returns a native, JavaScript or host exception.
     /// Stale/malformed calls never reach module code. A codec that exports an
     /// invalid graph is a protocol error; its state and advanced revision remain.
-    pub fn invoke(
+    #[doc(hidden)]
+    pub fn prepare_detached_invocation(
         &mut self,
         expected_revision: u64,
         call: MethodCall,
-        host: &mut dyn RenderResources,
-    ) -> Result<InvocationOutcome, PeleError> {
+    ) -> Result<Option<DetachedInvocationJob>, PeleError> {
+        // Discovery is nonmutating; unsupported modules use their original lane.
+        let Some(program) = self.registration.codec.detached_invocation(call.clone()) else {
+            return Ok(None);
+        };
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
                 ErrorCode::Semantic,
             ));
         }
-        let next = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        let before = self.registration.codec.graph(&self.state)?;
-        call.validate(&before, self.registration.schema)?;
+        self.next_revision()?;
+        call.validate_compiled(
+            self.snapshot_view()?.as_ref(),
+            self.registration.compiled_schema()?,
+        )?;
+        let book = self
+            .render_book
+            .get_or_insert_with(|| Arc::new(Mutex::new(RenderBook::new())));
+        DetachedInvocationJob::new(book, self.revision, program).map(Some)
+    }
+    #[doc(hidden)]
+    pub fn resume_detached_invocation(
+        &mut self,
+        job: &mut DetachedInvocationJob,
+        reply: Option<Result<super::PublicHostValue, PublicError>>,
+    ) -> Result<DetachedInvocationStep, PeleError> {
+        let book = self.render_book.as_ref().ok_or_else(|| {
+            PeleError::new(
+                "Public invocation belongs to another document",
+                ErrorCode::Semantic,
+            )
+        })?;
+        job.check_resume(book, reply.is_some())?;
+        if let Some(Ok(super::PublicHostValue::Graph(atom))) = &reply {
+            let graph = self.snapshot_read()?;
+            super::captured_admission::atom(graph.reader().extent(), atom)?;
+            if let Atom::BuiltinFunction(id) = atom {
+                if self
+                    .registration
+                    .schema
+                    .method(super::MethodId(*id))
+                    .is_none()
+                {
+                    return Err(PeleError::new(
+                        "Unknown public builtin function",
+                        ErrorCode::Semantic,
+                    ));
+                }
+            }
+        }
+        // Every dispatched phase owns its mutations, including partial failure
+        // and cancellation. Nested operations use this current revision.
+        self.revision = self.next_revision()?;
+        job.advance(book, self.state.as_mut(), reply)
+    }
+    #[doc(hidden)]
+    pub fn finish_detached_invocation(
+        &mut self,
+        job: &mut DetachedInvocationJob,
+    ) -> Result<ReadOutcome<'_, Atom>, PeleError> {
+        let book = self.render_book.as_ref().ok_or_else(|| {
+            PeleError::new(
+                "Public invocation belongs to another document",
+                ErrorCode::Semantic,
+            )
+        })?;
+        let (revision, mut result) = job.finish(book, self.revision)?;
+        self.revision = revision;
+        let graph = self.snapshot_read()?;
+        if let Ok(atom) = &result {
+            let checked =
+                super::captured_admission::atom(graph.reader().extent(), atom).and_then(|_| {
+                    if let Atom::BuiltinFunction(id) = atom {
+                        if self
+                            .registration
+                            .schema
+                            .method(super::MethodId(*id))
+                            .is_none()
+                        {
+                            return Err(PeleError::new(
+                                "Unknown public builtin function",
+                                ErrorCode::Semantic,
+                            ));
+                        }
+                    }
+                    Ok(())
+                });
+            if let Err(error) = checked {
+                result = Err(error.into());
+            }
+        }
+        Ok(ReadOutcome {
+            revision,
+            graph,
+            result,
+        })
+    }
+    pub fn invoke(
+        &mut self,
+        expected_revision: u64,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+    ) -> Result<InvocationOutcome, PeleError> {
+        let outcome = self.invoke_policy(expected_revision, call, host, GraphExport::Owned)?;
+        Ok(InvocationOutcome {
+            revision: outcome.revision,
+            graph: outcome.graph.into_model()?.into_owned(),
+            result: outcome.result,
+        })
+    }
+    pub fn invoke_read(
+        &mut self,
+        expected_revision: u64,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, Atom>, PeleError> {
+        self.invoke_policy(expected_revision, call, host, GraphExport::Logical)
+    }
+    fn invoke_policy(
+        &mut self,
+        expected_revision: u64,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+        export: GraphExport,
+    ) -> Result<ReadOutcome<'_, Atom>, PeleError> {
+        if expected_revision != self.revision {
+            return Err(PeleError::new(
+                "Stale public model revision",
+                ErrorCode::Semantic,
+            ));
+        }
+        let next = self.next_revision()?;
+        {
+            let before = self.read_view()?;
+            match &before {
+                GraphReadView::Arena(graph) => {
+                    call.validate_compiled(graph, self.registration.compiled_schema()?)?
+                }
+                GraphReadView::Logical(_) => {
+                    self.registration.validate_read(&before)?;
+                    super::schema::validate_call_after_graph(
+                        &call,
+                        before.reader().extent(),
+                        self.registration.compiled_schema()?.methods(),
+                    )?;
+                }
+            }
+        }
         let mut result = self
             .registration
             .codec
             .invoke(&mut self.state, call, &self.config, host);
         self.revision = next;
-        let graph = self.snapshot()?;
+        let graph = export.finish(self.snapshot_read()?)?;
         // A malformed native return is an operation protocol error, while its
         // successful partial mutations still publish in the same outcome.
         if let Ok(atom) = &result {
-            let checked = graph.validate_atom(atom).and_then(|_| {
-                if let Atom::BuiltinFunction(id) = atom {
-                    if self
-                        .registration
-                        .schema
-                        .method(super::MethodId(*id))
-                        .is_none()
-                    {
-                        return Err(PeleError::new(
-                            "Unknown public builtin function",
-                            ErrorCode::Semantic,
-                        ));
+            let checked =
+                super::captured_admission::atom(graph.reader().extent(), atom).and_then(|_| {
+                    if let Atom::BuiltinFunction(id) = atom {
+                        if self
+                            .registration
+                            .schema
+                            .method(super::MethodId(*id))
+                            .is_none()
+                        {
+                            return Err(PeleError::new(
+                                "Unknown public builtin function",
+                                ErrorCode::Semantic,
+                            ));
+                        }
                     }
-                }
-                Ok(())
-            });
+                    Ok(())
+                });
             if let Err(e) = checked {
                 result = Err(e.into());
             }
         }
-        Ok(InvocationOutcome {
+        Ok(ReadOutcome {
             revision: next,
             graph,
             result,
@@ -788,24 +2003,83 @@ impl PublicDocument {
         settings: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<RawRenderOutcome, PeleError> {
+        self.render_raw_operation_policy(
+            expected_revision,
+            config,
+            settings,
+            host,
+            GraphExport::Owned,
+        )
+        .and_then(ReadOutcome::into_raw_view)
+        .map(RawRenderOutcomeView::into_owned)
+    }
+    /// Borrow the validated post-state without changing dispatch or revision order.
+    pub fn render_raw_operation_view(
+        &mut self,
+        expected_revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<RawRenderOutcomeView<'_>, PeleError> {
+        self.render_raw_operation_policy(
+            expected_revision,
+            config,
+            settings,
+            host,
+            GraphExport::Borrowed,
+        )
+        .and_then(ReadOutcome::into_raw_view)
+    }
+    pub fn render_raw_operation_read(
+        &mut self,
+        revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, Rendered>, PeleError> {
+        self.render_raw_operation_policy(revision, config, settings, host, GraphExport::Logical)
+    }
+    fn render_raw_operation_policy(
+        &mut self,
+        expected_revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+        export: GraphExport,
+    ) -> Result<ReadOutcome<'_, Rendered>, PeleError> {
+        self.render_raw_with_registration(
+            expected_revision,
+            config,
+            settings,
+            host,
+            export,
+            self.registration.clone(),
+        )
+    }
+    fn render_raw_with_registration(
+        &mut self,
+        expected_revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+        export: GraphExport,
+        registration: Arc<Registration>,
+    ) -> Result<ReadOutcome<'_, Rendered>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
                 ErrorCode::Semantic,
             ));
         }
-        let next = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        self.snapshot()?;
+        let next = self.next_revision()?;
+        self.snapshot_read()?;
         let mut operation_error = None;
         let result = crate::compat::engine::render_raw_registered(
-            &self.registration.descriptor,
+            &registration.descriptor,
             settings,
             host,
             |session| {
-                self.registration
+                registration
                     .codec
                     .render_raw_operation(&mut self.state, config, settings, session)
                     .map_err(|error| {
@@ -816,8 +2090,8 @@ impl PublicDocument {
         )
         .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
         self.revision = next;
-        let graph = self.snapshot()?;
-        Ok(RawRenderOutcome {
+        let graph = export.finish(self.snapshot_read()?)?;
+        Ok(ReadOutcome {
             revision: next,
             graph,
             result,
@@ -831,7 +2105,16 @@ impl PublicDocument {
         options: &RenderOptions,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, None, false)
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            None,
+            false,
+            GraphExport::Owned,
+        )
+        .and_then(ReadOutcome::into_render_view)
+        .map(RenderOutcomeView::into_owned)
     }
     /// Exact output comparison after rendering. Dispatched mutations/revision
     /// publish on limit and host errors, under the existing graph export budgets.
@@ -842,7 +2125,16 @@ impl PublicDocument {
         limit: OutputLimit,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, Some(limit), true)
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            Some(limit),
+            true,
+            GraphExport::Owned,
+        )
+        .and_then(ReadOutcome::into_render_view)
+        .map(RenderOutcomeView::into_owned)
     }
     /// Additive native lane: bound returned SVG bytes even when the caller keeps
     /// legacy integer output semantics. Dispatched errors still publish state.
@@ -853,7 +2145,103 @@ impl PublicDocument {
         output_limit: Option<OutputLimit>,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, output_limit, true)
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            output_limit,
+            true,
+            GraphExport::Owned,
+        )
+        .and_then(ReadOutcome::into_render_view)
+        .map(RenderOutcomeView::into_owned)
+    }
+    /// Legacy output policy with a validated borrowed post-state.
+    pub fn render_operation_view(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcomeView<'_>, PeleError> {
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            None,
+            false,
+            GraphExport::Borrowed,
+        )
+        .and_then(ReadOutcome::into_render_view)
+    }
+    /// Exact output policy with a validated borrowed post-state.
+    pub fn render_operation_with_output_limit_view(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        limit: OutputLimit,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcomeView<'_>, PeleError> {
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            Some(limit),
+            true,
+            GraphExport::Borrowed,
+        )
+        .and_then(ReadOutcome::into_render_view)
+    }
+    /// Bounded rendering with a validated borrowed post-state. Existing owned
+    /// APIs still materialize their graph before publishing presentation.
+    pub fn render_operation_bounded_view(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        output_limit: Option<OutputLimit>,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcomeView<'_>, PeleError> {
+        self.render_operation_policy(
+            expected_revision,
+            options,
+            host,
+            output_limit,
+            true,
+            GraphExport::Borrowed,
+        )
+        .and_then(ReadOutcome::into_render_view)
+    }
+    pub fn render_operation_read(
+        &mut self,
+        revision: u64,
+        options: &RenderOptions,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
+        self.render_operation_policy(revision, options, host, None, false, GraphExport::Logical)
+    }
+    pub fn render_operation_with_output_limit_read(
+        &mut self,
+        revision: u64,
+        options: &RenderOptions,
+        limit: OutputLimit,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
+        self.render_operation_policy(
+            revision,
+            options,
+            host,
+            Some(limit),
+            true,
+            GraphExport::Logical,
+        )
+    }
+    pub fn render_operation_bounded_read(
+        &mut self,
+        revision: u64,
+        options: &RenderOptions,
+        limit: Option<OutputLimit>,
+        host: &mut dyn RenderResources,
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
+        self.render_operation_policy(revision, options, host, limit, true, GraphExport::Logical)
     }
     fn render_operation_policy(
         &mut self,
@@ -862,18 +2250,16 @@ impl PublicDocument {
         host: &mut dyn RenderResources,
         limit: Option<OutputLimit>,
         enforce_native_bytes: bool,
-    ) -> Result<RenderOutcome, PeleError> {
+        export: GraphExport,
+    ) -> Result<ReadOutcome<'_, RenderResult>, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
                 ErrorCode::Semantic,
             ));
         }
-        let next = self
-            .revision
-            .checked_add(1)
-            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
-        self.snapshot()?;
+        let next = self.next_revision()?;
+        self.snapshot_read()?;
         let mut operation_error = None;
         let mut presentation = crate::compat::PresentationCapture::deferred(host);
         let result = crate::compat::engine::render_registered_policy(
@@ -907,9 +2293,11 @@ impl PublicDocument {
         )
         .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
         self.revision = next;
-        let graph = self.snapshot()?;
+        // The owned policy clones here, at the original snapshot stage. Its
+        // wrapper only moves that already owned graph after publication.
+        let graph = export.finish(self.snapshot_read()?)?;
         presentation.publish();
-        Ok(RenderOutcome {
+        Ok(ReadOutcome {
             revision: next,
             graph,
             result,
@@ -931,5 +2319,269 @@ impl PublicDocument {
                     .render(&mut self.state, &self.config, settings, session)
             },
         )
+    }
+}
+
+#[cfg(feature = "web-host-sankey")]
+#[derive(Clone)]
+pub(crate) struct CapturedSankeyRegistration(Arc<Registration>);
+#[cfg(feature = "web-host-sankey")]
+impl CapturedSankeyRegistration {
+    pub(crate) fn descriptor(&self) -> &ModuleDescriptor {
+        &self.0.descriptor
+    }
+    pub(crate) fn schema(&self) -> ModelSchemaView {
+        ModelSchemaView {
+            model: self.0.schema,
+            shared_functions: self.0.shared_functions,
+            function_shapes: self.0.function_shapes,
+        }
+    }
+    pub(crate) fn validate<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+    ) -> Result<(), PeleError> {
+        let schema = self.0.compiled_schema()?;
+        super::captured_admission::validate(store)?;
+        super::captured_admission::validate_schema_ids(store, schema.methods(), schema.prototypes())
+    }
+    pub(crate) fn validate_uncached<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+    ) -> Result<(), PeleError> {
+        self.0.schema.validate()?;
+        super::captured_admission::validate(store)?;
+        let methods = self.0.schema.methods.iter().map(|m| m.id).collect();
+        let prototypes = self.0.schema.prototypes.iter().map(|p| p.id).collect();
+        super::captured_admission::validate_schema_ids(store, &methods, &prototypes)
+    }
+    pub(crate) fn validate_call<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+        call: &MethodCall,
+    ) -> Result<(), PeleError> {
+        self.validate(store)?;
+        super::schema::validate_call_after_graph(
+            call,
+            store.extent()?,
+            self.0.compiled_schema()?.methods(),
+        )
+    }
+    pub(crate) fn validate_return<S: super::captured_admission::AdmissionRead>(
+        &self,
+        store: &mut S,
+        value: &Atom,
+    ) -> Result<(), PeleError> {
+        super::captured_admission::atom(store.extent()?, value)?;
+        if let Atom::BuiltinFunction(id) = value {
+            if self.0.schema.method(super::MethodId(*id)).is_none() {
+                return Err(PeleError::new(
+                    "Unknown public builtin function",
+                    ErrorCode::Semantic,
+                ));
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Captured concrete Sankey policy; registry replacement never reselects it.
+#[cfg(feature = "web-host-sankey")]
+#[derive(Clone)]
+#[doc(hidden)]
+pub struct HostSankeyEntrySelection {
+    registration: CapturedSankeyRegistration,
+}
+#[cfg(feature = "web-host-sankey")]
+impl HostSankeyEntrySelection {
+    pub fn schema(&self) -> ModelSchemaView {
+        self.registration.schema()
+    }
+    pub fn bind<
+        S: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    >(
+        &self,
+        config: Object,
+        store: &mut S,
+    ) -> Result<crate::compat::host_sankey::Document, PeleError> {
+        // Registry create_from_graph admission, then the concrete codec's own
+        // validate_schema before its eager (possibly latent-error) projection.
+        self.registration.validate(store)?;
+        self.registration.validate_uncached(store)?;
+        let model = crate::compat::diagrams::sankey::imported_from(store);
+        Ok(crate::compat::host_sankey::Document::captured(
+            self.registration.clone(),
+            config,
+            model,
+        ))
+    }
+}
+
+#[cfg(feature = "web-host-sankey")]
+impl PublicEngine {
+    #[doc(hidden)]
+    pub fn select_host_sankey_entry(
+        &self,
+        id: &DiagramId,
+    ) -> Result<Option<HostSankeyEntrySelection>, PeleError> {
+        let registration = self.graph_registration(id)?;
+        Ok(registration
+            .codec
+            .is_host_sankey()
+            .then(|| HostSankeyEntrySelection {
+                registration: CapturedSankeyRegistration(registration),
+            }))
+    }
+    fn create_host_sankey<W>(
+        document: crate::compat::ParsedDocument,
+        registration: Arc<Registration>,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        let policy = CapturedSankeyRegistration(registration);
+        let schema = policy.schema();
+        schema.validate()?;
+        let ((storage, model), config) = document
+            .into_public_state::<crate::compat::diagrams::sankey::SankeyModel, _>(
+                |model, prepared, _edge| {
+                    let mut storage =
+                        crate::compat::diagrams::sankey::initial_into(make(schema)?, &model)?;
+                    // Independent native admission at the original GraphWriter.finish
+                    // boundary. A sink's finish() is never a validation certificate.
+                    super::captured_admission::validate(&mut storage)?;
+                    let projection = if prepared {
+                        crate::compat::diagrams::sankey::imported_from(&mut storage)
+                    } else {
+                        crate::compat::diagrams::sankey::normalized_source(model)
+                    };
+                    Ok((storage, projection))
+                },
+            )?;
+        Ok(crate::compat::host_sankey::Parsed::Captured {
+            document: crate::compat::host_sankey::Document::captured(policy, config, model),
+            storage,
+        })
+    }
+    /// One source preparation selects the captured ER, captured Sankey, or
+    /// ordinary arena route. A declined family never triggers a second parse.
+    #[cfg(feature = "web-host-er")]
+    #[doc(hidden)]
+    pub fn parse_host_storage_with_limits<E, S>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        mut make_er: impl FnMut(ModelSchemaView) -> Result<E, PeleError>,
+        make_sankey: impl FnOnce(ModelSchemaView) -> Result<S, PeleError>,
+    ) -> Result<crate::compat::host_sankey::CombinedParsed<E::Output, S::Output>, PeleError>
+    where
+        E: super::InitialWriter,
+        S: super::InitialWriter,
+        S::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        use crate::compat::{host_er, host_sankey};
+        let plan =
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Limits(limits))?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|module| module.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        if registration.codec.is_host_er() {
+            return Self::parse_host_er_plan(plan, registration, |schema, _| make_er(schema)).map(
+                |parsed| match parsed {
+                    host_er::Parsed::Host { policy, output } => {
+                        host_sankey::CombinedParsed::Er { policy, output }
+                    }
+                    host_er::Parsed::Arena(document) => {
+                        host_sankey::CombinedParsed::Arena(document)
+                    }
+                },
+            );
+        }
+        if registration.codec.is_host_sankey() {
+            return Self::parse_host_sankey_plan(plan, registration, make_sankey).map(|parsed| {
+                match parsed {
+                    host_sankey::Parsed::Captured { document, storage } => {
+                        host_sankey::CombinedParsed::Sankey { document, storage }
+                    }
+                    host_sankey::Parsed::Arena(document) => {
+                        host_sankey::CombinedParsed::Arena(document)
+                    }
+                }
+            });
+        }
+        self.parse_plan(plan)
+            .map(host_sankey::CombinedParsed::Arena)
+    }
+    #[doc(hidden)]
+    pub fn parse_host_sankey_with_limits<W>(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        let plan =
+            self.engine
+                .prepare_parse(source, options, None, ParseAdmission::Limits(limits))?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|r| r.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        if !registration.codec.is_host_sankey() {
+            return self
+                .parse_plan(plan)
+                .map(crate::compat::host_sankey::Parsed::Arena);
+        }
+        Self::parse_host_sankey_plan(plan, registration, make)
+    }
+    fn parse_host_sankey_plan<W>(
+        plan: ParsePlan,
+        registration: Arc<Registration>,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        Self::create_host_sankey(plan.parse()?, registration, make)
+    }
+    #[doc(hidden)]
+    pub fn parse_prepared_host_sankey_as<W>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        limit: EdgeLimit,
+        make: impl FnOnce(ModelSchemaView) -> Result<W, PeleError>,
+    ) -> Result<crate::compat::host_sankey::Parsed<W::Output>, PeleError>
+    where
+        W: super::InitialWriter,
+        W::Output: super::captured_read::CapturedRead + super::captured_admission::AdmissionRead,
+    {
+        let plan = self.engine.prepare_prepared_as(id, context, limit)?;
+        let registration = self
+            .modules
+            .iter()
+            .find(|r| r.descriptor.id == *plan.diagram_type())
+            .expect("paired public registration")
+            .clone();
+        let document = plan.parse()?;
+        if !registration.codec.is_host_sankey() {
+            return Self::create_document_registered(document, registration)
+                .map(crate::compat::host_sankey::Parsed::Arena);
+        }
+        Self::create_host_sankey(document, registration, make)
     }
 }

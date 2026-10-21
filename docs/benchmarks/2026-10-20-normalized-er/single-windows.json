@@ -1,0 +1,92 @@
+[
+  {
+    "stage": "parse",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-parse-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-parse-sequence-small-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "parse",
+    "workload": "er/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-parse-er-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-parse-er-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-source",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt1.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "render-source",
+    "workload": "sequence/small",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt2.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "render-source",
+    "workload": "sequence/small",
+    "attempt": 3,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt3.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt3.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "render-source",
+    "workload": "sequence/small",
+    "attempt": 4,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt4.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-sequence-small-attempt4.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-source",
+    "workload": "er/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-er-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-source-er-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-retained",
+    "workload": "sequence/small",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-retained-sequence-small-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-retained-sequence-small-attempt1.log",
+    "code": 1,
+    "complete": false
+  },
+  {
+    "stage": "render-retained",
+    "workload": "sequence/small",
+    "attempt": 2,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-retained-sequence-small-attempt2.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-retained-sequence-small-attempt2.log",
+    "code": 0,
+    "complete": true
+  },
+  {
+    "stage": "render-retained",
+    "workload": "er/medium",
+    "attempt": 1,
+    "output": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-retained-er-medium-attempt1.json",
+    "log": "dist/perf-patches/parse-architecture/normalized-er/swift-single-render-retained-er-medium-attempt1.log",
+    "code": 0,
+    "complete": true
+  }
+]

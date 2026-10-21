@@ -1,0 +1,233 @@
+[
+  {
+    "phase": "freeze-before-sdk",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/freeze.mjs",
+      "before-sdk",
+      "11f27516d98c3d89799a7fe2065eec0bd4e147cf"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-freeze-before-sdk.log",
+    "startedAt": "2026-10-20T21:08:12.116886+00:00",
+    "endedAt": "2026-10-20T21:08:13.364626+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "native-features",
+    "command": [
+      "bash",
+      "-c",
+      "source scripts/env.sh; CARGO_BUILD_JOBS=2 cargo test --locked -p pele-rs --test public_binary --test public_methods --test public_model_construction --test public_registry --test public_sankey --test public_sankey_owned_parse --test public_schema_registration --test public_shared_functions --test public_source_ingress --test sankey_compat --test public_detached_render"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/source-symbols-correctness-native-features.log",
+    "startedAt": "2026-10-20T21:08:13.365302+00:00",
+    "endedAt": "2026-10-20T21:09:56.711580+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "sdk-build",
+    "command": [
+      "bash",
+      "scripts/build-native.sh",
+      "--host"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/source-symbols-correctness-sdk-build.log",
+    "startedAt": "2026-10-20T21:09:56.713314+00:00",
+    "endedAt": "2026-10-20T21:13:22.143858+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-after-sdk",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/freeze.mjs",
+      "after-sdk",
+      "11f27516d98c3d89799a7fe2065eec0bd4e147cf"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-freeze-after-sdk.log",
+    "startedAt": "2026-10-20T21:13:22.145877+00:00",
+    "endedAt": "2026-10-20T21:13:22.664326+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-build",
+    "command": [
+      "node",
+      "scripts/perf/swift/build.mjs"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/source-symbols-correctness-swift-build.log",
+    "startedAt": "2026-10-20T21:13:22.664822+00:00",
+    "endedAt": "2026-10-20T21:13:29.855250+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-before-correctness",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/freeze.mjs",
+      "before-correctness",
+      "11f27516d98c3d89799a7fe2065eec0bd4e147cf"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-freeze-before-correctness.log",
+    "startedAt": "2026-10-20T21:13:29.856162+00:00",
+    "endedAt": "2026-10-20T21:13:30.226331+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-corpus",
+    "command": [
+      "swift",
+      "test",
+      "-c",
+      "release",
+      "--package-path",
+      "bindings/swift",
+      "--filter",
+      "AdditionalDiagramTests/testPinnedDiagramsThroughNativeDocuments|EagerProjectionIntegrationTests|PreparedDocumentTests|NonfiniteDiagramTests/testSankeyOwnedRenderAndCodableKeepNonfiniteHeight"
+    ],
+    "environmentOverrides": {
+      "PELE_VERIFY_MUTABLE": "1",
+      "PELE_FAMILIES": "er,sankey"
+    },
+    "log": "dist/evidence/source-symbols-correctness-swift-corpus.log",
+    "startedAt": "2026-10-20T21:13:30.227141+00:00",
+    "endedAt": "2026-10-20T21:14:42.878273+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-symbols-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-ffi-compile.log",
+    "startedAt": "2026-10-20T21:14:42.880003+00:00",
+    "endedAt": "2026-10-20T21:14:43.230218+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-run",
+    "command": [
+      "dist/evidence/source-symbols-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-ffi-run.log",
+    "startedAt": "2026-10-20T21:14:43.230740+00:00",
+    "endedAt": "2026-10-20T21:14:43.883738+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-symbols-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-ffi-public-compile.log",
+    "startedAt": "2026-10-20T21:14:43.884348+00:00",
+    "endedAt": "2026-10-20T21:14:44.103690+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-run",
+    "command": [
+      "dist/evidence/source-symbols-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-ffi-public-run.log",
+    "startedAt": "2026-10-20T21:14:44.104502+00:00",
+    "endedAt": "2026-10-20T21:14:44.660703+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-symbols-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T21:14:44.661228+00:00",
+    "endedAt": "2026-10-20T21:14:44.809112+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-run",
+    "command": [
+      "dist/evidence/source-symbols-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T21:14:44.809631+00:00",
+    "endedAt": "2026-10-20T21:14:45.373587+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-api",
+    "command": [
+      "node",
+      "scripts/perf/swift/run.mjs",
+      "--output",
+      "dist/evidence/source-symbols-correctness-swift-api.json"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-swift-api.log",
+    "startedAt": "2026-10-20T21:14:45.374665+00:00",
+    "endedAt": "2026-10-20T21:14:48.090491+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-after-correctness",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-symbols-correctness/runtime/freeze.mjs",
+      "after-correctness",
+      "11f27516d98c3d89799a7fe2065eec0bd4e147cf"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-symbols-correctness-freeze-after-correctness.log",
+    "startedAt": "2026-10-20T21:14:48.091570+00:00",
+    "endedAt": "2026-10-20T21:14:48.399769+00:00",
+    "exitCode": 0
+  }
+]

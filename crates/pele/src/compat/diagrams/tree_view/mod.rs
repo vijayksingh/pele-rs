@@ -1,6 +1,7 @@
 //! TreeView parser, box-drawing conversion and native row renderer, Pele 458322a5 (MIT).
 mod box_drawing;
 mod icons;
+mod live_phase;
 mod model;
 mod parser;
 mod render;
@@ -8,6 +9,7 @@ use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,
     RenderSettings, Rendered,
 };
+pub(crate) use live_phase::{render_detached, TreeViewDetachedInput};
 pub use model::{NodeType, TreeNode, TreeViewModel};
 #[derive(Default)]
 pub struct TreeView;

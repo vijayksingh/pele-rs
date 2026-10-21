@@ -1,5 +1,9 @@
 //! Dedicated Block grid renderer, Pele block/render.ts, 458322a5 (MIT, kepano).
-use super::{arrows, layout, route, BlockModel, BlockNode};
+use super::{
+    arrows, layout,
+    phase::{PhaseInput, Typed},
+    route, BlockModel,
+};
 use crate::compat::{
     source::space,
     svg::{
@@ -73,39 +77,46 @@ fn shape(kind: Option<&str>) -> &'static str {
         _ => "rect",
     }
 }
-fn style(block: &BlockNode, m: &BlockModel) -> ResolvedStyle {
+fn style<I: PhaseInput>(input: &mut I, block: &I::Value) -> Result<ResolvedStyle, I::Error> {
     let mut declarations = vec![];
-    let names = block.classes.as_deref().filter(|v| !v.is_empty());
-    if let Some(names) = names {
-        for name in names {
-            if let Some((_, def)) = m.classes.iter().find(|(n, _)| n == name) {
-                for s in &def.styles {
-                    declarations.extend(s.split(';').map(str::to_owned));
-                }
+    let classes = input.get(block, "classes")?;
+    let names = if input.truthy(&classes) && input.count(&classes)? > 0 {
+        input.strings(&classes)?
+    } else {
+        vec!["default".into()]
+    };
+    let root = input.root();
+    for name in names {
+        let classes = input.get(&root, "classes")?;
+        let class = input.map_get_text(&classes, &name)?;
+        if input.truthy(&class) {
+            let styles = input.get(&class, "styles")?;
+            for value in input.strings(&styles)? {
+                input.keep_text(value.len())?;
+                declarations.extend(value.split(';').map(str::to_owned));
             }
         }
-    } else if let Some((_, def)) = m.classes.iter().find(|(n, _)| n == "default") {
-        for s in &def.styles {
-            declarations.extend(s.split(';').map(str::to_owned));
+    }
+    let styles = input.get(block, "styles")?;
+    if input.truthy(&styles) {
+        for value in input.strings(&styles)? {
+            input.keep_text(value.len())?;
+            declarations.extend(value.split(';').map(str::to_owned));
         }
     }
-    if let Some(styles) = &block.styles {
-        for s in styles {
-            declarations.extend(s.split(';').map(str::to_owned));
-        }
-    }
-    resolve_style(&declarations)
+    Ok(resolve_style(&declarations))
 }
-fn view(
+fn view<I: PhaseInput>(
+    input: &mut I,
     index: usize,
-    m: &BlockModel,
+    b: &I::Value,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     gap: f64,
     tight: bool,
-) -> Result<View, PeleError> {
-    let b = &m.nodes[index];
-    let kind = match b.kind.as_deref() {
+) -> Result<View, I::Error> {
+    let raw_kind = input.field_text(b, "type")?;
+    let kind = match raw_kind.as_deref() {
         Some("space") => Kind::Space,
         Some("composite") => Kind::Composite,
         Some("block_arrow") => Kind::Arrow,
@@ -114,7 +125,7 @@ fn view(
     let style = if kind == Kind::Space {
         resolve_style(&[])
     } else {
-        style(b, m)
+        style(input, b)?
     };
     let text_style = u8::from(style.bold) | u8::from(style.italic) * 2;
     let size = style.font_size.unwrap_or(o.font_size.unwrap_or(16.));
@@ -131,16 +142,8 @@ fn view(
         dy: 0.,
         bw: 0.,
         bh: 0.,
-        columns: if kind == Kind::Composite {
-            b.columns.unwrap_or(-1.)
-        } else {
-            -1.
-        },
-        span: if kind == Kind::Space {
-            1.
-        } else {
-            b.width_in_columns.unwrap_or(1.)
-        },
+        columns: -1.,
+        span: 1.,
         space: kind == Kind::Space,
         head: 0.,
         nw: 0.,
@@ -154,11 +157,19 @@ fn view(
         w: 0.,
         h: 0.,
     };
+    let label = if kind == Kind::Space {
+        None
+    } else {
+        input.field_text(b, "label")?
+    };
+    if let Some(text) = &label {
+        input.keep_text(text.len())?;
+    }
     match kind {
         Kind::Space => v.label = layout_label(None, false, r, o, size, wrap, 0)?,
         Kind::Composite => {
             v.label = layout_label(
-                b.label.as_deref(),
+                label.as_deref(),
                 false,
                 r,
                 o,
@@ -175,14 +186,16 @@ fn view(
             v.nh = v.head + 2. * gap;
         }
         Kind::Arrow => {
-            v.label = layout_label(b.label.as_deref(), false, r, o, size, wrap, text_style)?;
+            v.label = layout_label(label.as_deref(), false, r, o, size, wrap, text_style)?;
             let blank = v
                 .label
                 .lines
                 .iter()
                 .flatten()
                 .all(|s| s.icon.is_none() && s.text.trim_matches(space).is_empty());
-            v.mask = arrows::mask(b.directions.as_deref());
+            let directions = input.get(b, "directions")?;
+            let directions = input.strings(&directions)?;
+            v.mask = arrows::mask(Some(&directions));
             let (w, h, dx, dy) = if blank {
                 arrows::size(v.mask, 0., 0.)
             } else {
@@ -194,8 +207,8 @@ fn view(
             v.dy = dy;
         }
         Kind::Leaf => {
-            v.shape = shape(b.kind.as_deref());
-            v.label = layout_label(b.label.as_deref(), false, r, o, size, wrap, text_style)?;
+            v.shape = shape(raw_kind.as_deref());
+            v.label = layout_label(label.as_deref(), false, r, o, size, wrap, text_style)?;
             let s = shape_size(v.shape, v.label.width, v.label.height);
             v.nw = s.w;
             v.nh = if v.shape == "cyl" {
@@ -206,6 +219,17 @@ fn view(
             v.dy = s.dy;
         }
     }
+    // Ot reads grid operands after label resources have returned.
+    v.columns = if kind == Kind::Composite {
+        input.field_number(b, "columns")?.unwrap_or(-1.)
+    } else {
+        -1.
+    };
+    v.span = if kind == Kind::Space {
+        1.
+    } else {
+        input.field_number(b, "widthInColumns")?.unwrap_or(1.)
+    };
     Ok(v)
 }
 fn grow(bounds: &mut (f64, f64, f64, f64), x: f64, y: f64, w: f64, h: f64) {
@@ -247,26 +271,43 @@ pub(super) fn render_accessible(
     acc_title: Option<&str>,
     acc_descr: Option<&str>,
 ) -> Result<Rendered, PeleError> {
-    let loose = draw(m, c, o, r, false, acc_title, acc_descr)?;
+    render_phases(
+        &mut Typed {
+            model: m,
+            acc_title,
+            acc_descr,
+        },
+        c,
+        o,
+        r,
+    )
+}
+pub(super) fn render_phases<I: PhaseInput>(
+    input: &mut I,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, I::Error> {
+    let loose = draw(input, c, o, r, false)?;
     if o.max_width.is_none_or(|w| !(w > 0.) || loose.width <= w) {
         return Ok(loose);
     }
-    let tight = draw(m, c, o, r, true, acc_title, acc_descr)?;
+    let tight = draw(input, c, o, r, true)?;
     Ok(if tight.width < loose.width {
         tight
     } else {
         loose
     })
 }
-fn draw(
-    m: &BlockModel,
+fn draw<I: PhaseInput>(
+    input: &mut I,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     tight: bool,
-    acc_title: Option<&str>,
-    acc_descr: Option<&str>,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, I::Error> {
+    input.begin_draw();
+    let model = input.root();
     let size = o.font_size.unwrap_or(16.);
     let edge_size = (size * 0.875 + 0.5).floor();
     let pad = o.padding.unwrap_or(8.);
@@ -279,7 +320,9 @@ fn draw(
         _ => 12.,
     }
     .min(if tight { 6. } else { f64::INFINITY });
-    let mut root = view(m.root, m, o, r, gap, tight)?;
+    let root_record = input.get(&model, "root")?;
+    let mut root = view(input, 0, &root_record, o, r, gap, tight)?;
+    let mut records = vec![root_record];
     root.nw = 0.;
     root.nh = 0.;
     let mut order = vec![root];
@@ -287,16 +330,31 @@ fn draw(
     let mut i = 0;
     while i < order.len() {
         if order[i].kind == Kind::Composite {
-            for &child in m.nodes[order[i].block].children.as_deref().unwrap_or(&[]) {
-                let v = view(child, m, o, r, gap, tight)?;
+            let record = records[order[i].block].clone();
+            let children = input.get(&record, "children")?;
+            let mut at = 0;
+            while !input.nullish(&children) && at < input.count(&children)? {
+                input.work(1)?;
+                let child = input.index(&children, at)?;
                 let j = order.len();
+                if j >= 1_000_000 {
+                    let mut error = PeleError::new(
+                        "Block expanded rendering exceeds native work budget",
+                        crate::compat::ErrorCode::Limit,
+                    );
+                    error.diagram_type = Some("block".into());
+                    return Err(error.into());
+                }
+                let v = view(input, j, &child, o, r, gap, tight)?;
                 if v.kind != Kind::Space {
-                    if let Some(id) = &m.nodes[child].id {
-                        by_id.insert(id.clone(), j);
+                    if let Some(id) = input.field_text(&child, "id")? {
+                        by_id.insert(id, j);
                     }
                 }
+                records.push(child);
                 order[i].children.push(j);
                 order.push(v);
+                at += 1;
             }
         }
         i += 1;
@@ -332,19 +390,28 @@ fn draw(
     let mut pairs = HashMap::<(usize, usize), usize>::new();
     let mut labelled = HashSet::new();
     let mut ends = vec![];
-    for &edge in &m.edges {
-        let e = &m.nodes[edge];
-        let (Some(&s), Some(&t)) = (
-            by_id.get(e.start.as_deref().unwrap_or("")),
-            by_id.get(e.end.as_deref().unwrap_or("")),
-        ) else {
+    let mut edge_records = vec![];
+    let edge_receiver = input.get(&model, "edges")?;
+    let mut at = 0;
+    while at < input.count(&edge_receiver)? {
+        input.work(1)?;
+        let e = input.index(&edge_receiver, at)?;
+        at += 1;
+        let start = input.field_text(&e, "start")?.unwrap_or_default();
+        let end = input.field_text(&e, "end")?.unwrap_or_default();
+        let (Some(&s), Some(&t)) = (by_id.get(&start), by_id.get(&end)) else {
             continue;
         };
+        let edge = edge_records.len();
         let key = (s.min(t), s.max(t));
         *pairs.entry(key).or_default() += 1;
-        if e.label.as_ref().is_some_and(|l| !l.is_empty()) {
+        if input
+            .field_text(&e, "label")?
+            .is_some_and(|l| !l.is_empty())
+        {
             labelled.insert(key);
         }
+        edge_records.push(e);
         ends.push((edge, s, t));
     }
     let check =
@@ -358,15 +425,11 @@ fn draw(
         let k = seen.entry(key).or_default();
         let nth = *k;
         *k += 1;
-        let label = layout_label(
-            m.nodes[edge].label.as_deref(),
-            false,
-            r,
-            o,
-            edge_size,
-            200.,
-            0,
-        )?;
+        let label_text = input.field_text(&edge_records[edge], "label")?;
+        if let Some(text) = &label_text {
+            input.keep_text(text.len())?;
+        }
+        let label = layout_label(label_text.as_deref(), false, r, o, edge_size, 200., 0)?;
         let points;
         let (lx, ly);
         if s == t {
@@ -423,8 +486,12 @@ fn draw(
             s,
         });
     }
+    let title_text = input.field_text(&model, "title")?;
+    if let Some(text) = &title_text {
+        input.keep_text(text.len())?;
+    }
     let title = layout_label(
-        m.title.as_deref(),
+        title_text.as_deref(),
         false,
         r,
         o,
@@ -452,9 +519,14 @@ fn draw(
         if v.kind == Kind::Space {
             continue;
         }
-        let block = &m.nodes[v.block];
-        let classes = class_names(&block.classes.as_deref().unwrap_or(&[]).join(" "));
-        let id = esc_text(block.id.as_deref().unwrap_or(""))?;
+        let block = &records[v.block];
+        let raw_classes = input.get(block, "classes")?;
+        let classes = if input.nullish(&raw_classes) {
+            String::new()
+        } else {
+            class_names(&input.join(&raw_classes)?)
+        };
+        let id = esc_text(&input.field_text(block, "id")?.unwrap_or_default())?;
         if v.kind == Kind::Composite {
             let top = v.y - v.h / 2.;
             clusters+=&format!("<g class=\"pele-cluster{classes}\" data-id=\"{id}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"{}/>{}</g>",num(v.x-v.w/2.),num(top),num(v.w),num(v.h),v.style.shape,label_svg_with_resources(&v.label,v.x,top+(v.head+gap)/2.+2.,&format!(" class=\"pele-cluster-label\" fill=\"var(--_m)\"{}",v.style.text),r)?);
@@ -478,9 +550,13 @@ fn draw(
     let mut edges = String::new();
     let mut labels = String::new();
     for route in &mut routes {
-        let edge = &m.nodes[route.edge];
-        let start = edge.arrow_type_start.as_deref().unwrap_or("");
-        let end = edge.arrow_type_end.as_deref().unwrap_or("");
+        let edge = &edge_records[route.edge];
+        let start_value = input
+            .field_text(edge, "arrowTypeStart")?
+            .unwrap_or_default();
+        let end_value = input.field_text(edge, "arrowTypeEnd")?.unwrap_or_default();
+        let start = start_value.as_str();
+        let end = end_value.as_str();
         let path = if route.loop_index > 0 {
             route::loop_path(
                 &order[route.s],
@@ -495,16 +571,16 @@ fn draw(
             }
             route::trace(&route.points, marker_trim(start), marker_trim(end))
         };
-        let id = esc_text(edge.id.as_deref().unwrap_or(""))?;
+        let id = esc_text(&input.field_text(edge, "id")?.unwrap_or_default())?;
         edges += &format!(
             "<g class=\"pele-edge\" data-id=\"{id}\"><path d=\"{}\"{}{}/>{}{}</g>",
             path.d,
-            if edge.thickness.as_deref() == Some("thick") {
+            if input.field_text(edge, "thickness")?.as_deref() == Some("thick") {
                 " stroke-width=\"2.5\""
             } else {
                 ""
             },
-            if edge.pattern.as_deref() == Some("dotted") {
+            if input.field_text(edge, "pattern")?.as_deref() == Some("dotted") {
                 " stroke-dasharray=\"3 4\""
             } else {
                 ""
@@ -514,7 +590,7 @@ fn draw(
         );
         if route.label.width > 0. {
             labels += &edge_label_svg(
-                edge.id.as_deref().unwrap_or(""),
+                &input.field_text(edge, "id")?.unwrap_or_default(),
                 &route.label,
                 route.lx + ox,
                 route.ly + oy,
@@ -552,7 +628,14 @@ fn draw(
     );
     Ok(Rendered {
         svg: document(
-            "block", width, height, size, o, acc_title, acc_descr, &content,
+            "block",
+            width,
+            height,
+            size,
+            o,
+            input.field_text(&model, "accTitle")?.as_deref(),
+            input.field_text(&model, "accDescr")?.as_deref(),
+            &content,
         )?,
         width,
         height,

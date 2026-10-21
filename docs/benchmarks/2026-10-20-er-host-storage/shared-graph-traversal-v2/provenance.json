@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "sourcePins": {
+    "candidate": {
+      "commit": "e48ea33f65294f752fa5f3bee85c67611fb5db36",
+      "files": {
+        "bindings/web/graph.js": "2df5494ff26a13dae6de9c8bff2c1651e1bd443631757377ce41d3ebf3c1267a",
+        "bindings/web/graph-storage.js": "ebcbadefe360ca5c876ef409c0cd2214fd9cb866e867ed8e73bf69bd1242c181",
+        "bindings/web/package.json": "2acd242ecd5a478eb8f154cde806de2f6358d8ffad36b51e0dda41658c845ef2"
+      }
+    },
+    "control": {
+      "commit": "ae15d16a757e679364209e6a9565c205c78eb595",
+      "files": {
+        "bindings/web/graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+        "bindings/web/graph-storage.js": null,
+        "bindings/web/package.json": "42b3141f8f64a819fb957d7c00900cc7201069f8119940da1019742e3ef64a0c"
+      }
+    }
+  },
+  "rustWasmSourceCommit": "365ec6d0df050199f9efb93d23d9ce7d352c60fa",
+  "wasmSha256": "3f6c40133130905f170ba582b3b9ef0c8718e795f2305e402200d5877563fc5b",
+  "wasmIsIdentical": true,
+  "changedPackagePaths": [
+    "graph-storage.js",
+    "graph.js",
+    "package.json"
+  ],
+  "newNativeCoreIncluded": false,
+  "scope": "Only committed e48ea33 browser traversal versus its previous wrappers; measured Rust/WASM remains365ec6d. Native graphless core08a1 is not in these artifacts.",
+  "logs": [
+    {
+      "file": "logs/shared-graph-traversal-v2-focused-web.log.gz",
+      "uncompressedSha256": "abb2e100be20bb436ddbfc4b11a5dbee0078ce8b1a280e41b61439d7f6d789ca",
+      "passed": 54
+    },
+    {
+      "file": "logs/shared-graph-traversal-v2-full-web.log.gz",
+      "uncompressedSha256": "a1cf11e6d79a0cce56d2b0aec5dca381ff13c139d6860a9e51f051fe1c5646db",
+      "passed": 417
+    },
+    {
+      "file": "logs/shared-graph-traversal-v2-vm-comparison.log.gz",
+      "uncompressedSha256": "5dc252363370666a1e5bee28531eefb6442d03e63feb98473d784fee1165fd6d",
+      "passed": null
+    },
+    {
+      "file": "logs/shared-graph-traversal-v2-vm-first-use.log.gz",
+      "uncompressedSha256": "a527c22d104863e7704c98380d4d2d2871df8079e8d5bef07b7f64a99ea66c9c",
+      "passed": null
+    }
+  ],
+  "copiedPackageOrBinaryBytes": false,
+  "verificationLimit": "Portable verification checks supplied records, hashes and arithmetic. Runtime files are not distributed in this bundle; it does not rerun tests, reproduce measurements or authenticate unavailable package bytes."
+}

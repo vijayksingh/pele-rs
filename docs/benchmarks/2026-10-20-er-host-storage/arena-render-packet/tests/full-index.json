@@ -1,0 +1,476 @@
+{
+  "passedTests": 417,
+  "elapsed": "18.4m",
+  "explicitReports": 78,
+  "reports": [
+    {
+      "sourcePath": "arena-render-packet-arena--0c889-d-metadata-64-MiB-admission-chromium/arena-packet-combined-budget.json",
+      "engine": "chromium",
+      "path": "tests/webkit/arena-packet-combined-budget.json.gz",
+      "uncompressedSha256": "0cd284d5e35eb1a8fad8f08e5992587c761ed28cdccbf48c8ba21f6cc2e04a53"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--0c889-d-metadata-64-MiB-admission-firefox/arena-packet-combined-budget.json",
+      "engine": "firefox",
+      "path": "tests/webkit/arena-packet-combined-budget.json.gz",
+      "uncompressedSha256": "0cd284d5e35eb1a8fad8f08e5992587c761ed28cdccbf48c8ba21f6cc2e04a53"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--0c889-d-metadata-64-MiB-admission-webkit/arena-packet-combined-budget.json",
+      "engine": "webkit",
+      "path": "tests/webkit/arena-packet-combined-budget.json.gz",
+      "uncompressedSha256": "0cd284d5e35eb1a8fad8f08e5992587c761ed28cdccbf48c8ba21f6cc2e04a53"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--2356a-s-across-all-arena-families-chromium/arena-packet-all-families.json",
+      "engine": "chromium",
+      "path": "tests/webkit/arena-packet-all-families.json.gz",
+      "uncompressedSha256": "f2aa89d049f70fd4e164bfedcbf05a6c70403264f6df73f0958880d8b91898d3"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--2356a-s-across-all-arena-families-firefox/arena-packet-all-families.json",
+      "engine": "firefox",
+      "path": "tests/webkit/arena-packet-all-families.json.gz",
+      "uncompressedSha256": "f2aa89d049f70fd4e164bfedcbf05a6c70403264f6df73f0958880d8b91898d3"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--2356a-s-across-all-arena-families-webkit/arena-packet-all-families.json",
+      "engine": "webkit",
+      "path": "tests/webkit/arena-packet-all-families.json.gz",
+      "uncompressedSha256": "f2aa89d049f70fd4e164bfedcbf05a6c70403264f6df73f0958880d8b91898d3"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--28738-s-and-recovery-match-legacy-chromium/arena-packet-callbacks.json",
+      "engine": "chromium",
+      "path": "tests/webkit/arena-packet-callbacks.json.gz",
+      "uncompressedSha256": "d6cd337841b64768fd6776689ee079405191f2181e4429c8076a78a83d812041"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--28738-s-and-recovery-match-legacy-firefox/arena-packet-callbacks.json",
+      "engine": "firefox",
+      "path": "tests/webkit/arena-packet-callbacks.json.gz",
+      "uncompressedSha256": "d6cd337841b64768fd6776689ee079405191f2181e4429c8076a78a83d812041"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--28738-s-and-recovery-match-legacy-webkit/arena-packet-callbacks.json",
+      "engine": "webkit",
+      "path": "tests/webkit/arena-packet-callbacks.json.gz",
+      "uncompressedSha256": "d6cd337841b64768fd6776689ee079405191f2181e4429c8076a78a83d812041"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--35f0c-original-exception-identity-chromium/arena-packet-factory-errors.json",
+      "engine": "chromium",
+      "path": "tests/webkit/arena-packet-factory-errors.json.gz",
+      "uncompressedSha256": "f3d759e05fd78f292b814c642dac0a8fda12615725634c176a5be3000e37c903"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--35f0c-original-exception-identity-firefox/arena-packet-factory-errors.json",
+      "engine": "firefox",
+      "path": "tests/webkit/arena-packet-factory-errors.json.gz",
+      "uncompressedSha256": "f3d759e05fd78f292b814c642dac0a8fda12615725634c176a5be3000e37c903"
+    },
+    {
+      "sourcePath": "arena-render-packet-arena--35f0c-original-exception-identity-webkit/arena-packet-factory-errors.json",
+      "engine": "webkit",
+      "path": "tests/webkit/arena-packet-factory-errors.json.gz",
+      "uncompressedSha256": "f3d759e05fd78f292b814c642dac0a8fda12615725634c176a5be3000e37c903"
+    },
+    {
+      "sourcePath": "er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-chromium/er-entry-read-frame.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-entry-read-frame.json.gz",
+      "uncompressedSha256": "bdfce42ea5ad37b76e5c6e2ab351f1cc3b61fffe105114ee5b501eea19705d51"
+    },
+    {
+      "sourcePath": "er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-firefox/er-entry-read-frame.json",
+      "engine": "firefox",
+      "path": "tests/full/firefox/er-entry-read-frame.json.gz",
+      "uncompressedSha256": "a64d2b5b8d970559556f429240dac37b1eaaf2375fbf6886e7be782a64940d72"
+    },
+    {
+      "sourcePath": "er-entry-read-frame-ER-ent-01eb4-d-optional-scratch-fallback-webkit/er-entry-read-frame.json",
+      "engine": "webkit",
+      "path": "tests/full/firefox/er-entry-read-frame.json.gz",
+      "uncompressedSha256": "a64d2b5b8d970559556f429240dac37b1eaaf2375fbf6886e7be782a64940d72"
+    },
+    {
+      "sourcePath": "er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-chromium/er-error-brands.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-error-brands.json.gz",
+      "uncompressedSha256": "6026cd39b683bd3dc9f4d3f7ebdbfd5ccfa58d7213ac7d0d1486719bed29fe37"
+    },
+    {
+      "sourcePath": "er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-firefox/er-error-brands.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-error-brands.json.gz",
+      "uncompressedSha256": "6026cd39b683bd3dc9f4d3f7ebdbfd5ccfa58d7213ac7d0d1486719bed29fe37"
+    },
+    {
+      "sourcePath": "er-error-brands-ER-error-d-ac4a0-nd-original-callback-throws-webkit/er-error-brands.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-error-brands.json.gz",
+      "uncompressedSha256": "6026cd39b683bd3dc9f4d3f7ebdbfd5ccfa58d7213ac7d0d1486719bed29fe37"
+    },
+    {
+      "sourcePath": "er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-chromium/er-lexical-dispatch.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-lexical-dispatch.json.gz",
+      "uncompressedSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011"
+    },
+    {
+      "sourcePath": "er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-firefox/er-lexical-dispatch.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-lexical-dispatch.json.gz",
+      "uncompressedSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011"
+    },
+    {
+      "sourcePath": "er-lexical-dispatch-ER-pub-fbf53-pans-and-keyword-boundaries-webkit/er-lexical-dispatch.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-lexical-dispatch.json.gz",
+      "uncompressedSha256": "c484dbd1b94cf774702156044a8cafc5d7c7e41f6736f54be88d95f6310c1011"
+    },
+    {
+      "sourcePath": "er-live-callbacks-ER-fallb-e5926-hods-without-an-arena-owner-chromium/fallback-callback-report.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/fallback-callback-report.json.gz",
+      "uncompressedSha256": "b89a1dead9b2bf709e4f925ae4b75d9a083f280dcf89d9147ab35b795a4aa91c"
+    },
+    {
+      "sourcePath": "er-live-callbacks-ER-fallb-e5926-hods-without-an-arena-owner-firefox/fallback-callback-report.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/fallback-callback-report.json.gz",
+      "uncompressedSha256": "b89a1dead9b2bf709e4f925ae4b75d9a083f280dcf89d9147ab35b795a4aa91c"
+    },
+    {
+      "sourcePath": "er-live-callbacks-ER-fallb-e5926-hods-without-an-arena-owner-webkit/fallback-callback-report.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/fallback-callback-report.json.gz",
+      "uncompressedSha256": "b89a1dead9b2bf709e4f925ae4b75d9a083f280dcf89d9147ab35b795a4aa91c"
+    },
+    {
+      "sourcePath": "er-live-callbacks-ER-live--44f83-riginal-throws-and-recovery-chromium/live-scalar-report.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/live-scalar-report.json.gz",
+      "uncompressedSha256": "6a33b06a0173a8872318ec21c477bc62aa742e238211023a09e6d9021c05cc16"
+    },
+    {
+      "sourcePath": "er-live-callbacks-ER-live--44f83-riginal-throws-and-recovery-firefox/live-scalar-report.json",
+      "engine": "firefox",
+      "path": "tests/full/firefox/live-scalar-report.json.gz",
+      "uncompressedSha256": "d8bc4ce1d037f363261f249d1f15947fefd70991eb30016508d46db2eefff05a"
+    },
+    {
+      "sourcePath": "er-live-callbacks-ER-live--44f83-riginal-throws-and-recovery-webkit/live-scalar-report.json",
+      "engine": "webkit",
+      "path": "tests/full/webkit/live-scalar-report.json.gz",
+      "uncompressedSha256": "7dd4d9cfb89236ed0da5c599824e3843b33b85aeaf38a4021a641767127f04cc"
+    },
+    {
+      "sourcePath": "er-oversized-public-constr-878f7-nd-retained-helper-identity-chromium/er-oversized-public-construction.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-oversized-public-construction.json.gz",
+      "uncompressedSha256": "40f09b98f9c56e4fe32d2fc9b01458b1eaa3321ac23e3f43b5d577f406336641"
+    },
+    {
+      "sourcePath": "er-oversized-public-constr-878f7-nd-retained-helper-identity-firefox/er-oversized-public-construction.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-oversized-public-construction.json.gz",
+      "uncompressedSha256": "40f09b98f9c56e4fe32d2fc9b01458b1eaa3321ac23e3f43b5d577f406336641"
+    },
+    {
+      "sourcePath": "er-oversized-public-constr-878f7-nd-retained-helper-identity-webkit/er-oversized-public-construction.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-oversized-public-construction.json.gz",
+      "uncompressedSha256": "40f09b98f9c56e4fe32d2fc9b01458b1eaa3321ac23e3f43b5d577f406336641"
+    },
+    {
+      "sourcePath": "er-prepared-host-normal-re-33f83-a-config-and-wrapper-policy-chromium/er-prepared-normal-render-controls.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-prepared-normal-render-controls.json.gz",
+      "uncompressedSha256": "79cba4fcd9111a1cc1159089c3d0a517aae7ed3eaefd4f9b969798c80d1494b6"
+    },
+    {
+      "sourcePath": "er-prepared-host-normal-re-33f83-a-config-and-wrapper-policy-firefox/er-prepared-normal-render-controls.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-prepared-normal-render-controls.json.gz",
+      "uncompressedSha256": "79cba4fcd9111a1cc1159089c3d0a517aae7ed3eaefd4f9b969798c80d1494b6"
+    },
+    {
+      "sourcePath": "er-prepared-host-normal-re-33f83-a-config-and-wrapper-policy-webkit/er-prepared-normal-render-controls.json",
+      "engine": "webkit",
+      "path": "tests/full/webkit/er-prepared-normal-render-controls.json.gz",
+      "uncompressedSha256": "781a37d94cbb4034dbc9c2458687cf0cf712dcf379413028dea2decfd6b368a7"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--1fb01-ws-and-nested-raw-rendering-chromium/er-prepared-live-baseline.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-prepared-live-baseline.json.gz",
+      "uncompressedSha256": "45cf9d245223b3b7f274dc3f28d66b65618f87c6adc222153995681f1c4f8ee2"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--1fb01-ws-and-nested-raw-rendering-firefox/er-prepared-live-baseline.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-prepared-live-baseline.json.gz",
+      "uncompressedSha256": "45cf9d245223b3b7f274dc3f28d66b65618f87c6adc222153995681f1c4f8ee2"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--1fb01-ws-and-nested-raw-rendering-webkit/er-prepared-live-baseline.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-prepared-live-baseline.json.gz",
+      "uncompressedSha256": "45cf9d245223b3b7f274dc3f28d66b65618f87c6adc222153995681f1c4f8ee2"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--e0246-ependent-captured-providers-chromium/er-prepared-policy-controls.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-prepared-policy-controls.json.gz",
+      "uncompressedSha256": "d3614e8093cdf60f7cbf29656e2f27a27bc3b4046c103420cfc3f9528f42d240"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--e0246-ependent-captured-providers-firefox/er-prepared-policy-controls.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-prepared-policy-controls.json.gz",
+      "uncompressedSha256": "d3614e8093cdf60f7cbf29656e2f27a27bc3b4046c103420cfc3f9528f42d240"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--e0246-ependent-captured-providers-webkit/er-prepared-policy-controls.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-prepared-policy-controls.json.gz",
+      "uncompressedSha256": "d3614e8093cdf60f7cbf29656e2f27a27bc3b4046c103420cfc3f9528f42d240"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--e3f1d-rs-and-low-level-arena-APIs-chromium/er-prepared-error-controls.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-prepared-error-controls.json.gz",
+      "uncompressedSha256": "fee8d2330174845efbb793cc286f6c4ed905059bb169e59e0d1f70c942cdaabb"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--e3f1d-rs-and-low-level-arena-APIs-firefox/er-prepared-error-controls.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-prepared-error-controls.json.gz",
+      "uncompressedSha256": "fee8d2330174845efbb793cc286f6c4ed905059bb169e59e0d1f70c942cdaabb"
+    },
+    {
+      "sourcePath": "er-prepared-host-prepared--e3f1d-rs-and-low-level-arena-APIs-webkit/er-prepared-error-controls.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-prepared-error-controls.json.gz",
+      "uncompressedSha256": "fee8d2330174845efbb793cc286f6c4ed905059bb169e59e0d1f70c942cdaabb"
+    },
+    {
+      "sourcePath": "er-raw-host-caller-owned-p-d5007-rows-and-nested-raw-renders-chromium/er-raw-caller-baseline.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-raw-caller-baseline.json.gz",
+      "uncompressedSha256": "a87bc5b605c7c6f2974da311fbe012c29e0519005ef0a23d3da428ef332f5f67"
+    },
+    {
+      "sourcePath": "er-raw-host-caller-owned-p-d5007-rows-and-nested-raw-renders-firefox/er-raw-caller-baseline.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-raw-caller-baseline.json.gz",
+      "uncompressedSha256": "a87bc5b605c7c6f2974da311fbe012c29e0519005ef0a23d3da428ef332f5f67"
+    },
+    {
+      "sourcePath": "er-raw-host-caller-owned-p-d5007-rows-and-nested-raw-renders-webkit/er-raw-caller-baseline.json",
+      "engine": "webkit",
+      "path": "tests/full/webkit/er-raw-caller-baseline.json.gz",
+      "uncompressedSha256": "0f91ef4943c7d51e02380312fb1ea9ed5c34ded4eef71dd3e7fa44dcbb4b02b7"
+    },
+    {
+      "sourcePath": "er-raw-host-raw-adoption-c-1ca38-er-objects-through-disposal-chromium/raw-lifecycle.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/raw-lifecycle.json.gz",
+      "uncompressedSha256": "4160a1e2b8078e7b56cd5f5523722865c921ffece31a2b6e0e12c37e345a6cc0"
+    },
+    {
+      "sourcePath": "er-raw-host-raw-adoption-c-1ca38-er-objects-through-disposal-firefox/raw-lifecycle.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/raw-lifecycle.json.gz",
+      "uncompressedSha256": "4160a1e2b8078e7b56cd5f5523722865c921ffece31a2b6e0e12c37e345a6cc0"
+    },
+    {
+      "sourcePath": "er-raw-host-raw-adoption-c-1ca38-er-objects-through-disposal-webkit/raw-lifecycle.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/raw-lifecycle.json.gz",
+      "uncompressedSha256": "4160a1e2b8078e7b56cd5f5523722865c921ffece31a2b6e0e12c37e345a6cc0"
+    },
+    {
+      "sourcePath": "er-raw-host-raw-adoption-p-2aab2-rs-against-the-legacy-entry-chromium/raw-order.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/raw-order.json.gz",
+      "uncompressedSha256": "1ad774e7b402974ce9d25370a152a9817eaa64c47a6166851e3060b1dac4d742"
+    },
+    {
+      "sourcePath": "er-raw-host-raw-adoption-p-2aab2-rs-against-the-legacy-entry-firefox/raw-order.json",
+      "engine": "firefox",
+      "path": "tests/full/firefox/raw-order.json.gz",
+      "uncompressedSha256": "d8298c79846417571dabe088698ced5e560f451ea5a717e61b3536988cdd471c"
+    },
+    {
+      "sourcePath": "er-raw-host-raw-adoption-p-2aab2-rs-against-the-legacy-entry-webkit/raw-order.json",
+      "engine": "webkit",
+      "path": "tests/full/webkit/raw-order.json.gz",
+      "uncompressedSha256": "2bab555e220f8c7876777b470b88912ed55e0ce6935e1bf6877e75f8cdab7527"
+    },
+    {
+      "sourcePath": "er-record-layout-ER-record-c7ce2-fallback-and-retained-edits-chromium/er-record-layout.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-record-layout.json.gz",
+      "uncompressedSha256": "97f5b78400192abfe4663d0491e478666fa6dc7edace15ed8f1355d576a62265"
+    },
+    {
+      "sourcePath": "er-record-layout-ER-record-c7ce2-fallback-and-retained-edits-firefox/er-record-layout.json",
+      "engine": "firefox",
+      "path": "tests/full/firefox/er-record-layout.json.gz",
+      "uncompressedSha256": "8fda40165e28a04888db6acb9e8582cfdb866b55d2b7bbd749082e0bd0875361"
+    },
+    {
+      "sourcePath": "er-record-layout-ER-record-c7ce2-fallback-and-retained-edits-webkit/er-record-layout.json",
+      "engine": "webkit",
+      "path": "tests/full/firefox/er-record-layout.json.gz",
+      "uncompressedSha256": "8fda40165e28a04888db6acb9e8582cfdb866b55d2b7bbd749082e0bd0875361"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-chromium/er-result-packet-budget.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-result-packet-budget.json.gz",
+      "uncompressedSha256": "b0fd7bb4cfeac4f7c5de3657987fe3962c8ed5ac91cf74ee25062d7ab29ceab5"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-firefox/er-result-packet-budget.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-result-packet-budget.json.gz",
+      "uncompressedSha256": "b0fd7bb4cfeac4f7c5de3657987fe3962c8ed5ac91cf74ee25062d7ab29ceab5"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-packet-01b87-ph-plus-metadata-byte-gates-webkit/er-result-packet-budget.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-result-packet-budget.json.gz",
+      "uncompressedSha256": "b0fd7bb4cfeac4f7c5de3657987fe3962c8ed5ac91cf74ee25062d7ab29ceab5"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-chromium/er-result-packet-errors.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-result-packet-errors.json.gz",
+      "uncompressedSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-firefox/er-result-packet-errors.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-result-packet-errors.json.gz",
+      "uncompressedSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-result-ec3a7-audit-precedence-and-repair-webkit/er-result-packet-errors.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-result-packet-errors.json.gz",
+      "uncompressedSha256": "a4d116ee03da524c59319e2d17546eda87945c26841593d25cba0c43660e2566"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-succes-695ed--legacy-capability-fallback-chromium/er-result-packet-differential.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/er-result-packet-differential.json.gz",
+      "uncompressedSha256": "9dd8dbfa598e75c99779b3a82f8ca4492ef54bd44964d73deef0e384adf501dc"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-succes-695ed--legacy-capability-fallback-firefox/er-result-packet-differential.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/er-result-packet-differential.json.gz",
+      "uncompressedSha256": "9dd8dbfa598e75c99779b3a82f8ca4492ef54bd44964d73deef0e384adf501dc"
+    },
+    {
+      "sourcePath": "er-result-packet-ER-succes-695ed--legacy-capability-fallback-webkit/er-result-packet-differential.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/er-result-packet-differential.json.gz",
+      "uncompressedSha256": "9dd8dbfa598e75c99779b3a82f8ca4492ef54bd44964d73deef0e384adf501dc"
+    },
+    {
+      "sourcePath": "source-result-packet-regis-2ab74--packet-across-all-families-chromium/source-packet-free-true.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/source-packet-free-true.json.gz",
+      "uncompressedSha256": "f989da76fe7f376cc213dfecfdce37fd3cb60e1ca931b96475af8906ef97fa10"
+    },
+    {
+      "sourcePath": "source-result-packet-regis-2ab74--packet-across-all-families-firefox/source-packet-free-true.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/source-packet-free-true.json.gz",
+      "uncompressedSha256": "f989da76fe7f376cc213dfecfdce37fd3cb60e1ca931b96475af8906ef97fa10"
+    },
+    {
+      "sourcePath": "source-result-packet-regis-2ab74--packet-across-all-families-webkit/source-packet-free-true.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/source-packet-free-true.json.gz",
+      "uncompressedSha256": "f989da76fe7f376cc213dfecfdce37fd3cb60e1ca931b96475af8906ef97fa10"
+    },
+    {
+      "sourcePath": "source-result-packet-regis-b2bc7-allback-across-all-families-chromium/source-packet-free-false.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/source-packet-free-false.json.gz",
+      "uncompressedSha256": "4830cccae6dcb9b162e1ff87b9eb20e6035ff5d8ad646e652df0a15c76c5a78c"
+    },
+    {
+      "sourcePath": "source-result-packet-regis-b2bc7-allback-across-all-families-firefox/source-packet-free-false.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/source-packet-free-false.json.gz",
+      "uncompressedSha256": "4830cccae6dcb9b162e1ff87b9eb20e6035ff5d8ad646e652df0a15c76c5a78c"
+    },
+    {
+      "sourcePath": "source-result-packet-regis-b2bc7-allback-across-all-families-webkit/source-packet-free-false.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/source-packet-free-false.json.gz",
+      "uncompressedSha256": "4830cccae6dcb9b162e1ff87b9eb20e6035ff5d8ad646e652df0a15c76c5a78c"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-661f9-e-counts-and-resource-order-chromium/source-packet-all-families.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/source-packet-all-families.json.gz",
+      "uncompressedSha256": "1dea40a3e303b7978d76ae5a9fd17ab9b0c6efe1cf5be28d766adcdfc9fdcff2"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-661f9-e-counts-and-resource-order-firefox/source-packet-all-families.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/source-packet-all-families.json.gz",
+      "uncompressedSha256": "1dea40a3e303b7978d76ae5a9fd17ab9b0c6efe1cf5be28d766adcdfc9fdcff2"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-661f9-e-counts-and-resource-order-webkit/source-packet-all-families.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/source-packet-all-families.json.gz",
+      "uncompressedSha256": "1dea40a3e303b7978d76ae5a9fd17ab9b0c6efe1cf5be28d766adcdfc9fdcff2"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-cddcb-n-and-recovery-match-legacy-chromium/source-packet-controls.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/source-packet-controls.json.gz",
+      "uncompressedSha256": "5677d69dd5f30165049ec11c47845cfd7f1cf8d4eaba0538a7c3216d985f01eb"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-cddcb-n-and-recovery-match-legacy-firefox/source-packet-controls.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/source-packet-controls.json.gz",
+      "uncompressedSha256": "5677d69dd5f30165049ec11c47845cfd7f1cf8d4eaba0538a7c3216d985f01eb"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-cddcb-n-and-recovery-match-legacy-webkit/source-packet-controls.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/source-packet-controls.json.gz",
+      "uncompressedSha256": "5677d69dd5f30165049ec11c47845cfd7f1cf8d4eaba0538a7c3216d985f01eb"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-cf400-ate-after-output-generation-chromium/source-packet-envelope-limit.json",
+      "engine": "chromium",
+      "path": "tests/full/chromium/source-packet-envelope-limit.json.gz",
+      "uncompressedSha256": "52d1257bdb4eb10fa18f6ea2074012340883815b3bfe7b54c7726e04cba894b0"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-cf400-ate-after-output-generation-firefox/source-packet-envelope-limit.json",
+      "engine": "firefox",
+      "path": "tests/full/chromium/source-packet-envelope-limit.json.gz",
+      "uncompressedSha256": "52d1257bdb4eb10fa18f6ea2074012340883815b3bfe7b54c7726e04cba894b0"
+    },
+    {
+      "sourcePath": "source-result-packet-sourc-cf400-ate-after-output-generation-webkit/source-packet-envelope-limit.json",
+      "engine": "webkit",
+      "path": "tests/full/chromium/source-packet-envelope-limit.json.gz",
+      "uncompressedSha256": "52d1257bdb4eb10fa18f6ea2074012340883815b3bfe7b54c7726e04cba894b0"
+    }
+  ],
+  "deduplication": "Identical focused/full reports reference one retained compressed file; attachment duplicates omitted."
+}

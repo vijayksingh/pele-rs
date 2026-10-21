@@ -604,6 +604,22 @@ fn replace(s: &JsString, from: &[u16], to: &[u16], all: bool) -> JsString {
     }
     JsString(out)
 }
+// Shared by the public getter, getDirection(), and the native live reader.
+// This reads admitted ordinary graph values only; no host call occurs here.
+fn direction_value(g: &ModelGraph, root: u32, last: bool) -> Result<Option<Atom>, PublicError> {
+    let mut result = None;
+    for item in native_dense(g, get(g, root, "rootDoc"))? {
+        if let Atom::Ref(i) = item {
+            if is(g, get(g, i, "stmt"), "dir") {
+                result = Some(get(g, i, "value").clone());
+                if !last {
+                    break;
+                }
+            }
+        }
+    }
+    Ok(result)
+}
 impl Arena<'_> {
     fn guard(&self, root: u32, name: &str, method: u32) -> Result<(), PublicError> {
         let p = self.g.nodes[root as usize]
@@ -638,18 +654,7 @@ impl Arena<'_> {
         self.map_get(self.field_id(root, key)?, id)
     }
     fn direction(&self, root: u32, last: bool) -> Result<Option<Atom>, PublicError> {
-        let mut result = None;
-        for item in native_dense(self.g, &self.field(root, "rootDoc"))? {
-            if let Atom::Ref(i) = item {
-                if is(self.g, &self.field(i, "stmt"), "dir") {
-                    result = Some(self.field(i, "value"));
-                    if !last {
-                        break;
-                    }
-                }
-            }
-        }
-        Ok(result)
+        direction_value(self.g, root, last)
     }
     fn add_state(&mut self, root: u32, args: &[Atom]) -> Result<(), PublicError> {
         let arg = |i: usize| args.get(i).cloned().unwrap_or(Atom::Undefined);
@@ -1646,21 +1651,31 @@ fn source_doc(a: &mut Arena<'_>, input: &[Stmt]) -> Result<Atom, PublicError> {
     }
     Ok(Atom::Ref(root))
 }
-fn new_graph(model: &StateModel) -> Result<ModelGraph, PublicError> {
-    let mut g = ModelGraph {
+fn empty_graph() -> ModelGraph {
+    ModelGraph {
         version: 1,
         root: Atom::Undefined,
         strings: vec![],
         nodes: vec![],
-    };
-    let mut a = Arena::new(&mut g);
+    }
+}
+// Shared field-initializer boundary. Parsed models perform extraction afterward;
+// a constructed StateDb exposes these fresh Maps/arrays and empty drawing as-is.
+fn initial_root(
+    a: &mut Arena<'_>,
+    root_doc: &[Stmt],
+    title: Option<&String>,
+    acc_title: Option<&String>,
+    acc_descr: Option<&String>,
+    divider_count: usize,
+) -> Result<(u32, Atom), PublicError> {
     let root = a.node(Node::Instance {
         prototype: PROTOTYPE,
         properties: vec![],
     })?;
     a.g.root = Atom::Ref(root);
     let kind = a.string("state")?;
-    let doc = source_doc(&mut a, &model.root_doc)?;
+    let doc = source_doc(a, root_doc)?;
     let states = a.map()?;
     let relations = a.array(vec![])?;
     let classes = a.map()?;
@@ -1679,17 +1694,27 @@ fn new_graph(model: &StateModel) -> Result<ModelGraph, PublicError> {
         ("classes", Atom::Ref(classes)),
         ("links", Atom::Ref(links)),
         ("graph", Atom::Ref(drawing)),
-        ("title", a.opt(model.title.as_ref())?),
-        ("accTitle", a.opt(model.acc_title.as_ref())?),
-        ("accDescr", a.opt(model.acc_descr.as_ref())?),
-        (
-            "dividerCount",
-            Atom::Number(model.public_divider_count as f64),
-        ),
+        ("title", a.opt(title)?),
+        ("accTitle", a.opt(acc_title)?),
+        ("accDescr", a.opt(acc_descr)?),
+        ("dividerCount", Atom::Number(divider_count as f64)),
     ];
     for (k, v) in fields {
         a.assign(root, k, v)?
     }
+    Ok((root, doc))
+}
+fn new_graph(model: &StateModel) -> Result<ModelGraph, PublicError> {
+    let mut g = empty_graph();
+    let mut a = Arena::new(&mut g);
+    let (root, doc) = initial_root(
+        &mut a,
+        &model.root_doc,
+        model.title.as_ref(),
+        model.acc_title.as_ref(),
+        model.acc_descr.as_ref(),
+        model.public_divider_count,
+    )?;
     a.extract(root, doc)?;
     Ok(g)
 }
@@ -1973,10 +1998,62 @@ fn public_to_pele(e: PublicError) -> PeleError {
         _ => error("State native host exception"),
     }
 }
+fn construct_default() -> Result<StatePublicState, PeleError> {
+    // No ParseContext, source, translation or extract call: StateDb ignores
+    // constructor arguments and its drawing cache starts independently empty.
+    let mut graph = empty_graph();
+    initial_root(&mut Arena::new(&mut graph), &[], None, None, None, 0).map_err(public_to_pele)?;
+    let projected = project(&graph);
+    Ok(StatePublicState { graph, projected })
+}
+
 impl PublicDiagramModule for State {
+    fn read_public_getter(
+        &self,
+        state: &Self::PublicState,
+        receiver: &Atom,
+        method: MethodId,
+    ) -> Option<Result<PublicActiveValue, PublicError>> {
+        if method != MethodId(1) {
+            return None;
+        }
+        Some((|| {
+            state.graph.validate_atom(receiver)?;
+            let root = reference(receiver)?;
+            match direction_value(&state.graph, root, true)? {
+                Some(Atom::String(id)) => Ok(PublicActiveValue::String(
+                    state.graph.strings[id as usize].clone(),
+                )),
+                Some(value) => Ok(PublicActiveValue::Atom(value)),
+                None => Ok(PublicActiveValue::String("TB".into())),
+            }
+        })())
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::state())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::state(
+            super::StateDetachedInput::new(state.projected.as_ref().err()),
+        ))
+    }
+
     type PublicState = StatePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            PublicConstructorFactory::ignoring_arguments::<Self>(PROTOTYPE, construct_default)
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -1987,6 +2064,12 @@ impl PublicDiagramModule for State {
         let graph = new_graph(m).map_err(public_to_pele)?;
         let projected = project(&graph);
         Ok(StatePublicState { graph, projected })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

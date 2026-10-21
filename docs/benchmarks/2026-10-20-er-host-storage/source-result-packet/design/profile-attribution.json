@@ -1,0 +1,197 @@
+{
+  "source": "/Users/vijaysingh/unlocalhosted/pele-rs/dist/perf-patches/parse-architecture/er-dense-array-first/profile/er-medium-render-source-wasm.cpuprofile",
+  "sourceSha256": "97ced13b339b55dff592100115076b787e500d9acf1059a499c103353a2f48ca",
+  "method": "Sum leaf/self timeDeltas by exact frames; classify decode with full ancestor path; categories disjoint, no inclusive sum",
+  "samples": 4370,
+  "weightedSampleUs": 1569726,
+  "categories": {
+    "bounded_serialize_str_self": {
+      "weightedSelfUs": 104471,
+      "percent": 6.655365331274376
+    },
+    "facade_result_self": {
+      "weightedSelfUs": 92074,
+      "percent": 5.8656096669100215
+    },
+    "resource_text_decode_self": {
+      "weightedSelfUs": 70697,
+      "percent": 4.50377964052325
+    },
+    "resource_decodeText_self": {
+      "weightedSelfUs": 16194,
+      "percent": 1.0316450132061263
+    },
+    "returned_json_decode_self": {
+      "weightedSelfUs": 9999,
+      "percent": 0.63699014987329
+    }
+  },
+  "details": [
+    {
+      "category": "bounded_serialize_str_self",
+      "function": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+      "weightedSelfUs": 355,
+      "ancestors": [
+        "<serde_json[eea81336d5ddbfd4]::ser::Compound<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded, serde_json[eea81336d5ddbfd4]::ser::CompactFormatter> as serde_core[c28dadb02bad1c47]::ser::SerializeMap>::serialize_entry::<str, alloc[508e33bd5656020b]::string::String>",
+        "<pele[37270552ffd5eb7c]::compat::RenderResultTransport as serde_core[c28dadb02bad1c47]::ser::Serialize>::serialize::<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded>>",
+        "pele_wasm[e6e81f4f4d17d0e2]::render_numbers::rendered",
+        "nativeregistry_render_numbers_with_resources",
+        "nativeregistry_render_numbers_with_resources multivalue shim",
+        "js-to-wasm::",
+        "render_numbers_with_resources",
+        "render"
+      ]
+    },
+    {
+      "category": "facade_result_self",
+      "function": "result",
+      "weightedSelfUs": 341,
+      "ancestors": [
+        "render",
+        "run",
+        "",
+        "evaluate",
+        "",
+        "(root)"
+      ]
+    },
+    {
+      "category": "bounded_serialize_str_self",
+      "function": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+      "weightedSelfUs": 97567,
+      "ancestors": [
+        "<serde_json[eea81336d5ddbfd4]::ser::Compound<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded, serde_json[eea81336d5ddbfd4]::ser::CompactFormatter> as serde_core[c28dadb02bad1c47]::ser::SerializeMap>::serialize_entry::<str, alloc[508e33bd5656020b]::string::String>",
+        "<pele[37270552ffd5eb7c]::compat::RenderResultTransport as serde_core[c28dadb02bad1c47]::ser::Serialize>::serialize::<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded>>",
+        "pele_wasm[e6e81f4f4d17d0e2]::render_numbers::rendered",
+        "nativeregistry_render_numbers_with_resources",
+        "nativeregistry_render_numbers_with_resources multivalue shim",
+        "js-to-wasm::",
+        "render_numbers_with_resources",
+        "render"
+      ]
+    },
+    {
+      "category": "facade_result_self",
+      "function": "result",
+      "weightedSelfUs": 91733,
+      "ancestors": [
+        "render",
+        "",
+        "evaluate",
+        "",
+        "(root)"
+      ]
+    },
+    {
+      "category": "resource_text_decode_self",
+      "function": "decode",
+      "weightedSelfUs": 68937,
+      "ancestors": [
+        "decodeText",
+        "getStringFromWasm0",
+        "__wbindgen_generic_0000000000000003",
+        "wasm-to-js",
+        "Ref(String) -> Externref externref shim",
+        "<pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width",
+        "pele[37270552ffd5eb7c]::compat::text::layout_label",
+        "pele[37270552ffd5eb7c]::compat::diagrams::er::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::TypedRead>"
+      ]
+    },
+    {
+      "category": "resource_decodeText_self",
+      "function": "decodeText",
+      "weightedSelfUs": 16194,
+      "ancestors": [
+        "getStringFromWasm0",
+        "__wbindgen_generic_0000000000000003",
+        "wasm-to-js",
+        "Ref(String) -> Externref externref shim",
+        "<pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width",
+        "pele[37270552ffd5eb7c]::compat::text::layout_label",
+        "pele[37270552ffd5eb7c]::compat::diagrams::er::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::TypedRead>",
+        "pele[37270552ffd5eb7c]::compat::diagrams::er::render::render_read::<pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::TypedRead>"
+      ]
+    },
+    {
+      "category": "returned_json_decode_self",
+      "function": "decode",
+      "weightedSelfUs": 9999,
+      "ancestors": [
+        "decodeText",
+        "getStringFromWasm0",
+        "render_numbers_with_resources",
+        "render",
+        "",
+        "evaluate",
+        "",
+        "(root)"
+      ]
+    },
+    {
+      "category": "bounded_serialize_str_self",
+      "function": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+      "weightedSelfUs": 1033,
+      "ancestors": [
+        "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+        "<serde_json[eea81336d5ddbfd4]::ser::Compound<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded, serde_json[eea81336d5ddbfd4]::ser::CompactFormatter> as serde_core[c28dadb02bad1c47]::ser::SerializeMap>::serialize_entry::<str, alloc[508e33bd5656020b]::string::String>",
+        "<pele[37270552ffd5eb7c]::compat::RenderResultTransport as serde_core[c28dadb02bad1c47]::ser::Serialize>::serialize::<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded>>",
+        "pele_wasm[e6e81f4f4d17d0e2]::render_numbers::rendered",
+        "nativeregistry_render_numbers_with_resources",
+        "nativeregistry_render_numbers_with_resources multivalue shim",
+        "js-to-wasm::",
+        "render_numbers_with_resources"
+      ]
+    },
+    {
+      "category": "bounded_serialize_str_self",
+      "function": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+      "weightedSelfUs": 361,
+      "ancestors": [
+        "pele_wasm[e6e81f4f4d17d0e2]::render_numbers::rendered",
+        "nativeregistry_render_numbers_with_resources",
+        "nativeregistry_render_numbers_with_resources multivalue shim",
+        "js-to-wasm::",
+        "render_numbers_with_resources",
+        "render",
+        "",
+        "evaluate"
+      ]
+    },
+    {
+      "category": "resource_text_decode_self",
+      "function": "decode",
+      "weightedSelfUs": 1760,
+      "ancestors": [
+        "decodeText",
+        "getStringFromWasm0",
+        "__wbindgen_generic_0000000000000003",
+        "wasm-to-js",
+        "Ref(String) -> Externref externref shim",
+        "<pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width",
+        "pele[37270552ffd5eb7c]::compat::text::layout_label",
+        "pele[37270552ffd5eb7c]::compat::diagrams::er::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::TypedRead>"
+      ]
+    },
+    {
+      "category": "bounded_serialize_str_self",
+      "function": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+      "weightedSelfUs": 5155,
+      "ancestors": [
+        "<serde_json[eea81336d5ddbfd4]::ser::Compound<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded, serde_json[eea81336d5ddbfd4]::ser::CompactFormatter> as serde_core[c28dadb02bad1c47]::ser::SerializeMap>::serialize_entry::<str, alloc[508e33bd5656020b]::string::String>",
+        "<pele[37270552ffd5eb7c]::compat::RenderResultTransport as serde_core[c28dadb02bad1c47]::ser::Serialize>::serialize::<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded>>",
+        "pele_wasm[e6e81f4f4d17d0e2]::render_numbers::rendered",
+        "nativeregistry_render_numbers_with_resources",
+        "nativeregistry_render_numbers_with_resources multivalue shim",
+        "js-to-wasm:iiiiiiiiidididiii:ii",
+        "render_numbers_with_resources",
+        "render"
+      ]
+    }
+  ],
+  "interpretation": [
+    "Most decode self belongs to text_width callback strings, outside packet scope.",
+    "Reference counting retains canonical serde traversal; serialize_str self cannot be assumed removed.",
+    "Direct SVG still crosses WASM as UTF8 and is decoded; returned-JSON decode is not fully removable.",
+    "Single ER medium source profile is an opportunity locator, not a speedup prediction or all-family ceiling."
+  ]
+}

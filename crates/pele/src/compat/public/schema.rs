@@ -337,6 +337,33 @@ impl ModelSchema {
         Ok(())
     }
 }
+/// Private validation state for one captured immutable registration. Never used
+/// by public validators accepting arbitrary (possibly stack-owned) schemas.
+/// Construction validates before allocating the retained membership indexes.
+pub(super) struct CompiledSchema {
+    methods: HashSet<MethodId>,
+    prototypes: HashSet<PrototypeId>,
+}
+impl CompiledSchema {
+    pub(super) fn new(schema: &'static ModelSchema) -> Result<Self, PeleError> {
+        schema.validate()?;
+        Ok(Self {
+            methods: schema.methods.iter().map(|method| method.id).collect(),
+            prototypes: schema
+                .prototypes
+                .iter()
+                .map(|prototype| prototype.id)
+                .collect(),
+        })
+    }
+    pub(super) fn methods(&self) -> &HashSet<MethodId> {
+        &self.methods
+    }
+    pub(super) fn prototypes(&self) -> &HashSet<PrototypeId> {
+        &self.prototypes
+    }
+}
+
 /// IDs refer to the document's current graph, including detached retained nodes.
 /// Borrowed receivers are passed unchanged; the typed module owns receiver rules.
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -349,32 +376,63 @@ impl MethodCall {
     pub fn validate(&self, g: &ModelGraph, schema: &ModelSchema) -> Result<(), PeleError> {
         g.validate_schema(schema)?;
         let methods: HashSet<_> = schema.methods.iter().map(|m| m.id).collect();
-        if !methods.contains(&self.method) {
-            return Err(invalid("Public model method is unavailable"));
-        }
-        if self.arguments.len() > 1_000_000 {
-            return Err(PeleError::new(
-                "Public method arguments exceed work budget",
-                ErrorCode::Limit,
-            ));
-        }
-        g.validate_atom(&self.receiver)?;
-        for a in &self.arguments {
-            g.validate_atom(a)?;
-            if let Atom::BuiltinFunction(id) = a {
-                if !methods.contains(&MethodId(*id)) {
-                    return Err(invalid("Unknown public builtin function"));
-                }
-            }
-        }
-        if let Atom::BuiltinFunction(id) = self.receiver {
-            if !methods.contains(&MethodId(id)) {
+        self.validate_after_graph(g, &methods)
+    }
+    pub(super) fn validate_compiled(
+        &self,
+        g: &ModelGraph,
+        schema: &CompiledSchema,
+    ) -> Result<(), PeleError> {
+        g.validate_compiled(schema)?;
+        self.validate_after_graph(g, schema.methods())
+    }
+    fn validate_after_graph(
+        &self,
+        g: &ModelGraph,
+        methods: &HashSet<MethodId>,
+    ) -> Result<(), PeleError> {
+        validate_call_after_graph(
+            self,
+            super::captured_admission::Extent {
+                version: g.version,
+                nodes: g.nodes.len(),
+                strings: g.strings.len(),
+            },
+            methods,
+        )
+    }
+}
+pub(super) fn validate_call_after_graph(
+    call: &MethodCall,
+    extent: super::captured_admission::Extent,
+    methods: &HashSet<MethodId>,
+) -> Result<(), PeleError> {
+    if !methods.contains(&call.method) {
+        return Err(invalid("Public model method is unavailable"));
+    }
+    if call.arguments.len() > 1_000_000 {
+        return Err(PeleError::new(
+            "Public method arguments exceed work budget",
+            ErrorCode::Limit,
+        ));
+    }
+    super::captured_admission::atom(extent, &call.receiver)?;
+    for a in &call.arguments {
+        super::captured_admission::atom(extent, a)?;
+        if let Atom::BuiltinFunction(id) = a {
+            if !methods.contains(&MethodId(*id)) {
                 return Err(invalid("Unknown public builtin function"));
             }
         }
-        Ok(())
     }
+    if let Atom::BuiltinFunction(id) = call.receiver {
+        if !methods.contains(&MethodId(id)) {
+            return Err(invalid("Unknown public builtin function"));
+        }
+    }
+    Ok(())
 }
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum JavaScriptErrorKind {
     Error,

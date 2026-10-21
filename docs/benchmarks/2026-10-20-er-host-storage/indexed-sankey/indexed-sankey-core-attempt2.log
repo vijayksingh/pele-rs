@@ -1,0 +1,23 @@
+   Compiling pele-rs v0.3.0 (/Users/vijaysingh/unlocalhosted/pele-rs/crates/pele)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.12s
+     Running tests/public_sankey_owned_parse.rs (target/debug/deps/public_sankey_owned_parse-1abfa84df89d61f2)
+
+running 7 tests
+test public_owned_default_hook_preserves_legacy_policy_dispatch_and_errors ... ok
+test sankey_owned_parse_keeps_source_limits_and_prepared_publication ... ok
+test sankey_indexed_source_keeps_first_helper_latent_errors_and_raw_recovery ... ok
+test sankey_indexed_source_preserves_resource_order_and_public_typed_projection ... ok
+test sankey_custom_delegation_cannot_forge_canonical_parser_provenance ... ok
+test sankey_owned_retained_methods_edits_and_replacement_match_legacy ... ok
+test sankey_owned_and_legacy_match_complete_frozen_source_corpus ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.88s
+
+     Running tests/sankey_compat.rs (target/debug/deps/sankey_compat-360643f2e66708ae)
+
+running 3 tests
+test retained_sankey_reflow_colors_native_pixels_and_cycle_recovery ... ok
+test pinned_sankey_complete_svg_corpus ... ok
+test pinned_sankey_parser_corpus ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.12s

@@ -1,6 +1,7 @@
 //! Dedicated TreeView row/guide renderer, Pele treeview/render.ts, 458322a5 (MIT).
 use super::{icons, NodeType, TreeViewModel};
 use crate::compat::number_math::{round, NumberMath};
+use crate::compat::ErrorCode;
 use crate::compat::{
     diagrams::common::literal_label::{left_label_svg, literal_label},
     source::{decode_entities, space},
@@ -8,6 +9,7 @@ use crate::compat::{
     text::{layout_label, measure, Label},
     Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
+use std::collections::HashMap;
 fn setting(config: &Object, key: &str, fallback: f64, min: f64, max: f64) -> f64 {
     match config
         .get("treeView")
@@ -18,8 +20,8 @@ fn setting(config: &Object, key: &str, fallback: f64, min: f64, max: f64) -> f64
         _ => fallback,
     }
 }
-struct Row {
-    node: usize,
+struct Row<N> {
+    node: N,
     x: f64,
     cy: f64,
     icon: Option<String>,
@@ -37,6 +39,14 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut TypedPhase(m), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let loose = draw(m, c, o, r, false)?;
     if o.max_width.is_none_or(|w| !(w > 0.) || loose.width <= w) {
         return Ok(loose);
@@ -48,13 +58,13 @@ pub(super) fn render(
         loose
     })
 }
-fn draw(
-    m: &TreeViewModel,
+fn draw<P: PhaseInput>(
+    m: &mut P,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let pad = o.padding.unwrap_or(8.);
     let icons = icons::Config::new(c);
@@ -63,17 +73,23 @@ fn draw(
     let row_indent = setting(c, "rowIndent", 15., 0., 400.);
     let thickness = setting(c, "lineThickness", 1., 0.25, 12.);
     let mut max_depth = 0;
-    let mut depths = m.nodes[m.root]
-        .children
-        .iter()
-        .map(|&i| (i, 0usize))
-        .collect::<Vec<_>>();
+    let root_children = m.root_children()?;
+    let mut depths = Vec::new();
+    for i in 0..m.length(&root_children)? {
+        if m.has_index(&root_children, i)? {
+            depths.push((m.index(&root_children, i)?, 0usize));
+        }
+    }
     let mut i = 0;
     while tight && i < depths.len() {
-        let (node, depth) = depths[i];
+        let (node, depth) = depths[i].clone();
         max_depth = max_depth.max(depth);
-        for &child in &m.nodes[node].children {
-            depths.push((child, depth + 1));
+        let children = m.children(&node)?;
+        let mut j = 0;
+        while j < m.length(&children)? {
+            reserve::<P::Error>(depths.len())?;
+            depths.push((m.index(&children, j)?, depth + 1));
+            j += 1;
         }
         i += 1;
     }
@@ -91,31 +107,27 @@ fn draw(
     } else {
         4000.
     };
-    let title = layout_label(m.title.as_deref(), false, r, o, size, room, 1)?;
+    let title = m.title()?;
+    let title = layout_label(title.as_deref(), false, r, o, size, room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
         0.
     };
     let mut rows = vec![];
-    let mut row_of = vec![0; m.nodes.len()];
+    let mut row_of = HashMap::new();
     let mut pending = vec![];
-    let push = |list: &[usize], depth: usize, pending: &mut Vec<(usize, usize, bool)>| {
-        let slot = list
-            .iter()
-            .any(|&i| icons::get(&m.nodes[i], &icons).is_some());
-        for &i in list.iter().rev() {
-            pending.push((i, depth, slot));
-        }
-    };
-    push(&m.nodes[m.root].children, 0, &mut pending);
+    let children = m.root_children()?;
+    push(m, &children, &icons, 0, &mut pending)?;
     let mut label_right = 0.;
     let mut any_highlight = false;
     let mut rows_height = 0.;
-    while let Some((index, depth, slot)) = pending.pop() {
-        let node = &m.nodes[index];
+    let mut retained_text = 0usize;
+    while let Some((node, depth, slot)) = pending.pop() {
+        reserve::<P::Error>(rows.len())?;
         let x = depth as f64 * step;
-        let text = decode_entities(&node.name)?;
+        let text = decode_entities(&m.name(&node)?)?;
+        retain_text(&mut retained_text, &text)?;
         let label_x = x + if slot { size + 6. } else { 0. };
         let room = 40_f64.js_max(o.max_width.unwrap_or(320.) - 2. * pad - 8. - label_x);
         let label = if tight {
@@ -125,45 +137,32 @@ fn draw(
                 o,
                 size,
                 room,
-                if node.node_type == NodeType::Directory {
-                    1
-                } else {
-                    0
-                },
+                if m.directory(&node)? { 1 } else { 0 },
             )?)
         } else {
             None
         };
         let description = if tight {
-            node.description
-                .as_deref()
-                .filter(|s| !s.is_empty())
-                .map(|s| decode_entities(s).and_then(|s| literal_label(&s, r, o, size, room, 2)))
-                .transpose()?
+            if let Some(s) = m.description(&node, true)? {
+                let s = decode_entities(&s)?;
+                retain_text(&mut retained_text, &s)?;
+                Some(literal_label(&s, r, o, size, room, 2)?)
+            } else {
+                None
+            }
         } else {
             None
         };
         let width = if let Some(label) = &label {
             label.width
         } else {
-            measure(
-                r,
-                o,
-                &text,
-                size,
-                if node.node_type == NodeType::Directory {
-                    1
-                } else {
-                    0
-                },
-            )?
+            measure(r, o, &text, size, if m.directory(&node)? { 1 } else { 0 })?
         };
         if label_x + width > label_right {
             label_right = label_x + width;
         }
-        let highlighted = node
-            .css_class
-            .as_deref()
+        let highlighted = m
+            .css_class(&node)?
             .is_some_and(|class| class.split(space).any(|name| name == "highlight"));
         if highlighted {
             any_highlight = true;
@@ -182,11 +181,15 @@ fn draw(
             } else {
                 height / 2.
             };
+        let icon = icons::get_from(m, &node, &icons)?;
+        if let Some(icon) = &icon {
+            retain_text(&mut retained_text, icon)?;
+        }
         let row = Row {
-            node: index,
+            node: node.clone(),
             x,
             cy,
-            icon: icons::get(node, &icons),
+            icon,
             text,
             label_x,
             highlighted,
@@ -196,24 +199,21 @@ fn draw(
             height,
         };
         rows_height += height;
-        row_of[index] = rows.len();
+        row_of.insert(m.identity(&node)?, rows.len());
         rows.push(row);
-        push(&node.children, depth + 1, &mut pending);
+        let children = m.children(&node)?;
+        push(m, &children, &icons, depth + 1, &mut pending)?;
     }
     let desc_x = label_right + 16.;
     let mut width = label_right;
     for row in &rows {
-        let Some(description) = m.nodes[row.node]
-            .description
-            .as_deref()
-            .filter(|s| !s.is_empty())
-        else {
+        let Some(description) = m.description(&row.node, false)? else {
             continue;
         };
         let w = if let Some(label) = &row.description {
             label.width
         } else {
-            measure(r, o, &decode_entities(description)?, size, 2)?
+            measure(r, o, &decode_entities(&description)?, size, 2)?
         };
         width = width.js_max(if tight { row.label_x } else { desc_x } + w);
     }
@@ -224,13 +224,16 @@ fn draw(
     let total_height = (top + rows_height + pad).ceil();
     let mut guides = String::new();
     for row in &rows {
-        let children = &m.nodes[row.node].children;
-        if children.is_empty() {
+        let children = m.children(&row.node)?;
+        if m.length(&children)? == 0 {
             continue;
         }
         let gx = inset + row.x + 7.;
         let tick = gx.js_max(inset + row.x + step - padding_x);
-        let last = top + rows[row_of[*children.last().unwrap()]].cy;
+        let count = m.length(&children)?;
+        let last_child = m.index(&children, count - 1)?;
+        let last_row = lookup(m, &last_child, &row_of)?;
+        let last = top + rows[last_row].cy;
         let radius = 4_f64.js_min(tick - gx);
         let mut d = format!(
             "M{},{}V{}",
@@ -249,13 +252,17 @@ fn draw(
             );
         }
         if tick > gx {
-            for &child in children.iter().take(children.len() - 1) {
+            let mut child_index = 0;
+            while child_index + 1 < m.length(&children)? {
+                let child = m.index(&children, child_index)?;
+                let child_row = lookup(m, &child, &row_of)?;
                 d += &format!(
                     "M{},{}H{}",
                     num(gx),
-                    num(top + rows[row_of[child]].cy),
+                    num(top + rows[child_row].cy),
                     num(tick)
                 );
+                child_index += 1;
             }
         }
         guides += &format!("<path d=\"{d}\"/>");
@@ -263,9 +270,9 @@ fn draw(
     let baseline = size * 0.35;
     let mut body = String::new();
     for row in &rows {
-        let node = &m.nodes[row.node];
+        let node = &row.node;
         let cy = top + row.cy;
-        let directory = node.node_type == NodeType::Directory;
+        let directory = m.directory(node)?;
         let mut inner = String::new();
         if row.highlighted {
             let x = inset + row.x - 4.;
@@ -305,14 +312,14 @@ fn draw(
                 top + row.top + padding_y + row.label.as_ref().map_or(0., |l| l.height),
                 " class=\"pele-tree-description\" font-style=\"italic\" fill=\"var(--_m)\"",
             );
-        } else if let Some(description) = node.description.as_deref().filter(|s| !s.is_empty()) {
-            inner+=&format!("<text class=\"pele-tree-description\" x=\"{}\" y=\"{}\" font-style=\"italic\" fill=\"var(--_m)\" xml:space=\"preserve\">{}</text>",num(inset+desc_x),num(cy+baseline),esc(&decode_entities(description)?));
+        } else if let Some(description) = m.description(node, true)? {
+            inner+=&format!("<text class=\"pele-tree-description\" x=\"{}\" y=\"{}\" font-style=\"italic\" fill=\"var(--_m)\" xml:space=\"preserve\">{}</text>",num(inset+desc_x),num(cy+baseline),esc(&decode_entities(&description)?));
         }
         body += &format!(
             "<g class=\"pele-node pele-tree-{}{}\" data-id=\"{}\">{inner}</g>",
             if directory { "dir" } else { "file" },
-            class_names(node.css_class.as_deref().unwrap_or("")),
-            esc_text(&node.name)?
+            class_names(m.css_class(node)?.as_deref().unwrap_or("")),
+            esc_text(&m.name(node)?)?
         );
     }
     let content = format!(
@@ -329,6 +336,8 @@ fn draw(
             format!("<g class=\"pele-tree-guides\" fill=\"none\" stroke=\"var(--_b)\" stroke-width=\"{}\">{guides}</g>",num(thickness))
         }
     );
+    let acc_title = m.accessibility(false)?;
+    let acc_descr = m.accessibility(true)?;
     Ok(Rendered {
         svg: document(
             "treeView",
@@ -336,12 +345,151 @@ fn draw(
             total_height,
             size,
             o,
-            m.acc_title.as_deref(),
-            m.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width: total_width,
         height: total_height,
         links: vec![],
     })
+}
+
+pub(super) trait PhaseInput: icons::IconInput {
+    type Children;
+    fn root_children(&mut self) -> Result<Self::Children, Self::Error>;
+    fn children(&mut self, node: &Self::Node) -> Result<Self::Children, Self::Error>;
+    fn length(&mut self, children: &Self::Children) -> Result<usize, Self::Error>;
+    fn has_index(&mut self, children: &Self::Children, index: usize) -> Result<bool, Self::Error>;
+    fn index(&mut self, children: &Self::Children, index: usize)
+        -> Result<Self::Node, Self::Error>;
+    fn identity(&mut self, node: &Self::Node) -> Result<u64, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn description(
+        &mut self,
+        node: &Self::Node,
+        reread: bool,
+    ) -> Result<Option<String>, Self::Error>;
+    fn css_class(&mut self, node: &Self::Node) -> Result<Option<String>, Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, Self::Error>;
+}
+fn limit() -> PeleError {
+    PeleError::new(
+        "TreeView public graph exceeds native work budget",
+        ErrorCode::Limit,
+    )
+}
+// Repeated handles can expand into many owned rows. Charge each retained
+// occurrence, independently from the host reader's per-object read budget.
+fn retain_text(total: &mut usize, text: &str) -> Result<(), PeleError> {
+    *total = total.saturating_add(text.encode_utf16().count());
+    if *total > 16_000_000 {
+        Err(limit())
+    } else {
+        Ok(())
+    }
+}
+fn reserve<E: From<PeleError>>(count: usize) -> Result<(), E> {
+    if count >= 1_000_000 {
+        Err(limit().into())
+    } else {
+        Ok(())
+    }
+}
+fn push<P: PhaseInput>(
+    m: &mut P,
+    children: &P::Children,
+    icons: &icons::Config<'_>,
+    depth: usize,
+    pending: &mut Vec<(P::Node, usize, bool)>,
+) -> Result<(), P::Error> {
+    let count = m.length(children)?;
+    let mut slot = false;
+    for i in 0..count {
+        if m.has_index(children, i)? {
+            let node = m.index(children, i)?;
+            if icons::get_from(m, &node, icons)?.is_some() {
+                slot = true;
+                break;
+            }
+        }
+    }
+    let count = m.length(children)?;
+    if count > 1_000_000usize.saturating_sub(pending.len()) {
+        return Err(limit().into());
+    }
+    for i in (0..count).rev() {
+        pending.push((m.index(children, i)?, depth, slot));
+    }
+    Ok(())
+}
+fn lookup<P: PhaseInput>(
+    m: &mut P,
+    node: &P::Node,
+    rows: &HashMap<u64, usize>,
+) -> Result<usize, P::Error> {
+    rows.get(&m.identity(node)?).copied().ok_or_else(|| {
+        PeleError::new(
+            "TreeView child was not visited during layout",
+            ErrorCode::Semantic,
+        )
+        .into()
+    })
+}
+struct TypedPhase<'a>(&'a TreeViewModel);
+impl icons::IconInput for TypedPhase<'_> {
+    type Node = usize;
+    type Error = PeleError;
+    fn icon(&mut self, n: &usize) -> Result<Option<String>, PeleError> {
+        Ok(self.0.nodes[*n].icon.clone())
+    }
+    fn name(&mut self, n: &usize) -> Result<String, PeleError> {
+        Ok(self.0.nodes[*n].name.clone())
+    }
+    fn file(&mut self, n: &usize) -> Result<bool, PeleError> {
+        Ok(self.0.nodes[*n].node_type == NodeType::File)
+    }
+    fn directory(&mut self, n: &usize) -> Result<bool, PeleError> {
+        Ok(self.0.nodes[*n].node_type == NodeType::Directory)
+    }
+}
+impl PhaseInput for TypedPhase<'_> {
+    type Children = usize;
+    fn root_children(&mut self) -> Result<usize, PeleError> {
+        Ok(self.0.root)
+    }
+    fn children(&mut self, n: &usize) -> Result<usize, PeleError> {
+        Ok(*n)
+    }
+    fn length(&mut self, n: &usize) -> Result<usize, PeleError> {
+        Ok(self.0.nodes[*n].children.len())
+    }
+    fn has_index(&mut self, n: &usize, i: usize) -> Result<bool, PeleError> {
+        Ok(i < self.0.nodes[*n].children.len())
+    }
+    fn index(&mut self, n: &usize, i: usize) -> Result<usize, PeleError> {
+        Ok(self.0.nodes[*n].children[i])
+    }
+    fn identity(&mut self, n: &usize) -> Result<u64, PeleError> {
+        Ok(*n as u64)
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn description(&mut self, n: &usize, _: bool) -> Result<Option<String>, PeleError> {
+        Ok(self.0.nodes[*n]
+            .description
+            .clone()
+            .filter(|s| !s.is_empty()))
+    }
+    fn css_class(&mut self, n: &usize) -> Result<Option<String>, PeleError> {
+        Ok(self.0.nodes[*n].css_class.clone())
+    }
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, PeleError> {
+        Ok(if description {
+            self.0.acc_descr.clone()
+        } else {
+            self.0.acc_title.clone()
+        })
+    }
 }

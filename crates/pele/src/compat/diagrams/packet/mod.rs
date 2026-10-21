@@ -1,4 +1,6 @@
 //! Pele diagrams/packet/{parser,model,index}.ts, 458322a5 (MIT, kepano).
+mod live_phase;
+pub(crate) use live_phase::{render_detached, PacketDetachedInput};
 mod parser;
 mod public_model;
 pub use public_model::PacketPublicState;

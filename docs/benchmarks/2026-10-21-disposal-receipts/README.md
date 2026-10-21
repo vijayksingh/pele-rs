@@ -1,0 +1,15 @@
+# Terminal disposal releases publication receipts
+
+Commit `d7caf8c684ac6b6fda3918a2bcbd91c5953b92c9` clears completed publication receipts when a public model bridge is disposed. Previously, a caller-held leaf could retain the disposed bridge through the registry owner map, and the receipt retained the model root. Disposal now releases that root while the caller's leaf and borrowed helper remain usable.
+
+The Chromium reachability feature covers parsed, rendered, and helper-mutated roots. Before the change all three roots remained reachable after explicit disposal and CDP garbage collection; afterward all three were collected. Each held leaf retained ID `A`, index `0`, and its prototype helper. This is bounded reachability evidence, not a process-memory or allocation measurement.
+
+The consolidated browser slice passed 118 tests, with two explicit skips for the Chromium-only CDP test in Firefox and WebKit. It includes borrowed-helper disposal, callback state and exception behavior, source lifecycle, result factories, and transport limits. The standalone actual-Pele comparison passed 122 cases, TypeScript checks passed, and fresh Swift API correctness passed 168 conditions across 21 cases. These are scoped checks, not complete API parity or SwiftUI runtime verification.
+
+All 558 source inputs and 117 package files stayed unchanged across verification. The 370 native/SDK inputs, SDK archive, and Swift consumer exactly match the fresh `11f27516` proof; its native, Swift corpus, and C checks were reused rather than rerun. The initial proof helper failed during import resolution before any tests; its corrected before/after proofs and diagnostic note are retained.
+
+The matched VM window compares this candidate with immediate Rust control `11f27516`, with pinned Pele JS as the third lane. Both Rust packages have 117 files and the same WASM; only `full.js` and `graph-storage.js` differ. The original `e148605` package is used only by untimed probes. All 24 conditions retain 21 balanced paired trials and 1,000 ms warmup, with 36 separate activation/continuity checks.
+
+All six Sankey parse paired medians are lower by 0.38-6.96%, while candidate parse takes 3.395-11.991 times JS. The large fixed/Canvas rows have only 12/21 and 11/21 lower pairs. Retained rendering is mixed: three of six conditions are adverse, spanning -1.15% to +2.93% paired and 1.973-3.121 times JS. Three Sankey source conditions and both Flowchart source controls are adverse. [All rows and controls](RESULTS.md) are preserved alongside the raw samples; paired medians and ratios of independent medians are distinct statistics.
+
+The reachability result does not establish a GC performance cause, allocation savings, or a broad performance win. No first-use or profile run was performed for this layer. Historical release-gate failures remain unresolved, and these checks do not establish complete API parity or a release. Run `python3 verify.py` for the portable data-only audit; it does not execute the library, tests, or benchmarks.

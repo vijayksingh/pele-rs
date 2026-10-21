@@ -1,0 +1,1 @@
+Run `python3 verify.py`, then `python3 analyze.py` from this directory. The large ingress activation report is losslessly stored as `.json.gz`; verification checks its original uncompressed hash from the unchanged index. The analyzer uses the unchanged raw profiles and summary. No browser, native build or timing runs during these commands.

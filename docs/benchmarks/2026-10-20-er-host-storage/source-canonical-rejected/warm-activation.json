@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T16:25:19.031Z",
+  "roots": {
+    "control": "/home/admin/pele-perf.jL9wzP/parse-architecture/svg-append-e148/candidate-package",
+    "candidate": "/home/admin/pele-perf.jL9wzP/parse-architecture/source-layout-d35ca5b/candidate-package"
+  },
+  "checks": [
+    {
+      "runtime": "control",
+      "case": "sankey/small",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null
+    },
+    {
+      "runtime": "control",
+      "case": "flowchart/medium",
+      "modelType": "flowchart",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/medium",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null
+    },
+    {
+      "runtime": "control",
+      "case": "sankey/large",
+      "modelType": "sankey",
+      "expected": null,
+      "actual": null,
+      "calls": 0,
+      "metadata": null
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/small",
+      "modelType": "sankey",
+      "expected": "PLCSRC01",
+      "actual": "PLCSRC01",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC01",
+        "type": "sankey",
+        "canonicalBytes": 1172,
+        "recipeBytes": 1212
+      }
+    },
+    {
+      "runtime": "candidate",
+      "case": "flowchart/medium",
+      "modelType": "flowchart",
+      "expected": null,
+      "actual": null,
+      "calls": 1,
+      "metadata": {
+        "capability": null
+      }
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/medium",
+      "modelType": "sankey",
+      "expected": "PLCSRC01",
+      "actual": "PLCSRC01",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC01",
+        "type": "sankey",
+        "canonicalBytes": 5804,
+        "recipeBytes": 3724
+      }
+    },
+    {
+      "runtime": "candidate",
+      "case": "sankey/large",
+      "modelType": "sankey",
+      "expected": "PLCSRC01",
+      "actual": "PLCSRC01",
+      "calls": 1,
+      "metadata": {
+        "capability": "PLCSRC01",
+        "type": "sankey",
+        "canonicalBytes": 23836,
+        "recipeBytes": 13700
+      }
+    }
+  ],
+  "selectors": false,
+  "directParseSPI": false,
+  "probeInsideTimer": false,
+  "browser": "156.0.8078.4",
+  "prototypesRestored": true,
+  "succeeded": true,
+  "browserClosedBeforeTiming": true,
+  "completedAt": "2026-10-20T16:25:19.741Z"
+}

@@ -4,7 +4,10 @@
 //! and export use worklists; neither serialization nor recursive Clone is used.
 use super::{Treemap, TreemapModel, TreemapNode};
 use crate::compat::{
-    public::{Atom, GraphWriter, ModelGraph, Node, PublicDiagramModule},
+    public::{
+        Atom, DetachedPublicRender, DetachedRenderCapability, GraphWriter, ModelGraph, Node,
+        PublicDiagramModule,
+    },
     DiagramModule, DiagramType, ErrorCode, Object, PeleError, RenderResources, RenderSettings,
     Rendered,
 };
@@ -340,6 +343,12 @@ impl PublicDiagramModule for Treemap {
         let model = imported(&graph);
         Ok(TreemapPublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }
@@ -349,6 +358,14 @@ impl PublicDiagramModule for Treemap {
         s.graph = g;
         s.model = model;
         Ok(())
+    }
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::treemap())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::treemap(
+            super::TreemapDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
     }
     fn render_public(
         &self,

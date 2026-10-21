@@ -1,7 +1,8 @@
 //! Opt-in native ClassDb/ClassMember codec, Pele 458322a5 (MIT, kepano).
 //! Object identity belongs to the arena; render imports the existing concrete
 //! ClassModel without reparsing. Namespace maps and tag Sets retain live aliases.
-//! Constructor calls and overridden callbacks need separate dispatch capability.
+//! Root and member construction use captured native factories. Member bodies
+//! yield virtual method reads/calls without retaining a state borrow.
 //! Own readonly Array length is represented by an additional flags0 property;
 //! default writable flags2 is implicit alongside scalar Array.length.
 use super::model::RelationType;
@@ -11,11 +12,16 @@ use crate::compat::{
         ActiveModel, Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString,
         MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema, ModelDelta, ModelGraph,
         ModelSchema, Node, Property, PrototypeId, PrototypeParent, PrototypeSchema,
-        PublicDiagramModule, PublicError, RecordId, RecordKind, RecordSchema,
+        PublicConstructorFactory, PublicDiagramModule, PublicError, RecordId, RecordKind,
+        RecordSchema,
     },
     ErrorCode,
 };
 use std::collections::{BTreeSet, HashMap, HashSet};
+#[path = "public_model/display_continuation.rs"]
+mod display_continuation;
+#[path = "public_model/member_constructor.rs"]
+mod member_constructor;
 const PROTO: PrototypeId = PrototypeId(1);
 const MEMBER: PrototypeId = PrototypeId(2);
 const fn field_schema(
@@ -1491,10 +1497,39 @@ fn initial(m: &ClassModel) -> Result<ModelGraph, PeleError> {
     graph.validate()?;
     Ok(graph)
 }
+fn construct_default() -> Result<ClassPublicState, PeleError> {
+    Class.create_public(&ClassModel::new(None))
+}
 impl PublicDiagramModule for Class {
     type PublicState = ClassPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::class())
+    }
+    fn detached_public_render(
+        &self,
+        state: &ClassPublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::class(
+            super::live_phase::ClassDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        match prototype {
+            PROTO => Some(PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )),
+            MEMBER => Some(member_constructor::factory()),
+            _ => None,
+        }
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -1506,6 +1541,12 @@ impl PublicDiagramModule for Class {
         let model = imported(&graph);
         Ok(ClassPublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &ClassPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }
@@ -1514,6 +1555,35 @@ impl PublicDiagramModule for Class {
         s.model = imported(&g);
         s.graph = g;
         Ok(())
+    }
+    fn active_public_operation(
+        &self,
+        state: &mut ClassPublicState,
+        operation: crate::compat::public::PublicActiveOperation,
+        budget: &mut crate::compat::public::PublicActiveBudget,
+    ) -> Result<crate::compat::public::PublicActiveValue, PublicError> {
+        use crate::compat::public::{PublicActiveOperation, PublicActiveValue};
+        let mut context = Context::new(&mut state.graph);
+        context.work = 1_000_000 - budget.remaining;
+        let result = match operation {
+            PublicActiveOperation::Builtin(call) if call.method.0 != 26 => (|| {
+                context.validate(&call.receiver)?;
+                for atom in &call.arguments {
+                    context.validate(atom)?;
+                }
+                context.invoke(call).map(PublicActiveValue::Atom)
+            })(),
+            operation => operation.run(&mut context),
+        };
+        budget.remaining = 1_000_000 - context.work.min(1_000_000);
+        state.model = imported(&state.graph);
+        result
+    }
+    fn detached_public_invocation(
+        &self,
+        call: MethodCall,
+    ) -> Option<crate::compat::public::DetachedPublicInvocation> {
+        display_continuation::prepare(call)
     }
     fn invoke_public(
         &self,
@@ -2984,6 +3054,29 @@ impl super::render::LiveMembers for Live<'_> {
             },
             tooltip: i.optional(&a, "tooltip")?,
         })
+    }
+    fn annotations(&mut self, index: usize) -> Result<Vec<String>, PeleError> {
+        let value = self.class_value(index);
+        let class = self.result(value)?;
+        let graph = &*self.context.g;
+        let mut import = Import {
+            g: graph,
+            bytes: 0,
+            work: 0,
+        };
+        import.texts(required(graph, &class, "annotations")?)
+    }
+    fn paint(&mut self, index: usize) -> Result<ClassNode, PeleError> {
+        self.class(index)
+    }
+    fn metadata(&mut self, key: &str) -> Result<Option<String>, PeleError> {
+        let graph = &*self.context.g;
+        let mut import = Import {
+            g: graph,
+            bytes: 0,
+            work: 0,
+        };
+        import.optional(&graph.root, key)
     }
     fn definition(&mut self, name: &str) -> Result<Vec<String>, PeleError> {
         let result = (|| {

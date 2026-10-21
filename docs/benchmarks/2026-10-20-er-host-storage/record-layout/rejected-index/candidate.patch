@@ -1,0 +1,30 @@
+--- a/bindings/web/host-er-store.js
++++ b/bindings/web/host-er-store.js
+@@ -239,7 +239,8 @@
+ export class HostErOwner {
+   constructor(registration,registry,root,invoke) {
+     this.registration=registration;this.registry=registry;this.root=root;
+-    this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();
++    // Every indexed object is already strongly retained by objects until reset/disposal.
++    this.objects=[];this.ids=new Map();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();
+     this.hostValues=[];this.hostIds=new Map();this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];
+     this.disposed=false;this.phase='constructing';this.epoch=0n;this.resourceDepth=0;this.methodDepth=0;this.depth=0;
+     this.invoke=invoke;this.temporary=null;this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];
+@@ -361,7 +362,7 @@
+     if(this.phase!=='idle'&&this.phase!=='needsAudit'&&!nested)throw new TypeError('Public model document is already in use');
+     if(this.depth>=128)throw new PeleError('Host operation nesting exceeds work budget','limit');
+     const previous=this.phase;this.phase='entryAudit';
+-    try{const audit=this.audit(values,true,false,collectFrame&&kind==='render'&&this.depth===0);this.frameAdmission(audit,0);if(this.epoch===0xffffffffffffffffn)throw new RangeError('Public model revision exhausted');this.epoch++;if(this.depth===0)this.temporary={objects:[],objectsIds:new WeakMap(),strings:[],stringsIds:new Map(),hosts:[],hostsIds:new Map(),units:0};this.depth++;this.phase='running';if(kind==='method')this.methodDepth++;return{audit,previous,nested,kind,finishedAudit:false};}
++    try{const audit=this.audit(values,true,false,collectFrame&&kind==='render'&&this.depth===0);this.frameAdmission(audit,0);if(this.epoch===0xffffffffffffffffn)throw new RangeError('Public model revision exhausted');this.epoch++;if(this.depth===0)this.temporary={objects:[],objectsIds:new Map(),strings:[],stringsIds:new Map(),hosts:[],hostsIds:new Map(),units:0};this.depth++;this.phase='running';if(kind==='method')this.methodDepth++;return{audit,previous,nested,kind,finishedAudit:false};}
+     catch(error){this.phase=nested?previous:'needsAudit';throw error;}
+   }
+   structure(token){this.phase='finalAudit';try{token.audit=this.audit([],false);token.finishedAudit=true;if(token.audit.references>8_000_000)throw new PeleError('Public graph exceeds work budget','limit');return token.audit;}catch(error){token.auditError=error;token.auditFailed=true;throw error;}}
+@@ -558,7 +559,7 @@
+     if(offset!==bytes.byteLength)bad();
+     return 0;
+   }
+-  disposeConstruction(){this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];this.objects=[];this.ids=new WeakMap();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();this.hostValues=[];this.hostIds=new Map();this.root=undefined;this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];}
++  disposeConstruction(){this.constructionNode=null;this.constructionString=null;this.constructionBytes=0;this.constructionNeedsAudit=false;this.constructionLayouts=[];this.objects=[];this.ids=new Map();this.strings=[];this.firstStrings=new Map();this.lastStrings=new Map();this.hostValues=[];this.hostIds=new Map();this.root=undefined;this.units=0;this.references=0;this.nodeBytes=[];this.nodeRefs=[];}
+   // Generic adapter ABI; no ER method/field decisions occur in this switch.
+   primitive(op,args){
+     this.assertLive();

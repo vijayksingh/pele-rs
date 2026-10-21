@@ -1,5 +1,7 @@
 //! Pele diagrams/info/{index,model,parser,render}.ts, 458322a5 (MIT, kepano).
 //! Information diagrams report the pinned compatibility engine version.
+mod live_phase;
+pub(crate) use live_phase::{render_detached, InfoDetachedInput};
 mod parser;
 mod public_model;
 pub use public_model::InfoPublicState;

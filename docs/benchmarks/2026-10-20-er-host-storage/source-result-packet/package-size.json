@@ -1,0 +1,38 @@
+{
+  "method": "Raw WASM from exact frozen packages; gzip level9, Brotli quality11 generic mode. Compression bytes are storage/transfer diagnostics, not runtime allocation or latency.",
+  "node": "v25.9.0",
+  "zlib": "1.3.1-e00f703",
+  "brotli": "1.2.0",
+  "wasm": {
+    "control": {
+      "rawBytes": 8149880,
+      "rawSha256": "6567d1a9ca51488928fd5940c7dc53afb85038c181d6278b84f55fcb0d4a1f8e",
+      "gzipBytes": 2481985,
+      "gzipSha256": "5e342665b076afef9f9da4e8f658a0ba525e3359dda44d6144453fea9b30dbc3",
+      "brotliBytes": 1713271,
+      "brotliSha256": "5a78eaa24b162d4769d1270db3686d1b6d617dd31f24282fcb9be6f8827cb6b2"
+    },
+    "candidate": {
+      "rawBytes": 8153968,
+      "rawSha256": "0cc191fa6f7e12d3a81fbe956ee3a60a5ed7db758ea1340fe11e47d8181e3ba2",
+      "gzipBytes": 2483251,
+      "gzipSha256": "8ab466ef83f5d7c59030ea7acd721d3f7726bc377b65112fae11e57a3da8060e",
+      "brotliBytes": 1713888,
+      "brotliSha256": "c5494dfb55d259cf6d62fc7f9b8a2ac941579603c75369e580df18a16dfedc15"
+    }
+  },
+  "deltas": {
+    "rawBytes": {
+      "bytes": 4088,
+      "percent": 0.05016024775825745
+    },
+    "gzipBytes": {
+      "bytes": 1266,
+      "percent": 0.051007560480820224
+    },
+    "brotliBytes": {
+      "bytes": 617,
+      "percent": 0.03601298335171865
+    }
+  }
+}

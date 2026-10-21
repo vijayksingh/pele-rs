@@ -18,6 +18,26 @@ v1-only engine and wrappers are removed. A new release remains on hold while the
 web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
+**Functional port verified in Rust, Swift and packed WebAssembly.** The current
+checkpoint passes **99 Swift integration tests**, **seven strict C clients** and
+**387 browser checks** (129 each in Chromium, Firefox and WebKit). The public
+runtime audit matches Pele for **33/33 families**; all 22 class-root constructors
+and ClassMember are implemented. Packed type exports cover all 33 model names.
+
+Constructors, mutable helpers, live callbacks, original errors, retained iterables,
+calendar resources and native presentation use shared Rust operations. The latest
+batch also fixes XYChart's NaN loop termination. [Results, source/artifact hashes
+and retained failures](docs/parity/2026-10-21-api-completion/README.md) include
+scope and limitations. Firefox's unstable intrinsic constructor key order is
+recorded separately; names, arity, descriptors, class identity and original errors
+remain checked. General JavaScript metaprogramming is outside this acceptance.
+See the [constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md) and
+[owned runtime contract](docs/LLD_OWNED_RUNTIME_COMPLETION.md).
+
+Native normal/prepared Sankey resource callbacks support same-document helpers,
+edits and nested rendering. [Scoped verification](docs/parity/2026-10-21-native-sankey-callbacks/README.md)
+preserves the original failures, matching SDK identity and actual C/Swift results.
+
 ![Packed Rust WASM demo: five diagram families, mutable pie, error recovery and dark palette](docs/images/full-demo.gif)
 
 Recorded from the actual packed-library playground with
@@ -175,42 +195,168 @@ provided by the host. Source, retained-model and mutable-model APIs use this sam
 
 ## Performance
 
-**The current WASM build does not meet the goal of matching Pele JS.** Independent
-VM measurements across 21 workloads show warm source rendering takes
-1.92–5.25× the Pele JS time. No speedup or GPU acceleration is claimed.
+**0.3 remains unreleased. JS performance parity is not met.** The most recent
+complete release-gate run, historical source `0b32797`, fails all 126 conditions.
+New scoped diagnostics do not replace that gate.
 
-Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
-Same browser, inputs and cached Canvas metrics; nine alternating trials after
-at least 100 ms warmup per API. Complete SVG and dimensions match before/after.
-Large workloads use 200 units, except Sankey (199 links) and Railroad (60 rules).
+The latest measured candidate, [`d7caf8c`](docs/benchmarks/2026-10-21-disposal-receipts/), releases disposed publication receipts while preserving caller-held leaves and helpers. In the matched 24-row window versus immediate Rust control [11f](docs/benchmarks/2026-10-21-source-symbols/), all six Sankey parse paired medians are lower by 0.38-6.96%, but parse remains **3.395-11.991x JS**. **Warm retained rendering remains 1.973-3.121x JS**; three of six conditions are adverse versus 11f (-1.15% to +2.93% paired). Three source-render conditions and both Flowchart source controls are adverse. Large parse has only 12 and 11 lower pairs out of 21; the reachability fix does not establish a GC performance cause. All rows, controls and 36 untimed probes are retained. Node 122, browser 118 with two explicit CDP-only skips, TypeScript and fresh Swift API 168/21 pass; unchanged native inputs reuse 11f's fresh SDK/Swift/C proof. First-use and the full release gate were not rerun; complete API parity remains unproven. No 0.3 release.
 
-| Large workload | Pele JS | Rust/WASM | WASM / JS |
-| --- | ---: | ---: | ---: |
-| Flowchart | 1.387 ms | 3.025 ms | 2.18× |
-| Sequence | 0.512 ms | 1.344 ms | 2.62× |
-| ER | 2.900 ms | 8.050 ms | 2.78× |
-| Pie | 0.281 ms | 0.769 ms | 2.73× |
-| Sankey | 0.869 ms | 1.987 ms | 2.29× |
-| Gantt | 0.719 ms | 2.975 ms | 4.14× |
-| Railroad | 0.756 ms | 2.325 ms | 3.07× |
+The earlier [owned-ID index experiment](docs/benchmarks/2026-10-21-owned-ids/) passed correctness but produced mixed same-run results versus 11f, including small-parse regressions; it was rejected and reverted before the disposal fix.
 
-Swift runs here on Apple M1 Pro because the Linux VM lacks the macOS/AppKit SDK.
-Seven-trial medium-workload medians (48 units; Railroad 15 rules):
+The preceding candidate, [`bb0fc18`](docs/benchmarks/2026-10-20-er-host-storage/source-typed-columns/), remains **rejected for release**. Compact source columns avoid tagged-scalar expansion, but parse still takes 5.50–13.15× Pele JS. Five of six edited Sankey workflows remain slower than the original best Rust checkpoint (−2.01% to +22.20% paired). All 48 diagnostic rows and adverse controls are preserved. Fresh regression checks pass: 54 native integrations, 81 browser cases, Swift 16, strict C 3 and API 168. A direct oracle audit additionally found callback-mutation and helper-reentry mismatches; existing restoration tests did not establish that contract. Full API parity remains incomplete. First-use includes parse, edit setup, render and disposal. [Prepared admission](docs/benchmarks/2026-10-20-er-host-storage/source-prepared-ingress/), [edited profiles](docs/benchmarks/2026-10-20-er-host-storage/source-sparse-ingress/profile/) and [parse profiles](docs/benchmarks/2026-10-20-er-host-storage/source-fresh-initializer/profile/) remain preserved. No 0.3 release.
 
-| Medium workload | Source render | Retained render | Mutable render |
-| --- | ---: | ---: | ---: |
-| Flowchart | 0.597 ms | 0.493 ms | 0.621 ms |
-| Sequence | 0.275 ms | 0.235 ms | 0.290 ms |
-| ER | 1.624 ms | 1.411 ms | 1.580 ms |
-| Pie | 0.306 ms | 0.290 ms | 0.309 ms |
-| Sankey | 0.399 ms | 0.372 ms | 0.420 ms |
-| Gantt | 0.450 ms | 0.383 ms | 1.130 ms |
-| Railroad | 0.469 ms | 0.442 ms | 0.501 ms |
+The preceding default checkpoint appends Sankey SVG directly into existing paint buffers,
+sharing exact numeric/escaping rules with the other renderers. [Matched VM and
+local evidence](docs/benchmarks/2026-10-20-er-host-storage/svg-append/), `e148605`:
 
-The Swift and VM figures cannot be compared across machines. Timings include
-public API/ownership costs, and exclude startup, downloads and SVG painting.
-Larger compiler and schema-cache experiments showed no reliable overall win and
-remain out of the default. See [methodology, all stages and raw results](docs/benchmarks/2026-10-19-vm/README.md).
+| Default Sankey path | Paired change versus indexed-source default | Candidate / Pele JS |
+| --- | --- | --- |
+| Warm source render, six conditions | 18.74–26.04% lower | 0.993–1.578× |
+| Warm retained render, six conditions | 14.43–18.14% lower | 1.78–2.79× |
+| First unchanged render | 5.51–12.79% lower | 2.20–5.11× |
+| First edited render | 5.69–8.98% lower | 3.77–7.49× |
+
+The edit adds a cyclic extension property, not diagram content. All48 diagnostic
+rows and adverse controls remain visible: five warm Sankey parse rows increase
+1.81–4.69%, and Flowchart retained rows increase2.06–2.63% paired. This does not
+establish overall parity or neutrality. Parse still measures6.44–15.06×JS in
+this window; percentages are not compounded with earlier measurements.
+
+For that SVG checkpoint:24native feature integrations;12focused browser checks
+across Chromium, Firefox and WebKit; fresh arm64 SDK Swift16, strict C3 and
+API168, covering12,481drawings and16,572expected errors. No new Swift timing
+claim. Intel SDK and AppKit activation remain release checks.
+
+The preceding [indexed source ownership](docs/benchmarks/2026-10-20-er-host-storage/indexed-sankey/)
+reduced cloned endpoint records while preserving public models and helpers.
+Source-backed storage still needs validation and publication corrections to address
+the larger mutable-parse cost. No GPU or all33diagram speedup is claimed. VM and Swift
+use different machines; their timings cannot be subtracted to estimate bridge cost.
+
+<details>
+<summary>Earlier measurements and rejected experimental backends</summary>
+
+The native canonical Sankey backend puts its model tables in Rust-owned POD
+pages, streams bounded host observations and shares browser publication and
+matching. Its [first runtime](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-rejected/)
+still regressed against the arena. Profiling located repeated memory-view
+refreshes and buffer getters, rather than the grammar, as a major cost.
+
+The [bounded row reader](docs/benchmarks/2026-10-20-er-host-storage/native-pod-cursor/),
+source `5db9f35`, lowered paired parse time 22.19–29.78% and retained render
+32.98–37.70% against the first native reader. The subsequent
+[operation-scoped read sessions](docs/benchmarks/2026-10-20-er-host-storage/native-read-sessions/),
+source `4033e41`, lower parse another **4.05–11.08%** and retained render
+**4.17–15.91%** versus the preceding cursor. Separate windows are not compounded.
+A matched arena comparison still fails acceptance:
+
+| Current opt-in native backend | Cost versus arena | Cost versus pinned JS |
+| --- | ---: | ---: |
+| Parse, six size/resource conditions | 1.28–1.47× | 12.82–20.83× |
+| Retained render, six conditions | 1.20–1.41× | 2.70–4.64× |
+
+The latest comparisons retain all **48 rows**, 21 paired samples per row,
+source controls and adverse Flowchart controls. In the arena window, Flowchart
+paired parse medians rise 3.15–6.71% and retained render 2.91–3.48%; no default-path
+neutrality is claimed. Candidate/control packages differ in two JS modules and
+use identical WASM. **The native backend stays disabled.** Six fresh profiles
+show refresh down to 0.45% parse / 0.14% retained inclusive sampled time. Native
+construction and generic publication remain substantial; profile groups overlap
+and do not predict speedup.
+
+[Browser correctness at `3166b3d`](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-browser/)
+passes **468/468 checks**, 156 per engine, with all 586 source inputs and 113
+packed files pinned and unchanged. This includes the selected native backend,
+memory growth, callback restoration and failure recovery. The later session
+runtime passes **84 focused checks** across Chromium, Firefox and WebKit.
+Test-only `34da266` adds three factory-failure checks, each with six normal/raw
+cases, original thrown values, restored aliases and exact recovery; both the
+initial fixture failure and corrected run are retained.
+[Fresh local SDK correctness](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-correctness/)
+passes 16 Swift integrations, three C consumers and 168 API conditions;
+its corpus covers 12,481 drawings and 16,572 expected errors with zero explicit
+budget differences. All 362 native/SDK inputs remain unchanged through these
+JS/test changes. These checks establish neither performance parity nor release
+readiness.
+
+The previous [JS-column backend](docs/benchmarks/2026-10-20-er-host-storage/captured-backend-rejected/)
+also remains rejected: parse was 5.3–6.5× arena latency and retained render
+3.7–4.0×. Its separate 450-test correctness result belongs to `00d2411` and is
+not relabeled as the native backend's validation.
+
+The first [shared traversal attempt](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-rejected/)
+was rejected after Flowchart/medium fixed retained render measured **9.16% slower**
+(4/21 lower pairs). The revised [shared traversal](docs/benchmarks/2026-10-20-er-host-storage/shared-graph-traversal-v2/),
+source `e48ea33`, passed full 417 and focused 54 browser tests but has **mixed timing,
+not a neutrality or speedup claim**: its 42-row same-WASM diagnostic has median paired
+changes of −0.19% for parse, +0.22% for retained render and +0.14% for source
+render; 40 first-use rows also retain
+adverse conditions. Both packages use identical `365ec6d` WASM. These results cover
+only the browser traversal preparation, not the later native graphless Sankey owner
+and not the 126-condition release gate.
+
+The [shared constructor evidence](docs/benchmarks/2026-10-20-er-host-storage/shared-constructor/README.md) retains both the rejected per-field extraction and its bulk-storage redesign. V1 increased all six ER parse conditions (median paired +5.45%). V2 removes the per-record wrapper/per-field sink callback while preserving the shared wire decoder: parse shifts −0.84% to +1.86% (median −0.33%, four lower/two higher), with retained/source controls mixed. Each version passed 57 focused browser checks; both VM runs used the same frozen `365ec6d` WASM and accepted V2 traversal control. These are descriptive enabling-layer results, not neutrality, a general speedup, a new Sankey backend or a passing release gate.
+
+An earlier [storage preparation](docs/benchmarks/2026-10-20-er-host-storage/shared-public-primitives/),
+source `1906d68`, separates construction and projection from native graph storage.
+It still retains the arena and initial snapshot/decode. Its 30-condition VM run
+shows **all six Sankey parse rows slower by 0.51–6.22%**, and all six retained
+rows slower by 0.04–5.45%. In a separate 24-condition first-use run, large fixed
+Sankey's first unchanged render is **19.04% slower**; source controls are mixed,
+including a 7.16% slowdown. These preparation layers establish no speedup.
+
+Earlier matched checkpoints have scoped gains, while still trailing JS:
+
+| Evidence checkpoint | Paired change versus its control | Measured cost versus JS |
+| --- | --- | --- |
+| [Arena result transport](docs/benchmarks/2026-10-20-er-host-storage/arena-render-packet/), `9ae8142` | All 36 affected retained rows lower; median −15.30% | 1.65–18.49× |
+| [Source result transport](docs/benchmarks/2026-10-20-er-host-storage/source-result-packet/), `640deee` | All 42 source rows lower; median −13.89% | 1.35–4.63× |
+| [Owned Sankey construction](docs/benchmarks/2026-10-20-er-host-storage/owned-construction/), `b19f38d` | All six parse rows 8.65–11.19% lower | 8.91–15.08× |
+
+Each link retains all samples and adverse controls. These are different artifacts
+and timer windows; percentages are not compounded. First-use measurements include
+parse, first API use and disposal. Native allocation counts are separate from
+latency and RSS. [Earlier checkpoints](docs/PERFORMANCE_CHECKPOINTS.md) retain the
+full measurement history, native-core comparisons, compiler tradeoffs and rejected
+experiments.
+
+Latest [local Swift timing](docs/benchmarks/2026-10-20-er-host-storage/native-canonical-swift-timing/),
+`25d87cb` → `3166b3d`, completed all four Sankey/medium conditions with 15 pairs
+each: mutable parse **−0.299%**, immutable parse **−0.125%**, render **+1.328%**,
+lifetime **−0.337%**. The strict compiler/test guard passed, but the shared host
+was not idle; lifetime pairs range **−82.43% to +95.81%**. Every sample is retained.
+This is neither a general speedup nor a neutrality claim, and it does not measure
+the opt-in browser backend.
+
+Correctness is pinned separately from performance:
+
+- `9ae8142`: full browser suite **417/417**, 41 native integrations, Swift 16,
+  strict C3 and 168 API conditions pass.
+- `1906d68`: 20 targeted native integrations and **24 browser checks** pass;
+  fresh SDK, Swift 16, strict C3 and API168 pass with all 353 source/SDK inputs
+  unchanged. The preceding construction slice passed 18 overlapping integrations.
+- Subsequent helper-storage source `243580c`: **22 native integrations** pass,
+  including raw duplicate keys/descriptors, exact number bits, partial failures
+  and repair. Fresh SDK at `365ec6d` passes Swift 16, strict C3 and API168 with all
+  354 source/SDK inputs unchanged. The traversal experiment stopped at 147 browser
+  passes, one interruption and 269 unrun checks; it is not a full-suite pass.
+- Captured native core `25d87cb`: **61 feature-enabled and 29 default native
+  integrations** pass. Its fresh arm64 SDK passes Swift 16, strict C3 and API168;
+  the ER/Sankey corpus covers 12,481 drawings and 16,572 expected errors with zero
+  explicit budget differences. All 357 source/SDK inputs stay unchanged through
+  correctness. Later combined source dispatch `eb72419` passes **22 native
+  integrations** separately; the SDK proof remains pinned to `25d87cb`.
+  [Exact logs, source bindings and portable verifier](docs/benchmarks/2026-10-20-er-host-storage/captured-native-core/README.md).
+  These overlapping checks do not establish captured-browser validation or latency.
+
+Work now targets the remaining publication/read boundaries and native
+construction costs, preserving eager projection and full callback restoration.
+Intel SDK and AppKit activation
+verification remain release checks. No GPU acceleration or all-33 JS speedup is
+claimed. Timings exclude startup, downloads and SVG painting; Swift and VM figures
+use different machines and cannot be subtracted to estimate bridge cost.
+
+</details>
 
 ## Build and verification
 
@@ -228,12 +374,15 @@ scripts/build-wasm.sh
 npm run test:types
 ```
 
-The current cleanup passes all-target Rust compilation, packaged Rust consumers
-for all 33 mutable families, 28 strict C executions across ARM/Intel, all-33-family
-Swift consumers on both architectures, native painted-pixel checks, and the
-canonical web package and 60 focused browser checks through Chromium/Firefox/WebKit. An independent exact-WASM
-consumer checks all 33 complete SVG baselines and live host features. The broader
-pinned corpus history is retained in [verification evidence](docs/FULL_PARITY_PROGRESS.md).
+The previous eager checkpoint passed 42 native public integrations and all 324
+browser checks. Current static-policy validation passes 20 native integrations,
+three strict ARM64 C programs, the complete 33-family Swift corpus plus seven
+eager integrations, all 168 consumer API conditions and 12 corpus/identity checks
+for ER/Gantt/Sequence across Chromium/Firefox/WebKit. Full Swift UI activation checks remain failing
+as disclosed above; the new ARM64 SDK is not universal Intel release proof.
+Earlier cross-platform release evidence and the broader pinned corpus history
+remain in [verification evidence](docs/FULL_PARITY_PROGRESS.md) and
+[0.2 acceptance](docs/RELEASE_0_2.md).
 
 `scripts/verify.sh` runs Rust integration corpora, packaged consumers, strict C
 ownership checks, Swift integration features, AppKit checks and packed-WASM

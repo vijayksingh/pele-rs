@@ -8,6 +8,39 @@ use crate::compat::{
 };
 pub type SwimlanePublicState = FlowchartPublicState;
 impl PublicDiagramModule for Swimlane {
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::swimlane())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::swimlane(state.detached_seed()))
+    }
+
+    fn active_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        operation: PublicActiveOperation,
+        budget: &mut PublicActiveBudget,
+    ) -> Result<PublicActiveValue, PublicError> {
+        Flowchart.active_public_operation(state, operation, budget)
+    }
+
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PrototypeId(1)).then(|| {
+            PublicConstructorFactory::first_value::<Self>(
+                prototype,
+                crate::compat::diagrams::flowchart::construct_flow_with,
+                crate::compat::diagrams::flowchart::FLOW_LIVE_FIELDS,
+            )
+            .sharing_class::<Flowchart>()
+        })
+    }
+    fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        crate::compat::diagrams::flowchart::detached_flow_method::<Self>(call)
+    }
+
     type PublicState = SwimlanePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         Flowchart.model_schema()
@@ -31,6 +64,12 @@ impl PublicDiagramModule for Swimlane {
         limit: crate::compat::EdgeLimit,
     ) -> Result<Self::PublicState, PeleError> {
         crate::compat::public::create_prepared_edge_public(self, model, limit)
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Flowchart.borrow_public_graph(state)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Flowchart.export_public(state)

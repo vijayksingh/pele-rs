@@ -9,7 +9,7 @@ fn invalid(message: &str) -> PeleError {
 fn failure(error: PeleError) -> JsValue {
     JsValue::from_str(&super::render_numbers::failure(&error))
 }
-fn config(json: &str) -> Result<Object, PeleError> {
+pub(super) fn config(json: &str) -> Result<Object, PeleError> {
     if json.len() > 1024 * 1024 {
         return Err(PeleError::new(
             "Prepared config exceeds 1 MiB transport budget",
@@ -26,7 +26,7 @@ fn edge(kind: u32, value: f64) -> Result<EdgeLimit, PeleError> {
         _ => Err(invalid("Invalid prepared maxEdges kind")),
     }
 }
-fn builtin_id(id: &str) -> Result<DiagramId, PeleError> {
+pub(super) fn builtin_id(id: &str) -> Result<DiagramId, PeleError> {
     DIAGRAM_TYPES
         .into_iter()
         .find(|kind| kind.as_str() == id)
@@ -37,6 +37,63 @@ fn builtin_id(id: &str) -> Result<DiagramId, PeleError> {
                 ErrorCode::UnsupportedDiagram,
             )
         })
+}
+pub(super) struct PreparedInput<'a> {
+    pub engine: &'a PublicEngine,
+    pub id: DiagramId,
+    pub config: Object,
+    pub limit: EdgeLimit,
+    pub line_offset: usize,
+}
+#[allow(clippy::too_many_arguments)]
+pub(super) fn prepared_input<'a>(
+    registry: &'a NativeRegistry,
+    id: &str,
+    source: &str,
+    json: &str,
+    title: Option<&str>,
+    line_offset: f64,
+    edge_kind: u32,
+    edge_value: f64,
+) -> Result<PreparedInput<'a>, PeleError> {
+    if source.len() > MAX_PUBLIC_SOURCE_BYTES
+        || title.is_some_and(|s| s.len() > MAX_PUBLIC_SOURCE_BYTES)
+    {
+        return Err(PeleError::new(
+            "Native transport: declared input exceeds budget",
+            ErrorCode::Limit,
+        ));
+    }
+    let engine = registry
+        .inner
+        .as_ref()
+        .ok_or_else(|| invalid("Registry is closed"))?;
+    if !line_offset.is_finite()
+        || line_offset < 0.
+        || line_offset.fract() != 0.
+        || line_offset > (usize::MAX - source.len()) as f64
+    {
+        return Err(invalid("Prepared lineOffset must be a nonnegative integer within the native source-position range"));
+    }
+    let config = config(json)?;
+    let limit = edge(edge_kind, edge_value)?;
+    let id = DIAGRAM_TYPES
+        .into_iter()
+        .find(|kind| kind.as_str() == id)
+        .map(DiagramId::Builtin)
+        .ok_or_else(|| {
+            PeleError::new(
+                "Unknown prepared diagram type",
+                ErrorCode::UnsupportedDiagram,
+            )
+        })?;
+    Ok(PreparedInput {
+        engine,
+        id,
+        config,
+        limit,
+        line_offset: line_offset as usize,
+    })
 }
 #[wasm_bindgen]
 impl NativeRegistry {
@@ -91,50 +148,27 @@ impl NativeRegistry {
         edge_value: f64,
     ) -> Result<MutableDocument, JsValue> {
         let run = || -> Result<MutableDocument, PeleError> {
-            if source.len() > MAX_PUBLIC_SOURCE_BYTES
-                || title
-                    .as_ref()
-                    .is_some_and(|s| s.len() > MAX_PUBLIC_SOURCE_BYTES)
-            {
-                return Err(PeleError::new(
-                    "Native transport: declared input exceeds budget",
-                    ErrorCode::Limit,
-                ));
-            }
-            let engine = self
-                .inner
-                .as_ref()
-                .ok_or_else(|| invalid("Registry is closed"))?;
-            if !line_offset.is_finite()
-                || line_offset < 0.
-                || line_offset.fract() != 0.
-                || line_offset > (usize::MAX - source.len()) as f64
-            {
-                return Err(invalid("Prepared lineOffset must be a nonnegative integer within the native source-position range"));
-            }
-            let config = config(json)?;
-            let limit = edge(edge_kind, edge_value)?;
-            let id = DIAGRAM_TYPES
-                .into_iter()
-                .find(|kind| kind.as_str() == id)
-                .map(DiagramId::Builtin)
-                .ok_or_else(|| {
-                    PeleError::new(
-                        "Unknown prepared diagram type",
-                        ErrorCode::UnsupportedDiagram,
-                    )
-                })?;
+            let input = prepared_input(
+                self,
+                id,
+                source,
+                json,
+                title.as_deref(),
+                line_offset,
+                edge_kind,
+                edge_value,
+            )?;
             Ok(MutableDocument {
-                inner: engine.parse_prepared_as(
-                    &id,
+                inner: input.engine.parse_prepared_as(
+                    &input.id,
                     ParseContext {
                         source,
-                        config: &config,
+                        config: &input.config,
                         title: title.as_deref(),
-                        line_offset: line_offset as usize,
+                        line_offset: input.line_offset,
                         max_edges: DEFAULT_MAX_EDGES,
                     },
-                    limit,
+                    input.limit,
                 )?,
             })
         };
@@ -142,7 +176,7 @@ impl NativeRegistry {
     }
 }
 #[derive(Serialize)]
-struct RawTransport<'a> {
+pub(super) struct RawTransport<'a> {
     #[serde(flatten)]
     rendered: &'a Rendered,
     #[serde(
@@ -151,7 +185,7 @@ struct RawTransport<'a> {
     )]
     numbers: std::collections::BTreeMap<&'static str, String>,
 }
-fn transport(rendered: &Rendered) -> RawTransport<'_> {
+pub(super) fn transport(rendered: &Rendered) -> RawTransport<'_> {
     let mut numbers = std::collections::BTreeMap::new();
     for (key, value) in [("width", rendered.width), ("height", rendered.height)] {
         if !value.is_finite() || (value == 0. && value.is_sign_negative()) {
@@ -268,13 +302,112 @@ impl MutableDocument {
         };
         run().map_err(failure)
     }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_raw_operation_packet_with_functions(
+        &mut self,
+        revision: &str,
+        config_json: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+        inline_icons: Option<js_sys::Function>,
+        dispatcher: Option<js_sys::Function>,
+    ) -> Result<JsValue, JsValue> {
+        raw_operation_packet(
+            self,
+            None,
+            revision,
+            config_json,
+            json,
+            mask,
+            numbers,
+            width,
+            icons,
+            clock,
+            inline_icons,
+            dispatcher,
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_raw_operation_source_layout_with_functions(
+        &mut self,
+        revision: &str,
+        config_json: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+        inline_icons: Option<js_sys::Function>,
+        dispatcher: Option<js_sys::Function>,
+    ) -> Result<JsValue, JsValue> {
+        let run = || -> Result<JsValue, JsValue> {
+            let config = config(config_json).map_err(failure)?;
+            // Raw entries have no core output policy. JS removes parse-only
+            // fields before decoding; numeric render fields retain raw f64.
+            let (options, _) =
+                super::render_numbers::options(json, mask, numbers, 3, 0.).map_err(failure)?;
+            let revision = revision
+                .parse::<u64>()
+                .map_err(|_| failure(invalid("Invalid public model revision")))?;
+            let mut host = RawResources {
+                resources: super::render_numbers::NumericResources {
+                    browser: super::BrowserResources { width, icons },
+                    clock,
+                },
+                inline: super::BrowserResources {
+                    width: None,
+                    icons: inline_icons,
+                },
+            };
+            let outcome = match dispatcher {
+                Some(dispatcher) => self
+                    .inner
+                    .render_raw_operation_read(
+                        revision,
+                        &config,
+                        &options.render,
+                        &mut super::host_functions::Resources {
+                            host: &mut host,
+                            dispatcher,
+                        },
+                    )
+                    .map_err(failure)?,
+                None => self
+                    .inner
+                    .render_raw_operation_read(revision, &config, &options.render, &mut host)
+                    .map_err(failure)?,
+            };
+            super::source_layout::render(
+                outcome.revision,
+                &outcome.graph,
+                true,
+                "",
+                outcome.result.as_ref().ok(),
+                &outcome.result.as_ref().map(transport),
+            )
+        };
+        run()
+    }
 }
 
-struct RawResources {
+pub(super) struct RawResources {
     resources: super::render_numbers::NumericResources,
     inline: super::BrowserResources,
 }
 impl RenderResources for RawResources {
+    fn javascript_failure(
+        &mut self,
+        operation: pele::compat::JavaScriptFailure,
+    ) -> pele::compat::public::PublicError {
+        self.resources.javascript_failure(operation)
+    }
+
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
         self.resources.text_width(request)
     }
@@ -299,4 +432,91 @@ impl RenderResources for RawResources {
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         self.resources.now_millis()
     }
+}
+
+pub(super) fn host_er_raw_resources(
+    width: Option<js_sys::Function>,
+    icons: Option<js_sys::Function>,
+    clock: Option<js_sys::Function>,
+    inline_icons: Option<js_sys::Function>,
+) -> RawResources {
+    RawResources {
+        resources: super::render_numbers::NumericResources {
+            browser: super::BrowserResources { width, icons },
+            clock,
+        },
+        inline: super::BrowserResources {
+            width: None,
+            icons: inline_icons,
+        },
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+pub(super) fn raw_operation_packet(
+    document: &mut MutableDocument,
+    target: Option<&CapturedPublicConstructor>,
+    revision: &str,
+    config_json: &str,
+    json: &str,
+    mask: u32,
+    numbers: &[f64],
+    width: Option<js_sys::Function>,
+    icons: Option<js_sys::Function>,
+    clock: Option<js_sys::Function>,
+    inline_icons: Option<js_sys::Function>,
+    dispatcher: Option<js_sys::Function>,
+) -> Result<JsValue, JsValue> {
+    let run = || -> Result<JsValue, JsValue> {
+        let config = config(config_json).map_err(failure)?;
+        // Raw entries have no core output policy. JS removes parse-only
+        // fields before decoding; numeric render fields retain raw f64.
+        let (options, _) =
+            super::render_numbers::options(json, mask, numbers, 3, 0.).map_err(failure)?;
+        let revision = revision
+            .parse::<u64>()
+            .map_err(|_| failure(invalid("Invalid public model revision")))?;
+        let mut host = RawResources {
+            resources: super::render_numbers::NumericResources {
+                browser: super::BrowserResources { width, icons },
+                clock,
+            },
+            inline: super::BrowserResources {
+                width: None,
+                icons: inline_icons,
+            },
+        };
+        let mut resources = dispatcher.map(|dispatcher| super::host_functions::Resources {
+            host: &mut host as &mut dyn RenderResources,
+            dispatcher,
+        });
+        let host: &mut dyn RenderResources = match resources.as_mut() {
+            Some(resources) => resources,
+            None => &mut host,
+        };
+        let outcome = match target {
+            Some(target) => target.render_raw_operation_view(
+                &mut document.inner,
+                revision,
+                &config,
+                &options.render,
+                host,
+            ),
+            None => {
+                document
+                    .inner
+                    .render_raw_operation_view(revision, &config, &options.render, host)
+            }
+        }
+        .map_err(failure)?;
+        super::render_packet::arena(
+            outcome.revision,
+            &outcome.graph,
+            true,
+            "",
+            outcome.result.as_ref().ok(),
+            &outcome.result.as_ref().map(transport),
+        )
+    };
+    run()
 }

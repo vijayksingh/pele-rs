@@ -1,0 +1,98 @@
+[
+  {
+    "consumer": "ffi",
+    "phase": "compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/er-borrowed-interner-ffi"
+    ],
+    "log": "dist/evidence/er-borrowed-interner-ffi-compile.log",
+    "startedAt": "2026-10-20T08:40:51.327485+00:00",
+    "endedAt": "2026-10-20T08:40:51.814533+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi",
+    "phase": "run",
+    "command": [
+      "dist/evidence/er-borrowed-interner-ffi"
+    ],
+    "log": "dist/evidence/er-borrowed-interner-ffi-run.log",
+    "startedAt": "2026-10-20T08:40:51.815016+00:00",
+    "endedAt": "2026-10-20T08:40:52.529143+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-public",
+    "phase": "compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/er-borrowed-interner-ffi-public"
+    ],
+    "log": "dist/evidence/er-borrowed-interner-ffi-public-compile.log",
+    "startedAt": "2026-10-20T08:40:52.529563+00:00",
+    "endedAt": "2026-10-20T08:40:52.663713+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-public",
+    "phase": "run",
+    "command": [
+      "dist/evidence/er-borrowed-interner-ffi-public"
+    ],
+    "log": "dist/evidence/er-borrowed-interner-ffi-public-run.log",
+    "startedAt": "2026-10-20T08:40:52.664119+00:00",
+    "endedAt": "2026-10-20T08:40:53.242315+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-parse-limits",
+    "phase": "compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/er-borrowed-interner-ffi-parse-limits"
+    ],
+    "log": "dist/evidence/er-borrowed-interner-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T08:40:53.242758+00:00",
+    "endedAt": "2026-10-20T08:40:53.381668+00:00",
+    "exitCode": 0
+  },
+  {
+    "consumer": "ffi-parse-limits",
+    "phase": "run",
+    "command": [
+      "dist/evidence/er-borrowed-interner-ffi-parse-limits"
+    ],
+    "log": "dist/evidence/er-borrowed-interner-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T08:40:53.382102+00:00",
+    "endedAt": "2026-10-20T08:40:53.953384+00:00",
+    "exitCode": 0
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "frozenSourceContext": "bb0fc18055a175de4645129ea25a4917a6fa7d17",
+  "candidatePinned": false,
+  "probes": {
+    "probe-layout-continuity.mjs": {
+      "oldSHA256": "5930f4d8a395f59fc7ed5ebf69bbfd4964a363d40fa59018244ac44528719c3f",
+      "newSHA256": "8af37f83784fd32ce07d452eea20391d06a41c7abbfe47caec1a867f08ce39a7",
+      "oldFull02Literals": 3,
+      "newFull03Literals": 3,
+      "exactDelta": "--- before/probe-layout-continuity.mjs\n+++ after/probe-layout-continuity.mjs\n@@ -38,10 +38,10 @@\n         if(packet===null)return{capability:null};\n         if(!Array.isArray(packet)||(packet.length!==4&&packet.length!==6)||packet[0]!==1||!(packet[2] instanceof Uint8Array))throw Error('Unexpected source layout packet');\n         const bytes=packet[2],magic=String.fromCharCode(...bytes.subarray(0,8));\n-        if(!['PLCSRC02','PLCSRU01'].includes(magic)||bytes.length<45)throw Error('Expected immutable full/update protocol');\n+        if(!['PLCSRC03','PLCSRU01'].includes(magic)||bytes.length<45)throw Error('Expected immutable full/update protocol');\n         const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength),layoutId=view.getBigUint64(8,true).toString(),revision=view.getBigUint64(16,true).toString();\n         if(layoutId==='0')throw Error('Zero layout identity');\n-        return{capability:magic,layoutId,revision,canonicalBytes:packet[1],recipeBytes:bytes.length,...(magic==='PLCSRC02'?{type:JSON.parse(packet[3]).type}:{})};\n+        return{capability:magic,layoutId,revision,canonicalBytes:packet[1],recipeBytes:bytes.length,...(magic==='PLCSRC03'?{type:JSON.parse(packet[3]).type}:{})};\n       };\n       try{\n         for(const[key,original]of originals)if(original)Object.defineProperty(prototype,key,{...original,value:function(...args){const packet=Reflect.apply(original.value,this,args);(key==='snapshot_source_layout'?snapshots:updates).push(packetRecord(packet));return packet;}});\n@@ -49,7 +49,7 @@\n           snapshots=[];updates=[];let model;\n           try{\n             model=renderer.parse(workload.source,workload.options);\n-            const expected=name==='candidate'&&workload.family==='sankey'?'PLCSRC02':null;\n+            const expected=name==='candidate'&&workload.family==='sankey'?'PLCSRC03':null;\n             if(name==='candidate'){\n               if(snapshots.length!==1||snapshots[0].capability!==expected)throw Error(name+'/'+workload.id+': wrong actual snapshot route');\n               if(expected&&snapshots[0].type!=='sankey')throw Error('Wrong recipe type metadata');\n"
+    },
+    "probe-source-layout.mjs": {
+      "oldSHA256": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+      "newSHA256": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+      "oldFull02Literals": 0,
+      "newFull03Literals": 0,
+      "exactDelta": ""
+    },
+    "probe-source-ingress.mjs": {
+      "oldSHA256": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67",
+      "newSHA256": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67",
+      "oldFull02Literals": 0,
+      "newFull03Literals": 0,
+      "exactDelta": ""
+    }
+  }
+}

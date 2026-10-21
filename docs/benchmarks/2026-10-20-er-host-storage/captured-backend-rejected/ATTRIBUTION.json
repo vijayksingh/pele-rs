@@ -1,0 +1,3353 @@
+{
+  "sourceSummarySHA256": "e8245319adfce9b7b9bf8977393141fb96d4ffabde666b2622619461fea91c2e",
+  "executedHarnessSHA256": "0fac8448a4c6e17280dd209700652a7f7289a15458078cd69a48216200849edb",
+  "wasmSHA256": "fbaa003fc95224a27cd8f7a49964a4a271b85f9a1dfaac4c44a3ecc4bed3dee2",
+  "packageFiles": 112,
+  "browser": "156.0.8078.4",
+  "correction": "Original summary classified HTTP-served .wasm frames as JavaScript. This offline result recognizes both HTTP .wasm and wasm://. Shared compiled WASM frame URLs can point to control even during candidate execution; runtime identity comes from the profiled operation, not frame URL. Raw profiles and original summary are unchanged.",
+  "phaseCallCounts": null,
+  "rows": [
+    {
+      "stage": "parse",
+      "runtime": "control",
+      "profileSHA256": "f03cc42c9845b3fef9e0d05cbd4a71ccf928009926981b9074ee10cab79f367b",
+      "weightedUs": 2054705,
+      "sampleCount": 5820,
+      "selfCategories": {
+        "wasm": {
+          "weightedUs": 857561,
+          "percent": 41.73645365149741
+        },
+        "javascript": {
+          "weightedUs": 827213,
+          "percent": 40.25945330351559
+        },
+        "gc": {
+          "weightedUs": 289506,
+          "percent": 14.089905850231542
+        },
+        "engine-or-profiler": {
+          "weightedUs": 80425,
+          "percent": 3.9141871947554514
+        }
+      },
+      "admissionAdapterImportsUnionPercent": 3.2312181067355166,
+      "rawParserInclusivePercent": 2.5075132439936634,
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 66392,
+          "inclusiveUs": 66392,
+          "selfPercent": 3.2312181067355166,
+          "inclusivePercent": 3.2312181067355166
+        },
+        "captured-native-adapter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 3661,
+          "inclusiveUs": 7611,
+          "selfPercent": 0.17817642921976634,
+          "inclusivePercent": 0.37041813788354044
+        },
+        "sankey-raw-parser": {
+          "selfUs": 16347,
+          "inclusiveUs": 51522,
+          "selfPercent": 0.7955886611460039,
+          "inclusivePercent": 2.5075132439936634
+        },
+        "initial-native-construction": {
+          "selfUs": 32894,
+          "inclusiveUs": 358947,
+          "selfPercent": 1.6009110796927053,
+          "inclusivePercent": 17.469515088540692
+        },
+        "flat-columns-and-indexes": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-page-fork-copy-compact": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "captured-js-imports": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "construction-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 454303,
+          "inclusiveUs": 472595,
+          "selfPercent": 22.11037594204521,
+          "inclusivePercent": 23.000625393912994
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 118463,
+          "inclusiveUs": 461289,
+          "selfPercent": 5.765450514794095,
+          "inclusivePercent": 22.45037608805157
+        },
+        "allocator": {
+          "selfUs": 78103,
+          "inclusiveUs": 95764,
+          "selfPercent": 3.8011782713333546,
+          "inclusivePercent": 4.660717718601941
+        }
+      },
+      "topSelf": [
+        {
+          "frame": {
+            "functionName": "reconcileGraph",
+            "scriptId": "31",
+            "url": "http://127.0.0.1:33205/control/graph-storage.js",
+            "lineNumber": 60,
+            "columnNumber": 23
+          },
+          "weightedUs": 454303,
+          "percent": 22.11037594204521
+        },
+        {
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 289506,
+          "percent": 14.089905850231542
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::binary::Writer>::put",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5951913
+          },
+          "weightedUs": 74031,
+          "percent": 3.602998970655155
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4712844
+          },
+          "weightedUs": 67417,
+          "percent": 3.281103613414091
+        },
+        {
+          "frame": {
+            "functionName": "snapshot_binary",
+            "scriptId": "24",
+            "url": "http://127.0.0.1:33205/control/pkg/pele.js",
+            "lineNumber": 979,
+            "columnNumber": 19
+          },
+          "weightedUs": 60138,
+          "percent": 2.9268435128157084
+        },
+        {
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 52475,
+          "percent": 2.5538945980079863
+        },
+        {
+          "frame": {
+            "functionName": "decodeGraphBinary",
+            "scriptId": "26",
+            "url": "http://127.0.0.1:33205/control/graph-binary.js",
+            "lineNumber": 50,
+            "columnNumber": 33
+          },
+          "weightedUs": 47154,
+          "percent": 2.294927982362432
+        },
+        {
+          "frame": {
+            "functionName": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&[u16]>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5057176
+          },
+          "weightedUs": 42518,
+          "percent": 2.0692994858142653
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::public::captured_admission::validate::<pele[8831ffd8be202214]::compat::public::captured_admission::ArenaAdmission>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3331735
+          },
+          "weightedUs": 41635,
+          "percent": 2.026324946890186
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey as pele[8831ffd8be202214]::compat::module::DiagramModule>::parse",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2447847
+          },
+          "weightedUs": 39140,
+          "percent": 1.9048963233164857
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::graph::GraphWriter>::property",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5308748
+          },
+          "weightedUs": 36962,
+          "percent": 1.7988957052228909
+        },
+        {
+          "frame": {
+            "functionName": "properties",
+            "scriptId": "26",
+            "url": "http://127.0.0.1:33205/control/graph-binary.js",
+            "lineNumber": 64,
+            "columnNumber": 19
+          },
+          "weightedUs": 32280,
+          "percent": 1.5710284444725642
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2620953
+          },
+          "weightedUs": 30263,
+          "percent": 1.4728635010865307
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::binary::Writer>::node",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3926598
+          },
+          "weightedUs": 28029,
+          "percent": 1.3641374309207404
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4629770
+          },
+          "weightedUs": 27811,
+          "percent": 1.3535276353539802
+        },
+        {
+          "frame": {
+            "functionName": "bits",
+            "scriptId": "26",
+            "url": "http://127.0.0.1:33205/control/graph-binary.js",
+            "lineNumber": 56,
+            "columnNumber": 13
+          },
+          "weightedUs": 27171,
+          "percent": 1.3223796116717486
+        },
+        {
+          "frame": {
+            "functionName": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[8831ffd8be202214]::compat::public::graph::JsString>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5056725
+          },
+          "weightedUs": 24994,
+          "percent": 1.216427662365157
+        },
+        {
+          "frame": {
+            "functionName": "atom",
+            "scriptId": "26",
+            "url": "http://127.0.0.1:33205/control/graph-binary.js",
+            "lineNumber": 59,
+            "columnNumber": 13
+          },
+          "weightedUs": 24463,
+          "percent": 1.1905845364663055
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::public_model::initial_graph",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2560369
+          },
+          "weightedUs": 24433,
+          "percent": 1.1891244728562007
+        },
+        {
+          "frame": {
+            "functionName": "adoptMutable",
+            "scriptId": "13",
+            "url": "http://127.0.0.1:33205/control/full.js",
+            "lineNumber": 262,
+            "columnNumber": 23
+          },
+          "weightedUs": 23873,
+          "percent": 1.161869952134248
+        }
+      ],
+      "topInclusive": [
+        {
+          "frame": {
+            "functionName": "(root)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 2054705,
+          "percent": 100
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "140",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1701952,
+          "percent": 82.8319393781589
+        },
+        {
+          "frame": {
+            "functionName": "evaluate",
+            "scriptId": "4",
+            "url": "",
+            "lineNumber": 363,
+            "columnNumber": 10
+          },
+          "weightedUs": 1701952,
+          "percent": 82.8319393781589
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "9",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 1
+          },
+          "weightedUs": 1701952,
+          "percent": 82.8319393781589
+        },
+        {
+          "frame": {
+            "functionName": "run",
+            "scriptId": "131",
+            "url": "",
+            "lineNumber": 7,
+            "columnNumber": 7
+          },
+          "weightedUs": 1701302,
+          "percent": 82.80030466660664
+        },
+        {
+          "frame": {
+            "functionName": "parse",
+            "scriptId": "13",
+            "url": "http://127.0.0.1:33205/control/full.js",
+            "lineNumber": 464,
+            "columnNumber": 9
+          },
+          "weightedUs": 1646726,
+          "percent": 80.14415694710434
+        },
+        {
+          "frame": {
+            "functionName": "adoptMutable",
+            "scriptId": "13",
+            "url": "http://127.0.0.1:33205/control/full.js",
+            "lineNumber": 262,
+            "columnNumber": 23
+          },
+          "weightedUs": 997133,
+          "percent": 48.52925359114812
+        },
+        {
+          "frame": {
+            "functionName": "parse_with_host_er",
+            "scriptId": "24",
+            "url": "http://127.0.0.1:33205/control/pkg/pele.js",
+            "lineNumber": 1287,
+            "columnNumber": 22
+          },
+          "weightedUs": 599430,
+          "percent": 29.173530993500282
+        },
+        {
+          "frame": {
+            "functionName": "js-to-wasm:iiiiiididnn:iii",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6114540
+          },
+          "weightedUs": 593542,
+          "percent": 28.88696917562375
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_parse_with_host_er externref shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6131254
+          },
+          "weightedUs": 592490,
+          "percent": 28.835769611696083
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_parse_with_host_er externref shim multivalue shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6114540
+          },
+          "weightedUs": 592490,
+          "percent": 28.835769611696083
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_parse_with_host_er",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2782397
+          },
+          "weightedUs": 591859,
+          "percent": 28.805059607096883
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::engine::PublicEngine>::parse_plan",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4574260
+          },
+          "weightedUs": 541593,
+          "percent": 26.3586743595796
+        },
+        {
+          "frame": {
+            "functionName": "ModelBridge",
+            "scriptId": "28",
+            "url": "http://127.0.0.1:33205/control/graph.js",
+            "lineNumber": 81,
+            "columnNumber": 13
+          },
+          "weightedUs": 495059,
+          "percent": 24.09392102515933
+        },
+        {
+          "frame": {
+            "functionName": "reconcileGraph",
+            "scriptId": "31",
+            "url": "http://127.0.0.1:33205/control/graph-storage.js",
+            "lineNumber": 60,
+            "columnNumber": 23
+          },
+          "weightedUs": 472595,
+          "percent": 23.000625393912994
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::engine::PublicEngine>::create_document",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5787677
+          },
+          "weightedUs": 386544,
+          "percent": 18.812627603475924
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::engine::PublicEngine>::create_document_registered",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5272104
+          },
+          "weightedUs": 385827,
+          "percent": 18.777732083194426
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::engine::Codec<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey> as pele[8831ffd8be202214]::compat::public::engine::Erased>::create_owned",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4808019
+          },
+          "weightedUs": 368250,
+          "percent": 17.92228081403413
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::public_model::initial_graph",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2560369
+          },
+          "weightedUs": 358643,
+          "percent": 17.45471977729163
+        },
+        {
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 289506,
+          "percent": 14.089905850231542
+        }
+      ]
+    },
+    {
+      "stage": "parse",
+      "runtime": "candidate",
+      "profileSHA256": "de4cabbe684e273e2bbf3c7e0448657515b62c68d9aec94566faf411ce3c17f4",
+      "weightedUs": 2053243,
+      "sampleCount": 5887,
+      "selfCategories": {
+        "wasm": {
+          "weightedUs": 280349,
+          "percent": 13.653961075235616
+        },
+        "javascript": {
+          "weightedUs": 1635073,
+          "percent": 79.63368193633194
+        },
+        "gc": {
+          "weightedUs": 49385,
+          "percent": 2.405219450401146
+        },
+        "engine-or-profiler": {
+          "weightedUs": 88436,
+          "percent": 4.3071375380312995
+        }
+      },
+      "admissionAdapterImportsUnionPercent": 75.98881379359383,
+      "rawParserInclusivePercent": 0.4031183839418909,
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 75140,
+          "inclusiveUs": 1051383,
+          "selfPercent": 3.659576582021709,
+          "inclusivePercent": 51.20597026265279
+        },
+        "captured-native-adapter": {
+          "selfUs": 81020,
+          "inclusiveUs": 1058419,
+          "selfPercent": 3.945952817080102,
+          "inclusivePercent": 51.548647675896135
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 996,
+          "selfPercent": 0,
+          "inclusivePercent": 0.04850862757111555
+        },
+        "sankey-raw-parser": {
+          "selfUs": 3802,
+          "inclusiveUs": 8277,
+          "selfPercent": 0.1851704839612262,
+          "inclusivePercent": 0.4031183839418909
+        },
+        "initial-native-construction": {
+          "selfUs": 33607,
+          "inclusiveUs": 597134,
+          "selfPercent": 1.636776552994458,
+          "inclusivePercent": 29.082480739006538
+        },
+        "flat-columns-and-indexes": {
+          "selfUs": 1186185,
+          "inclusiveUs": 1186185,
+          "selfPercent": 57.77129156169046,
+          "inclusivePercent": 57.77129156169046
+        },
+        "flat-page-fork-copy-compact": {
+          "selfUs": 183315,
+          "inclusiveUs": 409027,
+          "selfPercent": 8.92807134859342,
+          "inclusivePercent": 19.921022499528796
+        },
+        "captured-js-imports": {
+          "selfUs": 159230,
+          "inclusiveUs": 1310704,
+          "selfPercent": 7.7550489640047475,
+          "inclusivePercent": 63.835795373465295
+        },
+        "construction-js": {
+          "selfUs": 63533,
+          "inclusiveUs": 494529,
+          "selfPercent": 3.0942757384294017,
+          "inclusivePercent": 24.085264140678916
+        },
+        "shared-publication": {
+          "selfUs": 87309,
+          "inclusiveUs": 174207,
+          "selfPercent": 4.2522487596451075,
+          "inclusivePercent": 8.48448040490093
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 30749,
+          "inclusiveUs": 33452,
+          "selfPercent": 1.4975821176548514,
+          "inclusivePercent": 1.6292275195873065
+        }
+      },
+      "topSelf": [
+        {
+          "frame": {
+            "functionName": "requireValue",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 11,
+            "columnNumber": 21
+          },
+          "weightedUs": 186419,
+          "percent": 9.079246830501797
+        },
+        {
+          "frame": {
+            "functionName": "#page",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 33,
+            "columnNumber": 7
+          },
+          "weightedUs": 183315,
+          "percent": 8.92807134859342
+        },
+        {
+          "frame": {
+            "functionName": "get",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 54,
+            "columnNumber": 5
+          },
+          "weightedUs": 178858,
+          "percent": 8.711000110556812
+        },
+        {
+          "frame": {
+            "functionName": "set",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 55,
+            "columnNumber": 5
+          },
+          "weightedUs": 167148,
+          "percent": 8.14068281250685
+        },
+        {
+          "frame": {
+            "functionName": "propertyAddress",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 179,
+            "columnNumber": 17
+          },
+          "weightedUs": 138812,
+          "percent": 6.760622098796879
+        },
+        {
+          "frame": {
+            "functionName": "#checkNode",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 167,
+            "columnNumber": 12
+          },
+          "weightedUs": 104805,
+          "percent": 5.1043641692678365
+        },
+        {
+          "frame": {
+            "functionName": "reconcileGraph",
+            "scriptId": "54",
+            "url": "http://127.0.0.1:33205/candidate/graph-storage.js",
+            "lineNumber": 60,
+            "columnNumber": 23
+          },
+          "weightedUs": 87309,
+          "percent": 4.2522487596451075
+        },
+        {
+          "frame": {
+            "functionName": "capturedProperties",
+            "scriptId": "38",
+            "url": "http://127.0.0.1:33205/candidate/captured-store.js",
+            "lineNumber": 154,
+            "columnNumber": 34
+          },
+          "weightedUs": 59978,
+          "percent": 2.9211350044782813
+        },
+        {
+          "frame": {
+            "functionName": "header",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 170,
+            "columnNumber": 8
+          },
+          "weightedUs": 56749,
+          "percent": 2.7638715924028476
+        },
+        {
+          "frame": {
+            "functionName": "protocol",
+            "scriptId": "38",
+            "url": "http://127.0.0.1:33205/candidate/captured-store.js",
+            "lineNumber": 8,
+            "columnNumber": 17
+          },
+          "weightedUs": 53071,
+          "percent": 2.584740335167343
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 44,
+            "columnNumber": 111
+          },
+          "weightedUs": 52810,
+          "percent": 2.572028736978526
+        },
+        {
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 49828,
+          "percent": 2.426795074913198
+        },
+        {
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 49385,
+          "percent": 2.405219450401146
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 1947,
+            "columnNumber": 92
+          },
+          "weightedUs": 44091,
+          "percent": 2.147383431965919
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::public::captured_admission::validate::<pele_wasm[308eba2172ef4d2c]::captured_store::CapturedStore>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2639806
+          },
+          "weightedUs": 30601,
+          "percent": 1.4903740083370551
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 24780,
+          "percent": 1.2068712763175133
+        },
+        {
+          "frame": {
+            "functionName": "need",
+            "scriptId": "56",
+            "url": "http://127.0.0.1:33205/candidate/constructor-storage.js",
+            "lineNumber": 14,
+            "columnNumber": 15
+          },
+          "weightedUs": 20002,
+          "percent": 0.9741662336119008
+        },
+        {
+          "frame": {
+            "functionName": "getArrayU32FromWasm0",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 2337,
+            "columnNumber": 29
+          },
+          "weightedUs": 19989,
+          "percent": 0.9735330888745268
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2620953
+          },
+          "weightedUs": 19455,
+          "percent": 0.9475254512008564
+        },
+        {
+          "frame": {
+            "functionName": "__wbg_new_from_slice_4ee02165f9de919e",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 2168,
+            "columnNumber": 55
+          },
+          "weightedUs": 18393,
+          "percent": 0.8958023965015344
+        }
+      ],
+      "topInclusive": [
+        {
+          "frame": {
+            "functionName": "(root)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 2053243,
+          "percent": 100
+        },
+        {
+          "frame": {
+            "functionName": "evaluate",
+            "scriptId": "4",
+            "url": "",
+            "lineNumber": 363,
+            "columnNumber": 10
+          },
+          "weightedUs": 1945853,
+          "percent": 94.76973743487741
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "9",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 1
+          },
+          "weightedUs": 1945853,
+          "percent": 94.76973743487741
+        },
+        {
+          "frame": {
+            "functionName": "run",
+            "scriptId": "131",
+            "url": "",
+            "lineNumber": 7,
+            "columnNumber": 7
+          },
+          "weightedUs": 1945495,
+          "percent": 94.75230160287896
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "140",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1945495,
+          "percent": 94.75230160287896
+        },
+        {
+          "frame": {
+            "functionName": "parse",
+            "scriptId": "36",
+            "url": "http://127.0.0.1:33205/candidate/full.js",
+            "lineNumber": 464,
+            "columnNumber": 9
+          },
+          "weightedUs": 1935918,
+          "percent": 94.28586874519966
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "36",
+            "url": "http://127.0.0.1:33205/candidate/full.js",
+            "lineNumber": 493,
+            "columnNumber": 35
+          },
+          "weightedUs": 1722694,
+          "percent": 83.90112616967403
+        },
+        {
+          "frame": {
+            "functionName": "capturedNativeValue",
+            "scriptId": "36",
+            "url": "http://127.0.0.1:33205/candidate/full.js",
+            "lineNumber": 52,
+            "columnNumber": 28
+          },
+          "weightedUs": 1722694,
+          "percent": 83.90112616967403
+        },
+        {
+          "frame": {
+            "functionName": "parse_with_host_storage",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 1310,
+            "columnNumber": 27
+          },
+          "weightedUs": 1722345,
+          "percent": 83.88412866864759
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_parse_with_host_storage externref shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6120501
+          },
+          "weightedUs": 1718190,
+          "percent": 83.6817658698946
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_parse_with_host_storage externref shim multivalue shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6112468
+          },
+          "weightedUs": 1718190,
+          "percent": 83.6817658698946
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_parse_with_host_storage",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2183235
+          },
+          "weightedUs": 1717836,
+          "percent": 83.6645248516615
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1288174,
+          "percent": 62.73850684015482
+        },
+        {
+          "frame": {
+            "functionName": "js-to-wasm::",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1216058,
+          "percent": 59.226209464734566
+        },
+        {
+          "frame": {
+            "functionName": "pele_wasm[308eba2172ef4d2c]::captured_sankey::parsed",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4551849
+          },
+          "weightedUs": 848474,
+          "percent": 41.32360368451275
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::public::captured_admission::validate::<pele_wasm[308eba2172ef4d2c]::captured_store::CapturedStore>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2639806
+          },
+          "weightedUs": 615342,
+          "percent": 29.969272998860827
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::public_model::initial_into::<pele_wasm[308eba2172ef4d2c]::host_construction::HostConstruction<pele_wasm[308eba2172ef4d2c]::captured_store::InitialTransport>>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2442364
+          },
+          "weightedUs": 596487,
+          "percent": 29.05096961246185
+        },
+        {
+          "frame": {
+            "functionName": "__wbg_capturedProperties_9f5ced2343aad214",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 1947,
+            "columnNumber": 59
+          },
+          "weightedUs": 528955,
+          "percent": 25.761928812127938
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 1947,
+            "columnNumber": 92
+          },
+          "weightedUs": 522174,
+          "percent": 25.431670776425392
+        },
+        {
+          "frame": {
+            "functionName": "<pele_wasm[308eba2172ef4d2c]::host_construction::ConstructionEmitter<pele_wasm[308eba2172ef4d2c]::captured_store::InitialTransport>>::flush",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5449767
+          },
+          "weightedUs": 514663,
+          "percent": 25.06585922854723
+        }
+      ]
+    },
+    {
+      "stage": "render-model",
+      "runtime": "candidate",
+      "profileSHA256": "bcac075b0989728870ec1ba88b62209882b74783aada455f90cfbf8b4b6efcc1",
+      "weightedUs": 2041940,
+      "sampleCount": 5874,
+      "selfCategories": {
+        "wasm": {
+          "weightedUs": 434838,
+          "percent": 21.295336787564768
+        },
+        "javascript": {
+          "weightedUs": 1482336,
+          "percent": 72.59449347189438
+        },
+        "gc": {
+          "weightedUs": 4597,
+          "percent": 0.225129043948402
+        },
+        "engine-or-profiler": {
+          "weightedUs": 120169,
+          "percent": 5.885040696592456
+        }
+      },
+      "admissionAdapterImportsUnionPercent": 57.020578469494694,
+      "rawParserInclusivePercent": 0.0,
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 72237,
+          "inclusiveUs": 1150577,
+          "selfPercent": 3.537665161562044,
+          "inclusivePercent": 56.34724820513825
+        },
+        "captured-native-adapter": {
+          "selfUs": 89515,
+          "inclusiveUs": 1163244,
+          "selfPercent": 4.383821268009834,
+          "inclusivePercent": 56.96758964514139
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-columns-and-indexes": {
+          "selfUs": 1049461,
+          "inclusiveUs": 1049461,
+          "selfPercent": 51.39529075291145,
+          "inclusivePercent": 51.39529075291145
+        },
+        "flat-page-fork-copy-compact": {
+          "selfUs": 168649,
+          "inclusiveUs": 741467,
+          "selfPercent": 8.25925345504765,
+          "inclusivePercent": 36.31188967354574
+        },
+        "captured-js-imports": {
+          "selfUs": 138150,
+          "inclusiveUs": 876544,
+          "selfPercent": 6.765624846959264,
+          "inclusivePercent": 42.92702038257735
+        },
+        "construction-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 69427,
+          "inclusiveUs": 209303,
+          "selfPercent": 3.4000509319568644,
+          "inclusivePercent": 10.250203238097104
+        },
+        "shared-observation-and-match": {
+          "selfUs": 84558,
+          "inclusiveUs": 216378,
+          "selfPercent": 4.141061931300626,
+          "inclusivePercent": 10.596687463882386
+        },
+        "owner-transport-gates": {
+          "selfUs": 3725,
+          "inclusiveUs": 38649,
+          "selfPercent": 0.18242455703889437,
+          "inclusivePercent": 1.8927588469788534
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 48063,
+          "inclusiveUs": 48063,
+          "selfPercent": 2.353791002673928,
+          "inclusivePercent": 2.353791002673928
+        }
+      },
+      "topSelf": [
+        {
+          "frame": {
+            "functionName": "requireValue",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 11,
+            "columnNumber": 21
+          },
+          "weightedUs": 586807,
+          "percent": 28.737720011361745
+        },
+        {
+          "frame": {
+            "functionName": "#page",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 33,
+            "columnNumber": 7
+          },
+          "weightedUs": 168649,
+          "percent": 8.25925345504765
+        },
+        {
+          "frame": {
+            "functionName": "propertyAddress",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 179,
+            "columnNumber": 17
+          },
+          "weightedUs": 158629,
+          "percent": 7.768543639871886
+        },
+        {
+          "frame": {
+            "functionName": "matchesGraph",
+            "scriptId": "54",
+            "url": "http://127.0.0.1:33205/candidate/graph-storage.js",
+            "lineNumber": 157,
+            "columnNumber": 21
+          },
+          "weightedUs": 84558,
+          "percent": 4.141061931300626
+        },
+        {
+          "frame": {
+            "functionName": "reconcileGraph",
+            "scriptId": "54",
+            "url": "http://127.0.0.1:33205/candidate/graph-storage.js",
+            "lineNumber": 60,
+            "columnNumber": 23
+          },
+          "weightedUs": 69427,
+          "percent": 3.4000509319568644
+        },
+        {
+          "frame": {
+            "functionName": "__wbg_capturedProperties_9f5ced2343aad214",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 1947,
+            "columnNumber": 59
+          },
+          "weightedUs": 60881,
+          "percent": 2.981527371029511
+        },
+        {
+          "frame": {
+            "functionName": "header",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 170,
+            "columnNumber": 8
+          },
+          "weightedUs": 59128,
+          "percent": 2.895677639891476
+        },
+        {
+          "frame": {
+            "functionName": "capturedProperties",
+            "scriptId": "38",
+            "url": "http://127.0.0.1:33205/candidate/captured-store.js",
+            "lineNumber": 154,
+            "columnNumber": 34
+          },
+          "weightedUs": 52010,
+          "percent": 2.547087573581986
+        },
+        {
+          "frame": {
+            "functionName": "capturedNodeHeaders",
+            "scriptId": "38",
+            "url": "http://127.0.0.1:33205/candidate/captured-store.js",
+            "lineNumber": 69,
+            "columnNumber": 35
+          },
+          "weightedUs": 44757,
+          "percent": 2.1918861474871933
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 40186,
+          "percent": 1.9680304024604054
+        },
+        {
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 38636,
+          "percent": 1.8921221975180467
+        },
+        {
+          "frame": {
+            "functionName": "decode",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 35487,
+          "percent": 1.7379061088964416
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2620953
+          },
+          "weightedUs": 30369,
+          "percent": 1.4872621134803177
+        },
+        {
+          "frame": {
+            "functionName": "core[ed718c3d60ebd546]::fmt::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4865491
+          },
+          "weightedUs": 26741,
+          "percent": 1.3095879408797515
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::public::captured_admission::validate::<pele_wasm[308eba2172ef4d2c]::captured_store::CapturedStore>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2639806
+          },
+          "weightedUs": 26144,
+          "percent": 1.2803510387180819
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::render::draw",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 1054440
+          },
+          "weightedUs": 23113,
+          "percent": 1.1319137682791856
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4303280
+          },
+          "weightedUs": 23023,
+          "percent": 1.127506195088984
+        },
+        {
+          "frame": {
+            "functionName": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[308eba2172ef4d2c]::render_numbers::Counted> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3928045
+          },
+          "weightedUs": 22210,
+          "percent": 1.0876911172708308
+        },
+        {
+          "frame": {
+            "functionName": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5257735
+          },
+          "weightedUs": 21181,
+          "percent": 1.0372978637961938
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::public::captured_admission::validate_schema_ids::<pele_wasm[308eba2172ef4d2c]::captured_store::CapturedStore>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2884455
+          },
+          "weightedUs": 19526,
+          "percent": 0.9562474901319333
+        }
+      ],
+      "topInclusive": [
+        {
+          "frame": {
+            "functionName": "(root)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 2041940,
+          "percent": 100
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "140",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1991084,
+          "percent": 97.50942730932348
+        },
+        {
+          "frame": {
+            "functionName": "evaluate",
+            "scriptId": "4",
+            "url": "",
+            "lineNumber": 363,
+            "columnNumber": 10
+          },
+          "weightedUs": 1991084,
+          "percent": 97.50942730932348
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "9",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 1
+          },
+          "weightedUs": 1991084,
+          "percent": 97.50942730932348
+        },
+        {
+          "frame": {
+            "functionName": "run",
+            "scriptId": "131",
+            "url": "",
+            "lineNumber": 7,
+            "columnNumber": 7
+          },
+          "weightedUs": 1990048,
+          "percent": 97.45869124460073
+        },
+        {
+          "frame": {
+            "functionName": "render",
+            "scriptId": "36",
+            "url": "http://127.0.0.1:33205/candidate/full.js",
+            "lineNumber": 570,
+            "columnNumber": 10
+          },
+          "weightedUs": 1989150,
+          "percent": 97.4147134587696
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "37",
+            "url": "http://127.0.0.1:33205/candidate/captured-owner.js",
+            "lineNumber": 177,
+            "columnNumber": 27
+          },
+          "weightedUs": 1982912,
+          "percent": 97.10921966365319
+        },
+        {
+          "frame": {
+            "functionName": "busy",
+            "scriptId": "37",
+            "url": "http://127.0.0.1:33205/candidate/captured-owner.js",
+            "lineNumber": 125,
+            "columnNumber": 6
+          },
+          "weightedUs": 1982912,
+          "percent": 97.10921966365319
+        },
+        {
+          "frame": {
+            "functionName": "render",
+            "scriptId": "37",
+            "url": "http://127.0.0.1:33205/candidate/captured-owner.js",
+            "lineNumber": 176,
+            "columnNumber": 8
+          },
+          "weightedUs": 1982912,
+          "percent": 97.10921966365319
+        },
+        {
+          "frame": {
+            "functionName": "packet",
+            "scriptId": "37",
+            "url": "http://127.0.0.1:33205/candidate/captured-owner.js",
+            "lineNumber": 156,
+            "columnNumber": 8
+          },
+          "weightedUs": 1762696,
+          "percent": 86.32457368972644
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "37",
+            "url": "http://127.0.0.1:33205/candidate/captured-owner.js",
+            "lineNumber": 159,
+            "columnNumber": 37
+          },
+          "weightedUs": 1506113,
+          "percent": 73.75892533571016
+        },
+        {
+          "frame": {
+            "functionName": "capturedNativeValue",
+            "scriptId": "36",
+            "url": "http://127.0.0.1:33205/candidate/full.js",
+            "lineNumber": 52,
+            "columnNumber": 28
+          },
+          "weightedUs": 1506113,
+          "percent": 73.75892533571016
+        },
+        {
+          "frame": {
+            "functionName": "render_captured",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 105,
+            "columnNumber": 19
+          },
+          "weightedUs": 1505053,
+          "percent": 73.70701391813667
+        },
+        {
+          "frame": {
+            "functionName": "capturedsankeydocument_render_captured externref shim multivalue shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6092977
+          },
+          "weightedUs": 1500402,
+          "percent": 73.47924033027415
+        },
+        {
+          "frame": {
+            "functionName": "capturedsankeydocument_render_captured externref shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6123050
+          },
+          "weightedUs": 1500054,
+          "percent": 73.4621977139387
+        },
+        {
+          "frame": {
+            "functionName": "capturedsankeydocument_render_captured",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2729751
+          },
+          "weightedUs": 1498711,
+          "percent": 73.3964269273338
+        },
+        {
+          "frame": {
+            "functionName": "js-to-wasm::",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1064960,
+          "percent": 52.154323829299585
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1053325,
+          "percent": 51.58452256187743
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::engine::CapturedSankeyRegistration>::validate::<pele_wasm[308eba2172ef4d2c]::captured_store::CapturedStore>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5840514
+          },
+          "weightedUs": 773300,
+          "percent": 37.87084831092001
+        },
+        {
+          "frame": {
+            "functionName": "#page",
+            "scriptId": "53",
+            "url": "http://127.0.0.1:33205/candidate/captured-graph.js",
+            "lineNumber": 33,
+            "columnNumber": 7
+          },
+          "weightedUs": 741467,
+          "percent": 36.31188967354574
+        }
+      ]
+    },
+    {
+      "stage": "render-model",
+      "runtime": "control",
+      "profileSHA256": "2a7c62e83dd62b61cac95d34dce150fc90dcf1bd5bfd38066b170ac12fc617ac",
+      "weightedUs": 2040507,
+      "sampleCount": 5849,
+      "selfCategories": {
+        "wasm": {
+          "weightedUs": 1205338,
+          "percent": 59.07051531800675
+        },
+        "javascript": {
+          "weightedUs": 631544,
+          "percent": 30.950347144116634
+        },
+        "gc": {
+          "weightedUs": 9582,
+          "percent": 0.46958917563135044
+        },
+        "engine-or-profiler": {
+          "weightedUs": 194043,
+          "percent": 9.509548362245265
+        }
+      },
+      "admissionAdapterImportsUnionPercent": 2.643019602481148,
+      "rawParserInclusivePercent": 0.0,
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 53584,
+          "inclusiveUs": 53931,
+          "selfPercent": 2.626014024945761,
+          "inclusivePercent": 2.643019602481148
+        },
+        "captured-native-adapter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-columns-and-indexes": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-page-fork-copy-compact": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "captured-js-imports": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "construction-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 246748,
+          "inclusiveUs": 258726,
+          "selfPercent": 12.092484857929916,
+          "inclusivePercent": 12.679495831183132
+        },
+        "shared-observation-and-match": {
+          "selfUs": 158313,
+          "inclusiveUs": 158313,
+          "selfPercent": 7.758512957809015,
+          "inclusivePercent": 7.758512957809015
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 30734,
+          "inclusiveUs": 211034,
+          "selfPercent": 1.5061942938691217,
+          "inclusivePercent": 10.34223357234256
+        },
+        "allocator": {
+          "selfUs": 89576,
+          "inclusiveUs": 89576,
+          "selfPercent": 4.38988937553265,
+          "inclusivePercent": 4.38988937553265
+        }
+      },
+      "topSelf": [
+        {
+          "frame": {
+            "functionName": "reconcileGraph",
+            "scriptId": "31",
+            "url": "http://127.0.0.1:33205/control/graph-storage.js",
+            "lineNumber": 60,
+            "columnNumber": 23
+          },
+          "weightedUs": 246748,
+          "percent": 12.092484857929916
+        },
+        {
+          "frame": {
+            "functionName": "matchesGraph",
+            "scriptId": "31",
+            "url": "http://127.0.0.1:33205/control/graph-storage.js",
+            "lineNumber": 157,
+            "columnNumber": 21
+          },
+          "weightedUs": 158313,
+          "percent": 7.758512957809015
+        },
+        {
+          "frame": {
+            "functionName": "decode",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 129190,
+          "percent": 6.331269630537901
+        },
+        {
+          "frame": {
+            "functionName": "core[ed718c3d60ebd546]::fmt::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4865491
+          },
+          "weightedUs": 103816,
+          "percent": 5.087755151048245
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4303280
+          },
+          "weightedUs": 91894,
+          "percent": 4.503488593766157
+        },
+        {
+          "frame": {
+            "functionName": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[308eba2172ef4d2c]::render_numbers::Counted> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3928045
+          },
+          "weightedUs": 91885,
+          "percent": 4.5030475269136545
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::render::draw",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 1054440
+          },
+          "weightedUs": 82256,
+          "percent": 4.031155002163678
+        },
+        {
+          "frame": {
+            "functionName": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5257735
+          },
+          "weightedUs": 77820,
+          "percent": 3.8137580513078366
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::svg::num",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4799658
+          },
+          "weightedUs": 65323,
+          "percent": 3.201312222893624
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::layout::Work>::settle",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3972730
+          },
+          "weightedUs": 58059,
+          "percent": 2.8453222654957813
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4235507
+          },
+          "weightedUs": 57551,
+          "percent": 2.8204264920433992
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2620953
+          },
+          "weightedUs": 54965,
+          "percent": 2.693693283090918
+        },
+        {
+          "frame": {
+            "functionName": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.32",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6062449
+          },
+          "weightedUs": 49801,
+          "percent": 2.440618924610403
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::binary::Writer>::put",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5951913
+          },
+          "weightedUs": 46657,
+          "percent": 2.2865395708027467
+        },
+        {
+          "frame": {
+            "functionName": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[3]",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5996062
+          },
+          "weightedUs": 40748,
+          "percent": 1.9969546784206083
+        },
+        {
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 37669,
+          "percent": 1.8460608074365832
+        },
+        {
+          "frame": {
+            "functionName": "ryu_js[fec93a693d864c8d]::pretty::format64",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3479554
+          },
+          "weightedUs": 30374,
+          "percent": 1.4885516197690083
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::public::captured_admission::validate::<pele[8831ffd8be202214]::compat::public::captured_admission::ArenaAdmission>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3331735
+          },
+          "weightedUs": 28920,
+          "percent": 1.4172948193757728
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4629770
+          },
+          "weightedUs": 27428,
+          "percent": 1.3441757367164142
+        },
+        {
+          "frame": {
+            "functionName": "decodeGraphBinary",
+            "scriptId": "26",
+            "url": "http://127.0.0.1:33205/control/graph-binary.js",
+            "lineNumber": 50,
+            "columnNumber": 33
+          },
+          "weightedUs": 24156,
+          "percent": 1.183823432117606
+        }
+      ],
+      "topInclusive": [
+        {
+          "frame": {
+            "functionName": "(root)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 2040507,
+          "percent": 100
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "140",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1984097,
+          "percent": 97.23549098336835
+        },
+        {
+          "frame": {
+            "functionName": "evaluate",
+            "scriptId": "4",
+            "url": "",
+            "lineNumber": 363,
+            "columnNumber": 10
+          },
+          "weightedUs": 1984097,
+          "percent": 97.23549098336835
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "9",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 1
+          },
+          "weightedUs": 1984097,
+          "percent": 97.23549098336835
+        },
+        {
+          "frame": {
+            "functionName": "run",
+            "scriptId": "131",
+            "url": "",
+            "lineNumber": 7,
+            "columnNumber": 7
+          },
+          "weightedUs": 1983793,
+          "percent": 97.22059272523937
+        },
+        {
+          "frame": {
+            "functionName": "render",
+            "scriptId": "13",
+            "url": "http://127.0.0.1:33205/control/full.js",
+            "lineNumber": 570,
+            "columnNumber": 10
+          },
+          "weightedUs": 1981282,
+          "percent": 97.09753507339107
+        },
+        {
+          "frame": {
+            "functionName": "arenaRenderResult",
+            "scriptId": "13",
+            "url": "http://127.0.0.1:33205/control/full.js",
+            "lineNumber": 73,
+            "columnNumber": 26
+          },
+          "weightedUs": 1526868,
+          "percent": 74.82787366081077
+        },
+        {
+          "frame": {
+            "functionName": "render_numbers_operation_packet_with_functions",
+            "scriptId": "24",
+            "url": "http://127.0.0.1:33205/control/pkg/pele.js",
+            "lineNumber": 763,
+            "columnNumber": 50
+          },
+          "weightedUs": 1407566,
+          "percent": 68.98118947888932
+        },
+        {
+          "frame": {
+            "functionName": "mutabledocument_render_numbers_operation_packet_with_functions externref shim multivalue shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6103429
+          },
+          "weightedUs": 1400369,
+          "percent": 68.62848301917121
+        },
+        {
+          "frame": {
+            "functionName": "mutabledocument_render_numbers_operation_packet_with_functions externref shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6132523
+          },
+          "weightedUs": 1400037,
+          "percent": 68.61221255305666
+        },
+        {
+          "frame": {
+            "functionName": "mutabledocument_render_numbers_operation_packet_with_functions",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3305937
+          },
+          "weightedUs": 1399354,
+          "percent": 68.5787404796945
+        },
+        {
+          "frame": {
+            "functionName": "js-to-wasm:iiiiiiiiidiiin:iii",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 1272307,
+          "percent": 62.35249376748034
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::engine::PublicDocument>::render_operation_policy",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3055305
+          },
+          "weightedUs": 1083650,
+          "percent": 53.10689941274399
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::public::engine::Codec<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey> as pele[8831ffd8be202214]::compat::public::engine::Erased>::render_operation_with_output_limit",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5847758
+          },
+          "weightedUs": 1037563,
+          "percent": 50.84829407593309
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey as pele[8831ffd8be202214]::compat::public::engine::PublicDiagramModule>::render_public",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5356563
+          },
+          "weightedUs": 1036918,
+          "percent": 50.81668428483705
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey as pele[8831ffd8be202214]::compat::module::DiagramModule>::render",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4511764
+          },
+          "weightedUs": 1036595,
+          "percent": 50.800854885575006
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::render::draw",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 1054440
+          },
+          "weightedUs": 1024938,
+          "percent": 50.229575296727724
+        },
+        {
+          "frame": {
+            "functionName": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5257735
+          },
+          "weightedUs": 366221,
+          "percent": 17.947549310048924
+        },
+        {
+          "frame": {
+            "functionName": "core[ed718c3d60ebd546]::fmt::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4865491
+          },
+          "weightedUs": 270231,
+          "percent": 13.243326290965921
+        },
+        {
+          "frame": {
+            "functionName": "reconcileGraph",
+            "scriptId": "31",
+            "url": "http://127.0.0.1:33205/control/graph-storage.js",
+            "lineNumber": 60,
+            "columnNumber": 23
+          },
+          "weightedUs": 258726,
+          "percent": 12.679495831183132
+        }
+      ]
+    },
+    {
+      "stage": "render-source",
+      "runtime": "control",
+      "profileSHA256": "1291bad423f1074da0bf872709facfe19a3abccc6a832fba3b35a52221f30b6d",
+      "weightedUs": 2281766,
+      "sampleCount": 6397,
+      "selfCategories": {
+        "wasm": {
+          "weightedUs": 1682681,
+          "percent": 73.74467846396169
+        },
+        "javascript": {
+          "weightedUs": 100123,
+          "percent": 4.387960903966489
+        },
+        "gc": {
+          "weightedUs": 201605,
+          "percent": 8.835480938886809
+        },
+        "engine-or-profiler": {
+          "weightedUs": 297357,
+          "percent": 13.031879693185015
+        }
+      },
+      "admissionAdapterImportsUnionPercent": 0.0,
+      "rawParserInclusivePercent": 2.3255233008117395,
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "captured-native-adapter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 17079,
+          "inclusiveUs": 53063,
+          "selfPercent": 0.7484991887862296,
+          "inclusivePercent": 2.3255233008117395
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-columns-and-indexes": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-page-fork-copy-compact": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "captured-js-imports": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "construction-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 158872,
+          "inclusiveUs": 158872,
+          "selfPercent": 6.9626771544496675,
+          "inclusivePercent": 6.9626771544496675
+        }
+      },
+      "topSelf": [
+        {
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 201605,
+          "percent": 8.835480938886809
+        },
+        {
+          "frame": {
+            "functionName": "decode",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 178268,
+          "percent": 7.812720498070354
+        },
+        {
+          "frame": {
+            "functionName": "core[ed718c3d60ebd546]::fmt::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4865491
+          },
+          "weightedUs": 151273,
+          "percent": 6.62964563412725
+        },
+        {
+          "frame": {
+            "functionName": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[308eba2172ef4d2c]::render_numbers::Counted> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3928045
+          },
+          "weightedUs": 122092,
+          "percent": 5.350767782498293
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::render::draw",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 1054440
+          },
+          "weightedUs": 118671,
+          "percent": 5.20084005108324
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4303280
+          },
+          "weightedUs": 110988,
+          "percent": 4.864127171673169
+        },
+        {
+          "frame": {
+            "functionName": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5257735
+          },
+          "weightedUs": 109422,
+          "percent": 4.795496120110476
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4235507
+          },
+          "weightedUs": 104778,
+          "percent": 4.591969553407317
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::svg::num",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4799658
+          },
+          "weightedUs": 100035,
+          "percent": 4.3841042420651375
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2620953
+          },
+          "weightedUs": 98927,
+          "percent": 4.335545362670843
+        },
+        {
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 80826,
+          "percent": 3.5422563049848232
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::layout::Work>::settle",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3972730
+          },
+          "weightedUs": 76254,
+          "percent": 3.341885188928225
+        },
+        {
+          "frame": {
+            "functionName": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.32",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6062449
+          },
+          "weightedUs": 74462,
+          "percent": 3.2633495283916054
+        },
+        {
+          "frame": {
+            "functionName": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[3]",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5996062
+          },
+          "weightedUs": 56816,
+          "percent": 2.490001165763711
+        },
+        {
+          "frame": {
+            "functionName": "ryu_js[fec93a693d864c8d]::pretty::format64",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3479554
+          },
+          "weightedUs": 53310,
+          "percent": 2.3363482495575796
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4629770
+          },
+          "weightedUs": 41580,
+          "percent": 1.822272748388748
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey as pele[8831ffd8be202214]::compat::module::DiagramModule>::parse",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2447847
+          },
+          "weightedUs": 39129,
+          "percent": 1.714855949295414
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::layout::Work>::stack_out",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5228351
+          },
+          "weightedUs": 31447,
+          "percent": 1.3781868955887677
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::layout::Work>::stack_in",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5228780
+          },
+          "weightedUs": 30454,
+          "percent": 1.334667972088286
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 27977,
+          "percent": 1.2261117047059165
+        }
+      ],
+      "topInclusive": [
+        {
+          "frame": {
+            "functionName": "(root)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 2281766,
+          "percent": 100
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "140",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1989286,
+          "percent": 87.18185826241604
+        },
+        {
+          "frame": {
+            "functionName": "evaluate",
+            "scriptId": "4",
+            "url": "",
+            "lineNumber": 363,
+            "columnNumber": 10
+          },
+          "weightedUs": 1989286,
+          "percent": 87.18185826241604
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "9",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 1
+          },
+          "weightedUs": 1989286,
+          "percent": 87.18185826241604
+        },
+        {
+          "frame": {
+            "functionName": "run",
+            "scriptId": "131",
+            "url": "",
+            "lineNumber": 7,
+            "columnNumber": 7
+          },
+          "weightedUs": 1988701,
+          "percent": 87.15622022591273
+        },
+        {
+          "frame": {
+            "functionName": "render",
+            "scriptId": "13",
+            "url": "http://127.0.0.1:33205/control/full.js",
+            "lineNumber": 570,
+            "columnNumber": 10
+          },
+          "weightedUs": 1983142,
+          "percent": 86.9125931405762
+        },
+        {
+          "frame": {
+            "functionName": "render_numbers_packet_with_resources",
+            "scriptId": "24",
+            "url": "http://127.0.0.1:33205/control/pkg/pele.js",
+            "lineNumber": 1385,
+            "columnNumber": 40
+          },
+          "weightedUs": 1945831,
+          "percent": 85.27741232010645
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_render_numbers_packet_with_resources",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5341138
+          },
+          "weightedUs": 1937702,
+          "percent": 84.92115317696907
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_render_numbers_packet_with_resources multivalue shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6088695
+          },
+          "weightedUs": 1937702,
+          "percent": 84.92115317696907
+        },
+        {
+          "frame": {
+            "functionName": "js-to-wasm:iiiiiiiiidididiii:iii",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6088695
+          },
+          "weightedUs": 1937702,
+          "percent": 84.92115317696907
+        },
+        {
+          "frame": {
+            "functionName": "<pele_wasm[308eba2172ef4d2c]::wasm_registry::NativeRegistry>::render_source",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3995954
+          },
+          "weightedUs": 1693494,
+          "percent": 74.2185657950903
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::engine::render_registered_policy::<<pele[8831ffd8be202214]::compat::engine::Engine>::render_document_bounded::{closure#0}>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3451520
+          },
+          "weightedUs": 1489735,
+          "percent": 65.28868429102721
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::engine::Module<pele[8831ffd8be202214]::compat::public::engine::Shared<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey>, pele[8831ffd8be202214]::compat::engine::Legacy> as pele[8831ffd8be202214]::compat::engine::ErasedModule>::render_with_output_limit",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6021494
+          },
+          "weightedUs": 1487115,
+          "percent": 65.17386094805515
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey as pele[8831ffd8be202214]::compat::module::DiagramModule>::render",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4511764
+          },
+          "weightedUs": 1486047,
+          "percent": 65.12705509679783
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::render::draw",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 1054440
+          },
+          "weightedUs": 1475444,
+          "percent": 64.66237116338836
+        },
+        {
+          "frame": {
+            "functionName": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5257735
+          },
+          "weightedUs": 512483,
+          "percent": 22.459927968073853
+        },
+        {
+          "frame": {
+            "functionName": "core[ed718c3d60ebd546]::fmt::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4865491
+          },
+          "weightedUs": 371242,
+          "percent": 16.269941790700713
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 263653,
+          "percent": 11.554778184967258
+        },
+        {
+          "frame": {
+            "functionName": "pele_wasm[308eba2172ef4d2c]::render_numbers::rendered_packet",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3887356
+          },
+          "weightedUs": 243151,
+          "percent": 10.656263613359126
+        },
+        {
+          "frame": {
+            "functionName": "(garbage collector)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 201605,
+          "percent": 8.835480938886809
+        }
+      ]
+    },
+    {
+      "stage": "render-source",
+      "runtime": "candidate",
+      "profileSHA256": "c6bc722a847c19c74f7eb62fa5b14f26c0a533f6e39248cd2bf90d2c5adda3d8",
+      "weightedUs": 2069997,
+      "sampleCount": 5861,
+      "selfCategories": {
+        "wasm": {
+          "weightedUs": 1705835,
+          "percent": 82.40760735402031
+        },
+        "javascript": {
+          "weightedUs": 92214,
+          "percent": 4.454789064911688
+        },
+        "gc": {
+          "weightedUs": 14734,
+          "percent": 0.7117884711910211
+        },
+        "engine-or-profiler": {
+          "weightedUs": 257214,
+          "percent": 12.425815109876972
+        }
+      },
+      "admissionAdapterImportsUnionPercent": 0.0,
+      "rawParserInclusivePercent": 3.0311638132808887,
+      "architectureGroups": {
+        "native-admission": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "captured-native-adapter": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-import-projection": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "sankey-raw-parser": {
+          "selfUs": 24411,
+          "inclusiveUs": 62745,
+          "selfPercent": 1.1792770714160454,
+          "inclusivePercent": 3.0311638132808887
+        },
+        "initial-native-construction": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-columns-and-indexes": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "flat-page-fork-copy-compact": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "captured-js-imports": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "construction-js": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-publication": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "shared-observation-and-match": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "owner-transport-gates": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "legacy-binary": {
+          "selfUs": 0,
+          "inclusiveUs": 0,
+          "selfPercent": 0,
+          "inclusivePercent": 0
+        },
+        "allocator": {
+          "selfUs": 167413,
+          "inclusiveUs": 167413,
+          "selfPercent": 8.087596262216804,
+          "inclusivePercent": 8.087596262216804
+        }
+      },
+      "topSelf": [
+        {
+          "frame": {
+            "functionName": "decode",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 168097,
+          "percent": 8.120639788366843
+        },
+        {
+          "frame": {
+            "functionName": "core[ed718c3d60ebd546]::fmt::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4865491
+          },
+          "weightedUs": 140075,
+          "percent": 6.766918019687951
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::render::draw",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 1054440
+          },
+          "weightedUs": 125651,
+          "percent": 6.070105415611714
+        },
+        {
+          "frame": {
+            "functionName": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[308eba2172ef4d2c]::render_numbers::Counted> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3928045
+          },
+          "weightedUs": 120770,
+          "percent": 5.8343079724270135
+        },
+        {
+          "frame": {
+            "functionName": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5257735
+          },
+          "weightedUs": 117513,
+          "percent": 5.6769647492242745
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4303280
+          },
+          "weightedUs": 114338,
+          "percent": 5.523582884419639
+        },
+        {
+          "frame": {
+            "functionName": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4235507
+          },
+          "weightedUs": 96765,
+          "percent": 4.674644456006458
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::svg::num",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4799658
+          },
+          "weightedUs": 96652,
+          "percent": 4.669185510896876
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2620953
+          },
+          "weightedUs": 96183,
+          "percent": 4.646528473229671
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::layout::Work>::settle",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3972730
+          },
+          "weightedUs": 86801,
+          "percent": 4.19329110138807
+        },
+        {
+          "frame": {
+            "functionName": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.32",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6062449
+          },
+          "weightedUs": 73198,
+          "percent": 3.536140390541629
+        },
+        {
+          "frame": {
+            "functionName": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate[3]",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5996062
+          },
+          "weightedUs": 68135,
+          "percent": 3.291550664083088
+        },
+        {
+          "frame": {
+            "functionName": "(program)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 53993,
+          "percent": 2.608361268156427
+        },
+        {
+          "frame": {
+            "functionName": "ryu_js[fec93a693d864c8d]::pretty::format64",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3479554
+          },
+          "weightedUs": 51629,
+          "percent": 2.4941582040940156
+        },
+        {
+          "frame": {
+            "functionName": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4629770
+          },
+          "weightedUs": 48476,
+          "percent": 2.341839142762043
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey as pele[8831ffd8be202214]::compat::module::DiagramModule>::parse",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 2447847
+          },
+          "weightedUs": 40910,
+          "percent": 1.9763313666638165
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::layout::Work>::stack_in",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5228780
+          },
+          "weightedUs": 34093,
+          "percent": 1.647007217884857
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 27931,
+          "percent": 1.3493256270419716
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::layout::Work>::stack_out",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5228351
+          },
+          "weightedUs": 26132,
+          "percent": 1.2624172885274714
+        },
+        {
+          "frame": {
+            "functionName": "<pele_wasm[308eba2172ef4d2c]::BrowserResources as pele[8831ffd8be202214]::compat::module::RenderResources>::text_width",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5067686
+          },
+          "weightedUs": 23483,
+          "percent": 1.1344460885692105
+        }
+      ],
+      "topInclusive": [
+        {
+          "frame": {
+            "functionName": "(root)",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "weightedUs": 2069997,
+          "percent": 100
+        },
+        {
+          "frame": {
+            "functionName": "evaluate",
+            "scriptId": "4",
+            "url": "",
+            "lineNumber": 363,
+            "columnNumber": 10
+          },
+          "weightedUs": 1989407,
+          "percent": 96.10675764264393
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "9",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 1
+          },
+          "weightedUs": 1989407,
+          "percent": 96.10675764264393
+        },
+        {
+          "frame": {
+            "functionName": "",
+            "scriptId": "140",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 1989060,
+          "percent": 96.08999433332512
+        },
+        {
+          "frame": {
+            "functionName": "run",
+            "scriptId": "131",
+            "url": "",
+            "lineNumber": 7,
+            "columnNumber": 7
+          },
+          "weightedUs": 1988718,
+          "percent": 96.0734725702501
+        },
+        {
+          "frame": {
+            "functionName": "render",
+            "scriptId": "36",
+            "url": "http://127.0.0.1:33205/candidate/full.js",
+            "lineNumber": 570,
+            "columnNumber": 10
+          },
+          "weightedUs": 1986814,
+          "percent": 95.98149176061608
+        },
+        {
+          "frame": {
+            "functionName": "render_numbers_packet_with_resources",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 1385,
+            "columnNumber": 40
+          },
+          "weightedUs": 1945085,
+          "percent": 93.96559511921998
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_render_numbers_packet_with_resources",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5341138
+          },
+          "weightedUs": 1933861,
+          "percent": 93.42337211116731
+        },
+        {
+          "frame": {
+            "functionName": "nativeregistry_render_numbers_packet_with_resources multivalue shim",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6088695
+          },
+          "weightedUs": 1933861,
+          "percent": 93.42337211116731
+        },
+        {
+          "frame": {
+            "functionName": "js-to-wasm:iiiiiiiiidididiii:iii",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6088695
+          },
+          "weightedUs": 1924236,
+          "percent": 92.95839559187768
+        },
+        {
+          "frame": {
+            "functionName": "<pele_wasm[308eba2172ef4d2c]::wasm_registry::NativeRegistry>::render_source",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3995954
+          },
+          "weightedUs": 1703274,
+          "percent": 82.2838873679527
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::engine::render_registered_policy::<<pele[8831ffd8be202214]::compat::engine::Engine>::render_document_bounded::{closure#0}>",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3451520
+          },
+          "weightedUs": 1499657,
+          "percent": 72.44730306372425
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey as pele[8831ffd8be202214]::compat::module::DiagramModule>::render",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4511764
+          },
+          "weightedUs": 1496243,
+          "percent": 72.2823752884666
+        },
+        {
+          "frame": {
+            "functionName": "<pele[8831ffd8be202214]::compat::engine::Module<pele[8831ffd8be202214]::compat::public::engine::Shared<pele[8831ffd8be202214]::compat::diagrams::sankey::Sankey>, pele[8831ffd8be202214]::compat::engine::Legacy> as pele[8831ffd8be202214]::compat::engine::ErasedModule>::render_with_output_limit",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 6021494
+          },
+          "weightedUs": 1496243,
+          "percent": 72.2823752884666
+        },
+        {
+          "frame": {
+            "functionName": "pele[8831ffd8be202214]::compat::diagrams::sankey::render::draw",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 1054440
+          },
+          "weightedUs": 1483981,
+          "percent": 71.69000728020379
+        },
+        {
+          "frame": {
+            "functionName": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 5257735
+          },
+          "weightedUs": 503898,
+          "percent": 24.342933830338886
+        },
+        {
+          "frame": {
+            "functionName": "core[ed718c3d60ebd546]::fmt::write",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 4865491
+          },
+          "weightedUs": 351204,
+          "percent": 16.96640140058174
+        },
+        {
+          "frame": {
+            "functionName": "wasm-to-js",
+            "scriptId": "-1",
+            "url": "",
+            "lineNumber": 0,
+            "columnNumber": 0
+          },
+          "weightedUs": 239460,
+          "percent": 11.568132707438707
+        },
+        {
+          "frame": {
+            "functionName": "pele_wasm[308eba2172ef4d2c]::render_numbers::rendered_packet",
+            "scriptId": "58",
+            "url": "http://127.0.0.1:33205/control/pkg/pele_bg.wasm",
+            "lineNumber": 0,
+            "columnNumber": 3887356
+          },
+          "weightedUs": 228865,
+          "percent": 11.05629621685442
+        },
+        {
+          "frame": {
+            "functionName": "decodeText",
+            "scriptId": "48",
+            "url": "http://127.0.0.1:33205/candidate/pkg/pele.js",
+            "lineNumber": 2465,
+            "columnNumber": 19
+          },
+          "weightedUs": 182920,
+          "percent": 8.83672778269727
+        }
+      ]
+    }
+  ]
+}

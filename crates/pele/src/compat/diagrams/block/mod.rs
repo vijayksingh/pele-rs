@@ -3,9 +3,12 @@
 mod arrows;
 mod layout;
 mod lexer;
+mod live_phase;
 mod model;
 mod parser;
+mod phase;
 mod render;
+pub(crate) use live_phase::{render_detached, BlockDetachedInput};
 mod route;
 mod tokens;
 use crate::compat::{

@@ -2,6 +2,7 @@
 use super::RadarModel;
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
+    public::LiveGeometryError,
     svg::{self, esc_text, js_num, label_svg, num, series_color},
     text::layout_label,
     Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
@@ -52,16 +53,110 @@ fn closed_round_curve(points: &[Point], tension: f64) -> String {
     }
     d + " Z"
 }
+pub(super) struct Geometry {
+    pub count: usize,
+    pub present: Vec<bool>,
+    pub ticks: f64,
+    pub circle: bool,
+    pub min: f64,
+    pub max: f64,
+}
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    fn missing_point(&mut self, site: LiveGeometryError) -> Self::Error;
+    fn begin_draw(&mut self) -> Result<Geometry, Self::Error>;
+    fn axis_label(&mut self, index: usize) -> Result<Option<String>, Self::Error>;
+    fn axis_name(&mut self, index: usize) -> Result<String, Self::Error>;
+    fn curves_len(&mut self) -> Result<usize, Self::Error>;
+    fn curve_entries(&mut self, index: usize) -> Result<Vec<f64>, Self::Error>;
+    fn curve_name(&mut self, index: usize) -> Result<String, Self::Error>;
+    fn show_legend(&mut self) -> Result<bool, Self::Error>;
+    fn curve_label(&mut self, index: usize) -> Result<Option<String>, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, Self::Error>;
+}
+struct Typed<'a>(&'a RadarModel);
+impl PhaseInput for Typed<'_> {
+    type Error = PeleError;
+    fn missing_point(&mut self, _site: LiveGeometryError) -> PeleError {
+        let mut error = PeleError::new(
+            "Cannot read properties of undefined (reading 'x')",
+            crate::compat::ErrorCode::Semantic,
+        );
+        error.name = "TypeError".into();
+        error
+    }
+    fn begin_draw(&mut self) -> Result<Geometry, PeleError> {
+        let max = self.0.options.max.unwrap_or_else(|| {
+            let mut max = f64::NEG_INFINITY;
+            for curve in &self.0.curves {
+                for &value in &curve.entries {
+                    if value > max {
+                        max = value;
+                    }
+                }
+            }
+            max
+        });
+        Ok(Geometry {
+            count: self.0.axes.len(),
+            present: vec![true; self.0.axes.len()],
+            ticks: self.0.options.ticks,
+            circle: self.0.options.graticule == "circle",
+            min: self.0.options.min,
+            max,
+        })
+    }
+    fn axis_label(&mut self, i: usize) -> Result<Option<String>, PeleError> {
+        Ok(Some(self.0.axes[i].label.clone()))
+    }
+    fn axis_name(&mut self, i: usize) -> Result<String, PeleError> {
+        Ok(self.0.axes[i].name.clone())
+    }
+    fn curves_len(&mut self) -> Result<usize, PeleError> {
+        Ok(self.0.curves.len())
+    }
+    fn curve_entries(&mut self, i: usize) -> Result<Vec<f64>, PeleError> {
+        Ok(self.0.curves[i].entries.clone())
+    }
+    fn curve_name(&mut self, i: usize) -> Result<String, PeleError> {
+        Ok(self.0.curves[i].name.clone())
+    }
+    fn show_legend(&mut self) -> Result<bool, PeleError> {
+        Ok(self.0.options.show_legend)
+    }
+    fn curve_label(&mut self, i: usize) -> Result<Option<String>, PeleError> {
+        Ok(Some(self.0.curves[i].label.clone()))
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn accessibility(&mut self, d: bool) -> Result<Option<String>, PeleError> {
+        Ok(if d {
+            self.0.acc_descr.clone()
+        } else {
+            self.0.acc_title.clone()
+        })
+    }
+}
 pub(super) fn render(
     model: &RadarModel,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(model), config, options, resources)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let natural = option(config, "width", 320., 1., 4000.);
     let height = option(config, "height", 320., 1., 4000.);
     let mut result = draw(
-        model,
+        input,
         config,
         options,
         resources,
@@ -78,7 +173,7 @@ pub(super) fn render(
     let floor = 160f64.js_min(natural);
     let mut plot = natural;
     result = draw(
-        model,
+        input,
         config,
         options,
         resources,
@@ -92,7 +187,7 @@ pub(super) fn render(
         }
         plot = (plot - (result.width - available)).js_max(floor);
         result = draw(
-            model,
+            input,
             config,
             options,
             resources,
@@ -103,15 +198,15 @@ pub(super) fn render(
     }
     Ok(result)
 }
-fn draw(
-    model: &RadarModel,
+fn draw<P: PhaseInput>(
+    input: &mut P,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     width: f64,
     height: f64,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = options.padding.unwrap_or(8.);
@@ -119,12 +214,16 @@ fn draw(
     let label_factor = option(config, "axisLabelFactor", 1.05, 0., 10.);
     let tension = option(config, "curveTension", 0.17, 0., 1.);
     let radius = width.js_min(height) / 2.;
-    let count = model.axes.len();
-    let unit: Vec<_> = model
-        .axes
-        .iter()
-        .enumerate()
-        .map(|(i, _)| {
+    let Geometry {
+        count,
+        present,
+        ticks,
+        circle,
+        min,
+        max,
+    } = input.begin_draw()?;
+    let unit: Vec<_> = (0..count)
+        .map(|i| {
             let angle = 2. * PI * i as f64 / count as f64 - PI / 2.;
             Point {
                 x: angle.cos(),
@@ -132,18 +231,6 @@ fn draw(
             }
         })
         .collect();
-    let max = model.options.max.unwrap_or_else(|| {
-        let mut max = f64::NEG_INFINITY;
-        for curve in &model.curves {
-            for value in &curve.entries {
-                if *value > max {
-                    max = *value
-                }
-            }
-        }
-        max
-    });
-    let min = model.options.min;
     let (mut x0, mut x1, mut y0, mut y1) = (
         -width / 2. - option(config, "marginLeft", 16., 0., 2000.),
         width / 2. + option(config, "marginRight", 16., 0., 2000.),
@@ -152,28 +239,38 @@ fn draw(
     );
     let mut grid = String::new();
     let mut i = 0;
-    while (i as f64) < model.options.ticks {
-        let r = radius.js_min(radius * (i as f64 + 1.) / model.options.ticks);
-        if model.options.graticule == "circle" {
+    while (i as f64) < ticks {
+        let r = radius.js_min(radius * (i as f64 + 1.) / ticks);
+        if circle {
             grid.push_str(&format!("<circle r=\"{}\"/>", num(r)))
         } else {
-            let points: Vec<_> = unit
+            let points = unit
                 .iter()
-                .map(|u| Point {
-                    x: u.x * r,
-                    y: u.y * r,
+                .enumerate()
+                .map(|(index, u)| {
+                    if !present[index] {
+                        return Err(input.missing_point(LiveGeometryError::PolygonPoint));
+                    }
+                    Ok(Point {
+                        x: u.x * r,
+                        y: u.y * r,
+                    })
                 })
-                .collect();
+                .collect::<Result<Vec<_>, P::Error>>()?;
             grid.push_str(&format!("<polygon points=\"{}\"/>", polygon(&points)))
         }
         i += 1
     }
     let (mut spokes, mut labels) = (String::new(), String::new());
     for (i, u) in unit.iter().enumerate() {
+        if !present[i] {
+            continue;
+        }
         let reach = radius * axis_scale;
         spokes.push_str(&format!("M0,0L{},{}", num(u.x * reach), num(u.y * reach)));
+        let label_text = input.axis_label(i)?;
         let label = layout_label(
-            Some(&model.axes[i].label),
+            label_text.as_deref(),
             false,
             resources,
             options,
@@ -200,7 +297,7 @@ fn draw(
             };
         labels.push_str(&format!(
             "<g class=\"pele-axis-label\" data-id=\"{}\">{}</g>",
-            esc_text(&model.axes[i].name)?,
+            esc_text(&input.axis_name(i)?)?,
             label_svg(&label, cx, cy, "")
         ));
         x0 = x0.js_min(cx - label.width / 2.);
@@ -209,29 +306,37 @@ fn draw(
         y1 = y1.js_max(cy + label.height / 2.)
     }
     let mut shapes = String::new();
-    for (index, curve) in model.curves.iter().enumerate() {
-        if curve.entries.len() != count {
+    let curves_len = input.curves_len()?;
+    for index in 0..curves_len {
+        let entries = input.curve_entries(index)?;
+        if entries.len() != count {
             continue;
         }
-        let points: Vec<_> = curve
-            .entries
+        let points: Vec<_> = entries
             .iter()
             .enumerate()
             .map(|(i, value)| {
                 let r = relative_radius(*value, min, max, radius);
                 let safe = if r.is_finite() { r } else { 0. };
-                Point {
-                    x: unit[i].x * safe,
-                    y: unit[i].y * safe,
+                if !present[i] {
+                    return Err(input.missing_point(LiveGeometryError::IndexedPoint));
                 }
+                let u = unit[i];
+                Ok(Point {
+                    x: u.x * safe,
+                    y: u.y * safe,
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>, P::Error>>()?;
         let color = series_color(index);
         let attrs = format!(
             " class=\"pele-curve\" data-id=\"{}\" fill=\"{color}\" stroke=\"{color}\"",
-            esc_text(&curve.name)?
+            esc_text(&input.curve_name(index)?)?
         );
-        shapes.push_str(&if model.options.graticule == "circle" {
+        shapes.push_str(&if circle {
+            if points.is_empty() {
+                return Err(input.missing_point(LiveGeometryError::FirstCurvePoint));
+            }
             format!(
                 "<path{attrs} d=\"{}\"/>",
                 closed_round_curve(&points, tension)
@@ -241,10 +346,12 @@ fn draw(
         })
     }
     let mut legend = Vec::new();
-    if model.options.show_legend {
-        for curve in &model.curves {
+    if input.show_legend()? {
+        let length = input.curves_len()?;
+        for index in 0..length {
+            let text = input.curve_label(index)?;
             legend.push(layout_label(
-                Some(&curve.label),
+                text.as_deref(),
                 false,
                 resources,
                 options,
@@ -275,14 +382,15 @@ fn draw(
     for (index, label) in legend.iter().enumerate() {
         let y = legend_top + index as f64 * 26. + 13.;
         let color = series_color(index);
-        legend_out.push_str(&format!("<g class=\"pele-legend-item\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"12\" height=\"12\" rx=\"2\" fill=\"{color}\" fill-opacity=\"0.4\" stroke=\"{color}\"/>{}</g>",esc_text(&model.curves[index].name)?,num(legend_x),num(y-6.),label_svg(label,legend_x+12.+8.+label.width/2.,y,"")))
+        legend_out.push_str(&format!("<g class=\"pele-legend-item\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"12\" height=\"12\" rx=\"2\" fill=\"{color}\" fill-opacity=\"0.4\" stroke=\"{color}\"/>{}</g>",esc_text(&input.curve_name(index)?)?,num(legend_x),num(y-6.),label_svg(label,legend_x+12.+8.+label.width/2.,y,"")))
     }
     let title_room = options
         .max_width
         .filter(|v| *v > 0.)
         .map_or(4000., |v| (v - 2. * pad).js_max(80.));
+    let title_text = input.title()?;
     let title = layout_label(
-        model.title.as_deref(),
+        title_text.as_deref(),
         false,
         resources,
         options,
@@ -336,6 +444,8 @@ fn draw(
         ))
     }
     content.push_str("</g>");
+    let acc_title = input.accessibility(false)?;
+    let acc_descr = input.accessibility(true)?;
     Ok(Rendered {
         svg: svg::document(
             "radar",
@@ -343,8 +453,8 @@ fn draw(
             total_height,
             size,
             options,
-            model.acc_title.as_deref(),
-            model.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width: total_width,

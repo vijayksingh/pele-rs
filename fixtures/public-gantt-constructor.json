@@ -1,0 +1,966 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "266528458091790e0c9ded3f3fcb063c3508f13eb2573e2c7507ef7c1a6cd4c4",
+  "warningBody": "warn(e){this.options.warn&&this.options.warn(e())}",
+  "initial": {
+    "root": [
+      "ref",
+      0
+    ],
+    "nodes": [
+      {
+        "kind": "instance",
+        "properties": [
+          [
+            "type",
+            [
+              "string",
+              "gantt"
+            ],
+            7
+          ],
+          [
+            "title",
+            [
+              "undefined"
+            ],
+            7
+          ],
+          [
+            "accTitle",
+            [
+              "undefined"
+            ],
+            7
+          ],
+          [
+            "accDescr",
+            [
+              "undefined"
+            ],
+            7
+          ],
+          [
+            "dateFormat",
+            [
+              "string",
+              ""
+            ],
+            7
+          ],
+          [
+            "axisFormat",
+            [
+              "string",
+              ""
+            ],
+            7
+          ],
+          [
+            "tickInterval",
+            [
+              "undefined"
+            ],
+            7
+          ],
+          [
+            "todayMarker",
+            [
+              "string",
+              ""
+            ],
+            7
+          ],
+          [
+            "includes",
+            [
+              "ref",
+              1
+            ],
+            7
+          ],
+          [
+            "excludes",
+            [
+              "ref",
+              2
+            ],
+            7
+          ],
+          [
+            "inclusiveEndDates",
+            [
+              "bool",
+              false
+            ],
+            7
+          ],
+          [
+            "topAxis",
+            [
+              "bool",
+              false
+            ],
+            7
+          ],
+          [
+            "displayMode",
+            [
+              "string",
+              ""
+            ],
+            7
+          ],
+          [
+            "weekday",
+            [
+              "undefined"
+            ],
+            7
+          ],
+          [
+            "weekend",
+            [
+              "string",
+              "saturday"
+            ],
+            7
+          ],
+          [
+            "sections",
+            [
+              "ref",
+              3
+            ],
+            7
+          ],
+          [
+            "links",
+            [
+              "ref",
+              4
+            ],
+            7
+          ],
+          [
+            "tasks",
+            [
+              "ref",
+              5
+            ],
+            7
+          ],
+          [
+            "byId",
+            [
+              "ref",
+              6
+            ],
+            7
+          ],
+          [
+            "currentSection",
+            [
+              "string",
+              ""
+            ],
+            7
+          ],
+          [
+            "taskCount",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            7
+          ],
+          [
+            "lastOrder",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            7
+          ],
+          [
+            "lastTaskId",
+            [
+              "undefined"
+            ],
+            7
+          ],
+          [
+            "options",
+            [
+              "ref",
+              7
+            ],
+            7
+          ],
+          [
+            "now",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            7
+          ],
+          [
+            "work",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            7
+          ],
+          [
+            "includeSet",
+            [
+              "ref",
+              8
+            ],
+            7
+          ],
+          [
+            "excludeSet",
+            [
+              "ref",
+              9
+            ],
+            7
+          ],
+          [
+            "excludedDays",
+            [
+              "ref",
+              10
+            ],
+            7
+          ],
+          [
+            "datedTokens",
+            [
+              "bool",
+              false
+            ],
+            7
+          ]
+        ]
+      },
+      {
+        "kind": "array",
+        "properties": [
+          [
+            "length",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            2
+          ]
+        ]
+      },
+      {
+        "kind": "array",
+        "properties": [
+          [
+            "length",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            2
+          ]
+        ]
+      },
+      {
+        "kind": "array",
+        "properties": [
+          [
+            "length",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            2
+          ]
+        ]
+      },
+      {
+        "kind": "map",
+        "properties": [],
+        "entries": []
+      },
+      {
+        "kind": "array",
+        "properties": [
+          [
+            "length",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            2
+          ]
+        ]
+      },
+      {
+        "kind": "map",
+        "properties": [],
+        "entries": []
+      },
+      {
+        "kind": "object",
+        "properties": []
+      },
+      {
+        "kind": "set",
+        "properties": [],
+        "values": []
+      },
+      {
+        "kind": "set",
+        "properties": [],
+        "values": []
+      },
+      {
+        "kind": "array",
+        "properties": [
+          [
+            "length",
+            [
+              "number",
+              "0000000000000000"
+            ],
+            2
+          ]
+        ]
+      }
+    ],
+    "result": [
+      "undefined"
+    ]
+  },
+  "drawing": {
+    "ok": true,
+    "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-gantt\" viewBox=\"0 0 17 17\" width=\"17\" height=\"17\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"gantt\"></svg>",
+    "width": 17,
+    "height": 17,
+    "trace": []
+  },
+  "cases": [
+    {
+      "id": "lazy-undefined",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ]
+      ],
+      "optionReads": 1,
+      "warnReads": 1,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "lazy-null",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ]
+      ],
+      "optionReads": 1,
+      "warnReads": 1,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "lazy-false",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ]
+      ],
+      "optionReads": 1,
+      "warnReads": 1,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "lazy-zero",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ]
+      ],
+      "optionReads": 1,
+      "warnReads": 1,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "lazy-nan",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ]
+      ],
+      "optionReads": 1,
+      "warnReads": 1,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "lazy-empty",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ]
+      ],
+      "optionReads": 1,
+      "warnReads": 1,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "lazy-bigint-zero",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ]
+      ],
+      "optionReads": 1,
+      "warnReads": 1,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "changing-options",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ],
+        [
+          "call",
+          "warn",
+          "options2",
+          42
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": []
+    },
+    {
+      "id": "producer-reentry",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ],
+        [
+          "call",
+          "warn",
+          "options2",
+          42
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": [
+        "nested producer"
+      ]
+    },
+    {
+      "id": "warn-reentry",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ],
+        [
+          "call",
+          "warn",
+          "options2",
+          42
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": false,
+      "sections": [
+        "nested warning"
+      ]
+    },
+    {
+      "id": "producer-throw-object",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": "original-object",
+      "sections": []
+    },
+    {
+      "id": "producer-throw-undefined",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": "original-undefined",
+      "sections": []
+    },
+    {
+      "id": "producer-throw-symbol",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": "original-symbol",
+      "sections": []
+    },
+    {
+      "id": "second-get-throw",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": "original-object",
+      "sections": []
+    },
+    {
+      "id": "second-noncallable-false",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": {
+        "name": "TypeError",
+        "message": "this.options.warn is not a function"
+      },
+      "sections": []
+    },
+    {
+      "id": "second-noncallable-object",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": {
+        "name": "TypeError",
+        "message": "this.options.warn is not a function"
+      },
+      "sections": []
+    },
+    {
+      "id": "producer-noncallable-null",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": {
+        "name": "TypeError",
+        "message": "e is not a function"
+      },
+      "sections": []
+    },
+    {
+      "id": "producer-noncallable-number",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": {
+        "name": "TypeError",
+        "message": "e is not a function"
+      },
+      "sections": []
+    },
+    {
+      "id": "warn-throw",
+      "trace": [
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options1",
+          "warn"
+        ],
+        [
+          "get",
+          "model",
+          "options"
+        ],
+        [
+          "get",
+          "options2",
+          "warn"
+        ],
+        [
+          "call",
+          "producer",
+          "undefined"
+        ],
+        [
+          "call",
+          "warn",
+          "options2",
+          42
+        ]
+      ],
+      "optionReads": 2,
+      "warnReads": 2,
+      "readsInConstructor": 0,
+      "result": "undefined",
+      "thrown": true,
+      "error": "original-object",
+      "sections": []
+    }
+  ]
+}

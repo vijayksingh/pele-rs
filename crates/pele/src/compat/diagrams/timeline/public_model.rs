@@ -484,7 +484,23 @@ fn invoke(g: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
     }
     Ok(Atom::Undefined)
 }
+fn construct_default() -> Result<TimelinePublicState, PeleError> {
+    Timeline.create_public(&TimelineModel::empty(None))
+}
+
 impl PublicDiagramModule for Timeline {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTOTYPE,
+                construct_default,
+            )
+        })
+    }
+
     type PublicState = TimelinePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
@@ -541,6 +557,12 @@ impl PublicDiagramModule for Timeline {
         let imported = imported(&graph);
         Ok(TimelinePublicState { graph, imported })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }
@@ -559,6 +581,14 @@ impl PublicDiagramModule for Timeline {
         let out = invoke(&mut s.graph, call);
         s.imported = imported(&s.graph);
         out
+    }
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::timeline())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::timeline(
+            super::TimelineDetachedInput::new(state.imported.as_ref().err().cloned()),
+        ))
     }
     fn render_public(
         &self,

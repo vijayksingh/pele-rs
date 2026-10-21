@@ -593,7 +593,7 @@ fn mutable_radar_unedited_results_keep_the_entire_existing_pinned_render_corpus(
     }
 }
 #[test]
-fn radar_explicit_runtime_shape_gaps_preserve_graph_and_recover() {
+fn radar_runtime_shape_errors_preserve_graph_and_recover() {
     let mut engine = PublicEngine::empty();
     engine.register(Radar);
     let mut document = engine.parse(SOURCE, &ParseOptions::default()).unwrap();
@@ -606,9 +606,10 @@ fn radar_explicit_runtime_shape_gaps_preserve_graph_and_recover() {
         .render(&RenderOptions::default(), &mut MetricsResources)
         .unwrap_err();
     assert_eq!(error.code, ErrorCode::Semantic);
+    assert_eq!(error.name, "TypeError");
     assert_eq!(
         error.message,
-        "Radar sparse active arrays are not implemented"
+        "Cannot read properties of undefined (reading 'x')"
     );
     let mut graph = document.snapshot().unwrap();
     assert!(matches!(
@@ -624,8 +625,7 @@ fn radar_explicit_runtime_shape_gaps_preserve_graph_and_recover() {
     assert!(document
         .render(&RenderOptions::default(), &mut MetricsResources)
         .is_ok());
-    // Pinned empty circle curves throw TypeError at points[0].x. The native lane
-    // reports Semantic and keeps the graph; it must not panic in the old renderer.
+    // Pinned empty circle curves throw TypeError at points[0].x and retain edits.
     let mut graph = document.snapshot().unwrap();
     graph.nodes[axes as usize] = Node::Array {
         length: 0,
@@ -651,7 +651,7 @@ fn radar_explicit_runtime_shape_gaps_preserve_graph_and_recover() {
             .render(&RenderOptions::default(), &mut MetricsResources)
             .unwrap_err()
             .message,
-        "Radar circle curves require at least one axis"
+        "Cannot read properties of undefined (reading 'x')"
     );
     let mut graph = document.snapshot().unwrap();
     text(&mut graph, options, "graticule", "polygon");

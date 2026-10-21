@@ -1,0 +1,250 @@
+{
+  "control": "../2026-10-20-mutable/mutable-layers-control.json",
+  "candidate": "web.json",
+  "stageSummary": {
+    "render-source": {
+      "conditions": 42,
+      "medianImprovementPercent": -0.38167719421161594,
+      "improvementRange": [
+        -18.045125289866814,
+        13.617024523146604
+      ],
+      "medianWasmOverJS": 2.600686811145575,
+      "wasmOverJSRange": [
+        1.7837837350203058,
+        5.2444443172878685
+      ],
+      "regressionsAbove5Percent": [
+        {
+          "case": "er/medium",
+          "profile": "fixed",
+          "improvementPercent": -17.886177033739514
+        },
+        {
+          "case": "sankey/medium",
+          "profile": "canvas",
+          "improvementPercent": -9.230767763577985
+        },
+        {
+          "case": "sankey/large",
+          "profile": "fixed",
+          "improvementPercent": -5.38461391742413
+        },
+        {
+          "case": "sankey/large",
+          "profile": "canvas",
+          "improvementPercent": -18.045125289866814
+        }
+      ]
+    },
+    "parse": {
+      "conditions": 42,
+      "medianImprovementPercent": 25.840578730132677,
+      "improvementRange": [
+        -4.54543927484341,
+        54.43038478949751
+      ],
+      "medianWasmOverJS": 12.725581550082378,
+      "wasmOverJSRange": [
+        2.8749995995312987,
+        45.66663699681791
+      ],
+      "regressionsAbove5Percent": []
+    },
+    "render-model": {
+      "conditions": 42,
+      "medianImprovementPercent": 21.33261907056287,
+      "improvementRange": [
+        -11.764705882352944,
+        42.434206192182714
+      ],
+      "medianWasmOverJS": 4.948917702941122,
+      "wasmOverJSRange": [
+        2.1679389846470087,
+        29.473682731142407
+      ],
+      "regressionsAbove5Percent": [
+        {
+          "case": "railroad/small",
+          "profile": "fixed",
+          "improvementPercent": -11.764705882352944
+        },
+        {
+          "case": "pie/medium",
+          "profile": "fixed",
+          "improvementPercent": -5.263156385161372
+        }
+      ]
+    }
+  },
+  "largeCanvas": [
+    {
+      "case": "flowchart/large",
+      "stage": "render-source",
+      "wasmMedianMs": 2.587499976158142,
+      "controlMs": 2.6374999284744263,
+      "improvementPercent": 1.8957328406528196,
+      "wasmOverJS": 1.9166666151564806
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "parse",
+      "wasmMedianMs": 3.3999998569488525,
+      "controlMs": 5.0249998569488525,
+      "improvementPercent": 32.338309378314875,
+      "wasmOverJS": 12.651163100164753
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "render-model",
+      "wasmMedianMs": 4.650000095367432,
+      "controlMs": 6.349999904632568,
+      "improvementPercent": 26.771650941678303,
+      "wasmOverJS": 4.065573811499029
+    },
+    {
+      "case": "sequence/large",
+      "stage": "render-source",
+      "wasmMedianMs": 1.112500011920929,
+      "controlMs": 1.09375,
+      "improvementPercent": -1.7142868041992276,
+      "wasmOverJS": 2.144578286950484
+    },
+    {
+      "case": "sequence/large",
+      "stage": "parse",
+      "wasmMedianMs": 1.5625,
+      "controlMs": 1.975000023841858,
+      "improvementPercent": 20.88607690441666,
+      "wasmOverJS": 10.362694710161069
+    },
+    {
+      "case": "sequence/large",
+      "stage": "render-model",
+      "wasmMedianMs": 1.8875000476837158,
+      "controlMs": 2.475000023841858,
+      "improvementPercent": 23.73737254540248,
+      "wasmOverJS": 5.275109391443334
+    },
+    {
+      "case": "er/large",
+      "stage": "render-source",
+      "wasmMedianMs": 7.050000190734863,
+      "controlMs": 6.849999904632568,
+      "improvementPercent": -2.9197122465218994,
+      "wasmOverJS": 2.3797468232184036
+    },
+    {
+      "case": "er/large",
+      "stage": "parse",
+      "wasmMedianMs": 4.049999952316284,
+      "controlMs": 5.224999904632568,
+      "improvementPercent": 22.48803777535977,
+      "wasmOverJS": 5.22580634989426
+    },
+    {
+      "case": "er/large",
+      "stage": "render-model",
+      "wasmMedianMs": 9.949999809265137,
+      "controlMs": 10.949999809265137,
+      "improvementPercent": 9.132420250399175,
+      "wasmOverJS": 4.020201904410527
+    },
+    {
+      "case": "pie/large",
+      "stage": "render-source",
+      "wasmMedianMs": 0.6843750178813934,
+      "controlMs": 0.6875,
+      "improvementPercent": 0.45454285361550273,
+      "wasmOverJS": 2.4606741952288105
+    },
+    {
+      "case": "pie/large",
+      "stage": "parse",
+      "wasmMedianMs": 0.2718749940395355,
+      "controlMs": 0.29375000298023224,
+      "improvementPercent": 7.446811478728321,
+      "wasmOverJS": 3.624999776482591
+    },
+    {
+      "case": "pie/large",
+      "stage": "render-model",
+      "wasmMedianMs": 0.793749988079071,
+      "controlMs": 0.9125000238418579,
+      "improvementPercent": 13.013702209323663,
+      "wasmOverJS": 3.708029193015401
+    },
+    {
+      "case": "sankey/large",
+      "stage": "render-source",
+      "wasmMedianMs": 1.9625000953674316,
+      "controlMs": 1.6624999046325684,
+      "improvementPercent": -18.045125289866814,
+      "wasmOverJS": 1.8690476886539495
+    },
+    {
+      "case": "sankey/large",
+      "stage": "parse",
+      "wasmMedianMs": 1.0625,
+      "controlMs": 1.324999988079071,
+      "improvementPercent": 19.811320033265247,
+      "wasmOverJS": 8.774193548387096
+    },
+    {
+      "case": "sankey/large",
+      "stage": "render-model",
+      "wasmMedianMs": 2.6750000715255737,
+      "controlMs": 3.1500000953674316,
+      "improvementPercent": 15.079365379716014,
+      "wasmOverJS": 3.1240877182687314
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-source",
+      "wasmMedianMs": 2.75,
+      "controlMs": 2.700000047683716,
+      "improvementPercent": -1.8518500530834592,
+      "wasmOverJS": 3.981900383756812
+    },
+    {
+      "case": "gantt/large",
+      "stage": "parse",
+      "wasmMedianMs": 3.25,
+      "controlMs": 4,
+      "improvementPercent": 18.75,
+      "wasmOverJS": 20.594059600396296
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-model",
+      "wasmMedianMs": 8.050000190734863,
+      "controlMs": 9.349999904632568,
+      "improvementPercent": 13.903740397404762,
+      "wasmOverJS": 13.010101193032108
+    },
+    {
+      "case": "railroad/large",
+      "stage": "render-source",
+      "wasmMedianMs": 2.024999976158142,
+      "controlMs": 2.087499976158142,
+      "improvementPercent": 2.9940120102432632,
+      "wasmOverJS": 2.492307662963867
+    },
+    {
+      "case": "railroad/large",
+      "stage": "parse",
+      "wasmMedianMs": 1.5750000476837158,
+      "controlMs": 1.962499976158142,
+      "improvementPercent": 19.745219525200174,
+      "wasmOverJS": 5.1958762927141
+    },
+    {
+      "case": "railroad/large",
+      "stage": "render-model",
+      "wasmMedianMs": 2.725000023841858,
+      "controlMs": 3.7249999046325684,
+      "improvementPercent": 26.84563507094505,
+      "wasmOverJS": 4.360000038146973
+    }
+  ]
+}

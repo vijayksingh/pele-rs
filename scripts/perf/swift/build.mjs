@@ -37,7 +37,9 @@ export async function inputs(root){
 }
 async function command(program,args,options={}){await new Promise((resolve,reject)=>{const child=spawn(program,args,{stdio:'inherit',...options});child.on('error',reject);child.on('exit',code=>code===0?resolve():reject(Error(program+' failed: '+code)))})}
 async function main(){
- const root=repository();guardQuiet();
+ // Correctness builds may share the host. Before/after input hashes and the
+ // linked SDK slice still establish freshness; only timed runs require quiet.
+ const root=repository();
  const before=await inputs(root);
  const arch=process.arch==='arm64'?'arm64':process.arch==='x64'?'x86_64':null;assert(arch,'Unsupported Swift benchmark host architecture');
  const target=arch==='arm64'?'aarch64-apple-darwin':'x86_64-apple-darwin';

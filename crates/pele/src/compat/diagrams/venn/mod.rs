@@ -39,3 +39,6 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<VennModel, PeleErro
 
 mod public_model;
 pub use public_model::VennPublicState;
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, VennDetachedInput};

@@ -4,9 +4,9 @@ use super::{Atom, ErrorObjectKind, JsString, ModelGraph, Node, Property, Prototy
 use crate::compat::{ErrorCode, PeleError};
 
 const MAGIC: &[u8; 8] = b"PELGBIN1";
-const MAX_TABLE: usize = 1_000_000;
-const MAX_UNITS: usize = 16_000_000;
-const MAX_ENTRIES: usize = 8_000_000;
+pub(super) const MAX_TABLE: usize = 1_000_000;
+pub(super) const MAX_UNITS: usize = 16_000_000;
+pub(super) const MAX_ENTRIES: usize = 8_000_000;
 /// Per-exchange byte ceiling, separate from the engine's graph work ceilings.
 pub const DEFAULT_BINARY_BUDGET: usize = 64 * 1024 * 1024;
 /// Metadata is caller-owned UTF-8/JSON or another negotiated format; the graph
@@ -17,40 +17,63 @@ pub struct BinaryExchange {
     pub graph: ModelGraph,
     pub metadata: Vec<u8>,
 }
-fn invalid() -> PeleError {
+pub(super) fn invalid() -> PeleError {
     PeleError::new("Invalid public binary graph transport", ErrorCode::Semantic)
 }
-fn limit() -> PeleError {
+pub(super) fn limit() -> PeleError {
     PeleError::new(
         "Public binary graph exceeds transport budget",
         ErrorCode::Limit,
     )
 }
-struct Writer {
-    bytes: Vec<u8>,
+pub(super) fn check_count(n: usize, max: usize) -> Result<(), PeleError> {
+    if n > max {
+        Err(limit())
+    } else {
+        Ok(())
+    }
+}
+pub(super) fn add_bounded(total: &mut usize, n: usize, max: usize) -> Result<(), PeleError> {
+    *total = total.checked_add(n).ok_or_else(limit)?;
+    check_count(*total, max)
+}
+pub(super) fn check_bytes(
+    current: usize,
+    additional: usize,
     budget: usize,
+) -> Result<(), PeleError> {
+    if additional > budget.saturating_sub(current) {
+        Err(limit())
+    } else {
+        Ok(())
+    }
+}
+pub(crate) struct Writer {
+    pub(crate) bytes: Vec<u8>,
+    pub(crate) budget: usize,
 }
 impl Writer {
-    fn put(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
-        if bytes.len() > self.budget.saturating_sub(self.bytes.len()) {
-            return Err(limit());
-        }
+    pub(crate) fn check_additional(&self, count: usize) -> Result<(), PeleError> {
+        check_bytes(self.bytes.len(), count, self.budget)
+    }
+    pub(crate) fn put(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
+        self.check_additional(bytes.len())?;
         self.bytes.extend_from_slice(bytes);
         Ok(())
     }
-    fn byte(&mut self, value: u8) -> Result<(), PeleError> {
+    pub(crate) fn byte(&mut self, value: u8) -> Result<(), PeleError> {
         self.put(&[value])
     }
-    fn u32(&mut self, value: u32) -> Result<(), PeleError> {
+    pub(crate) fn u32(&mut self, value: u32) -> Result<(), PeleError> {
         self.put(&value.to_le_bytes())
     }
-    fn count(&mut self, value: usize) -> Result<(), PeleError> {
+    pub(crate) fn count(&mut self, value: usize) -> Result<(), PeleError> {
         self.u32(u32::try_from(value).map_err(|_| limit())?)
     }
-    fn number(&mut self, value: f64) -> Result<(), PeleError> {
+    pub(crate) fn number(&mut self, value: f64) -> Result<(), PeleError> {
         self.put(&value.to_bits().to_le_bytes())
     }
-    fn atom(&mut self, value: &Atom) -> Result<(), PeleError> {
+    pub(crate) fn atom(&mut self, value: &Atom) -> Result<(), PeleError> {
         match value {
             Atom::Undefined => self.byte(0),
             Atom::Null => self.byte(1),
@@ -78,7 +101,7 @@ impl Writer {
             }
         }
     }
-    fn properties(&mut self, values: &[Property]) -> Result<(), PeleError> {
+    pub(crate) fn properties(&mut self, values: &[Property]) -> Result<(), PeleError> {
         self.count(values.len())?;
         for p in values {
             self.u32(p.key)?;
@@ -87,7 +110,7 @@ impl Writer {
         }
         Ok(())
     }
-    fn node(&mut self, node: &Node) -> Result<(), PeleError> {
+    pub(crate) fn node(&mut self, node: &Node) -> Result<(), PeleError> {
         match node {
             Node::Error { error_type, .. } => {
                 self.byte(6)?;
@@ -166,14 +189,27 @@ pub fn encode_binary_exchange(
     w.put(metadata)?;
     Ok(w.bytes)
 }
-struct Reader<'a> {
+pub(super) struct Reader<'a> {
     bytes: &'a [u8],
     offset: usize,
     units: usize,
     entries: usize,
+    physical_only: bool,
 }
 impl<'a> Reader<'a> {
-    fn take(&mut self, size: usize) -> Result<&'a [u8], PeleError> {
+    pub(super) fn physical(bytes: &'a [u8]) -> Self {
+        Self {
+            bytes,
+            offset: 0,
+            units: 0,
+            entries: 0,
+            physical_only: true,
+        }
+    }
+    pub(super) fn finished(&self) -> bool {
+        self.offset == self.bytes.len()
+    }
+    pub(super) fn take(&mut self, size: usize) -> Result<&'a [u8], PeleError> {
         let end = self.offset.checked_add(size).ok_or_else(invalid)?;
         let value = self.bytes.get(self.offset..end).ok_or_else(invalid)?;
         self.offset = end;
@@ -182,22 +218,22 @@ impl<'a> Reader<'a> {
     fn byte(&mut self) -> Result<u8, PeleError> {
         Ok(self.take(1)?[0])
     }
-    fn u32(&mut self) -> Result<u32, PeleError> {
+    pub(super) fn u32(&mut self) -> Result<u32, PeleError> {
         Ok(u32::from_le_bytes(
             self.take(4)?.try_into().map_err(|_| invalid())?,
         ))
     }
-    fn u64(&mut self) -> Result<u64, PeleError> {
+    pub(super) fn u64(&mut self) -> Result<u64, PeleError> {
         Ok(u64::from_le_bytes(
             self.take(8)?.try_into().map_err(|_| invalid())?,
         ))
     }
     // Check counts against both native ceilings and physical remaining input
     // before allocating. A malicious length cannot reserve unbacked memory.
-    fn count(&mut self, max: usize, min_bytes: usize) -> Result<usize, PeleError> {
+    pub(super) fn count(&mut self, max: usize, min_bytes: usize) -> Result<usize, PeleError> {
         let n = self.u32()? as usize;
-        if n > max {
-            return Err(limit());
+        if !self.physical_only {
+            check_count(n, max)?;
         }
         if n > self.bytes.len().saturating_sub(self.offset) / min_bytes {
             return Err(invalid());
@@ -205,13 +241,13 @@ impl<'a> Reader<'a> {
         Ok(n)
     }
     fn work(&mut self, n: usize) -> Result<(), PeleError> {
-        self.entries = self.entries.checked_add(n).ok_or_else(limit)?;
-        if self.entries > MAX_ENTRIES {
-            return Err(limit());
+        if self.physical_only {
+            Ok(())
+        } else {
+            add_bounded(&mut self.entries, n, MAX_ENTRIES)
         }
-        Ok(())
     }
-    fn atom(&mut self) -> Result<Atom, PeleError> {
+    pub(super) fn atom(&mut self) -> Result<Atom, PeleError> {
         Ok(match self.byte()? {
             0 => Atom::Undefined,
             1 => Atom::Null,
@@ -225,76 +261,158 @@ impl<'a> Reader<'a> {
             _ => return Err(invalid()),
         })
     }
-    fn properties(&mut self) -> Result<Vec<Property>, PeleError> {
-        let n = self.count(MAX_ENTRIES, 6)?;
-        self.work(n)?;
-        let mut out = Vec::with_capacity(n);
-        for _ in 0..n {
-            let key = self.u32()?;
-            let flags = self.byte()?;
-            let value = self.atom()?;
-            out.push(Property { key, value, flags });
-        }
-        Ok(out)
+    pub(super) fn position(&self) -> usize {
+        self.offset
     }
-    fn node(&mut self) -> Result<Node, PeleError> {
-        let tag = self.byte()?;
-        let mut node = match tag {
-            6 => Node::Error {
-                error_type: match self.byte()? {
-                    0 => ErrorObjectKind::Error,
-                    1 => ErrorObjectKind::Pele,
-                    2 => ErrorObjectKind::Type,
-                    3 => ErrorObjectKind::Range,
-                    4 => ErrorObjectKind::Syntax,
-                    5 => ErrorObjectKind::Reference,
-                    6 => ErrorObjectKind::Eval,
-                    7 => ErrorObjectKind::Uri,
-                    _ => return Err(invalid()),
-                },
-                properties: vec![],
-            },
-            0 => Node::Object { properties: vec![] },
-            1 => Node::Instance {
-                prototype: PrototypeId(self.u32()?),
-                properties: vec![],
-            },
-            2 => Node::Array {
-                length: self.u32()?,
-                properties: vec![],
-            },
+    pub(super) fn scan_node(&mut self) -> Result<super::captured_admission::Header, PeleError> {
+        self.node_with::<ScanNode>()
+    }
+    pub(super) fn node(&mut self) -> Result<Node, PeleError> {
+        self.node_with::<MaterializeNode>()
+    }
+    // One wire decoder owns kind/atom/count/error order for both physical
+    // scanning and materialization. The scan sink never reserves collection
+    // storage; the ordinary reader still checks semantic work before reserves.
+    fn node_with<S: NodeSink>(&mut self) -> Result<S::Output, PeleError> {
+        use super::captured_admission::AdmissionKind as K;
+        let kind = match self.byte()? {
+            0 => K::Object,
+            1 => K::Instance(PrototypeId(self.u32()?)),
+            2 => K::Array(self.u32()?),
             3 => {
                 let n = self.count(MAX_ENTRIES / 2, 2)?;
                 self.work(n * 2)?;
-                let mut entries = Vec::with_capacity(n);
-                for _ in 0..n {
-                    entries.push((self.atom()?, self.atom()?));
-                }
-                Node::Map {
-                    entries,
-                    properties: vec![],
-                }
+                K::Map(n)
             }
             4 => {
                 let n = self.count(MAX_ENTRIES, 1)?;
                 self.work(n)?;
-                let mut values = Vec::with_capacity(n);
-                for _ in 0..n {
-                    values.push(self.atom()?);
-                }
-                Node::Set {
-                    values,
-                    properties: vec![],
-                }
+                K::Set(n)
             }
-            5 => Node::Date {
-                milliseconds: f64::from_bits(self.u64()?),
-                properties: vec![],
-            },
+            5 => K::Date(self.u64()?),
+            6 => K::Error(match self.byte()? {
+                0 => ErrorObjectKind::Error,
+                1 => ErrorObjectKind::Pele,
+                2 => ErrorObjectKind::Type,
+                3 => ErrorObjectKind::Range,
+                4 => ErrorObjectKind::Syntax,
+                5 => ErrorObjectKind::Reference,
+                6 => ErrorObjectKind::Eval,
+                7 => ErrorObjectKind::Uri,
+                _ => return Err(invalid()),
+            }),
             _ => return Err(invalid()),
         };
-        *node.properties_mut() = self.properties()?;
-        Ok(node)
+        let mut sink = S::begin(kind)?;
+        match kind {
+            K::Map(n) => {
+                for _ in 0..n {
+                    let key = self.atom()?;
+                    let value = self.atom()?;
+                    sink.map_entry(key, value);
+                }
+            }
+            K::Set(n) => {
+                for _ in 0..n {
+                    sink.set_item(self.atom()?);
+                }
+            }
+            _ => {}
+        }
+        let n = self.count(MAX_ENTRIES, 6)?;
+        self.work(n)?;
+        sink.properties(n);
+        for _ in 0..n {
+            let key = self.u32()?;
+            let flags = self.byte()?;
+            let value = self.atom()?;
+            sink.property(Property { key, flags, value });
+        }
+        Ok(sink.finish())
+    }
+}
+trait NodeSink {
+    type Output;
+    fn begin(kind: super::captured_admission::AdmissionKind) -> Result<Self, PeleError>
+    where
+        Self: Sized;
+    fn map_entry(&mut self, key: Atom, value: Atom);
+    fn set_item(&mut self, value: Atom);
+    fn properties(&mut self, count: usize);
+    fn property(&mut self, value: Property);
+    fn finish(self) -> Self::Output;
+}
+struct ScanNode(super::captured_admission::Header);
+impl NodeSink for ScanNode {
+    type Output = super::captured_admission::Header;
+    fn begin(kind: super::captured_admission::AdmissionKind) -> Result<Self, PeleError> {
+        Ok(Self(super::captured_admission::Header {
+            kind,
+            properties: 0,
+        }))
+    }
+    fn map_entry(&mut self, _: Atom, _: Atom) {}
+    fn set_item(&mut self, _: Atom) {}
+    fn properties(&mut self, count: usize) {
+        self.0.properties = count;
+    }
+    fn property(&mut self, _: Property) {}
+    fn finish(self) -> Self::Output {
+        self.0
+    }
+}
+struct MaterializeNode(Node);
+impl NodeSink for MaterializeNode {
+    type Output = Node;
+    fn begin(kind: super::captured_admission::AdmissionKind) -> Result<Self, PeleError> {
+        use super::captured_admission::AdmissionKind as K;
+        let properties = Vec::new();
+        Ok(Self(match kind {
+            K::Object => Node::Object { properties },
+            K::Instance(prototype) => Node::Instance {
+                prototype,
+                properties,
+            },
+            K::Array(length) => Node::Array { length, properties },
+            K::Map(count) => Node::Map {
+                entries: Vec::with_capacity(count),
+                properties,
+            },
+            K::Set(count) => Node::Set {
+                values: Vec::with_capacity(count),
+                properties,
+            },
+            K::Date(bits) => Node::Date {
+                milliseconds: f64::from_bits(bits),
+                properties,
+            },
+            K::Error(error_type) => Node::Error {
+                error_type,
+                properties,
+            },
+            K::InvalidArray | K::InvalidError => return Err(invalid()),
+        }))
+    }
+    fn map_entry(&mut self, key: Atom, value: Atom) {
+        let Node::Map { entries, .. } = &mut self.0 else {
+            unreachable!("paired node sink")
+        };
+        entries.push((key, value));
+    }
+    fn set_item(&mut self, value: Atom) {
+        let Node::Set { values, .. } = &mut self.0 else {
+            unreachable!("paired node sink")
+        };
+        values.push(value);
+    }
+    fn properties(&mut self, count: usize) {
+        *self.0.properties_mut() = Vec::with_capacity(count);
+    }
+    fn property(&mut self, value: Property) {
+        self.0.properties_mut().push(value);
+    }
+    fn finish(self) -> Self::Output {
+        self.0
     }
 }
 /// Decode one complete bounded exchange. All graph references/flags are checked;
@@ -311,6 +429,7 @@ pub fn decode_binary_exchange(
         offset: 0,
         units: 0,
         entries: 0,
+        physical_only: false,
     };
     if r.take(MAGIC.len())? != MAGIC {
         return Err(invalid());
@@ -332,10 +451,7 @@ pub fn decode_binary_exchange(
     let mut strings = Vec::with_capacity(count);
     for _ in 0..count {
         let n = r.count(MAX_UNITS, 2)?;
-        r.units = r.units.checked_add(n).ok_or_else(limit)?;
-        if r.units > MAX_UNITS {
-            return Err(limit());
-        }
+        add_bounded(&mut r.units, n, MAX_UNITS)?;
         let raw = r.take(n.checked_mul(2).ok_or_else(limit)?)?;
         strings.push(JsString(
             raw.chunks_exact(2)
@@ -363,4 +479,121 @@ pub fn decode_binary_exchange(
         graph,
         metadata: bytes[graph_end..].to_vec(),
     })
+}
+
+// Internal logical transport shares the same writer and ordered structural
+// admission. Explicit byte decoders and ordinary arena encoding are unchanged.
+pub(crate) fn encode_read_exchange(
+    revision: u64,
+    graph: &dyn super::graph_read::PublicGraphRead,
+    metadata: &[u8],
+    byte_budget: usize,
+) -> Result<Vec<u8>, PeleError> {
+    use super::captured_admission as admission;
+    admission::validate(&mut super::graph_read::ReadAdapter(graph))?;
+    let extent = graph.extent();
+    let mut w = Writer {
+        bytes: Vec::new(),
+        budget: byte_budget,
+    };
+    w.put(MAGIC)?;
+    w.u32(extent.version)?;
+    w.put(&revision.to_le_bytes())?;
+    w.count(metadata.len())?;
+    w.atom(&graph.root())?;
+    w.count(extent.strings)?;
+    for id in 0..extent.strings {
+        let length = graph.string_length(id)?;
+        w.count(length)?;
+        let mut seen = 0usize;
+        graph.string_chunks(id, &mut |units| {
+            seen = seen
+                .checked_add(units.len())
+                .filter(|n| *n <= length)
+                .ok_or_else(invalid)?;
+            for unit in units {
+                w.put(&unit.to_le_bytes())?;
+            }
+            Ok(())
+        })?;
+        if seen != length {
+            return Err(invalid());
+        }
+    }
+    w.count(extent.nodes)?;
+    for id in 0..extent.nodes {
+        write_read_node(&mut w, graph, id)?;
+    }
+    w.put(metadata)?;
+    Ok(w.bytes)
+}
+
+pub(crate) fn write_read_node(
+    w: &mut Writer,
+    graph: &dyn super::graph_read::PublicGraphRead,
+    id: usize,
+) -> Result<(), PeleError> {
+    use super::captured_admission::AdmissionKind;
+    let header = graph.header(id)?;
+    match header.kind {
+        AdmissionKind::Object => w.byte(0)?,
+        AdmissionKind::Instance(p) => {
+            w.byte(1)?;
+            w.u32(p.0)?;
+        }
+        AdmissionKind::Array(n) => {
+            w.byte(2)?;
+            w.u32(n)?;
+        }
+        AdmissionKind::Map(n) => {
+            w.byte(3)?;
+            w.count(n)?;
+            super::graph_read::visit_map(graph, id, |pairs| {
+                for (k, v) in pairs {
+                    w.atom(k)?;
+                    w.atom(v)?;
+                }
+                Ok(())
+            })?;
+        }
+        AdmissionKind::Set(n) => {
+            w.byte(4)?;
+            w.count(n)?;
+            super::graph_read::visit_set(graph, id, |values| {
+                for v in values {
+                    w.atom(v)?;
+                }
+                Ok(())
+            })?;
+        }
+        AdmissionKind::Date(bits) => {
+            w.byte(5)?;
+            w.put(&bits.to_le_bytes())?;
+        }
+        AdmissionKind::Error(kind) => {
+            w.byte(6)?;
+            w.byte(match kind {
+                ErrorObjectKind::Error => 0,
+                ErrorObjectKind::Pele => 1,
+                ErrorObjectKind::Type => 2,
+                ErrorObjectKind::Range => 3,
+                ErrorObjectKind::Syntax => 4,
+                ErrorObjectKind::Reference => 5,
+                ErrorObjectKind::Eval => 6,
+                ErrorObjectKind::Uri => 7,
+            })?;
+        }
+        AdmissionKind::InvalidArray | AdmissionKind::InvalidError => return Err(invalid()),
+    }
+    w.count(header.properties)?;
+    super::graph_read::visit_properties(graph, id, |properties| {
+        for p in properties {
+            w.u32(p.key)?;
+            w.byte(p.flags)?;
+            w.atom(&p.value)?;
+        }
+        Ok(())
+    })?;
+
+    Ok(())
 }

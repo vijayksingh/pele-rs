@@ -1,0 +1,21 @@
+{
+  "status": "allocation-evidence-only",
+  "reportSha256": "54fd5769946b28747215ace35c32a2d83bed5229e53d2fd54fb1cd1a3e7cb453",
+  "erMediumPublicParseCount1PercentChange": {
+    "allocations": -20.55177928828469,
+    "reallocations": -81.33561643835617,
+    "requestedBytes": -5.4632578692146545,
+    "peakAdditionalRequestedBytes": -0.7391675167650602
+  },
+  "negativeControlRows": 8,
+  "negativeControlAllocationMetricsIdentical": true,
+  "scope": "ER native public arena construction. Ordinary host-owned web parse uses another interner and is not directly affected.",
+  "interpretation": "Temporary UTF16 allocation/reallocation traffic decreases; canonical output summaries, graph counts and binary sizes match. Requested bytes are allocator requests, not RSS. Peak decrease is 884 bytes, not 15232 bytes. Live delta remains zero; this stage drops each parsed document. No elapsed CPU claim.",
+  "proofLimits": [
+    "Allocation consumer is separately instrumented and must not be used for elapsed timings.",
+    "Counts1/16 share one medium synthetic source; no distribution or universal-family performance claim.",
+    "Build helper validated source hash before/after build; frozen binaries verified before/after capture.",
+    "Output equality checks use exact SVG hashes and dimension-bit strings; allocation protocol checksum is auxiliary."
+  ],
+  "nextGate": "Parent public integration results and guarded matched native timing, if warranted, before adoption."
+}

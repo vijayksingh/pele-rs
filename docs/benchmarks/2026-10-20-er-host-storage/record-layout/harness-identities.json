@@ -1,0 +1,23 @@
+{
+  "method": "Immutable Git blob SHA256 matches each executed report; no harness invocation",
+  "files": [
+    {
+      "path": "scripts/perf/compare-web-vm.mjs",
+      "sourceCommit": "bd7df0d609778a33ef261e065017c9e171653d22",
+      "sha256": "7d632fa69ddfbd18fe716388f6e277e6b48ed267fa378b9f73d4ff74f7e1a808",
+      "report": "comparison.json"
+    },
+    {
+      "path": "scripts/perf/compare-first-use-web-vm.mjs",
+      "sourceCommit": "bd7df0d609778a33ef261e065017c9e171653d22",
+      "sha256": "672d3321799b325116a09d10fe7b1ce6ad4335b6f75e28dfc8481118d50fe59f",
+      "report": "first-use.json"
+    },
+    {
+      "path": "scripts/perf/profile-web.mjs",
+      "sourceCommit": "bd7df0d609778a33ef261e065017c9e171653d22",
+      "sha256": "8481a04a81b15893e0e61536d1e6d88d2eb15bb48d62b385f4c9c4e42fa6421f",
+      "report": "profile/summary.json"
+    }
+  ]
+}

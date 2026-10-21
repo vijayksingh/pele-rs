@@ -66,8 +66,14 @@ static SCHEMA: ModelSchema = ModelSchema {
             f("currentBox", FieldKind::Object, true),
             f("lastCreated", FieldKind::String, true),
             f("lastDestroyed", FieldKind::String, true),
-            f("wrapEnabled", FieldKind::Bool, true),
-            f("sequenceWrap", FieldKind::Bool, false),
+            FieldSchema {
+                nullable: true,
+                ..f("wrapEnabled", FieldKind::Any, true)
+            },
+            FieldSchema {
+                nullable: true,
+                ..f("sequenceWrap", FieldKind::Any, true)
+            },
             f("active", FieldKind::Map, false),
         ],
     }],
@@ -2012,7 +2018,128 @@ fn validate_frame_labels(m: &SequenceModel) -> Result<(), PublicError> {
     }
     Ok(())
 }
+fn construct_default() -> Result<SequencePublicState, PeleError> {
+    let graph = new_graph(&super::model::Db::new(&Object::default(), None).model)
+        .map_err(public_to_pele)?;
+    let projected = project(&graph);
+    Ok(SequencePublicState { graph, projected })
+}
+fn construct_initial(_: ConstructorArgument) -> Result<SequencePublicState, PeleError> {
+    let mut state = construct_default()?;
+    let Atom::Ref(root) = state.graph.root else {
+        unreachable!("native class root")
+    };
+    Arena::new(&mut state.graph)
+        .assign(root, "sequenceWrap", Atom::Undefined)
+        .map_err(public_to_pele)?;
+    state.projected = project(&state.graph);
+    Ok(state)
+}
+enum SequenceConstruction {
+    Start(ConstructorArgument),
+    Wrap(Atom),
+    SequenceWrap,
+    Done,
+}
+fn resume_construction(
+    state: &mut SequencePublicState,
+    phase: &mut SequenceConstruction,
+    reply: Option<PublicHostValue>,
+) -> PublicInvocationPhase {
+    fn run(
+        state: &mut SequencePublicState,
+        phase: &mut SequenceConstruction,
+        reply: Option<PublicHostValue>,
+    ) -> Result<PublicInvocationPhase, PublicError> {
+        let Atom::Ref(root) = state.graph.root else {
+            unreachable!("native class root")
+        };
+        let mut arena = Arena::new(&mut state.graph);
+        Ok(match std::mem::replace(phase, SequenceConstruction::Done) {
+            SequenceConstruction::Start(argument) => {
+                let options = if matches!(argument, ConstructorArgument::Undefined) {
+                    Atom::Ref(arena.object()?)
+                } else {
+                    argument.into_atom(|value| arena.string(value))?
+                };
+                *phase = SequenceConstruction::Wrap(options.clone());
+                PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver: options,
+                    key: "wrap",
+                })
+            }
+            SequenceConstruction::Wrap(options) => {
+                let value = reply
+                    .expect("awaited wrap")
+                    .into_atom(|value| arena.string(value))?;
+                arena.assign(root, "wrapEnabled", value)?;
+                *phase = SequenceConstruction::SequenceWrap;
+                PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver: options,
+                    key: "sequenceWrap",
+                })
+            }
+            SequenceConstruction::SequenceWrap => {
+                let value = reply
+                    .expect("awaited sequenceWrap")
+                    .into_atom(|value| arena.string(value))?;
+                let value = if matches!(value, Atom::Undefined | Atom::Null) {
+                    Atom::Bool(false)
+                } else {
+                    value
+                };
+                arena.assign(root, "sequenceWrap", value)?;
+                PublicInvocationPhase::Complete(Ok(Atom::Undefined))
+            }
+            SequenceConstruction::Done => {
+                return Err(error("Sequence construction already finished").into())
+            }
+        })
+    }
+    let result = run(state, phase, reply);
+    state.projected = project(&state.graph);
+    match result {
+        Ok(step) => step,
+        Err(error) => PublicInvocationPhase::Complete(Err(error)),
+    }
+}
+fn constructor_body(argument: ConstructorArgument) -> DetachedPublicInvocation {
+    DetachedPublicInvocation::new::<Sequence, SequencePublicState, _>(
+        SequenceConstruction::Start(argument),
+        resume_construction,
+    )
+}
+
 impl PublicDiagramModule for Sequence {
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::sequence())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::sequence(
+            super::SequenceDetachedInput::new(state.projected.as_ref().err()),
+        ))
+    }
+
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            PublicConstructorFactory::first_value_body::<Self>(
+                PROTOTYPE,
+                construct_default,
+                construct_initial,
+                constructor_body,
+                &[],
+            )
+        })
+    }
+
     type PublicState = SequencePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
@@ -2026,6 +2153,12 @@ impl PublicDiagramModule for Sequence {
         let graph = new_graph(m).map_err(public_to_pele)?;
         let projected = project(&graph);
         Ok(SequencePublicState { graph, projected })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

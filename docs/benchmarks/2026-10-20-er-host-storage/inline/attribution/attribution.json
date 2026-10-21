@@ -1,0 +1,486 @@
+{
+  "input": "dist/perf-patches/parse-architecture/er-inline-publication/runtime/profile/er-medium-render-model-wasm.cpuprofile",
+  "input_sha256": "59a75f605b9b7073d92407aede9ffc87427349a7ef4ddc527f82b0c45c2f7954",
+  "method": "Each sampled context is weighted by its matching timeDeltas entry. An ancestor predicate contributes at most once per sample. phase, admission_split, draw_split, audit_split are each mutually exclusive within their own domain; overlapping metrics must not be summed.",
+  "sample_count": 4480,
+  "sampled_us": 1545088,
+  "span_us": 1545521,
+  "capture_frames": [],
+  "metrics": {
+    "admission_split/key_cache": {
+      "us": 24147,
+      "percent_of_all_sampled_time": 1.5628236061635323
+    },
+    "admission_split/other_store": {
+      "us": 27163,
+      "percent_of_all_sampled_time": 1.7580228440062962
+    },
+    "admission_split/other_typed_import": {
+      "us": 62370,
+      "percent_of_all_sampled_time": 4.036663283903571
+    },
+    "admission_split/own_info": {
+      "us": 91614,
+      "percent_of_all_sampled_time": 5.929371013172065
+    },
+    "admission_split/units_cache_transfer": {
+      "us": 27202,
+      "percent_of_all_sampled_time": 1.760546972081849
+    },
+    "admission_split/validation_outside_store": {
+      "us": 48822,
+      "percent_of_all_sampled_time": 3.15982002319609
+    },
+    "audit_split/entry": {
+      "us": 94133,
+      "percent_of_all_sampled_time": 6.0924037983597055
+    },
+    "audit_split/final": {
+      "us": 93588,
+      "percent_of_all_sampled_time": 6.05713072653467
+    },
+    "draw_split/HostStore_or_HostRead_subtree": {
+      "us": 242594,
+      "percent_of_all_sampled_time": 15.700982727197415
+    },
+    "draw_split/remaining_draw": {
+      "us": 524227,
+      "percent_of_all_sampled_time": 33.92861765802336
+    },
+    "other_self/metadata_UTF8_encode": {
+      "us": 53023,
+      "percent_of_all_sampled_time": 3.43171392179604
+    },
+    "other_self/serde_serialize_str": {
+      "us": 42707,
+      "percent_of_all_sampled_time": 2.764049685195924
+    },
+    "overlapping/admission/HostStore_subtree": {
+      "us": 232496,
+      "percent_of_all_sampled_time": 15.047427719327313
+    },
+    "overlapping/admission/typed_import_subtree": {
+      "us": 65057,
+      "percent_of_all_sampled_time": 4.2105692361859
+    },
+    "overlapping/draw/HostStore_subtree": {
+      "us": 226342,
+      "percent_of_all_sampled_time": 14.649133253251595
+    },
+    "overlapping/draw/RenderStore_array_get": {
+      "us": 21337,
+      "percent_of_all_sampled_time": 1.380956942258305
+    },
+    "overlapping/draw/RenderStore_array_has": {
+      "us": 4290,
+      "percent_of_all_sampled_time": 0.2776540883108276
+    },
+    "overlapping/draw/RenderStore_array_length": {
+      "us": 9882,
+      "percent_of_all_sampled_time": 0.6395752216055007
+    },
+    "overlapping/draw/RenderStore_coerce_string": {
+      "us": 3712,
+      "percent_of_all_sampled_time": 0.24024521580647834
+    },
+    "overlapping/draw/RenderStore_field": {
+      "us": 109910,
+      "percent_of_all_sampled_time": 7.113510686769945
+    },
+    "overlapping/draw/RenderStore_join": {
+      "us": 51822,
+      "percent_of_all_sampled_time": 3.3539837213155494
+    },
+    "overlapping/draw/RenderStore_map_entries": {
+      "us": 6302,
+      "percent_of_all_sampled_time": 0.4078732085162787
+    },
+    "overlapping/draw/compound_layout": {
+      "us": 30375,
+      "percent_of_all_sampled_time": 1.9659074434595312
+    },
+    "overlapping/draw/svg_document": {
+      "us": 82253,
+      "percent_of_all_sampled_time": 5.323515553806644
+    },
+    "overlapping/draw/text_layout": {
+      "us": 160169,
+      "percent_of_all_sampled_time": 10.366335121365255
+    },
+    "overlapping/draw/typed_import_subtree": {
+      "us": 97269,
+      "percent_of_all_sampled_time": 6.295369584127247
+    },
+    "overlapping/other/HostStore_subtree": {
+      "us": 3705,
+      "percent_of_all_sampled_time": 0.23979216717753293
+    },
+    "phase/admission": {
+      "us": 281318,
+      "percent_of_all_sampled_time": 18.207247742523403
+    },
+    "phase/audit": {
+      "us": 187721,
+      "percent_of_all_sampled_time": 12.149534524894374
+    },
+    "phase/draw": {
+      "us": 766821,
+      "percent_of_all_sampled_time": 49.629600385220776
+    },
+    "phase/other": {
+      "us": 309228,
+      "percent_of_all_sampled_time": 20.013617347361446
+    }
+  },
+  "phase_self_top": {
+    "other": [
+      {
+        "name": "encode",
+        "us": 53023,
+        "percent_of_all_sampled_time": 3.43171392179604
+      },
+      {
+        "name": "hostOperation",
+        "us": 46820,
+        "percent_of_all_sampled_time": 3.0302481153177037
+      },
+      {
+        "name": "(program)",
+        "us": 43485,
+        "percent_of_all_sampled_time": 2.8144028042415705
+      },
+      {
+        "name": "<&mut serde_json[eea81336d5ddbfd4]::ser::Serializer<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded> as serde_core[c28dadb02bad1c47]::ser::Serializer>::serialize_str",
+        "us": 42707,
+        "percent_of_all_sampled_time": 2.764049685195924
+      },
+      {
+        "name": "http://127.0.0.1:40063/package/host-er-store.js",
+        "us": 29096,
+        "percent_of_all_sampled_time": 1.8831289868279346
+      },
+      {
+        "name": "<alloc[508e33bd5656020b]::vec::Vec<u8> as alloc[508e33bd5656020b]::vec::spec_extend::SpecExtend<&u8, core[ed718c3d60ebd546]::slice::iter::Iter<u8>>>::spec_extend",
+        "us": 19155,
+        "percent_of_all_sampled_time": 1.2397352124927512
+      },
+      {
+        "name": "structure",
+        "us": 15643,
+        "percent_of_all_sampled_time": 1.0124342432275701
+      },
+      {
+        "name": "begin",
+        "us": 13702,
+        "percent_of_all_sampled_time": 0.8868103305442797
+      },
+      {
+        "name": "(garbage collector)",
+        "us": 7936,
+        "percent_of_all_sampled_time": 0.5136277027586779
+      },
+      {
+        "name": "decode",
+        "us": 7666,
+        "percent_of_all_sampled_time": 0.49615296992792646
+      },
+      {
+        "name": "renderNumericOptions",
+        "us": 2035,
+        "percent_of_all_sampled_time": 0.13170770855770028
+      },
+      {
+        "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::unlink_chunk",
+        "us": 1715,
+        "percent_of_all_sampled_time": 0.11099691409162456
+      },
+      {
+        "name": "(idle)",
+        "us": 1650,
+        "percent_of_all_sampled_time": 0.10679003396570293
+      },
+      {
+        "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::render_store::<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>",
+        "us": 1570,
+        "percent_of_all_sampled_time": 0.101612335349184
+      },
+      {
+        "name": "render",
+        "us": 1361,
+        "percent_of_all_sampled_time": 0.0880855977135283
+      },
+      {
+        "name": "core[ed718c3d60ebd546]::str::converts::from_utf8",
+        "us": 1356,
+        "percent_of_all_sampled_time": 0.08776199154999585
+      },
+      {
+        "name": "<alloc[508e33bd5656020b]::raw_vec::RawVecInner>::deallocate",
+        "us": 1001,
+        "percent_of_all_sampled_time": 0.0647859539391931
+      },
+      {
+        "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+        "us": 995,
+        "percent_of_all_sampled_time": 0.06439762654295418
+      },
+      {
+        "name": "__rustc[100742bb89c490cb]::__rust_realloc",
+        "us": 984,
+        "percent_of_all_sampled_time": 0.06368569298318283
+      },
+      {
+        "name": "<serde_json[eea81336d5ddbfd4]::ser::Compound<&mut pele_wasm[e6e81f4f4d17d0e2]::render_numbers::Bounded, serde_json[eea81336d5ddbfd4]::ser::CompactFormatter> as serde_core[c28dadb02bad1c47]::ser::SerializeMap>::serialize_entry::<str, alloc[508e33bd5656020b]::string::String>",
+        "us": 979,
+        "percent_of_all_sampled_time": 0.0633620868196504
+      }
+    ],
+    "audit": [
+      {
+        "name": "audit",
+        "us": 108569,
+        "percent_of_all_sampled_time": 7.026719513710546
+      },
+      {
+        "name": "http://127.0.0.1:40063/package/host-er-store.js",
+        "us": 36392,
+        "percent_of_all_sampled_time": 2.355335100654461
+      },
+      {
+        "name": "atom",
+        "us": 21362,
+        "percent_of_all_sampled_time": 1.382574973075967
+      },
+      {
+        "name": "errorKind",
+        "us": 19729,
+        "percent_of_all_sampled_time": 1.2768852000662745
+      },
+      {
+        "name": "prototypeAudit",
+        "us": 1349,
+        "percent_of_all_sampled_time": 0.08730894292105044
+      },
+      {
+        "name": "visit",
+        "us": 320,
+        "percent_of_all_sampled_time": 0.020710794466075717
+      }
+    ],
+    "admission": [
+      {
+        "name": "__wbg_hostErReadOwn_1d66b88ab119400e",
+        "us": 37771,
+        "percent_of_all_sampled_time": 2.444585680556706
+      },
+      {
+        "name": "decode",
+        "us": 23410,
+        "percent_of_all_sampled_time": 1.5151240576588518
+      },
+      {
+        "name": "ownInfo",
+        "us": 22031,
+        "percent_of_all_sampled_time": 1.4258734777566067
+      },
+      {
+        "name": "wasm-to-js",
+        "us": 18562,
+        "percent_of_all_sampled_time": 1.2013555214978047
+      },
+      {
+        "name": "__wbg_hostErReadIndex_930a4aa239dbbbb1",
+        "us": 16250,
+        "percent_of_all_sampled_time": 1.0517200314804076
+      },
+      {
+        "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>::own_info",
+        "us": 11793,
+        "percent_of_all_sampled_time": 0.7632574973075967
+      },
+      {
+        "name": "<pele[37270552ffd5eb7c]::compat::host_er::Admission<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>>::required",
+        "us": 10485,
+        "percent_of_all_sampled_time": 0.6786021249275123
+      },
+      {
+        "name": "decodeText",
+        "us": 9971,
+        "percent_of_all_sampled_time": 0.6453354113163781
+      },
+      {
+        "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>::units",
+        "us": 9694,
+        "percent_of_all_sampled_time": 0.6274076298566813
+      },
+      {
+        "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&str>",
+        "us": 7437,
+        "percent_of_all_sampled_time": 0.481331807638141
+      },
+      {
+        "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>::key",
+        "us": 7057,
+        "percent_of_all_sampled_time": 0.4567377392096761
+      },
+      {
+        "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+        "us": 6423,
+        "percent_of_all_sampled_time": 0.41570447767376356
+      },
+      {
+        "name": "<core[ed718c3d60ebd546]::hash::sip::Hasher<core[ed718c3d60ebd546]::hash::sip::Sip13Rounds> as core[ed718c3d60ebd546]::hash::Hasher>::write",
+        "us": 6321,
+        "percent_of_all_sampled_time": 0.40910291193770193
+      },
+      {
+        "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&pele[37270552ffd5eb7c]::compat::public::schema::PrototypeId>",
+        "us": 6114,
+        "percent_of_all_sampled_time": 0.3957056167674592
+      },
+      {
+        "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore as pele[37270552ffd5eb7c]::compat::host_er::AdmissionStore>::utf16",
+        "us": 5674,
+        "percent_of_all_sampled_time": 0.3672282743766051
+      },
+      {
+        "name": "<pele[37270552ffd5eb7c]::compat::host_er::Admission<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>>::text",
+        "us": 5660,
+        "percent_of_all_sampled_time": 0.3663221771187143
+      },
+      {
+        "name": "pele[37270552ffd5eb7c]::compat::host_er::validate_render::<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>",
+        "us": 5321,
+        "percent_of_all_sampled_time": 0.3443816792312153
+      },
+      {
+        "name": "<pele[37270552ffd5eb7c]::compat::host_er::Admission<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>>::array",
+        "us": 4393,
+        "percent_of_all_sampled_time": 0.28432037527959575
+      },
+      {
+        "name": "getDataViewMemory0",
+        "us": 4100,
+        "percent_of_all_sampled_time": 0.26535705409659516
+      },
+      {
+        "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>::read_atom",
+        "us": 3627,
+        "percent_of_all_sampled_time": 0.23474391102642697
+      }
+    ],
+    "draw": [
+      {
+        "name": "__wbg_hostErReadOwn_1d66b88ab119400e",
+        "us": 61402,
+        "percent_of_all_sampled_time": 3.9740131306436917
+      },
+      {
+        "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher as core[ed718c3d60ebd546]::str::pattern::Searcher>::next_match",
+        "us": 46686,
+        "percent_of_all_sampled_time": 3.0215754701350344
+      },
+      {
+        "name": "decode",
+        "us": 43488,
+        "percent_of_all_sampled_time": 2.81459696793969
+      },
+      {
+        "name": "width",
+        "us": 37083,
+        "percent_of_all_sampled_time": 2.4000574724546433
+      },
+      {
+        "name": "pele[37270552ffd5eb7c]::compat::diagrams::er::render::draw::<pele[37270552ffd5eb7c]::compat::diagrams::er::live_read::HostRead<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>>",
+        "us": 32351,
+        "percent_of_all_sampled_time": 2.0937965992875487
+      },
+      {
+        "name": "wasm-to-js",
+        "us": 26025,
+        "percent_of_all_sampled_time": 1.6843700811863143
+      },
+      {
+        "name": "core[ed718c3d60ebd546]::fmt::write",
+        "us": 25323,
+        "percent_of_all_sampled_time": 1.6389357758263607
+      },
+      {
+        "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::malloc",
+        "us": 24902,
+        "percent_of_all_sampled_time": 1.6116881368569298
+      },
+      {
+        "name": "__wbg_hostErReadIndex_930a4aa239dbbbb1",
+        "us": 22926,
+        "percent_of_all_sampled_time": 1.4837989810289123
+      },
+      {
+        "name": "<core[ed718c3d60ebd546]::fmt::Formatter>::pad",
+        "us": 22716,
+        "percent_of_all_sampled_time": 1.4702075221605502
+      },
+      {
+        "name": "pele[37270552ffd5eb7c]::compat::svg::num",
+        "us": 22698,
+        "percent_of_all_sampled_time": 1.4690425399718334
+      },
+      {
+        "name": "<core[ed718c3d60ebd546]::str::pattern::StrSearcher>::new",
+        "us": 20301,
+        "percent_of_all_sampled_time": 1.313905745174385
+      },
+      {
+        "name": "alloc[508e33bd5656020b]::fmt::format::format_inner",
+        "us": 16341,
+        "percent_of_all_sampled_time": 1.0576096636566978
+      },
+      {
+        "name": "<alloc[508e33bd5656020b]::string::String as core[ed718c3d60ebd546]::fmt::Write>::write_str.28",
+        "us": 15438,
+        "percent_of_all_sampled_time": 0.9991663905227405
+      },
+      {
+        "name": "<dlmalloc[d2f63edc47c9a479]::dlmalloc::Dlmalloc<dlmalloc[d2f63edc47c9a479]::sys::System>>::free",
+        "us": 14190,
+        "percent_of_all_sampled_time": 0.9183942921050452
+      },
+      {
+        "name": "<pele_wasm[e6e81f4f4d17d0e2]::BrowserResources as pele[37270552ffd5eb7c]::compat::module::RenderResources>::text_width",
+        "us": 13268,
+        "percent_of_all_sampled_time": 0.8587213155496645
+      },
+      {
+        "name": "pele[37270552ffd5eb7c]::compat::text::layout_label",
+        "us": 12923,
+        "percent_of_all_sampled_time": 0.8363924902659265
+      },
+      {
+        "name": "<std[5a6270b673d0c64d]::hash::random::RandomState as core[ed718c3d60ebd546]::hash::BuildHasher>::hash_one::<&str>",
+        "us": 10981,
+        "percent_of_all_sampled_time": 0.7107038563499296
+      },
+      {
+        "name": "decodeText",
+        "us": 10539,
+        "percent_of_all_sampled_time": 0.6820970714936625
+      },
+      {
+        "name": "<pele_wasm[e6e81f4f4d17d0e2]::host_er::HostStore>::key",
+        "us": 9676,
+        "percent_of_all_sampled_time": 0.6262426476679646
+      }
+    ]
+  },
+  "illustrative_projections_not_benchmarks": {
+    "reported_current_ms": 3.14375,
+    "reported_old_ms": 1.77125,
+    "reported_js_ms": 0.48609,
+    "required_fraction_removed_to_old": 0.43658051689860833,
+    "required_fraction_removed_to_js": 0.8453789264413518,
+    "delete_entire_admission_ms": 2.5713596490944206,
+    "delete_entire_admission_store_ms": 2.6706964910736475,
+    "delete_entire_admission_and_audits_ms": 2.1894086574680536,
+    "delete_entire_own_info_ms": 2.957345398773403
+  }
+}

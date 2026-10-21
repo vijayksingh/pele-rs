@@ -59,6 +59,12 @@ impl PublicDiagramModule for Info {
             graph: out.finish(Atom::Ref(root))?,
         })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, state: &InfoPublicState) -> Result<ModelGraph, PeleError> {
         Ok(state.graph.clone())
     }
@@ -69,6 +75,19 @@ impl PublicDiagramModule for Info {
     ) -> Result<(), PeleError> {
         state.graph = graph;
         Ok(())
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::info())
+    }
+    fn detached_public_render(
+        &self,
+        _state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::info(
+            super::InfoDetachedInput,
+        ))
     }
     fn render_public(
         &self,

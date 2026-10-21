@@ -1,0 +1,242 @@
+{
+  "sourceCommit": "e518012745a2eaf12c8bb048b91074566bf2000a",
+  "nativeTests": 54,
+  "browserTests": 81,
+  "swiftTests": 16,
+  "cConsumers": 3,
+  "apiConditions": 168,
+  "performanceMeasured": false,
+  "artifacts": {
+    "web/source.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-runtime/source.json",
+      "sha256": "eb810575935858f5aade4d97717f90976725b25412b126f98a4c8b21c09bd7ef",
+      "bytes": 70187,
+      "stored": "web/source.json",
+      "storedSha256": "eb810575935858f5aade4d97717f90976725b25412b126f98a4c8b21c09bd7ef"
+    },
+    "web/package.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-runtime/package.json",
+      "sha256": "ed33022af649aedd4ba27df0f7d9cab2aecd9ebc70d237d9cdbc7de9742ca07c",
+      "bytes": 81003,
+      "stored": "web/package.json",
+      "storedSha256": "ed33022af649aedd4ba27df0f7d9cab2aecd9ebc70d237d9cdbc7de9742ca07c"
+    },
+    "web/after.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-runtime/after.json",
+      "sha256": "521ece82ed0740b575c64817ee3fde93ed0e6d117cb3a89b098cea68876ab01f",
+      "bytes": 81029,
+      "stored": "web/after.json",
+      "storedSha256": "521ece82ed0740b575c64817ee3fde93ed0e6d117cb3a89b098cea68876ab01f"
+    },
+    "native/run-correctness.py": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/run-correctness.py",
+      "sha256": "673232686d8d23b4cdb2eb093a4c3ff88369f5820d05a92d91c58d104fae2fbb",
+      "bytes": 2749,
+      "stored": "native/run-correctness.py",
+      "storedSha256": "673232686d8d23b4cdb2eb093a4c3ff88369f5820d05a92d91c58d104fae2fbb"
+    },
+    "native/freeze.mjs": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/freeze.mjs",
+      "sha256": "ed6cd3259144b1936be191805563a2f724a2791a4d436209895369d1b7f6d0df",
+      "bytes": 8084,
+      "stored": "native/freeze.mjs",
+      "storedSha256": "ed6cd3259144b1936be191805563a2f724a2791a4d436209895369d1b7f6d0df"
+    },
+    "native/before-sdk.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/before-sdk.json",
+      "sha256": "fbb9b2ede02364cde0e46809a4b4c58fcb0df3cf52af0df2539ff17f3d5917fc",
+      "bytes": 193050,
+      "stored": "native/before-sdk.json",
+      "storedSha256": "fbb9b2ede02364cde0e46809a4b4c58fcb0df3cf52af0df2539ff17f3d5917fc"
+    },
+    "native/after-sdk.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/after-sdk.json",
+      "sha256": "c491442653f33a7ba6399d9980a81a6923be597098f2b27ea0e92d64737618c9",
+      "bytes": 53345,
+      "stored": "native/after-sdk.json",
+      "storedSha256": "c491442653f33a7ba6399d9980a81a6923be597098f2b27ea0e92d64737618c9"
+    },
+    "native/before-correctness.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/before-correctness.json",
+      "sha256": "91a5fdca3fa8827fd5ff70ab06523df2bf5969af67a6f612818b6ca267d5a096",
+      "bytes": 101251,
+      "stored": "native/before-correctness.json",
+      "storedSha256": "91a5fdca3fa8827fd5ff70ab06523df2bf5969af67a6f612818b6ca267d5a096"
+    },
+    "native/after-correctness.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/after-correctness.json",
+      "sha256": "f1a703414919648739c9fc77cb5bc344f283a3a495ee1140931b5b69e5d2fcbd",
+      "bytes": 101936,
+      "stored": "native/after-correctness.json",
+      "storedSha256": "f1a703414919648739c9fc77cb5bc344f283a3a495ee1140931b5b69e5d2fcbd"
+    },
+    "native/correctness-commands.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/correctness-commands.json",
+      "sha256": "f8fa4323ebb42009a6b5fdae89677bef13ec1ef1e8b313eb099e31e88c222897",
+      "bytes": 6819,
+      "stored": "native/correctness-commands.json",
+      "storedSha256": "f8fa4323ebb42009a6b5fdae89677bef13ec1ef1e8b313eb099e31e88c222897"
+    },
+    "native/c-consumers.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/runtime/c-consumers.json",
+      "sha256": "e2d6b2405e5bb47a099a323adb6e160d40fed274e22467935011a13c2ad2fe2d",
+      "bytes": 2918,
+      "stored": "native/c-consumers.json",
+      "storedSha256": "e2d6b2405e5bb47a099a323adb6e160d40fed274e22467935011a13c2ad2fe2d"
+    },
+    "native/swift-build-manifest.json": {
+      "source": "dist/perf-patches/parse-architecture/source-prepared-ingress-correctness/candidate-swift/swift-build-manifest.json",
+      "sha256": "59610f9c35ece573492ada93cc8a09edd118015b661c87e33007c746e9e3025b",
+      "bytes": 46940,
+      "stored": "native/swift-build-manifest.json",
+      "storedSha256": "59610f9c35ece573492ada93cc8a09edd118015b661c87e33007c746e9e3025b"
+    },
+    "logs/source-prepared-ingress-build-wasm.log": {
+      "source": "dist/evidence/source-prepared-ingress-build-wasm.log",
+      "sha256": "cd615e6d85c780c590cd3282e47c95f5dd0ae6cd0fb44d7f32e0ac3a40f582cb",
+      "bytes": 320,
+      "stored": "logs/source-prepared-ingress-build-wasm.log.gz",
+      "storedSha256": "576992d2e717f37dc3e008158677dfa10f7d06e753f63d58a2cb2baf66944be0"
+    },
+    "logs/source-prepared-ingress-correctness-ffi-compile.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-ffi-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "stored": "logs/source-prepared-ingress-correctness-ffi-compile.log.gz",
+      "storedSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    "logs/source-prepared-ingress-correctness-ffi-parse-limits-compile.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-ffi-parse-limits-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "stored": "logs/source-prepared-ingress-correctness-ffi-parse-limits-compile.log.gz",
+      "storedSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    "logs/source-prepared-ingress-correctness-ffi-parse-limits-run.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-ffi-parse-limits-run.log",
+      "sha256": "4bfc3a7019827db0c69aa537226e1efc1c5d3f89e92ff430f355666d8a0ffc92",
+      "bytes": 104,
+      "stored": "logs/source-prepared-ingress-correctness-ffi-parse-limits-run.log.gz",
+      "storedSha256": "2c85db4a83a9951d01c913f8a590fba1e6781d4d0ced27176900b599d50cd62f"
+    },
+    "logs/source-prepared-ingress-correctness-ffi-public-compile.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-ffi-public-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "stored": "logs/source-prepared-ingress-correctness-ffi-public-compile.log.gz",
+      "storedSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    "logs/source-prepared-ingress-correctness-ffi-public-run.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-ffi-public-run.log",
+      "sha256": "1e1eec67c6fe2d0d7b7856581388604475ab48ec1cf4c168cf607273aecdae7c",
+      "bytes": 36,
+      "stored": "logs/source-prepared-ingress-correctness-ffi-public-run.log.gz",
+      "storedSha256": "c5ef1bd2870c3734fc64a40f041f482a5644eab53cf6555fd28a2ca32a75f3e0"
+    },
+    "logs/source-prepared-ingress-correctness-ffi-run.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-ffi-run.log",
+      "sha256": "51308478fbd8472c41325835d0b8aa84c62abe79ea5166ca973c66c1deb9c0a9",
+      "bytes": 97,
+      "stored": "logs/source-prepared-ingress-correctness-ffi-run.log.gz",
+      "storedSha256": "afa68cd1f6234a3566db0c8163d3c4ace62c16a7074ef2a8da5bbbf9a8ce8bb9"
+    },
+    "logs/source-prepared-ingress-correctness-freeze-after-correctness.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-freeze-after-correctness.log",
+      "sha256": "96a5736de69a892184df8ac936b0e58292c458eccc47a8e8c762467e58f0568a",
+      "bytes": 941,
+      "stored": "logs/source-prepared-ingress-correctness-freeze-after-correctness.log.gz",
+      "storedSha256": "97b1a52ada28512e683b5a77a8c7fdf882b9546b13537eabc0283ffb650a9b26"
+    },
+    "logs/source-prepared-ingress-correctness-freeze-after-sdk.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-freeze-after-sdk.log",
+      "sha256": "fd13255dc0005271c41a4f9cd6c93efeaf2fd336be7655d41f79e0c301e53979",
+      "bytes": 267,
+      "stored": "logs/source-prepared-ingress-correctness-freeze-after-sdk.log.gz",
+      "storedSha256": "938a65f381a8839d2ba920062a3510ee66149dd2a368edfc07bb68e6f0f5764a"
+    },
+    "logs/source-prepared-ingress-correctness-freeze-before-correctness.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-freeze-before-correctness.log",
+      "sha256": "956620c7d6d0cd88bd402fddb32a2d912206eb36171ddbb259a73ca3aa515037",
+      "bytes": 358,
+      "stored": "logs/source-prepared-ingress-correctness-freeze-before-correctness.log.gz",
+      "storedSha256": "4b2cd47d0f77aa06347364cadbaa8692f3c2b255861ef251cb8694378cf925e2"
+    },
+    "logs/source-prepared-ingress-correctness-freeze-before-sdk.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-freeze-before-sdk.log",
+      "sha256": "9b423a04f062df1715563c141cbdb54dbdd22d4776daf20916bf92df59f393a2",
+      "bytes": 179,
+      "stored": "logs/source-prepared-ingress-correctness-freeze-before-sdk.log.gz",
+      "storedSha256": "05a569d6cf7f472dfe8f3c675ce47fec2d3504069ab9fa6b5150001301753e77"
+    },
+    "logs/source-prepared-ingress-correctness-sdk-build.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-sdk-build.log",
+      "sha256": "7ffff97f2a4225708d14d543eb09c89441204cef2d4f10198aa2d12ce3893589",
+      "bytes": 356,
+      "stored": "logs/source-prepared-ingress-correctness-sdk-build.log.gz",
+      "storedSha256": "dcff926ad5723da0a5452bd0fb46cf260ded3481f2ccd0fddd61f36ffc17f446"
+    },
+    "logs/source-prepared-ingress-correctness-swift-api.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-swift-api.log",
+      "sha256": "d9c8f0fb4edebd12f63741b5189f06eb8fa16964d6144d0ba2147bb1cc39376b",
+      "bytes": 571,
+      "stored": "logs/source-prepared-ingress-correctness-swift-api.log.gz",
+      "storedSha256": "5a11acc127b9009af089d65f446a3867981fd440727c7535d782932076b929c6"
+    },
+    "logs/source-prepared-ingress-correctness-swift-build.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-swift-build.log",
+      "sha256": "ce051d08ec869d15b268785e1f57ddc8f6bc09ddbd08810d14486e99deaa5aaf",
+      "bytes": 426,
+      "stored": "logs/source-prepared-ingress-correctness-swift-build.log.gz",
+      "storedSha256": "c675894d0ffc273ddbc9c3a4fc22de0066407803d94964316651c69fb32302bf"
+    },
+    "logs/source-prepared-ingress-correctness-swift-corpus.log": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-swift-corpus.log",
+      "sha256": "50cd864b518b1569baae2d4f8e41123e2e4093b82cb97477ba8c38e984840d25",
+      "bytes": 5663,
+      "stored": "logs/source-prepared-ingress-correctness-swift-corpus.log.gz",
+      "storedSha256": "74df6b55c3e0a6fa052c154d1fa6f5aa06ff281d99ee386be024d039216483c5"
+    },
+    "logs/source-prepared-ingress-generator-corrected.log": {
+      "source": "dist/evidence/source-prepared-ingress-generator-corrected.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "stored": "logs/source-prepared-ingress-generator-corrected.log.gz",
+      "storedSha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    "logs/source-prepared-ingress-generator.log": {
+      "source": "dist/evidence/source-prepared-ingress-generator.log",
+      "sha256": "62c60846f954197ba93fb0a2fb059f210c6f70ef1900ffc5d14d0fc0c9cb6afb",
+      "bytes": 619,
+      "stored": "logs/source-prepared-ingress-generator.log.gz",
+      "storedSha256": "01fa0059aa28c7ef229c07cd691979f84464cfb9e280c9c73f5fd6986df709bd"
+    },
+    "logs/source-prepared-ingress-native.log": {
+      "source": "dist/evidence/source-prepared-ingress-native.log",
+      "sha256": "33732542c0ec10f78b1708697cd7e348fa5dd9099fb37513404730c922107a2c",
+      "bytes": 6808,
+      "stored": "logs/source-prepared-ingress-native.log.gz",
+      "storedSha256": "d3c771209204f9fad9e7147e8b8dac9d0193683df02b2eba52f5d76a4da17d3b"
+    },
+    "logs/source-prepared-ingress-web.log": {
+      "source": "dist/evidence/source-prepared-ingress-web.log",
+      "sha256": "53f325b4a68975a89a389a5dd47891c870a5de56f860aab22fd7d7c674db8395",
+      "bytes": 13686,
+      "stored": "logs/source-prepared-ingress-web.log.gz",
+      "storedSha256": "1c8118ea869048453461ceb813b0e364e5bc8a286df09e1e90c4f07cc881d4ec"
+    },
+    "native/swift-api.json": {
+      "source": "dist/evidence/source-prepared-ingress-correctness-swift-api.json",
+      "sha256": "55ee3422977c66f1d115ae8b5ae77698341501ea0301e59756a88c8c507c1013",
+      "bytes": 236980,
+      "stored": "native/swift-api.json",
+      "storedSha256": "55ee3422977c66f1d115ae8b5ae77698341501ea0301e59756a88c8c507c1013"
+    },
+    "format-check.json": {
+      "source": "dist/evidence/source-prepared-ingress-format-check.json",
+      "sha256": "8d21602e443652afb48069d969abba1460b39ab7c2438b09dd72fa61b6ce9b6f",
+      "bytes": 265,
+      "stored": "format-check.json",
+      "storedSha256": "8d21602e443652afb48069d969abba1460b39ab7c2438b09dd72fa61b6ce9b6f"
+    }
+  }
+}

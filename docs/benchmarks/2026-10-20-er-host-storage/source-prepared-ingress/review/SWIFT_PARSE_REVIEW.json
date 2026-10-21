@@ -1,0 +1,43 @@
+{
+  "review": "independent source-only review; no concrete blocker",
+  "baseRuntime": "ef9c9a77428c35ac69753caad3178527fbd97864",
+  "rootAtReview": "f9aa728a5cdb7a2343534d12ac90ea10b0cba685",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/public_model.rs",
+      "originalSHA256": "c0569900debf0365e80df4ab71534111b05bc00c9dab2eea60925d042b301754",
+      "reviewedSHA256": "89da29648854ff91cb71e11e3bd6013025d44519689bd2f4fc013307aac298b3"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/source_store.rs",
+      "originalSHA256": "fc11f9e69657b0bbbd79eeed6956d8b9f9f2347de24eecaf82ec982558d93cb5",
+      "reviewedSHA256": "fe572d724e38afabf392170ba74acfdb10ef96c6a1b419b37574f95aaaeda52c"
+    },
+    {
+      "path": "crates/pele/src/compat/public/captured_transport.rs",
+      "originalSHA256": "6b34c870d9dc29a44644e2773af2abf86cca1e2fbe8547bb42fdd65c2f450c4d",
+      "reviewedSHA256": "9b417ad42a635fa3298a0ceea2dfff69851f796f2d27811e8d68f0897e5681ad"
+    },
+    {
+      "path": "crates/pele/src/compat/public/engine.rs",
+      "originalSHA256": "6486ca8fe4d15f0f3ea68a97aac6f46cd34ff1e6bc39171aea14bcc0547f62a5",
+      "reviewedSHA256": "77a4a275a3d2515ab47e9eb24e7dbd3371e82aa7292dbff2bd7e2547a5aefd4c"
+    },
+    {
+      "path": "crates/pele/src/compat/public/source_input.rs",
+      "originalSHA256": "cbf8159ad6529d51b9bde9fa8fb5d051ae39bd1ed6bfbfff5c866e9927dd9892",
+      "reviewedSHA256": "75707222cc590f136b4678d85d2868c99727a98f71db940bc86264d90aac8c40"
+    },
+    {
+      "path": "crates/pele/tests/public_source_ingress.rs",
+      "originalSHA256": "b5435b6dd4b07a8b22b52263b38a3935170a98f744ac9ece4f36f74c34bfc31d",
+      "reviewedSHA256": "22d2414a40ed57093f0b6664281a8b370b21fa5696011b1c7702fd54daf35896"
+    }
+  ],
+  "publicCapturedReadUnchanged": true,
+  "executedByReviewer": [],
+  "finalPatchSHA256": "ff0704f5264f47ce3c4022c8d42b5c0ea96f3c817936f9360b1af49fa47388e7",
+  "finalManifestSHA256": "fa2657e2db57acb5cb07c1c4537795c4a7743e6ad529bdd02f2f6b62234648fe",
+  "integratedRuntimeCommit": "e518012745a2eaf12c8bb048b91074566bf2000a",
+  "finalChangedFileCount": 6
+}

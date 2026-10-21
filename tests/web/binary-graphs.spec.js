@@ -26,3 +26,30 @@ test('binary WASM consumers retain edited graph identities and reject malformed 
   });
   expect(report).toEqual({type:'sankey',before:'0',applied:'1',stale:'Stale public model revision',malformed:'Invalid public binary graph transport',revision:'2',raw:[0xd800,65,0xdc00],cycle:true,date:'7ff8000000000042',rendered:'sankey',failed:'limit'});
 });
+
+test('binary graph publication preserves descriptors, special keys and cyclic references',async({page})=>{
+  await page.goto('/examples/web/');
+  const report=await page.evaluate(async()=>{
+    const {ModelBridge,ModelRegistry}=await import('/dist/package-web/package/graph.js');
+    const {encodeGraphBinary,decodeGraphBinary}=await import('/dist/package-web/package/graph-binary.js');
+    const schema={id:'consumer/publication@1',version:1,records:[],prototypes:[],methods:[]};
+    const strings=['__proto__','same','length','child','code'].map(s=>Array.from(s,c=>c.charCodeAt(0)));
+    const property=(key,value,flags=7)=>({key,value,flags}),ref=value=>({kind:'ref',value});
+    const graph={version:1,root:ref(0),strings,nodes:[
+      {kind:'object',properties:[property(0,ref(0)),property(1,{kind:'bool',value:false},4),property(1,{kind:'bool',value:true}),property(3,ref(1))]},
+      {kind:'array',length:2,properties:[property(2,{kind:'number',value:'4000000000000000'},0)]},
+      {kind:'error',errorType:'pele',properties:[]}
+    ]};
+    const exchange=decodeGraphBinary(encodeGraphBinary('0',graph));
+    const bridge=new ModelBridge(exchange.graph,schema,new ModelRegistry(),()=>{}),root=bridge.root;
+    const initial={ownProto:Object.hasOwn(root,'__proto__'),proto:Object.getPrototypeOf(root)===Object.prototype,cycle:root.__proto__===root,duplicate:root.same,readonly:!Object.getOwnPropertyDescriptor(root.child,'length').writable,holes:!(0 in root.child),errorCode:Object.hasOwn(bridge.objects[2],'code')};
+    root.same=false;Object.defineProperty(root,'child',{get(){throw Error('must not invoke getter');},configurable:true});
+    bridge.reconcile(exchange.graph);
+    const restored=root.same===true&&root.child===bridge.objects[1];
+    const invalidLength=structuredClone(graph);invalidLength.nodes[1].properties[0].flags=7;
+    let rejectedLength=false;
+    try{new ModelBridge(decodeGraphBinary(encodeGraphBinary('0',invalidLength)).graph,schema,new ModelRegistry(),()=>{});}catch(error){rejectedLength=error instanceof TypeError;}
+    return {initial,restored,rejectedLength};
+  });
+  expect(report).toEqual({initial:{ownProto:true,proto:true,cycle:true,duplicate:true,readonly:true,holes:true,errorCode:false},restored:true,rejectedLength:true});
+});

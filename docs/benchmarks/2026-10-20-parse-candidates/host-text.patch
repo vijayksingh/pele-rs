@@ -1,0 +1,103 @@
+--- a/bindings/web/full.js
++++ b/bindings/web/full.js
+@@ -7,7 +7,7 @@
+ export {enableZoom} from './zoom.js';
+ import { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry, foreign_decode_entities } from './pkg/pele.js';
+ import {renderNumericOptions} from './render-numbers.js';
+-import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
++import {encodeHostGraphBinary as encodeGraphBinary,decodeHostGraphBinary as decodeGraphBinary} from './graph-binary.js';
+ import {fromNativeError} from './errors.js';
+ export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
+ import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
+@@ -190,7 +190,7 @@
+             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
+             return bridge.value(outcome.result.Ok);
+           });
+-          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration);
++          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration,true);
+           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
+           entry.bridge = bridge;
+           entry.confirmedGraph = true;
+--- a/bindings/web/graph.js
++++ b/bindings/web/graph.js
+@@ -18,6 +18,7 @@
+   return output;
+ }
+ export function stringValue(value) {
++  if (typeof value === 'string') return value;
+   let output = '';
+   for (let i = 0; i < value.length; i += 8192) output += String.fromCharCode(...value.slice(i, i + 8192));
+   return output;
+@@ -109,7 +110,8 @@
+   }
+ }
+ export class ModelBridge {
+-  constructor(graph, schema, registry, invoke, prevalidatedRegistration) {
++  constructor(graph, schema, registry, invoke, prevalidatedRegistration, textStrings = false) {
++    this.textStrings = textStrings;
+     this.registry = registry;
+     if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || registry.schemas.get(`${schema.id}:${schema.version}`) !== prevalidatedRegistration)) throw new TypeError('Invalid prevalidated model registration');
+     this.registration = prevalidatedRegistration ?? registry.registration(schema);
+@@ -250,7 +252,7 @@
+     if (delta.stringsStart !== this.graph.strings.length || delta.nodesStart !== this.graph.nodes.length) throw new TypeError('Stale native model delta');
+     const nodes=this.graph.nodes.slice();
+     for(const [id,node] of delta.nodes) nodes[id]=node;
+-    return this.reconcile({...this.graph,strings:this.graph.strings.concat(delta.strings),nodes},delta.nodes.map(([id])=>id));
++    return this.reconcile({...this.graph,strings:this.graph.strings.concat(this.textStrings?delta.strings.map(stringValue):delta.strings),nodes},delta.nodes.map(([id])=>id));
+   }
+   hostReference(value) {
+     if (!this.hostIds.has(value)) {
+@@ -365,7 +367,7 @@
+       }
+     }
+     const appended=this.strings.slice(baseline.strings.length).map(units);
+-    this.graph = {version: 1, root, strings: delta ? baseline.strings.concat(appended) : this.strings.map(units), nodes};
++    this.graph = {version: 1, root, strings: this.textStrings ? this.strings.slice() : delta ? baseline.strings.concat(appended) : this.strings.map(units), nodes};
+     return {graph: this.graph, values: argumentsValue, ...(delta?{delta:{stringsStart:baseline.strings.length,strings:appended,nodesStart:baseline.nodes.length,nodes:changes.sort((a,b)=>a[0]-b[0])}}:{})};
+   }
+ }
+--- a/bindings/web/graph-binary.js
++++ b/bindings/web/graph-binary.js
+@@ -6,7 +6,10 @@
+ const limit=()=>new PeleError('Public binary graph exceeds transport budget','limit');
+ const atomSize=a=>a.kind==='number'?9:['string','ref','builtinFunction','hostReference'].includes(a.kind)?5:1;
+ const propertiesSize=p=>4+p.reduce((n,p)=>n+5+atomSize(p.value),0);
+-export function encodeGraphBinary(revision,graph,metadata=new Uint8Array()){
++export function encodeGraphBinary(revision,graph,metadata=new Uint8Array()){return writeGraphBinary(revision,graph,metadata,false);}
++// Internal adapter transport: host strings retain exact UTF-16 code units.
++export function encodeHostGraphBinary(revision,graph,metadata=new Uint8Array()){return writeGraphBinary(revision,graph,metadata,true);}
++function writeGraphBinary(revision,graph,metadata,textStrings){
+   if(graph.version!==1)throw invalid();
+   let size=24+atomSize(graph.root)+4+4+metadata.length;
+   for(const s of graph.strings)size+=4+2*s.length;
+@@ -35,7 +38,7 @@
+   const properties=p=>{u32(p.length);for(const value of p){u32(value.key);u8(value.flags);atom(value.value);}};
+   for(const v of magic)u8(v);u32(graph.version);view.setBigUint64(offset,BigInt(revision),true);offset+=8;u32(metadata.length);
+   atom(graph.root);u32(graph.strings.length);
+-  for(const s of graph.strings){u32(s.length);for(const unit of s){if(!Number.isInteger(unit)||unit<0||unit>65535)throw invalid();view.setUint16(offset,unit,true);offset+=2;}}
++  for(const s of graph.strings){u32(s.length);if(textStrings&&typeof s==='string'){for(let i=0;i<s.length;i++){view.setUint16(offset,s.charCodeAt(i),true);offset+=2;}}else for(const unit of s){if(!Number.isInteger(unit)||unit<0||unit>65535)throw invalid();view.setUint16(offset,unit,true);offset+=2;}}
+   u32(graph.nodes.length);
+   for(const node of graph.nodes){switch(node.kind){
+     case'error':{const tag=errorTypes.indexOf(node.errorType);if(tag<0)throw invalid();u8(6);u8(tag);break;}
+@@ -48,7 +51,9 @@
+   bytes.set(metadata,offset);offset+=metadata.length;
+   if(offset!==size)throw invalid();return bytes;
+ }
+-export function decodeGraphBinary(bytes){
++export function decodeGraphBinary(bytes){return readGraphBinary(bytes,false);}
++export function decodeHostGraphBinary(bytes){return readGraphBinary(bytes,true);}
++function readGraphBinary(bytes,textStrings){
+   if(!(bytes instanceof Uint8Array)||bytes.length>BUDGET)throw limit();
+   const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);let offset=0,end=bytes.length,work=0,units=0;
+   const need=n=>{if(!Number.isSafeInteger(n)||n<0||n>end-offset)throw invalid();};
+@@ -67,8 +72,8 @@
+   const version=u32();if(version!==1)throw invalid();
+   need(8);const revision=view.getBigUint64(offset,true).toString();offset+=8;
+   const metadataLength=u32();need(metadataLength);end-=metadataLength;
+-  const root=atom(),strings=[],nodes=[];let n=count(1_000_000,4);
+-  for(let i=0;i<n;i++){const length=count(16_000_000,2);units+=length;if(units>16_000_000)throw limit();const s=new Array(length);for(let j=0;j<length;j++){s[j]=view.getUint16(offset,true);offset+=2;}strings.push(s);}
++  const root=atom(),strings=[],nodes=[],scratch=[];let n=count(1_000_000,4);
++  for(let i=0;i<n;i++){const length=count(16_000_000,2);units+=length;if(units>16_000_000)throw limit();if(textStrings){let text='';for(let j=0;j<length;){const size=Math.min(8192,length-j);scratch.length=size;for(let k=0;k<size;k++){scratch[k]=view.getUint16(offset,true);offset+=2;}text+=String.fromCharCode(...scratch);j+=size;}strings.push(text);}else{const s=new Array(length);for(let j=0;j<length;j++){s[j]=view.getUint16(offset,true);offset+=2;}strings.push(s);}}
+   n=count(1_000_000,5);
+   for(let i=0;i<n;i++){
+     let node;switch(u8()){

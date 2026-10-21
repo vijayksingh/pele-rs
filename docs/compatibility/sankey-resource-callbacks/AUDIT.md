@@ -1,0 +1,11 @@
+# Sankey resource callback parity blocker
+
+This audit compares pinned Pele1.6.0 directly with the immutable bb0fc18 package, WASM6e14438c. It is correctness evidence, not timing or a new performance result. The complete116-file native package and pinned oracle remain unchanged.
+
+The existing bridge restores callback writes from its native snapshot. Pele preserves those writes on success and on arbitrary object, symbol or undefined throws. In56 basic differential cases, post-call states differ in all56;42 original thrown identities match. Four successful width cases also differ in current SVG/measurement trace. With maxWidth220,12 of14 responsive cases differ in current output. A same-owner findOrCreateNode helper succeeds in Pele and is rejected as busy by the current native bridge.
+
+A broader independent public regression harness then ran122 comparisons once against the same frozen package. All actual-oracle reachability/nonvacuity checks pass; native parity differs in113 cases and12 original callback-throw checks fail. Full SVG/dimension bits, callback traces, ordered descriptors, aliases, retained original references, subsequent calls, partial-helper repair and thrown identities are saved before assertions. This is a recorded RED run; it is not a completed fix or universal Proxy/getter contract.
+
+Deleting reconciliation alone cannot fix this feature. Pele rereads selected current fields after earlier resource calls and reloads geometry for responsive passes. Native holds a mutable document borrow across callbacks and rejects legitimate same-owner helper reentry. The proposed correction uses short prepare/finish calls around a detached Rust render job, phase-correct live reads, checked nested revision ownership and acknowledgement without restoring away callback writes. It keeps one Rust geometry/SVG algorithm. No such implementation or performance gain is claimed here.
+
+The existing restoration fixtures primarily compare native transports and therefore do not establish this actual oracle behavior. Full API parity and0.3 release remain blocked. The top manifest records original and compressed hashes; source scripts/excerpts retain pinned upstream provenance and the repository's existing Pele MIT license notice.

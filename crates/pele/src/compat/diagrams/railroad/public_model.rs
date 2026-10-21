@@ -7,10 +7,10 @@
 //! explicit capabilities; no JavaScript parser or renderer is used at runtime.
 use super::*;
 use crate::compat::public::{
-    Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString, MemberKind,
-    MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property,
-    PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId,
-    RecordKind, RecordSchema,
+    Atom, DetachedPublicRender, DetachedRenderCapability, FieldKind, FieldSchema, GraphWriter,
+    JavaScriptErrorKind, JsString, MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema,
+    ModelGraph, ModelSchema, Node, Property, PrototypeId, PrototypeParent, PrototypeSchema,
+    PublicDiagramModule, PublicError, RecordId, RecordKind, RecordSchema,
 };
 use crate::compat::ErrorCode;
 use std::collections::HashMap;
@@ -496,10 +496,35 @@ fn initial(m: &RailroadModel) -> Result<ModelGraph, PeleError> {
     g.validate()?;
     Ok(g)
 }
+fn construct_default() -> Result<RailroadPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    Railroad.create_public(&RailroadModel::new("railroad", None))
+}
+
 impl PublicDiagramModule for Railroad {
     type PublicState = RailroadPublicState;
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::railroad())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::railroad(
+            super::RailroadDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -510,6 +535,12 @@ impl PublicDiagramModule for Railroad {
         let graph = initial(m)?;
         let model = imported(&graph);
         Ok(RailroadPublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &RailroadPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

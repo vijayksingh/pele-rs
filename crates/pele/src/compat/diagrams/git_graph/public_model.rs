@@ -428,6 +428,19 @@ fn commit(out: &mut GraphWriter, c: &GitCommit) -> u32 {
 }
 impl PublicDiagramModule for GitGraph {
     type PublicState = GitGraphPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::git_graph())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::git_graph(
+            super::GitGraphDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
@@ -502,6 +515,12 @@ impl PublicDiagramModule for GitGraph {
         let graph = out.finish(Atom::Ref(root))?;
         let model = imported(&graph);
         Ok(GitGraphPublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &GitGraphPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

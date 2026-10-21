@@ -32,18 +32,96 @@ struct Frame {
     title: String,
     list: Vec<DocItem>,
 }
-struct Reader<'a> {
-    src: &'a str,
-    tokens: Vec<Token>,
-    i: usize,
-    db: ErModel,
+// One grammar, two private construction targets. Public/source typed parsing
+// keeps the original ErModel actions; direct publication may request fallback.
+pub(super) trait Target {
+    fn header(&mut self) -> &mut ErModel;
+    fn entity(
+        &mut self,
+        name: &str,
+        alias: Option<&str>,
+        attributes: Vec<ErAttribute>,
+        order: Vec<bool>,
+    ) -> Result<(), PeleError>;
+    fn relationship(
+        &mut self,
+        a: &str,
+        role: String,
+        b: &str,
+        spec: RelSpec,
+    ) -> Result<(), PeleError>;
+    fn subgraph(
+        &mut self,
+        id: String,
+        title: String,
+        list: Vec<DocItem>,
+    ) -> Result<String, PeleError>;
+    fn add_class(&mut self, ids: &[String], styles: &[String]) -> Result<(), PeleError>;
+    fn styles(&mut self, ids: &[String], styles: &[String]) -> Result<(), PeleError>;
+    fn set_class(&mut self, ids: &[String], names: &[String]) -> Result<(), PeleError>;
 }
-impl Reader<'_> {
+impl Target for ErModel {
+    fn header(&mut self) -> &mut ErModel {
+        self
+    }
+    fn entity(
+        &mut self,
+        name: &str,
+        alias: Option<&str>,
+        attributes: Vec<ErAttribute>,
+        order: Vec<bool>,
+    ) -> Result<(), PeleError> {
+        if let Some(alias) = alias {
+            self.add_entity(name, alias);
+        }
+        self.append_parsed_attributes(name, attributes, order);
+        Ok(())
+    }
+    fn relationship(
+        &mut self,
+        a: &str,
+        role: String,
+        b: &str,
+        spec: RelSpec,
+    ) -> Result<(), PeleError> {
+        self.add_entity(a, "");
+        self.add_entity(b, "");
+        ErModel::relationship(self, a, role, b, spec);
+        Ok(())
+    }
+    fn subgraph(
+        &mut self,
+        id: String,
+        title: String,
+        list: Vec<DocItem>,
+    ) -> Result<String, PeleError> {
+        Ok(ErModel::subgraph(self, id, title, list))
+    }
+    fn add_class(&mut self, ids: &[String], styles: &[String]) -> Result<(), PeleError> {
+        ErModel::add_class(self, ids, styles);
+        Ok(())
+    }
+    fn styles(&mut self, ids: &[String], styles: &[String]) -> Result<(), PeleError> {
+        ErModel::styles(self, ids, styles);
+        Ok(())
+    }
+    fn set_class(&mut self, ids: &[String], names: &[String]) -> Result<(), PeleError> {
+        ErModel::set_class(self, ids, names);
+        Ok(())
+    }
+}
+struct Reader<'a, 'b, D> {
+    src: &'a str,
+    tokens: Vec<Token<'a>>,
+    i: usize,
+    db: &'b mut D,
+}
+impl<D: Target> Reader<'_, '_, D> {
     fn t(&self) -> T {
         self.tokens.get(self.i).map_or(T::END, |t| t.kind)
     }
     fn take(&mut self) -> String {
-        let s = self.tokens[self.i].text.clone();
+        let s = self.tokens[self.i].text.to_owned();
         self.i += 1;
         s
     }
@@ -59,7 +137,7 @@ impl Reader<'_> {
                 &format!(
                     "Expecting {expected}, got '{}'",
                     if t.kind == T::CHAR {
-                        t.text.as_str()
+                        t.text
                     } else {
                         NAMES[t.kind as usize]
                     }
@@ -223,9 +301,8 @@ impl Reader<'_> {
                 vec![]
             };
             let (attrs, order) = self.block()?;
-            self.db.add_entity(&a, &alias);
-            self.db.append_parsed_attributes(&a, attrs, order);
-            self.db.set_class(std::slice::from_ref(&a), &classes);
+            self.db.entity(&a, Some(&alias), attrs, order)?;
+            self.db.set_class(std::slice::from_ref(&a), &classes)?;
             return Ok(vec![a]);
         }
         let classes = if self.t() == T::STYLE_SEPARATOR {
@@ -245,20 +322,18 @@ impl Reader<'_> {
             };
             self.expect(T::COLON)?;
             let label = self.role()?;
-            self.db.add_entity(&a, "");
-            self.db.add_entity(&b, "");
-            self.db.relationship(&a, label, &b, spec);
-            self.db.set_class(std::slice::from_ref(&a), &classes);
-            self.db.set_class(std::slice::from_ref(&b), &classes_b);
+            self.db.relationship(&a, label, &b, spec)?;
+            self.db.set_class(std::slice::from_ref(&a), &classes)?;
+            self.db.set_class(std::slice::from_ref(&b), &classes_b)?;
             Ok(vec![a, b])
         } else {
             let (attrs, order) = self.block()?;
-            self.db.append_parsed_attributes(&a, attrs, order);
-            self.db.set_class(std::slice::from_ref(&a), &classes);
+            self.db.entity(&a, None, attrs, order)?;
+            self.db.set_class(std::slice::from_ref(&a), &classes)?;
             Ok(vec![a])
         }
     }
-    fn parse(mut self) -> Result<ErModel, PeleError> {
+    fn parse(mut self) -> Result<(), PeleError> {
         self.expect(T::ER_DIAGRAM)?;
         let mut frames = vec![Frame {
             id: String::new(),
@@ -274,7 +349,7 @@ impl Reader<'_> {
                     if nested {
                         return Err(self.fail(&format!("'END', {LINE}")));
                     }
-                    return Ok(self.db);
+                    return Ok(());
                 }
                 T::END_KW => {
                     if !nested {
@@ -282,7 +357,7 @@ impl Reader<'_> {
                     }
                     self.i += 1;
                     let f = frames.pop().unwrap();
-                    let id = self.db.subgraph(f.id, f.title, f.list);
+                    let id = self.db.subgraph(f.id, f.title, f.list)?;
                     if frames.len() > 1 {
                         frames.last_mut().unwrap().list.push(DocItem::Text(id))
                     }
@@ -321,7 +396,7 @@ impl Reader<'_> {
                     };
                     let value = value.trim_matches(space).to_owned();
                     if t == T::acc_title {
-                        self.db.acc_title = Some(value.clone())
+                        self.db.header().acc_title = Some(value.clone())
                     } else {
                         let mut normalized = String::new();
                         let mut chars = value.chars().peekable();
@@ -333,7 +408,7 @@ impl Reader<'_> {
                                 }
                             }
                         }
-                        self.db.acc_descr = Some(normalized)
+                        self.db.header().acc_descr = Some(normalized)
                     }
                     if nested {
                         frames.last_mut().unwrap().list.push(DocItem::Text(value))
@@ -351,7 +426,7 @@ impl Reader<'_> {
                     if nested {
                         frames.last_mut().unwrap().list.push(DocItem::Dir(d))
                     } else {
-                        self.db.direction = d
+                        self.db.header().direction = d
                     }
                 }
                 T::CLASSDEF | T::STYLE => {
@@ -361,9 +436,9 @@ impl Reader<'_> {
                     let styles = self.styles()?;
                     self.separator()?;
                     if t == T::CLASSDEF {
-                        self.db.add_class(&ids, &styles)
+                        self.db.add_class(&ids, &styles)?
                     } else {
-                        self.db.styles(&ids, &styles)
+                        self.db.styles(&ids, &styles)?
                     }
                     if nested {
                         frames.last_mut().unwrap().list.push(DocItem::Text(keyword))
@@ -373,7 +448,7 @@ impl Reader<'_> {
                     let keyword = self.take();
                     let ids = self.ids()?;
                     let names = self.ids()?;
-                    self.db.set_class(&ids, &names);
+                    self.db.set_class(&ids, &names)?;
                     if nested {
                         frames.last_mut().unwrap().list.push(DocItem::Text(keyword))
                     }
@@ -400,11 +475,16 @@ impl Reader<'_> {
     }
 }
 pub(super) fn parse(context: ParseContext<'_>) -> Result<ErModel, PeleError> {
+    let mut db = ErModel::new(context.title);
+    parse_into(context.source, &mut db)?;
+    Ok(db)
+}
+pub(super) fn parse_into(source: &str, db: &mut impl Target) -> Result<(), PeleError> {
     Reader {
-        src: context.source,
-        tokens: tokenize(context.source),
+        src: source,
+        tokens: tokenize(source),
         i: 0,
-        db: ErModel::new(context.title),
+        db,
     }
     .parse()
 }

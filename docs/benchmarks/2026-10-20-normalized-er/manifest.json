@@ -1,0 +1,29 @@
+{
+  "baselineCommit": "ce559f1be92a751576d241440140a28bb728c508",
+  "scope": "Only ER builtin static projection policy; public register remains Legacy; four public feature integration tests. Private proposal, not applied or tested.",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/engine.rs",
+      "originalSha256": "9805911042d8fac20d3343bdeba5ae720a4629c3089aa3dcd5628bcae61ce1b2",
+      "candidateSha256": "d0d02bd0d3b772e1447854e63914aed21a9919ee48d4a74af121f9622bbd4c85",
+      "newFile": false
+    },
+    {
+      "path": "crates/pele/tests/normalized_er_projection.rs",
+      "originalSha256": null,
+      "candidateSha256": "052684a0835fb630b840d1198599b80592d5520914aff9156ef5f3e6e024a2c5",
+      "newFile": true
+    }
+  ],
+  "patchSha256": "6a32ff81f87a0e115d47eefada58dacea3eb4f3293a2545aa8d8aa30522d036e",
+  "fixture": {
+    "path": "fixtures/pele/er.json",
+    "sha256": "724cd2238adf0492e0bce879034da115e1e6589e27b67c17e52c74f7ac1967c1",
+    "cases": 17437
+  },
+  "checks": [
+    "Private Rust files formatted with rustfmt edition2021 skip_children=true; no build or test execution.",
+    "git apply --check candidate.patch passed against current production; production git diff --check passed.",
+    "Independent review corrected numeric-ID fixture tokenization and moved repeated class assignment to identifier A; refreshed private test rustfmt and hashes. No build/test execution. Earlier apply-check predates this fixture-only correction."
+  ]
+}

@@ -85,7 +85,14 @@ static SCHEMA: ModelSchema = ModelSchema {
             f("edgeById", FieldKind::Map, false),
             f("pairCount", FieldKind::Map, false),
             f("subCount", FieldKind::Number, false),
-            f("options", FieldKind::Object, false),
+            FieldSchema {
+                name: "options",
+                kind: FieldKind::Any,
+                optional: true,
+                undefined: true,
+                nullable: true,
+                flags: 7,
+            },
         ],
         members: &[],
     }],
@@ -139,9 +146,13 @@ static SCHEMA: ModelSchema = ModelSchema {
 };
 pub struct FlowchartPublicState {
     graph: ModelGraph,
-    imported: Result<FlowchartModel, PeleError>,
+    imported: std::cell::OnceCell<Result<FlowchartModel, PeleError>>,
 }
 impl FlowchartPublicState {
+    pub(crate) fn detached_seed(&self) -> super::FlowchartDetachedInput {
+        super::FlowchartDetachedInput::new(self.prepared_render_model().err())
+    }
+
     /// Shared DB projection for actual renderer variants such as Swimlane.
     /// Registration remains owned by the calling public document.
     pub(crate) fn prepared_render_model(&self) -> Result<&FlowchartModel, PublicError> {
@@ -154,7 +165,10 @@ impl FlowchartPublicState {
         Ok(model)
     }
     pub(crate) fn render_model(&self) -> Result<&FlowchartModel, PeleError> {
-        self.imported.as_ref().map_err(Clone::clone)
+        self.imported
+            .get_or_init(|| imported(&self.graph))
+            .as_ref()
+            .map_err(Clone::clone)
     }
 }
 fn error(message: impl Into<String>) -> PeleError {
@@ -328,7 +342,7 @@ impl Reader<'_> {
         }
     }
 }
-fn imported(g: &ModelGraph) -> Result<FlowchartModel, PeleError> {
+pub(crate) fn imported(g: &ModelGraph) -> Result<FlowchartModel, PeleError> {
     let root = reference(&g.root)?;
     let mut r = Reader {
         g,
@@ -530,7 +544,11 @@ impl<'a> Arena<'a> {
         }
     }
     fn property_position(&self, id: u32, key: &str) -> Option<usize> {
-        let canonical = *self.string_ids.get(&JsString::from(key))?;
+        let mut buffer = [0; 64];
+        let canonical = *match JsString::short_utf16(key, &mut buffer) {
+            Some(units) => self.string_ids.get(units),
+            None => self.string_ids.get(&JsString::from(key)),
+        }?;
         let mut cache = self.properties.borrow_mut();
         let index = cache.entry(id).or_insert_with(|| {
             self.g.nodes[id as usize]
@@ -575,6 +593,23 @@ impl<'a> Arena<'a> {
         self.g.strings.push(s);
         Ok(id)
     }
+    fn intern_key(&mut self, key: &str) -> Result<u32, PublicError> {
+        let mut buffer = [0; 64];
+        if let Some(units) = JsString::short_utf16(key, &mut buffer) {
+            if let Some(id) = self.string_ids.get(units).copied() {
+                // A repeated key still consumes the same text-work budget as
+                // intern. Only its temporary owned UTF-16 allocation disappears.
+                self.text_work = self.text_work.checked_add(units.len()).ok_or_else(limit)?;
+                if self.text_work > MAX_TEXT {
+                    return Err(limit().into());
+                }
+                return Ok(id);
+            }
+        }
+        // Misses and long keys use the original admission/order/budget path,
+        // and are charged exactly once there.
+        self.intern(key.into())
+    }
     fn string(&mut self, s: impl Into<JsString>) -> Result<Atom, PublicError> {
         self.intern(s.into()).map(Atom::String)
     }
@@ -602,7 +637,7 @@ impl<'a> Arena<'a> {
             return Err(limit().into());
         }
         self.work += 1;
-        let key = self.intern(key.into())?;
+        let key = self.intern_key(key)?;
         let index = self.g.nodes[id as usize].properties().len();
         self.g.nodes[id as usize].properties_mut().push(Property {
             key,
@@ -647,10 +682,37 @@ impl<'a> Arena<'a> {
             .collect::<Result<Vec<_>, _>>()?;
         self.array(values)
     }
+    // Only for objects allocated by record/ordered in this call. Track keys in
+    // insertion order rather than building the general imported-node index.
+    fn assign_fresh<'k>(
+        &mut self,
+        id: u32,
+        keys: &mut Vec<&'k str>,
+        key: &'k str,
+        value: Atom,
+    ) -> Result<(), PublicError> {
+        if let Some(index) = keys.iter().position(|existing| *existing == key) {
+            self.g.nodes[id as usize].properties_mut()[index].value = value;
+            return Ok(());
+        }
+        if self.work >= MAX_WORK {
+            return Err(limit().into());
+        }
+        self.work += 1;
+        let string_id = self.intern_key(key)?;
+        self.g.nodes[id as usize].properties_mut().push(Property {
+            key: string_id,
+            value,
+            flags: 7,
+        });
+        keys.push(key);
+        Ok(())
+    }
     fn record(&mut self, values: Vec<(&str, Atom)>) -> Result<u32, PublicError> {
         let id = self.object()?;
+        let mut keys = Vec::with_capacity(values.len());
         for (k, v) in values {
-            self.assign(id, k, v)?
+            self.assign_fresh(id, &mut keys, k, v)?
         }
         Ok(id)
     }
@@ -751,14 +813,15 @@ impl<'a> Arena<'a> {
         order: &[&'static str],
     ) -> Result<u32, PublicError> {
         let id = self.object()?;
+        let mut keys = Vec::with_capacity(fields.len());
         for key in order {
             if let Some((_, v)) = fields.iter().find(|(k, _)| k == key) {
-                self.assign(id, key, v.clone())?
+                self.assign_fresh(id, &mut keys, key, v.clone())?
             }
         }
         for (k, v) in fields {
             if !order.contains(&k) && !matches!(v, Atom::Undefined) {
-                self.assign(id, k, v)?
+                self.assign_fresh(id, &mut keys, k, v)?
             }
         }
         Ok(id)
@@ -779,6 +842,13 @@ fn same(g: &ModelGraph, a: &Atom, b: &Atom) -> bool {
 fn new_graph(
     m: &FlowchartModel,
     limit: Option<crate::compat::EdgeLimit>,
+) -> Result<ModelGraph, PublicError> {
+    new_graph_with_options(m, limit, None)
+}
+fn new_graph_with_options(
+    m: &FlowchartModel,
+    limit: Option<crate::compat::EdgeLimit>,
+    constructor: Option<ConstructorArgument>,
 ) -> Result<ModelGraph, PublicError> {
     let mut graph = ModelGraph {
         version: 1,
@@ -969,17 +1039,25 @@ fn new_graph(
     } else {
         Atom::Undefined
     };
-    let options = a.object()?;
-    a.assign(
-        options,
-        "inheritDir",
-        Atom::Bool(m.public_origin.inherit_dir),
-    )?;
-    let max_edges = match limit {
-        Some(limit) => a.value(&limit.value())?,
-        None => Atom::Number(m.public_origin.max_edges as f64),
+    let options = if let Some(argument) = constructor {
+        match argument {
+            ConstructorArgument::Undefined => Atom::Ref(a.object()?),
+            value => value.into_atom(|text| a.string(text))?,
+        }
+    } else {
+        let options = a.object()?;
+        a.assign(
+            options,
+            "inheritDir",
+            Atom::Bool(m.public_origin.inherit_dir),
+        )?;
+        let max_edges = match limit {
+            Some(limit) => a.value(&limit.value())?,
+            None => Atom::Number(m.public_origin.max_edges as f64),
+        };
+        a.assign(options, "maxEdges", max_edges)?;
+        Atom::Ref(options)
     };
-    a.assign(options, "maxEdges", max_edges)?;
     let fields = vec![
         ("type", a.string("flowchart")?),
         ("direction", a.opt(m.direction.as_ref())?),
@@ -1001,7 +1079,7 @@ fn new_graph(
         ("edgeById", Atom::Ref(edge_lookup)),
         ("pairCount", Atom::Ref(pair_count)),
         ("subCount", Atom::Number(m.public_origin.sub_count as f64)),
-        ("options", Atom::Ref(options)),
+        ("options", options),
     ];
     for (k, v) in fields {
         a.assign(root, k, v)?
@@ -1085,7 +1163,107 @@ fn unquote_units(mut text: JsString) -> JsString {
 fn arg(call: &MethodCall, n: usize) -> Atom {
     call.arguments.get(n).cloned().unwrap_or(Atom::Undefined)
 }
+struct LinkPending {
+    root: u32,
+    edge: u32,
+    start: Atom,
+    end: Atom,
+    id: Atom,
+}
+struct VertexPending {
+    root: u32,
+    id: Atom,
+    text_obj: Atom,
+    shape: Atom,
+    style: Atom,
+    classes: Atom,
+    direction: Atom,
+    props: Atom,
+    doc: Option<Object>,
+    existing: Atom,
+}
+impl VertexPending {
+    fn needs_warning(&self) -> bool {
+        matches!(self.existing, Atom::Undefined)
+            && matches!(self.text_obj, Atom::Undefined)
+            && matches!(self.shape, Atom::Undefined)
+            && !matches!(self.style, Atom::Undefined | Atom::Null)
+    }
+}
+struct LinkBatch {
+    root: u32,
+    starts: Vec<Atom>,
+    ends: Vec<Atom>,
+    info: Atom,
+    id: Atom,
+    start: usize,
+    end: usize,
+}
+impl LinkBatch {
+    fn next(&mut self, g: &ModelGraph) -> Option<(Atom, Atom, Atom)> {
+        if self.start >= self.starts.len() || self.ends.is_empty() {
+            return None;
+        }
+        let start = self.starts[self.start].clone();
+        let end = self.ends[self.end].clone();
+        let id = if self.starts.last().is_some_and(|s| same(g, s, &start))
+            && self.ends.first().is_some_and(|e| same(g, e, &end))
+        {
+            self.id.clone()
+        } else {
+            Atom::Undefined
+        };
+        self.end += 1;
+        if self.end == self.ends.len() {
+            self.end = 0;
+            self.start += 1;
+        }
+        Some((start, end, id))
+    }
+}
 impl Arena<'_> {
+    fn link_batch(&mut self, root: u32, call: &MethodCall) -> Result<LinkBatch, PublicError> {
+        self.guard(root, "addSingleLink", 2)?;
+        let starts = dense(self.g, &arg(call, 0))?;
+        let ends = dense(self.g, &arg(call, 1))?;
+        if starts
+            .len()
+            .checked_mul(ends.len())
+            .is_none_or(|n| n > MAX_WORK)
+        {
+            return Err(limit().into());
+        }
+        let info = arg(call, 2);
+        let id = if let Atom::Ref(i) = info {
+            let id = self.field(i, "id");
+            if let Atom::String(s) = id {
+                let s = self.g.strings[s as usize].0.clone();
+                let mut out = Vec::with_capacity(s.len());
+                let mut removed = false;
+                for c in s {
+                    if c == 64 && !removed {
+                        removed = true
+                    } else {
+                        out.push(c)
+                    }
+                }
+                self.string(JsString(out))?
+            } else {
+                Atom::Undefined
+            }
+        } else {
+            Atom::Undefined
+        };
+        Ok(LinkBatch {
+            root,
+            starts,
+            ends,
+            info,
+            id,
+            start: 0,
+            end: 0,
+        })
+    }
     fn guard(&self, id: u32, name: &str, builtin: u32) -> Result<(), PublicError> {
         if let Some(p) = self.g.nodes[id as usize]
             .properties()
@@ -1135,14 +1313,14 @@ impl Arena<'_> {
         }
         Ok(value)
     }
-    fn single_link(
+    fn single_link_prepare(
         &mut self,
         root: u32,
         start: Atom,
         end: Atom,
         info: Atom,
         id: Atom,
-    ) -> Result<(), PublicError> {
+    ) -> Result<LinkPending, PublicError> {
         let classes = self.array(vec![])?;
         let interpolate = self.field(root, "defaultInterpolate");
         let empty = self.string("")?;
@@ -1220,12 +1398,19 @@ impl Arena<'_> {
         };
         self.assign(edge, "id", id.clone())?;
         self.assign(edge, "isUserDefinedId", Atom::Bool(custom))?;
-        let edges = self.field_id(root, "edges")?;
+        Ok(LinkPending {
+            root,
+            edge,
+            start,
+            end,
+            id,
+        })
+    }
+    fn single_link_finish(&mut self, pending: LinkPending, max: Atom) -> Result<(), PublicError> {
+        let edges = self.field_id(pending.root, "edges")?;
         let Node::Array { length, .. } = self.g.nodes[edges as usize] else {
             return Err(ty("Flowchart edges must be an Array"));
         };
-        let options = self.field_id(root, "options")?;
-        let max = self.field(options, "maxEdges");
         if !matches!(max, Atom::Undefined) && length as f64 >= number(self.g, &max)? {
             let mut e = error(format!(
                 "Edge limit exceeded. {length} edges found, but the limit is {}.",
@@ -1234,8 +1419,33 @@ impl Arena<'_> {
             e.code = ErrorCode::Limit;
             return Err(e.into());
         }
+        self.single_link_commit(pending)
+    }
+    fn single_link_commit(&mut self, pending: LinkPending) -> Result<(), PublicError> {
+        let LinkPending {
+            root,
+            edge,
+            start,
+            end,
+            id,
+        } = pending;
+        let edges = self.field_id(root, "edges")?;
         self.push(edges, Atom::Ref(edge))?;
+        let pair = self.string(
+            format!(
+                "{}\0{}",
+                js_string(self.g, &start)?,
+                js_string(self.g, &end)?
+            )
+            .as_str(),
+        )?;
         let counts = self.field_id(root, "pairCount")?;
+        let old = self.map_get(counts, &pair)?;
+        let count = if matches!(old, Atom::Null | Atom::Undefined) {
+            0.
+        } else {
+            number(self.g, &old)?
+        };
         self.map_set(counts, pair, Atom::Number(count + 1.))?;
         let lookup = self.field_id(root, "edgeById")?;
         if !self.map_has(lookup, &id)? {
@@ -1243,15 +1453,32 @@ impl Arena<'_> {
         }
         Ok(())
     }
-    fn vertex(&mut self, root: u32, args: &[Atom]) -> Result<(), PublicError> {
+    fn single_link(
+        &mut self,
+        root: u32,
+        start: Atom,
+        end: Atom,
+        info: Atom,
+        id: Atom,
+    ) -> Result<(), PublicError> {
+        let pending = self.single_link_prepare(root, start, end, info, id)?;
+        let options = self.field_id(root, "options")?;
+        let max = self.field(options, "maxEdges");
+        self.single_link_finish(pending, max)
+    }
+    fn vertex_prepare(
+        &mut self,
+        root: u32,
+        args: &[Atom],
+    ) -> Result<Option<VertexPending>, PublicError> {
         let argument = |n| args.get(n).cloned().unwrap_or(Atom::Undefined);
         let id = argument(0);
         if !truthy(self.g, &id) {
-            return Ok(());
+            return Ok(None);
         }
         let name = text(self.g, &id)?;
         if name.trim_matches(space).is_empty() {
-            return Ok(());
+            return Ok(None);
         }
         let text_obj = argument(1);
         let shape = argument(2);
@@ -1295,7 +1522,7 @@ impl Arena<'_> {
                 self.assign(target_id, k, v)?
             }
             self.assign(sub, "metadata", target)?;
-            return Ok(());
+            return Ok(None);
         }
         let edge = self.map_field(root, "edgeById", &id)?;
         if truthy(self.g, &edge) {
@@ -1312,27 +1539,37 @@ impl Arena<'_> {
                     }
                 }
             }
-            return Ok(());
+            return Ok(None);
         }
         let nodes = self.field_id(root, "nodes")?;
         let existing = self.map_get(nodes, &id)?;
+        Ok(Some(VertexPending {
+            root,
+            id,
+            text_obj,
+            shape,
+            style,
+            classes,
+            direction,
+            props,
+            doc,
+            existing,
+        }))
+    }
+    fn vertex_finish(&mut self, pending: VertexPending) -> Result<(), PublicError> {
+        let VertexPending {
+            root,
+            id,
+            text_obj,
+            shape,
+            style,
+            classes,
+            direction,
+            props,
+            doc,
+            existing,
+        } = pending;
         let vertex = if matches!(existing, Atom::Undefined) {
-            if matches!(text_obj, Atom::Undefined)
-                && matches!(shape, Atom::Undefined)
-                && !matches!(style, Atom::Undefined | Atom::Null)
-            {
-                let options = self.field_id(root, "options")?;
-                let warn = self.field(options, "warn");
-                if !matches!(warn, Atom::Undefined | Atom::Null) {
-                    return Err(
-                        if matches!(warn, Atom::HostReference(_) | Atom::BuiltinFunction(_)) {
-                            error("Flowchart warning callback dispatch is not implemented").into()
-                        } else {
-                            ty("Flowchart warning callback is not a function")
-                        },
-                    );
-                }
-            }
             let styles = self.array(vec![])?;
             let classes = self.array(vec![])?;
             let kind = self.string("text")?;
@@ -1342,6 +1579,7 @@ impl Arena<'_> {
                 ("styles", Atom::Ref(styles)),
                 ("classes", Atom::Ref(classes)),
             ])?;
+            let nodes = self.field_id(root, "nodes")?;
             self.map_set(nodes, id.clone(), Atom::Ref(vertex))?;
             vertex
         } else {
@@ -1440,13 +1678,32 @@ impl Arena<'_> {
         }
         Ok(())
     }
-    fn add_subgraph(
+    fn vertex(&mut self, root: u32, args: &[Atom]) -> Result<(), PublicError> {
+        let Some(pending) = self.vertex_prepare(root, args)? else {
+            return Ok(());
+        };
+        if pending.needs_warning() {
+            let options = self.field_id(root, "options")?;
+            let warn = self.field(options, "warn");
+            if !matches!(warn, Atom::Undefined | Atom::Null) {
+                return Err(
+                    if matches!(warn, Atom::HostReference(_) | Atom::BuiltinFunction(_)) {
+                        error("Flowchart warning callback dispatch is not implemented").into()
+                    } else {
+                        ty("Flowchart warning callback is not a function")
+                    },
+                );
+            }
+        }
+        self.vertex_finish(pending)
+    }
+    fn subgraph_prepare(
         &mut self,
         root: u32,
         id_text: Atom,
         list: Atom,
         title_text: Atom,
-    ) -> Result<Atom, PublicError> {
+    ) -> Result<SubgraphPending, PublicError> {
         let mut id = if matches!(id_text, Atom::Undefined | Atom::Null) {
             None
         } else {
@@ -1496,17 +1753,47 @@ impl Arena<'_> {
                 }
             }
         }
-        let options = self.field_id(root, "options")?;
-        if matches!(dir, Atom::Undefined | Atom::Null)
-            && truthy(self.g, &self.field(options, "inheritDir"))
-        {
-            let d = self.field(root, "direction");
-            dir = if matches!(d, Atom::Undefined | Atom::Null) {
-                self.field(options, "direction")
+        Ok(SubgraphPending {
+            root,
+            id,
+            nodes,
+            dir,
+            title,
+            title_text,
+        })
+    }
+    fn add_subgraph(
+        &mut self,
+        root: u32,
+        id_text: Atom,
+        list: Atom,
+        title_text: Atom,
+    ) -> Result<Atom, PublicError> {
+        let mut pending = self.subgraph_prepare(root, id_text, list, title_text)?;
+        if matches!(pending.dir, Atom::Undefined | Atom::Null) {
+            let options = self.field_id(root, "options")?;
+            if truthy(self.g, &self.field(options, "inheritDir")) {
+                let direction = self.field(root, "direction");
+                pending.dir = if matches!(direction, Atom::Undefined | Atom::Null) {
+                    self.field(options, "direction")
+                } else {
+                    direction
+                };
             } else {
-                d
-            };
+                pending.dir = Atom::Undefined;
+            }
         }
+        self.subgraph_finish(pending)
+    }
+    fn subgraph_finish(&mut self, pending: SubgraphPending) -> Result<Atom, PublicError> {
+        let SubgraphPending {
+            root,
+            id,
+            mut nodes,
+            dir,
+            title,
+            title_text,
+        } = pending;
         let count = number(self.g, &self.field(root, "subCount"))?;
         let id = match id {
             Some(id) => self.string(id)?,
@@ -1655,48 +1942,9 @@ fn invoke(g: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
             arg(&call, 3),
         )?,
         3 => {
-            a.guard(root, "addSingleLink", 2)?;
-            let starts = dense(a.g, &arg(&call, 0))?;
-            let ends = dense(a.g, &arg(&call, 1))?;
-            if starts
-                .len()
-                .checked_mul(ends.len())
-                .is_none_or(|n| n > MAX_WORK)
-            {
-                return Err(limit().into());
-            }
-            let info = arg(&call, 2);
-            let id = if let Atom::Ref(i) = info {
-                let id = a.field(i, "id");
-                if let Atom::String(s) = id {
-                    let s = a.g.strings[s as usize].0.clone();
-                    let mut out = Vec::with_capacity(s.len());
-                    let mut removed = false;
-                    for c in s {
-                        if c == 64 && !removed {
-                            removed = true
-                        } else {
-                            out.push(c)
-                        }
-                    }
-                    a.string(JsString(out))?
-                } else {
-                    Atom::Undefined
-                }
-            } else {
-                Atom::Undefined
-            };
-            for start in &starts {
-                for end in &ends {
-                    let id = if starts.last().is_some_and(|s| same(a.g, s, start))
-                        && ends.first().is_some_and(|e| same(a.g, e, end))
-                    {
-                        id.clone()
-                    } else {
-                        Atom::Undefined
-                    };
-                    a.single_link(root, start.clone(), end.clone(), info.clone(), id)?
-                }
+            let mut batch = a.link_batch(root, &call)?;
+            while let Some((start, end, id)) = batch.next(a.g) {
+                a.single_link(root, start, end, batch.info.clone(), id)?;
             }
         }
         4 | 5 => {
@@ -1982,17 +2230,153 @@ fn create_state(
         PublicError::Pele(e) => e,
         _ => error("Flowchart public export failed"),
     })?;
-    let imported = imported(&graph);
+    let imported = std::cell::OnceCell::new();
     Ok(FlowchartPublicState { graph, imported })
 }
+pub(crate) const LIVE_FIELDS: &[LiveConstructorField] = &[LiveConstructorField {
+    key: "options",
+    methods: &[MethodId(1), MethodId(2), MethodId(3), MethodId(15)],
+}];
+pub(crate) fn construct_with(
+    argument: ConstructorArgument,
+) -> Result<FlowchartPublicState, PeleError> {
+    let graph = new_graph_with_options(&FlowchartModel::empty(), None, Some(argument)).map_err(
+        |e| match e {
+            PublicError::Pele(e) => e,
+            _ => error("Flowchart public construction failed"),
+        },
+    )?;
+    Ok(FlowchartPublicState {
+        graph,
+        imported: std::cell::OnceCell::new(),
+    })
+}
 impl PublicDiagramModule for Flowchart {
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::flowchart())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::flowchart(state.detached_seed()))
+    }
+
+    fn active_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        operation: PublicActiveOperation,
+        budget: &mut PublicActiveBudget,
+    ) -> Result<PublicActiveValue, PublicError> {
+        fn validate(g: &ModelGraph, v: &Atom) -> Result<(), PublicError> {
+            g.validate_atom(v)?;
+            if let Atom::BuiltinFunction(id) = v {
+                if SCHEMA.method(MethodId(*id)).is_none() {
+                    return Err(ty("Unknown public builtin function"));
+                }
+            }
+            Ok(())
+        }
+        fn charge(b: &mut PublicActiveBudget, n: usize) -> Result<(), PublicError> {
+            if n > b.remaining {
+                return Err(limit().into());
+            }
+            b.remaining -= n;
+            Ok(())
+        }
+        charge(budget, 1)?;
+        let result = (|| {
+            Ok(PublicActiveValue::Atom(match operation {
+                PublicActiveOperation::Validate(v) => {
+                    validate(&state.graph, &v)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Intern(s) => {
+                    charge(budget, s.0.len())?;
+                    Arena::new(&mut state.graph).string(s)?
+                }
+                PublicActiveOperation::String(v) => {
+                    validate(&state.graph, &v)?;
+                    let Atom::String(id) = v else {
+                        return Err(ty("Active model value is not a string"));
+                    };
+                    let s = &state.graph.strings[id as usize];
+                    charge(budget, s.0.len())?;
+                    return Ok(PublicActiveValue::String(s.clone()));
+                }
+                PublicActiveOperation::Object => Atom::Ref(Arena::new(&mut state.graph).object()?),
+                PublicActiveOperation::Array => {
+                    Atom::Ref(Arena::new(&mut state.graph).array(vec![])?)
+                }
+                PublicActiveOperation::Read { receiver, key } => {
+                    validate(&state.graph, &receiver)?;
+                    charge(budget, key.len())?;
+                    let a = Arena::new(&mut state.graph);
+                    let id = a.id(&receiver)?;
+                    if key == "length" {
+                        if let Node::Array { length, .. } = &a.g.nodes[id as usize] {
+                            return Ok(PublicActiveValue::Atom(Atom::Number(*length as f64)));
+                        }
+                    }
+                    a.field(id, &key)
+                }
+                PublicActiveOperation::Set {
+                    receiver,
+                    key,
+                    value,
+                } => {
+                    validate(&state.graph, &receiver)?;
+                    validate(&state.graph, &value)?;
+                    charge(budget, key.len())?;
+                    let mut a = Arena::new(&mut state.graph);
+                    let id = a.id(&receiver)?;
+                    if matches!(a.g.nodes[id as usize], Node::Array { .. }) {
+                        return Err(ty(
+                            "Active Flowchart array structural edits are unavailable",
+                        ));
+                    }
+                    a.assign(id, &key, value)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Push { receiver, value } => {
+                    validate(&state.graph, &receiver)?;
+                    validate(&state.graph, &value)?;
+                    let mut a = Arena::new(&mut state.graph);
+                    let id = a.id(&receiver)?;
+                    a.push(id, value)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Builtin(call) if call.method == MethodId(19) => {
+                    validate(&state.graph, &call.receiver)?;
+                    for a in &call.arguments {
+                        validate(&state.graph, a)?;
+                    }
+                    charge(budget, state.graph.nodes.len())?;
+                    invoke(&mut state.graph, call)?
+                }
+                _ => return Err(ty("Owned Flowchart active operation is unavailable")),
+            }))
+        })();
+        state.imported.take();
+        result
+    }
+
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            PublicConstructorFactory::first_value::<Self>(PROTOTYPE, construct_with, LIVE_FIELDS)
+        })
+    }
+    fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        detached_method::<Self>(call)
+    }
+
     type PublicState = FlowchartPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
-        let imported = imported(&graph);
+        let imported = std::cell::OnceCell::new();
         Ok(FlowchartPublicState { graph, imported })
     }
     fn create_public(&self, m: &FlowchartModel) -> Result<Self::PublicState, PeleError> {
@@ -2012,11 +2396,17 @@ impl PublicDiagramModule for Flowchart {
     ) -> Result<Self::PublicState, PeleError> {
         crate::compat::public::create_prepared_edge_public(self, model, limit)
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }
     fn apply_public(&self, s: &mut Self::PublicState, g: ModelGraph) -> Result<(), PeleError> {
-        s.imported = imported(&g);
+        s.imported.take();
         s.graph = g;
         Ok(())
     }
@@ -2028,7 +2418,7 @@ impl PublicDiagramModule for Flowchart {
         _: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
         let result = invoke(&mut s.graph, call);
-        s.imported = imported(&s.graph);
+        s.imported.take();
         result
     }
     fn render_public(
@@ -2050,4 +2440,270 @@ impl PublicDiagramModule for Flowchart {
         self.render(s.prepared_render_model()?, config, options, host)
             .map_err(Into::into)
     }
+}
+
+struct SubgraphPending {
+    root: u32,
+    id: Option<JsString>,
+    nodes: Vec<Atom>,
+    dir: Atom,
+    title: Atom,
+    title_text: Atom,
+}
+struct FlowInvocation {
+    text_work: usize,
+    stage: FlowStage,
+    batch: Option<LinkBatch>,
+}
+enum FlowStage {
+    Start(MethodCall),
+    WarnOptions(VertexPending),
+    WarnGet(VertexPending, Atom),
+    WarnCall(VertexPending),
+    MaxOptions(LinkPending),
+    MaxGet(LinkPending),
+    MaxCompare(LinkPending, u32, Atom),
+    MaxError(u32),
+    SubOptions(SubgraphPending),
+    SubInherit(SubgraphPending),
+    SubTruthy(SubgraphPending),
+    SubDirectionOptions(SubgraphPending),
+    SubDirection(SubgraphPending),
+    Finished,
+}
+impl FlowInvocation {
+    fn request_max(&mut self, pending: LinkPending) -> PublicInvocationPhase {
+        let receiver = Atom::Ref(pending.root);
+        self.stage = FlowStage::MaxOptions(pending);
+        PublicInvocationPhase::Host(PublicHostOperation::Get {
+            receiver,
+            key: "options",
+        })
+    }
+    fn next_link(&mut self, a: &mut Arena<'_>) -> Result<PublicInvocationPhase, PublicError> {
+        let Some(batch) = self.batch.as_mut() else {
+            return Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)));
+        };
+        let Some((start, end, id)) = batch.next(a.g) else {
+            return Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)));
+        };
+        let pending = a.single_link_prepare(batch.root, start, end, batch.info.clone(), id)?;
+        Ok(self.request_max(pending))
+    }
+    fn step(
+        &mut self,
+        a: &mut Arena<'_>,
+        reply: Option<Atom>,
+    ) -> Result<PublicInvocationPhase, PublicError> {
+        let stage = std::mem::replace(&mut self.stage, FlowStage::Finished);
+        match stage {
+            FlowStage::Start(call) => {
+                let root = a.id(&call.receiver)?;
+                match call.method.0 {
+                    1 => {
+                        let Some(pending) = a.vertex_prepare(root, &call.arguments)? else {
+                            return Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)));
+                        };
+                        if pending.needs_warning() {
+                            let receiver = Atom::Ref(root);
+                            self.stage = FlowStage::WarnOptions(pending);
+                            Ok(PublicInvocationPhase::Host(PublicHostOperation::Get {
+                                receiver,
+                                key: "options",
+                            }))
+                        } else {
+                            a.vertex_finish(pending)?;
+                            Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)))
+                        }
+                    }
+                    2 => {
+                        let pending = a.single_link_prepare(
+                            root,
+                            arg(&call, 0),
+                            arg(&call, 1),
+                            arg(&call, 2),
+                            arg(&call, 3),
+                        )?;
+                        Ok(self.request_max(pending))
+                    }
+                    3 => {
+                        self.batch = Some(a.link_batch(root, &call)?);
+                        self.next_link(a)
+                    }
+                    15 => {
+                        let pending =
+                            a.subgraph_prepare(root, arg(&call, 0), arg(&call, 1), arg(&call, 2))?;
+                        if matches!(pending.dir, Atom::Undefined | Atom::Null) {
+                            self.stage = FlowStage::SubOptions(pending);
+                            Ok(PublicInvocationPhase::Host(PublicHostOperation::Get {
+                                receiver: Atom::Ref(root),
+                                key: "options",
+                            }))
+                        } else {
+                            Ok(PublicInvocationPhase::Complete(a.subgraph_finish(pending)))
+                        }
+                    }
+                    _ => Err(error("Flowchart detached method is unavailable").into()),
+                }
+            }
+            FlowStage::WarnOptions(pending) => {
+                let receiver = reply.expect("protocol requires reply");
+                self.stage = FlowStage::WarnGet(pending, receiver.clone());
+                Ok(PublicInvocationPhase::HostWithContext {
+                    operation: PublicHostOperation::Get {
+                        receiver,
+                        key: "warn",
+                    },
+                    expression: PublicHostErrorExpression::ThisOptionsWarn,
+                })
+            }
+            FlowStage::MaxOptions(pending) => {
+                let receiver = reply.expect("protocol requires reply");
+                self.stage = FlowStage::MaxGet(pending);
+                Ok(PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver,
+                    key: "maxEdges",
+                }))
+            }
+            FlowStage::WarnGet(pending, receiver) => {
+                let function = reply.expect("protocol requires reply");
+                if matches!(function, Atom::Undefined | Atom::Null) {
+                    a.vertex_finish(pending)?;
+                    return Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)));
+                }
+                let name = text(a.g, &pending.id)?;
+                let message=a.string(format!("Style applied to unknown node \"{name}\". This may indicate a typo. The node will be created automatically.").as_str())?;
+                self.stage = FlowStage::WarnCall(pending);
+                Ok(PublicInvocationPhase::HostWithContext {
+                    operation: PublicHostOperation::Call {
+                        function,
+                        receiver,
+                        arguments: vec![message],
+                        not_callable_error: "this.options.warn is not a function",
+                        result: PublicHostResult::Discard,
+                    },
+                    expression: PublicHostErrorExpression::OptionalWarnStyle,
+                })
+            }
+            FlowStage::WarnCall(pending) => {
+                a.vertex_finish(pending)?;
+                Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)))
+            }
+            FlowStage::MaxGet(pending) => {
+                let max = reply.expect("protocol requires reply");
+                if matches!(max, Atom::Undefined) {
+                    a.single_link_commit(pending)?;
+                    return self.next_link(a);
+                }
+                let edges = a.field_id(pending.root, "edges")?;
+                let Node::Array { length, .. } = a.g.nodes[edges as usize] else {
+                    return Err(ty("Flowchart edges must be an Array"));
+                };
+                self.stage = FlowStage::MaxCompare(pending, length, max.clone());
+                Ok(PublicInvocationPhase::Host(
+                    PublicHostOperation::GreaterEqual {
+                        left: Atom::Number(length as f64),
+                        right: max,
+                    },
+                ))
+            }
+            FlowStage::MaxCompare(pending, length, max) => {
+                match reply.expect("protocol requires reply") {
+                    Atom::Bool(false) => {
+                        a.single_link_commit(pending)?;
+                        self.next_link(a)
+                    }
+                    Atom::Bool(true) => {
+                        self.stage = FlowStage::MaxError(length);
+                        Ok(PublicInvocationPhase::Host(PublicHostOperation::ToString {
+                            value: max,
+                        }))
+                    }
+                    _ => Err(error("Invalid host comparison result").into()),
+                }
+            }
+            FlowStage::MaxError(length) => {
+                let value = reply.expect("protocol requires reply");
+                let limit = text(a.g, &value)?;
+                let mut error = error(format!(
+                    "Edge limit exceeded. {length} edges found, but the limit is {limit}."
+                ));
+                error.code = ErrorCode::Limit;
+                Err(error.into())
+            }
+            FlowStage::SubOptions(pending) => {
+                self.stage = FlowStage::SubInherit(pending);
+                Ok(PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver: reply.expect("protocol requires reply"),
+                    key: "inheritDir",
+                }))
+            }
+            FlowStage::SubInherit(pending) => {
+                self.stage = FlowStage::SubTruthy(pending);
+                Ok(PublicInvocationPhase::Host(PublicHostOperation::Truthy {
+                    value: reply.expect("protocol requires reply"),
+                }))
+            }
+            FlowStage::SubTruthy(mut pending) => {
+                match reply.expect("protocol requires reply") {
+                    Atom::Bool(false) => pending.dir = Atom::Undefined,
+                    Atom::Bool(true) => {
+                        pending.dir = a.field(pending.root, "direction");
+                        if matches!(pending.dir, Atom::Undefined | Atom::Null) {
+                            let receiver = Atom::Ref(pending.root);
+                            self.stage = FlowStage::SubDirectionOptions(pending);
+                            return Ok(PublicInvocationPhase::Host(PublicHostOperation::Get {
+                                receiver,
+                                key: "options",
+                            }));
+                        }
+                    }
+                    _ => return Err(error("Invalid host truthiness result").into()),
+                }
+                Ok(PublicInvocationPhase::Complete(a.subgraph_finish(pending)))
+            }
+            FlowStage::SubDirectionOptions(pending) => {
+                self.stage = FlowStage::SubDirection(pending);
+                Ok(PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver: reply.expect("protocol requires reply"),
+                    key: "direction",
+                }))
+            }
+            FlowStage::SubDirection(mut pending) => {
+                pending.dir = reply.expect("protocol requires reply");
+                Ok(PublicInvocationPhase::Complete(a.subgraph_finish(pending)))
+            }
+            FlowStage::Finished => Err(error("Flowchart invocation already finished").into()),
+        }
+    }
+}
+fn resume_flow(
+    state: &mut FlowchartPublicState,
+    phase: &mut FlowInvocation,
+    reply: Option<PublicHostValue>,
+) -> PublicInvocationPhase {
+    state.imported.take();
+    let mut arena = Arena::new(&mut state.graph);
+    arena.text_work = phase.text_work;
+    let reply = reply
+        .map(|value| value.into_atom(|text| arena.string(text)))
+        .transpose();
+    let result = reply.and_then(|reply| phase.step(&mut arena, reply));
+    phase.text_work = arena.text_work;
+    match result {
+        Ok(step) => step,
+        Err(error) => PublicInvocationPhase::Complete(Err(error)),
+    }
+}
+pub(crate) fn detached_method<D: 'static>(call: MethodCall) -> Option<DetachedPublicInvocation> {
+    matches!(call.method.0, 1..=3 | 15).then(|| {
+        DetachedPublicInvocation::new::<D, FlowchartPublicState, _>(
+            FlowInvocation {
+                text_work: 0,
+                stage: FlowStage::Start(call),
+                batch: None,
+            },
+            resume_flow,
+        )
+    })
 }

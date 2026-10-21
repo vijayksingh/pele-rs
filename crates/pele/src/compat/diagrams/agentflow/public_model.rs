@@ -9,6 +9,8 @@ use std::{
     cell::RefCell,
     collections::{HashMap, HashSet},
 };
+#[path = "public_model/live_options.rs"]
+mod live_options;
 const MAX_ITEMS: usize = 1_000_000;
 const MAX_WORK: usize = 8_000_000;
 const MAX_TEXT: usize = 16_000_000;
@@ -201,6 +203,7 @@ static SCHEMA: ModelSchema = ModelSchema {
 pub struct AgentflowPublicState {
     graph: ModelGraph,
     base: Option<AgentflowModel>,
+    constructed_cache: super::live_builder::Cache,
     style_bindings: Vec<Option<u32>>,
     projected: Result<AgentflowModel, PeleError>,
 }
@@ -495,6 +498,15 @@ impl<'a> Arena<'a> {
         let Node::Array { length, .. } = self.g.nodes[id as usize] else {
             return Err(ty("AgentFlow collection push is not a function"));
         };
+        if self.g.nodes[id as usize]
+            .properties()
+            .iter()
+            .any(|p| self.g.strings[p.key as usize].is("length") && p.flags & 2 == 0)
+        {
+            return Err(ty(
+                "Cannot assign to read only property 'length' of object '[object Array]'",
+            ));
+        }
         if length as usize >= MAX_ITEMS {
             return Err(limit().into());
         }
@@ -503,6 +515,11 @@ impl<'a> Arena<'a> {
             unreachable!()
         };
         *len = length + 1;
+        for property in self.g.nodes[id as usize].properties_mut() {
+            if self.g.strings[property.key as usize].is("length") {
+                property.value = Atom::Number((length + 1) as f64);
+            }
+        }
         Ok(())
     }
     fn map(&mut self) -> Result<u32, PublicError> {
@@ -747,6 +764,14 @@ fn new_graph(
     m: &AgentflowModel,
     limit: Option<crate::compat::EdgeLimit>,
 ) -> Result<(ModelGraph, Vec<Option<u32>>), PublicError> {
+    new_graph_with_options(m, limit, None)
+}
+fn new_graph_with_options(
+    m: &AgentflowModel,
+    limit: Option<crate::compat::EdgeLimit>,
+    argument: Option<ConstructorArgument>,
+) -> Result<(ModelGraph, Vec<Option<u32>>), PublicError> {
+    let constructing = argument.is_some();
     let mut graph = ModelGraph {
         version: 1,
         root: Atom::Undefined,
@@ -1028,20 +1053,27 @@ fn new_graph(
     } else {
         Atom::Undefined
     };
-    let options = a.object()?;
-    a.assign(
-        options,
-        "inheritDir",
-        Atom::Bool(m.public_origin.inherit_dir),
-    )?;
-    let dir = a.opt(m.public_origin.direction.as_ref())?;
-    a.assign(options, "direction", dir)?;
-    a.assign(options, "lineOffset", Atom::Number(m.line_offset as f64))?;
-    let max_edges = match limit {
-        Some(limit) => a.value(&limit.value())?,
-        None => Atom::Number(m.public_origin.max_edges as f64),
+    let options = match argument {
+        Some(ConstructorArgument::Undefined) => Atom::Ref(a.object()?),
+        Some(argument) => argument.into_atom(|value| a.string(value))?,
+        None => {
+            let options = a.object()?;
+            a.assign(
+                options,
+                "inheritDir",
+                Atom::Bool(m.public_origin.inherit_dir),
+            )?;
+            let dir = a.opt(m.public_origin.direction.as_ref())?;
+            a.assign(options, "direction", dir)?;
+            a.assign(options, "lineOffset", Atom::Number(m.line_offset as f64))?;
+            let max_edges = match limit {
+                Some(limit) => a.value(&limit.value())?,
+                None => Atom::Number(m.public_origin.max_edges as f64),
+            };
+            a.assign(options, "maxEdges", max_edges)?;
+            Atom::Ref(options)
+        }
     };
-    a.assign(options, "maxEdges", max_edges)?;
     let fields = vec![
         ("type", a.string("agentflow")?),
         ("direction", a.opt(m.direction.as_ref())?),
@@ -1071,24 +1103,27 @@ fn new_graph(
         ("bareMappings", Atom::Ref(bare)),
         ("firstMapping", Atom::Ref(first_mapping)),
         ("reported", Atom::Ref(reported)),
-        ("options", Atom::Ref(options)),
+        ("options", options),
     ];
     for (key, value) in fields {
         a.assign(root, key, value)?
     }
-    let bindings = m
-        .graph
-        .as_ref()
-        .ok_or_else(|| error("AgentFlow parsed graph is unavailable"))?
-        .nodes
-        .iter()
-        .map(|n| {
-            node_ids
-                .get(&n.id)
-                .map(|id| reference(get(a.g, *id, "styles")))
-                .transpose()
-        })
-        .collect::<Result<Vec<_>, _>>()?;
+    let bindings = if constructing {
+        vec![]
+    } else {
+        m.graph
+            .as_ref()
+            .ok_or_else(|| error("AgentFlow parsed graph is unavailable"))?
+            .nodes
+            .iter()
+            .map(|n| {
+                node_ids
+                    .get(&n.id)
+                    .map(|id| reference(get(a.g, *id, "styles")))
+                    .transpose()
+            })
+            .collect::<Result<Vec<_>, _>>()?
+    };
     Ok((graph, bindings))
 }
 fn project_render(
@@ -1199,6 +1234,32 @@ impl Arena<'_> {
         info: Atom,
         id: Atom,
     ) -> Result<(), PublicError> {
+        let pending = self.single_link_prepare(root, start, end, info, id)?;
+        let root = pending.root;
+        let edges = self.field_id(root, "edges")?;
+        let Node::Array { length, .. } = self.g.nodes[edges as usize] else {
+            return Err(ty("AgentFlow edges must be an Array"));
+        };
+        let options = self.field_id(root, "options")?;
+        let max = self.field(options, "maxEdges");
+        if !matches!(max, Atom::Undefined) && length as f64 >= number(self.g, &max)? {
+            let mut e = error(format!(
+                "Edge limit exceeded. {length} edges found, but the limit is {}.",
+                js_string(self.g, &max)?
+            ));
+            e.code = ErrorCode::Limit;
+            return Err(e.into());
+        }
+        self.single_link_commit(pending)
+    }
+    fn single_link_prepare(
+        &mut self,
+        root: u32,
+        start: Atom,
+        end: Atom,
+        info: Atom,
+        id: Atom,
+    ) -> Result<live_options::LinkPending, PublicError> {
         let classes = self.array(vec![])?;
         let interpolate = self.field(root, "defaultInterpolate");
         let empty = self.string("")?;
@@ -1280,20 +1341,26 @@ impl Arena<'_> {
         };
         self.assign(edge, "id", id.clone())?;
         self.assign(edge, "isUserDefinedId", Atom::Bool(custom))?;
+        Ok(live_options::LinkPending {
+            root,
+            edge,
+            pair,
+            count,
+            id,
+        })
+    }
+    fn single_link_commit(
+        &mut self,
+        pending: live_options::LinkPending,
+    ) -> Result<(), PublicError> {
+        let live_options::LinkPending {
+            root,
+            edge,
+            pair,
+            count,
+            id,
+        } = pending;
         let edges = self.field_id(root, "edges")?;
-        let Node::Array { length, .. } = self.g.nodes[edges as usize] else {
-            return Err(ty("AgentFlow edges must be an Array"));
-        };
-        let options = self.field_id(root, "options")?;
-        let max = self.field(options, "maxEdges");
-        if !matches!(max, Atom::Undefined) && length as f64 >= number(self.g, &max)? {
-            let mut e = error(format!(
-                "Edge limit exceeded. {length} edges found, but the limit is {}.",
-                js_string(self.g, &max)?
-            ));
-            e.code = ErrorCode::Limit;
-            return Err(e.into());
-        }
         self.push(edges, Atom::Ref(edge))?;
         let counts = self.field_id(root, "pairCount")?;
         self.map_set(counts, pair, Atom::Number(count + 1.))?;
@@ -1772,6 +1839,29 @@ impl Arena<'_> {
         list: Atom,
         title_text: Atom,
     ) -> Result<Atom, PublicError> {
+        let mut pending = self.subgraph_prepare(root, id_text, list, title_text)?;
+        let mut dir = pending.dir;
+        let options = self.field_id(root, "options")?;
+        if matches!(dir, Atom::Undefined | Atom::Null)
+            && truthy(self.g, &self.field(options, "inheritDir"))
+        {
+            let d = self.field(root, "direction");
+            dir = if matches!(d, Atom::Undefined | Atom::Null) {
+                self.field(options, "direction")
+            } else {
+                d
+            };
+        }
+        pending.dir = dir;
+        self.subgraph_finish(pending)
+    }
+    fn subgraph_prepare(
+        &mut self,
+        root: u32,
+        id_text: Atom,
+        list: Atom,
+        title_text: Atom,
+    ) -> Result<live_options::SubgraphPending, PublicError> {
         let mut id = if let Atom::Ref(i) = id_text {
             let text = self.field(i, "text");
             if matches!(text, Atom::Undefined | Atom::Null) {
@@ -1803,18 +1893,28 @@ impl Arena<'_> {
                 }
             }
         }
-        let (nodes, mut dir) = self.list_nodes(&list)?;
-        let options = self.field_id(root, "options")?;
-        if matches!(dir, Atom::Undefined | Atom::Null)
-            && truthy(self.g, &self.field(options, "inheritDir"))
-        {
-            let d = self.field(root, "direction");
-            dir = if matches!(d, Atom::Undefined | Atom::Null) {
-                self.field(options, "direction")
-            } else {
-                d
-            };
-        }
+        let (nodes, dir) = self.list_nodes(&list)?;
+        Ok(live_options::SubgraphPending {
+            root,
+            id,
+            nodes,
+            dir,
+            title,
+            title_text,
+        })
+    }
+    fn subgraph_finish(
+        &mut self,
+        pending: live_options::SubgraphPending,
+    ) -> Result<Atom, PublicError> {
+        let live_options::SubgraphPending {
+            root,
+            id,
+            nodes,
+            dir,
+            title,
+            title_text,
+        } = pending;
         let count = number(self.g, &self.field(root, "subCount"))?;
         let id = match id {
             Some(id) => self.string(id)?,
@@ -2085,6 +2185,33 @@ impl Arena<'_> {
         message: Atom,
         ctx: Atom,
     ) -> Result<(), PublicError> {
+        if self
+            .emit_prepare(root, id, severity, message, ctx)?
+            .is_none()
+        {
+            return Ok(());
+        }
+        let options = self.field_id(root, "options")?;
+        let log = self.field(options, "log");
+        if !matches!(log, Atom::Undefined | Atom::Null) {
+            return Err(
+                if matches!(log, Atom::HostReference(_) | Atom::BuiltinFunction(_)) {
+                    error("AgentFlow diagnostic log callback dispatch is not implemented").into()
+                } else {
+                    ty("AgentFlow diagnostic log callback is not a function")
+                },
+            );
+        }
+        Ok(())
+    }
+    fn emit_prepare(
+        &mut self,
+        root: u32,
+        id: Atom,
+        severity: Atom,
+        message: Atom,
+        ctx: Atom,
+    ) -> Result<Option<live_options::DiagnosticPending>, PublicError> {
         let (ctx_node, ctx_edge) = if let Atom::Ref(i) = ctx {
             (self.field(i, "nodeId"), self.field(i, "edgeId"))
         } else {
@@ -2139,25 +2266,18 @@ impl Arena<'_> {
                     && same(self.g, &self.field(d, "nodeId"), &node)
                     && same(self.g, &self.field(d, "edgeId"), &edge)
                 {
-                    return Ok(());
+                    return Ok(None);
                 }
             }
             self.push(list, Atom::Ref(diagnostic))?;
         }
         let diagnostics = self.field_id(root, "diagnostics")?;
         self.push(diagnostics, Atom::Ref(diagnostic))?;
-        let options = self.field_id(root, "options")?;
-        let log = self.field(options, "log");
-        if !matches!(log, Atom::Undefined | Atom::Null) {
-            return Err(
-                if matches!(log, Atom::HostReference(_) | Atom::BuiltinFunction(_)) {
-                    error("AgentFlow diagnostic log callback dispatch is not implemented").into()
-                } else {
-                    ty("AgentFlow diagnostic log callback is not a function")
-                },
-            );
-        }
-        Ok(())
+        Ok(Some(live_options::DiagnosticPending {
+            id,
+            severity,
+            message,
+        }))
     }
     fn vertex_kind(&self, vertex: u32) -> Result<&'static str, PublicError> {
         let shape = self.field(vertex, "type");
@@ -2932,11 +3052,257 @@ fn create_state(
     Ok(AgentflowPublicState {
         graph,
         base: Some(m.clone()),
+        constructed_cache: super::live_builder::cache(),
         style_bindings,
         projected,
     })
 }
+fn constructor_state(
+    argument: ConstructorArgument,
+    initializing: bool,
+) -> Result<AgentflowPublicState, PeleError> {
+    let model = AgentflowModel::empty();
+    let (mut graph, _) =
+        new_graph_with_options(&model, None, Some(argument)).map_err(|e| match e {
+            PublicError::Pele(e) => e,
+            _ => error("AgentFlow native construction failed"),
+        })?;
+    if initializing {
+        let Atom::Ref(root) = graph.root else {
+            unreachable!("native class root")
+        };
+        Arena::new(&mut graph)
+            .assign(root, "lineOffset", Atom::Undefined)
+            .map_err(|_| error("AgentFlow native initializer failed"))?;
+    }
+    Ok(AgentflowPublicState {
+        graph,
+        base: None,
+        constructed_cache: super::live_builder::cache(),
+        style_bindings: vec![],
+        projected: Err(error("AgentFlow constructed graph has not been projected")),
+    })
+}
+fn construct_default() -> Result<AgentflowPublicState, PeleError> {
+    constructor_state(ConstructorArgument::Undefined, false)
+}
+fn construct_initial(argument: ConstructorArgument) -> Result<AgentflowPublicState, PeleError> {
+    constructor_state(argument, true)
+}
+enum AgentConstruction {
+    Start,
+    Offset,
+    Done,
+}
+fn resume_construction(
+    state: &mut AgentflowPublicState,
+    phase: &mut AgentConstruction,
+    reply: Option<PublicHostValue>,
+) -> PublicInvocationPhase {
+    fn run(
+        state: &mut AgentflowPublicState,
+        phase: &mut AgentConstruction,
+        reply: Option<PublicHostValue>,
+    ) -> Result<PublicInvocationPhase, PublicError> {
+        let Atom::Ref(root) = state.graph.root else {
+            unreachable!("native class root")
+        };
+        let mut arena = Arena::new(&mut state.graph);
+        Ok(match std::mem::replace(phase, AgentConstruction::Done) {
+            AgentConstruction::Start => {
+                let options = arena.field(root, "options");
+                *phase = AgentConstruction::Offset;
+                PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver: options,
+                    key: "lineOffset",
+                })
+            }
+            AgentConstruction::Offset => {
+                let value = reply
+                    .expect("awaited lineOffset")
+                    .into_atom(|value| arena.string(value))?;
+                let value = if matches!(value, Atom::Null | Atom::Undefined) {
+                    Atom::Number(0.0)
+                } else {
+                    value
+                };
+                arena.assign(root, "lineOffset", value)?;
+                PublicInvocationPhase::Complete(Ok(Atom::Undefined))
+            }
+            AgentConstruction::Done => {
+                return Err(error("AgentFlow construction already finished").into())
+            }
+        })
+    }
+    let result = run(state, phase, reply);
+    state.projected = Err(error(
+        "AgentFlow constructed graph requires current projection",
+    ));
+    match result {
+        Ok(step) => step,
+        Err(error) => PublicInvocationPhase::Complete(Err(error)),
+    }
+}
+fn constructor_body(_: ConstructorArgument) -> DetachedPublicInvocation {
+    DetachedPublicInvocation::new::<AgentFlow, AgentflowPublicState, _>(
+        AgentConstruction::Start,
+        resume_construction,
+    )
+}
+
 impl PublicDiagramModule for AgentFlow {
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::agentflow())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        let Some(base) = state.base.as_ref() else {
+            return Some(DetachedPublicRender::agentflow(
+                super::AgentflowDetachedInput::constructed(
+                    state.constructed_cache.clone(),
+                    state.projected.as_ref().err(),
+                ),
+            ));
+        };
+        let graph = base.graph.as_ref()?;
+        Some(DetachedPublicRender::agentflow(
+            super::AgentflowDetachedInput::new(
+                graph,
+                &state.style_bindings,
+                state.projected.as_ref().err(),
+            ),
+        ))
+    }
+
+    fn active_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        operation: PublicActiveOperation,
+        budget: &mut PublicActiveBudget,
+    ) -> Result<PublicActiveValue, PublicError> {
+        fn validate(g: &ModelGraph, v: &Atom) -> Result<(), PublicError> {
+            g.validate_atom(v)?;
+            if let Atom::BuiltinFunction(id) = v {
+                if SCHEMA.method(MethodId(*id)).is_none() {
+                    return Err(error("Unknown public builtin function").into());
+                }
+            }
+            Ok(())
+        }
+        fn charge(b: &mut PublicActiveBudget, n: usize) -> Result<(), PublicError> {
+            if n > b.remaining {
+                return Err(limit().into());
+            }
+            b.remaining -= n;
+            Ok(())
+        }
+        charge(budget, 1)?;
+        let result = (|| {
+            Ok(PublicActiveValue::Atom(match operation {
+                PublicActiveOperation::Validate(v) => {
+                    validate(&state.graph, &v)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Intern(s) => {
+                    charge(budget, s.0.len())?;
+                    Arena::new(&mut state.graph).string(s)?
+                }
+                PublicActiveOperation::String(v) => {
+                    validate(&state.graph, &v)?;
+                    let Atom::String(id) = v else {
+                        return Err(ty("Active model value is not a string"));
+                    };
+                    let s = &state.graph.strings[id as usize];
+                    charge(budget, s.0.len())?;
+                    return Ok(PublicActiveValue::String(s.clone()));
+                }
+                PublicActiveOperation::Object => Atom::Ref(Arena::new(&mut state.graph).object()?),
+                PublicActiveOperation::Record(fields) => {
+                    let units = fields
+                        .iter()
+                        .fold(fields.len(), |n, (k, _)| n.saturating_add(k.0.len()));
+                    charge(budget, units)?;
+                    for (_, value) in &fields {
+                        validate(&state.graph, value)?;
+                    }
+                    let mut arena = Arena::new(&mut state.graph);
+                    if arena.work.saturating_add(fields.len()) > MAX_WORK {
+                        return Err(limit().into());
+                    }
+                    let id = arena.object()?;
+                    for (key, value) in fields {
+                        let key = arena.intern(key)?;
+                        let properties = arena.g.nodes[id as usize].properties_mut();
+                        if let Some(p) = properties.iter_mut().find(|p| p.key == key) {
+                            p.value = value
+                        } else {
+                            properties.push(Property {
+                                key,
+                                value,
+                                flags: 7,
+                            });
+                        }
+                    }
+                    Atom::Ref(id)
+                }
+                PublicActiveOperation::Read { receiver, key } => {
+                    validate(&state.graph, &receiver)?;
+                    charge(budget, key.len())?;
+                    let id = reference(&receiver)?;
+                    get(&state.graph, id, &key).clone()
+                }
+                PublicActiveOperation::Set {
+                    receiver,
+                    key,
+                    value,
+                } => {
+                    validate(&state.graph, &receiver)?;
+                    validate(&state.graph, &value)?;
+                    charge(budget, key.len())?;
+                    let id = reference(&receiver)?;
+                    if matches!(state.graph.nodes[id as usize], Node::Array { .. }) {
+                        return Err(error(
+                            "Active Agentflow array structural edits are unavailable",
+                        )
+                        .into());
+                    }
+                    Arena::new(&mut state.graph).assign(id, &key, value)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Builtin(call) if matches!(call.method.0, 21 | 22) => {
+                    validate(&state.graph, &call.receiver)?;
+                    for v in &call.arguments {
+                        validate(&state.graph, v)?;
+                    }
+                    charge(budget, state.graph.nodes.len())?;
+                    invoke(&mut state.graph, call)?
+                }
+                _ => return Err(error("Owned Agentflow active operation is unavailable").into()),
+            }))
+        })();
+        if let Some(base) = &state.base {
+            state.projected = project_render(&state.graph, base, &state.style_bindings);
+        }
+        result
+    }
+
+    fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        live_options::program(call)
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            PublicConstructorFactory::first_value_body::<Self>(
+                PROTOTYPE,
+                construct_default,
+                construct_initial,
+                constructor_body,
+                live_options::FIELDS,
+            )
+        })
+    }
+
     type PublicState = AgentflowPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
@@ -2946,6 +3312,7 @@ impl PublicDiagramModule for AgentFlow {
         Ok(AgentflowPublicState {
             graph,
             base: None,
+            constructed_cache: super::live_builder::cache(),
             style_bindings: vec![],
             projected: Err(error("AgentFlow graph has not been built")),
         })
@@ -2966,6 +3333,12 @@ impl PublicDiagramModule for AgentFlow {
         limit: crate::compat::EdgeLimit,
     ) -> Result<Self::PublicState, PeleError> {
         crate::compat::public::create_prepared_edge_public(self, model, limit)
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
@@ -3014,7 +3387,7 @@ impl PublicDiagramModule for AgentFlow {
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         if s.base.is_none() {
-            let (base, bindings) = fresh_render_model(&s.graph, c)?;
+            let (base, bindings) = fresh_render_model(&mut s.graph, c)?;
             s.projected = project_render(&s.graph, &base, &bindings);
             s.style_bindings = bindings;
             s.base = Some(base);
@@ -3024,15 +3397,29 @@ impl PublicDiagramModule for AgentFlow {
     }
 }
 
+// A native DB instance inherits these methods; a caller-authored plain model
+// does not. An own replacement shadows the inherited native method.
+fn native_db_method(g: &ModelGraph, root: u32, name: &str, method: u32) -> bool {
+    let node = &g.nodes[root as usize];
+    if let Some(property) = node
+        .properties()
+        .iter()
+        .find(|p| g.strings[p.key as usize].is(name))
+    {
+        return matches!(property.value, Atom::BuiltinFunction(id) if id == method);
+    }
+    matches!(node, Node::Instance { prototype, .. } if *prototype == PROTOTYPE)
+}
+
 // The declared AgentflowModel is data plus semanticModel(); it does not promise
 // DB-only helpers. Missing helper calls must fail at graph construction, rather
 // than silently inheriting a database prototype or a parser-created graph cache.
 fn fresh_render_model(
-    g: &ModelGraph,
+    g: &mut ModelGraph,
     config: &Object,
 ) -> Result<(AgentflowModel, Vec<Option<u32>>), PublicError> {
     use super::model::{AgentClassDef, AgentDb, AgentEdge, AgentNode, AgentSubgraph};
-    use crate::compat::diagrams::flowchart::{Flowchart, LabelType as FlowLabel};
+    use crate::compat::diagrams::flowchart::LabelType as FlowLabel;
     fn label(v: FlowLabel) -> super::model::LabelType {
         match v {
             FlowLabel::Text => super::model::LabelType::Text,
@@ -3040,8 +3427,9 @@ fn fresh_render_model(
             FlowLabel::Markdown => super::model::LabelType::Markdown,
         }
     }
-    let common = Flowchart.create_public_from_graph(g.clone())?;
-    let common = common.render_model()?.clone();
+    // The enclosing AgentFlow document already admitted this graph against its
+    // own schema. Reuse field projection, not a foreign registration's schema.
+    let common = crate::compat::diagrams::flowchart::import_public_graph(g)?;
     let root = reference(&g.root)?;
     let raw_nodes = entries(g, get(g, root, "nodes"))?;
     let mut styles = std::collections::HashMap::new();
@@ -3108,7 +3496,8 @@ fn fresh_render_model(
     // The first collapsed walk calls the actual model's subgraph method.
     if subgraphs.iter().any(|s| {
         s.metadata.as_ref().and_then(|m| m.get("view")) == Some(&Value::String("collapsed".into()))
-    }) {
+    }) && !native_db_method(g, root, "subgraph", 21)
+    {
         return Err(ty("n.subgraph is not a function"));
     }
     let edges = common
@@ -3168,14 +3557,39 @@ fn fresh_render_model(
     };
     let mut db = AgentDb::from_render_model(model);
     let graph = super::graph::build(&mut db, config);
-    if let Some(diagnostic) = db.model.diagnostics.first() {
-        return Err(ty(if diagnostic.severity == "error" {
-            "t.emitError is not a function"
-        } else if diagnostic.id == super::model::DiagnosticId::ContainmentViolation {
-            "n.emitWarning is not a function"
-        } else {
-            "t.emitWarning is not a function"
-        }));
+    // The graph builder selects diagnostics in native normalization order. A
+    // fresh database inherits the emit helpers; a plain authored model does not.
+    // Reuse the public helper body so reported deduplication, mapping aliases,
+    // descriptor failures and diagnostic-before-log effects stay identical.
+    if !db.model.diagnostics.is_empty() {
+        let mut arena = Arena::new(g);
+        for diagnostic in &db.model.diagnostics {
+            let (name, method, missing) = if diagnostic.severity == "error" {
+                ("emitError", 34, "t.emitError is not a function")
+            } else if diagnostic.id == DiagnosticId::ContainmentViolation {
+                ("emitWarning", 33, "n.emitWarning is not a function")
+            } else {
+                ("emitWarning", 33, "t.emitWarning is not a function")
+            };
+            if !native_db_method(arena.g, root, name, method) {
+                return Err(ty(missing));
+            }
+            if !native_db_method(arena.g, root, "emit", 32) {
+                return Err(ty("this.emit is not a function"));
+            }
+            let id = arena.string(diagnostic_id(diagnostic.id))?;
+            let severity = arena.string(diagnostic.severity.as_str())?;
+            let message = arena.string(diagnostic.message.as_str())?;
+            let mut fields = Vec::new();
+            if let Some(node) = &diagnostic.node_id {
+                fields.push(("nodeId", arena.string(node.as_str())?));
+            }
+            if let Some(edge) = &diagnostic.edge_id {
+                fields.push(("edgeId", arena.string(edge.as_str())?));
+            }
+            let ctx = Atom::Ref(arena.record(fields)?);
+            arena.emit(root, id, severity, message, ctx)?;
+        }
     }
     let connectors: std::collections::HashSet<_> = db
         .model
@@ -3188,7 +3602,8 @@ fn fresh_render_model(
             && n.shape != "collapsedGroup"
             && !connectors.contains(n.id.as_str())
             && db.model.nodes.iter().any(|(id, _)| id == &n.id)
-    }) {
+    }) && !native_db_method(g, root, "vertexKind", 22)
+    {
         return Err(ty("n.vertexKind is not a function"));
     }
     let bindings = graph

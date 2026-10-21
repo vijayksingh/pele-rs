@@ -1,0 +1,98 @@
+[
+  {
+    "phase": "ffi-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/shared-graph-traversal-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/shared-graph-traversal-ffi-compile.log",
+    "startedAt": "2026-10-20T11:56:48.825542+00:00",
+    "endedAt": "2026-10-20T11:56:49.344961+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-run",
+    "command": [
+      "dist/evidence/shared-graph-traversal-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/shared-graph-traversal-ffi-run.log",
+    "startedAt": "2026-10-20T11:56:49.345395+00:00",
+    "endedAt": "2026-10-20T11:56:50.026618+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/shared-graph-traversal-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/shared-graph-traversal-ffi-public-compile.log",
+    "startedAt": "2026-10-20T11:56:50.027054+00:00",
+    "endedAt": "2026-10-20T11:56:50.170312+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-run",
+    "command": [
+      "dist/evidence/shared-graph-traversal-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/shared-graph-traversal-ffi-public-run.log",
+    "startedAt": "2026-10-20T11:56:50.170862+00:00",
+    "endedAt": "2026-10-20T11:56:50.745219+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/shared-graph-traversal-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/shared-graph-traversal-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T11:56:50.745724+00:00",
+    "endedAt": "2026-10-20T11:56:50.880085+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-run",
+    "command": [
+      "dist/evidence/shared-graph-traversal-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/shared-graph-traversal-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T11:56:50.880618+00:00",
+    "endedAt": "2026-10-20T11:56:51.463052+00:00",
+    "exitCode": 0
+  }
+]

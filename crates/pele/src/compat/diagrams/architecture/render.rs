@@ -278,12 +278,94 @@ fn path_data(p: &[f64], start_trim: f64, end_trim: f64) -> String {
     }
     d + &format!("L{},{}", num(xs[n - 1]), num(ys[n - 1]))
 }
+pub(super) struct Geometry {
+    grid: super::layout::Grid,
+    index: HashMap<String, usize>,
+    nodes: usize,
+    groups: usize,
+}
+pub(super) fn geometry(m: &ArchitectureModel) -> Geometry {
+    Geometry {
+        grid: place(&m.nodes, &m.groups, &m.edges, &m.layout_hints),
+        index: m
+            .nodes
+            .iter()
+            .enumerate()
+            .map(|(i, (id, _))| (id.clone(), i))
+            .collect(),
+        nodes: m.nodes.len(),
+        groups: m.groups.len(),
+    }
+}
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    fn begin(&mut self) -> Result<Geometry, Self::Error>;
+    fn node_label(&mut self, i: usize) -> Result<Option<String>, Self::Error>;
+    fn edge_count(&mut self) -> Result<usize, Self::Error>;
+    fn edge(&mut self, i: usize, label: bool) -> Result<ArchEdge, Self::Error>;
+    fn node_type(&mut self, i: usize) -> Result<String, Self::Error>;
+    fn group_title(&mut self, i: usize) -> Result<Option<String>, Self::Error>;
+    fn group_icon(&mut self, i: usize) -> Result<Option<String>, Self::Error>;
+    fn group_id(&mut self, i: usize) -> Result<String, Self::Error>;
+    fn node_paint(&mut self, i: usize) -> Result<ArchNode, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn accessibility(&mut self) -> Result<(Option<String>, Option<String>), Self::Error>;
+}
+struct Typed<'a>(&'a ArchitectureModel);
+impl PhaseInput for Typed<'_> {
+    type Error = PeleError;
+    fn begin(&mut self) -> Result<Geometry, PeleError> {
+        Ok(geometry(self.0))
+    }
+    fn node_label(&mut self, i: usize) -> Result<Option<String>, PeleError> {
+        Ok(if self.0.nodes[i].1.node_type == "service" {
+            self.0.nodes[i].1.title.clone()
+        } else {
+            None
+        })
+    }
+    fn edge_count(&mut self) -> Result<usize, PeleError> {
+        Ok(self.0.edges.len())
+    }
+    fn edge(&mut self, i: usize, _label: bool) -> Result<ArchEdge, PeleError> {
+        Ok(self.0.edges[i].clone())
+    }
+    fn node_type(&mut self, i: usize) -> Result<String, PeleError> {
+        Ok(self.0.nodes[i].1.node_type.clone())
+    }
+    fn group_title(&mut self, i: usize) -> Result<Option<String>, PeleError> {
+        Ok(self.0.groups[i].1.title.clone())
+    }
+    fn group_icon(&mut self, i: usize) -> Result<Option<String>, PeleError> {
+        Ok(self.0.groups[i].1.icon.clone())
+    }
+    fn group_id(&mut self, i: usize) -> Result<String, PeleError> {
+        Ok(self.0.groups[i].1.id.clone())
+    }
+    fn node_paint(&mut self, i: usize) -> Result<ArchNode, PeleError> {
+        Ok(self.0.nodes[i].1.clone())
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn accessibility(&mut self) -> Result<(Option<String>, Option<String>), PeleError> {
+        Ok((self.0.acc_title.clone(), self.0.acc_descr.clone()))
+    }
+}
 pub fn render(
     m: &ArchitectureModel,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phase(&mut Typed(m), c, o, r)
+}
+pub(super) fn render_phase<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let loose = draw(m, c, o, r, false)?;
     if o.max_width.is_none_or(|w| !(w > 0.) || loose.width <= w) {
         return Ok(loose);
@@ -300,13 +382,13 @@ fn title_room(o: &RenderSettings) -> f64 {
         .filter(|w| *w > 0.)
         .map_or(4000., |w| (w - 2. * o.padding.unwrap_or(8.)).js_max(80.))
 }
-fn draw(
-    m: &ArchitectureModel,
+fn draw<P: PhaseInput>(
+    m: &mut P,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
     let icon_size = setting(c, "iconSize", 48., 8., 512.);
     let size = setting(c, "fontSize", o.font_size.unwrap_or(16.), 4., 128.);
     let group_pad =
@@ -314,15 +396,12 @@ fn draw(
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
     let half = icon_size / 2.;
-    let nodes = &m.nodes;
-    let groups = &m.groups;
-    let (n, g) = (nodes.len(), groups.len());
-    let grid = place(nodes, groups, &m.edges, &m.layout_hints);
-    let index: HashMap<&str, usize> = nodes
-        .iter()
-        .enumerate()
-        .map(|(i, (id, _))| (id.as_str(), i))
-        .collect();
+    let Geometry {
+        grid,
+        index,
+        nodes: n,
+        groups: g,
+    } = m.begin()?;
     let mut labels = vec![];
     let mut box_w = vec![0f64; n];
     let mut box_h = vec![0f64; n];
@@ -332,20 +411,8 @@ fn draw(
         (icon_size * 2.25).js_max(96.)
     };
     for i in 0..n {
-        let node = &nodes[i].1;
-        let label = layout_label(
-            if node.node_type == "service" {
-                node.title.as_deref()
-            } else {
-                None
-            },
-            true,
-            r,
-            o,
-            size,
-            wrap,
-            0,
-        )?;
+        let title = m.node_label(i)?;
+        let label = layout_label(title.as_deref(), true, r, o, size, wrap, 0)?;
         box_w[i] = icon_size.js_max(2. * (label.width / 2.).ceil());
         box_h[i] = icon_size
             + if label.height > 0. {
@@ -391,7 +458,9 @@ fn draw(
     }
     let mut edge_labels = vec![];
     let mut ends = vec![];
-    for edge in &m.edges {
+    let edge_count = m.edge_count()?;
+    for edge_index in 0..edge_count {
+        let edge = m.edge(edge_index, true)?;
         let a = index.get(edge.lhs_id.as_str()).copied();
         let b = index.get(edge.rhs_id.as_str()).copied();
         ends.push((a, b));
@@ -440,8 +509,9 @@ fn draw(
             .get(&(grid.group_row[k] + grid.group_rows[k] - 1))
             .copied()
             .unwrap_or(0);
+        let title = m.group_title(k)?;
         let label = layout_label(
-            groups[k].1.title.as_deref(),
+            title.as_deref(),
             true,
             r,
             o,
@@ -453,7 +523,7 @@ fn draw(
             },
             0,
         )?;
-        let icon = if groups[k].1.icon.as_deref().is_some_and(|s| !s.is_empty()) {
+        let icon = if m.group_icon(k)?.as_deref().is_some_and(|s| !s.is_empty()) {
             badge
         } else {
             0.
@@ -533,7 +603,7 @@ fn draw(
     let top = |k: usize| ys[r0[k]] - it[k];
     let bottom = |k: usize| ys[r1[k]] + rh[r1[k]] + ib[k];
     let center = |i: usize| xs[nc[i]] + cw[nc[i]] / 2.;
-    let port = |i: usize, side: usize, via: bool| {
+    let port = |i: usize, side: usize, via: bool, junction: bool| {
         let (dx, dy) = (DX[side] as f64, DY[side] as f64);
         let cx = center(i);
         let y = ys[nr[i]];
@@ -549,7 +619,7 @@ fn draw(
             gap: 0.,
             wire: false,
         };
-        if nodes[i].1.node_type == "junction" {
+        if junction {
             p.x0 = cx;
             p.x1 = cx;
             p.y0 = p.y;
@@ -572,7 +642,7 @@ fn draw(
             p.y0 = top(k);
             p.y1 = bottom(k);
             p.gap = 0.;
-            p.wire = nodes[i].1.node_type == "junction";
+            p.wire = junction;
             if dx != 0. {
                 p.x = if dx < 0. { p.x0 } else { p.x1 }
             } else {
@@ -584,12 +654,23 @@ fn draw(
     let (mut edges_out, mut labels_out) = (String::new(), String::new());
     let mut runs = vec![];
     let trim = marker_trim("arrow_point");
-    for (k, edge) in m.edges.iter().enumerate() {
+    for k in 0..edge_count {
+        let edge = m.edge(k, false)?;
         let (Some(a), Some(b)) = ends[k] else {
             continue;
         };
-        let mut s = port(a, side_index(edge.lhs_dir), edge.lhs_group);
-        let mut e = port(b, side_index(edge.rhs_dir), edge.rhs_group);
+        let mut s = port(
+            a,
+            side_index(edge.lhs_dir),
+            edge.lhs_group,
+            m.node_type(a)? == "junction",
+        );
+        let mut e = port(
+            b,
+            side_index(edge.rhs_dir),
+            edge.rhs_group,
+            m.node_type(b)? == "junction",
+        );
         if s.x == e.x && s.y == e.y && s.dx == e.dx {
             s.x -= 8. * s.dy.abs();
             s.y -= 8. * s.dx.abs();
@@ -718,7 +799,6 @@ fn draw(
     }
     let mut clusters = String::new();
     for k in 0..g {
-        let group = &groups[k].1;
         let (x, y) = (left(k), top(k));
         let w = right(k) - x;
         let label = &gl[k];
@@ -744,7 +824,8 @@ fn draw(
             }
             let cy = y + 6. + hh[k] / 2.;
             let mut tx = start;
-            if let Some(icon) = group.icon.as_deref().filter(|s| !s.is_empty()) {
+            let icon = m.group_icon(k)?;
+            if let Some(icon) = icon.as_deref().filter(|s| !s.is_empty()) {
                 head += &icon_slot(icon, start, cy - badge / 2., badge, r)?;
                 tx += badge + 6.
             }
@@ -756,13 +837,13 @@ fn draw(
                 r,
             )?
         }
-        clusters+=&format!("<g class=\"pele-cluster\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"/>{head}</g>",esc_text(&group.id)?,num(x),num(y),num(w),num(bottom(k)-y))
+        clusters+=&format!("<g class=\"pele-cluster\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"/>{head}</g>",esc_text(&m.group_id(k)?)?,num(x),num(y),num(w),num(bottom(k)-y))
     }
     let mut nodes_out = String::new();
     let glyph = icon_size * 0.5;
     let text_size = 6f64.js_max(round(size * 0.75));
     for i in 0..n {
-        let node = &nodes[i].1;
+        let node = m.node_paint(i)?;
         let at = format!(
             "data-id=\"{}\" transform=\"translate({},{})\"",
             esc_text(&node.id)?,
@@ -796,8 +877,9 @@ fn draw(
         }
         nodes_out+=&format!("<g class=\"pele-node pele-service\" {at}><rect x=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{inner}{}</g>",num(-half),num(icon_size),num(icon_size),label_svg_with_resources(&labels[i],0.,icon_size+4.+labels[i].height/2.," class=\"pele-label\"",r)?)
     }
+    let title_text = m.title()?;
     let title = layout_label(
-        m.title.as_deref(),
+        title_text.as_deref(),
         false,
         r,
         o,
@@ -830,6 +912,7 @@ fn draw(
             num(oy)
         )
     };
+    let (acc_title, acc_descr) = m.accessibility()?;
     Ok(Rendered {
         svg: document(
             "architecture",
@@ -837,8 +920,8 @@ fn draw(
             height,
             size,
             o,
-            m.acc_title.as_deref(),
-            m.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width,

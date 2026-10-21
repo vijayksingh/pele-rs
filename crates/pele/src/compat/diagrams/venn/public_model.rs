@@ -392,7 +392,7 @@ fn numeric(g: &ModelGraph, a: &Atom) -> Result<f64, PublicError> {
         _ => Err(invalid("Venn object-to-number coercion is not implemented").into()),
     }
 }
-fn js_number(raw: &str) -> f64 {
+pub(super) fn js_number(raw: &str) -> f64 {
     let raw = raw.trim_matches(space);
     if raw.is_empty() {
         return 0.;
@@ -1093,10 +1093,26 @@ fn strings_out(out: &mut GraphWriter, values: &[String]) -> u32 {
         .collect();
     array_out(out, values)
 }
+fn construct_default() -> Result<VennPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    Venn.create_public(&VennModel::new(None))
+}
+
 impl PublicDiagramModule for Venn {
     type PublicState = VennPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -1207,6 +1223,12 @@ impl PublicDiagramModule for Venn {
         let model = imported(&graph);
         Ok(VennPublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &VennPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }
@@ -1225,6 +1247,19 @@ impl PublicDiagramModule for Venn {
         let result = invoke(&mut s.graph, c);
         s.model = imported(&s.graph);
         result
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::venn())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::venn(
+            super::VennDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
     }
     fn render_public(
         &self,

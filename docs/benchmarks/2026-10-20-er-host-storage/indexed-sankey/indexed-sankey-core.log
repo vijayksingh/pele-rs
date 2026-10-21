@@ -1,0 +1,48 @@
+   Compiling pele-rs v0.3.0 (/Users/vijaysingh/unlocalhosted/pele-rs/crates/pele)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 51.88s
+     Running tests/public_sankey.rs (target/debug/deps/public_sankey-12de39ed50d0e78d)
+
+running 12 tests
+test sankey_native_lookup_returns_raw_values_same_value_zero_keys_and_utf16_storage ... ok
+test sankey_projection_validates_both_arrays_before_labels_and_repairs_latent_errors ... ok
+test mutable_sankey_render_errors_preserve_edits_and_recover_without_parsing ... ok
+test sankey_native_methods_keep_real_prototype_aliases_live_cache_and_borrowed_receivers ... ok
+test sankey_native_partial_failure_keeps_lookup_node_and_never_repairs_arrays_implicitly ... ok
+test mutable_sankey_aliases_order_lookup_and_object_replacement ... ok
+test sankey_raw_helpers_keep_duplicate_descriptor_checks_partial_state_and_repair ... ok
+test sankey_raw_helpers_preserve_first_equivalent_map_slot_and_original_number_bits ... ok
+test sankey_real_methods_and_authored_edits_match_pinned_complete_svg_vectors ... ok
+test sankey_projection_keeps_unicode_across_capture_chunks_and_raw_adoption ... ok
+test sankey_mutable_repeated_long_labels_reject_native_expansion_and_recover ... ok
+test mutable_sankey_retains_unknown_deep_cycles_utf16_and_ieee_fields ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running tests/public_sankey_owned_parse.rs (target/debug/deps/public_sankey_owned_parse-1abfa84df89d61f2)
+
+running 7 tests
+test public_owned_default_hook_preserves_legacy_policy_dispatch_and_errors ... ok
+test sankey_owned_parse_keeps_source_limits_and_prepared_publication ... ok
+test sankey_indexed_source_keeps_first_helper_latent_errors_and_raw_recovery ... FAILED
+test sankey_custom_delegation_cannot_forge_canonical_parser_provenance ... ok
+test sankey_indexed_source_preserves_resource_order_and_public_typed_projection ... ok
+test sankey_owned_retained_methods_edits_and_replacement_match_legacy ... ok
+test sankey_owned_and_legacy_match_complete_frozen_source_corpus ... ok
+
+failures:
+
+---- sankey_indexed_source_keeps_first_helper_latent_errors_and_raw_recovery stdout ----
+
+thread 'sankey_indexed_source_keeps_first_helper_latent_errors_and_raw_recovery' (19391792) panicked at crates/pele/tests/public_sankey_owned_parse.rs:534:5:
+assertion `left == right` failed
+  left: "Expected a public string"
+ right: "Sankey node ID must be a string"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    sankey_indexed_source_keeps_first_helper_latent_errors_and_raw_recovery
+
+test result: FAILED. 6 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.64s
+
+error: test failed, to rerun pass `-p pele-rs --test public_sankey_owned_parse`

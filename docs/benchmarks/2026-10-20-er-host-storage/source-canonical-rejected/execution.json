@@ -1,0 +1,26 @@
+{
+  "runtimeSource": "d35ca5bbc6398c75b7b92a9f8ffa429ee41369ef",
+  "candidateWasm": "707da8ce4764afdcc1210f27c8d637a16e70f7077ec0bc995671f2a59b5d3d1f",
+  "testOnlyHead": "6d302d5",
+  "controlSource": "e1486055d596d4e0ac25e4c78f1d5d95a73f781a",
+  "transferSession": 12213,
+  "transferExit": 0,
+  "warmSession": 41867,
+  "warmExit": 0,
+  "fetchSession": 89211,
+  "fetchExit": 0,
+  "reportSHA256": "34c1edddfe2de79a2635a1fae97813695a7f2b8575a98e4432467c81943ccf4b",
+  "activationSHA256": "bfc82f95995a77f617c07fc620886a5fae95d6bfbba592e9c0f8cb5c823b437d",
+  "allRows": 24,
+  "samplesPerLane": 21,
+  "preservedInitialPreflightFailure": {
+    "session": 95127,
+    "exit": 1,
+    "browserLaunched": false,
+    "log": "warm-preflight-failed.log",
+    "reason": "AppleDouble sidecar files rejected before launch"
+  },
+  "runtimeSourceEdits": false,
+  "firstUseExecuted": false,
+  "conclusion": "Rejected warm performance: every affected parse/retained row slower. Source and Flowchart adverse controls retained; no cross-window inference."
+}

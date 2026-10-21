@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const pin='d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d';
+if(sha(fs.readFileSync('node_modules/pele/dist/pele.js'))!==pin)throw Error('Oracle changed');
+const core=await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/core.js'))),entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/radar.js')))).default;core.register(entry);
+const support=process.argv[2]??'tests/web/support/radar-runtime-shapes.js';
+const {cases,runRadar,SOURCE}=await import(pathToFileURL(path.resolve(support)));
+const rows=[];for(const {raw,mode} of cases())rows.push(runRadar(core,entry,()=>{},raw,mode));
+const report={oracleSHA256:pin,source:SOURCE,driverSHA256:sha(fs.readFileSync(support)),rows};
+fs.writeFileSync(process.argv[3]??'fixtures/public-radar-runtime-shapes.json',JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({rows:rows.length,errors:rows.filter(r=>!r.first.ok).length,originalThrows:rows.filter(r=>r.first.original).length,recovered:rows.length}));

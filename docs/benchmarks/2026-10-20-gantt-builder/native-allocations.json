@@ -1,0 +1,970 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-19T23:55:17.690Z",
+  "mode": "native-allocations-only",
+  "artifacts": {
+    "control": {
+      "binarySHA256": "f43315d1d20bcb1187a6541354fe343753f3185ec013d82b4e2f2bd080e41d89",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "5d0b924df12d053469a5c101016e6535af1303a1d4beeade97a0e96dd08efc92",
+        "revision": "a9b23509d239495ce4dfdfceef5ad45065ec42f8",
+        "builtAt": "2026-10-19T23:23:50.055Z",
+        "binaries": {
+          "pele-perf": "f43315d1d20bcb1187a6541354fe343753f3185ec013d82b4e2f2bd080e41d89",
+          "pele-perf-alloc": "60f03a6839632079416e186c893f8a3f8575a5fe78ffd3e711f2d064822b743a"
+        }
+      },
+      "allocationBinary": "/Users/vijaysingh/unlocalhosted/pele-rs/dist/perf-patches/gantt-native/control/pele-perf-alloc",
+      "allocationSHA256": "60f03a6839632079416e186c893f8a3f8575a5fe78ffd3e711f2d064822b743a"
+    },
+    "candidate": {
+      "binarySHA256": "2fc4c1c24617fb1184aada27d4a3eee66199f8bd9786bf8c1ddd7f2943fa38a7",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "837524e572fcfbb26f9b5ce172f56032bd162263c0a50c11b4df9d27bb9a9af5",
+        "revision": "6099c58667d71a9396aa999288a31f10f483e30c",
+        "builtAt": "2026-10-19T23:55:03.513Z",
+        "binaries": {
+          "pele-perf": "2fc4c1c24617fb1184aada27d4a3eee66199f8bd9786bf8c1ddd7f2943fa38a7",
+          "pele-perf-alloc": "a1563a4251cefe5ccda44c9c840a0710f876f3647db0d2cdf1ec103606316732"
+        }
+      },
+      "allocationBinary": "/Users/vijaysingh/unlocalhosted/pele-rs/scripts/perf/native/target/release/pele-perf-alloc",
+      "allocationSHA256": "a1563a4251cefe5ccda44c9c840a0710f876f3647db0d2cdf1ec103606316732"
+    }
+  },
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "55409520e85bf463787721eaf1c74a17d9729d775c337c071ba11b2e79fdd592",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "settings": {
+    "nativeTypedDocumentRetainedAcrossBatches": true,
+    "nativePublicStateFreshPerBatch": true,
+    "jsRetainedModelFreshPerBatch": true,
+    "stages": [
+      "parse",
+      "parse-public",
+      "render-source",
+      "render-retained"
+    ],
+    "selectedCases": [
+      "flowchart/medium",
+      "sequence/medium",
+      "er/medium",
+      "pie/medium",
+      "sankey/medium",
+      "gantt/medium",
+      "railroad/medium"
+    ],
+    "separateAllocationBinaries": true,
+    "operationsPerCondition": 1,
+    "timingRequested": false
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "loadBefore": [
+      10.07470703125,
+      8.08154296875,
+      7.01513671875
+    ],
+    "processesBefore": [
+      {
+        "pid": 388,
+        "cpuPercent": 15.4,
+        "name": "dasd"
+      },
+      {
+        "pid": 410,
+        "cpuPercent": 42,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 14392,
+        "cpuPercent": 11.9,
+        "name": "Google Chrome Helper (Renderer)"
+      },
+      {
+        "pid": 14991,
+        "cpuPercent": 92.2,
+        "name": "rustc"
+      },
+      {
+        "pid": 15425,
+        "cpuPercent": 18,
+        "name": "node"
+      },
+      {
+        "pid": 23301,
+        "cpuPercent": 24.3,
+        "name": "Claude"
+      },
+      {
+        "pid": 23310,
+        "cpuPercent": 11.9,
+        "name": "Claude Helper"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 11.7,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 44311,
+        "cpuPercent": 31.3,
+        "name": "Codex (Renderer)"
+      },
+      {
+        "pid": 44434,
+        "cpuPercent": 23,
+        "name": "SkyComputerUseService"
+      }
+    ],
+    "loadAfter": [
+      10.07470703125,
+      8.08154296875,
+      7.01513671875
+    ],
+    "processesAfter": [
+      {
+        "pid": 410,
+        "cpuPercent": 48,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 11549,
+        "cpuPercent": 21.3,
+        "name": "codex"
+      },
+      {
+        "pid": 14991,
+        "cpuPercent": 91.3,
+        "name": "rustc"
+      },
+      {
+        "pid": 15425,
+        "cpuPercent": 17.4,
+        "name": "node"
+      },
+      {
+        "pid": 15443,
+        "cpuPercent": 12.4,
+        "name": "pele-perf-alloc"
+      },
+      {
+        "pid": 15445,
+        "cpuPercent": 13.3,
+        "name": "pele-perf-alloc"
+      },
+      {
+        "pid": 23310,
+        "cpuPercent": 15.3,
+        "name": "Claude Helper"
+      },
+      {
+        "pid": 87498,
+        "cpuPercent": 33.8,
+        "name": "XprotectService"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "flowchart/medium",
+      "family": "flowchart",
+      "scale": "medium",
+      "units": 48,
+      "source": "flowchart TB\nn0[Node 0]\nn1[Node 1]\nn2[Node 2]\nn3[Node 3]\nn4[Node 4]\nn5[Node 5]\nn6[Node 6]\nn7[Node 7]\nn8[Node 8]\nn9[Node 9]\nn10[Node 10]\nn11[Node 11]\nn12[Node 12]\nn13[Node 13]\nn14[Node 14]\nn15[Node 15]\nn16[Node 16]\nn17[Node 17]\nn18[Node 18]\nn19[Node 19]\nn20[Node 20]\nn21[Node 21]\nn22[Node 22]\nn23[Node 23]\nn24[Node 24]\nn25[Node 25]\nn26[Node 26]\nn27[Node 27]\nn28[Node 28]\nn29[Node 29]\nn30[Node 30]\nn31[Node 31]\nn32[Node 32]\nn33[Node 33]\nn34[Node 34]\nn35[Node 35]\nn36[Node 36]\nn37[Node 37]\nn38[Node 38]\nn39[Node 39]\nn40[Node 40]\nn41[Node 41]\nn42[Node 42]\nn43[Node 43]\nn44[Node 44]\nn45[Node 45]\nn46[Node 46]\nn47[Node 47]\nn0 --> n1\nn1 --> n2\nn2 --> n3\nn3 --> n4\nn4 --> n5\nn5 --> n6\nn6 --> n7\nn7 --> n8\nn8 --> n9\nn9 --> n10\nn10 --> n11\nn11 --> n12\nn12 --> n13\nn13 --> n14\nn14 --> n15\nn15 --> n16\nn16 --> n17\nn17 --> n18\nn18 --> n19\nn19 --> n20\nn20 --> n21\nn21 --> n22\nn22 --> n23\nn23 --> n24\nn24 --> n25\nn25 --> n26\nn26 --> n27\nn27 --> n28\nn28 --> n29\nn29 --> n30\nn30 --> n31\nn31 --> n32\nn32 --> n33\nn33 --> n34\nn34 --> n35\nn35 --> n36\nn36 --> n37\nn37 --> n38\nn38 --> n39\nn39 --> n40\nn40 --> n41\nn41 --> n42\nn42 --> n43\nn43 --> n44\nn44 --> n45\nn45 --> n46\nn46 --> n47",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405e000000000000",
+        "heightBits": "40b1e00000000000",
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "svgBytes": 21889
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "sequence/medium",
+      "family": "sequence",
+      "scale": "medium",
+      "units": 48,
+      "source": "sequenceDiagram\nparticipant App\nparticipant Core\nApp->>Core: Message 0\nCore-->>App: Message 1\nApp->>Core: Message 2\nCore-->>App: Message 3\nApp->>Core: Message 4\nCore-->>App: Message 5\nApp->>Core: Message 6\nCore-->>App: Message 7\nApp->>Core: Message 8\nCore-->>App: Message 9\nApp->>Core: Message 10\nCore-->>App: Message 11\nApp->>Core: Message 12\nCore-->>App: Message 13\nApp->>Core: Message 14\nCore-->>App: Message 15\nApp->>Core: Message 16\nCore-->>App: Message 17\nApp->>Core: Message 18\nCore-->>App: Message 19\nApp->>Core: Message 20\nCore-->>App: Message 21\nApp->>Core: Message 22\nCore-->>App: Message 23\nApp->>Core: Message 24\nCore-->>App: Message 25\nApp->>Core: Message 26\nCore-->>App: Message 27\nApp->>Core: Message 28\nCore-->>App: Message 29\nApp->>Core: Message 30\nCore-->>App: Message 31\nApp->>Core: Message 32\nCore-->>App: Message 33\nApp->>Core: Message 34\nCore-->>App: Message 35\nApp->>Core: Message 36\nCore-->>App: Message 37\nApp->>Core: Message 38\nCore-->>App: Message 39\nApp->>Core: Message 40\nCore-->>App: Message 41\nApp->>Core: Message 42\nCore-->>App: Message 43\nApp->>Core: Message 44\nCore-->>App: Message 45\nApp->>Core: Message 46\nCore-->>App: Message 47",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "ff4d80b120bdba34c800984585ea064e45cb46ce19ea198c35ab0e7a5064cd1c",
+      "output": {
+        "type": "sequence",
+        "widthBits": "4069400000000000",
+        "heightBits": "409dc80000000000",
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "svgBytes": 15759
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "er/medium",
+      "family": "er",
+      "scale": "medium",
+      "units": 48,
+      "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "pie/medium",
+      "family": "pie",
+      "scale": "medium",
+      "units": 48,
+      "source": "pie title Benchmark\n\"Slice 0\":1\n\"Slice 1\":2\n\"Slice 2\":3\n\"Slice 3\":4\n\"Slice 4\":5\n\"Slice 5\":6\n\"Slice 6\":7\n\"Slice 7\":8\n\"Slice 8\":9\n\"Slice 9\":10\n\"Slice 10\":11\n\"Slice 11\":12\n\"Slice 12\":13\n\"Slice 13\":14\n\"Slice 14\":15\n\"Slice 15\":16\n\"Slice 16\":17\n\"Slice 17\":18\n\"Slice 18\":19\n\"Slice 19\":20\n\"Slice 20\":21\n\"Slice 21\":22\n\"Slice 22\":23\n\"Slice 23\":24\n\"Slice 24\":25\n\"Slice 25\":26\n\"Slice 26\":27\n\"Slice 27\":28\n\"Slice 28\":29\n\"Slice 29\":30\n\"Slice 30\":31\n\"Slice 31\":32\n\"Slice 32\":33\n\"Slice 33\":34\n\"Slice 34\":35\n\"Slice 35\":36\n\"Slice 36\":37\n\"Slice 37\":38\n\"Slice 38\":39\n\"Slice 39\":40\n\"Slice 40\":41\n\"Slice 41\":42\n\"Slice 42\":43\n\"Slice 43\":44\n\"Slice 44\":45\n\"Slice 45\":46\n\"Slice 46\":47\n\"Slice 47\":48",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "71db10120ad41f8031b3d4f5eac266754e1eba7680ac530e2c5a00f3938e8954",
+      "output": {
+        "type": "pie",
+        "widthBits": "407b000000000000",
+        "heightBits": "4094600000000000",
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "svgBytes": 17134
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "sankey/medium",
+      "family": "sankey",
+      "scale": "medium",
+      "units": 48,
+      "source": "sankey-beta\nN0,N1,1\nN1,N2,2\nN2,N3,3\nN3,N4,4\nN4,N5,5\nN5,N6,6\nN6,N7,7\nN7,N8,1\nN8,N9,2\nN9,N10,3\nN10,N11,4\nN11,N12,5\nN12,N13,6\nN13,N14,7\nN14,N15,1\nN15,N16,2\nN16,N17,3\nN17,N18,4\nN18,N19,5\nN19,N20,6\nN20,N21,7\nN21,N22,1\nN22,N23,2\nN23,N24,3\nN24,N25,4\nN25,N26,5\nN26,N27,6\nN27,N28,7\nN28,N29,1\nN29,N30,2\nN30,N31,3\nN31,N32,4\nN32,N33,5\nN33,N34,6\nN34,N35,7\nN35,N36,1\nN36,N37,2\nN37,N38,3\nN38,N39,4\nN39,N40,5\nN40,N41,6\nN41,N42,7\nN42,N43,1\nN43,N44,2\nN44,N45,3\nN45,N46,4\nN46,N47,5",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "6543cd2e087fca2b0c5636630c6b73381f1298dea196e4379c6056f33a1ebd7c",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "svgBytes": 24853
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "gantt/medium",
+      "family": "gantt",
+      "scale": "medium",
+      "units": 48,
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "railroad/medium",
+      "family": "railroad",
+      "scale": "medium",
+      "units": 15,
+      "source": "railroad-beta\nrule0 = sequence(terminal(\"token 0\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule1 = sequence(terminal(\"token 1\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule2 = sequence(terminal(\"token 2\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule3 = sequence(terminal(\"token 3\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule4 = sequence(terminal(\"token 4\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule5 = sequence(terminal(\"token 5\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule6 = sequence(terminal(\"token 6\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule7 = sequence(terminal(\"token 7\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule8 = sequence(terminal(\"token 8\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule9 = sequence(terminal(\"token 9\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule10 = sequence(terminal(\"token 10\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule11 = sequence(terminal(\"token 11\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule12 = sequence(terminal(\"token 12\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule13 = sequence(terminal(\"token 13\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));\nrule14 = sequence(terminal(\"token 14\"),choice(nonterminal(\"rule0\"),optional(terminal(\"x\"))),zeroOrMore(terminal(\",\")));",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "368f387f0b24c8d1f198738179c4d03e6ac744ca578a5c5ad03ebdba67804963",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4078400000000000",
+        "heightBits": "40a1400000000000",
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "svgBytes": 27258
+      },
+      "jsRetainedBeforeVerified": true
+    }
+  ],
+  "rows": [],
+  "allocationRows": [
+    {
+      "case": "flowchart/medium",
+      "stage": "parse",
+      "control": {
+        "allocations": 2026,
+        "checksum": 9,
+        "freedBytes": 204699,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 105124,
+        "reallocations": 170,
+        "requestedBytes": 204699
+      },
+      "candidate": {
+        "allocations": 2026,
+        "checksum": 9,
+        "freedBytes": 204699,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 105124,
+        "reallocations": 170,
+        "requestedBytes": 204699
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "control": {
+        "allocations": 3431,
+        "checksum": 9,
+        "freedBytes": 493299,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 180322,
+        "reallocations": 867,
+        "requestedBytes": 493299
+      },
+      "candidate": {
+        "allocations": 3431,
+        "checksum": 9,
+        "freedBytes": 493299,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 180322,
+        "reallocations": 867,
+        "requestedBytes": 493299
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-source",
+      "control": {
+        "allocations": 6098,
+        "checksum": 67518810038490500,
+        "freedBytes": 915196,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 255288,
+        "reallocations": 928,
+        "requestedBytes": 915196
+      },
+      "candidate": {
+        "allocations": 6098,
+        "checksum": 67518810038490500,
+        "freedBytes": 915196,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 255288,
+        "reallocations": 928,
+        "requestedBytes": 915196
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-retained",
+      "control": {
+        "allocations": 4072,
+        "checksum": 67518810038490500,
+        "freedBytes": 710497,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 185268,
+        "reallocations": 758,
+        "requestedBytes": 710497
+      },
+      "candidate": {
+        "allocations": 4072,
+        "checksum": 67518810038490500,
+        "freedBytes": 710497,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 185268,
+        "reallocations": 758,
+        "requestedBytes": 710497
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse",
+      "control": {
+        "allocations": 771,
+        "checksum": 8,
+        "freedBytes": 113087,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 58229,
+        "reallocations": 18,
+        "requestedBytes": 113087
+      },
+      "candidate": {
+        "allocations": 771,
+        "checksum": 8,
+        "freedBytes": 113087,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 58229,
+        "reallocations": 18,
+        "requestedBytes": 113087
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse-public",
+      "control": {
+        "allocations": 2820,
+        "checksum": 8,
+        "freedBytes": 285121,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 68980,
+        "reallocations": 757,
+        "requestedBytes": 285121
+      },
+      "candidate": {
+        "allocations": 2820,
+        "checksum": 8,
+        "freedBytes": 285121,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 68980,
+        "reallocations": 757,
+        "requestedBytes": 285121
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-source",
+      "control": {
+        "allocations": 2032,
+        "checksum": 68829427898793360,
+        "freedBytes": 316615,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 76303,
+        "reallocations": 234,
+        "requestedBytes": 316615
+      },
+      "candidate": {
+        "allocations": 2032,
+        "checksum": 68829427898793360,
+        "freedBytes": 316615,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 76303,
+        "reallocations": 234,
+        "requestedBytes": 316615
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-retained",
+      "control": {
+        "allocations": 1261,
+        "checksum": 68829427898793360,
+        "freedBytes": 203528,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 62645,
+        "reallocations": 216,
+        "requestedBytes": 203528
+      },
+      "candidate": {
+        "allocations": 1261,
+        "checksum": 68829427898793360,
+        "freedBytes": 203528,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 62645,
+        "reallocations": 216,
+        "requestedBytes": 203528
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "control": {
+        "allocations": 2069,
+        "checksum": 2,
+        "freedBytes": 192835,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 99641,
+        "reallocations": 17,
+        "requestedBytes": 192835
+      },
+      "candidate": {
+        "allocations": 2069,
+        "checksum": 2,
+        "freedBytes": 192835,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 99641,
+        "reallocations": 17,
+        "requestedBytes": 192835
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "control": {
+        "allocations": 3838,
+        "checksum": 2,
+        "freedBytes": 380866,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 133398,
+        "reallocations": 971,
+        "requestedBytes": 380866
+      },
+      "candidate": {
+        "allocations": 3838,
+        "checksum": 2,
+        "freedBytes": 380866,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 133398,
+        "reallocations": 971,
+        "requestedBytes": 380866
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "control": {
+        "allocations": 11263,
+        "checksum": 47186091261891330,
+        "freedBytes": 1753892,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 558492,
+        "reallocations": 2590,
+        "requestedBytes": 1753892
+      },
+      "candidate": {
+        "allocations": 11263,
+        "checksum": 47186091261891330,
+        "freedBytes": 1753892,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 558492,
+        "reallocations": 2590,
+        "requestedBytes": 1753892
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "control": {
+        "allocations": 9194,
+        "checksum": 47186091261891330,
+        "freedBytes": 1561057,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 511988,
+        "reallocations": 2573,
+        "requestedBytes": 1561057
+      },
+      "candidate": {
+        "allocations": 9194,
+        "checksum": 47186091261891330,
+        "freedBytes": 1561057,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 511988,
+        "reallocations": 2573,
+        "requestedBytes": 1561057
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "parse",
+      "control": {
+        "allocations": 59,
+        "checksum": 3,
+        "freedBytes": 26016,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 13328,
+        "reallocations": 16,
+        "requestedBytes": 26016
+      },
+      "candidate": {
+        "allocations": 59,
+        "checksum": 3,
+        "freedBytes": 26016,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 13328,
+        "reallocations": 16,
+        "requestedBytes": 26016
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "parse-public",
+      "control": {
+        "allocations": 181,
+        "checksum": 3,
+        "freedBytes": 37466,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 13328,
+        "reallocations": 77,
+        "requestedBytes": 37466
+      },
+      "candidate": {
+        "allocations": 181,
+        "checksum": 3,
+        "freedBytes": 37466,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 13328,
+        "reallocations": 77,
+        "requestedBytes": 37466
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "render-source",
+      "control": {
+        "allocations": 1354,
+        "checksum": 67378072550130420,
+        "freedBytes": 252166,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 77979,
+        "reallocations": 253,
+        "requestedBytes": 252166
+      },
+      "candidate": {
+        "allocations": 1354,
+        "checksum": 67378072550130420,
+        "freedBytes": 252166,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 77979,
+        "reallocations": 253,
+        "requestedBytes": 252166
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "render-retained",
+      "control": {
+        "allocations": 1295,
+        "checksum": 67378072550130420,
+        "freedBytes": 226150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75427,
+        "reallocations": 237,
+        "requestedBytes": 226150
+      },
+      "candidate": {
+        "allocations": 1295,
+        "checksum": 67378072550130420,
+        "freedBytes": 226150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75427,
+        "reallocations": 237,
+        "requestedBytes": 226150
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse",
+      "control": {
+        "allocations": 395,
+        "checksum": 6,
+        "freedBytes": 47732,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 24157,
+        "reallocations": 16,
+        "requestedBytes": 47732
+      },
+      "candidate": {
+        "allocations": 395,
+        "checksum": 6,
+        "freedBytes": 47732,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 24157,
+        "reallocations": 16,
+        "requestedBytes": 47732
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse-public",
+      "control": {
+        "allocations": 1002,
+        "checksum": 6,
+        "freedBytes": 110400,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 39439,
+        "reallocations": 39,
+        "requestedBytes": 110400
+      },
+      "candidate": {
+        "allocations": 1002,
+        "checksum": 6,
+        "freedBytes": 110400,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 39439,
+        "reallocations": 39,
+        "requestedBytes": 110400
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-source",
+      "control": {
+        "allocations": 2322,
+        "checksum": 70157637945155864,
+        "freedBytes": 294243,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107186,
+        "reallocations": 225,
+        "requestedBytes": 294243
+      },
+      "candidate": {
+        "allocations": 2322,
+        "checksum": 70157637945155864,
+        "freedBytes": 294243,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107186,
+        "reallocations": 225,
+        "requestedBytes": 294243
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-retained",
+      "control": {
+        "allocations": 1927,
+        "checksum": 70157637945155864,
+        "freedBytes": 246511,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 100005,
+        "reallocations": 209,
+        "requestedBytes": 246511
+      },
+      "candidate": {
+        "allocations": 1927,
+        "checksum": 70157637945155864,
+        "freedBytes": 246511,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 100005,
+        "reallocations": 209,
+        "requestedBytes": 246511
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse",
+      "control": {
+        "allocations": 1103,
+        "checksum": 5,
+        "freedBytes": 93583,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 41964,
+        "reallocations": 16,
+        "requestedBytes": 93583
+      },
+      "candidate": {
+        "allocations": 1103,
+        "checksum": 5,
+        "freedBytes": 93583,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 41964,
+        "reallocations": 16,
+        "requestedBytes": 93583
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "control": {
+        "allocations": 3471,
+        "checksum": 5,
+        "freedBytes": 499645,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 169236,
+        "reallocations": 1539,
+        "requestedBytes": 499645
+      },
+      "candidate": {
+        "allocations": 3071,
+        "checksum": 5,
+        "freedBytes": 374617,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 111778,
+        "reallocations": 1344,
+        "requestedBytes": 374617
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-source",
+      "control": {
+        "allocations": 3455,
+        "checksum": 8466239533887774,
+        "freedBytes": 331045,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 101749,
+        "reallocations": 465,
+        "requestedBytes": 331045
+      },
+      "candidate": {
+        "allocations": 3455,
+        "checksum": 8466239533887774,
+        "freedBytes": 331045,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 101749,
+        "reallocations": 465,
+        "requestedBytes": 331045
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-retained",
+      "control": {
+        "allocations": 2352,
+        "checksum": 8466239533887774,
+        "freedBytes": 237462,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75827,
+        "reallocations": 449,
+        "requestedBytes": 237462
+      },
+      "candidate": {
+        "allocations": 2352,
+        "checksum": 8466239533887774,
+        "freedBytes": 237462,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75827,
+        "reallocations": 449,
+        "requestedBytes": 237462
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "parse",
+      "control": {
+        "allocations": 164,
+        "checksum": 8,
+        "freedBytes": 55947,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 27550,
+        "reallocations": 15,
+        "requestedBytes": 55947
+      },
+      "candidate": {
+        "allocations": 164,
+        "checksum": 8,
+        "freedBytes": 55947,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 27550,
+        "reallocations": 15,
+        "requestedBytes": 55947
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "parse-public",
+      "control": {
+        "allocations": 1565,
+        "checksum": 8,
+        "freedBytes": 195005,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 58331,
+        "reallocations": 424,
+        "requestedBytes": 195005
+      },
+      "candidate": {
+        "allocations": 1565,
+        "checksum": 8,
+        "freedBytes": 195005,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 58331,
+        "reallocations": 424,
+        "requestedBytes": 195005
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "render-source",
+      "control": {
+        "allocations": 2804,
+        "checksum": 61080069946239610,
+        "freedBytes": 521841,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 113858,
+        "reallocations": 830,
+        "requestedBytes": 521841
+      },
+      "candidate": {
+        "allocations": 2804,
+        "checksum": 61080069946239610,
+        "freedBytes": 521841,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 113858,
+        "reallocations": 830,
+        "requestedBytes": 521841
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "render-retained",
+      "control": {
+        "allocations": 2640,
+        "checksum": 61080069946239610,
+        "freedBytes": 465894,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107578,
+        "reallocations": 815,
+        "requestedBytes": 465894
+      },
+      "candidate": {
+        "allocations": 2640,
+        "checksum": 61080069946239610,
+        "freedBytes": 465894,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 107578,
+        "reallocations": 815,
+        "requestedBytes": 465894
+      }
+    }
+  ],
+  "completedAt": "2026-10-19T23:55:20.304Z",
+  "succeeded": true
+}

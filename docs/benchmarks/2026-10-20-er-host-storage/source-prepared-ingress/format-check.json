@@ -1,0 +1,5 @@
+{
+  "changedRustFiles": "rustfmt --edition 2021 --check: pass",
+  "wholeWorkspaceCheck": "cargo fmt --all -- --check: failed on unchanged public_render_outcome_view.rs and host_er.rs; neither altered",
+  "sourceCommit": "e518012745a2eaf12c8bb048b91074566bf2000a"
+}

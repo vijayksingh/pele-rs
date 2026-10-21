@@ -1,0 +1,963 @@
+{
+  "schemaVersion": 1,
+  "diagnostic": true,
+  "startedAt": "2026-10-20T00:43:34.125Z",
+  "oracleRevision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "7d632fa69ddfbd18fe716388f6e277e6b48ed267fa378b9f73d4ff74f7e1a808",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "runtimeHashes": {
+    "control": {
+      "all-diagram-entries.js": "2198ccdbf3586d74e9770006fb05c820e445a0968a6256a2ab0d6627f92cd424",
+      "builtin-entries.js": "c613f773cdfcd8d9922737c6a88dab17db3c070903e14bce2f198e369d02aba3",
+      "core.d.ts": "9ecbec2091a240664457e687e8b6083ace52a620a64ef65a876bf8fc606a4441",
+      "core.js": "b4189751676890c646ec76fb831eb16c141279b27f44dd665f3f03813f23754a",
+      "diagram-entries.d.ts": "97b2290e3dbfd3aa735dfea383a63c0da0ed1ca445dfa68db4669bf24ecb9c47",
+      "diagram-entries.js": "649ddeffc62753190854d0440dde259011400f826852b4aa20a14bb6507f2008",
+      "diagrams/agentflow.d.ts": "ed966aa366e4f443ebc04f7766bcb326c033fcf1b5198802a3d3262ac4fd1640",
+      "diagrams/agentflow.js": "76b816c01cf6b17ef9eebf6943e44dfc217839f04ad1e556ebcc60871d6bab63",
+      "diagrams/architecture.d.ts": "685d1aad08763ed184576061f1af57ebd020e97275a35ee28c743bed76491d65",
+      "diagrams/architecture.js": "f6797d1af08dd37c49d99cec1dcd76dd45390a635d3f57af5eb43400f176bc38",
+      "diagrams/block.d.ts": "4bb13f66ae9d1ea73e1e73bb382ffdd2d5396ed2a442fc35b3feed09f486929d",
+      "diagrams/block.js": "9ec59c1ae0c9ebca58d3d5facf7c2e10a66b7d1aa9fe5a2a9d47def7d6def9cd",
+      "diagrams/c4.d.ts": "8bbe330bc5e9233c3b4f2b08ea3ff801111962bef52b66b0bf412da82929c9f9",
+      "diagrams/c4.js": "4648be6d26ce54747289b95972989f1d57b8cb01cb7015e1d1c150c40b1b5470",
+      "diagrams/class.d.ts": "0663430c12f41c282d2025e332341c869d93570bcd3e5657029dcc18e9de7847",
+      "diagrams/class.js": "d2d07b788987e4107ab9f4c76e46ce35001598530d1cc4a6317d73060ef58802",
+      "diagrams/cynefin.d.ts": "b251614dde7430ff521e12c769cf8e083edd793a6d63b31678ffb1df55a431a3",
+      "diagrams/cynefin.js": "dda906572a81cf956d584fb2a1beb54662f0d9f8c8b8c0e15159a26bb62f1701",
+      "diagrams/er.d.ts": "cfe808613977d282727b2f2375f3b2fe781bc9cad5e02e023f753a2f6cf851cc",
+      "diagrams/er.js": "4f58c75060c6965e255f9dc43d5e4c71700bd15fd41408bc6c210df2c7f1c414",
+      "diagrams/eventmodeling.d.ts": "a20be3600f375bb9358120f3b8b8588856ce46b365e2b7e7d0c9f276f3b56a24",
+      "diagrams/eventmodeling.js": "2bd0d3ae5ee0cc85c81638fa225601001fa984d338b28d617e4f4625b0b211f6",
+      "diagrams/flowchart.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/flowchart.js": "1d8357752cfc2560c778b6b8e8677b28e31bb33b738b83e50cda2fe60b10c6d6",
+      "diagrams/gantt.d.ts": "6cfab071c62f397e4ea63e8622637f9e307c47868fe38ac370fb1dffbdcb76f5",
+      "diagrams/gantt.js": "084cd1ef3df8e755d4be23a4697f7a09e9eef2f9242669b7ba089108f7be86b3",
+      "diagrams/gitGraph.d.ts": "e893045bf79909c866b514bb924ee048fd01f8bc2caa2f023b225e89b5ac41de",
+      "diagrams/gitGraph.js": "bd51ef5f4b2d158e3b47c95eef52c5575bb4d77cf6becdbd57ed20071f771bc1",
+      "diagrams/info.d.ts": "318d29ac48e33d7a5ff62ad5832803ab30c1759273cb700f4f81e90a7a772f5a",
+      "diagrams/info.js": "4973c7dd85283de9615c3ede99cae84b077ae53c897a219c42ac56627fb7bf12",
+      "diagrams/ishikawa.d.ts": "3c3d832ac347626f6ecd4ec520eb1c57ba47ada2b3aa3c68aac8ff9b42e96577",
+      "diagrams/ishikawa.js": "11e6631b6d577db24d85b51e9f0a7ba1e05601b1f3ce18891bc24bf225f78b03",
+      "diagrams/journey.d.ts": "d9364c99a6013ccf33cbbf7753b6606c80dc24a9543c3f764045c70ada30c553",
+      "diagrams/journey.js": "a618aa5122dff51245d6f1d24a19df278eb81de128d2a442408445ced8200115",
+      "diagrams/kanban.d.ts": "887e9f8e63e1e20e4d34228705bc9f276424bf0606b407a99e29be9a1a7ba61b",
+      "diagrams/kanban.js": "d55dd426f18681396dbdd3294fd7afcec3d4df189cb4769c961367647b010770",
+      "diagrams/mindmap.d.ts": "b73b90c318ead5a5aa869d4cba49e357ea1b90182669e0e139f0b6def47828af",
+      "diagrams/mindmap.js": "93c4922666ee8e0cac9822bb4b9af6bf22471f63bbb352fe5818e4d57451b7ab",
+      "diagrams/packet.d.ts": "c5a09be592cd97ee1c86e8c2281d7c87b677b55cdeeac9a99e6d2111010b054e",
+      "diagrams/packet.js": "ada87c921a18dd72d3c52f14c7a53b8cd628fc0275bf232ac9d1201b967cb7bb",
+      "diagrams/pie.d.ts": "7a3ccf3e6b762089d37cafe61d1aab941c8de69072301b78a3f14afda3915a02",
+      "diagrams/pie.js": "e31a8fe275411e76361094ed3a3b03bb58e1ab50edae051371f0838b876d2c43",
+      "diagrams/quadrantChart.d.ts": "45d683e54a3f1c28c46de448930329f5344d2d673308c41ad6dbc61871942f69",
+      "diagrams/quadrantChart.js": "8877ba13ccfdb408fadd9e63929625864544e1c95f07bb0674d9770dfa6874d5",
+      "diagrams/radar.d.ts": "e963a59434fd12ff343b2ed389c30b3d03e32e8e299f8555c0d1af864415594b",
+      "diagrams/radar.js": "dc956214601d6084d77c96108ca00a2be58640df1a9d3e6251045250e99b7604",
+      "diagrams/railroad.d.ts": "23c4cb03d8c1abea156392964bd5b0e6f8d7087ab3d0bce66e3348438e84f773",
+      "diagrams/railroad.js": "d0d30c37203c93db5b127b6e8e34affbf095996403e362990b20aa70baeb2a81",
+      "diagrams/requirement.d.ts": "1398a66ab6c04298e009433e681091b0b024bff2d7d48a45057360b3666322e1",
+      "diagrams/requirement.js": "bf9651beff933c6a3db084e1ab2567a8d1487aa935822e04dbcf66de4eb60de1",
+      "diagrams/sankey.d.ts": "8ecb9af4bb2f44e5712842315c53b133937c2b028881d939d54628b63d5a9421",
+      "diagrams/sankey.js": "c6fcc9edcd50910cbe5b0773e4d6a683b6befda044dcca92f115c72d987187ef",
+      "diagrams/sequence.d.ts": "cecc8a8a1c16cf47bf3e43e9dded18cfc96c1777f9ad85f825db8d6851a2a5e3",
+      "diagrams/sequence.js": "b87558078379f8183a95f613064e2cae76bb5b3fe6bf91f64e085e99a382a6ad",
+      "diagrams/state.d.ts": "7bfba0476f781b60a6313af1dd7ff28d6e592249e0a57e59d51d466b6a8644ef",
+      "diagrams/state.js": "d627791aeac455514abbde4a4c74089209d9a21cb0fbe6d1c53ff8346b718163",
+      "diagrams/swimlane.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/swimlane.js": "2ad18d6a0e9bf45d20161539843a305235efbf34ea83b5080fb8f722e8329dc0",
+      "diagrams/timeline.d.ts": "ffdce40a2ca1cabfd08a5e5fae52cb14056f4057153184e4dc2480a63e9b3875",
+      "diagrams/timeline.js": "449a69e40593627605fd8ad5818cae1da8ca075529f61cd92dcb340dc72f58fc",
+      "diagrams/treemap.d.ts": "f326b681722b56667c012c82c6250717deac5c41b26c06706dd1f23d83d66f19",
+      "diagrams/treemap.js": "8487c58c79eb01ce6a8ba9b1eb7f4cc05940316aa649365dacff76062832c37f",
+      "diagrams/treeView.d.ts": "3a1ff6d58f50f61387906e6ad1d6a8fa389cbf0d1bf71458d38cddfc78cb18c9",
+      "diagrams/treeView.js": "06c583a03010f7f26aacc1cbc8a5a3982e47890339e6115f8fbc6486b279f497",
+      "diagrams/usecase.d.ts": "35d802519f837262075c97f2fb868a5d9cbe1e11d1c7d6fe6b6f4fc5accaa85c",
+      "diagrams/usecase.js": "de333bea8f335fea2117c273f272bc51902c77c839f19bf9915a6ac00a402e65",
+      "diagrams/venn.d.ts": "9449b3af69edba6a5913152ed172e2aa9e07275d144f7de0a6f83f0e0f0c4708",
+      "diagrams/venn.js": "7bab9528e3c06dabfb2cc6c41ca717717a5d44091777d74a1d8570770bf64d57",
+      "diagrams/wardley.d.ts": "76f8a09179ba84a8fd08009928c1b2d78b03c00667de33d5b6bd74425a698865",
+      "diagrams/wardley.js": "8757dec7935fc53e299fa212589d6fc9f544905c1986a6d988cf15ef8d0952c5",
+      "diagrams/xychart.d.ts": "e280a1e33debe14d03128c02f426da021b21f5c9b365b2738dd376783b8d7050",
+      "diagrams/xychart.js": "bcb6d5fb732fbd5567cc72167e2e38d405a733020aed6b8fc6b788eb884fa89f",
+      "errors.js": "b7ecbd71b53235f2e83825571145db878f65059e5d6d3d814de348d634ab4a98",
+      "FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "full.d.ts": "6bd357541b024665c872be6f1cf2433059c22b0b17bbccd682cdb981b96a6307",
+      "full.js": "ced332e9c8449dbcd4bfc2623c2ccd882c6d01affb1fa8358fc296c5b0dd9213",
+      "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+      "graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+      "host-functions.js": "f86795a2710cb9e4ea70604c122f8685d0d994acb29b1f8b8afe954ffbc53b06",
+      "index.d.ts": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+      "lazy.d.ts": "b5252f51d93719e01ec2221ce14686d5a79ca69fdbfa545ba7fad83fca253503",
+      "lazy.js": "9c18e4d7da1c6bba736a4f739a43179b7af514493ba6d97364d31e80429cbb93",
+      "LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+      "MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "mount.js": "61bf88521d76030f64fc8457ebe80137dedc61a6a93db6ec2d6ac8324863a07b",
+      "NOTICE": "b29bd5d01e4cd9cf1a6cd96ffdb12ed6548ab290c01e0a374f12d7212c3baf01",
+      "package.json": "5047699f66bf0ae74c162ba5f20a76346b0fa2eccf21c90564f8e17cbc26f769",
+      "parse-limits.js": "643293e8fe70ff35a9ecc431601f5cfa8430c3ad91e9f8681a5c8f3fcc0043c9",
+      "PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "pkg/pele_bg.wasm": "951f51e8fdcf9cbb928f8ce261176d1eab18b0c7f3b1a1c95d70c71113b99d78",
+      "pkg/pele_bg.wasm.d.ts": "6e2d9933a73933137e6fc5c12f0c09cff528a2fd369d02ac771be534bf0b0cd2",
+      "pkg/pele.d.ts": "3be0f9e002e8f6da71d5046f732901d4abe622d10befae3794deef0a3c77e7aa",
+      "pkg/pele.js": "f1e920830c811859e8df8d78b5547e25becd7b4b11c04f7732350ec5c2f3b3fc",
+      "README.md": "8fc9239e13d6c39ab7d5b3232e7e9d79f715cbc958fab0ea221b34e4f3e153f3",
+      "registry.d.ts": "251873bffdbc0e1608e5050f321790178cb48270ede48c728ae4ea3af8019199",
+      "registry.js": "0b6fd01dd8228ae286b1827ffa7ef280f169d4fbb43be6034de8d739aaee9855",
+      "REGISTRY.md": "b618e3039b3f50a2553ef124508adc458fd34e8ee9f4b3ffff96f7a75b702054",
+      "render-numbers.js": "c47561036e06abe9795f766863a2f3600e44f6312888077e3ba0c09ec47cb102",
+      "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+      "V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "window.js": "10838164b41efcdf3252a2fadcbbf799a49be9b9197f795a2cda2e0bc8e7d3d0",
+      "zoom.js": "c5d293c1f157b04e37344318de97b4c066a18d95d730f5a7ce76655020d72734"
+    },
+    "candidate": {
+      "._all-diagram-entries.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._builtin-entries.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._core.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._core.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._diagram-entries.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._diagram-entries.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._diagrams": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._errors.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._FDLIBM-LICENSE": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._FONT-OFL.txt": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._full.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._full.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._graph-binary.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._graph.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._host-functions.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._index.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._index.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._initialize.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._lazy.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._lazy.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._LICENSE": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._MERMAID-LICENSE": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._mount.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._NOTICE": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._package.json": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._parse-limits.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._PELE-LICENSE": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._pkg": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._README.md": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._registry.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._registry.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._REGISTRY.md": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._render-numbers.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._resources.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._V8-LICENSE": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._window.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "._zoom.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "all-diagram-entries.js": "2198ccdbf3586d74e9770006fb05c820e445a0968a6256a2ab0d6627f92cd424",
+      "builtin-entries.js": "c613f773cdfcd8d9922737c6a88dab17db3c070903e14bce2f198e369d02aba3",
+      "core.d.ts": "9ecbec2091a240664457e687e8b6083ace52a620a64ef65a876bf8fc606a4441",
+      "core.js": "b4189751676890c646ec76fb831eb16c141279b27f44dd665f3f03813f23754a",
+      "diagram-entries.d.ts": "97b2290e3dbfd3aa735dfea383a63c0da0ed1ca445dfa68db4669bf24ecb9c47",
+      "diagram-entries.js": "649ddeffc62753190854d0440dde259011400f826852b4aa20a14bb6507f2008",
+      "diagrams/._agentflow.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._agentflow.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._architecture.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._architecture.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._block.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._block.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._c4.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._c4.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._class.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._class.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._cynefin.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._cynefin.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._er.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._er.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._eventmodeling.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._eventmodeling.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._flowchart.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._flowchart.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._gantt.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._gantt.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._gitGraph.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._gitGraph.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._info.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._info.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._ishikawa.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._ishikawa.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._journey.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._journey.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._kanban.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._kanban.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._mindmap.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._mindmap.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._packet.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._packet.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._pie.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._pie.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._quadrantChart.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._quadrantChart.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._radar.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._radar.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._railroad.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._railroad.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._requirement.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._requirement.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._sankey.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._sankey.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._sequence.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._sequence.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._state.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._state.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._swimlane.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._swimlane.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._timeline.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._timeline.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._treemap.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._treemap.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._treeView.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._treeView.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._usecase.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._usecase.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._venn.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._venn.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._wardley.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._wardley.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._xychart.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/._xychart.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "diagrams/agentflow.d.ts": "ed966aa366e4f443ebc04f7766bcb326c033fcf1b5198802a3d3262ac4fd1640",
+      "diagrams/agentflow.js": "76b816c01cf6b17ef9eebf6943e44dfc217839f04ad1e556ebcc60871d6bab63",
+      "diagrams/architecture.d.ts": "685d1aad08763ed184576061f1af57ebd020e97275a35ee28c743bed76491d65",
+      "diagrams/architecture.js": "f6797d1af08dd37c49d99cec1dcd76dd45390a635d3f57af5eb43400f176bc38",
+      "diagrams/block.d.ts": "4bb13f66ae9d1ea73e1e73bb382ffdd2d5396ed2a442fc35b3feed09f486929d",
+      "diagrams/block.js": "9ec59c1ae0c9ebca58d3d5facf7c2e10a66b7d1aa9fe5a2a9d47def7d6def9cd",
+      "diagrams/c4.d.ts": "8bbe330bc5e9233c3b4f2b08ea3ff801111962bef52b66b0bf412da82929c9f9",
+      "diagrams/c4.js": "4648be6d26ce54747289b95972989f1d57b8cb01cb7015e1d1c150c40b1b5470",
+      "diagrams/class.d.ts": "0663430c12f41c282d2025e332341c869d93570bcd3e5657029dcc18e9de7847",
+      "diagrams/class.js": "d2d07b788987e4107ab9f4c76e46ce35001598530d1cc4a6317d73060ef58802",
+      "diagrams/cynefin.d.ts": "b251614dde7430ff521e12c769cf8e083edd793a6d63b31678ffb1df55a431a3",
+      "diagrams/cynefin.js": "dda906572a81cf956d584fb2a1beb54662f0d9f8c8b8c0e15159a26bb62f1701",
+      "diagrams/er.d.ts": "cfe808613977d282727b2f2375f3b2fe781bc9cad5e02e023f753a2f6cf851cc",
+      "diagrams/er.js": "4f58c75060c6965e255f9dc43d5e4c71700bd15fd41408bc6c210df2c7f1c414",
+      "diagrams/eventmodeling.d.ts": "a20be3600f375bb9358120f3b8b8588856ce46b365e2b7e7d0c9f276f3b56a24",
+      "diagrams/eventmodeling.js": "2bd0d3ae5ee0cc85c81638fa225601001fa984d338b28d617e4f4625b0b211f6",
+      "diagrams/flowchart.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/flowchart.js": "1d8357752cfc2560c778b6b8e8677b28e31bb33b738b83e50cda2fe60b10c6d6",
+      "diagrams/gantt.d.ts": "6cfab071c62f397e4ea63e8622637f9e307c47868fe38ac370fb1dffbdcb76f5",
+      "diagrams/gantt.js": "084cd1ef3df8e755d4be23a4697f7a09e9eef2f9242669b7ba089108f7be86b3",
+      "diagrams/gitGraph.d.ts": "e893045bf79909c866b514bb924ee048fd01f8bc2caa2f023b225e89b5ac41de",
+      "diagrams/gitGraph.js": "bd51ef5f4b2d158e3b47c95eef52c5575bb4d77cf6becdbd57ed20071f771bc1",
+      "diagrams/info.d.ts": "318d29ac48e33d7a5ff62ad5832803ab30c1759273cb700f4f81e90a7a772f5a",
+      "diagrams/info.js": "4973c7dd85283de9615c3ede99cae84b077ae53c897a219c42ac56627fb7bf12",
+      "diagrams/ishikawa.d.ts": "3c3d832ac347626f6ecd4ec520eb1c57ba47ada2b3aa3c68aac8ff9b42e96577",
+      "diagrams/ishikawa.js": "11e6631b6d577db24d85b51e9f0a7ba1e05601b1f3ce18891bc24bf225f78b03",
+      "diagrams/journey.d.ts": "d9364c99a6013ccf33cbbf7753b6606c80dc24a9543c3f764045c70ada30c553",
+      "diagrams/journey.js": "a618aa5122dff51245d6f1d24a19df278eb81de128d2a442408445ced8200115",
+      "diagrams/kanban.d.ts": "887e9f8e63e1e20e4d34228705bc9f276424bf0606b407a99e29be9a1a7ba61b",
+      "diagrams/kanban.js": "d55dd426f18681396dbdd3294fd7afcec3d4df189cb4769c961367647b010770",
+      "diagrams/mindmap.d.ts": "b73b90c318ead5a5aa869d4cba49e357ea1b90182669e0e139f0b6def47828af",
+      "diagrams/mindmap.js": "93c4922666ee8e0cac9822bb4b9af6bf22471f63bbb352fe5818e4d57451b7ab",
+      "diagrams/packet.d.ts": "c5a09be592cd97ee1c86e8c2281d7c87b677b55cdeeac9a99e6d2111010b054e",
+      "diagrams/packet.js": "ada87c921a18dd72d3c52f14c7a53b8cd628fc0275bf232ac9d1201b967cb7bb",
+      "diagrams/pie.d.ts": "7a3ccf3e6b762089d37cafe61d1aab941c8de69072301b78a3f14afda3915a02",
+      "diagrams/pie.js": "e31a8fe275411e76361094ed3a3b03bb58e1ab50edae051371f0838b876d2c43",
+      "diagrams/quadrantChart.d.ts": "45d683e54a3f1c28c46de448930329f5344d2d673308c41ad6dbc61871942f69",
+      "diagrams/quadrantChart.js": "8877ba13ccfdb408fadd9e63929625864544e1c95f07bb0674d9770dfa6874d5",
+      "diagrams/radar.d.ts": "e963a59434fd12ff343b2ed389c30b3d03e32e8e299f8555c0d1af864415594b",
+      "diagrams/radar.js": "dc956214601d6084d77c96108ca00a2be58640df1a9d3e6251045250e99b7604",
+      "diagrams/railroad.d.ts": "23c4cb03d8c1abea156392964bd5b0e6f8d7087ab3d0bce66e3348438e84f773",
+      "diagrams/railroad.js": "d0d30c37203c93db5b127b6e8e34affbf095996403e362990b20aa70baeb2a81",
+      "diagrams/requirement.d.ts": "1398a66ab6c04298e009433e681091b0b024bff2d7d48a45057360b3666322e1",
+      "diagrams/requirement.js": "bf9651beff933c6a3db084e1ab2567a8d1487aa935822e04dbcf66de4eb60de1",
+      "diagrams/sankey.d.ts": "8ecb9af4bb2f44e5712842315c53b133937c2b028881d939d54628b63d5a9421",
+      "diagrams/sankey.js": "c6fcc9edcd50910cbe5b0773e4d6a683b6befda044dcca92f115c72d987187ef",
+      "diagrams/sequence.d.ts": "cecc8a8a1c16cf47bf3e43e9dded18cfc96c1777f9ad85f825db8d6851a2a5e3",
+      "diagrams/sequence.js": "b87558078379f8183a95f613064e2cae76bb5b3fe6bf91f64e085e99a382a6ad",
+      "diagrams/state.d.ts": "7bfba0476f781b60a6313af1dd7ff28d6e592249e0a57e59d51d466b6a8644ef",
+      "diagrams/state.js": "d627791aeac455514abbde4a4c74089209d9a21cb0fbe6d1c53ff8346b718163",
+      "diagrams/swimlane.d.ts": "579bafac38c9ba7172120eb64859e32b7a485b8af854cac7f8a9883121625998",
+      "diagrams/swimlane.js": "2ad18d6a0e9bf45d20161539843a305235efbf34ea83b5080fb8f722e8329dc0",
+      "diagrams/timeline.d.ts": "ffdce40a2ca1cabfd08a5e5fae52cb14056f4057153184e4dc2480a63e9b3875",
+      "diagrams/timeline.js": "449a69e40593627605fd8ad5818cae1da8ca075529f61cd92dcb340dc72f58fc",
+      "diagrams/treemap.d.ts": "f326b681722b56667c012c82c6250717deac5c41b26c06706dd1f23d83d66f19",
+      "diagrams/treemap.js": "8487c58c79eb01ce6a8ba9b1eb7f4cc05940316aa649365dacff76062832c37f",
+      "diagrams/treeView.d.ts": "3a1ff6d58f50f61387906e6ad1d6a8fa389cbf0d1bf71458d38cddfc78cb18c9",
+      "diagrams/treeView.js": "06c583a03010f7f26aacc1cbc8a5a3982e47890339e6115f8fbc6486b279f497",
+      "diagrams/usecase.d.ts": "35d802519f837262075c97f2fb868a5d9cbe1e11d1c7d6fe6b6f4fc5accaa85c",
+      "diagrams/usecase.js": "de333bea8f335fea2117c273f272bc51902c77c839f19bf9915a6ac00a402e65",
+      "diagrams/venn.d.ts": "9449b3af69edba6a5913152ed172e2aa9e07275d144f7de0a6f83f0e0f0c4708",
+      "diagrams/venn.js": "7bab9528e3c06dabfb2cc6c41ca717717a5d44091777d74a1d8570770bf64d57",
+      "diagrams/wardley.d.ts": "76f8a09179ba84a8fd08009928c1b2d78b03c00667de33d5b6bd74425a698865",
+      "diagrams/wardley.js": "8757dec7935fc53e299fa212589d6fc9f544905c1986a6d988cf15ef8d0952c5",
+      "diagrams/xychart.d.ts": "e280a1e33debe14d03128c02f426da021b21f5c9b365b2738dd376783b8d7050",
+      "diagrams/xychart.js": "bcb6d5fb732fbd5567cc72167e2e38d405a733020aed6b8fc6b788eb884fa89f",
+      "errors.js": "b7ecbd71b53235f2e83825571145db878f65059e5d6d3d814de348d634ab4a98",
+      "FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "full.d.ts": "6bd357541b024665c872be6f1cf2433059c22b0b17bbccd682cdb981b96a6307",
+      "full.js": "ced332e9c8449dbcd4bfc2623c2ccd882c6d01affb1fa8358fc296c5b0dd9213",
+      "graph-binary.js": "4cde98f1aa0dc97bdd8c6618fee03756f775f285718f9a5baf4e09c19b11301e",
+      "graph.js": "349a87120a54eae99fdf0d6878f0d2fdf4f1f255eeb5448ddd61b0c63ca9cbe5",
+      "host-functions.js": "f86795a2710cb9e4ea70604c122f8685d0d994acb29b1f8b8afe954ffbc53b06",
+      "index.d.ts": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "index.js": "fcc56b642466d7314aaf3fbb0308acc211b75fd51898f2a2566007ea2e5d23d6",
+      "initialize.js": "ac2411f588c3f4e8de0de7ad53e658cc1fc8b8f6d0e1f82a55bd7396ea443c31",
+      "lazy.d.ts": "b5252f51d93719e01ec2221ce14686d5a79ca69fdbfa545ba7fad83fca253503",
+      "lazy.js": "9c18e4d7da1c6bba736a4f739a43179b7af514493ba6d97364d31e80429cbb93",
+      "LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+      "MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "mount.js": "61bf88521d76030f64fc8457ebe80137dedc61a6a93db6ec2d6ac8324863a07b",
+      "NOTICE": "b29bd5d01e4cd9cf1a6cd96ffdb12ed6548ab290c01e0a374f12d7212c3baf01",
+      "package.json": "5047699f66bf0ae74c162ba5f20a76346b0fa2eccf21c90564f8e17cbc26f769",
+      "parse-limits.js": "643293e8fe70ff35a9ecc431601f5cfa8430c3ad91e9f8681a5c8f3fcc0043c9",
+      "PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "pkg/._pele_bg.wasm": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "pkg/._pele_bg.wasm.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "pkg/._pele.d.ts": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "pkg/._pele.js": "9cf87100e4c1d1d26c914b75a2adca8c193ba6b9848da466b8a2496d5e328b85",
+      "pkg/pele_bg.wasm": "c7aea7ca6263d720e5d540633d7680d6ebf4c4a90dc3595fc5994b64afde8b7b",
+      "pkg/pele_bg.wasm.d.ts": "6e2d9933a73933137e6fc5c12f0c09cff528a2fd369d02ac771be534bf0b0cd2",
+      "pkg/pele.d.ts": "3be0f9e002e8f6da71d5046f732901d4abe622d10befae3794deef0a3c77e7aa",
+      "pkg/pele.js": "f1e920830c811859e8df8d78b5547e25becd7b4b11c04f7732350ec5c2f3b3fc",
+      "README.md": "8fc9239e13d6c39ab7d5b3232e7e9d79f715cbc958fab0ea221b34e4f3e153f3",
+      "registry.d.ts": "251873bffdbc0e1608e5050f321790178cb48270ede48c728ae4ea3af8019199",
+      "registry.js": "0b6fd01dd8228ae286b1827ffa7ef280f169d4fbb43be6034de8d739aaee9855",
+      "REGISTRY.md": "b618e3039b3f50a2553ef124508adc458fd34e8ee9f4b3ffff96f7a75b702054",
+      "render-numbers.js": "c47561036e06abe9795f766863a2f3600e44f6312888077e3ba0c09ec47cb102",
+      "resources.js": "a310f19d43dc2b418c38d69230a11f941eaf65ae873d8f75ec5c6b9d479604d2",
+      "V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "window.js": "10838164b41efcdf3252a2fadcbbf799a49be9b9197f795a2cda2e0bc8e7d3d0",
+      "zoom.js": "c5d293c1f157b04e37344318de97b4c066a18d95d730f5a7ce76655020d72734"
+    }
+  },
+  "platform": {
+    "os": "linux",
+    "arch": "x64",
+    "cpu": "AMD EPYC-Genoa Processor",
+    "logicalCPUs": 8,
+    "totalMemory": 16366505984
+  },
+  "hostBefore": {
+    "loadAverage": [
+      0.52,
+      0.58,
+      0.46
+    ],
+    "freeMemory": 12354396160
+  },
+  "settings": {
+    "trials": 15,
+    "warmupMs": 1000,
+    "batchTargetMs": 12,
+    "maxBatch": 128,
+    "balancedThreeWayOrder": true,
+    "matchedWasmBatchCounts": true,
+    "calibrationMedianOfThree": true,
+    "freshRetainedModelPerBatch": true,
+    "crossOriginIsolated": true,
+    "observedClockResolutionMs": 0.0049991607666015625
+  },
+  "scope": "One browser/page holds independent control and candidate WASM instances and pinned JS. Balanced cyclic/reverse order; whole SVG and exact dimensions before/after. Shared heaps/GC/cache pressure differ from the release harness. Diagnostic, never a replacement release gate.",
+  "rows": [
+    {
+      "case": "gantt/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.03859374672174454,
+        "control": 0.20664063096046448,
+        "candidate": 0.20273436605930328
+      },
+      "candidateOverControl": 0.9810963367513693,
+      "candidateOverJS": 5.253036651792049,
+      "controlOverJS": 5.354251621391264,
+      "counts": {
+        "js": 128,
+        "control": 64,
+        "candidate": 64
+      },
+      "warmups": {
+        "js": {
+          "operations": 25918,
+          "elapsedMs": 1000.045000076294
+        },
+        "control": {
+          "operations": 4442,
+          "elapsedMs": 1000.2000007629395
+        },
+        "candidate": {
+          "operations": 4745,
+          "elapsedMs": 1000.0299997329712
+        }
+      },
+      "samples": {
+        "js": [
+          0.05082031339406967,
+          0.041679687798023224,
+          0.037109375,
+          0.03714843839406967,
+          0.03761718422174454,
+          0.03812500089406967,
+          0.03703124821186066,
+          0.04093749821186066,
+          0.04152343422174454,
+          0.03859374672174454,
+          0.03761718422174454,
+          0.03910156339406967,
+          0.03644531965255737,
+          0.04140625149011612,
+          0.03999999910593033
+        ],
+        "control": [
+          0.2265625,
+          0.20890624821186066,
+          0.20664063096046448,
+          0.19914062321186066,
+          0.20890624821186066,
+          0.19570311903953552,
+          0.19968751072883606,
+          0.208984375,
+          0.20640625059604645,
+          0.20890624821186066,
+          0.20359374582767487,
+          0.20554687082767487,
+          0.21187499165534973,
+          0.19968749582767487,
+          0.2264062464237213
+        ],
+        "candidate": [
+          0.24570313096046448,
+          0.19679687917232513,
+          0.2006249874830246,
+          0.20164062082767487,
+          0.20007812976837158,
+          0.20031249523162842,
+          0.20273436605930328,
+          0.20499999821186066,
+          0.20710937678813934,
+          0.20656250417232513,
+          0.2100781351327896,
+          0.19875000417232513,
+          0.2010156214237213,
+          0.21765625476837158,
+          0.20867186784744263
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.05082031339406967,
+        "control": 0.2265625,
+        "candidate": 0.24570313096046448
+      }
+    },
+    {
+      "case": "gantt/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.04332031309604645,
+        "control": 0.20156250894069672,
+        "candidate": 0.2022656351327896
+      },
+      "candidateOverControl": 1.0034883778525487,
+      "candidateOverJS": 4.669071405009052,
+      "controlOverJS": 4.652840539120941,
+      "counts": {
+        "js": 128,
+        "control": 64,
+        "candidate": 64
+      },
+      "warmups": {
+        "js": {
+          "operations": 22627,
+          "elapsedMs": 1000.039999961853
+        },
+        "control": {
+          "operations": 4859,
+          "elapsedMs": 1000.0199995040894
+        },
+        "candidate": {
+          "operations": 4581,
+          "elapsedMs": 1000.1000003814697
+        }
+      },
+      "samples": {
+        "js": [
+          0.04339843988418579,
+          0.04355468600988388,
+          0.044921875,
+          0.044062502682209015,
+          0.04218749701976776,
+          0.04398437589406967,
+          0.04457031190395355,
+          0.043125003576278687,
+          0.04332031309604645,
+          0.04402343928813934,
+          0.043242186307907104,
+          0.04304687678813934,
+          0.04273436963558197,
+          0.042812496423721313,
+          0.04332031309604645
+        ],
+        "control": [
+          0.20195312798023224,
+          0.20351561903953552,
+          0.20093749463558197,
+          0.2013281136751175,
+          0.2052343785762787,
+          0.1974218785762787,
+          0.201171875,
+          0.1979687511920929,
+          0.21703125536441803,
+          0.20343749225139618,
+          0.20140624046325684,
+          0.197265625,
+          0.20156250894069672,
+          0.20265625417232513,
+          0.20585937798023224
+        ],
+        "candidate": [
+          0.20179687440395355,
+          0.2013281285762787,
+          0.20734374225139618,
+          0.2022656351327896,
+          0.19820313155651093,
+          0.2013281285762787,
+          0.20140624046325684,
+          0.20070312917232513,
+          0.20484375953674316,
+          0.20250000059604645,
+          0.2045312523841858,
+          0.2096875011920929,
+          0.2036718726158142,
+          0.2029687464237213,
+          0.20015625655651093
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.044921875,
+        "control": 0.21703125536441803,
+        "candidate": 0.2096875011920929
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.15855468064546585,
+        "control": 0.645312488079071,
+        "candidate": 0.655468761920929
+      },
+      "candidateOverControl": 1.0157385360263065,
+      "candidateOverJS": 4.1340234123178075,
+      "controlOverJS": 4.0699680731722685,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 6385,
+          "elapsedMs": 1000.0200004577637
+        },
+        "control": {
+          "operations": 1461,
+          "elapsedMs": 1000.8050003051758
+        },
+        "candidate": {
+          "operations": 1473,
+          "elapsedMs": 1000.5299997329712
+        }
+      },
+      "samples": {
+        "js": [
+          0.1763281226158142,
+          0.15503906458616257,
+          0.15335937589406967,
+          0.16171874850988388,
+          0.16175781190395355,
+          0.15433593839406967,
+          0.16191406548023224,
+          0.15371093899011612,
+          0.15296874940395355,
+          0.1618359386920929,
+          0.1544531211256981,
+          0.1614062488079071,
+          0.15417968481779099,
+          0.1596093773841858,
+          0.15855468064546585
+        ],
+        "control": [
+          0.6520312428474426,
+          0.6426562368869781,
+          0.8221874833106995,
+          0.7012499868869781,
+          0.637499988079071,
+          0.6384375095367432,
+          0.6446875035762787,
+          0.6423437297344208,
+          0.645312488079071,
+          0.6404687464237213,
+          0.6642187237739563,
+          0.663281261920929,
+          0.6418749988079071,
+          0.6517187356948853,
+          0.659843772649765
+        ],
+        "candidate": [
+          0.6656250059604645,
+          0.6831249892711639,
+          0.6535937488079071,
+          0.7315624952316284,
+          0.6510937511920929,
+          0.6576562225818634,
+          0.6635937690734863,
+          0.6459375023841858,
+          0.6426562666893005,
+          0.6496874988079071,
+          0.6543750166893005,
+          0.6895312368869781,
+          0.655468761920929,
+          0.6540625095367432,
+          0.6807812750339508
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.1763281226158142,
+        "control": 0.8221874833106995,
+        "candidate": 0.7315624952316284
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.17050781100988388,
+        "control": 0.6595312356948853,
+        "candidate": 0.6798437535762787
+      },
+      "candidateOverControl": 1.0307984167876325,
+      "candidateOverJS": 3.9871707316497655,
+      "controlOverJS": 3.868041187020189,
+      "counts": {
+        "js": 128,
+        "control": 32,
+        "candidate": 32
+      },
+      "warmups": {
+        "js": {
+          "operations": 5460,
+          "elapsedMs": 1000.0249996185303
+        },
+        "control": {
+          "operations": 1506,
+          "elapsedMs": 1000.3699998855591
+        },
+        "candidate": {
+          "operations": 1459,
+          "elapsedMs": 1000.295000076294
+        }
+      },
+      "samples": {
+        "js": [
+          0.18878906220197678,
+          0.17226562649011612,
+          0.17710937559604645,
+          0.17253906279802322,
+          0.16738281399011612,
+          0.16886718571186066,
+          0.16761718690395355,
+          0.17320312559604645,
+          0.17031250149011612,
+          0.17289062589406967,
+          0.1685156226158142,
+          0.17015625536441803,
+          0.17050781100988388,
+          0.16972655802965164,
+          0.18824218958616257
+        ],
+        "control": [
+          0.6831250190734863,
+          0.6735937297344208,
+          0.6595312356948853,
+          0.6550000011920929,
+          0.6481249928474426,
+          0.6476562321186066,
+          0.6821874976158142,
+          0.6770312488079071,
+          0.6592187285423279,
+          0.6521874964237213,
+          0.6548437476158142,
+          0.6618749797344208,
+          0.6617187559604645,
+          0.6551562547683716,
+          0.6635937392711639
+        ],
+        "candidate": [
+          0.6846874952316284,
+          0.6690624952316284,
+          0.6796875,
+          0.672656238079071,
+          0.6812500059604645,
+          0.6732812523841858,
+          0.8900000154972076,
+          0.6834374964237213,
+          0.7265625,
+          0.6709375083446503,
+          0.6859374940395355,
+          0.6762500107288361,
+          0.6798437535762787,
+          0.6762500107288361,
+          0.71484375
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.18878906220197678,
+        "control": 0.6831250190734863,
+        "candidate": 0.8900000154972076
+      }
+    },
+    {
+      "case": "gantt/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.6256250143051147,
+        "control": 2.4368749856948853,
+        "candidate": 2.4418749809265137
+      },
+      "candidateOverControl": 1.0020518062112254,
+      "candidateOverJS": 3.903096783364262,
+      "controlOverJS": 3.8951047831767664,
+      "counts": {
+        "js": 16,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 1583,
+          "elapsedMs": 1000.9900007247925
+        },
+        "control": {
+          "operations": 409,
+          "elapsedMs": 1001.204999923706
+        },
+        "candidate": {
+          "operations": 402,
+          "elapsedMs": 1000.0750007629395
+        }
+      },
+      "samples": {
+        "js": [
+          0.635937511920929,
+          0.6253125071525574,
+          0.6256250143051147,
+          0.6568750143051147,
+          0.6784374713897705,
+          0.6059374809265137,
+          0.6268749833106995,
+          0.6028125286102295,
+          0.6315624713897705,
+          0.6056249737739563,
+          0.645312488079071,
+          0.6124999523162842,
+          0.62437504529953,
+          0.6068750023841858,
+          0.6265625357627869
+        ],
+        "control": [
+          2.4081250429153442,
+          2.4700000286102295,
+          2.5774999856948853,
+          2.4418749809265137,
+          2.6687499284744263,
+          2.4287500381469727,
+          2.416249990463257,
+          2.385624885559082,
+          2.418750047683716,
+          2.5643750429153442,
+          2.4418749809265137,
+          2.3612500429153442,
+          2.4325000047683716,
+          2.453125,
+          2.4368749856948853
+        ],
+        "candidate": [
+          2.4737499952316284,
+          2.4806249141693115,
+          2.449375033378601,
+          2.4543750286102295,
+          2.523750066757202,
+          2.4418749809265137,
+          2.4862500429153442,
+          2.4012500047683716,
+          2.4306249618530273,
+          2.3962498903274536,
+          2.4287500381469727,
+          2.4012500047683716,
+          2.4212499856948853,
+          2.471250057220459,
+          2.4143749475479126
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.6784374713897705,
+        "control": 2.6687499284744263,
+        "candidate": 2.523750066757202
+      }
+    },
+    {
+      "case": "gantt/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "medianMs": {
+        "js": 0.6876562535762787,
+        "control": 2.508125066757202,
+        "candidate": 2.50124990940094
+      },
+      "candidateOverControl": 0.9972588458815766,
+      "candidateOverJS": 3.637354995890381,
+      "controlOverJS": 3.6473529524573527,
+      "counts": {
+        "js": 32,
+        "control": 8,
+        "candidate": 8
+      },
+      "warmups": {
+        "js": {
+          "operations": 1404,
+          "elapsedMs": 1000.0550003051758
+        },
+        "control": {
+          "operations": 401,
+          "elapsedMs": 1001.329999923706
+        },
+        "candidate": {
+          "operations": 405,
+          "elapsedMs": 1001.4699993133545
+        }
+      },
+      "samples": {
+        "js": [
+          0.7201562523841858,
+          0.6785937547683716,
+          0.6879687607288361,
+          0.69140625,
+          0.6848437488079071,
+          0.6742187738418579,
+          0.6876562535762787,
+          0.7217187285423279,
+          0.7665624916553497,
+          0.6868749856948853,
+          0.6795312464237213,
+          0.68359375,
+          0.6909374892711639,
+          0.6865624785423279,
+          0.6946875154972076
+        ],
+        "control": [
+          2.5006250143051147,
+          2.4981249570846558,
+          2.525624990463257,
+          2.4574999809265137,
+          2.4837499856948853,
+          2.565624952316284,
+          2.508125066757202,
+          2.7368749380111694,
+          2.5462499856948853,
+          2.4731249809265137,
+          2.523750066757202,
+          2.4643750190734863,
+          2.5137499570846558,
+          2.5243749618530273,
+          2.4887499809265137
+        ],
+        "candidate": [
+          2.484375,
+          2.5625,
+          2.4862499237060547,
+          2.4981249570846558,
+          2.5487500429153442,
+          2.50124990940094,
+          2.497499942779541,
+          2.5500000715255737,
+          2.496250033378601,
+          2.552500009536743,
+          2.556249976158142,
+          2.5231250524520874,
+          2.5231250524520874,
+          2.480625033378601,
+          2.474375009536743
+        ]
+      },
+      "p95BatchMeanMs": {
+        "js": 0.7665624916553497,
+        "control": 2.7368749380111694,
+        "candidate": 2.5625
+      }
+    }
+  ],
+  "cases": [
+    {
+      "id": "gantt/small",
+      "sourceSHA256": "e95d857b2d21277ff82edeab27a83c843a3012c9ab06f2c55b30c0b96c0fd531",
+      "sourceBytes": 255,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 3407
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 3500
+        }
+      ],
+      "checksum": 349332442
+    },
+    {
+      "id": "gantt/medium",
+      "sourceSHA256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "sourceBytes": 1291,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 12574
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 12762
+        }
+      ],
+      "checksum": 373869754
+    },
+    {
+      "id": "gantt/large",
+      "sourceSHA256": "1b44e7d9f858100864304e01163c081d9b86efab39b4677585fe6cfdd0b2a6aa",
+      "sourceBytes": 5443,
+      "checks": [
+        {
+          "profile": "fixed",
+          "svgBytes": 48636
+        },
+        {
+          "profile": "canvas",
+          "svgBytes": 49514
+        }
+      ],
+      "checksum": 350411320
+    }
+  ],
+  "browser": "156.0.8078.4",
+  "completedAt": "2026-10-20T00:43:59.556Z",
+  "hostAfter": {
+    "loadAverage": [
+      0.82,
+      0.65,
+      0.48
+    ],
+    "freeMemory": 12120752128
+  },
+  "succeeded": true
+}

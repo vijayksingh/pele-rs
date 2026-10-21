@@ -46,3 +46,7 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<RailroadModel, Pele
 
 mod public_model;
 pub use public_model::RailroadPublicState;
+
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{render_detached, RailroadDetachedInput};

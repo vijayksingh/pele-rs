@@ -1,0 +1,489 @@
+{
+  "status": "Rejected and reversed; not accepted record-layout runtime",
+  "reportSha256": "db143a6ac492dcd7741d85c366e26ce71144134c9ed8e9c3c22d1693172c9cd4",
+  "controlMatchesAcceptedRecordCandidate": true,
+  "onlyChangedPackageFile": "host-er-store.js",
+  "browserChecks": 45,
+  "rows": [
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.007929682731628418,
+        "control": 0.1321093738079071,
+        "candidate": 0.1333593800663948
+      },
+      "candidateOverJS": 16.81774474210376,
+      "pairedPercent": -1.4894194137525019,
+      "candidateFasterPairs": 14,
+      "ratioOfMediansPercent": 0.9461904348326389,
+      "pairedRatioMedian": 0.985105805862475,
+      "pairedRatioMAD": 0.03503411746708496,
+      "pairedRatioMin": 0.3660053201089073,
+      "pairedRatioMax": 1.548212012886174,
+      "pairedRatioSampleP95": 1.50612503623163
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.016914062201976776,
+        "control": 0.11371093988418579,
+        "candidate": 0.11343750357627869
+      },
+      "candidateOverJS": 6.706697789193482,
+      "pairedPercent": -1.2798957941389522,
+      "candidateFasterPairs": 14,
+      "ratioOfMediansPercent": -0.24046614000868827,
+      "pairedRatioMedian": 0.9872010420586105,
+      "pairedRatioMAD": 0.033032965679018034,
+      "pairedRatioMin": 0.7542394966072532,
+      "pairedRatioMax": 1.3602528897872597,
+      "pairedRatioSampleP95": 1.232810032716142
+    },
+    {
+      "case": "sequence/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.024882808327674866,
+        "control": 0.07218749821186066,
+        "candidate": 0.07109375298023224
+      },
+      "candidateOverJS": 2.8571434559965314,
+      "pairedPercent": -0.16331347455049716,
+      "candidateFasterPairs": 13,
+      "ratioOfMediansPercent": -1.5151449471464185,
+      "pairedRatioMedian": 0.998366865254495,
+      "pairedRatioMAD": 0.031192570195849978,
+      "pairedRatioMin": 0.4218283348211742,
+      "pairedRatioMax": 1.2169492829500155,
+      "pairedRatioSampleP95": 1.0838744196674897
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.008281253278255463,
+        "control": 0.13355468958616257,
+        "candidate": 0.1311328113079071
+      },
+      "candidateOverJS": 15.834899247947126,
+      "pairedPercent": 5.3539535756346845,
+      "candidateFasterPairs": 7,
+      "ratioOfMediansPercent": -1.8133981560362944,
+      "pairedRatioMedian": 1.0535395357563468,
+      "pairedRatioMAD": 0.14417445056000244,
+      "pairedRatioMin": 0.7248749749871911,
+      "pairedRatioMax": 4.4190623215411335,
+      "pairedRatioSampleP95": 1.5420072306008703
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.01968749612569809,
+        "control": 0.11488281190395355,
+        "candidate": 0.11800780892372131
+      },
+      "candidateOverJS": 5.994048616963826,
+      "pairedPercent": 2.047782925232333,
+      "candidateFasterPairs": 8,
+      "ratioOfMediansPercent": 2.7201606297557968,
+      "pairedRatioMedian": 1.0204778292523233,
+      "pairedRatioMAD": 0.07195827389046905,
+      "pairedRatioMin": 0.8911400511840788,
+      "pairedRatioMax": 1.6302439371744792,
+      "pairedRatioSampleP95": 1.1284341282846582
+    },
+    {
+      "case": "sequence/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.028476566076278687,
+        "control": 0.07234375178813934,
+        "candidate": 0.07132812589406967
+      },
+      "candidateOverJS": 2.5048008142206037,
+      "pairedPercent": -1.4697798917473137,
+      "candidateFasterPairs": 17,
+      "ratioOfMediansPercent": -1.403888890147642,
+      "pairedRatioMedian": 0.9853022010825269,
+      "pairedRatioMAD": 0.007138436812287652,
+      "pairedRatioMin": 0.9268537499278533,
+      "pairedRatioMax": 1.0398491006959818,
+      "pairedRatioSampleP95": 1.0119957044096362
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.011640623211860657,
+        "control": 0.12457031011581421,
+        "candidate": 0.12285156548023224
+      },
+      "candidateOverJS": 10.553693152361337,
+      "pairedPercent": -0.347005071621842,
+      "candidateFasterPairs": 12,
+      "ratioOfMediansPercent": -1.3797385861719635,
+      "pairedRatioMedian": 0.9965299492837816,
+      "pairedRatioMAD": 0.07258981648641638,
+      "pairedRatioMin": 0.47554713101732804,
+      "pairedRatioMax": 2.3123277451547786,
+      "pairedRatioSampleP95": 1.8352516163541002
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.08617187291383743,
+        "control": 0.39390623569488525,
+        "candidate": 0.3934375047683716
+      },
+      "candidateOverJS": 4.565729993611333,
+      "pairedPercent": -0.8733672728814645,
+      "candidateFasterPairs": 12,
+      "ratioOfMediansPercent": -0.11899555885089841,
+      "pairedRatioMedian": 0.9912663272711854,
+      "pairedRatioMAD": 0.03828442375670116,
+      "pairedRatioMin": 0.7321166129507796,
+      "pairedRatioMax": 1.1776212349081794,
+      "pairedRatioSampleP95": 1.0746209448956616
+    },
+    {
+      "case": "er/small",
+      "profile": "fixed",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.09753906726837158,
+        "control": 0.24476562440395355,
+        "candidate": 0.23828125
+      },
+      "candidateOverJS": 2.4429313983943133,
+      "pairedPercent": -0.9345753933683865,
+      "candidateFasterPairs": 12,
+      "ratioOfMediansPercent": -2.6492177648491766,
+      "pairedRatioMedian": 0.9906542460663161,
+      "pairedRatioMAD": 0.03258101888011655,
+      "pairedRatioMin": 0.42477751953076465,
+      "pairedRatioMax": 1.5521863798017563,
+      "pairedRatioSampleP95": 1.1614034897726264
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.012031249701976776,
+        "control": 0.12468750029802322,
+        "candidate": 0.1259765625
+      },
+      "candidateOverJS": 10.470779480148401,
+      "pairedPercent": 1.9470682013811969,
+      "candidateFasterPairs": 8,
+      "ratioOfMediansPercent": 1.0338343449790122,
+      "pairedRatioMedian": 1.019470682013812,
+      "pairedRatioMAD": 0.04288949581428092,
+      "pairedRatioMin": 0.2636082583706739,
+      "pairedRatioMax": 2.4732547529525286,
+      "pairedRatioSampleP95": 1.91898648855042
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.11234375089406967,
+        "control": 0.4229687452316284,
+        "candidate": 0.4256249964237213
+      },
+      "candidateOverJS": 3.7885952092257313,
+      "pairedPercent": 0.29607669263775893,
+      "candidateFasterPairs": 9,
+      "ratioOfMediansPercent": 0.6280017665698301,
+      "pairedRatioMedian": 1.0029607669263776,
+      "pairedRatioMAD": 0.018228813107354913,
+      "pairedRatioMin": 0.8437500057019752,
+      "pairedRatioMax": 1.0620282684472762,
+      "pairedRatioSampleP95": 1.0441988503922184
+    },
+    {
+      "case": "er/small",
+      "profile": "canvas",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.11171875149011612,
+        "control": 0.2510156184434891,
+        "candidate": 0.24656251072883606
+      },
+      "candidateOverJS": 2.2069930735902443,
+      "pairedPercent": -1.966721644089453,
+      "candidateFasterPairs": 12,
+      "ratioOfMediansPercent": -1.7740361106874825,
+      "pairedRatioMedian": 0.9803327835591055,
+      "pairedRatioMAD": 0.028941310181924362,
+      "pairedRatioMin": 0.8901881877348892,
+      "pairedRatioMax": 1.2242752804209656,
+      "pairedRatioSampleP95": 1.0627588805036032
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.07089843600988388,
+        "control": 0.5174999833106995,
+        "candidate": 0.5275000035762787
+      },
+      "candidateOverJS": 7.440220592492907,
+      "pairedPercent": 2.298855887035667,
+      "candidateFasterPairs": 5,
+      "ratioOfMediansPercent": 1.932371128131094,
+      "pairedRatioMedian": 1.0229885588703567,
+      "pairedRatioMAD": 0.017522409356003577,
+      "pairedRatioMin": 0.2991920851542774,
+      "pairedRatioMax": 1.9525966836320112,
+      "pairedRatioSampleP95": 1.753222195852857
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.5190625190734863,
+        "control": 2.09375,
+        "candidate": 2.0875000953674316
+      },
+      "candidateOverJS": 4.02167372649747,
+      "pairedPercent": -0.23880574240613406,
+      "candidateFasterPairs": 11,
+      "ratioOfMediansPercent": -0.2985029078241608,
+      "pairedRatioMedian": 0.9976119425759387,
+      "pairedRatioMAD": 0.01597670922954819,
+      "pairedRatioMin": 0.922413808566766,
+      "pairedRatioMax": 1.0363580980965792,
+      "pairedRatioSampleP95": 1.0302486419494692
+    },
+    {
+      "case": "er/medium",
+      "profile": "fixed",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.5724999904632568,
+        "control": 1.2984375357627869,
+        "candidate": 1.2878125309944153
+      },
+      "candidateOverJS": 2.249454240081891,
+      "pairedPercent": -0.9644785819915125,
+      "candidateFasterPairs": 14,
+      "ratioOfMediansPercent": -0.8182915601041785,
+      "pairedRatioMedian": 0.9903552141800849,
+      "pairedRatioMAD": 0.019069003975959675,
+      "pairedRatioMin": 0.8475457178059566,
+      "pairedRatioMax": 1.1479853856568216,
+      "pairedRatioSampleP95": 1.0747417114789708
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.07582031190395355,
+        "control": 0.5332812368869781,
+        "candidate": 0.5390625
+      },
+      "candidateOverJS": 7.109737304732603,
+      "pairedPercent": 1.988130745180161,
+      "candidateFasterPairs": 7,
+      "ratioOfMediansPercent": 1.084092728776631,
+      "pairedRatioMedian": 1.0198813074518016,
+      "pairedRatioMAD": 0.03239417937664246,
+      "pairedRatioMin": 0.44395443027930354,
+      "pairedRatioMax": 1.842660443482878,
+      "pairedRatioSampleP95": 1.776950572122231
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.6198437511920929,
+        "control": 2.1518750190734863,
+        "candidate": 2.172499895095825
+      },
+      "candidateOverJS": 3.504915377331207,
+      "pairedPercent": 1.3892951090721972,
+      "candidateFasterPairs": 4,
+      "ratioOfMediansPercent": 0.9584606838002774,
+      "pairedRatioMedian": 1.013892951090722,
+      "pairedRatioMAD": 0.012732495148622514,
+      "pairedRatioMin": 0.8852249571882639,
+      "pairedRatioMax": 1.0952246650848805,
+      "pairedRatioSampleP95": 1.067906677888131
+    },
+    {
+      "case": "er/medium",
+      "profile": "canvas",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.6767187714576721,
+        "control": 1.3931249976158142,
+        "candidate": 1.3834375143051147
+      },
+      "candidateOverJS": 2.044331519465833,
+      "pairedPercent": -0.27062929473393726,
+      "candidateFasterPairs": 11,
+      "ratioOfMediansPercent": -0.6953778969782776,
+      "pairedRatioMedian": 0.9972937070526606,
+      "pairedRatioMAD": 0.016910206914160897,
+      "pairedRatioMin": 0.8735909692417767,
+      "pairedRatioMax": 1.0184403024247228,
+      "pairedRatioSampleP95": 1.0172723297236754
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.29468750953674316,
+        "control": 2.121250033378601,
+        "candidate": 2.1206248998641968
+      },
+      "candidateOverJS": 7.196181823918758,
+      "pairedPercent": -0.7653074050700814,
+      "candidateFasterPairs": 14,
+      "ratioOfMediansPercent": -0.029470053250091333,
+      "pairedRatioMedian": 0.9923469259492992,
+      "pairedRatioMAD": 0.030492443554076765,
+      "pairedRatioMin": 0.3378292684207022,
+      "pairedRatioMax": 1.6518833822018997,
+      "pairedRatioSampleP95": 1.069073746600982
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 2.0787500143051147,
+        "control": 8.4375,
+        "candidate": 8.34250020980835
+      },
+      "candidateOverJS": 4.013229177341501,
+      "pairedPercent": 0.2704331452252795,
+      "candidateFasterPairs": 10,
+      "ratioOfMediansPercent": -1.1259234393084516,
+      "pairedRatioMedian": 1.0027043314522528,
+      "pairedRatioMAD": 0.05567337731529487,
+      "pairedRatioMin": 0.8444221862136102,
+      "pairedRatioMax": 1.1852589095404935,
+      "pairedRatioSampleP95": 1.1007893667451725
+    },
+    {
+      "case": "er/large",
+      "profile": "fixed",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 2.3700000047683716,
+        "control": 5.338750123977661,
+        "candidate": 5.3137500286102295
+      },
+      "candidateOverJS": 2.2420886151557458,
+      "pairedPercent": -0.5657703222218702,
+      "candidateFasterPairs": 15,
+      "ratioOfMediansPercent": -0.468276184254246,
+      "pairedRatioMedian": 0.9943422967777813,
+      "pairedRatioMAD": 0.006127970288706486,
+      "pairedRatioMin": 0.9379142430605233,
+      "pairedRatioMax": 1.0545583244595522,
+      "pairedRatioSampleP95": 1.0312574382306743
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "parse",
+      "trials": 21,
+      "medianMs": {
+        "js": 0.42445312440395355,
+        "control": 2.03125,
+        "candidate": 2.027500033378601
+      },
+      "candidateOverJS": 4.77673485435113,
+      "pairedPercent": -2.2151922610416652,
+      "candidateFasterPairs": 16,
+      "ratioOfMediansPercent": -0.1846137413611726,
+      "pairedRatioMedian": 0.9778480773895833,
+      "pairedRatioMAD": 0.012983383067758147,
+      "pairedRatioMin": 0.45493801781068843,
+      "pairedRatioMax": 2.122225674664425,
+      "pairedRatioSampleP95": 1.0745147517359321
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-model",
+      "trials": 21,
+      "medianMs": {
+        "js": 2.527500033378601,
+        "control": 8.625,
+        "candidate": 8.742499828338623
+      },
+      "candidateOverJS": 3.4589514195385416,
+      "pairedPercent": 0.8354912125961622,
+      "candidateFasterPairs": 7,
+      "ratioOfMediansPercent": 1.3623168503028804,
+      "pairedRatioMedian": 1.0083549121259616,
+      "pairedRatioMAD": 0.01686177651084475,
+      "pairedRatioMin": 0.6525138052364904,
+      "pairedRatioMax": 1.1120000203450522,
+      "pairedRatioSampleP95": 1.1092895941050256
+    },
+    {
+      "case": "er/large",
+      "profile": "canvas",
+      "stage": "render-source",
+      "trials": 21,
+      "medianMs": {
+        "js": 2.7618749141693115,
+        "control": 5.752500057220459,
+        "candidate": 5.702500104904175
+      },
+      "candidateOverJS": 2.0647206271538603,
+      "pairedPercent": -0.36940476880257256,
+      "candidateFasterPairs": 14,
+      "ratioOfMediansPercent": -0.8691864722978115,
+      "pairedRatioMedian": 0.9963059523119743,
+      "pairedRatioMAD": 0.013634291981520552,
+      "pairedRatioMin": 0.9539501415684595,
+      "pairedRatioMax": 1.6768199912877557,
+      "pairedRatioSampleP95": 1.0396226696507676
+    }
+  ]
+}

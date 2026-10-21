@@ -1,0 +1,46 @@
+{
+  "status": "candidate pinned; no transfer or timing authorized",
+  "primaryControl": "unchanged e148 + PeleJS",
+  "executionPriority": [
+    "first-use",
+    "warm only if authorized"
+  ],
+  "protocolProbeDelta": "Only expected full packet magic changed PLCSRC02 to PLCSRC03 at3locations. Update remainsPLCSRU01;8checks unchanged. Actual initializer16 and ingress12 probes byte-identical.",
+  "harnesses": {
+    "warm": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "firstUse": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0"
+  },
+  "files": {
+    "cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "compare-first-use-web-vm.mjs": "5469078edefad399f109ad29f4c3f25a56ce3834bfdbe4a635c4f3b7ea463bb0",
+    "compare-web-vm.mjs": "1429f77380082b13424f8942824a86437dccf988c9200d228fc487b2437f8272",
+    "probe-layout-continuity.mjs": "8af37f83784fd32ce07d452eea20391d06a41c7abbfe47caec1a867f08ce39a7",
+    "probe-source-ingress.mjs": "98a4055a80b366c491e9a4e807349a76179db340930b491bbca5942e5b98ae67",
+    "probe-source-layout.mjs": "f562381358e6446a5a5f58323c5c7081018a1245d77e049384bb735947033015",
+    "run-source-layout.mjs": "d85077d436e4a35c03f67929c7212bfb8d6a5ac51d635e2b792bc079b858c3bf",
+    "source-layout-pins.json": "45aeba53d3bf9a4f6405d32a2c364ddf4838ffc6a3da2b12bcd57497ded023b7"
+  },
+  "referencesSHA256": "1bbefbe19f77604be77ac2425938767ea381916a6221ff81a9eef4f4f15dc86a",
+  "preparationFiles": {
+    "pin-candidate.py": "7dc14cd9c06cb9201a3c19b78d955fd80a2b48542fab7bb1fcef02138061a992",
+    "vm-artifacts.py": "e541a70c70c5e0b7aa59a36f692c2f0bd8f3399986df23b88f0c8ce22f081a9e",
+    "PLAN.md": "13d063607266a1887e43fbd89918f986de8e444aa5b06dafd80967c72de93c16"
+  },
+  "conditions": 24,
+  "trials": 21,
+  "warmupMs": 1000,
+  "probeCounts": [
+    8,
+    16,
+    12
+  ],
+  "candidateSource": "bb0fc18055a175de4645129ea25a4917a6fa7d17",
+  "candidateWasm": "6e14438c387a81dddec03647f13b3092efb704b617838055911e4b91bcd907cc",
+  "candidateManifestSHA256": "ad143bf1a823427005bfc6480ef58cc22b501301f5688642bcf5b867155e233f",
+  "candidateManifestPath": "dist/perf-patches/parse-architecture/source-typed-columns-runtime/package.json",
+  "candidatePackagePath": "dist/perf-patches/parse-architecture/source-typed-columns-runtime/candidate-package",
+  "reviewedSourceManifestSHA256": "a55d60aa48afb4cd45b8d6509435787ed68e55d141c420decaaf92177c610691",
+  "reviewedGeneratorSHA256": "2ee1170a84d0d6b72edde1815ceddd62cfaa6ec3f616a6ecd228188b8d400b7d",
+  "independentReviewSHA256": "904dba31355d3dcbc91e59abdcdf914fad4f7345df32e5d6d93629371abc01b5",
+  "probeReviewSHA256": "3b93c444121560afc0daaf0d207fe297e929ed8902e079016746aef7ce172496"
+}

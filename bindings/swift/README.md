@@ -97,3 +97,5 @@ Rosetta discovery recovery and artifact boundaries.
 No Kamui dependency, web view or JavaScript diagram renderer is required.
 No iOS or Windows binary is included. Native transport/work budgets and
 documented compatibility boundaries remain active.
+
+For local Swift correctness and performance iteration, `scripts/build-native.sh --host` builds an XCFramework containing only the current explicit Rust host target. It matches the standalone Swift consumer freshness check without compiling duplicate untargeted or foreign-architecture archives. Use `--universal` for release validation and distributable macOS artifacts.

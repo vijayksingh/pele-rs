@@ -1,0 +1,35 @@
+{
+  "sourceEquivalentCommit": "ce559f1be92a751576d241440140a28bb728c508",
+  "runtimeFiles": {
+    "crates/pele/src/compat/engine.rs": "9805911042d8fac20d3343bdeba5ae720a4629c3089aa3dcd5628bcae61ce1b2",
+    "crates/pele/src/compat/normalized_projection.rs": "98bfeb89193664e351ef1fba8b5d679f3ba6c8813dae39df4a6a2a7b963ba784"
+  },
+  "fullSwiftCorpus": {
+    "testCases": 8,
+    "families": 33,
+    "mutableDrawings": 167473,
+    "mutableErrors": 270358,
+    "explicitExistingBudgetDifferences": 5,
+    "durationSeconds": 652.187,
+    "passed": true
+  },
+  "cPrograms": [
+    "tests/ffi.c",
+    "tests/ffi-public.c",
+    "tests/ffi-parse-limits.c"
+  ],
+  "nativeIntegrationCases": 20,
+  "webIdentityChecks": 3,
+  "webFullFamilyChecks": 9,
+  "webFamilies": [
+    "er",
+    "gantt",
+    "sequence"
+  ],
+  "swiftConsumerConditions": 168,
+  "limitations": [
+    "AppKit focus/activation UI acceptance remains open; no current full-suite UI pass claimed.",
+    "Current SDK is ARM64; universal Intel validation remains required.",
+    "Full JS performance gate still fails126/126 conditions."
+  ]
+}

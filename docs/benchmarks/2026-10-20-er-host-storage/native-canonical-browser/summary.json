@@ -1,0 +1,97 @@
+{
+  "scope": "frozen native-canonical backend correctness; no performance or release claim",
+  "sourceCommit": "3166b3dd18569ad0bc20f173a8941dd628609ddc",
+  "browser": {
+    "totalPassed": 468,
+    "totalFailed": 0,
+    "totalSkipped": 0,
+    "engines": {
+      "chromium": {
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "nativeMemoryCases": 6,
+        "capturedFeatureCases": 3
+      },
+      "firefox": {
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "nativeMemoryCases": 6,
+        "capturedFeatureCases": 3
+      },
+      "webkit": {
+        "passed": 156,
+        "failed": 0,
+        "skipped": 0,
+        "nativeMemoryCases": 6,
+        "capturedFeatureCases": 3
+      }
+    },
+    "reportedWallTime": "13.4m"
+  },
+  "native": {
+    "featureDistinctTargetTests": 27,
+    "featureExecutions": 32,
+    "initialWindow": [
+      {
+        "target": "public_captured_admission",
+        "passed": 3
+      },
+      {
+        "target": "public_native_flat_store",
+        "passed": 5
+      },
+      {
+        "target": "public_render_outcome_view",
+        "passed": 2
+      },
+      {
+        "target": "public_sankey_graphless",
+        "passed": 11
+      },
+      {
+        "target": "public_sankey_owned_parse",
+        "passed": 5
+      }
+    ],
+    "followupWindow": [
+      {
+        "target": "public_native_flat_store",
+        "passed": 6
+      }
+    ],
+    "defaultPassed": 11,
+    "defaultWindow": [
+      {
+        "target": "public_binary",
+        "passed": 3
+      },
+      {
+        "target": "public_captured_admission",
+        "passed": 3
+      },
+      {
+        "target": "public_sankey_owned_parse",
+        "passed": 5
+      }
+    ],
+    "sourceCorpusCases": 11616
+  },
+  "provenance": {
+    "sourceInputs": 586,
+    "packageFiles": 113,
+    "wasmSha256": "2310934dd43dc52c20723c3e0217377f9819fef8e146d03ef3a33845e06bdcce",
+    "sourceFrozenBeforeBuildCommit": "39338ff5a4dc230e5dc45b95cca89cc0b7d4a42a",
+    "sourceAndPackageUnchangedThroughFullBrowser": true,
+    "immutableGitMappings": 586,
+    "frozenPackageRehashedFiles": 113
+  },
+  "limitations": [
+    "Feature-native windows overlap: five tests repeat; default/feature names also overlap and are not one unique total.",
+    "Package build was recorded before final commit; identical frozen source hashes bind it to 3166b3d, not a claim of a later clean rebuild.",
+    "The portable verifier checks captured logs and hash records; source/binary trees are omitted and it performs no new browser run or package rehash.",
+    "Explicit feature tests opt into the native owner; ordinary default selection remains a separate adoption decision.",
+    "The experimental backend performance/release decision is not established by passing correctness tests. Current cursor-layer sources are excluded."
+  ]
+}

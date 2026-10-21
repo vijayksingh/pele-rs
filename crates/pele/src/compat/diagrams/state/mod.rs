@@ -20,10 +20,13 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<StateModel, PeleErr
         max_edges: options.max_edges,
     })
 }
+mod live_phase;
+mod phase;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, RenderResources, RenderSettings, Rendered,
 };
+pub(crate) use live_phase::{render_detached, StateDetachedInput};
 #[derive(Default)]
 pub struct State;
 impl DiagramModule for State {

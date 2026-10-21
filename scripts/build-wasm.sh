@@ -8,10 +8,21 @@ fi
 # Explicit opt-in experiment; the smaller default remains measured and reproducible.
 pele_wasm_opt_level="${PELE_WASM_OPT_LEVEL:-s}"
 case "$pele_wasm_opt_level" in s|3) ;; *) echo 'PELE_WASM_OPT_LEVEL must be s or 3' >&2; exit 2 ;; esac
+pele_wasm_build_args=(--locked --release -p pele-wasm --target wasm32-unknown-unknown)
+case "${PELE_WASM_CAPTURED_SANKEY:-0}" in
+    0) ;;
+    1) pele_wasm_build_args+=(--features captured-sankey) ;;
+    *) echo 'PELE_WASM_CAPTURED_SANKEY must be 0 or 1' >&2; exit 2 ;;
+esac
+case "${PELE_WASM_NATIVE_CANONICAL_SANKEY:-0}" in
+    0) ;;
+    1) pele_wasm_build_args+=(--features native-canonical-sankey) ;;
+    *) echo 'PELE_WASM_NATIVE_CANONICAL_SANKEY must be 0 or 1' >&2; exit 2 ;;
+esac
 # rust-lld on macOS needs the LLVM library shipped in the toolchain's lib/.
 DYLD_FALLBACK_LIBRARY_PATH="$rust_bin/../lib:${DYLD_FALLBACK_LIBRARY_PATH:-/usr/local/lib:/usr/lib}" \
 CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_OPT_LEVEL="$pele_wasm_opt_level" \
-  cargo build --locked --release -p pele-wasm --target wasm32-unknown-unknown
+  cargo build "${pele_wasm_build_args[@]}"
 mkdir -p dist/wasm dist/evidence
 # Test oracle only, never included in the distributed WASM package.
 cp node_modules/pele/dist/pele.js dist/evidence/pele-oracle.js

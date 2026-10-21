@@ -23,6 +23,16 @@ const MAX_BINDINGS: usize = 1024;
 // Identity allocation only: no callable, pointer, graph or host state is global.
 // IDs never repeat, including after close; foreign-owner references cannot alias.
 static NEXT_REFERENCE: AtomicU32 = AtomicU32::new(1);
+pub(super) fn allocate_reference() -> Result<u32, PeleError> {
+    NEXT_REFERENCE
+        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+        .map_err(|_| {
+            PeleError::new(
+                "Host function identity space exhausted",
+                pele::compat::ErrorCode::Limit,
+            )
+        })
+}
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct PeleHostFunctionV12 {
@@ -140,13 +150,19 @@ impl HostFunction for Function {
 }
 struct Resources<'a> {
     host: &'a mut dyn RenderResources,
-    bindings: &'a Bindings,
+    bindings: &'a RefCell<Bindings>,
 }
 impl RenderResources for Resources<'_> {
     fn host_function(&mut self, id: u32) -> Result<Rc<dyn HostFunction>, PublicError> {
-        self.bindings.functions.get(&id).cloned().ok_or_else(|| {
-            public::invalid("Unbound or foreign-owner host function reference").into()
-        })
+        self.bindings
+            .try_borrow()
+            .map_err(|_| public::invalid("Host function bindings are already in use"))?
+            .functions
+            .get(&id)
+            .cloned()
+            .ok_or_else(|| {
+                public::invalid("Unbound or foreign-owner host function reference").into()
+            })
     }
     fn image(&mut self, uri: &str) -> Result<pele::compat::ImageResource, PeleError> {
         self.host.image(uri)
@@ -185,8 +201,8 @@ impl RenderResources for Resources<'_> {
         self.host.capture_presentation(v)
     }
 }
-/// Caller holds the public document operation guard. Reuses its owner bindings
-/// for both orchestrated and raw render entry points.
+/// Reuses owner bindings for ordinary and detached render entry points.
+/// Only callable lookup borrows bindings; no binding borrow crosses a callback.
 pub(super) unsafe fn with_resources<T>(
     handle: *const PelePublicDocument,
     resources: *const PeleHostResourcesV3,
@@ -194,15 +210,11 @@ pub(super) unsafe fn with_resources<T>(
 ) -> Result<T, PeleError> {
     let owner =
         unsafe { handle.as_ref() }.ok_or_else(|| public::invalid("Null public document"))?;
-    let bindings = owner
-        .host_functions
-        .try_borrow()
-        .map_err(|_| public::invalid("Host function bindings are already in use"))?;
     unsafe {
         calendar::with_resources(resources, |host| {
             run(&mut Resources {
                 host,
-                bindings: &bindings,
+                bindings: &owner.host_functions,
             })
         })
     }
@@ -252,14 +264,7 @@ pub unsafe extern "C" fn pele_public_bind_host_function_v12(
                 pele::compat::ErrorCode::Limit,
             ));
         }
-        let id = NEXT_REFERENCE
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
-            .map_err(|_| {
-                PeleError::new(
-                    "Host function identity space exhausted",
-                    pele::compat::ErrorCode::Limit,
-                )
-            })?;
+        let id = allocate_reference()?;
         let result = public::success(serde_json::json!({"reference":id}))?;
         unsafe { table.retain.expect("validated")(table.context) };
         bindings.functions.insert(id, Rc::new(Function(table)));
@@ -410,7 +415,7 @@ pub unsafe extern "C" fn pele_public_invoke_with_functions_v12(
         let mut document = unsafe { public::document(handle) }?;
         let outcome = unsafe {
             with_resources(handle, resources, |host| {
-                document.invoke(revision, call, host)
+                document.invoke_read(revision, call, host)
             })
         }?;
         public::binary_metadata(outcome.revision, &outcome.graph, &outcome.result)

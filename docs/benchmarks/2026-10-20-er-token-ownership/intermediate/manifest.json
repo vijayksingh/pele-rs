@@ -1,0 +1,21 @@
+{
+  "baselineCommit": "175daa8fd76fc1e25f488e4957b6970b4b6d4fe2",
+  "scope": "Private candidate only; consumed ER token text ownership transfer",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/er/parser.rs",
+      "originalSha256": "61bbad2a127617630d399f7634e1c484c9d9413cc699117c6ef5d2356f0e0abc",
+      "candidateSha256": "3d750d91adbef70e83929b391dcaa48d452c255030c63c104085eea090143441"
+    }
+  ],
+  "patchSha256": "71b82f0f4302fb7b6e3872ecbe3dfafcf0a4ba143b47eafa9dbc55bc2b354827",
+  "checks": [
+    "Private rustfmt completed; candidate is exactly one expression replacement"
+  ],
+  "notRun": [
+    "compilation",
+    "integration tests",
+    "benchmarks",
+    "WASM/SDK builds"
+  ]
+}

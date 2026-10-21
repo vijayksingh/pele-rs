@@ -6,6 +6,8 @@ use crate::compat::{
     RenderSettings, Rendered,
 };
 use std::collections::{HashMap, HashSet};
+#[path = "public_model/live_warning.rs"]
+mod live_warning;
 const PROTO: PrototypeId = PrototypeId(1);
 const fn field_schema(
     name: &'static str,
@@ -889,257 +891,306 @@ fn frame(g: &mut ModelGraph, statements: &Atom, parent: Atom) -> Result<Frame, P
         columns,
     })
 }
+struct HierarchyWarning {
+    block: Atom,
+    columns: Atom,
+}
+impl HierarchyWarning {
+    fn message(&self, g: &mut ModelGraph) -> Result<Atom, PublicError> {
+        let id = read(g, &self.block, "id")?;
+        let width = read(g, &self.block, "widthInColumns")?;
+        let prefix = key(g, "Block ")?;
+        let mid = key(g, " width ")?;
+        let tail = key(g, " exceeds configured column width ")?;
+        concatenate(g, &[prefix, id, mid, width, tail, self.columns.clone()])
+    }
+}
+struct Hierarchy {
+    receiver: Atom,
+    stack: Vec<Frame>,
+    work: usize,
+    pending: Option<Atom>,
+}
+impl Hierarchy {
+    fn new(g: &mut ModelGraph, receiver: Atom, statements: Atom) -> Result<Self, PublicError> {
+        let root = read(g, &receiver, "root")?;
+        let first = frame(g, &statements, root)?;
+        Ok(Self {
+            receiver,
+            stack: vec![first],
+            work: 0,
+            pending: None,
+        })
+    }
+    fn advance(
+        &mut self,
+        g: &mut ModelGraph,
+        depth: usize,
+    ) -> Result<Option<HierarchyWarning>, PublicError> {
+        let r = self.receiver.clone();
+        while !self.stack.is_empty() {
+            let block = if let Some(block) = self.pending.take() {
+                block
+            } else {
+                let f = self.stack.last_mut().unwrap();
+                if f.at == f.list.len() {
+                    let f = self.stack.pop().unwrap();
+                    set(g, &f.parent, "children", f.children)?;
+                    continue;
+                }
+                self.work += 1;
+                if self.work.saturating_mul(g.strings.len().max(1)) > 32_000_000
+                    || self.work > 1_000_000
+                {
+                    return Err(limit().into());
+                }
+                let block = f.list[f.at].clone();
+                f.at += 1;
+                let typ = read(g, &block, "type")?;
+                let columns = f.columns.clone();
+                let width = read(g, &block, "widthInColumns")?;
+                if numeric(g, &columns)? > 0.
+                    && !strict(g, &typ, "column-setting")
+                    && matches!(width, Atom::Number(_))
+                    && numeric(g, &width)? > numeric(g, &columns)?
+                {
+                    self.pending = Some(block.clone());
+                    return Ok(Some(HierarchyWarning { block, columns }));
+                }
+                block
+            };
+            // The warning callback can change this record before the switch.
+            let typ = read(g, &block, "type")?;
+            if strict(g, &typ, "classDef") {
+                let id = read(g, &block, "id")?;
+                let css = read(g, &block, "css")?;
+                internal(g, r.clone(), "addStyleClass", vec![id, css], depth)?;
+                continue;
+            }
+            if strict(g, &typ, "applyClass") {
+                let id = read(g, &block, "id")?;
+                let style = read(g, &block, "styleClass")?;
+                let style = if nullish(&style) { key(g, "")? } else { style };
+                internal(g, r.clone(), "setCssClass", vec![id, style], depth)?;
+                continue;
+            }
+            if strict(g, &typ, "applyStyles") {
+                let styles = read(g, &block, "stylesStr")?;
+                if truthy(g, &styles) {
+                    let id = read(g, &block, "id")?;
+                    internal(g, r.clone(), "addStyle2Node", vec![id, styles], depth)?;
+                }
+                continue;
+            }
+            if strict(g, &typ, "column-setting") {
+                let value = read(g, &block, "columns")?;
+                let value = if nullish(&value) {
+                    Atom::Number(-1.)
+                } else {
+                    value
+                };
+                let parent = self.stack.last().unwrap().parent.clone();
+                set(g, &parent, "columns", value)?;
+                continue;
+            }
+            if strict(g, &typ, "edge") {
+                let id = read(g, &block, "id")?;
+                let counts = read(g, &r, "edgeCount")?;
+                let old = map_get(g, &counts, &id, "this.edgeCount.get is not a function")?;
+                let old = if nullish(&old) { Atom::Number(0.) } else { old };
+                let count = add_values(g, &old, &Atom::Number(1.))?;
+                map_set(
+                    g,
+                    &counts,
+                    id.clone(),
+                    count.clone(),
+                    "this.edgeCount.set is not a function",
+                )?;
+                let dash = key(g, "-")?;
+                let id = concatenate(g, &[count, dash, id])?;
+                set(g, &block, "id", id)?;
+                let edges = read(g, &r, "edges")?;
+                push(g, edges, block, "this.edges.push is not a function")?;
+                continue;
+            }
+            let mut id = read(g, &block, "id")?;
+            if nullish(&id) {
+                id = internal(g, r.clone(), "generateId", vec![], depth)?;
+                set(g, &block, "id", id.clone())?
+            }
+            if !truthy(g, &read(g, &block, "label")?) {
+                let label = if strict(g, &typ, "composite") {
+                    key(g, "")?
+                } else {
+                    id.clone()
+                };
+                set(g, &block, "label", label)?;
+            }
+            let by_id = read(g, &r, "byId")?;
+            let known = map_get(g, &by_id, &id, "this.byId.get is not a function")?;
+            let fresh = if matches!(known, Atom::Undefined) {
+                true
+            } else {
+                let pending = read(g, &r, "pending")?;
+                set_delete(g, &pending, &id)?
+            };
+            if !fresh {
+                if !strict(g, &typ, "na") {
+                    set(g, &known, "type", typ.clone())?
+                }
+                let label = read(g, &block, "label")?;
+                if !equal(g, &label, &id) {
+                    set(g, &known, "label", label)?
+                }
+            } else {
+                if truthy(g, &known) {
+                    let classes = read(g, &known, "classes")?;
+                    set(g, &block, "classes", classes)?;
+                    let styles = read(g, &known, "styles")?;
+                    set(g, &block, "styles", styles)?
+                }
+                if strict(g, &typ, "composite") {
+                    let colors = read(g, &r, "colors")?;
+                    let old = numeric(g, &colors)?;
+                    set(g, &r, "colors", Atom::Number(old + 1.))?;
+                    set(g, &block, "colorIndex", Atom::Number(old))?
+                }
+                map_set(
+                    g,
+                    &by_id,
+                    id.clone(),
+                    block.clone(),
+                    "this.byId.set is not a function",
+                )?;
+            }
+            let inner = read(g, &block, "children")?;
+            let children = new_array(g, vec![])?;
+            set(g, &block, "children", children)?;
+            if strict(g, &typ, "space") {
+                let raw = read(g, &block, "width")?;
+                let width = if nullish(&raw) { Atom::Number(1.) } else { raw };
+                let spaces = read(g, &r, "spaces")?;
+                let n = numeric(g, &width)?;
+                if !(n <= 100_000. - numeric(g, &spaces)?) {
+                    let mut e = invalid("A block diagram can hold at most 100000 space blocks.");
+                    e.code = ErrorCode::Limit;
+                    return Err(e.into());
+                }
+                let delta = Atom::Number(if n.is_nan() { f64::NAN } else { n.max(0.) });
+                let total = add_values(g, &spaces, &delta)?;
+                set(g, &r, "spaces", total)?;
+                if !n.is_finite() && n > 0. || n > 1_000_000. {
+                    return Err(limit().into());
+                }
+                let count = if n > 0. { n.ceil() as usize } else { 0 };
+                self.work = self.work.saturating_add(count);
+                if self.work > 1_000_000 {
+                    return Err(limit().into());
+                }
+                if self
+                    .work
+                    .saturating_mul(g.strings.len().saturating_add(count).max(1))
+                    > 32_000_000
+                {
+                    return Err(limit().into());
+                }
+                for j in 0..count {
+                    let Atom::Ref(source) = block else {
+                        return Err(invalid(
+                            "Block spread of non-object spaces is not implemented",
+                        )
+                        .into());
+                    };
+                    let properties = g.nodes[source as usize]
+                        .properties()
+                        .iter()
+                        .filter(|p| p.flags & 1 != 0)
+                        .map(|p| Property {
+                            key: p.key,
+                            value: p.value.clone(),
+                            flags: 7,
+                        })
+                        .collect();
+                    let copy = node(g, Node::Object { properties })?;
+                    let dash = key(g, "-")?;
+                    let id = concatenate(g, &[id.clone(), dash, Atom::Number(j as f64)])?;
+                    set(g, &copy, "id", id.clone())?;
+                    let children = new_array(g, vec![])?;
+                    set(g, &copy, "children", children)?;
+                    map_set(
+                        g,
+                        &by_id,
+                        id,
+                        copy.clone(),
+                        "this.byId.set is not a function",
+                    )?;
+                    let children = self.stack.last().unwrap().children.clone();
+                    push(
+                        g,
+                        children,
+                        copy,
+                        "Block native frame children.push is not a function",
+                    )?;
+                }
+            } else if fresh {
+                let children = self.stack.last().unwrap().children.clone();
+                push(
+                    g,
+                    children,
+                    block.clone(),
+                    "Block native frame children.push is not a function",
+                )?;
+            }
+            if truthy(g, &inner) && numeric(g, &read(g, &inner, "length")?)? > 0. {
+                let f = frame(g, &inner, block)?;
+                self.stack.push(f);
+            }
+        }
+        let root = read(g, &r, "root")?;
+        let children = read(g, &root, "children")?;
+        let children = if nullish(&children) {
+            new_array(g, vec![])?
+        } else {
+            children
+        };
+        set(g, &r, "blocks", children)?;
+        Ok(None)
+    }
+}
 fn hierarchy(
     g: &mut ModelGraph,
     r: Atom,
     statements: Atom,
     depth: usize,
 ) -> Result<(), PublicError> {
-    let root = read(g, &r, "root")?;
-    let first = frame(g, &statements, root)?;
-    let mut stack = vec![first];
-    let mut work = 0usize;
-    while let Some(f) = stack.last_mut() {
-        if f.at == f.list.len() {
-            let f = stack.pop().unwrap();
-            set(g, &f.parent, "children", f.children)?;
+    let mut hierarchy = Hierarchy::new(g, r.clone(), statements)?;
+    while let Some(warning) = hierarchy.advance(g, depth)? {
+        let warn = read(g, &r, "warn")?;
+        if nullish(&warn) {
             continue;
         }
-        work += 1;
-        if work.saturating_mul(g.strings.len().max(1)) > 32_000_000 {
-            return Err(limit().into());
-        }
-        if work > 1_000_000 {
-            return Err(limit().into());
-        }
-        let block = f.list[f.at].clone();
-        f.at += 1;
-        let typ = read(g, &block, "type")?;
-        let columns = f.columns.clone();
-        let width = read(g, &block, "widthInColumns")?;
-        if numeric(g, &columns)? > 0.
-            && !strict(g, &typ, "column-setting")
-            && matches!(width, Atom::Number(_))
-            && numeric(g, &width)? > numeric(g, &columns)?
-        {
-            let warn = read(g, &r, "warn")?;
-            if !nullish(&warn) {
-                let id = read(g, &block, "id")?;
-                let prefix = key(g, "Block ")?;
-                let mid = key(g, " width ")?;
-                let tail = key(g, " exceeds configured column width ")?;
-                let message = concatenate(g, &[prefix, id, mid, width, tail, columns])?;
-                match warn {
-                    Atom::BuiltinFunction(method) => {
-                        invoke_inner(
-                            g,
-                            MethodCall {
-                                method: MethodId(method),
-                                receiver: r.clone(),
-                                arguments: vec![message],
-                            },
-                            depth + 1,
-                        )?;
-                    }
-                    Atom::HostReference(_) => {
-                        return Err(
-                            invalid("Block foreign warning callbacks are not implemented").into(),
-                        )
-                    }
-                    _ => return Err(type_error("this.warn is not a function")),
-                }
-            }
-        }
-        if strict(g, &typ, "classDef") {
-            let id = read(g, &block, "id")?;
-            let css = read(g, &block, "css")?;
-            internal(g, r.clone(), "addStyleClass", vec![id, css], depth)?;
-            continue;
-        }
-        if strict(g, &typ, "applyClass") {
-            let id = read(g, &block, "id")?;
-            let style = read(g, &block, "styleClass")?;
-            let style = if nullish(&style) { key(g, "")? } else { style };
-            internal(g, r.clone(), "setCssClass", vec![id, style], depth)?;
-            continue;
-        }
-        if strict(g, &typ, "applyStyles") {
-            let styles = read(g, &block, "stylesStr")?;
-            if truthy(g, &styles) {
-                let id = read(g, &block, "id")?;
-                internal(g, r.clone(), "addStyle2Node", vec![id, styles], depth)?;
-            }
-            continue;
-        }
-        if strict(g, &typ, "column-setting") {
-            let value = read(g, &block, "columns")?;
-            let value = if nullish(&value) {
-                Atom::Number(-1.)
-            } else {
-                value
-            };
-            let parent = stack.last().unwrap().parent.clone();
-            set(g, &parent, "columns", value)?;
-            continue;
-        }
-        if strict(g, &typ, "edge") {
-            let id = read(g, &block, "id")?;
-            let counts = read(g, &r, "edgeCount")?;
-            let old = map_get(g, &counts, &id, "this.edgeCount.get is not a function")?;
-            let old = if nullish(&old) { Atom::Number(0.) } else { old };
-            let count = add_values(g, &old, &Atom::Number(1.))?;
-            map_set(
-                g,
-                &counts,
-                id.clone(),
-                count.clone(),
-                "this.edgeCount.set is not a function",
-            )?;
-            let dash = key(g, "-")?;
-            let id = concatenate(g, &[count, dash, id])?;
-            set(g, &block, "id", id)?;
-            let edges = read(g, &r, "edges")?;
-            push(g, edges, block, "this.edges.push is not a function")?;
-            continue;
-        }
-        let mut id = read(g, &block, "id")?;
-        if nullish(&id) {
-            id = internal(g, r.clone(), "generateId", vec![], depth)?;
-            set(g, &block, "id", id.clone())?
-        }
-        if !truthy(g, &read(g, &block, "label")?) {
-            let label = if strict(g, &typ, "composite") {
-                key(g, "")?
-            } else {
-                id.clone()
-            };
-            set(g, &block, "label", label)?;
-        }
-        let by_id = read(g, &r, "byId")?;
-        let known = map_get(g, &by_id, &id, "this.byId.get is not a function")?;
-        let fresh = if matches!(known, Atom::Undefined) {
-            true
-        } else {
-            let pending = read(g, &r, "pending")?;
-            set_delete(g, &pending, &id)?
-        };
-        if !fresh {
-            if !strict(g, &typ, "na") {
-                set(g, &known, "type", typ.clone())?
-            }
-            let label = read(g, &block, "label")?;
-            if !equal(g, &label, &id) {
-                set(g, &known, "label", label)?
-            }
-        } else {
-            if truthy(g, &known) {
-                let classes = read(g, &known, "classes")?;
-                set(g, &block, "classes", classes)?;
-                let styles = read(g, &known, "styles")?;
-                set(g, &block, "styles", styles)?
-            }
-            if strict(g, &typ, "composite") {
-                let colors = read(g, &r, "colors")?;
-                let old = numeric(g, &colors)?;
-                set(g, &r, "colors", Atom::Number(old + 1.))?;
-                set(g, &block, "colorIndex", Atom::Number(old))?
-            }
-            map_set(
-                g,
-                &by_id,
-                id.clone(),
-                block.clone(),
-                "this.byId.set is not a function",
-            )?;
-        }
-        let inner = read(g, &block, "children")?;
-        let children = new_array(g, vec![])?;
-        set(g, &block, "children", children)?;
-        if strict(g, &typ, "space") {
-            let raw = read(g, &block, "width")?;
-            let width = if nullish(&raw) { Atom::Number(1.) } else { raw };
-            let spaces = read(g, &r, "spaces")?;
-            let n = numeric(g, &width)?;
-            if !(n <= 100_000. - numeric(g, &spaces)?) {
-                let mut e = invalid("A block diagram can hold at most 100000 space blocks.");
-                e.code = ErrorCode::Limit;
-                return Err(e.into());
-            }
-            let delta = Atom::Number(if n.is_nan() { f64::NAN } else { n.max(0.) });
-            let total = add_values(g, &spaces, &delta)?;
-            set(g, &r, "spaces", total)?;
-            if !n.is_finite() && n > 0. || n > 1_000_000. {
-                return Err(limit().into());
-            }
-            let count = if n > 0. { n.ceil() as usize } else { 0 };
-            work = work.saturating_add(count);
-            if work > 1_000_000 {
-                return Err(limit().into());
-            }
-            if work.saturating_mul(g.strings.len().saturating_add(count).max(1)) > 32_000_000 {
-                return Err(limit().into());
-            }
-            for j in 0..count {
-                let Atom::Ref(source) = block else {
-                    return Err(
-                        invalid("Block spread of non-object spaces is not implemented").into(),
-                    );
-                };
-                let properties = g.nodes[source as usize]
-                    .properties()
-                    .iter()
-                    .filter(|p| p.flags & 1 != 0)
-                    .map(|p| Property {
-                        key: p.key,
-                        value: p.value.clone(),
-                        flags: 7,
-                    })
-                    .collect();
-                let copy = node(g, Node::Object { properties })?;
-                let dash = key(g, "-")?;
-                let id = concatenate(g, &[id.clone(), dash, Atom::Number(j as f64)])?;
-                set(g, &copy, "id", id.clone())?;
-                let children = new_array(g, vec![])?;
-                set(g, &copy, "children", children)?;
-                map_set(
+        let message = warning.message(g)?;
+        match warn {
+            Atom::BuiltinFunction(method) => {
+                invoke_inner(
                     g,
-                    &by_id,
-                    id,
-                    copy.clone(),
-                    "this.byId.set is not a function",
-                )?;
-                let children = stack.last().unwrap().children.clone();
-                push(
-                    g,
-                    children,
-                    copy,
-                    "Block native frame children.push is not a function",
+                    MethodCall {
+                        method: MethodId(method),
+                        receiver: r.clone(),
+                        arguments: vec![message],
+                    },
+                    depth + 1,
                 )?;
             }
-        } else if fresh {
-            let children = stack.last().unwrap().children.clone();
-            push(
-                g,
-                children,
-                block.clone(),
-                "Block native frame children.push is not a function",
-            )?;
-        }
-        if truthy(g, &inner) && numeric(g, &read(g, &inner, "length")?)? > 0. {
-            let f = frame(g, &inner, block)?;
-            stack.push(f);
+            Atom::HostReference(_) => {
+                return Err(invalid("Block foreign warning callbacks are not implemented").into())
+            }
+            _ => return Err(type_error("this.warn is not a function")),
         }
     }
-    let root = read(g, &r, "root")?;
-    let children = read(g, &root, "children")?;
-    let children = if nullish(&children) {
-        new_array(g, vec![])?
-    } else {
-        children
-    };
-    set(g, &r, "blocks", children)?;
     Ok(())
 }
+
 fn invoke_inner(g: &mut ModelGraph, c: MethodCall, depth: usize) -> Result<Atom, PublicError> {
     if depth > 64 {
         return Err(limit().into());
@@ -1836,8 +1887,168 @@ fn node_out(
     }
     Ok(properties)
 }
+fn construct_default() -> Result<BlockPublicState, PeleError> {
+    let mut out = GraphWriter::default();
+    let children = array_out(&mut out, vec![]);
+    let root_id = out.string("root");
+    let composite = out.string("composite");
+    let properties = vec![
+        out.property("id", Atom::String(root_id)),
+        out.property("type", Atom::String(composite)),
+        out.property("children", Atom::Ref(children)),
+        out.property("columns", Atom::Number(-1.0)),
+    ];
+    let hierarchy_root = out.node(Node::Object { properties });
+    // Fresh BlockDb has distinct root.children and blocks arrays. Source parsing
+    // later aliases these through setHierarchy; construction must not do so.
+    let blocks = array_out(&mut out, vec![]);
+    let edges = array_out(&mut out, vec![]);
+    let classes = out.node(Node::Map {
+        entries: vec![],
+        properties: vec![],
+    });
+    let by_id = out.node(Node::Map {
+        entries: vec![],
+        properties: vec![],
+    });
+    let pending = out.node(Node::Set {
+        values: vec![],
+        properties: vec![],
+    });
+    let edge_count = out.node(Node::Map {
+        entries: vec![],
+        properties: vec![],
+    });
+    let kind = out.string("block");
+    let mut properties = vec![
+        out.property("type", Atom::String(kind)),
+        out.property("title", Atom::Undefined),
+        out.property("root", Atom::Ref(hierarchy_root)),
+        out.property("blocks", Atom::Ref(blocks)),
+        out.property("edges", Atom::Ref(edges)),
+        out.property("classes", Atom::Ref(classes)),
+        out.property("byId", Atom::Ref(by_id)),
+    ];
+    for (id, name) in [
+        "typeStr2Type",
+        "edgeStrToEdgeData",
+        "edgeStrToEdgeStartData",
+        "edgeStrToThickness",
+        "edgeStrToPattern",
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        properties.push(out.property(name, Atom::BuiltinFunction(id as u32)));
+    }
+    properties.extend([
+        out.property("warn", Atom::Undefined),
+        out.property("pending", Atom::Ref(pending)),
+        out.property("edgeCount", Atom::Ref(edge_count)),
+        out.property("ids", Atom::Number(0.0)),
+        out.property("colors", Atom::Number(0.0)),
+        out.property("spaces", Atom::Number(0.0)),
+    ]);
+    let root = out.node(Node::Instance {
+        prototype: PROTO,
+        properties,
+    });
+    let graph = out.finish(Atom::Ref(root))?;
+    let model = imported(&graph);
+    Ok(BlockPublicState { graph, model })
+}
+fn construct_initial(_: ConstructorArgument) -> Result<BlockPublicState, PeleError> {
+    construct_default()
+}
+enum BlockConstruction {
+    Start(ConstructorArgument),
+    Warn,
+    Done,
+}
+fn resume_construction(
+    state: &mut BlockPublicState,
+    phase: &mut BlockConstruction,
+    reply: Option<PublicHostValue>,
+) -> PublicInvocationPhase {
+    fn run(
+        state: &mut BlockPublicState,
+        phase: &mut BlockConstruction,
+        reply: Option<PublicHostValue>,
+    ) -> Result<PublicInvocationPhase, PublicError> {
+        Ok(match std::mem::replace(phase, BlockConstruction::Done) {
+            BlockConstruction::Start(argument) => {
+                let options = if matches!(argument, ConstructorArgument::Undefined) {
+                    new_object(&mut state.graph, &[])?
+                } else {
+                    argument.into_atom(|value| intern(&mut state.graph, value).map(Atom::String))?
+                };
+                *phase = BlockConstruction::Warn;
+                PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver: options,
+                    key: "warn",
+                })
+            }
+            BlockConstruction::Warn => {
+                let value = reply
+                    .expect("awaited warn")
+                    .into_atom(|value| intern(&mut state.graph, value).map(Atom::String))?;
+                let root = state.graph.root.clone();
+                set(&mut state.graph, &root, "warn", value)?;
+                PublicInvocationPhase::Complete(Ok(Atom::Undefined))
+            }
+            BlockConstruction::Done => {
+                return Err(invalid("Block construction already finished").into())
+            }
+        })
+    }
+    let result = run(state, phase, reply);
+    state.model = imported(&state.graph);
+    match result {
+        Ok(step) => step,
+        Err(error) => PublicInvocationPhase::Complete(Err(error)),
+    }
+}
+fn constructor_body(argument: ConstructorArgument) -> DetachedPublicInvocation {
+    DetachedPublicInvocation::new::<Block, BlockPublicState, _>(
+        BlockConstruction::Start(argument),
+        resume_construction,
+    )
+}
+
 impl PublicDiagramModule for Block {
+    fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        live_warning::program(call)
+    }
+
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            PublicConstructorFactory::first_value_body::<Self>(
+                PROTO,
+                construct_default,
+                construct_initial,
+                constructor_body,
+                live_warning::FIELDS,
+            )
+        })
+    }
+
     type PublicState = BlockPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::block())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::block(
+            super::BlockDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
@@ -2050,6 +2261,12 @@ impl PublicDiagramModule for Block {
         graph.validate_schema(&SCHEMA)?;
         let model = imported(&graph);
         Ok(BlockPublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &BlockPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

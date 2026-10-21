@@ -1,6 +1,42 @@
 import {test,expect} from '@playwright/test';
 const source='gantt\ndateFormat YYYY-MM-DD\nsection S\nA:a,2024-01-01,1d\nB:b,after a,2d';
 
+test('Gantt host-edited task records grow, shrink and recover during native delegation',async({page})=>{
+ await page.goto('/examples/web/');
+ const result=await page.evaluate(async(source)=>{
+  const {loadRenderer}=await import('/dist/package-web/package/full.js');
+  const oracle=await import('/dist/evidence/pele-oracle.js'),native=await loadRenderer();
+  function exercise(api){
+   const model=api.parse(source),original=model.getTasks,checks=[];
+   model.getTasks=function(now){
+    const tasks=original.call(this,now),first=tasks[0];
+    for(let index=0;index<40;index++)first[`extension${index}`]=index;
+    first.task='Expanded task';
+    this.setClass('a','expanded');
+    checks.push(original.call(this,now)===tasks,first.task==='Expanded task');
+    for(let index=0;index<40;index++){
+     checks.push(first[`extension${index}`]===index);
+     delete first[`extension${index}`];
+    }
+    first.task='Restored task';
+    this.setClass('a','restored');
+    checks.push(original.call(this,now)===tasks,first.task==='Restored task');
+    checks.push(first.endTime===tasks[1].startTime);
+    return tasks;
+   };
+   try{
+    const drawings=Array.from({length:2},()=>api.render(model,{
+     now:1704067200000,measurer:{width:(text,size)=>text.length*size*.6},
+    }));
+    return{drawings,checks,keys:Object.keys(model.tasks[0]),classes:[...model.tasks[0].classes]};
+   }finally{api.dispose?.(model);api.close?.();}
+  }
+  return{native:exercise(native),oracle:exercise(oracle)};
+ },source);
+ expect(result.native).toEqual(result.oracle);
+ expect(result.native.checks.every(Boolean)).toBe(true);
+});
+
 test('Gantt live getTasks preserves captured native calls, alternate arrays, Date aliases and mutable state',async({page})=>{
  await page.goto('/examples/web/');
  const result=await page.evaluate(async(source)=>{
@@ -65,20 +101,74 @@ test('Gantt captured native calls can catch host clock failures and recover insi
  expect(result.native).toEqual(result.oracle);expect(result.native.checks.every(Boolean)).toBe(true);
 });
 
-test('retained Gantt callback documents survive registry close and reject disposal or rendering during the active call',async({page})=>{
+test('Gantt resource clock errors preserve primitive identities without inspecting thrown values or poisoning nested recovery',async({page})=>{
  await page.goto('/examples/web/');
  const result=await page.evaluate(async(source)=>{
-  const {loadRegistry}=await import('/dist/package-web/package/registry.js');const api=await loadRegistry();api.registerBuiltin('gantt');
-  const model=api.parse(source),original=model.getTasks,checks=[];api.close();
-  model.getTasks=function(now){
-   for(const operation of [()=>api.dispose(model),()=>api.render(model,{now})]){try{operation();checks.push(false);}catch(error){checks.push(error instanceof TypeError&&error.message.includes('already in use'));}}
-   const tasks=original.call(this,now);checks.push(tasks===this.tasks);return tasks;
-  };
-  const drawing=api.render(model,{now:1704067200000,measurer:{width:(text,size)=>text.length*size*.6}});model.getTasks=original;const next=api.render(model,{now:1704067200000,measurer:{width:(text,size)=>text.length*size*.6}});api.dispose(model);
-  try{original.call(model,1704067200000);checks.push(false);}catch(error){checks.push(error instanceof TypeError);}
-  return{checks,same:drawing.svg===next.svg};
+  const {loadRenderer}=await import('/dist/package-web/package/full.js');
+  const oracle=await import('/dist/evidence/pele-oracle.js'),native=await loadRenderer();
+  function exercise(api){
+   const rows=[],options={now:1704067200000,measurer:{width:(text,size)=>text.length*size*.6}};
+   for(const mode of ['undefined','null','false','negative-zero','object','message-getter','nested-caught']){
+    const model=api.parse(source),original=model.getTasks,saved=Date.now,trace=[],checks=[];
+    const marker=mode==='undefined'?undefined:mode==='null'?null:mode==='false'?false:mode==='negative-zero'?-0:{};
+    if(mode==='message-getter')Object.defineProperty(marker,'message',{get(){trace.push('unexpected-message-read');throw new Error('do not read thrown value');}});
+    model.getTasks=function(now){
+     let entered=false;
+     Date.now=()=>{
+      trace.push('clock');
+      if(mode==='nested-caught'&&!entered){
+       entered=true;
+       try{original.call(this,NaN);checks.push(false);}catch(error){checks.push(Object.is(error,marker));}
+       return options.now;
+      }
+      throw marker;
+     };
+     try{original.call(this,NaN);checks.push(mode==='nested-caught');}catch(error){checks.push(mode!=='nested-caught'&&Object.is(error,marker));}
+     finally{Date.now=saved;}
+     return original.call(this,now);
+    };
+    let drawing;
+    try{drawing=api.render(model,options);}finally{Date.now=saved;model.getTasks=original;}
+    const recovered=api.render(model,options);api.dispose?.(model);
+    rows.push({mode,trace,checks,drawing,recovered});
+   }
+   api.close?.();return rows;
+  }
+  return{native:exercise(native),oracle:exercise(oracle)};
  },source);
- expect(result.same).toBe(true);expect(result.checks.every(Boolean)).toBe(true);
+ expect(result.native).toEqual(result.oracle);
+ for(const row of result.native){expect(row.checks.every(Boolean),row.mode).toBe(true);expect(row.trace.includes('unexpected-message-read'),row.mode).toBe(false);}
+});
+
+test('retained Gantt callback documents survive registry close and allow bounded nested rendering while rejecting disposal',async({page})=>{
+ await page.goto('/examples/web/');
+ const result=await page.evaluate(async(source)=>{
+  const {loadRegistry}=await import('/dist/package-web/package/registry.js');
+  const oracle=await import('/dist/evidence/pele-oracle.js'),native=await loadRegistry();native.registerBuiltin('gantt');
+  const lifecycle=[];
+  function exercise(api){
+   const model=api.parse(source),original=model.getTasks,checks=[],trace=[];
+   const options={now:1704067200000,measurer:{width:(text,size)=>text.length*size*.6}};
+   let entered=false,nested;api.close?.();
+   model.getTasks=function(now){
+    trace.push(['getTasks',now]);
+    if(!entered){
+     entered=true;
+     if(api.dispose)try{api.dispose(model);lifecycle.push(false);}catch(error){lifecycle.push(error instanceof TypeError&&error.message.includes('already in use'));}
+     nested=api.render(model,options);
+    }
+    const tasks=original.call(this,now);checks.push(tasks===this.tasks);return tasks;
+   };
+   const drawing=api.render(model,options);model.getTasks=original;
+   const next=api.render(model,options);
+   if(api.dispose){api.dispose(model);try{original.call(model,options.now);lifecycle.push(false);}catch(error){lifecycle.push(error instanceof TypeError);}}
+   return{checks,trace,drawing,nested,next};
+  }
+  return{native:exercise(native),oracle:exercise(oracle),lifecycle};
+ },source);
+ expect(result.native).toEqual(result.oracle);
+ expect(result.native.checks.every(Boolean)).toBe(true);
+ expect(result.lifecycle).toEqual([true,true]);
 });
 
 test('prepared Gantt raw render invokes the same live method while preserving raw limits and exception identity',async({page})=>{

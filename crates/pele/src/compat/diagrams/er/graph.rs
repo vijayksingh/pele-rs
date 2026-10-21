@@ -1,29 +1,35 @@
 //! Pele er/graph.ts resolved drawable graph, 458322a5 (MIT, kepano).
 use super::model::*;
+use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 #[derive(Clone)]
-pub(super) struct Node {
-    pub id: String,
-    pub label: String,
-    pub alias: String,
-    pub attributes: Vec<ErAttribute>,
+pub(super) struct Node<A: Clone, S: Clone, V: Clone> {
+    pub id: V,
+    pub label: V,
+    pub alias: V,
+    pub attributes: Option<A>,
     pub is_group: bool,
-    pub parent_id: Option<String>,
-    pub css_styles: Vec<String>,
+    pub parent_id: Option<V>,
+    pub css_styles: S,
     pub css_compiled_styles: Vec<String>,
-    pub css_classes: String,
-    pub dir: Option<String>,
+    pub css_classes: V,
+    pub dir: Option<V>,
 }
-pub(super) struct Edge {
+pub(super) struct Edge<V> {
     pub id: String,
-    pub start: String,
-    pub end: String,
-    pub label: String,
-    pub arrow_start: &'static str,
-    pub arrow_end: &'static str,
+    pub start: V,
+    pub end: V,
+    pub label: V,
+    pub arrow_start: Cow<'static, str>,
+    pub arrow_end: Cow<'static, str>,
     pub dashed: bool,
 }
-pub(super) fn build(model: &ErModel) -> (Vec<Node>, Vec<Edge>) {
+pub(super) fn build(
+    model: &ErModel,
+) -> (
+    Vec<Node<&[ErAttribute], &[String], String>>,
+    Vec<Edge<String>>,
+) {
     let compiled = |names: Vec<&str>| {
         let mut out = vec![];
         for n in names {
@@ -52,10 +58,10 @@ pub(super) fn build(model: &ErModel) -> (Vec<Node>, Vec<Edge>) {
             id: s.id.clone(),
             label: s.title.clone(),
             alias: String::new(),
-            attributes: vec![],
+            attributes: None,
             is_group: true,
             parent_id: parent.get(&s.id).cloned(),
-            css_styles: s.css_styles.clone(),
+            css_styles: s.css_styles.as_slice(),
             css_compiled_styles: compiled(s.classes.iter().map(String::as_str).collect()),
             css_classes: s.classes.join(" "),
             dir: s.dir.clone(),
@@ -71,10 +77,10 @@ pub(super) fn build(model: &ErModel) -> (Vec<Node>, Vec<Edge>) {
             id: e.id.clone(),
             label: e.label.clone(),
             alias: e.alias.clone(),
-            attributes: e.attributes.clone(),
+            attributes: Some(e.attributes.as_slice()),
             is_group: false,
             parent_id: parent.get(name).cloned(),
-            css_styles: e.css_styles.clone(),
+            css_styles: e.css_styles.as_slice(),
             css_compiled_styles: compiled(e.css_classes.split(' ').collect()),
             css_classes: e.css_classes.clone(),
             dir: None,
@@ -89,8 +95,8 @@ pub(super) fn build(model: &ErModel) -> (Vec<Node>, Vec<Edge>) {
             start: moved.get(&r.entity_a).unwrap_or(&r.entity_a).clone(),
             end: moved.get(&r.entity_b).unwrap_or(&r.entity_b).clone(),
             label: r.role_a.clone(),
-            arrow_start: r.rel_spec.card_b.marker(),
-            arrow_end: r.rel_spec.card_a.marker(),
+            arrow_start: Cow::Borrowed(r.rel_spec.card_b.marker()),
+            arrow_end: Cow::Borrowed(r.rel_spec.card_a.marker()),
             dashed: r.rel_spec.rel_type == Identification::NON_IDENTIFYING,
         })
         .collect();

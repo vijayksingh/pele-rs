@@ -1,0 +1,67 @@
+{
+  "checkedAt": "2026-10-20T09:24:22.060690+00:00",
+  "headAtReview": "6dfa9cac0ed7cf92ee4e5e7cacec0c1e1aa9268e",
+  "worktreeAtReview": "",
+  "denseRuntimeCommit": "770113546dd302a60b52707194bbda40bb9e070c",
+  "literalBaselineHead": "7ceb15edab31503e41493b9d0b67d0bfe0db06b9",
+  "literalPatchSHA256": "c5a80eb5362bf708386908ad2811b06bb21e625ba76838bcf18da222278cd51c",
+  "sourceFreezeFiles": 655,
+  "onlyRestoredSourceDifferences": [
+    {
+      "path": "bindings/web/host-er-store.js",
+      "literalSource": "0d44947ddc5f989a5fd0ddf892e4a788e7db56587e0142ed5dcd0fd8fb3ad752",
+      "restoredSource": "a9c749d8a762326eaf75d4b07be4b6cdec7494be7180c5f4392b20d56f6836a2"
+    },
+    {
+      "path": "crates/pele-wasm/src/host_er.rs",
+      "literalSource": "10b2fd8c843d5d7ce24df86ff8c0647ef2862e61223f886b7feaeb32ba65dc13",
+      "restoredSource": "eb3306bcc461eb27a659e42c7f7d48ee8932bd591f4291bd03e3c7f5c5af0bfb"
+    }
+  ],
+  "packages": {
+    "frozenDenseControl": {
+      "files": 106,
+      "allHashesMatch": true
+    },
+    "frozenLiteralCandidate": {
+      "files": 106,
+      "allHashesMatch": true
+    },
+    "restoredDistribution": {
+      "files": 106,
+      "allHashesMatch": true
+    }
+  },
+  "runtimeHashCountPerLane": 106,
+  "profileRuntimeMatchesControl": true,
+  "native": {
+    "inputCount": 351,
+    "allNamedInputHashesMatchManifest": true,
+    "sourceInputSHA256": "439fe2e6a023eebcafb980508b447162cdd5cd9c07519200df47f5ab3fcaea28",
+    "binarySHA256": "554ef37b648587962511c5e9eaa7ef639c469d87be601996817a1c9d762957fa",
+    "nativeArchiveSHA256": "d87e97d356dae4b4aee43cde0d821d09150a214e84d144c4f101e8d0dbe7c5f7",
+    "binaryAndArchiveStillMatch": true,
+    "newNativeBuildOrTimingRun": false
+  },
+  "rawBuildTarget": {
+    "path": "target/wasm32-unknown-unknown/release/pele_wasm.wasm",
+    "sha256AtReview": "09dc8e7088c2aa1cd8115b2d30d5a4d369ff3d7253df1b5e6545f262035993bf",
+    "status": "Parent reports raw target still contains rejected literal build. Not claimed to match restored source or distribution; no rebuild performed in this audit."
+  },
+  "browser": {
+    "log": "browser.log.gz",
+    "passed": 84,
+    "engines": [
+      "Chromium",
+      "Firefox",
+      "WebKit"
+    ],
+    "logHasPassTotal": true,
+    "passCountsByEngine": {
+      "chromium": 28,
+      "firefox": 28,
+      "webkit": 28
+    }
+  },
+  "firstUseRun": false
+}

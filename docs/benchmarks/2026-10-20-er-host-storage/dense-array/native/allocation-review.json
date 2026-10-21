@@ -1,0 +1,22 @@
+{
+  "status": "allocation-only-complete",
+  "reportSha256": "74c47e4e6ca0d99e789a730e6921d4dfe8ea7e4577ca1a581b617eb7d6518ccc",
+  "allTenRowsAllAllocationMetricsIdentical": true,
+  "erMediumPublicParsePerOperation": {
+    "allocations": 1987,
+    "reallocations": 109,
+    "requestedBytes": 263576,
+    "peakAdditionalRequestedBytes": 118710,
+    "liveBytesDelta": 0
+  },
+  "counts": [
+    1,
+    16
+  ],
+  "meaning": "No observed native peak increase for the extended input Vec lifetime on this medium fixture. No universal peak guarantee and no elapsed performance claim. Native default sink preserves allocation totals; intended specialization is host publication.",
+  "checks": {
+    "beforeAfterOutputEquality": true,
+    "binaryUnchanged": true,
+    "controlCandidateOutputEquality": true
+  }
+}

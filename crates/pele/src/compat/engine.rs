@@ -3,7 +3,7 @@ use super::{
     Object, OutputLimit, ParseLimits, PeleError, PrepareOptions, SourceLimit, Value, DIAGRAM_TYPES,
 };
 use serde::Serialize;
-use std::{any::Any, collections::HashMap, sync::Arc};
+use std::{any::Any, collections::HashMap, marker::PhantomData, sync::Arc};
 type Model = Box<dyn Any + Send + Sync>;
 trait ErasedModule: Send + Sync {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError>;
@@ -42,7 +42,26 @@ trait ErasedModule: Send + Sync {
     fn model_view(&self, model: &Model) -> Result<Value, PeleError>;
     fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError>;
 }
-struct Module<D>(D);
+// Projection policy belongs to the erased module's concrete type, not its
+// stored bytes. Unit builtin modules must remain zero-sized when boxed.
+trait ModelProjection: Send + Sync + 'static {
+    fn project(model: &impl Serialize) -> Result<Value, PeleError>;
+}
+struct Legacy;
+impl ModelProjection for Legacy {
+    fn project(model: &impl Serialize) -> Result<Value, PeleError> {
+        project_model(model)
+    }
+}
+// Selected only by private builtin registration. Public providers never inherit
+// this policy from a matching descriptor, model type or registration name.
+struct NormalizedBuiltin;
+impl ModelProjection for NormalizedBuiltin {
+    fn project(model: &impl Serialize) -> Result<Value, PeleError> {
+        super::normalized_projection::project(model)
+    }
+}
+struct Module<D, P>(D, PhantomData<P>);
 struct ModelWriter {
     bytes: Vec<u8>,
     exceeded: bool,
@@ -88,7 +107,7 @@ pub(crate) fn project_model(model: &impl Serialize) -> Result<Value, PeleError> 
             )
         })
 }
-impl<D: DiagramModule> ErasedModule for Module<D> {
+impl<D: DiagramModule, P: ModelProjection> ErasedModule for Module<D, P> {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError> {
         Ok(Box::new(self.0.parse(context)?))
     }
@@ -139,7 +158,7 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
             .downcast_ref::<D::Model>()
             .expect("private module/model pairing");
         self.0.validate_model_projection(model)?;
-        project_model(model)
+        P::project(model)
     }
     fn render_with_output_limit(
         &self,
@@ -168,6 +187,84 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
 struct Registration {
     descriptor: ModuleDescriptor,
     module: Box<dyn ErasedModule>,
+}
+/// Shared source preparation. The chosen registration and policy are captured
+/// before either the typed parser or an opted-in public parser consumes input.
+pub(crate) enum ParseAdmission {
+    Legacy,
+    Source(SourceLimit),
+    Limits(ParseLimits),
+}
+pub(crate) struct ParsePlan {
+    registration: Arc<Registration>,
+    source: String,
+    config: Object,
+    title: Option<String>,
+    line_offset: usize,
+    max_edges: usize,
+    edge_limit: Option<EdgeLimit>,
+}
+impl ParsePlan {
+    pub(crate) fn diagram_type(&self) -> &DiagramId {
+        &self.registration.descriptor.id
+    }
+    pub(crate) fn context(&self) -> ParseContext<'_> {
+        ParseContext {
+            source: &self.source,
+            config: &self.config,
+            title: self.title.as_deref(),
+            line_offset: self.line_offset,
+            max_edges: self.max_edges,
+        }
+    }
+    pub(crate) fn edge_limit(&self) -> Option<EdgeLimit> {
+        self.edge_limit
+    }
+    pub(crate) fn into_config(self) -> Object {
+        self.config
+    }
+    pub(crate) fn parse(self) -> Result<ParsedDocument, PeleError> {
+        let model = match self.edge_limit {
+            Some(limit) => self
+                .registration
+                .module
+                .parse_with_edge_limit(self.context(), limit),
+            None => self.registration.module.parse(self.context()),
+        }?;
+        Ok(ParsedDocument {
+            registration: self.registration,
+            model,
+            config: self.config,
+            edge_limit: self.edge_limit,
+            prepared: false,
+        })
+    }
+}
+/// Already-prepared input borrows its source unchanged and retains its module.
+pub(crate) struct PreparedParsePlan<'a> {
+    registration: Arc<Registration>,
+    context: ParseContext<'a>,
+    config: Object,
+    edge_limit: EdgeLimit,
+}
+impl PreparedParsePlan<'_> {
+    #[cfg(any(feature = "web-host-er", feature = "web-host-sankey"))]
+    pub(crate) fn diagram_type(&self) -> &DiagramId {
+        &self.registration.descriptor.id
+    }
+    pub(crate) fn parse(self) -> Result<ParsedDocument, PeleError> {
+        let model = self
+            .registration
+            .module
+            .parse_prepared(self.context, self.edge_limit)?;
+        Ok(ParsedDocument {
+            registration: self.registration,
+            model,
+            config: self.config,
+            edge_limit: Some(self.edge_limit),
+            prepared: true,
+        })
+    }
 }
 /// Immutable document with exact registration/config. Cannot be fabricated from JSON.
 pub struct ParsedDocument {
@@ -203,6 +300,24 @@ impl ParsedDocument {
                 }
                 error
             })
+    }
+    // Consume parser-owned storage only within the paired public codec. The
+    // captured module stays alive throughout the construction callback.
+    pub(crate) fn into_public_state<T: Any, R>(
+        self,
+        create: impl FnOnce(T, bool, Option<EdgeLimit>) -> Result<R, PeleError>,
+    ) -> Result<(R, Object), PeleError> {
+        let Self {
+            registration,
+            model,
+            config,
+            edge_limit,
+            prepared,
+        } = self;
+        let model = *model.downcast::<T>().expect("paired public codec");
+        let state = create(model, prepared, edge_limit);
+        drop(registration);
+        state.map(|state| (state, config))
     }
     /// Query the retained typed model without re-parsing or retargeting registration.
     pub fn query(&self, operation: &str, arguments: &Value) -> Result<Value, PeleError> {
@@ -248,11 +363,11 @@ impl Engine {
         engine.register(super::diagrams::architecture::Architecture);
         engine.register(super::diagrams::sankey::Sankey);
         engine.register(super::diagrams::state::State);
-        engine.register(super::diagrams::gantt::Gantt);
+        engine.register_projected::<_, NormalizedBuiltin>(super::diagrams::gantt::Gantt);
         engine.register(super::diagrams::sequence::Sequence);
         engine.register(super::diagrams::xychart::XyChart);
         engine.register(super::diagrams::class_diagram::Class);
-        engine.register(super::diagrams::er::Er);
+        engine.register_projected::<_, NormalizedBuiltin>(super::diagrams::er::Er);
         engine.register(super::diagrams::flowchart::Flowchart);
         engine.register(super::diagrams::kanban::Kanban);
         engine.register(super::diagrams::mindmap::Mindmap);
@@ -268,10 +383,13 @@ impl Engine {
         Self::default()
     }
     pub fn register<D: DiagramModule>(&mut self, module: D) {
+        self.register_projected::<D, Legacy>(module);
+    }
+    fn register_projected<D: DiagramModule, P: ModelProjection>(&mut self, module: D) {
         let descriptor = module.descriptor();
         let registration = Arc::new(Registration {
             descriptor,
-            module: Box::new(Module(module)),
+            module: Box::new(Module::<D, P>(module, PhantomData)),
         });
         if let Some(i) = self
             .modules
@@ -485,10 +603,54 @@ impl Engine {
         max_edges: usize,
         edge_limit: Option<EdgeLimit>,
     ) -> Result<ParsedDocument, PeleError> {
+        self.prepare_inspected(inspection, Some(id), max_edges, edge_limit)?
+            .parse()
+    }
+    /// Internal preparation seam shared by native typed/public entry points.
+    /// Raw prepared parsing retains its existing borrowed-input path.
+    pub(crate) fn prepare_parse(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        selected: Option<&DiagramId>,
+        admission: ParseAdmission,
+    ) -> Result<ParsePlan, PeleError> {
+        let (inspection, edge_limit) = match admission {
+            ParseAdmission::Legacy => (self.inspect(source, &options.preparation)?, None),
+            ParseAdmission::Source(limit) => (
+                self.inspect_with_source_limit(source, &options.preparation, limit)?,
+                None,
+            ),
+            ParseAdmission::Limits(limits) => (
+                self.inspect_with_limits(source, options, limits)?,
+                limits.max_edges,
+            ),
+        };
+        self.prepare_inspected(inspection, selected, options.max_edges, edge_limit)
+    }
+    fn prepare_inspected(
+        &self,
+        inspection: Inspection,
+        selected: Option<&DiagramId>,
+        max_edges: usize,
+        edge_limit: Option<EdgeLimit>,
+    ) -> Result<ParsePlan, PeleError> {
+        let id = match selected {
+            Some(id) => id.clone(),
+            None => inspection
+                .diagram_type
+                .ok_or_else(|| {
+                    PeleError::new(
+                        "No diagram type detected for the given text.",
+                        ErrorCode::UnsupportedDiagram,
+                    )
+                })?
+                .into(),
+        };
         let registration = self
             .modules
             .iter()
-            .find(|m| &m.descriptor.id == id)
+            .find(|m| m.descriptor.id == id)
             .ok_or_else(|| {
                 let mut error = PeleError::new(
                     format!("Diagram type \"{id}\" is not supported yet."),
@@ -505,23 +667,14 @@ impl Engine {
             inspection.encoded_text
         };
         source.push('\n');
-        let context = ParseContext {
-            source: &source,
-            config: &pre.config,
-            title: pre.title.as_deref(),
+        Ok(ParsePlan {
+            registration,
+            source,
+            config: pre.config,
+            title: pre.title,
             line_offset: pre.line_offset,
             max_edges,
-        };
-        let model = match edge_limit {
-            Some(limit) => registration.module.parse_with_edge_limit(context, limit),
-            None => registration.module.parse(context),
-        }?;
-        Ok(ParsedDocument {
-            registration,
-            model,
-            config: pre.config,
             edge_limit,
-            prepared: false,
         })
     }
     /// Parse an already-prepared diagram source verbatim. No source limit,
@@ -534,6 +687,14 @@ impl Engine {
         context: ParseContext<'_>,
         edge_limit: EdgeLimit,
     ) -> Result<ParsedDocument, PeleError> {
+        self.prepare_prepared_as(id, context, edge_limit)?.parse()
+    }
+    pub(crate) fn prepare_prepared_as<'a>(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'a>,
+        edge_limit: EdgeLimit,
+    ) -> Result<PreparedParsePlan<'a>, PeleError> {
         SourceLimit::check_bytes(context.source)?;
         if context
             .line_offset
@@ -559,13 +720,11 @@ impl Engine {
                 e
             })?;
         let config = context.config.clone();
-        let model = registration.module.parse_prepared(context, edge_limit)?;
-        Ok(ParsedDocument {
+        Ok(PreparedParsePlan {
             registration,
-            model,
+            context,
             config,
-            edge_limit: Some(edge_limit),
-            prepared: true,
+            edge_limit,
         })
     }
     /// Invoke only the retained module's raw renderer with the supplied config.
@@ -827,6 +986,13 @@ struct RawRenderSession<'a> {
     session: RenderSession<'a>,
 }
 impl RenderResources for RawRenderSession<'_> {
+    fn javascript_failure(
+        &mut self,
+        operation: crate::compat::JavaScriptFailure,
+    ) -> crate::compat::public::PublicError {
+        self.session.javascript_failure(operation)
+    }
+
     fn host_function(
         &mut self,
         reference: u32,
@@ -871,6 +1037,13 @@ struct RenderSession<'a> {
     clock: Option<Result<f64, PeleError>>,
 }
 impl RenderResources for RenderSession<'_> {
+    fn javascript_failure(
+        &mut self,
+        operation: crate::compat::JavaScriptFailure,
+    ) -> crate::compat::public::PublicError {
+        self.host.javascript_failure(operation)
+    }
+
     fn host_function(
         &mut self,
         reference: u32,

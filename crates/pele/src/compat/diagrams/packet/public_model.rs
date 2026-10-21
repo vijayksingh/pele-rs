@@ -195,6 +195,20 @@ fn array_node(out: &mut GraphWriter, values: impl Iterator<Item = Atom>) -> u32 
 }
 impl PublicDiagramModule for Packet {
     type PublicState = PacketPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::packet())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::packet(
+            super::PacketDetachedInput::new(state.imported.as_ref().err()),
+        ))
+    }
+
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
         let imported = imported(&graph);
@@ -240,6 +254,12 @@ impl PublicDiagramModule for Packet {
         let graph = out.finish(Atom::Ref(root))?;
         let imported = imported(&graph);
         Ok(PacketPublicState { graph, imported })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(state.graph.clone())

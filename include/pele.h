@@ -19,6 +19,30 @@ PeleResult *pele_capabilities(void);
  * render_document borrows it synchronously; source/options are copied into owned models.
  * A render/error result cannot serve as a document. Transport budgets match inspect. */
 PeleResult *pele_parse_v2(const uint8_t *source, size_t source_len, const uint8_t *options, size_t options_len);
+/* Additive eager immutable projection transport; existing v2 JSON ABI unchanged.
+ * Success envelope result is {type, projectionBytes}; projectionBytes is the exact
+ * original v2 envelope size. Above 64 MiB, no events are delivered; the caller must
+ * reject the result using its existing compatibility-result admission error.
+ * A successful handle retains only the typed document and this small envelope.
+ * Callback receives 1..128 events; all pointers are borrowed only for that call.
+ * It must copy strings eagerly, must not unwind, and returns 0 to continue or
+ * nonzero to abort. Aborted calls return an error handle with no document.
+ * Scalar tags: 0 null, 1 bool (count=0/1), 2 number, 3 UTF-8 string.
+ * Container tags: 4 array begin (count=length), 5 array end,
+ * 6 object begin (count=entry count), 7 key, 8 object end.
+ * String/key count is UTF-8 byte length. Unused fields are zero/NULL.
+ * Numbers match JSON projection (nonfinite=null, negative zero=positive zero).
+ * Object keys follow JS enumeration order; consumers choose host key equality.
+ * Callbacks/context are synchronous, never retained. No host resources invoked. */
+typedef struct PeleProjectionEventV1 {
+    uint32_t tag;
+    size_t count;
+    double number;
+    const uint8_t *text;
+} PeleProjectionEventV1;
+typedef uint32_t (*PeleProjectionBatchV1)(void *, const PeleProjectionEventV1 *, size_t);
+PeleResult *pele_parse_eager_v1(const uint8_t *source, size_t source_len,
+    const uint8_t *options, size_t options_len, void *context, PeleProjectionBatchV1 receive);
 PeleResult *pele_render_v2(const uint8_t *source, size_t source_len, const uint8_t *options, size_t options_len);
 PeleResult *pele_render_document_v2(const PeleResult *document, const uint8_t *options, size_t options_len);
 PeleResult *pele_builtin_capabilities(void);
@@ -68,7 +92,8 @@ PeleResult *pele_render_document_with_resources_v3(const PeleResult *, const uin
  * Expected revisions accept exact uint64 values. Graph input <=64 MiB.
  * NULL resources select default native resources. Parse sets *out_document=NULL
  * before work; a successful handle must be freed once. Recursive/concurrent
- * operations on one handle return an error; never free during an active call. */
+ * operations on one handle return an error, except synchronous callbacks in the
+ * additive v15 detached lifecycle below. Never free during an active call. */
 typedef struct PelePublicDocument PelePublicDocument;
 /* Owned selective registry. mode0 empty, mode1 all33 built-ins; all successful
  * results use owned version2 envelopes. create writes NULL before any failure
@@ -85,6 +110,79 @@ typedef struct PelePublicDocument PelePublicDocument;
  * every known built-in even when unregistered. NULL registry operations fail.
  * Synchronize free with all operations; no registry pointer is retained by docs. */
 typedef struct PeleRegistry PeleRegistry;
+/* Captured builtin constructor (v16). Capture returns {selected:bool}; false
+ * writes NULL for unported/foreign prototypes. A selected factory retains its
+ * registration after registry replacement/free. Construct has no source input
+ * or callbacks and creates low-level mutable state, not core parse provenance.
+ * Construction returns ordinary document metadata plus constructorCreated.
+ * Free each factory/document once; never free during an active call.
+ * id is readable UTF-8 <=4096 bytes; outputs writable and nulled before failure.
+ * prototype is the exact ID exposed by the public model schema. */
+typedef struct PelePublicConstructorV16 PelePublicConstructorV16;
+PeleResult *pele_registry_capture_constructor_v16(const PeleRegistry *, const uint8_t *, size_t,
+    uint32_t prototype, PelePublicConstructorV16 **out_constructor);
+PeleResult *pele_public_constructor_construct_v16(const PelePublicConstructorV16 *, PelePublicDocument **);
+void pele_public_constructor_free_v16(PelePublicConstructorV16 *);
+/* Lossless host-value/owned invocation lane (v17). Actor/thread confined.
+ * tag 0 undefined,1 null,2 bool(payload0/1),3 IEEE bits,4 borrowed UTF16,
+ * 5 owner-local opaque identity. UTF16 is copied, <=16M units. NULL=undefined.
+ * reply_state: 0 start, 1 value, 2 original exception token (tag5),
+ * 3 JavaScript TypeError message (tag4).
+ * No host callbacks run inside these calls. Keep document alive through job free.
+ * Resume returns PELGBIN1 with Host step or Complete metadata; finish returns
+ * PELGBIN1 Result<Atom,PublicError>. Invoke host operations between calls only.
+ * Every dispatched phase advances current revision before mutation. The output
+ * revision acknowledges it even if subsequent export fails. Drop cancels future
+ * phases without rolling back accepted partial state. Native refs are graph IDs.
+ */
+typedef struct PeleHostValueV17 {
+    uint32_t version, struct_size, tag, reserved;
+    uint64_t payload;
+    const uint16_t *units;
+    size_t unit_count;
+} PeleHostValueV17;
+typedef struct PeleInvocationJobV17 PeleInvocationJobV17;
+PeleResult *pele_public_constructor_construct_with_v17(const PelePublicConstructorV16 *, const PeleHostValueV17 *, PelePublicDocument **);
+PeleResult *pele_public_invocation_prepare_v17(PelePublicDocument *, uint64_t, const uint8_t *, size_t, PeleInvocationJobV17 **);
+PeleResult *pele_public_invocation_resume_v17(PelePublicDocument *, PeleInvocationJobV17 *, uint32_t reply_state, const PeleHostValueV17 *, uint64_t *revision);
+PeleResult *pele_public_invocation_finish_v17(PelePublicDocument *, PeleInvocationJobV17 *, uint64_t *revision);
+void pele_public_invocation_free_v17(PeleInvocationJobV17 *);
+/* Native owned resource carrier (v19). A v17 step can return {resource:true}.
+ * Take once, run outside every job/document borrow, accept exactly once into the
+ * originating invocation phase, then resume_v17(reply_state=4,reply=NULL).
+ * Native scalar/exception values remain in Rust; no host-number/JSON roundtrip.
+ * Keep document and invocation alive through resource free; no concurrent use/free.
+ * Run can call host resources, including reentry into that document. Take/accept
+ * never call hosts. Free cancels a carrier without undoing accepted mutations.
+ */
+typedef struct PeleResourceOperationV19 PeleResourceOperationV19;
+PeleResult *pele_public_invocation_take_resource_v19(PeleInvocationJobV17 *, PeleResourceOperationV19 **);
+PeleResult *pele_resource_operation_run_v19(PeleResourceOperationV19 *, const PeleHostResourcesV3 *);
+PeleResult *pele_public_invocation_accept_resource_v19(PeleInvocationJobV17 *, PeleResourceOperationV19 *);
+void pele_resource_operation_free_v19(PeleResourceOperationV19 *);
+PeleResult *pele_host_number_string_v17(uint64_t ieee_bits);
+/* Shared identity namespace with v12 bound functions; IDs never repeat. */
+PeleResult *pele_host_identity_v17(void);
+PeleResult *pele_host_primitive_number_v17(const PeleHostValueV17 *value);
+PeleResult *pele_public_constructor_policy_v17(const PelePublicConstructorV16 *constructor);
+/* Unpublished constructor bodies (v18). Same value/reply/step formats as v17.
+ * Getters/calls run only between calls. Dispose cannot overlap an active call.
+ * policy returns argumentCount, arity and argumentTransfers (retain/value).
+ * Retain arguments use caller-owned opaque identities without inspecting their
+ * values; Value arguments copy known scalars/UTF16, leaving foreign objects
+ * opaque. No argument beyond the declared transfer list is inspected.
+ * finish transfers a partial owner even when it returns an error; always free
+ * a non-null out_document. No callback may use a freed provisional job. */
+typedef struct PeleConstructionJobV18 PeleConstructionJobV18;
+PeleResult *pele_public_constructor_policy_v18(const PelePublicConstructorV16 *);
+PeleResult *pele_public_constructor_begin_v18(const PelePublicConstructorV16 *, const PeleHostValueV17 *, const PeleHostValueV17 *, PeleConstructionJobV18 **);
+PeleResult *pele_public_construction_resume_v18(PeleConstructionJobV18 *, uint32_t, const PeleHostValueV17 *, uint64_t *);
+PeleResult *pele_public_construction_snapshot_v18(PeleConstructionJobV18 *);
+PeleResult *pele_public_construction_apply_v18(PeleConstructionJobV18 *, const uint8_t *, size_t);
+PeleResult *pele_public_construction_invoke_v18(PeleConstructionJobV18 *, uint64_t, const uint8_t *, size_t, uint64_t *);
+PeleResult *pele_public_construction_get_v18(PeleConstructionJobV18 *, uint32_t, const uint8_t *, size_t);
+PeleResult *pele_public_construction_finish_v18(PeleConstructionJobV18 *, PelePublicDocument **, uint64_t *);
+void pele_public_construction_free_v18(PeleConstructionJobV18 *);
 PeleResult *pele_registry_create_v8(uint32_t mode, PeleRegistry **out_registry);
 void pele_registry_free_v8(PeleRegistry *registry);
 PeleResult *pele_registry_capabilities_v8(const PeleRegistry *registry);
@@ -196,6 +294,35 @@ PeleResult *pele_public_render_operation_with_numbers_v9(PelePublicDocument *doc
     const PeleRenderNumbersV9 *numbers, uint32_t output_limit_kind,
     uint64_t output_limit_bits, const PeleHostResourcesV3 *resources);
 void pele_public_document_free_v4(PelePublicDocument *);
+
+/* Additive detached builtin rendering (v15). Preparation returns {selected:bool}
+ * and an owned job, or NULL job for unsupported providers. Existing entrypoints
+ * stay unchanged. The document MUST outlive every job, including abandoned jobs.
+ * Never free the document/job during any active run/callback. Run releases the
+ * document lock, permitting synchronous same-owner snapshot/apply/invoke/nested
+ * detached rendering. Native Ref IDs remain graph coordinates: arbitrary table
+ * replacement/truncation is not JavaScript retained-object lifetime parity.
+ * Finish consumes completion in nesting order and returns the existing bounded
+ * binary render outcome. out_revision is updated to current committed revision
+ * before returning an export error; callers must acknowledge it before decoding
+ * or rethrowing their original resource exception. Job free is required once
+ * after finish, or to abandon a prepared/completed job. Null free is safe.
+ * All options/resource input spans have the same bounds as v9/v13. */
+/* Metadata-only read: returns {revision:"<decimal u64>"}. Does not export or
+ * validate the graph, advance revision, or run callbacks. Same live-handle and
+ * short-operation exclusion rules as snapshot. Useful before nested operations
+ * after native-owned helper phases advanced the revision during a callback. */
+PeleResult *pele_public_revision_v15(const PelePublicDocument *document);
+typedef struct PeleDetachedRenderJobV15 PeleDetachedRenderJobV15;
+PeleResult *pele_public_prepare_detached_render_v15(PelePublicDocument *, uint64_t,
+    const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t,
+    PeleDetachedRenderJobV15 **);
+PeleResult *pele_public_prepare_detached_raw_v15(PelePublicDocument *, uint64_t,
+    const uint8_t *, size_t, const uint8_t *, size_t, const PeleRenderNumbersV9 *,
+    PeleDetachedRenderJobV15 **);
+PeleResult *pele_detached_render_run_v15(PeleDetachedRenderJobV15 *, const PeleHostResourcesV3 *);
+PeleResult *pele_public_finish_detached_render_v15(PelePublicDocument *, PeleDetachedRenderJobV15 *, uint64_t *);
+void pele_detached_render_job_free_v15(PeleDetachedRenderJobV15 *);
 
 
 /* Additive owner-confined provider prototype (v10). Only canonical built-in IDs
@@ -376,6 +503,47 @@ PeleResult *pele_render_document_native_v14(const PeleResult *, const uint8_t *,
 PeleResult *pele_public_render_native_v14(PelePublicDocument *, uint64_t, const uint8_t *, size_t,
     const PeleRenderNumbersV9 *, uint32_t, uint64_t, const PelePresentationOptionsV11 *,
     const PeleHostResourcesV3 *, const PeleNativeResourcesV14 *);
+
+/* v20 owner-bound opaque host dispatch used by owned C15 rendering.
+ * Owner-thread confinement and no-free-during-call rules remain unchanged.
+ * Requests/UTF16 are borrowed until invoke returns. Reply release runs exactly
+ * once after validation/copy, including rejected replies. No lock spans invoke.
+ * Values use v17 tags 0..5 plus 6=current owner graph reference, 7=builtin method.
+ * Mint opaque identities through pele_host_identity_v17, the same nonreused
+ * allocator as C12 bindings; maintain an owner-local ledger and reject missing
+ * or foreign tokens. Never derive opaque IDs from graph coordinates.
+ * Get operands=[receiver]; Call=[function,receiver,...arguments]; unary=[value];
+ * comparison=[left,right]. Operation codes: 0=Get, 1=Call, 2=Truthy,
+ * 3=ToString, 4=GreaterEqual, 5=StrictEqual, 6=ToNumber.
+ * Call result: 0=Value, 1=Retain (opaque tag5 required), 2=Discard.
+ * At most 1,000,000 call arguments and 16,000,000 aggregate UTF16 units
+ * per request; reply UTF16 also at most 16,000,000. Nesting is capped at64.
+ * status 0 is unhandled (Call can fall back to C12), 1=value, 2=original exception
+ * with nonzero owner token, 3=TypeError with UTF16 message value. */
+typedef struct PeleHostRequestV20 {
+    uint32_t operation, result;
+    const PeleHostValueV17 *values;
+    size_t count;
+    const uint16_t *key; size_t key_count;
+    const uint16_t *error; size_t error_count;
+} PeleHostRequestV20;
+typedef struct PeleHostReplyV20 {
+    uint32_t status, exception;
+    PeleHostValueV17 value;
+    void *owner;
+    void (*release)(void *);
+} PeleHostReplyV20;
+typedef struct PeleHostAccessV20 {
+    uint32_t version, struct_size;
+    void *context;
+    void (*retain)(void *);
+    void (*release)(void *);
+    void (*invoke)(void *, const PeleHostRequestV20 *, PeleHostReplyV20 *);
+    uint64_t reserved[2];
+} PeleHostAccessV20;
+/* Optional table; NULL clears. Replacement releases the old context outside
+ * its binding borrow. Callback tables must not unwind across C boundaries. */
+PeleResult *pele_public_set_host_access_v20(PelePublicDocument *, const PeleHostAccessV20 *);
 
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);

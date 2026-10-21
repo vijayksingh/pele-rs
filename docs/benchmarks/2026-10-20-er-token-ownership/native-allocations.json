@@ -1,0 +1,466 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T04:44:47.411Z",
+  "mode": "native-allocations-only",
+  "artifacts": {
+    "control": {
+      "binarySHA256": "9e3772a3a8a59df1fda0c7932f53331d03160105ffbc13255678f656ddb9e174",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "a81c89b02eccb359b288c4af2de85b8d465c9f770c4979033a958c91c69376a9",
+        "revision": "175daa8fd76fc1e25f488e4957b6970b4b6d4fe2",
+        "builtAt": "2026-10-20T04:07:26.697Z",
+        "binaries": {
+          "pele-perf": "9e3772a3a8a59df1fda0c7932f53331d03160105ffbc13255678f656ddb9e174",
+          "pele-perf-alloc": "c527c1e523433880b85d290906c032e45c40807e23c083fbaf78f1a2da2e1038"
+        }
+      },
+      "allocationBinary": "/Users/vijaysingh/unlocalhosted/pele-rs/dist/perf-patches/parse-architecture/direct-er/self-control-native/pele-perf-alloc",
+      "allocationSHA256": "c527c1e523433880b85d290906c032e45c40807e23c083fbaf78f1a2da2e1038"
+    },
+    "candidate": {
+      "binarySHA256": "98b22aed6e015e0001fe1e83dcb3cc3a36e7c7120db2f0316e56c5aba3646902",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "6b573f513ea6ed3739824213143b5fc29c45ddf7ba1bb229569a0db7d85c78dd",
+        "revision": "0b32797d5e5f6ded562c61de7acbd35ca4643839",
+        "builtAt": "2026-10-20T04:44:13.822Z",
+        "binaries": {
+          "pele-perf": "98b22aed6e015e0001fe1e83dcb3cc3a36e7c7120db2f0316e56c5aba3646902",
+          "pele-perf-alloc": "d23d31488999fbfa92be9ba4b11c7d176660b7d3a646583b1e046a73d18c6576"
+        }
+      },
+      "allocationBinary": "/Users/vijaysingh/unlocalhosted/pele-rs/scripts/perf/native/target/release/pele-perf-alloc",
+      "allocationSHA256": "d23d31488999fbfa92be9ba4b11c7d176660b7d3a646583b1e046a73d18c6576"
+    }
+  },
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "settings": {
+    "nativeTypedDocumentRetainedAcrossBatches": true,
+    "nativePublicStateFreshPerBatch": true,
+    "jsRetainedModelFreshPerBatch": true,
+    "stages": [
+      "parse",
+      "parse-public",
+      "render-source",
+      "render-retained",
+      "render-mutable-publish"
+    ],
+    "selectedCases": [
+      "er/medium",
+      "gantt/medium"
+    ],
+    "separateAllocationBinaries": true,
+    "fixedBatchCount": 1,
+    "operationsPerCondition": 1,
+    "timingRequested": false
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "loadBefore": [
+      8.8173828125,
+      6.8173828125,
+      6.552734375
+    ],
+    "processesBefore": [
+      {
+        "pid": 410,
+        "cpuPercent": 42.9,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 23.9,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 34074,
+        "cpuPercent": 16,
+        "name": "siriactionsd"
+      },
+      {
+        "pid": 34078,
+        "cpuPercent": 36,
+        "name": "BackgroundShortcutRunner"
+      },
+      {
+        "pid": 34287,
+        "cpuPercent": 44.2,
+        "name": "rustc"
+      },
+      {
+        "pid": 34343,
+        "cpuPercent": 27.6,
+        "name": "node"
+      },
+      {
+        "pid": 36748,
+        "cpuPercent": 12.9,
+        "name": "AssetCache"
+      },
+      {
+        "pid": 44246,
+        "cpuPercent": 10.2,
+        "name": "Codex (Service)"
+      },
+      {
+        "pid": 44311,
+        "cpuPercent": 56.6,
+        "name": "Codex (Renderer)"
+      },
+      {
+        "pid": 69848,
+        "cpuPercent": 118.6,
+        "name": "Google Chrome Helper (Renderer)"
+      }
+    ],
+    "loadAfter": [
+      8.8173828125,
+      6.8173828125,
+      6.552734375
+    ],
+    "processesAfter": [
+      {
+        "pid": 410,
+        "cpuPercent": 32.4,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 18.1,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 34074,
+        "cpuPercent": 22.6,
+        "name": "siriactionsd"
+      },
+      {
+        "pid": 34078,
+        "cpuPercent": 44.2,
+        "name": "BackgroundShortcutRunner"
+      },
+      {
+        "pid": 34287,
+        "cpuPercent": 94,
+        "name": "rustc"
+      },
+      {
+        "pid": 34314,
+        "cpuPercent": 40.2,
+        "name": "XprotectService"
+      },
+      {
+        "pid": 34343,
+        "cpuPercent": 12.2,
+        "name": "node"
+      },
+      {
+        "pid": 44308,
+        "cpuPercent": 10,
+        "name": "codex"
+      },
+      {
+        "pid": 44311,
+        "cpuPercent": 15.4,
+        "name": "Codex (Renderer)"
+      },
+      {
+        "pid": 69848,
+        "cpuPercent": 49.1,
+        "name": "Google Chrome Helper (Renderer)"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "er/medium",
+      "family": "er",
+      "scale": "medium",
+      "units": 48,
+      "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "jsRetainedBeforeVerified": true
+    },
+    {
+      "id": "gantt/medium",
+      "family": "gantt",
+      "scale": "medium",
+      "units": 48,
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "jsRetainedBeforeVerified": true
+    }
+  ],
+  "rows": [],
+  "allocationRows": [
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 1,
+      "control": {
+        "allocations": 2069,
+        "checksum": 2,
+        "freedBytes": 192835,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 94445,
+        "reallocations": 17,
+        "requestedBytes": 192835
+      },
+      "candidate": {
+        "allocations": 1259,
+        "checksum": 2,
+        "freedBytes": 174504,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 84274,
+        "reallocations": 17,
+        "requestedBytes": 174504
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "control": {
+        "allocations": 3407,
+        "checksum": 2,
+        "freedBytes": 321618,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 133197,
+        "reallocations": 775,
+        "requestedBytes": 321618
+      },
+      "candidate": {
+        "allocations": 2597,
+        "checksum": 2,
+        "freedBytes": 303287,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 123026,
+        "reallocations": 775,
+        "requestedBytes": 303287
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "count": 1,
+      "control": {
+        "allocations": 11263,
+        "checksum": 47186091261891330,
+        "freedBytes": 1753892,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 558492,
+        "reallocations": 2590,
+        "requestedBytes": 1753892
+      },
+      "candidate": {
+        "allocations": 10453,
+        "checksum": 47186091261891330,
+        "freedBytes": 1735561,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 558492,
+        "reallocations": 2590,
+        "requestedBytes": 1735561
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "control": {
+        "allocations": 9194,
+        "checksum": 47186091261891330,
+        "freedBytes": 1561057,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 511988,
+        "reallocations": 2573,
+        "requestedBytes": 1561057
+      },
+      "candidate": {
+        "allocations": 9194,
+        "checksum": 47186091261891330,
+        "freedBytes": 1561057,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 511988,
+        "reallocations": 2573,
+        "requestedBytes": 1561057
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "control": {
+        "allocations": 9713,
+        "checksum": 47186091261891250,
+        "freedBytes": 1622421,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 511988,
+        "reallocations": 2573,
+        "requestedBytes": 1622421
+      },
+      "candidate": {
+        "allocations": 9713,
+        "checksum": 47186091261891250,
+        "freedBytes": 1622421,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 511988,
+        "reallocations": 2573,
+        "requestedBytes": 1622421
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse",
+      "count": 1,
+      "control": {
+        "allocations": 1103,
+        "checksum": 5,
+        "freedBytes": 93583,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 39337,
+        "reallocations": 16,
+        "requestedBytes": 93583
+      },
+      "candidate": {
+        "allocations": 1103,
+        "checksum": 5,
+        "freedBytes": 93583,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 39337,
+        "reallocations": 16,
+        "requestedBytes": 93583
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "control": {
+        "allocations": 1437,
+        "checksum": 5,
+        "freedBytes": 197885,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 87681,
+        "reallocations": 40,
+        "requestedBytes": 197885
+      },
+      "candidate": {
+        "allocations": 1437,
+        "checksum": 5,
+        "freedBytes": 197885,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 87681,
+        "reallocations": 40,
+        "requestedBytes": 197885
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-source",
+      "count": 1,
+      "control": {
+        "allocations": 3455,
+        "checksum": 8466239533887774,
+        "freedBytes": 331045,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 101749,
+        "reallocations": 465,
+        "requestedBytes": 331045
+      },
+      "candidate": {
+        "allocations": 3455,
+        "checksum": 8466239533887774,
+        "freedBytes": 331045,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 101749,
+        "reallocations": 465,
+        "requestedBytes": 331045
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "control": {
+        "allocations": 2352,
+        "checksum": 8466239533887774,
+        "freedBytes": 237462,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75827,
+        "reallocations": 449,
+        "requestedBytes": 237462
+      },
+      "candidate": {
+        "allocations": 2352,
+        "checksum": 8466239533887774,
+        "freedBytes": 237462,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75827,
+        "reallocations": 449,
+        "requestedBytes": 237462
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "control": {
+        "allocations": 3315,
+        "checksum": 8466239533887615,
+        "freedBytes": 412008,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 127992,
+        "reallocations": 484,
+        "requestedBytes": 426536
+      },
+      "candidate": {
+        "allocations": 3315,
+        "checksum": 8466239533887615,
+        "freedBytes": 412008,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 127992,
+        "reallocations": 484,
+        "requestedBytes": 426536
+      }
+    }
+  ],
+  "completedAt": "2026-10-20T04:44:48.875Z",
+  "succeeded": true
+}

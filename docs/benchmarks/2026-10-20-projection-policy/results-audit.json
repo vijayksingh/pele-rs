@@ -1,0 +1,1068 @@
+{
+  "comparisons": [
+    {
+      "file": "web-comparison.json",
+      "sha256": "9ab4e75dd9b19a3e5d681baae7a56f6f6c124c1f2fbf1caf45eb7964d7775491",
+      "controlWasm": "1cef29703a89a502d765958f0429af74c92f379b400293bf616af8ce0717ea76",
+      "candidateWasm": "b71e7365d757889d76d7e8b1b5e6eb4a6e8d95dc44d09f1d20c6acf76b6b834e",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "profile": "fixed",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.025312498211860657,
+            "control": 0.07093749940395355,
+            "candidate": 0.07085937261581421
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": -0.11013468024076989,
+          "pairedPercentChange": -0.6622562564874368,
+          "wins": 13,
+          "pairedMinPercentChange": -16.643609643006574,
+          "pairedMaxPercentChange": 5.146653685014502,
+          "pairedRatios": [
+            1.047645465191256,
+            1.0430702733217094,
+            1.006593347629365,
+            0.9784599017176203,
+            1.0334634897522297,
+            0.9804241097172519,
+            0.9846826763606161,
+            0.9994490231905225,
+            0.9900388267367428,
+            1.0285395728435378,
+            0.8335639035699343,
+            0.9863201444192528,
+            0.993902405500607,
+            1.0049423480017983,
+            0.9933774374351256,
+            0.9776932557788879,
+            0.986331432137335,
+            1.0359793919207065,
+            0.9726603341089082,
+            0.9889867420363467,
+            1.051466536850145
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "fixed",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.007617183029651642,
+            "control": 0.12785156071186066,
+            "candidate": 0.12753906100988388
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": -0.2444238460890258,
+          "pairedPercentChange": -0.028969376446186246,
+          "wins": 11,
+          "pairedMinPercentChange": -40.31928881071132,
+          "pairedMaxPercentChange": 162.4028590391307,
+          "pairedRatios": [
+            0.8571059878742415,
+            0.6514879376483271,
+            0.9700580642852838,
+            1.0627188577817457,
+            0.6873484345902381,
+            1.0006434540046374,
+            0.9874310866496467,
+            0.9827000468204904,
+            1.601286190789935,
+            0.9646654416215923,
+            0.9975557615391097,
+            1.013590340714302,
+            2.624028590391307,
+            1.0034256836160715,
+            0.9817110927339773,
+            0.5968071118928868,
+            1.045296208928452,
+            0.9997103062355381,
+            1.0201225564702312,
+            1.1756971205260027,
+            1.2478514169585768
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.028671875596046448,
+            "control": 0.07269531488418579,
+            "candidate": 0.07308593392372131
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": 0.5373372963001,
+          "pairedPercentChange": 0.10805217458864647,
+          "wins": 10,
+          "pairedMinPercentChange": -6.656579424623221,
+          "pairedMaxPercentChange": 2.4193486363534245,
+          "pairedRatios": [
+            0.9334342057537678,
+            1.005390959187673,
+            0.9989429941683723,
+            0.968454239378064,
+            0.9821064169899132,
+            0.9755844512543121,
+            1.0032380667697645,
+            1.0102370980347424,
+            0.9532134707657373,
+            1.0205295009949436,
+            1.0151925542409375,
+            1.013086137901929,
+            1.0062695362462484,
+            1.0053850502484176,
+            1.0043149907219933,
+            0.961459500106051,
+            0.9895559971617858,
+            0.9695247864675983,
+            1.0241934863635342,
+            1.0010805217458865,
+            0.9887156912985549
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.008242189884185791,
+            "control": 0.12617187947034836,
+            "candidate": 0.1279296875
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": 1.3931852620652663,
+          "pairedPercentChange": 0.1614962385619867,
+          "wins": 10,
+          "pairedMinPercentChange": -32.380954299019585,
+          "pairedMaxPercentChange": 48.60140292589472,
+          "pairedRatios": [
+            0.7445724648826435,
+            1.1003375404250806,
+            0.6761904570098042,
+            1.0016149623856199,
+            1.032713147356536,
+            0.9815146407209618,
+            0.7427679037810317,
+            0.991950398544321,
+            0.9738642804592853,
+            0.9475058152560234,
+            0.9587206060133624,
+            1.0792304659857301,
+            1.0295504731166072,
+            1.4860140292589472,
+            1.010728215905415,
+            0.9930904738599189,
+            1.022478904087401,
+            1.0145631316664998,
+            1.1831683592130544,
+            1.0213225776790704,
+            0.950947908606378
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "fixed",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.1533203125,
+            "control": 0.667656272649765,
+            "candidate": 0.6650000214576721
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "medianPercentChange": -0.39784711099184467,
+          "pairedPercentChange": -1.2811701616834759,
+          "wins": 13,
+          "pairedMinPercentChange": -3.149786549168765,
+          "pairedMaxPercentChange": 8.144155199698687,
+          "pairedRatios": [
+            0.9798769299543821,
+            0.9780349479965947,
+            0.9780660303409687,
+            0.9685021345083124,
+            0.9798027547077535,
+            1.0102065106639937,
+            0.9871882983831652,
+            0.9863425451500761,
+            1.0097363555953665,
+            0.9763425599912353,
+            0.9786935175153646,
+            1.0682144646871845,
+            0.9697399373045954,
+            1.0814415519969869,
+            1.0032288122966981,
+            0.9943925288621279,
+            1.0046263460915084,
+            1.0077981248225805,
+            0.9986171612929827,
+            1.0022899102655145,
+            0.9769006778252478
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.023632816970348358,
+            "control": 0.539843738079071,
+            "candidate": 0.546875
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "medianPercentChange": 1.3024624395845175,
+          "pairedPercentChange": 1.2156352906429468,
+          "wins": 8,
+          "pairedMinPercentChange": -36.02300154194153,
+          "pairedMaxPercentChange": 51.464192861096514,
+          "pairedRatios": [
+            0.7086145186638307,
+            1.0331202611017305,
+            1.45655826426144,
+            1.0115555939850984,
+            1.387503494445415,
+            1.0297146288815233,
+            0.6942725720301011,
+            1.0121563529064295,
+            1.4502466134877716,
+            0.9887446062354392,
+            1.5101331344772417,
+            1.0237955757018793,
+            0.6901010070184265,
+            1.0317691684510188,
+            0.969498298256804,
+            1.004964955532428,
+            0.7017051659037526,
+            1.045157470726505,
+            1.5146419286109651,
+            0.9769060086791266,
+            0.6397699845805846
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.16675781458616257,
+            "control": 0.6676562428474426,
+            "candidate": 0.6618749797344208
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "medianPercentChange": -0.8659041497711017,
+          "pairedPercentChange": -0.6565080636574128,
+          "wins": 13,
+          "pairedMinPercentChange": -3.866152164075276,
+          "pairedMaxPercentChange": 25.187797732207162,
+          "pairedRatios": [
+            0.976118651321908,
+            0.9913592028369517,
+            1.2518779773220716,
+            0.970997680071079,
+            0.9948039390668335,
+            1.0047824190434942,
+            0.9665821876933064,
+            0.9821805337472586,
+            0.9815156854963722,
+            0.9860302147110533,
+            1.0174117593204275,
+            1.003336541945943,
+            0.9672694336741647,
+            0.9871284988777755,
+            1.0094051166722853,
+            0.9957686363739895,
+            1.0004680659484657,
+            1.0007078972921095,
+            0.9613384783592472,
+            0.9934349193634259,
+            1.0051414168217456
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.02339843660593033,
+            "control": 0.5487500131130219,
+            "candidate": 0.5456250011920929
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "medianPercentChange": -0.5694782407750565,
+          "pairedPercentChange": -0.6071147467328841,
+          "wins": 13,
+          "pairedMinPercentChange": -34.85126901197697,
+          "pairedMaxPercentChange": 47.03693146759365,
+          "pairedRatios": [
+            0.6514873098802303,
+            0.9783933330082211,
+            0.9618620130069838,
+            0.9891459278597277,
+            0.8079273490610398,
+            1.0303924089665981,
+            1.4034272223796753,
+            1.0096406639824482,
+            0.6846339396275046,
+            1.0142773827352936,
+            0.6974789720344831,
+            1.0216500808809563,
+            1.4164046810554927,
+            1.0125284344018992,
+            0.9711565722289605,
+            1.4703693146759365,
+            0.999420725029987,
+            0.7815760618893786,
+            0.9939288525326712,
+            0.7257271434337454,
+            0.9974388660557072
+          ]
+        }
+      ]
+    },
+    {
+      "file": "web-before-normalization.json",
+      "sha256": "06ea25a60b926b4d05277aab73bb2cf3f47ea28c34e88c113a0a99be7c613321",
+      "controlWasm": "5280e2211f6a133314f914156ea95c4792b5ee561fc433704f3897daff388207",
+      "candidateWasm": "b71e7365d757889d76d7e8b1b5e6eb4a6e8d95dc44d09f1d20c6acf76b6b834e",
+      "rows": [
+        {
+          "case": "sequence/small",
+          "profile": "fixed",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.024570316076278687,
+            "control": 0.07242187112569809,
+            "candidate": 0.0725390613079071
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": 0.16181600998075307,
+          "pairedPercentChange": 0.3324175946103125,
+          "wins": 9,
+          "pairedMinPercentChange": -9.613481192862238,
+          "pairedMaxPercentChange": 10.283868029455512,
+          "pairedRatios": [
+            0.9542650949827226,
+            1.015483231319541,
+            0.9973031693778144,
+            1.1028386802945551,
+            0.9588052965362373,
+            1.016611252173226,
+            1.0196614211279025,
+            1.018428297074582,
+            0.9900783008959558,
+            0.9038651880713776,
+            1.0828988596084028,
+            0.9790795187775572,
+            1.0385659433350707,
+            1.0033241759461031,
+            1.028556072300436,
+            0.9934284208342656,
+            1.0133186291772076,
+            1.0072221755981445,
+            0.9745945286106419,
+            1.002767080534235,
+            0.9682966075638003
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "fixed",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.007695317268371582,
+            "control": 0.12468750029802322,
+            "candidate": 0.126953125
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": 1.8170423631571397,
+          "pairedPercentChange": 1.5047067565045813,
+          "wins": 6,
+          "pairedMinPercentChange": -3.0179890766373396,
+          "pairedMaxPercentChange": 68.94567804260943,
+          "pairedRatios": [
+            1.2164402383715853,
+            1.0179680224669603,
+            0.988566105307333,
+            1.0239615995280988,
+            1.6894567804260943,
+            1.0611038962422348,
+            0.9944700951752341,
+            1.0150470675650458,
+            1.0367177404130152,
+            0.9968671559764816,
+            1.014352605390685,
+            1.5940529684391755,
+            1.0038498213535787,
+            0.9971189200241762,
+            1.001176151580657,
+            1.5603631130192677,
+            1.0017054993013617,
+            0.9798010227689814,
+            1.584142885577611,
+            1.023051917470514,
+            0.9698201092336266
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.028085939586162567,
+            "control": 0.07503905892372131,
+            "candidate": 0.07359375059604645
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": -1.9260746981702548,
+          "pairedPercentChange": -1.5231139789013581,
+          "wins": 14,
+          "pairedMinPercentChange": -23.643561637047494,
+          "pairedMaxPercentChange": 14.485836251234673,
+          "pairedRatios": [
+            0.9683116566051136,
+            0.9830777526490562,
+            0.9661810800337209,
+            0.9864300505765947,
+            0.9847688602109864,
+            1.0289458623454824,
+            0.7635643836295251,
+            0.9927612463804506,
+            1.0228480505923727,
+            1.0057262163245222,
+            1.028586239272527,
+            1.0261295329508737,
+            0.9721074901263185,
+            0.9455095892868209,
+            0.9963099790533497,
+            1.0048051337313137,
+            0.9111650538923198,
+            1.1448583625123467,
+            0.8293413210290579,
+            0.9739582350270655,
+            0.9824840806245575
+          ]
+        },
+        {
+          "case": "sequence/small",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.008124999701976776,
+            "control": 0.1273828148841858,
+            "candidate": 0.12757812440395355
+          },
+          "counts": {
+            "js": 128,
+            "control": 128,
+            "candidate": 128
+          },
+          "medianPercentChange": 0.15332485778818405,
+          "pairedPercentChange": -1.4294383374416575,
+          "wins": 11,
+          "pairedMinPercentChange": -38.463077001119636,
+          "pairedMaxPercentChange": 198.31851971352498,
+          "pairedRatios": [
+            0.8752337686823854,
+            1.0155472637553584,
+            0.9159123775732778,
+            1.4812053281803912,
+            2.9831851971352497,
+            1.0395498877792058,
+            0.9681079148708384,
+            0.6153692299888036,
+            0.9502729104787236,
+            0.9187761262336952,
+            0.689013857440621,
+            1.0116693875494343,
+            1.02913864427636,
+            1.1328850972369158,
+            1.528602687352287,
+            0.9584743041536373,
+            0.8118151202217977,
+            1.4371903060218736,
+            0.9348991771229577,
+            1.02335720914805,
+            0.9857056166255834
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "fixed",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.1535937562584877,
+            "control": 0.6956250071525574,
+            "candidate": 0.6939062476158142
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "medianPercentChange": -0.24708133248093622,
+          "pairedPercentChange": 0.13553075518855096,
+          "wins": 8,
+          "pairedMinPercentChange": -6.65046052399243,
+          "pairedMaxPercentChange": 8.86048562848336,
+          "pairedRatios": [
+            0.9982030136964939,
+            1.0004505622446198,
+            0.9986643039661515,
+            1.0308129703864575,
+            1.0665276050032133,
+            1.0009259029507478,
+            1.0152725476195181,
+            1.0886048562848336,
+            1.0730516144173037,
+            0.9717059287541078,
+            1.05909287065864,
+            1.0254237151152785,
+            1.0013553075518855,
+            0.9334953947600757,
+            0.98733882736205,
+            0.965373960974907,
+            1.0385064084910443,
+            1.0626815143203479,
+            0.9613174601789324,
+            0.959179203738336,
+            1.004025008786087
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "fixed",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.025742188096046448,
+            "control": 0.5842187404632568,
+            "candidate": 0.5962499976158142
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "medianPercentChange": 2.059375422126508,
+          "pairedPercentChange": 3.529752217723958,
+          "wins": 6,
+          "pairedMinPercentChange": -30.778719433150503,
+          "pairedMaxPercentChange": 49.28191114707794,
+          "pairedRatios": [
+            0.7356180972909657,
+            1.0352975221772396,
+            1.0748434565650216,
+            0.9698019969090566,
+            1.0398406815650463,
+            0.9918011248262085,
+            1.0380842933636485,
+            1.0315211149506294,
+            1.3341708911972079,
+            1.010998344812926,
+            0.9641615868651167,
+            0.9759101246673946,
+            1.0445112265335432,
+            1.0105932101722903,
+            1.4928191114707794,
+            1.0402451573323677,
+            1.4609074451869517,
+            1.0782034600261303,
+            0.692212805668495,
+            1.0271782182721354,
+            1.0820367634295822
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "render-source",
+          "medianMs": {
+            "js": 0.16808594018220901,
+            "control": 0.6840624809265137,
+            "candidate": 0.6787500381469727
+          },
+          "counts": {
+            "js": 128,
+            "control": 16,
+            "candidate": 16
+          },
+          "medianPercentChange": -0.7766019812028957,
+          "pairedPercentChange": -0.36036859596978443,
+          "wins": 13,
+          "pairedMinPercentChange": -13.343950907518309,
+          "pairedMaxPercentChange": 2.737139731421201,
+          "pairedRatios": [
+            1.0011136820907034,
+            0.9984188608274108,
+            0.8665604909248169,
+            1.004289325305852,
+            1.0153488336607468,
+            1.0179584627058356,
+            1.0132906012641298,
+            1.003255799759266,
+            0.9836586201030038,
+            1.0060804992150698,
+            0.9944877888511664,
+            0.9913203000453791,
+            0.9967859687802594,
+            0.9880734710719072,
+            0.9917808085555119,
+            0.9757412846978287,
+            0.9913203000453791,
+            1.027371397314212,
+            0.9963963140403022,
+            0.9791942798792198,
+            0.979627945377522
+          ]
+        },
+        {
+          "case": "gantt/medium",
+          "profile": "canvas",
+          "stage": "parse",
+          "medianMs": {
+            "js": 0.02347656339406967,
+            "control": 0.5475000143051147,
+            "candidate": 0.5543749928474426
+          },
+          "counts": {
+            "js": 128,
+            "control": 32,
+            "candidate": 32
+          },
+          "medianPercentChange": 1.2557038105384555,
+          "pairedPercentChange": 1.1079582661268406,
+          "wins": 8,
+          "pairedMinPercentChange": -33.544427643151074,
+          "pairedMaxPercentChange": 48.86199538994234,
+          "pairedRatios": [
+            0.9767115617867511,
+            1.4886199538994234,
+            0.9633106082543496,
+            0.6645557235684892,
+            0.9855071858911488,
+            1.418746314059943,
+            0.999424281580442,
+            1.3799076235360659,
+            0.9754007382672756,
+            0.8846741189547477,
+            1.005176940466748,
+            1.4464074645850133,
+            1.0315668143200183,
+            1.026620372989316,
+            0.995790075384968,
+            1.0110795826612684,
+            1.0034217519326385,
+            1.011415513929197,
+            1.0273581955057887,
+            1.0713258415181464,
+            1.4249710513419929
+          ]
+        }
+      ]
+    }
+  ],
+  "gate": {
+    "webSHA256": "f1c50ef3ccf172995d26949dcdd7bf935b6eb7ac4efa3ef6faf607a2572d85d8",
+    "gateSHA256": "e2174d5cf3caa56f9b6cde96528910fb6adda07a2a03b62855cf7687961ba726",
+    "checked": 126,
+    "slowerCount": 126,
+    "passed": false,
+    "medianRatioByStage": {
+      "render-source": 2.385258484875276,
+      "parse": 11.18982207852493,
+      "render-model": 4.177316080258546
+    },
+    "averageMiddleMedianRatioByStage": {
+      "render-source": 2.3949176710399946,
+      "parse": 11.339953742800073,
+      "render-model": 4.192811809085027
+    }
+  },
+  "allocations": {
+    "control": {
+      "reportSHA256": "d5d7d252c7233ddc9248b052b86c93daea05d6a267e10f255d6dcb1ddd2eefa7",
+      "binarySHA256": "c2cd0a31a563c0a1f8fa0d759d2868437b66e5aa805fed967cfe71078d84a243",
+      "row": {
+        "allocations": 69,
+        "oneByteAllocations": 33,
+        "reallocations": 4,
+        "requestedBytes": 3948
+      }
+    },
+    "candidate": {
+      "reportSHA256": "c59158ea14a1b228226b16e44c50853f8a73b079fa630fcdd8d20bd44da7a199",
+      "binarySHA256": "b38c4bacb263d6ff3b9d62c09a3273a2568ef00fe7276f204903b7c27ab4419d",
+      "row": {
+        "allocations": 36,
+        "oneByteAllocations": 0,
+        "reallocations": 4,
+        "requestedBytes": 3915
+      }
+    }
+  },
+  "rejectedSwiftAttempts": [
+    {
+      "file": "swift-parse-gantt-sequence-attempt1.json",
+      "completed": false,
+      "rawRows": [
+        {
+          "case": "sequence/small",
+          "stage": "parse",
+          "rawPairs": 0
+        }
+      ]
+    },
+    {
+      "file": "swift-parse-gantt-sequence-attempt2.json",
+      "completed": false,
+      "rawRows": [
+        {
+          "case": "sequence/small",
+          "stage": "parse",
+          "rawPairs": 0
+        }
+      ]
+    },
+    {
+      "file": "swift-parse-gantt-sequence-attempt3.json",
+      "completed": false,
+      "rawRows": [
+        {
+          "case": "sequence/small",
+          "stage": "parse",
+          "rawPairs": 15
+        },
+        {
+          "case": "gantt/medium",
+          "stage": "parse",
+          "rawPairs": 0
+        }
+      ]
+    },
+    {
+      "file": "swift-parse-gantt-sequence-attempt4.json",
+      "completed": false,
+      "rawRows": [
+        {
+          "case": "sequence/small",
+          "stage": "parse",
+          "rawPairs": 0
+        }
+      ]
+    }
+  ],
+  "orderOffsetCorrectnessHarnessSHA256": "3f6853435e45703c2aa3b94f36026444666a963a71c03e8e04e21fb46bab4549",
+  "acceptedSwift": {
+    "reports": [
+      {
+        "file": "swift-single-parse-gantt-medium-attempt1.json",
+        "sha256": "59f6b4e0327ae2947a02885a0fd6ec5a1e2c16299ad2aa724772280f833fca66",
+        "startedAt": "2026-10-20T03:30:28.953Z",
+        "completedAt": "2026-10-20T03:30:34.813Z",
+        "rows": [
+          {
+            "case": "gantt/medium",
+            "stage": "parse",
+            "count": 32,
+            "controlMs": {
+              "median": 0.6059674375,
+              "mad": 0.003404937500000038,
+              "min": 0.60109115625,
+              "max": 0.6110833125,
+              "sampleP95": 0.6110833125
+            },
+            "candidateMs": {
+              "median": 0.60073565625,
+              "mad": 0.0028047187499999904,
+              "min": 0.5945520625,
+              "max": 0.61009634375,
+              "sampleP95": 0.61009634375
+            },
+            "medianPercentChange": -0.8633766315207292,
+            "pairedPercentChange": -0.8624776397270661,
+            "pairedMinPercentChange": -2.137377340016966,
+            "pairedMaxPercentChange": 0.9691428274819502,
+            "wins": 13,
+            "warmup": {
+              "control": {
+                "operations": 1670,
+                "elapsedNs": 1004953749
+              },
+              "candidate": {
+                "operations": 1670,
+                "elapsedNs": 1001648919
+              },
+              "pairs": 19
+            }
+          }
+        ]
+      },
+      {
+        "file": "swift-single-parse-sequence-small-attempt1.json",
+        "sha256": "5c9f12f7ec20e0b86fb5268f837807e690f24127f53b224392c4aa3e27a7ba71",
+        "startedAt": "2026-10-20T03:30:14.828Z",
+        "completedAt": "2026-10-20T03:30:28.760Z",
+        "rows": [
+          {
+            "case": "sequence/small",
+            "stage": "parse",
+            "count": 128,
+            "controlMs": {
+              "median": 0.0595009765625,
+              "mad": 0.000466140625,
+              "min": 0.0578935546875,
+              "max": 0.060152015625,
+              "sampleP95": 0.060152015625
+            },
+            "candidateMs": {
+              "median": 0.058422203125,
+              "mad": 0.00034114062499999986,
+              "min": 0.0572662734375,
+              "max": 0.0589973984375,
+              "sampleP95": 0.0589973984375
+            },
+            "medianPercentChange": -1.8130348438346267,
+            "pairedPercentChange": -2.1634291174556064,
+            "pairedMinPercentChange": -3.713005234043487,
+            "pairedMaxPercentChange": 1.6985292117396966,
+            "wins": 13,
+            "warmup": {
+              "control": {
+                "operations": 17030,
+                "elapsedNs": 1024345834
+              },
+              "candidate": {
+                "operations": 17030,
+                "elapsedNs": 1003691631
+              },
+              "pairs": 139
+            }
+          }
+        ]
+      },
+      {
+        "file": "swift-single-render-retained-gantt-medium-attempt1.json",
+        "sha256": "2845af6c1fabd1c9710040f51c2e448edeeeb143781e78107921f0ffd13c0a4c",
+        "startedAt": "2026-10-20T03:31:07.377Z",
+        "completedAt": "2026-10-20T03:31:14.368Z",
+        "rows": [
+          {
+            "case": "gantt/medium",
+            "stage": "render-retained",
+            "count": 64,
+            "controlMs": {
+              "median": 0.367279296875,
+              "mad": 0.003016921874999967,
+              "min": 0.36096484375,
+              "max": 0.374525390625,
+              "sampleP95": 0.374525390625
+            },
+            "candidateMs": {
+              "median": 0.364525390625,
+              "mad": 0.002831375000000025,
+              "min": 0.359696609375,
+              "max": 1.820462234375,
+              "sampleP95": 1.820462234375
+            },
+            "medianPercentChange": -0.7498125468632821,
+            "pairedPercentChange": -0.12845351522069448,
+            "pairedMinPercentChange": -3.1472123573063837,
+            "pairedMaxPercentChange": 400.45996864328515,
+            "wins": 8,
+            "warmup": {
+              "control": {
+                "operations": 2822,
+                "elapsedNs": 1031822708
+              },
+              "candidate": {
+                "operations": 2822,
+                "elapsedNs": 1025267001
+              },
+              "pairs": 28
+            }
+          }
+        ]
+      },
+      {
+        "file": "swift-single-render-retained-sequence-small-attempt1.json",
+        "sha256": "8484d793486ff9ff8d77dceed2f41ad12cf4192eb5ca15e529e324896a5afc6c",
+        "startedAt": "2026-10-20T03:30:52.901Z",
+        "completedAt": "2026-10-20T03:31:07.180Z",
+        "rows": [
+          {
+            "case": "sequence/small",
+            "stage": "render-retained",
+            "count": 128,
+            "controlMs": {
+              "median": 0.0682239609375,
+              "mad": 0.0006360625000000064,
+              "min": 0.066730140625,
+              "max": 0.069730796875,
+              "sampleP95": 0.069730796875
+            },
+            "candidateMs": {
+              "median": 0.0684176484375,
+              "mad": 0.0005123750000000094,
+              "min": 0.0671061171875,
+              "max": 0.0702493515625,
+              "sampleP95": 0.0702493515625
+            },
+            "medianPercentChange": 0.28389952347893654,
+            "pairedPercentChange": -0.28709741100315656,
+            "pairedMinPercentChange": -1.6394791628281946,
+            "pairedMaxPercentChange": 4.301371318660596,
+            "wins": 9,
+            "warmup": {
+              "control": {
+                "operations": 14342,
+                "elapsedNs": 1235575790
+              },
+              "candidate": {
+                "operations": 14342,
+                "elapsedNs": 1006754538
+              },
+              "pairs": 118
+            }
+          }
+        ]
+      },
+      {
+        "file": "swift-single-render-source-gantt-medium-attempt1.json",
+        "sha256": "6adb7512051245f422a6933dd54ce5473c493e1f4b270e1a2568d5b235ee7cc7",
+        "startedAt": "2026-10-20T03:30:46.549Z",
+        "completedAt": "2026-10-20T03:30:52.715Z",
+        "rows": [
+          {
+            "case": "gantt/medium",
+            "stage": "render-source",
+            "count": 32,
+            "controlMs": {
+              "median": 0.43530728125,
+              "mad": 0.005044250000000028,
+              "min": 0.423546875,
+              "max": 0.46197525,
+              "sampleP95": 0.46197525
+            },
+            "candidateMs": {
+              "median": 0.43523046875,
+              "mad": 0.00594271875000002,
+              "min": 0.42448046875,
+              "max": 0.45785415625,
+              "sampleP95": 0.45785415625
+            },
+            "medianPercentChange": -0.017645581249969844,
+            "pairedPercentChange": -0.057320702994700934,
+            "pairedMinPercentChange": -4.2421679344917145,
+            "pairedMaxPercentChange": 2.0723573189223243,
+            "wins": 8,
+            "warmup": {
+              "control": {
+                "operations": 2438,
+                "elapsedNs": 1049869082
+              },
+              "candidate": {
+                "operations": 2438,
+                "elapsedNs": 1043660665
+              },
+              "pairs": 25
+            }
+          }
+        ]
+      },
+      {
+        "file": "swift-single-render-source-sequence-small-attempt1.json",
+        "sha256": "e1d9660121036d5e957107873a271422f253580423b93fe11cd22cf6d7c4e17f",
+        "startedAt": "2026-10-20T03:30:35.008Z",
+        "completedAt": "2026-10-20T03:30:46.350Z",
+        "rows": [
+          {
+            "case": "sequence/small",
+            "stage": "render-source",
+            "count": 128,
+            "controlMs": {
+              "median": 0.08259765625,
+              "mad": 0.00038639062499999655,
+              "min": 0.08033821875,
+              "max": 0.0851344375,
+              "sampleP95": 0.0851344375
+            },
+            "candidateMs": {
+              "median": 0.0813404921875,
+              "mad": 0.000907226562500002,
+              "min": 0.079208984375,
+              "max": 0.0839270859375,
+              "sampleP95": 0.0839270859375
+            },
+            "medianPercentChange": -1.5220335776779281,
+            "pairedPercentChange": -1.5220335776779281,
+            "pairedMinPercentChange": -4.108293432641719,
+            "pairedMaxPercentChange": 2.5440289359016433,
+            "wins": 10,
+            "warmup": {
+              "control": {
+                "operations": 12166,
+                "elapsedNs": 1002712879
+              },
+              "candidate": {
+                "operations": 12166,
+                "elapsedNs": 1040581042
+              },
+              "pairs": 101
+            }
+          }
+        ]
+      }
+    ],
+    "orderCounts": {
+      "control": 45,
+      "candidate": 45
+    },
+    "comparatorSHA256": "3f6853435e45703c2aa3b94f36026444666a963a71c03e8e04e21fb46bab4549",
+    "candidateSourceInputSHA256": "4a1ffee9c1b87c8513edfdd8345db9af0cb7ddad1c867908d22a33e353d743a2",
+    "controlSourceInputSHA256": "8de3d3bdb4ac141d0f5aa3815137a3236a99de43e2174b3df2c40e068dfb4de2"
+  }
+}

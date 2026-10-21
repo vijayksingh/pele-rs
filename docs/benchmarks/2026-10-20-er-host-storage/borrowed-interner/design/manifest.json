@@ -1,0 +1,33 @@
+{
+  "status": "private-static-candidate",
+  "baselineHead": "31edd859f0bcaf84d0bcfc1ab4ada33490dcaa71",
+  "patchSha256": "87b627a83dc45a521589d084c86cdddfbeec838d61876329ee1da068987d57cb",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/er/public_model.rs",
+      "originalSha256": "21dbde5cf31247ccba1f96bc53128aba37af0b5f26137c4ff6a249a10c1d9309",
+      "candidateSha256": "159f3b561cb582269793dcf322f89c5cc46323615482b2a55e70e647dc4c7bae",
+      "originalMatchesProduction": true
+    },
+    {
+      "path": "crates/pele/src/compat/public/graph.rs",
+      "originalSha256": "cd5f31bcd73d1d6ad67ff6dcbb9f218241acf2fca1660d402f97f3d27330bd97",
+      "candidateSha256": "9d2ecc7ab2e329fae83d5305f65ab996e24c79b7ac6ab8eb20f0ec953f26e233",
+      "originalMatchesProduction": true
+    },
+    {
+      "path": "crates/pele/tests/public_er_borrowed_strings.rs",
+      "originalSha256": null,
+      "candidateSha256": "56327c97e559303766f6393436f686d4e82d600c5458f3b022f1c9fdf2cfdab4",
+      "originalMatchesProduction": true
+    }
+  ],
+  "validation": {
+    "rustfmt": "passed three private Rust files",
+    "gitApplyCheck": "passed",
+    "builds": "not run",
+    "tests": "not run",
+    "measurements": "not run"
+  },
+  "scope": "ER GraphWriter construction only; ordinary host-owned web parse does not use this helper"
+}

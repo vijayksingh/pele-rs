@@ -1,0 +1,94 @@
+{
+  "completed": true,
+  "attempt": 1,
+  "reportSha256": "8e30cbe3908227005b31cc4f1e1da967147b54cc465c6215f25a834aabfb3a5b",
+  "startedAt": "2026-10-20T08:44:33.609Z",
+  "completedAt": "2026-10-20T08:45:25.587Z",
+  "rows": [
+    {
+      "case": "sequence/small",
+      "stage": "parseMutable",
+      "count": 128,
+      "controlMedianMs": 0.0671315078125,
+      "candidateMedianMs": 0.06690234375,
+      "pairedPercent": 0.4845729146419453,
+      "candidateFasterPairs": 7,
+      "trials": 15
+    },
+    {
+      "case": "sequence/small",
+      "stage": "lifetime",
+      "count": 64,
+      "controlMedianMs": 0.222160796875,
+      "candidateMedianMs": 0.219824859375,
+      "pairedPercent": -0.6299903483372837,
+      "candidateFasterPairs": 10,
+      "trials": 15
+    },
+    {
+      "case": "sequence/small",
+      "stage": "parse",
+      "count": 128,
+      "controlMedianMs": 0.060064453125,
+      "candidateMedianMs": 0.0602496796875,
+      "pairedPercent": 0.7889112305105916,
+      "candidateFasterPairs": 7,
+      "trials": 15
+    },
+    {
+      "case": "er/medium",
+      "stage": "parseMutable",
+      "count": 64,
+      "controlMedianMs": 0.201787109375,
+      "candidateMedianMs": 0.178163421875,
+      "pairedPercent": -12.002302147412912,
+      "candidateFasterPairs": 15,
+      "trials": 15
+    },
+    {
+      "case": "er/medium",
+      "stage": "lifetime",
+      "count": 8,
+      "controlMedianMs": 2.16766675,
+      "candidateMedianMs": 2.1615,
+      "pairedPercent": -2.442868582082547,
+      "candidateFasterPairs": 10,
+      "trials": 15
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 32,
+      "controlMedianMs": 0.52483465625,
+      "candidateMedianMs": 0.52324740625,
+      "pairedPercent": -0.2640347718952163,
+      "candidateFasterPairs": 8,
+      "trials": 15
+    }
+  ],
+  "pairs": 90,
+  "orderCounts": {
+    "control": 45,
+    "candidate": 45
+  },
+  "measuredGuardsChecked": 180,
+  "exactBeforeAfterAndBatchResponses": true,
+  "changedInputs": [
+    {
+      "path": "CPele/macos-arm64/libpele_ffi.a",
+      "control": "4bfd4da820bfb7fcf980db7d0bb58c75a0ceedf995d871494c3f763cadc895c3",
+      "candidate": "33fbc11ee6347fd8068b0a383494aa45f54b3563138e34939775591d989e8366"
+    },
+    {
+      "path": "root/crates/pele/src/compat/diagrams/er/public_model.rs",
+      "control": "21dbde5cf31247ccba1f96bc53128aba37af0b5f26137c4ff6a249a10c1d9309",
+      "candidate": "159f3b561cb582269793dcf322f89c5cc46323615482b2a55e70e647dc4c7bae"
+    },
+    {
+      "path": "root/crates/pele/src/compat/public/graph.rs",
+      "control": "cd5f31bcd73d1d6ad67ff6dcbb9f218241acf2fca1660d402f97f3d27330bd97",
+      "candidate": "9d2ecc7ab2e329fae83d5305f65ab996e24c79b7ac6ab8eb20f0ec953f26e233"
+    }
+  ],
+  "scope": "Isolated borrowed-interner layer versus frozen record-layout consumer: two Rust source inputs and SDK archive only; no retries or pooling."
+}

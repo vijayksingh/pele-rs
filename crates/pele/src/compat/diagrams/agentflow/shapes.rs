@@ -1,5 +1,5 @@
 //! Pele agentflow/shapes.ts constrained shapes and semantic aliases, 458322a5 (MIT).
-use super::model::{AgentDb, DiagnosticId};
+use super::model::DiagnosticId;
 pub(super) fn resolve(s: &str) -> &str {
     match s {
         "task" => "roundedRect",
@@ -18,7 +18,10 @@ pub(super) fn valid(s: &str) -> bool {
 pub(super) fn canonical(s: Option<&str>) -> &str {
     super::super::flowchart::shapes::canonical(s)
 }
-pub(super) fn normalize(nodes: &mut [super::graph::GraphNode], db: &mut AgentDb) {
+pub(super) fn normalize_with<E>(
+    nodes: &mut [super::graph::GraphNode],
+    mut emit: impl FnMut(DiagnosticId, &str, String, &str) -> Result<(), E>,
+) -> Result<(), E> {
     const REMOVED: &[&str] = &[
         "doc",
         "stadium",
@@ -71,31 +74,30 @@ pub(super) fn normalize(nodes: &mut [super::graph::GraphNode], db: &mut AgentDb)
             node.shape = "roundedRect".into();
         }
         if REMOVED.contains(&node.shape.as_str()) {
-            db.emit(
+            emit(
                 DiagnosticId::ShapeRemoved,
                 "error",
                 format!(
                     "shape \"{}\" was removed in v0.8.1, using \"roundedRect\"",
                     node.shape
                 ),
-                Some(&node.id),
-                None,
-            );
+                &node.id,
+            )?;
             node.shape = "roundedRect".into();
         } else if !ALLOWED.contains(&node.shape.as_str()) {
-            db.emit(
+            emit(
                 DiagnosticId::ShapeUnsupported,
                 "warning",
                 format!(
                     "shape \"{}\" is not supported, using \"roundedRect\"",
                     node.shape
                 ),
-                Some(&node.id),
-                None,
-            );
+                &node.id,
+            )?;
             node.shape = "roundedRect".into();
         }
     }
+    Ok(())
 }
 pub(super) fn kind_slot(s: &str) -> Option<usize> {
     match s {

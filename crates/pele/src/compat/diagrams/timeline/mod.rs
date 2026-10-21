@@ -53,3 +53,22 @@ impl DiagramModule for Timeline {
 
 mod public_model;
 pub use public_model::TimelinePublicState;
+
+impl TimelineModel {
+    /// Empty class state shared by parser population and native construction.
+    pub(super) fn empty(title: Option<&str>) -> Self {
+        Self {
+            diagram_type: DiagramType::Timeline,
+            title: title.map(str::to_owned),
+            acc_title: None,
+            acc_descr: None,
+            direction: "LR".into(),
+            sections: Vec::new(),
+            periods: Vec::new(),
+            current_section: String::new(),
+        }
+    }
+}
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, TimelineDetachedInput};

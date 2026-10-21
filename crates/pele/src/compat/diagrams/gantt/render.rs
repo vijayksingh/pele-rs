@@ -2,7 +2,8 @@
 use super::{
     axis::{auto_ticks, interval_ticks, time_format},
     dates::Calendar,
-    model::{GanttModel, GanttTask},
+    model::GanttModel,
+    phase::{PhaseInput, Typed},
 };
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
@@ -61,11 +62,8 @@ fn one_line(
     }
     Ok(label)
 }
-fn scheduled(t: &GanttTask) -> bool {
-    t.start_time.is_some_and(f64::is_finite) && t.end_time.is_some_and(f64::is_finite)
-}
-struct Bar {
-    task: usize,
+struct Bar<T> {
+    task: T,
     label: Label,
     row: usize,
     x0: f64,
@@ -88,8 +86,14 @@ pub fn render(
     };
     let mut cal = Calendar::new(r);
     let mut m = model.clone();
-    m.schedule(now, &mut cal)?;
-    let result = draw(&mut m, c, o, &mut cal, size, pad, now, true, &mut false)?;
+    let mut missing = false;
+    let mut input = Typed {
+        model: &mut m,
+        schedule: true,
+        filter_callable: true,
+        missing_filter: &mut missing,
+    };
+    let result = draw(&mut input, c, o, &mut cal, size, pad, now)?;
     if let Some(e) = cal.error {
         return Err(e);
     }
@@ -109,16 +113,20 @@ pub(super) fn render_scheduled_checked(
     let mut cal = Calendar::public(r);
     let now = model.now;
     let mut missing_filter = false;
-    let result = draw(
+    let mut input = Typed {
         model,
+        schedule: false,
+        filter_callable,
+        missing_filter: &mut missing_filter,
+    };
+    let result = draw(
+        &mut input,
         c,
         o,
         &mut cal,
         o.font_size.unwrap_or(16.),
         o.padding.unwrap_or(8.),
         now,
-        filter_callable,
-        &mut missing_filter,
     );
     if let Some(e) = cal.error {
         return Err(e.into());
@@ -132,17 +140,15 @@ pub(super) fn render_scheduled_checked(
     result.map_err(Into::into)
 }
 
-fn draw(
-    m: &mut GanttModel,
+pub(super) fn draw<I: PhaseInput>(
+    m: &mut I,
     c: &Object,
     o: &RenderSettings,
     cal: &mut Calendar<'_>,
     size: f64,
     pad: f64,
     now: f64,
-    filter_callable: bool,
-    missing_filter: &mut bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, I::Error> {
     let label_size = setting(c, "fontSize", 4., 72.).unwrap_or(round(size * 0.8125));
     let section_size = setting(c, "sectionFontSize", 4., 72.).unwrap_or(label_size);
     let tick_size = round(size * 0.75);
@@ -151,89 +157,128 @@ fn draw(
     let row_h = bar_h + bar_gap;
     let section_styles =
         (setting(c, "numberSectionStyles", 1., 1000.).unwrap_or(4.) + 0.5).floor() as usize;
-    let compact = m.display_mode == "compact";
-    let top_axis = m.top_axis || flag(c, "topAxis");
-    let tasks = &m.tasks;
-    let row_tasks: Vec<usize> = tasks
-        .iter()
-        .enumerate()
-        .filter_map(|(i, t)| (!t.vert).then_some(i))
-        .collect();
-    let mut verts: Vec<usize> = tasks
-        .iter()
-        .enumerate()
-        .filter_map(|(i, t)| (t.vert && scheduled(t)).then_some(i))
-        .collect();
-    let mut categories: Vec<String> = vec![];
-    for &i in &row_tasks {
-        if !categories.contains(&tasks[i].section) {
-            categories.push(tasks[i].section.clone())
+    let compact = m.root_text("displayMode")?.as_deref() == Some("compact");
+    let top_axis = m.root_bool("topAxis")? || flag(c, "topAxis");
+    let tasks = m.tasks(now, cal.resources)?;
+    let mut row_tasks = Vec::new();
+    for task in &tasks {
+        m.work(1)?;
+        if !m.flag(task, "vert")? {
+            row_tasks.push(task.clone());
+        }
+    }
+    let mut verts = Vec::new();
+    for task in &tasks {
+        m.work(1)?;
+        if m.flag(task, "vert")? && m.scheduled(task, cal.resources)? {
+            verts.push(task.clone());
+        }
+    }
+    let mut categories: Vec<String> = Vec::new();
+    for task in &row_tasks {
+        m.work(1)?;
+        let section = m.text(task, "section")?;
+        m.work(categories.len())?;
+        if !categories.contains(&section) {
+            m.keep_text(section.encode_utf16().count())?;
+            categories.push(section);
         }
     }
     let mut row_of = HashMap::new();
-    let mut row_section: Vec<String> = vec![];
+    let mut row_section: Vec<String> = Vec::new();
     if compact {
-        for section in &categories {
-            let group: Vec<usize> = row_tasks
-                .iter()
-                .copied()
-                .filter(|&i| tasks[i].section == *section)
-                .collect();
-            let mut sorted: Vec<usize> = group
-                .iter()
-                .copied()
-                .filter(|&i| scheduled(&tasks[i]))
-                .collect();
-            sorted.sort_by(|&a, &b| {
-                tasks[a]
-                    .start_time
-                    .unwrap()
-                    .total_cmp(&tasks[b].start_time.unwrap())
-                    .then_with(|| {
-                        m.public_task_order(a)
-                            .partial_cmp(&m.public_task_order(b))
-                            .unwrap_or(std::cmp::Ordering::Equal)
-                    })
-            });
+        // The upstream section groups capture handles before the first measure.
+        let mut groups: Vec<(String, Vec<I::Task>)> = Vec::new();
+        for task in &row_tasks {
+            m.work(1)?;
+            let section = m.text(task, "section")?;
+            m.work(groups.len())?;
+            if let Some((_, group)) = groups.iter_mut().find(|(key, _)| key == &section) {
+                group.push(task.clone())
+            } else {
+                m.keep_text(section.encode_utf16().count())?;
+                groups.push((section, vec![task.clone()]));
+            }
+        }
+        for (section, group) in groups {
+            let mut sorted = Vec::new();
+            for task in &group {
+                m.work(1)?;
+                if m.scheduled(task, cal.resources)? {
+                    sorted.push(task.clone());
+                }
+            }
+            sort_tasks(&mut sorted, |a, b| -> Result<_, I::Error> {
+                let delta = m.date(a, "startTime", cal.resources)?
+                    - m.date(b, "startTime", cal.resources)?;
+                let delta = if delta == 0. || delta.is_nan() {
+                    m.order(a, cal.resources)? - m.order(b, cal.resources)?
+                } else {
+                    delta
+                };
+                Ok(delta.partial_cmp(&0.).unwrap_or(std::cmp::Ordering::Equal))
+            })?;
             let offset = row_section.len();
-            let mut free = vec![];
-            for i in sorted {
-                let start = tasks[i].start_time.unwrap();
+            let mut free = Vec::new();
+            for task in sorted {
+                m.work(1)?;
+                let start = m.date(&task, "startTime", cal.resources)?;
+                m.work(free.len())?;
                 let row = free
                     .iter()
                     .position(|&end| start >= end)
                     .unwrap_or(free.len());
+                let end = m.date(&task, "endTime", cal.resources)?;
                 if row == free.len() {
-                    free.push(tasks[i].end_time.unwrap())
+                    free.push(end)
                 } else {
-                    free[row] = tasks[i].end_time.unwrap()
+                    free[row] = end
                 }
-                row_of.insert(m.public_task_identity(i), offset + row);
+                row_of.insert(m.identity(&task)?, offset + row);
             }
             let mut rows = free.len();
-            for i in group {
-                if !row_of.contains_key(&m.public_task_identity(i)) {
-                    row_of.insert(m.public_task_identity(i), offset + rows);
-                    rows += 1
+            for task in group {
+                m.work(1)?;
+                let id = m.identity(&task)?;
+                if !row_of.contains_key(&id) {
+                    row_of.insert(id, offset + rows);
+                    rows += 1;
                 }
             }
-            row_section.extend(std::iter::repeat_n(section.clone(), rows.max(1)))
+            for _ in 0..rows.max(1) {
+                m.keep_text(section.encode_utf16().count())?;
+                row_section.push(section.clone());
+            }
         }
     } else {
-        for &i in &row_tasks {
-            row_of.insert(m.public_task_identity(i), row_section.len());
-            row_section.push(tasks[i].section.clone())
+        for task in &row_tasks {
+            m.work(1)?;
+            row_of.insert(m.identity(task)?, row_section.len());
+            let section = m.text(task, "section")?;
+            m.keep_text(section.encode_utf16().count())?;
+            row_section.push(section);
         }
     }
     let row_count = row_section.len();
     let (mut start, mut stop) = (f64::INFINITY, f64::NEG_INFINITY);
-    for t in tasks {
-        if scheduled(t) {
-            start = start.js_min(t.start_time.unwrap());
-            stop = stop.js_max(t.end_time.unwrap())
+    for task in &tasks {
+        m.work(1)?;
+        if m.scheduled(task, cal.resources)? {
+            start = start.js_min(m.date(task, "startTime", cal.resources)?);
+            stop = stop.js_max(m.date(task, "endTime", cal.resources)?);
         }
     }
-    let title = layout_label(m.title.as_deref(), false, cal.resources, o, size, 4000., 1)?;
+    let title_text = m.root_text("title")?;
+    m.keep_text(title_text.as_deref().unwrap_or("").encode_utf16().count())?;
+    let title = layout_label(
+        title_text.as_deref(),
+        false,
+        cal.resources,
+        o,
+        size,
+        4000.,
+        1,
+    )?;
     let title_h = if title.height > 0. {
         title.height + 16.
     } else {
@@ -255,8 +300,8 @@ fn draw(
                 height,
                 size,
                 o,
-                m.acc_title.as_deref(),
-                m.acc_descr.as_deref(),
+                m.root_text("accTitle")?.as_deref(),
+                m.root_text("accDescr")?.as_deref(),
                 &content,
             )?,
             width,
@@ -267,6 +312,8 @@ fn draw(
     let mut section_labels = HashMap::new();
     let mut section_width = 0f64;
     for section in &categories {
+        m.work(1)?;
+        m.keep_text(section.encode_utf16().count())?;
         let label = layout_label(
             Some(section),
             false,
@@ -279,24 +326,20 @@ fn draw(
         section_width = section_width.js_max(label.width);
         section_labels.insert(section.clone(), label);
     }
-    let axis_format = if !m.axis_format.is_empty() {
-        m.axis_format.as_str()
-    } else if m.date_format == "D" {
-        "%d"
+    let axis = m.root_text("axisFormat")?;
+    let axis_format = if let Some(s) = axis.filter(|s| !s.is_empty()) {
+        s
+    } else if m.root_text("dateFormat")?.as_deref() == Some("D") {
+        "%d".into()
     } else {
-        text(c, "axisFormat").unwrap_or("%Y-%m-%d")
+        text(c, "axisFormat").unwrap_or("%Y-%m-%d").into()
     };
-    let a = time_format(cal, axis_format, start);
+    let a = time_format(cal, &axis_format, start);
     cal.check()?;
-    let b = time_format(cal, axis_format, stop);
+    let start_width = measure(cal.resources, o, &a, tick_size, 0)?;
+    let b = time_format(cal, &axis_format, stop);
     cal.check()?;
-    let sample_width = measure(cal.resources, o, &a, tick_size, 0)?.js_max(measure(
-        cal.resources,
-        o,
-        &b,
-        tick_size,
-        0,
-    )?);
+    let sample_width = start_width.js_max(measure(cal.resources, o, &b, tick_size, 0)?);
     let left = pad
         + setting(c, "leftPadding", 0., 2000.).unwrap_or(
             (if section_width > 0. {
@@ -341,15 +384,17 @@ fn draw(
     let plot_bottom = plot_top + plot_h;
     let mut bars = vec![];
     let mut extent = right + right_pad;
-    for &i in &row_tasks {
-        let t = &tasks[i];
-        let label = one_line(&t.task, label_size, o, cal.resources)?;
-        let row = row_of[&m.public_task_identity(i)];
-        if !scheduled(t) {
+    for t in &row_tasks {
+        m.work(1)?;
+        let raw = m.text(t, "task")?;
+        m.keep_text(raw.encode_utf16().count())?;
+        let label = one_line(&raw, label_size, o, cal.resources)?;
+        let row = row_of[&m.identity(t)?];
+        if !m.scheduled(t, cal.resources)? {
             let label_x = left + 8. + label.width / 2.;
             extent = extent.js_max(label_x + label.width / 2.);
             bars.push(Bar {
-                task: i,
+                task: t.clone(),
                 label,
                 row,
                 x0: f64::NAN,
@@ -359,15 +404,15 @@ fn draw(
             });
             continue;
         }
-        let mut x0 = x(t.start_time.unwrap());
-        let mut x1 = x(t.render_end_time.or(t.end_time).unwrap())
-            .js_max(x0 + if t.milestone { 0. } else { 2. });
-        if t.milestone {
-            let mid = x0 + (x(t.end_time.unwrap()) - x0) / 2.;
+        let mut x0 = x(m.date(t, "startTime", cal.resources)?);
+        let mut x1 = x(m.render_end(t, cal.resources)?)
+            .js_max(x0 + if m.flag(t, "milestone")? { 0. } else { 2. });
+        if m.flag(t, "milestone")? {
+            let mid = x0 + (x(m.date(t, "endTime", cal.resources)?) - x0) / 2.;
             x0 = mid - bar_h / 2.;
             x1 = mid + bar_h / 2.
         }
-        let inside = !t.milestone && label.width + 16. <= x1 - x0;
+        let inside = !m.flag(t, "milestone")? && label.width + 16. <= x1 - x0;
         let mut label_x = (x0 + x1) / 2.;
         if !inside {
             let fits_right = x1 + 8. + label.width <= right + right_pad;
@@ -380,7 +425,7 @@ fn draw(
             extent = extent.js_max(label_x + label.width / 2.)
         }
         bars.push(Bar {
-            task: i,
+            task: t.clone(),
             label,
             row,
             x0,
@@ -390,21 +435,19 @@ fn draw(
         })
     }
     let interval = m
-        .tick_interval
-        .as_deref()
+        .root_text("tickInterval")?
         .filter(|s| !s.is_empty())
-        .or_else(|| text(c, "tickInterval"))
-        .unwrap_or("");
+        .or_else(|| text(c, "tickInterval").map(str::to_owned))
+        .unwrap_or_default();
     let weekday = m
-        .weekday
-        .as_deref()
-        .or_else(|| text(c, "weekday"))
-        .unwrap_or("sunday");
+        .root_text("weekday")?
+        .or_else(|| text(c, "weekday").map(str::to_owned))
+        .unwrap_or_else(|| "sunday".into());
     let count = (plot_width / (sample_width + 24.)).floor().clamp(2., 10.);
     let ticks = interval_ticks(
         cal,
-        interval,
-        weekday,
+        &interval,
+        &weekday,
         start,
         stop,
         (plot_width / 3.).ceil() as usize,
@@ -417,6 +460,7 @@ fn draw(
     let bottom_y = plot_bottom + tick_h / 2. + 2.;
     let top_y = plot_top - grid_lead - tick_h / 2. - 2.;
     for t in ticks {
+        m.work(1)?;
         let tx = x(t);
         grid += &format!(
             "M{},{}V{}",
@@ -424,7 +468,7 @@ fn draw(
             num(plot_top - grid_lead),
             num(plot_bottom)
         );
-        let label = time_format(cal, axis_format, t);
+        let label = time_format(cal, &axis_format, t);
         cal.check()?;
         let width = measure(cal.resources, o, &label, tick_size, 0)?;
         if tx - width / 2. < last_right + 8. || label == last_label {
@@ -451,17 +495,19 @@ fn draw(
     let mut vert_ends = vec![];
     let vert_top = plot_bottom + tick_h + 4.;
     let vert_line = round(label_size * 1.5);
-    verts.sort_by(|&a, &b| {
-        tasks[a]
-            .start_time
-            .unwrap()
-            .total_cmp(&tasks[b].start_time.unwrap())
-    });
-    for i in verts {
-        let t = &tasks[i];
-        let vx = x(t.start_time.unwrap());
-        let label = one_line(&t.task, label_size, o, cal.resources)?;
+    sort_tasks(&mut verts, |a, b| -> Result<_, I::Error> {
+        let delta =
+            m.date(a, "startTime", cal.resources)? - m.date(b, "startTime", cal.resources)?;
+        Ok(delta.partial_cmp(&0.).unwrap_or(std::cmp::Ordering::Equal))
+    })?;
+    for t in &verts {
+        m.work(1)?;
+        let vx = x(m.date(t, "startTime", cal.resources)?);
+        let raw = m.text(t, "task")?;
+        m.keep_text(raw.encode_utf16().count())?;
+        let label = one_line(&raw, label_size, o, cal.resources)?;
         let cx = (pad + label.width / 2.).js_max(vx);
+        m.work(vert_ends.len())?;
         let line = vert_ends
             .iter()
             .position(|&end| cx - label.width / 2. >= end + 8.)
@@ -474,7 +520,7 @@ fn draw(
         extent = extent.js_max(vert_ends[line]);
         vert_lines += &format!(
             "<path class=\"pele-vert\" data-id=\"{}\" d=\"M{},{}V{}\"/>",
-            esc_text(&t.id)?,
+            esc_text(&m.text(t, "id")?)?,
             num(vx),
             num(plot_top - grid_lead),
             num(plot_bottom)
@@ -485,7 +531,7 @@ fn draw(
             vert_top + line as f64 * vert_line + vert_line / 2.,
             &format!(
                 " class=\"pele-vert-label\" data-id=\"{}\"",
-                esc_text(&t.id)?
+                esc_text(&m.text(t, "id")?)?
             ),
         )
     }
@@ -502,6 +548,7 @@ fn draw(
     let (mut bands, mut section_out) = (String::new(), String::new());
     let mut row = 0;
     while row < row_count {
+        m.work(1)?;
         let section = &row_section[row];
         let mut end = row + 1;
         while end < row_count && row_section[end] == *section {
@@ -527,18 +574,12 @@ fn draw(
         row = end
     }
     let mut excluded = String::new();
-    if (!m.excludes.is_empty() || !m.includes.is_empty()) && cal.add(start, 6., "y") > stop {
+    if m.has_exclusions()? && cal.add(start, 6., "y") > stop {
         let mut from = None;
         let mut to = None;
         let mut day = start;
         loop {
-            if day <= stop && !filter_callable {
-                *missing_filter = true;
-                return Err(PeleError::new(
-                    "Gantt missing date filter",
-                    crate::compat::ErrorCode::Semantic,
-                ));
-            }
+            m.work(1)?;
             let invalid = day <= stop && m.invalid(day, cal)?;
             if invalid {
                 if from.is_none() {
@@ -584,11 +625,12 @@ fn draw(
     let mut links = vec![];
     let mut tasks_out = String::new();
     for bar in bars {
-        let t = &m.tasks[bar.task];
+        let t = &bar.task;
+        m.work(1)?;
         let cy = plot_top + bar.row as f64 * row_h + row_h / 2.;
-        let state = if t.active {
+        let state = if m.flag(t, "active")? {
             "active"
-        } else if t.done {
+        } else if m.flag(t, "done")? {
             "done"
         } else {
             ""
@@ -597,13 +639,13 @@ fn draw(
         if !state.is_empty() {
             classes += &format!(" pele-{state}")
         }
-        if t.crit {
+        if m.flag(t, "crit")? {
             classes += " pele-crit"
         }
-        if t.milestone {
+        if m.flag(t, "milestone")? {
             classes += " pele-milestone"
         }
-        if t.classes.iter().any(|s| s == "clickable") {
+        if m.clickable(t)? {
             classes += " pele-clickable"
         }
         let mut shape = String::new();
@@ -612,7 +654,7 @@ fn draw(
             classes += " pele-unscheduled";
             text_fill = " fill=\"var(--_m)\""
         } else {
-            let color = if t.crit {
+            let color = if m.flag(t, "crit")? {
                 "var(--pele-critical,#e45756)"
             } else {
                 "var(--_c)"
@@ -626,13 +668,13 @@ fn draw(
             };
             let stroke = format!(
                 "stroke=\"{}\"",
-                if state == "done" && !t.crit {
+                if state == "done" && !m.flag(t, "crit")? {
                     "var(--_b)"
                 } else {
                     color
                 }
             );
-            if t.milestone {
+            if m.flag(t, "milestone")? {
                 let cx = (bar.x0 + bar.x1) / 2.;
                 let r = bar_h / 2.;
                 shape=format!("<path d=\"M{},{}L{},{}L{},{}L{},{}Z\" {paint} {stroke} stroke-linejoin=\"round\"/>",num(cx),num(cy-r),num(cx+r),num(cy),num(cx),num(cy+r),num(cx-r),num(cy))
@@ -654,23 +696,34 @@ fn draw(
                 cy,
                 &format!(" class=\"pele-label\"{text_fill}"),
             );
-        if let Some((_, url)) = m.links.iter().find(|(id, _)| id == &t.id) {
-            body = linked(&body, url, &t.id, &mut links, o, "")
+        if let Some((id, url)) = m.link(t)? {
+            m.keep_text(
+                id.encode_utf16()
+                    .count()
+                    .saturating_add(url.encode_utf16().count()),
+            )?;
+            body = linked(&body, &url, &id, &mut links, o, "")
         }
         tasks_out += &format!(
             "<g class=\"{classes}\" data-id=\"{}\">{body}</g>",
-            esc_text(&t.id)?
+            esc_text(&m.text(t, "id")?)?
         )
     }
     let mut today = String::new();
-    if m.today_marker != "off" && now >= start && now <= stop && stop > start {
+    if m.root_text("todayMarker")?.as_deref() != Some("off")
+        && now >= start
+        && now <= stop
+        && stop > start
+    {
         let tx = x(now);
         let top = plot_top - grid_lead;
-        let style = if m.today_marker.is_empty() {
+        let marker = m.root_text("todayMarker")?.unwrap_or_default();
+        let style = if marker.is_empty() {
             String::new()
         } else {
             resolve_style(
-                &m.today_marker
+                &m.root_text("todayMarker")?
+                    .unwrap_or_default()
                     .split(',')
                     .map(str::to_string)
                     .collect::<Vec<_>>(),
@@ -703,8 +756,8 @@ fn draw(
             height,
             size,
             o,
-            m.acc_title.as_deref(),
-            m.acc_descr.as_deref(),
+            m.root_text("accTitle")?.as_deref(),
+            m.root_text("accDescr")?.as_deref(),
             &content,
         )?,
         width,
@@ -715,4 +768,27 @@ fn draw(
 
 fn compiled_regex(pattern: &str) -> Result<Regex, regex::Error> {
     Regex::new(&pattern.replace(r"\s", crate::compat::text::SPACE))
+}
+
+fn sort_tasks<T, E>(
+    items: &mut [T],
+    mut compare: impl FnMut(&T, &T) -> Result<std::cmp::Ordering, E>,
+) -> Result<(), E> {
+    let mut error = None;
+    items.sort_by(|a, b| {
+        if error.is_some() {
+            return std::cmp::Ordering::Equal;
+        }
+        match compare(a, b) {
+            Ok(v) => v,
+            Err(e) => {
+                error = Some(e);
+                std::cmp::Ordering::Equal
+            }
+        }
+    });
+    match error {
+        Some(e) => Err(e),
+        None => Ok(()),
+    }
 }

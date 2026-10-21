@@ -1,11 +1,45 @@
 //! Mutable host documents augment the immutable typed Rust API.
 //! Public codecs are opt-in; an unimplemented codec never silently ignores edits.
+pub(crate) mod captured_admission;
+pub(crate) mod captured_read;
+pub(crate) mod captured_write;
+mod constructor;
+mod constructor_body;
+#[doc(hidden)]
+pub use constructor::PublicConstructorFactory;
+#[doc(hidden)]
+pub use constructor_body::{PublicConstructionJob, PublicConstructionOutcome};
+mod detached_render;
 mod engine;
+#[doc(hidden)]
+pub use detached_render::{
+    live_number_string, DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion,
+    DetachedRenderJob, DetachedRenderOutcome, DetachedRenderRequest, DetachedRenderValue,
+    LiveCallArgument, LiveGeometryError, LiveRenderRead, LiveStringUse, LiveValueKind,
+};
 mod graph;
+pub(crate) mod graph_read;
+#[doc(hidden)]
+pub use captured_admission::{
+    AdmissionKind as GraphNodeKind, Extent as GraphExtent, Header as GraphHeader,
+};
+#[doc(hidden)]
+pub use graph_read::{GraphReadView, PublicGraphRead, TrustedGraphRead};
+mod initial_store;
+#[doc(hidden)]
+pub use initial_store::InitialWriter;
 mod host_function;
 pub use host_function::{ActiveModel, HostFunction, ModelDelta};
 mod schema;
-pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome};
+#[cfg(feature = "web-host-er")]
+pub(crate) use engine::HostErConstructorRegistration;
+#[cfg(feature = "web-host-er")]
+#[doc(hidden)]
+pub use engine::HostErEntrySelection;
+pub use engine::{
+    CapturedPublicConstructor, ParsedPublicModel, PublicDiagramModule, PublicDocument,
+    PublicEngine, RawRenderOutcome, RawRenderOutcomeView, ReadOutcome, RenderOutcomeView,
+};
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 
 pub use schema::{
@@ -15,9 +49,40 @@ pub use schema::{
     RecordId, RecordKind, RecordSchema, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 
-mod binary;
+pub(crate) mod binary;
 pub use binary::{
     decode_binary_exchange, encode_binary_exchange, BinaryExchange, DEFAULT_BINARY_BUDGET,
 };
 
 pub(crate) use engine::create_prepared_edge_public;
+
+pub(crate) mod captured_transport;
+#[cfg(feature = "web-host-sankey")]
+pub(crate) use engine::CapturedSankeyRegistration;
+#[cfg(feature = "web-host-sankey")]
+#[doc(hidden)]
+pub use engine::HostSankeyEntrySelection;
+
+#[cfg(feature = "web-host-sankey")]
+pub(crate) mod flat_store;
+
+pub(crate) mod source_input;
+#[doc(hidden)]
+pub use source_input::SourceIngress;
+
+mod detached_invocation;
+#[doc(hidden)]
+pub use constructor::{
+    ConstructorArgument, ConstructorArgumentTransfer, ConstructorReflection, LiveConstructorField,
+    PublicHostValue,
+};
+#[doc(hidden)]
+pub use detached_invocation::{
+    DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation,
+    PublicHostErrorContext, PublicHostErrorExpression, PublicHostOperation, PublicHostResult,
+    PublicInvocationPhase, PublicResourceOperation,
+};
+
+mod active_operation;
+#[doc(hidden)]
+pub use active_operation::{PublicActiveBudget, PublicActiveOperation, PublicActiveValue};

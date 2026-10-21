@@ -1,5 +1,5 @@
 //! Native mutable MindmapDb, Pele 458322a5 (MIT kepano).
-//! Constructors, exotic runtime coercion/descriptors, detached child records,
+//! Exotic runtime coercion/descriptors, detached child records,
 //! active lone UTF-16 and sparse active arrays remain explicit gaps.
 use super::{Mindmap, MindmapModel, MindmapNode};
 use crate::compat::{
@@ -617,7 +617,23 @@ fn export_array(out: &mut GraphWriter, values: Vec<Atom>) -> Atom {
         properties,
     }))
 }
+fn construct_default() -> Result<MindmapPublicState, PeleError> {
+    Mindmap.create_public(&MindmapModel::empty(None))
+}
+
 impl PublicDiagramModule for Mindmap {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )
+        })
+    }
+
     fn function_shapes(&self) -> &'static [FunctionShape] {
         &[FunctionShape {
             method: GET_TYPE,
@@ -632,6 +648,20 @@ impl PublicDiagramModule for Mindmap {
     }
 
     type PublicState = MindmapPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::mindmap())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::mindmap(
+            super::MindmapDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
@@ -726,6 +756,12 @@ impl PublicDiagramModule for Mindmap {
         graph.validate()?;
         let model = imported(&graph);
         Ok(MindmapPublicState { graph, model })
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
     }
     fn export_public(&self, s: &MindmapPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

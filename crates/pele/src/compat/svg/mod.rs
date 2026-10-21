@@ -1,4 +1,6 @@
 //! Pele svg/{builder,root,theme}.ts rendering primitives, 458322a5 (MIT, kepano).
+mod append;
+pub(crate) use append::SvgSink;
 pub(crate) mod edges;
 mod native;
 pub(crate) mod shapes;
@@ -12,47 +14,27 @@ pub(crate) use native::resolved_svg;
 pub use native::NativeTheme;
 use regex::Regex;
 use std::sync::OnceLock;
-pub(crate) fn esc(text: &str) -> String {
-    let mut out = String::new();
-    for c in text.chars() {
-        match c {
-            '&' => out.push_str("&amp;"),
-            '<' => out.push_str("&lt;"),
-            '>' => out.push_str("&gt;"),
-            '"' => out.push_str("&quot;"),
-            '\0'..='\x08' | '\x0b' | '\x0c' | '\x0e'..='\x1f' | '\x7f' => {}
-            _ => out.push(c),
-        }
+pub(crate) fn esc(text: &str) -> std::borrow::Cow<'_, str> {
+    use std::borrow::Cow;
+    if !append::needs_escape(text) {
+        return Cow::Borrowed(text);
     }
-    out
+    let mut out = String::with_capacity(text.len());
+    append::escaped_slow(&mut out, text);
+    Cow::Owned(out)
 }
 pub(crate) fn esc_text(text: &str) -> Result<String, PeleError> {
-    Ok(esc(&decode_entities(text)?))
+    let decoded = decode_entities(text)?;
+    match esc(&decoded) {
+        std::borrow::Cow::Borrowed(_) => Ok(decoded),
+        std::borrow::Cow::Owned(escaped) => Ok(escaped),
+    }
 }
 pub(crate) fn js_num(n: f64) -> String {
-    let mut b = ryu_js::Buffer::new();
-    b.format(n).to_string()
+    append::js_number(n, str::to_owned)
 }
 pub(crate) fn num(value: f64) -> String {
-    let n = (value * 100. + 0.5).floor();
-    if n == 0. {
-        return "0".into();
-    }
-    if n.abs() < 1e11 {
-        let m = n.abs() as u64;
-        let q = m / 100;
-        let r = m % 100;
-        let fraction = if r == 0 {
-            String::new()
-        } else if r % 10 == 0 {
-            format!(".{}", r / 10)
-        } else {
-            format!(".{r:02}")
-        };
-        format!("{}{q}{fraction}", if n < 0. { "-" } else { "" })
-    } else {
-        js_num(n / 100.)
-    }
+    append::coordinate(value, str::to_owned)
 }
 fn span_style(style: u8) -> String {
     format!(
@@ -190,31 +172,182 @@ fn family<'a>(list: Option<&'a str>, generic: &'a str) -> &'a str {
     list.filter(|v| !v.is_empty() && re.is_match(v))
         .unwrap_or(generic)
 }
-// Match Pele root.ts: put the default radius first so an authored radius wins.
-fn rounded(content: &str) -> std::borrow::Cow<'_, str> {
-    use std::borrow::Cow;
-    const ROUNDED: &str = " rx=\"var(--pele-radius,4px)\"";
-    if !content.contains(ROUNDED) {
-        return Cow::Borrowed(content);
+// Pele root.ts uses literal substring edits, not XML parsing. Keep those
+// semantics while borrowing the input and writing only the final SVG buffer.
+const DEFAULT_RADIUS: &str = " rx=\"var(--pele-radius,4px)\"";
+const EXISTING_STYLE_RADIUS: &str = "rx:var(--_r);";
+const NEW_STYLE_RADIUS: &str = " style=\"rx:var(--_r)\"";
+const STYLE_ATTRIBUTE: &str = " style=\"";
+
+// Only ASCII needles are used. A match crossing a removed substring starts
+// earlier when more of the needle is in `before`, hence the reverse order.
+fn crossing_ascii(before: &str, after: &str, needle: &str) -> Option<usize> {
+    debug_assert!(needle.is_ascii());
+    (1..needle.len()).rev().find_map(|split| {
+        (before.ends_with(&needle[..split]) && after.starts_with(&needle[split..]))
+            .then(|| before.len() - split)
+    })
+}
+fn find_joined_ascii(before: &str, after: &str, needle: &str) -> Option<usize> {
+    before
+        .find(needle)
+        .or_else(|| crossing_ascii(before, after, needle))
+        .or_else(|| after.find(needle).map(|at| before.len() + at))
+}
+fn joined_self_closing(before: &str, after: &str) -> bool {
+    after.ends_with("/>") || (after == ">" && before.ends_with('/'))
+}
+
+#[derive(Default)]
+struct RootStyles {
+    radius: bool,
+    title: bool,
+    heading: bool,
+    bold: bool,
+}
+impl RootStyles {
+    fn scan(content: &str) -> Self {
+        let mut styles = Self::default();
+        // One complete body scan instead of four separate contains searches.
+        for (at, _) in content.match_indices("var(--_") {
+            let suffix = &content[at + 7..];
+            styles.radius |= suffix.starts_with("r)");
+            styles.title |= suffix.starts_with("tw)");
+            styles.heading |= suffix.starts_with("hw)");
+            styles.bold |= suffix.starts_with("w)");
+        }
+        styles
     }
-    static RECT: OnceLock<Regex> = OnceLock::new();
-    let re = RECT.get_or_init(|| Regex::new(r"<rect\b[^>]*>").unwrap());
-    Cow::Owned(
-        re.replace_all(content, |captures: &regex::Captures<'_>| {
-            let tag = &captures[0];
-            let Some(at) = tag.find(ROUNDED) else {
-                return tag.to_string();
-            };
-            let rest = format!("{}{}", &tag[..at], &tag[at + ROUNDED.len()..]);
-            if let Some(style) = rest.find(" style=\"") {
-                format!("{}rx:var(--_r);{}", &rest[..style + 8], &rest[style + 8..])
-            } else {
-                let end = rest.len() - if rest.ends_with("/>") { 2 } else { 1 };
-                format!("{} style=\"rx:var(--_r)\"{}", &rest[..end], &rest[end..])
+    fn include_join(&mut self, before: &str, after: &str) {
+        // DEFAULT_RADIUS contains none of these aliases. Removing it can join
+        // two formerly separated pieces into an alias; inspect that boundary.
+        self.title |= crossing_ascii(before, after, "var(--_tw)").is_some();
+        self.heading |= crossing_ascii(before, after, "var(--_hw)").is_some();
+        self.bold |= crossing_ascii(before, after, "var(--_w)").is_some();
+        // Every rewritten rect inserts this alias regardless of its old text.
+        self.radius = true;
+    }
+}
+struct RadiusEdit {
+    remove: usize,
+    insert: usize,
+    addition: &'static str,
+}
+struct RoundedRects<'a> {
+    content: &'a str,
+    cursor: usize,
+}
+impl<'a> RoundedRects<'a> {
+    fn new(content: &'a str) -> Self {
+        Self { content, cursor: 0 }
+    }
+}
+impl Iterator for RoundedRects<'_> {
+    type Item = RadiusEdit;
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some(relative) = self.content[self.cursor..].find("<rect") {
+            let start = self.cursor + relative;
+            self.cursor = start + 5;
+            // JS /<rect\b[^>]*>/g has an ASCII word boundary. Non-ASCII
+            // letters after "rect" match; a Unicode-regex boundary would not.
+            if self
+                .content
+                .as_bytes()
+                .get(self.cursor)
+                .is_some_and(|byte| byte.is_ascii_alphanumeric() || *byte == b'_')
+            {
+                continue;
             }
-        })
-        .into_owned(),
-    )
+            let end = self.cursor + self.content[self.cursor..].find('>')? + 1;
+            self.cursor = end;
+            let tag = &self.content[start..end];
+            let Some(remove) = tag.find(DEFAULT_RADIUS) else {
+                continue;
+            };
+            let before = &tag[..remove];
+            let after = &tag[remove + DEFAULT_RADIUS.len()..];
+            // Search the logical joined tag, including a style marker created
+            // by removal. The former implementation allocated `rest` for this.
+            let (insert, addition) =
+                if let Some(style) = find_joined_ascii(before, after, STYLE_ATTRIBUTE) {
+                    (style + STYLE_ATTRIBUTE.len(), EXISTING_STYLE_RADIUS)
+                } else {
+                    (
+                        before.len() + after.len()
+                            - if joined_self_closing(before, after) {
+                                2
+                            } else {
+                                1
+                            },
+                        NEW_STYLE_RADIUS,
+                    )
+                };
+            let insert = start
+                + insert
+                + if insert > before.len() {
+                    DEFAULT_RADIUS.len()
+                } else {
+                    0
+                };
+            return Some(RadiusEdit {
+                remove: start + remove,
+                insert,
+                addition,
+            });
+        }
+        None
+    }
+}
+struct RootContent<'a> {
+    source: &'a str,
+    styles: RootStyles,
+    length: usize,
+    has_edits: bool,
+}
+impl<'a> RootContent<'a> {
+    fn inspect(source: &'a str) -> Self {
+        let mut content = Self {
+            source,
+            styles: RootStyles::scan(source),
+            length: source.len(),
+            has_edits: false,
+        };
+        if source.contains(DEFAULT_RADIUS) {
+            for edit in RoundedRects::new(source) {
+                content.has_edits = true;
+                content.styles.include_join(
+                    &source[..edit.remove],
+                    &source[edit.remove + DEFAULT_RADIUS.len()..],
+                );
+                // Both static replacement strings are shorter than the removed
+                // attribute, so length remains bounded by source.len().
+                content.length -= DEFAULT_RADIUS.len() - edit.addition.len();
+            }
+        }
+        content
+    }
+    fn append_to(&self, output: &mut String) {
+        if !self.has_edits {
+            output.push_str(self.source);
+            return;
+        }
+        let mut cursor = 0;
+        for edit in RoundedRects::new(self.source) {
+            if edit.insert <= edit.remove {
+                output.push_str(&self.source[cursor..edit.insert]);
+                output.push_str(edit.addition);
+                output.push_str(&self.source[edit.insert..edit.remove]);
+                cursor = edit.remove + DEFAULT_RADIUS.len();
+            } else {
+                output.push_str(&self.source[cursor..edit.remove]);
+                cursor = edit.remove + DEFAULT_RADIUS.len();
+                output.push_str(&self.source[cursor..edit.insert]);
+                output.push_str(edit.addition);
+                cursor = edit.insert;
+            }
+        }
+        output.push_str(&self.source[cursor..]);
+    }
 }
 pub(crate) fn document(
     kind: &str,
@@ -248,20 +381,28 @@ pub(crate) fn document(
     } else {
         "max-width:100%;height:auto;"
     };
-    let content = rounded(content);
-    let mut weights = if content.contains("var(--_r)") {
+    let content = RootContent::inspect(content);
+    let mut weights = if content.styles.radius {
         ";--_r:var(--pele-radius,4px)".to_string()
     } else {
         String::new()
     };
-    for (alias, name) in [("--_tw", "title"), ("--_hw", "heading"), ("--_w", "bold")] {
-        if content.contains(&format!("var({alias})")) {
+    for (used, alias, name) in [
+        (content.styles.title, "--_tw", "title"),
+        (content.styles.heading, "--_hw", "heading"),
+        (content.styles.bold, "--_w", "bold"),
+    ] {
+        if used {
             weights.push_str(&format!(";{alias}:var(--pele-{name}-weight,bold)"))
         }
     }
     let font=format!(";--_fm:var(--pele-font-mono,{});font:{}px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,{})",family(options.font_family_mono.as_deref(),"monospace"),js_num(size),family(options.font_family.as_deref(),"sans-serif"));
     let root="--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg)";
-    Ok(format!("<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-{kind}\" viewBox=\"0 0 {} {}\" width=\"{}\" height=\"{}\" style=\"{fit}{root}{weights}{}\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"{kind}\"{aria}>{head}{content}</svg>",js_num(width),js_num(height),js_num(width),js_num(height),esc(&font)))
+    let mut output = format!("<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-{kind}\" viewBox=\"0 0 {} {}\" width=\"{}\" height=\"{}\" style=\"{fit}{root}{weights}{}\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"{kind}\"{aria}>{head}",js_num(width),js_num(height),js_num(width),js_num(height),esc(&font));
+    output.reserve(content.length + "</svg>".len());
+    content.append_to(&mut output);
+    output.push_str("</svg>");
+    Ok(output)
 }
 pub(crate) fn series_color(index: usize) -> String {
     let colors = [

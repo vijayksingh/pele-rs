@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "sourceCommit": "8175006345f3b66a6c9fd942814ed0ba5ff3014d",
+  "review": "Parent integrated review plus independent Astra ownership/read-phase/adapter review. Native default error wire unchanged; host intrinsic failures are typed. Correctness and performance remain separate gates.",
+  "files": [
+    {
+      "path": "bindings/web/errors.js",
+      "sha256": "9e240e5bc2249f2a9a087f0d582b047fac9603aae4f0866599a639f48352662e"
+    },
+    {
+      "path": "bindings/web/full.js",
+      "sha256": "ff1e75349ca359993141815ca1d92ab529cd9a4f1beb2ddea203d7b885f40e7f"
+    },
+    {
+      "path": "bindings/web/live-render.js",
+      "sha256": "670079df4ab74b2e47f67597a12c105550d729e6ed8cb5223a35cf692b34b096"
+    },
+    {
+      "path": "bindings/web/package.json",
+      "sha256": "3865e49aa65b09a57982ac9b235b4b0cb33d975130ca8f491ec9d89d1edee657"
+    },
+    {
+      "path": "crates/pele-wasm/src/detached_render.rs",
+      "sha256": "f4494898661e04b05561a972e36f0e9bb0510d10ebc64c75f6fad16af4ec6846"
+    },
+    {
+      "path": "crates/pele-wasm/src/host_er.rs",
+      "sha256": "01a47c5ccd59e44b91ee89846570bce94d0daf23335643eea94848f65f9a82ce"
+    },
+    {
+      "path": "crates/pele-wasm/src/host_functions.rs",
+      "sha256": "e6cf9496f7626f9808d5b333b155ed96fa7207f08e91134e882864626d54890d"
+    },
+    {
+      "path": "crates/pele-wasm/src/lib.rs",
+      "sha256": "309f4a4e2ba4e7433894b580b297804f5089265366221c384dea7a17860abc6e"
+    },
+    {
+      "path": "crates/pele-wasm/src/prepared_entries.rs",
+      "sha256": "bd58472aaa5be64e33600038d52b9bccd4f96e48eee5cb63100bfb291bbc0806"
+    },
+    {
+      "path": "crates/pele-wasm/src/render_numbers.rs",
+      "sha256": "9ae7caba47a2de2a0792ec860ba408fe65d655d78529da82e4a54d96122d06bf"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/layout.rs",
+      "sha256": "106188fdf4a044c5822a701b8c71149ad2cab52d39ba7e1caaff17b1512215a9"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/live_phase.rs",
+      "sha256": "b1a0c82d665863282989d9d2559c359b6602e5c55a35d01801d0846d5d32cac4"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/mod.rs",
+      "sha256": "1c45a780ff16d5d496b2716691b07a38d492106c3a26fdcda5350a662256f5d6"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/public_model.rs",
+      "sha256": "347da1ce7d06169094b8feeb6ff66aaec341f263513b05b1c595f7d1841a1883"
+    },
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/render.rs",
+      "sha256": "1e32fc0d7c7aca349aabd9317ef491d77b604a188fbdd81cb0040c2efab1526d"
+    },
+    {
+      "path": "crates/pele/src/compat/engine.rs",
+      "sha256": "70dd599c9031bb372cd7723b9a531759bcf51a68fe83e06fddfac6dbccb5bf9a"
+    },
+    {
+      "path": "crates/pele/src/compat/module.rs",
+      "sha256": "47f044dd9abb6ad2c263dc2e771712fdba7995af452d95f26b5148ad4d14b7d2"
+    },
+    {
+      "path": "crates/pele/src/compat/presentation.rs",
+      "sha256": "4ab64e9007d3a237fe7028f026e7112afa85b7568ec59139762fb202d53cdde0"
+    },
+    {
+      "path": "crates/pele/src/compat/public/detached_render.rs",
+      "sha256": "f63afa787739950846b364dbc6b925533be3eb035edac71f44d961f5610e02c0"
+    },
+    {
+      "path": "crates/pele/src/compat/public/engine.rs",
+      "sha256": "d1201b7b1a73ffc62934b781ff52cc0c3d857feabef25c4dbba4860a187c1134"
+    },
+    {
+      "path": "crates/pele/src/compat/public/mod.rs",
+      "sha256": "ff4da35ea1ef7bccc76435c84b332807679e612a711b5167297592cfa668b29d"
+    },
+    {
+      "path": "crates/pele/src/compat/text/icon_cursor.rs",
+      "sha256": "acb77ec847cf07160db3f8bb8b06b21f39d329f71de26deb3e52cbee31f59eef"
+    },
+    {
+      "path": "crates/pele/src/compat/text/mod.rs",
+      "sha256": "c08907bee995b619d8d5b2c59372db07bf3ebec55c573f93437fd74cee255192"
+    },
+    {
+      "path": "crates/pele/tests/public_detached_render.rs",
+      "sha256": "503680ba4d4283d9d23dbed4e1a4aaa0def888b635721e078f72f5aaebe7902a"
+    },
+    {
+      "path": "docs/LLD.md",
+      "sha256": "166d0d0c79cc98b28f294abaa489a9eadb17da1fcfa9bfc4f3e3aaa620cbefb0"
+    },
+    {
+      "path": "docs/LLD_DETACHED_RENDER.md",
+      "sha256": "c4ff5c5312324a669b203639e629271c89a1b8032b5229ad4b6053d653afba75"
+    },
+    {
+      "path": "scripts/verify-sankey-resource-callbacks.mjs",
+      "sha256": "3e2ac70e5bbabc37a20979f29cf8a6f3272934d0ec6c5faa02d54a619f5d35d8"
+    },
+    {
+      "path": "tests/web/arena-render-packet.spec.js",
+      "sha256": "f8b8f4b8c1a23e20e0c31421e2973cf1ea58b0126fd2e24f87afe929c86b0742"
+    },
+    {
+      "path": "tests/web/sankey-resource-callbacks.spec.js",
+      "sha256": "7d5d1e41e36f592c62e94627ee8c7185c556afb680926a2302a1aaf1f09e2e99"
+    },
+    {
+      "path": "tests/web/source-initializer.spec.js",
+      "sha256": "fd1fe7766c85be8a1765924ea8e0e3473358fb88651a68bd016e1701d3391570"
+    },
+    {
+      "path": "tests/web/source-layout.spec.js",
+      "sha256": "3649895f84adb6fdd8d4530ff6fe53ab2b427c1a289472fe631f2e1c683ba320"
+    },
+    {
+      "path": "tests/web/support/sankey-callback-scenarios.js",
+      "sha256": "12a1376f72b5c3e30a266a7161027ed28e681c549cd0cbcc4ab0e5b8e5ae009a"
+    }
+  ]
+}

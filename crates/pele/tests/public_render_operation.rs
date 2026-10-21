@@ -53,7 +53,16 @@ impl PublicDiagramModule for Extension {
         w.finish(Atom::Ref(root))
     }
     fn export_public(&self, state: &ModelGraph) -> Result<ModelGraph, PeleError> {
+        if self.mode == "export-error" {
+            return Err(PeleError::new(
+                "original export failure",
+                ErrorCode::Semantic,
+            ));
+        }
         Ok(state.clone())
+    }
+    fn borrow_public_graph<'a>(&self, state: &'a ModelGraph) -> Option<&'a ModelGraph> {
+        self.mode.starts_with("borrowed").then_some(state)
     }
     fn apply_public(&self, state: &mut ModelGraph, graph: ModelGraph) -> Result<(), PeleError> {
         *state = graph;
@@ -97,7 +106,7 @@ impl PublicDiagramModule for Extension {
                 })?;
                 Ok(drawing(4., 5.))
             }
-            "invalid" => {
+            "invalid" | "borrowed-invalid" => {
                 state.nodes[root as usize].properties_mut()[0].value = Atom::Ref(u32::MAX);
                 Ok(drawing(4., 5.))
             }
@@ -219,4 +228,57 @@ fn nested_render_outcomes_preserve_ieee_dimension_transport_and_protocol_boundar
         .is_err());
     assert_eq!(bad.revision(), 1);
     assert!(bad.snapshot().is_err());
+}
+
+#[test]
+fn borrowed_and_fallback_snapshots_preserve_validation_revisions_and_recovery() {
+    let calls = Arc::new(AtomicUsize::new(0));
+    let mut doc = document("borrowed-invalid", calls.clone());
+    assert!(matches!(
+        doc.snapshot_view().unwrap(),
+        std::borrow::Cow::Borrowed(_)
+    ));
+    // Borrowing does not implicitly declare repeated apply to be a no-op.
+    assert!(!doc.unchanged_public_graph_is_noop());
+    let repair = doc.snapshot().unwrap();
+    assert!(doc
+        .render_operation(0, &RenderOptions::default(), &mut MetricsResources)
+        .is_err());
+    assert_eq!(doc.revision(), 1);
+    assert!(doc.snapshot_view().is_err());
+    assert_eq!(
+        doc.render_operation(0, &RenderOptions::default(), &mut MetricsResources)
+            .unwrap_err()
+            .message,
+        "Stale public model revision"
+    );
+    // Invalid borrowed graph rejects before another render dispatch.
+    assert!(doc
+        .render_operation(1, &RenderOptions::default(), &mut MetricsResources)
+        .is_err());
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    assert_eq!(doc.revision(), 1);
+    doc.apply(1, repair).unwrap();
+    assert_eq!(doc.revision(), 2);
+    assert_eq!(count(&doc.snapshot_view().unwrap()), 0.);
+
+    let fallback_calls = Arc::new(AtomicUsize::new(0));
+    let mut fallback = document("export-error", fallback_calls.clone());
+    assert_eq!(
+        fallback.snapshot_view().unwrap_err().message,
+        "original export failure"
+    );
+    assert_eq!(
+        fallback.snapshot().unwrap_err().message,
+        "original export failure"
+    );
+    assert_eq!(
+        fallback
+            .render_operation(0, &RenderOptions::default(), &mut MetricsResources)
+            .unwrap_err()
+            .message,
+        "original export failure"
+    );
+    assert_eq!(fallback.revision(), 0);
+    assert_eq!(fallback_calls.load(Ordering::SeqCst), 0);
 }

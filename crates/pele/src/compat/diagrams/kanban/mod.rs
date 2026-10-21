@@ -1,10 +1,12 @@
 //! Pele kanban/{index,db}.ts, 458322a5 (MIT, kepano).
+mod live_phase;
 mod render;
 use super::common::outline::{parse_outline, OutlineDb};
 use crate::compat::{
     source::yaml, DiagramModule, DiagramType, ErrorCode, ModuleDescriptor, Object, ParseContext,
     PeleError, RenderResources, RenderSettings, Rendered,
 };
+pub(crate) use live_phase::{render_detached, KanbanDetachedInput};
 use serde::Serialize;
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -189,14 +191,7 @@ impl DiagramModule for Kanban {
         ModuleDescriptor::new(DiagramType::Kanban)
     }
     fn parse(&self, c: ParseContext<'_>) -> Result<Self::Model, PeleError> {
-        let mut m = KanbanModel {
-            diagram_type: DiagramType::Kanban,
-            title: c.title.map(str::to_string),
-            sections: vec![],
-            last: None,
-            section_level: 0,
-            misplaced: None,
-        };
+        let mut m = KanbanModel::empty(c.title);
         parse_outline(c.source, &mut m, true)?;
         Ok(m)
     }
@@ -213,3 +208,17 @@ impl DiagramModule for Kanban {
 
 mod public_model;
 pub use public_model::KanbanPublicState;
+
+impl KanbanModel {
+    /// Empty class state shared by parser population and native construction.
+    pub(super) fn empty(title: Option<&str>) -> Self {
+        Self {
+            diagram_type: DiagramType::Kanban,
+            title: title.map(str::to_owned),
+            sections: vec![],
+            last: None,
+            section_level: 0,
+            misplaced: None,
+        }
+    }
+}

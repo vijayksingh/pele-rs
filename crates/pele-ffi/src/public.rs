@@ -2,7 +2,7 @@
 //! This bounded UTF-8 source/JSON lane is not the complete lossless source/options ABI.
 use super::{calendar, compatibility_call, compatibility_input, PeleHostResourcesV3, PeleResult};
 use pele::compat::{
-    public::{ModelGraph, PublicDocument, PublicEngine},
+    public::{GraphReadView, ModelGraph, PublicDocument, PublicEngine, ReadOutcome},
     ErrorCode, PeleError,
 };
 use serde::{Deserialize, Serialize};
@@ -15,12 +15,16 @@ const GRAPH_JSON_BUDGET: usize = 64 * 1024 * 1024;
 /// Opaque owner. Operations serialize; callers must not free while an operation is active.
 pub struct PelePublicDocument {
     document: Mutex<PublicDocument>,
+    pub(super) host_values: super::host_values::Access,
     pub(super) host_functions: std::cell::RefCell<super::host_functions::Bindings>,
+    pub(super) retained_values: std::cell::RefCell<super::detached_render::retained::Values>,
 }
 pub(super) fn owned_document(document: PublicDocument) -> *mut PelePublicDocument {
     Box::into_raw(Box::new(PelePublicDocument {
         document: Mutex::new(document),
+        host_values: Default::default(),
         host_functions: Default::default(),
+        retained_values: Default::default(),
     }))
 }
 pub(super) fn invalid(message: &str) -> PeleError {
@@ -405,12 +409,30 @@ pub unsafe extern "C" fn pele_public_snapshot_v4(
         struct Snapshot<'a> {
             r#type: &'a pele::compat::DiagramId,
             revision: String,
-            graph: ModelGraph,
+            graph: GraphReadView<'a>,
         }
         success(Snapshot {
             r#type: document.diagram_type(),
             revision: document.revision().to_string(),
-            graph: document.snapshot()?,
+            graph: document.snapshot_read()?,
+        })
+    })
+}
+/// Read only the current committed revision, without graph export or validation.
+/// # Safety
+/// handle must be null or a live owned document, not concurrently freed.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_revision_v15(
+    handle: *const PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let revision = unsafe { document(handle) }?.revision();
+        #[derive(Serialize)]
+        struct Revision {
+            revision: String,
+        }
+        success(Revision {
+            revision: revision.to_string(),
         })
     })
 }
@@ -448,10 +470,10 @@ pub unsafe extern "C" fn pele_public_invoke_v4(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             calendar::with_resources(resources, |host| {
-                document.invoke(expected_revision, call, host)
+                document.invoke_read(expected_revision, call, host)
             })
         }?;
-        success(outcome)
+        outcome_success(outcome.revision, &outcome.graph, &outcome.result)
     })
 }
 /// Apply a full flat graph without reparsing source. A stale revision leaves state unchanged.
@@ -523,10 +545,17 @@ pub unsafe extern "C" fn pele_public_render_operation_v4(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             calendar::with_resources(host, |resources| {
-                document.render_operation(expected_revision, &options, resources)
+                document.render_operation_read(expected_revision, &options, resources)
             })
         }?;
-        success(outcome)
+        outcome_success(
+            outcome.revision,
+            &outcome.graph,
+            outcome
+                .result
+                .as_ref()
+                .map(pele::compat::render_result_transport),
+        )
     })
 }
 /// # Safety
@@ -540,13 +569,30 @@ pub unsafe extern "C" fn pele_public_document_free_v4(handle: *mut PelePublicDoc
     }));
 }
 
+fn outcome_success<T: Serialize>(
+    revision: u64,
+    graph: &GraphReadView<'_>,
+    result: T,
+) -> Result<PeleResult, PeleError> {
+    #[derive(Serialize)]
+    struct Outcome<'a, 'graph, T> {
+        revision: u64,
+        graph: &'a GraphReadView<'graph>,
+        result: T,
+    }
+    success(Outcome {
+        revision,
+        graph,
+        result,
+    })
+}
+
 fn binary_success(
     revision: u64,
-    graph: &ModelGraph,
+    graph: &GraphReadView<'_>,
     metadata: &[u8],
 ) -> Result<PeleResult, PeleError> {
-    let data =
-        pele::compat::public::encode_binary_exchange(revision, graph, metadata, GRAPH_JSON_BUDGET)?;
+    let data = graph.encode_binary(revision, metadata, GRAPH_JSON_BUDGET)?;
     Ok(PeleResult {
         status: 0,
         data,
@@ -564,7 +610,8 @@ pub unsafe extern "C" fn pele_public_snapshot_binary_v5(
         let document = unsafe { document(handle) }?;
         let metadata = serde_json::to_vec(&serde_json::json!({"type":document.diagram_type()}))
             .map_err(|_| invalid("Invalid snapshot metadata"))?;
-        binary_success(document.revision(), &document.snapshot()?, &metadata)
+        let graph = document.snapshot_read()?;
+        binary_success(document.revision(), &graph, &metadata)
     })
 }
 /// # Safety
@@ -616,7 +663,7 @@ pub unsafe extern "C" fn pele_public_invoke_binary_v5(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             calendar::with_resources(resources, |host| {
-                document.invoke(expected_revision, call, host)
+                document.invoke_read(expected_revision, call, host)
             })
         }?;
         let metadata = serde_json::to_vec(&outcome.result)
@@ -640,7 +687,7 @@ pub unsafe extern "C" fn pele_public_render_operation_binary_v5(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             calendar::with_resources(resources, |host| {
-                document.render_operation(expected_revision, &options, host)
+                document.render_operation_read(expected_revision, &options, host)
             })
         }?;
         let metadata = serde_json::to_vec(
@@ -683,7 +730,7 @@ pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             calendar::with_resources(resources, |host| {
-                document.render_operation_with_output_limit(
+                document.render_operation_with_output_limit_read(
                     expected_revision,
                     &options,
                     limit,
@@ -696,7 +743,7 @@ pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
 }
 
 pub(super) fn render_outcome(
-    outcome: &pele::compat::public::RenderOutcome,
+    outcome: &ReadOutcome<'_, pele::compat::RenderResult>,
 ) -> Result<PeleResult, PeleError> {
     binary_metadata(
         outcome.revision,
@@ -709,7 +756,7 @@ pub(super) fn render_outcome(
 }
 pub(super) fn binary_metadata(
     revision: u64,
-    graph: &ModelGraph,
+    graph: &GraphReadView<'_>,
     value: &impl Serialize,
 ) -> Result<PeleResult, PeleError> {
     let mut metadata = Output {
@@ -745,7 +792,7 @@ pub unsafe extern "C" fn pele_public_render_operation_with_numbers_v9(
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
             super::host_functions::with_resources(handle, resources, |host| {
-                document.render_operation_bounded(expected_revision, &options, limit, host)
+                document.render_operation_bounded_read(expected_revision, &options, limit, host)
             })
         }?;
         render_outcome(&outcome)

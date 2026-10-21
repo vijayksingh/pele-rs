@@ -1,0 +1,26 @@
+{
+  "source": {
+    "control": "e1486055d596d4e0ac25e4c78f1d5d95a73f781a",
+    "candidate": "a4f933d9af2cd3ccd5cda7eac46dc1048a296249"
+  },
+  "phase": "warm",
+  "runnerExit": 0,
+  "fetchExit": 0,
+  "verificationExit": 0,
+  "remoteIdleAfter": true,
+  "firstUseStarted": false,
+  "rawSHA256": "5f48f354b4acfe73e680fd49168dbe771b85e762d87d4cf8c640c206fd43f6e2",
+  "adversePairedRows": 19,
+  "adverseMedianRatioRows": 19,
+  "pinFailure": "Attempt1 stopped beforetransfer because precommit package record7417 differed fromreviewed a4; parent createdcommittedpackage continuityrecord retainingoriginal. Authorizedattempt2passed. No browser/timing failure.",
+  "caveat": "Matched a4 versus e148 only; no isolated receiptgain versus741 acrosswindows.",
+  "files": {
+    "preflight-warm.log": "a045f8a9f72ec268558c8d9c80cb8be7b4795fb7890078a7ca65a5b0c0e0bacd",
+    "warm.log": "54bbc2e11778fcad68d19069ea421f71789a1a6d7d3362ef047221dc4350496f",
+    "paired-summary.json": "7c8a928ec75372976074b2c6ebf42307bf9ef9ff1de24bf125bd9bdc1075c209",
+    "RESULTS.md": "adb6ca0c16179f5e8c5695e334bde228ba0e60a4f9e17dee510a25ee61d50a56",
+    "warm-verification.json": "fc87bccf8367c4435976ee13ab959f5f55eb6c7e3ca8abb66dc0770cc238a856",
+    "pin-attempt1.json": "1b3160df300320c5b3f7a95456ddec9608be441e5d48ca5032ed3758e291c517",
+    "pin-attempt2.log": "6dcf74db98f5ecaf9a9887ac2519bb8b0aa972e12c64a39e179a82093674ce2b"
+  }
+}

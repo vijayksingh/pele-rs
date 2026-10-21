@@ -106,13 +106,125 @@ fn marker(x: f64, y: f64, dx: f64, dy: f64) -> String {
     let half = ARROW * 0.42;
     format!("<path class=\"pele-marker\" d=\"M{},{}L{},{}L{},{}Z\" fill=\"var(--_l)\" stroke=\"none\"/>",num(x),num(y),num(bx+nx*half),num(by+ny*half),num(bx-nx*half),num(by-ny*half))
 }
+/// Array-map phases preserve their captured receiver and length; individual
+/// values are read only when the shared renderer reaches that element.
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Periods;
+    type Events;
+    fn downward(&mut self) -> Result<bool, Self::Error>;
+    fn start(&mut self) -> Result<(Self::Periods, usize, Vec<Option<usize>>), Self::Error>;
+    fn period_count(&mut self, p: &Self::Periods) -> Result<usize, Self::Error>;
+    fn period_text(&mut self, p: &Self::Periods, i: usize) -> Result<Option<String>, Self::Error>;
+    fn events(&mut self, p: &Self::Periods, i: usize)
+        -> Result<(Self::Events, usize), Self::Error>;
+    fn event(&mut self, e: &Self::Events, i: usize) -> Result<Option<String>, Self::Error>;
+    fn section(&mut self, i: usize) -> Result<Option<String>, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, Self::Error>;
+}
+struct Typed<'a>(&'a TimelineModel);
+impl PhaseInput for Typed<'_> {
+    type Error = PeleError;
+    type Periods = ();
+    type Events = usize;
+    fn downward(&mut self) -> Result<bool, PeleError> {
+        Ok(self.0.direction == "TD")
+    }
+    fn start(&mut self) -> Result<((), usize, Vec<Option<usize>>), PeleError> {
+        Ok((
+            (),
+            self.0.sections.len(),
+            self.0
+                .periods
+                .iter()
+                .map(|p| usize::try_from(p.section_index).ok())
+                .collect(),
+        ))
+    }
+    fn period_count(&mut self, _: &()) -> Result<usize, PeleError> {
+        Ok(self.0.periods.len())
+    }
+    fn period_text(&mut self, _: &(), i: usize) -> Result<Option<String>, PeleError> {
+        Ok(Some(self.0.periods[i].text.clone()))
+    }
+    fn events(&mut self, _: &(), i: usize) -> Result<(usize, usize), PeleError> {
+        Ok((i, self.0.periods[i].events.len()))
+    }
+    fn event(&mut self, e: &usize, i: usize) -> Result<Option<String>, PeleError> {
+        Ok(Some(self.0.periods[*e].events[i].clone()))
+    }
+    fn section(&mut self, i: usize) -> Result<Option<String>, PeleError> {
+        Ok(self.0.sections.get(i).cloned())
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn accessibility(&mut self, d: bool) -> Result<Option<String>, PeleError> {
+        Ok(if d {
+            self.0.acc_descr.clone()
+        } else {
+            self.0.acc_title.clone()
+        })
+    }
+}
+fn section_label<P: PhaseInput>(
+    m: &mut P,
+    g: &Group,
+    w: f64,
+    r: &mut dyn RenderResources,
+    o: &RenderSettings,
+    size: f64,
+) -> Result<Label, P::Error> {
+    let text = match g.section {
+        Some(i) => m.section(i)?,
+        None => None,
+    };
+    Ok(fit(text.as_deref(), r, o, size, w - 2. * PAD_X, 1)?)
+}
+fn open<P: PhaseInput>(m: &mut P, g: &Group) -> Result<String, P::Error> {
+    Ok(if let Some(i) = g.section {
+        let value = m.section(i)?.ok_or_else(|| {
+            PeleError::new(
+                "Timeline section text is undefined",
+                crate::compat::ErrorCode::Semantic,
+            )
+        })?;
+        format!(
+            "<g class=\"pele-cluster pele-section\" data-id=\"{}\">",
+            esc_text(value.trim_matches(space))?
+        )
+    } else {
+        String::new()
+    })
+}
+fn open_period<P: PhaseInput>(m: &mut P, p: &P::Periods, i: usize) -> Result<String, P::Error> {
+    let value = m.period_text(p, i)?.ok_or_else(|| {
+        PeleError::new(
+            "Timeline period text is undefined",
+            crate::compat::ErrorCode::Semantic,
+        )
+    })?;
+    Ok(format!(
+        "<g class=\"pele-node pele-period\" data-id=\"{}\">",
+        esc_text(value.trim_matches(space))?
+    ))
+}
 pub(super) fn render(
     m: &TimelineModel,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    if m.direction == "TD" {
+    render_phases(&mut Typed(m), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    if m.downward()? {
         return draw(m, c, o, r, true);
     }
     let across = draw(m, c, o, r, false)?;
@@ -132,13 +244,13 @@ pub(super) fn render(
         across
     })
 }
-fn draw(
-    m: &TimelineModel,
+fn draw<P: PhaseInput>(
+    m: &mut P,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     vertical: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
@@ -147,13 +259,10 @@ fn draw(
         .and_then(Value::as_object)
         .and_then(|c| c.get("disableMulticolor"))
         != Some(&Value::Bool(true));
-    let periods = &m.periods;
-    let has_sections = !m.sections.is_empty();
-    let mut groups: Vec<_> = m
-        .sections
-        .iter()
-        .enumerate()
-        .map(|(s, _)| Group {
+    let (periods, section_count, memberships) = m.start()?;
+    let has_sections = section_count != 0;
+    let mut groups: Vec<_> = (0..section_count)
+        .map(|s| Group {
             section: Some(s),
             periods: Vec::new(),
         })
@@ -162,11 +271,8 @@ fn draw(
         section: None,
         periods: Vec::new(),
     };
-    for (i, p) in periods.iter().enumerate() {
-        if let Some(g) = usize::try_from(p.section_index)
-            .ok()
-            .and_then(|i| groups.get_mut(i))
-        {
+    for (i, section) in memberships.into_iter().enumerate() {
+        if let Some(g) = section.and_then(|s| groups.get_mut(s)) {
             g.periods.push(i)
         } else {
             leading.periods.push(i)
@@ -188,22 +294,25 @@ fn draw(
     let mut text_w = period_text;
     let mut period_labels = Vec::new();
     let mut event_labels = Vec::new();
-    for p in periods {
-        period_labels.push(plain(Some(&p.text), r, o, size, text_w, 0)?);
+    for i in 0..m.period_count(&periods)? {
+        let text = m.period_text(&periods, i)?;
+        period_labels.push(plain(text.as_deref(), r, o, size, text_w, 0)?);
     }
-    for p in periods {
-        let mut labels = Vec::new();
-        for e in &p.events {
+    for i in 0..m.period_count(&periods)? {
+        let (events, count) = m.events(&periods, i)?;
+        let mut labels = Vec::with_capacity(count);
+        for j in 0..count {
+            let text = m.event(&events, j)?;
             labels.push(plain(
-                Some(e),
+                text.as_deref(),
                 r,
                 o,
                 small,
                 if vertical { event_text } else { text_w },
                 0,
-            )?)
+            )?);
         }
-        event_labels.push(labels)
+        event_labels.push(labels);
     }
     let mut widest = period_labels.iter().map(|l| l.width).fold(0., f64::js_max);
     if !vertical {
@@ -226,23 +335,37 @@ fn draw(
             });
         period_labels.clear();
         event_labels.clear();
-        for p in periods {
-            period_labels.push(fit(Some(&p.text), r, o, size, text_w, 0)?);
+        for i in 0..m.period_count(&periods)? {
+            let text = m.period_text(&periods, i)?;
+            period_labels.push(fit(text.as_deref(), r, o, size, text_w, 0)?);
         }
-        for p in periods {
-            let mut labels = Vec::new();
-            for e in &p.events {
+        for i in 0..m.period_count(&periods)? {
+            let (events, count) = m.events(&periods, i)?;
+            let mut labels = Vec::with_capacity(count);
+            for j in 0..count {
+                let text = m.event(&events, j)?;
                 labels.push(fit(
-                    Some(e),
+                    text.as_deref(),
                     r,
                     o,
                     small,
                     if vertical { event_text } else { text_w },
                     0,
-                )?)
+                )?);
             }
-            event_labels.push(labels)
+            event_labels.push(labels);
         }
+    }
+    if groups
+        .iter()
+        .flat_map(|g| &g.periods)
+        .any(|&i| i >= period_labels.len() || i >= event_labels.len())
+    {
+        return Err(PeleError::new(
+            "Timeline callback removed a captured period",
+            crate::compat::ErrorCode::Semantic,
+        )
+        .into());
     }
     let line_height = round(size * 1.5);
     let col_w = text_w + 2. * PAD_X;
@@ -261,7 +384,7 @@ fn draw(
     let has_events = event_labels.iter().any(|l| !l.is_empty());
     let slots: usize = groups.iter().map(|g| g.periods.len().max(1)).sum();
     let pitch = col_w + GAP;
-    let drawn = !periods.is_empty();
+    let drawn = m.period_count(&periods)? != 0;
     let body_w = if vertical {
         col_w
             + if has_events {
@@ -276,7 +399,8 @@ fn draw(
     } else {
         0.
     };
-    let title = fit(m.title.as_deref(), r, o, size, body_w.js_max(320.), 1)?;
+    let title_text = m.title()?;
+    let title = fit(title_text.as_deref(), r, o, size, body_w.js_max(320.), 1)?;
     let title_h = if title.height > 0. {
         title.height + 16.
     } else {
@@ -285,16 +409,6 @@ fn draw(
     let width = body_w.js_max(title.width);
     let left = pad + (width - body_w) / 2.;
     let top = pad + title_h;
-    let section_label = |g: &Group, w: f64, r: &mut dyn RenderResources| {
-        fit(
-            g.section.map(|i| m.sections[i].as_str()),
-            r,
-            o,
-            size,
-            w - 2. * PAD_X,
-            1,
-        )
-    };
     let header = |g: &Group, l: &Label, x: f64, y: f64, w: f64, h: f64| {
         rect(
             x,
@@ -334,22 +448,6 @@ fn draw(
     let dot = |x: f64, y: f64, color: &str| {
         format!("<circle class=\"pele-dot\" cx=\"{}\" cy=\"{}\" r=\"4\" fill=\"{color}\" stroke=\"var(--_bg)\" stroke-width=\"2\"/>",num(x),num(y))
     };
-    let open = |g: &Group| -> Result<String, PeleError> {
-        Ok(if let Some(i) = g.section {
-            format!(
-                "<g class=\"pele-cluster pele-section\" data-id=\"{}\">",
-                esc_text(m.sections[i].trim_matches(space))?
-            )
-        } else {
-            String::new()
-        })
-    };
-    let open_period = |i: usize| -> Result<String, PeleError> {
-        Ok(format!(
-            "<g class=\"pele-node pele-period\" data-id=\"{}\">",
-            esc_text(periods[i].text.trim_matches(space))?
-        ))
-    };
     let mut body = String::new();
     let height;
     if vertical {
@@ -358,9 +456,9 @@ fn draw(
         let events_x = spine_x + SPINE;
         let mut y = top;
         for g in &groups {
-            body.push_str(&open(g)?);
+            body.push_str(&open(m, g)?);
             if g.section.is_some() {
-                let label = section_label(g, body_w, r)?;
+                let label = section_label(m, g, body_w, r, o, size)?;
                 let h = chip_height(&label);
                 body.push_str(&header(g, &label, left, y, body_w, h));
                 y += h + SECTION_GAP + 4.
@@ -396,7 +494,7 @@ fn draw(
                 }
                 body.push_str(&format!(
                     "{}{}<path class=\"pele-edge\" d=\"{d}\"{LINE}/>{}{cards}</g>",
-                    open_period(i)?,
+                    open_period(m, &periods, i)?,
                     period(i, &color, left, y, h),
                     dot(axis_x, cy, &color)
                 ));
@@ -425,7 +523,14 @@ fn draw(
             if g.section.is_none() {
                 section_labels.push(None)
             } else {
-                let label = section_label(g, g.periods.len().max(1) as f64 * pitch - GAP, r)?;
+                let label = section_label(
+                    m,
+                    g,
+                    g.periods.len().max(1) as f64 * pitch - GAP,
+                    r,
+                    o,
+                    size,
+                )?;
                 header_h = header_h.js_max(chip_height(&label));
                 section_labels.push(Some(label))
             }
@@ -444,7 +549,7 @@ fn draw(
         for (g_index, g) in groups.iter().enumerate() {
             let span = g.periods.len().max(1);
             let gx = left + slot as f64 * pitch;
-            body.push_str(&open(g)?);
+            body.push_str(&open(m, g)?);
             if let Some(label) = &section_labels[g_index] {
                 body.push_str(&header(
                     g,
@@ -482,7 +587,7 @@ fn draw(
                 bottom = bottom.js_max(ey - EVENT_GAP);
                 body.push_str(&format!(
                     "{}{}<path class=\"pele-edge\" d=\"{d}\"{LINE}/>{}{cards}</g>",
-                    open_period(i)?,
+                    open_period(m, &periods, i)?,
                     period(i, &color, x, periods_y, chip_h),
                     dot(cx, axis_y, &color)
                 ))
@@ -506,6 +611,8 @@ fn draw(
         pad + title.height / 2.,
         " class=\"pele-title\" font-weight=\"var(--_tw)\"",
     ) + &body;
+    let acc_title = m.accessibility(false)?;
+    let acc_descr = m.accessibility(true)?;
     Ok(Rendered {
         svg: document(
             "timeline",
@@ -513,8 +620,8 @@ fn draw(
             total_h,
             size,
             o,
-            m.acc_title.as_deref(),
-            m.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width: total_w,

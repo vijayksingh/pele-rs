@@ -8,6 +8,9 @@ use wasm_bindgen::prelude::*;
 pub struct NativeRegistry {
     pub(super) inner: Option<PublicEngine>,
     foreign: HashMap<DiagramType, JsValue>,
+    // Only raw caller adoption needs an origin token. Ordinary registries do
+    // not allocate one, and replacement never changes an existing token.
+    pub(super) raw_entry_origin: std::cell::OnceCell<std::rc::Rc<()>>,
 }
 fn closed() -> PeleError {
     PeleError::new("Registry is closed", ErrorCode::Semantic)
@@ -36,6 +39,7 @@ impl NativeRegistry {
                 PublicEngine::empty()
             }),
             foreign: HashMap::new(),
+            raw_entry_origin: std::cell::OnceCell::new(),
         }
     }
     pub fn registered(&self, id: &str) -> Result<String, JsValue> {
@@ -197,35 +201,104 @@ impl NativeRegistry {
         icons: Option<js_sys::Function>,
         clock: Option<js_sys::Function>,
     ) -> String {
-        super::render_numbers::rendered((|| {
-            let engine = self.inner.as_ref().ok_or_else(closed)?;
-            let (options, limits, output) = super::render_numbers::options_with_parse_limits(
-                source,
-                json,
-                mask,
-                numbers,
-                output_kind,
-                output,
-                source_kind,
-                source_value,
-                edge_kind,
-                edge_value,
-            )?;
-            engine.render_source_bounded_with_limits(
-                source,
-                &options,
-                limits,
-                output,
-                &mut super::render_numbers::NumericResources {
-                    browser: super::BrowserResources { width, icons },
-                    clock,
-                },
-            )
-        })())
+        super::render_numbers::rendered(self.render_source(
+            source,
+            json,
+            mask,
+            numbers,
+            output_kind,
+            output,
+            source_kind,
+            source_value,
+            edge_kind,
+            edge_value,
+            width,
+            icons,
+            clock,
+        ))
+    }
+    /// Additive successful source-result transport; failure strings are unchanged.
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_numbers_packet_with_resources(
+        &self,
+        source: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        output_kind: u32,
+        output: f64,
+        source_kind: u32,
+        source_value: f64,
+        edge_kind: u32,
+        edge_value: f64,
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+    ) -> Result<JsValue, JsValue> {
+        super::render_numbers::rendered_packet(self.render_source(
+            source,
+            json,
+            mask,
+            numbers,
+            output_kind,
+            output,
+            source_kind,
+            source_value,
+            edge_kind,
+            edge_value,
+            width,
+            icons,
+            clock,
+        ))
     }
     /// Retained PublicDocuments own their registration and survive registry close.
     pub fn close(&mut self) {
         self.inner.take();
         self.foreign.clear();
+    }
+}
+
+// Both exported transports execute the same closed/options/parse/render stages.
+impl NativeRegistry {
+    #[allow(clippy::too_many_arguments)]
+    fn render_source(
+        &self,
+        source: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        output_kind: u32,
+        output: f64,
+        source_kind: u32,
+        source_value: f64,
+        edge_kind: u32,
+        edge_value: f64,
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+    ) -> Result<pele::compat::RenderResult, PeleError> {
+        let engine = self.inner.as_ref().ok_or_else(closed)?;
+        let (options, limits, output) = super::render_numbers::options_with_parse_limits(
+            source,
+            json,
+            mask,
+            numbers,
+            output_kind,
+            output,
+            source_kind,
+            source_value,
+            edge_kind,
+            edge_value,
+        )?;
+        engine.render_source_bounded_with_limits(
+            source,
+            &options,
+            limits,
+            output,
+            &mut super::render_numbers::NumericResources {
+                browser: super::BrowserResources { width, icons },
+                clock,
+            },
+        )
     }
 }

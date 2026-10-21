@@ -7,6 +7,55 @@ use crate::compat::{
     text::{layout_label, Label},
     PeleError, RenderResources, RenderSettings, Rendered,
 };
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Node: Clone;
+    type Children;
+    fn begin_draw(&mut self) {}
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn root(&mut self, repeat: bool) -> Result<Option<Self::Node>, Self::Error>;
+    fn text(&mut self, node: &Self::Node) -> Result<String, Self::Error>;
+    fn children(&mut self, node: &Self::Node) -> Result<Self::Children, Self::Error>;
+    fn count(&mut self, children: &Self::Children) -> Result<usize, Self::Error>;
+    fn has_child(&mut self, children: &Self::Children, index: usize) -> Result<bool, Self::Error>;
+    fn child(&mut self, children: &Self::Children, index: usize)
+        -> Result<Self::Node, Self::Error>;
+}
+struct Typed<'a>(&'a IshikawaModel);
+impl<'a> PhaseInput for Typed<'a> {
+    type Error = PeleError;
+    type Node = usize;
+    type Children = &'a [usize];
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn root(&mut self, _: bool) -> Result<Option<usize>, PeleError> {
+        Ok(self.0.root)
+    }
+    fn text(&mut self, node: &usize) -> Result<String, PeleError> {
+        Ok(self.0.nodes[*node].text.clone())
+    }
+    fn children(&mut self, node: &usize) -> Result<Self::Children, PeleError> {
+        Ok(&self.0.nodes[*node].children)
+    }
+    fn count(&mut self, children: &Self::Children) -> Result<usize, PeleError> {
+        Ok(children.len())
+    }
+    fn has_child(&mut self, _: &Self::Children, _: usize) -> Result<bool, PeleError> {
+        Ok(true)
+    }
+    fn child(&mut self, children: &Self::Children, index: usize) -> Result<usize, PeleError> {
+        Ok(children[index])
+    }
+}
+fn work_limit() -> PeleError {
+    let mut e = PeleError::new(
+        "Ishikawa public operation exceeds native work budget",
+        crate::compat::ErrorCode::Limit,
+    );
+    e.diagram_type = Some("ishikawa".into());
+    e
+}
 struct Bone {
     label: Label,
     depth: usize,
@@ -17,8 +66,8 @@ struct Bone {
     at: f64,
     text_end: f64,
 }
-struct Category {
-    node: usize,
+struct Category<N> {
+    node: N,
     label: Label,
     box_w: f64,
     box_h: f64,
@@ -26,50 +75,69 @@ struct Category {
     rise: f64,
     reach: f64,
 }
-fn arrange(
-    node: usize,
+fn arrange<P: PhaseInput>(
+    node: P::Node,
     up: bool,
-    m: &IshikawaModel,
+    input: &mut P,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     size: f64,
     small: f64,
-) -> Result<Category, PeleError> {
-    let node_ref = &m.nodes[node];
-    let label = layout_label(Some(&node_ref.text), false, r, o, size, 180., 0)?;
+    work: &mut usize,
+) -> Result<Category<P::Node>, P::Error> {
+    *work += 1;
+    if *work > 1_000_000 {
+        return Err(work_limit().into());
+    }
+    let node_text = input.text(&node)?;
+    let label = layout_label(Some(&node_text), false, r, o, size, 180., 0)?;
     let line_height = round(small * 1.5);
     let mut bones = Vec::<Bone>::new();
     let mut rows = vec![];
     let mut stack = vec![];
-    let push =
-        |children: &[usize],
-         depth: usize,
-         parent: Option<usize>,
-         stack: &mut Vec<(usize, usize, Option<usize>, usize, Option<usize>)>| {
-            let n = children.len();
-            for slot in (0..n).rev() {
-                stack.push((
-                    children[if up { n - 1 - slot } else { slot }],
-                    depth,
-                    parent,
-                    slot,
-                    None,
-                ));
-            }
-        };
-    push(&node_ref.children, 2, None, &mut stack);
+    let push = |input: &mut P,
+                children: &P::Children,
+                depth: usize,
+                parent: Option<usize>,
+                stack: &mut Vec<(P::Node, usize, Option<usize>, usize, Option<usize>)>|
+     -> Result<(), P::Error> {
+        let n = input.count(children)?;
+        if n > 1_000_000usize.saturating_sub(stack.len()) {
+            return Err(work_limit().into());
+        }
+        for slot in (0..n).rev() {
+            stack.push((
+                input.child(children, if up { n - 1 - slot } else { slot })?,
+                depth,
+                parent,
+                slot,
+                None,
+            ));
+        }
+        Ok(())
+    };
+    let children = input.children(&node)?;
+    push(input, &children, 2, None, &mut stack)?;
     while let Some((node, depth, parent, slot, bone)) = stack.pop() {
         if let Some(bone) = bone {
             rows.push(bone);
             continue;
         }
+        *work += 1;
+        if *work > 1_000_000 {
+            return Err(work_limit().into());
+        }
         let index = bones.len();
+        let text = input.text(&node)?;
         bones.push(Bone {
-            label: layout_label(Some(&m.nodes[node].text), false, r, o, small, 200., 0)?,
+            label: layout_label(Some(&text), false, r, o, small, 200., 0)?,
             depth,
             parent,
             slot,
-            kids: m.nodes[node].children.len(),
+            kids: {
+                let children = input.children(&node)?;
+                input.count(&children)?
+            },
             rise: 0.,
             at: 0.,
             text_end: 0.,
@@ -77,9 +145,10 @@ fn arrange(
         if depth % 2 == 0 {
             rows.push(index);
         } else {
-            stack.push((node, depth, parent, slot, Some(index)));
+            stack.push((node.clone(), depth, parent, slot, Some(index)));
         }
-        push(&m.nodes[node].children, depth + 1, Some(index), &mut stack);
+        let children = input.children(&node)?;
+        push(input, &children, depth + 1, Some(index), &mut stack)?;
     }
     let mut rise = 14.;
     for index in rows {
@@ -125,7 +194,14 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let across = horizontal(m, o, r)?;
+    render_phases(&mut Typed(m), o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let across = horizontal(input, o, r)?;
     let Some(available) = o.max_width.filter(|w| *w > 0.) else {
         return Ok(across);
     };
@@ -135,22 +211,25 @@ pub(super) fn render(
     {
         return Ok(across);
     }
-    let down = vertical(m, o, r)?;
+    let down = vertical(input, o, r)?;
     Ok(if down.width < across.width {
         down
     } else {
         across
     })
 }
-fn horizontal(
-    m: &IshikawaModel,
+fn horizontal<P: PhaseInput>(
+    input: &mut P,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
+    input.begin_draw();
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
-    let title = layout_label(m.title.as_deref(), false, r, o, size, 4000., 1)?;
+    let root = input.root(false)?;
+    let title_text = input.title()?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, 4000., 1)?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
@@ -158,16 +237,40 @@ fn horizontal(
     };
     let mut body = String::new();
     let (mut min_x, mut max_x, mut min_y, mut max_y) = (0_f64, 0_f64, 0_f64, 0_f64);
-    if let Some(root) = m.root {
-        let head = layout_label(Some(&m.nodes[root].text), false, r, o, size, 200., 1)?;
+    if let Some(root) = root {
+        let head_text = input.text(&root)?;
+        let head = layout_label(Some(&head_text), false, r, o, size, 200., 1)?;
         let head_h = (head.height + 24.).js_max(48.);
         let head_w = head.width + 24. + head_h / 2.;
-        let mut categories = m.nodes[root]
-            .children
-            .iter()
-            .enumerate()
-            .map(|(i, &node)| arrange(node, i % 2 == 0, m, o, r, size, small))
-            .collect::<Result<Vec<_>, _>>()?;
+        let children = input.children(&root)?;
+        let count = input.count(&children)?;
+        let mut categories = Vec::with_capacity(count);
+        let mut work = 1usize;
+        let mut absent = false;
+        for i in 0..count {
+            if !input.has_child(&children, i)? {
+                absent = true;
+                continue;
+            }
+            let node = input.child(&children, i)?;
+            categories.push(arrange(
+                node,
+                i % 2 == 0,
+                input,
+                o,
+                r,
+                size,
+                small,
+                &mut work,
+            )?);
+        }
+        if absent {
+            return Err(PeleError::new(
+                "Ishikawa category arrays must not contain holes",
+                crate::compat::ErrorCode::Semantic,
+            )
+            .into());
+        }
         for c in &mut categories {
             c.rise = c.rise.js_max(head_h / 2. + 14.);
         }
@@ -245,10 +348,10 @@ fn horizontal(
             max_x = max_x.js_max(end_x + c.box_w / 2.);
             min_y = min_y.js_min(box_y - c.box_h / 2.);
             max_y = max_y.js_max(box_y + c.box_h / 2.);
-            groups+=&format!("<g class=\"pele-ishikawa-category\" data-id=\"{}\"><path class=\"pele-ishikawa-bones\" d=\"{d}\" fill=\"none\" stroke=\"var(--_l)\"/>{}<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{}{}</g>",esc_text(&m.nodes[c.node].text)?,marker("arrow_point",ax,0.,0.5/length,-sign/length,"var(--_l)"),num(end_x-c.box_w/2.),num(box_y-c.box_h/2.),num(c.box_w),num(c.box_h),label_svg(&c.label,end_x,box_y," class=\"pele-label\""),if texts.is_empty(){String::new()}else{format!("<g class=\"pele-ishikawa-causes\" font-size=\"{}\">{texts}</g>",js_num(small))});
+            groups+=&format!("<g class=\"pele-ishikawa-category\" data-id=\"{}\"><path class=\"pele-ishikawa-bones\" d=\"{d}\" fill=\"none\" stroke=\"var(--_l)\"/>{}<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{}{}</g>",esc_text(&input.text(&c.node)?)?,marker("arrow_point",ax,0.,0.5/length,-sign/length,"var(--_l)"),num(end_x-c.box_w/2.),num(box_y-c.box_h/2.),num(c.box_w),num(c.box_h),label_svg(&c.label,end_x,box_y," class=\"pele-label\""),if texts.is_empty(){String::new()}else{format!("<g class=\"pele-ishikawa-causes\" font-size=\"{}\">{texts}</g>",js_num(small))});
         }
         let radius = head_h / 2.;
-        body=format!("<path class=\"pele-ishikawa-spine\" d=\"M{},0H-7\" fill=\"none\" stroke=\"var(--_l)\"/>{}{groups}<g class=\"pele-ishikawa-head\" data-id=\"{}\"><path d=\"M0,{}H{}A{},{} 0 0 1 {},{}H0Z\" fill=\"var(--_s)\" stroke=\"var(--_b)\" stroke-linejoin=\"round\"/>{}</g>",num(tail),marker("arrow_point",0.,0.,1.,0.,"var(--_l)"),esc_text(&m.nodes[root].text)?,num(-radius),num(head_w-radius),num(radius),num(radius),num(head_w-radius),num(radius),label_svg(&head,12.+head.width/2.,0.," class=\"pele-label\" font-weight=\"var(--_hw)\""));
+        body=format!("<path class=\"pele-ishikawa-spine\" d=\"M{},0H-7\" fill=\"none\" stroke=\"var(--_l)\"/>{}{groups}<g class=\"pele-ishikawa-head\" data-id=\"{}\"><path d=\"M0,{}H{}A{},{} 0 0 1 {},{}H0Z\" fill=\"var(--_s)\" stroke=\"var(--_b)\" stroke-linejoin=\"round\"/>{}</g>",num(tail),marker("arrow_point",0.,0.,1.,0.,"var(--_l)"),esc_text(&input.text(&root)?)?,num(-radius),num(head_w-radius),num(radius),num(radius),num(head_w-radius),num(radius),label_svg(&head,12.+head.width/2.,0.," class=\"pele-label\" font-weight=\"var(--_hw)\""));
     }
     let inner = (max_x - min_x).js_max(title.width);
     let width = (inner + 2. * pad).ceil();
@@ -280,8 +383,8 @@ fn horizontal(
         links: vec![],
     })
 }
-struct Entry {
-    node: usize,
+struct Entry<N> {
+    node: N,
     depth: usize,
     parent: Option<usize>,
     x: f64,
@@ -289,11 +392,12 @@ struct Entry {
     w: f64,
     h: f64,
 }
-fn vertical(
-    m: &IshikawaModel,
+fn vertical<P: PhaseInput>(
+    input: &mut P,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
+    input.begin_draw();
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
@@ -302,14 +406,20 @@ fn vertical(
         .max_width
         .filter(|w| *w > 0.)
         .map_or(4000., |w| 80_f64.js_max(w - 2. * pad));
-    let title = layout_label(m.title.as_deref(), false, r, o, size, title_room, 1)?;
+    let title_text = input.title()?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, title_room, 1)?;
     let mut order = vec![];
-    let mut pending = m.root.map_or(vec![], |node| vec![(node, 0usize, None)]);
+    let mut pending = input
+        .root(true)?
+        .map_or(vec![], |node| vec![(node, 0usize, None)]);
     let mut max_depth = 0;
     while let Some((node, depth, parent)) = pending.pop() {
+        if order.len() >= 1_000_000 {
+            return Err(work_limit().into());
+        }
         let index = order.len();
         order.push(Entry {
-            node,
+            node: node.clone(),
             depth,
             parent,
             x: 0.,
@@ -318,7 +428,14 @@ fn vertical(
             h: 0.,
         });
         max_depth = max_depth.max(depth);
-        for &child in m.nodes[node].children.iter().rev() {
+        let children = input.children(&node)?;
+        let count = input.count(&children)?;
+        if count > 1_000_000usize.saturating_sub(pending.len()) {
+            return Err(work_limit().into());
+        }
+        for i in (0..count).rev() {
+            let children = input.children(&node)?;
+            let child = input.child(&children, i)?;
             pending.push((child, depth + 1, Some(index)));
         }
     }
@@ -336,8 +453,9 @@ fn vertical(
         let entry = &mut order[i];
         entry.x = pad + entry.depth as f64 * indent;
         let label_room = 60_f64.js_max(room - entry.depth as f64 * indent - 20.);
+        let text = input.text(&entry.node)?;
         let label = layout_label(
-            Some(&m.nodes[entry.node].text),
+            Some(&text),
             false,
             r,
             o,
@@ -365,7 +483,7 @@ fn vertical(
             } else {
                 "pele-ishikawa-cause"
             },
-            esc_text(&m.nodes[entry.node].text)?,
+            esc_text(&input.text(&entry.node)?)?,
             label_svg(
                 &label,
                 entry.x + entry.w / 2.,

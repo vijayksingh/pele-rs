@@ -1,0 +1,218 @@
+[
+  {
+    "phase": "freeze-before-sdk",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-sparse-ingress-correctness/runtime/freeze.mjs",
+      "before-sdk",
+      "ef9c9a77428c35ac69753caad3178527fbd97864"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-freeze-before-sdk.log",
+    "startedAt": "2026-10-20T18:34:59.737955+00:00",
+    "endedAt": "2026-10-20T18:35:00.236183+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "sdk-build",
+    "command": [
+      "bash",
+      "scripts/build-native.sh",
+      "--host"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/source-sparse-ingress-correctness-sdk-build.log",
+    "startedAt": "2026-10-20T18:35:00.236844+00:00",
+    "endedAt": "2026-10-20T18:38:10.258174+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-after-sdk",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-sparse-ingress-correctness/runtime/freeze.mjs",
+      "after-sdk",
+      "ef9c9a77428c35ac69753caad3178527fbd97864"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-freeze-after-sdk.log",
+    "startedAt": "2026-10-20T18:38:10.258934+00:00",
+    "endedAt": "2026-10-20T18:38:10.500623+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-build",
+    "command": [
+      "node",
+      "scripts/perf/swift/build.mjs"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/source-sparse-ingress-correctness-swift-build.log",
+    "startedAt": "2026-10-20T18:38:10.501352+00:00",
+    "endedAt": "2026-10-20T18:39:49.930743+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-before-correctness",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-sparse-ingress-correctness/runtime/freeze.mjs",
+      "before-correctness",
+      "ef9c9a77428c35ac69753caad3178527fbd97864"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-freeze-before-correctness.log",
+    "startedAt": "2026-10-20T18:39:49.931595+00:00",
+    "endedAt": "2026-10-20T18:39:50.158401+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-corpus",
+    "command": [
+      "swift",
+      "test",
+      "-c",
+      "release",
+      "--package-path",
+      "bindings/swift",
+      "--filter",
+      "AdditionalDiagramTests/testPinnedDiagramsThroughNativeDocuments|EagerProjectionIntegrationTests|PreparedDocumentTests|NonfiniteDiagramTests/testSankeyOwnedRenderAndCodableKeepNonfiniteHeight"
+    ],
+    "environmentOverrides": {
+      "PELE_VERIFY_MUTABLE": "1",
+      "PELE_FAMILIES": "er,sankey"
+    },
+    "log": "dist/evidence/source-sparse-ingress-correctness-swift-corpus.log",
+    "startedAt": "2026-10-20T18:39:50.158943+00:00",
+    "endedAt": "2026-10-20T18:40:49.362453+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-sparse-ingress-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-ffi-compile.log",
+    "startedAt": "2026-10-20T18:40:49.363257+00:00",
+    "endedAt": "2026-10-20T18:40:49.747274+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-run",
+    "command": [
+      "dist/evidence/source-sparse-ingress-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-ffi-run.log",
+    "startedAt": "2026-10-20T18:40:49.747990+00:00",
+    "endedAt": "2026-10-20T18:40:50.380447+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-sparse-ingress-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-ffi-public-compile.log",
+    "startedAt": "2026-10-20T18:40:50.380992+00:00",
+    "endedAt": "2026-10-20T18:40:50.515551+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-run",
+    "command": [
+      "dist/evidence/source-sparse-ingress-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-ffi-public-run.log",
+    "startedAt": "2026-10-20T18:40:50.515981+00:00",
+    "endedAt": "2026-10-20T18:40:51.092415+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/source-sparse-ingress-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T18:40:51.093214+00:00",
+    "endedAt": "2026-10-20T18:40:51.216784+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-run",
+    "command": [
+      "dist/evidence/source-sparse-ingress-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T18:40:51.217244+00:00",
+    "endedAt": "2026-10-20T18:40:51.814216+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-api",
+    "command": [
+      "node",
+      "scripts/perf/swift/run.mjs",
+      "--output",
+      "dist/evidence/source-sparse-ingress-correctness-swift-api.json"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-swift-api.log",
+    "startedAt": "2026-10-20T18:40:51.815377+00:00",
+    "endedAt": "2026-10-20T18:40:53.663124+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-after-correctness",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/source-sparse-ingress-correctness/runtime/freeze.mjs",
+      "after-correctness",
+      "ef9c9a77428c35ac69753caad3178527fbd97864"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/source-sparse-ingress-correctness-freeze-after-correctness.log",
+    "startedAt": "2026-10-20T18:40:53.663652+00:00",
+    "endedAt": "2026-10-20T18:40:53.868334+00:00",
+    "exitCode": 0
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "runtimeSource": "ee114c01c816623182972363867ea72954dff69d",
+  "candidateWasm": "7cc2aaed10097da5f89e50646c5194f5b7e8f5d154cfffe152cd231ef7f1b2f1",
+  "controlSource": "e1486055d596d4e0ac25e4c78f1d5d95a73f781a",
+  "transferSession": 87013,
+  "transferExit": 0,
+  "warmSession": 75697,
+  "warmExit": 0,
+  "fetchSession": 47018,
+  "fetchExit": 0,
+  "reportSHA256": "68418c3a260343b647836770262c7f0dfc92910fe2daf7f322ad4873322a2f20",
+  "activationSHA256": "3617690ede5e02d4273ce06eff9687d610b53c90753845950b0a72b320447f6f",
+  "allRows": 24,
+  "samplesPerLane": 21,
+  "activationChecks": 8,
+  "adversePairedRows": 22,
+  "runtimeSourceEdits": false,
+  "firstUseExecuted": false,
+  "conclusion": "All12 affected Sankey parse/retained rows slower than e148 control. No cross-window batching gain inferred. All adverse controls retained."
+}

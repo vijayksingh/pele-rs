@@ -1,0 +1,17 @@
+{
+  "initialPatchSha256": "916ab23920ddbf70764dd09ed22b8f5161c3a32a36f4318c791331589bb22d7c",
+  "repairedPatchSha256": "a9ec1aa610c97fea331e1e64cb647b9525d7ef2f614ca322e6057acde8038e0e",
+  "path": "crates/pele/tests/public_render_outcome_view.rs",
+  "initialTestSha256": "3a48a21b7056f551d8da87ef61fa9e1229c1d60d0938c0526640b8f1e35fc453",
+  "repairedTestSha256": "d77ab4e120fff25b5c2a2b4825aa8d64a24be22ca93efa169007efc6b8a8752b",
+  "change": "Two Object::new() calls replaced with Object::default(); runtime files unchanged.",
+  "reason": "Parent first native feature compile reported E0599: Object::new does not exist.",
+  "productionRepair": "Performed by parent; private copy exactly matches repaired production test.",
+  "verification": {
+    "allCandidateFilesMatchAppliedProduction": true,
+    "allRuntimeCandidateHashesUnchanged": true,
+    "originalHashesPreserved": true,
+    "reverseGitApplyCheck": true,
+    "buildsOrTestsByThisAgent": false
+  }
+}

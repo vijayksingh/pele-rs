@@ -1,47 +1,65 @@
-import {PeleError} from './errors.js';
-// Host values only: diagram state transitions and rendering remain in Rust.
-const errorConstructors={error:Error,pele:PeleError,type:TypeError,range:RangeError,syntax:SyntaxError,reference:ReferenceError,eval:EvalError,uri:URIError};
-const errorDiagnostics=new Set(['stack','fileName','lineNumber','columnNumber','sourceURL']);
-const errorKind=value=>{const proto=Object.getPrototypeOf(value);return Object.keys(errorConstructors).find(key=>proto===errorConstructors[key].prototype);};
-const bits = new DataView(new ArrayBuffer(8));
-function numberBits(value) {
-  bits.setFloat64(0, value);
-  return bits.getBigUint64(0).toString(16).padStart(16, '0');
-}
-function numberValue(hex) {
-  bits.setBigUint64(0, BigInt('0x' + hex));
-  return bits.getFloat64(0);
-}
-function units(value) {
-  const output = new Array(value.length);
-  for (let i = 0; i < value.length; i++) output[i] = value.charCodeAt(i);
-  return output;
-}
-export function stringValue(value) {
-  let output = '';
-  for (let i = 0; i < value.length; i += 8192) output += String.fromCharCode(...value.slice(i, i + 8192));
-  return output;
-}
-// Flat comparisons avoid serializing every unchanged record during an opted-in
-// live callback. The existing full snapshot remains the ordinary operation lane.
-const sameAtom=(a,b)=>a?.kind===b?.kind&&a?.value===b?.value;
-const sameList=(a,b,equal)=>a.length===b.length&&a.every((v,i)=>equal(v,b[i]));
-const sameNode=(a,b)=>a&&a.kind===b.kind&&a.prototype===b.prototype&&a.errorType===b.errorType&&a.length===b.length&&a.milliseconds===b.milliseconds&&
-  sameList(a.properties,b.properties,(x,y)=>x.key===y.key&&x.flags===y.flags&&sameAtom(x.value,y.value))&&
-  (a.kind!=='map'||sameList(a.entries,b.entries,(x,y)=>sameAtom(x[0],y[0])&&sameAtom(x[1],y[1])))&&
-  (a.kind!=='set'||sameList(a.values,b.values,sameAtom));
-/** Schema functions/prototypes share identity across documents of one renderer. */
+import {namedConstructor} from './constructor-shells.js';
+import {createHostLedger,LiveFieldBindings} from './host-values.js';
+import {LayoutGraph,LayoutStorage,applyLayoutDelta} from './layout-storage.js';
+import {tryInitializeSourceLayout} from './source-initializer.js';
+import {completeBridgePublication,invalidateBridgeObservation,getGraphTraversal,numberValue, reconcileNestedGraph as reconcileGraph, matchesNestedGraph as matchesGraph, snapshotNestedGraph as snapshotGraph} from './graph-storage.js';
+export {stringValue} from './graph-storage.js';
+const layoutTraversal=getGraphTraversal(LayoutStorage);
+const layoutMethods={
+  reconcile(graph,changed){invalidateBridgeObservation(this);if(!(graph instanceof LayoutGraph))throw new TypeError('Source layout outcome lost its baseline');return layoutTraversal.reconcileGraph(this,graph,changed);},
+  reconcileDelta(delta){invalidateBridgeObservation(this);return this.reconcile(applyLayoutDelta(this.graph,delta),delta.nodes.map(([id])=>id));},
+  matchesPublishedGraph(){return layoutTraversal.matchesGraph(this);},
+  snapshot(values=[],delta=false){return layoutTraversal.snapshotGraph(this,values,delta);},
+  hostReferenceId(value){if(!this.hostIds.has(value)){if(this.hostValues.length>=1_000_000)throw new RangeError('Host reference budget exceeded');this.hostIds.set(value,this.hostValues.length);this.hostValues.push(value);}return this.hostIds.get(value);}
+};
+// Shared reflection scopes are owned by full.js, never selected by caller
+// metadata. Public ModelRegistry instances remain local unless given that
+// private scope and one of its schema-bound, single-use tickets.
 export class ModelRegistry {
-  constructor() { this.schemas = new Map(); this.owners = new WeakMap(); this.sharedFunctions = new Map(); }
-  registration(schema) {
-    const key = `${schema.id}:${schema.version}`;
+  #reflectionScope;
+  #schemaIdentities = new Map();
+  constructor(scope) {
+    this.#reflectionScope=scope;
+    this.schemas=new Map();this.registrations=new WeakSet();this.sharedFunctions=new Map();
+    const localOwners=new WeakMap();
+    this.owners={
+      get:value=>localOwners.get(value),
+      set:(value,bridge)=>{
+        localOwners.set(value,bridge);
+        if(scope&&bridge.registry===this&&this.registrations.has(bridge.registration)&&scope.authenticated.has(bridge.registration))scope.owners.set(value,bridge);
+        return this.owners;
+      }
+    };
+  }
+  registration(schema, ticket) {
+    // Schema content is a renderer-local invariant independent of whether a
+    // registration carries native reflection authority. A failed reflection
+    // proof must not turn conflicting metadata into a fresh local identity.
+    const schemaKey=JSON.stringify([schema.id,schema.version]);
+    const schemaJSON=JSON.stringify(schema);
+    const knownSchema=this.#schemaIdentities.get(schemaKey);
+    if(knownSchema!==undefined&&knownSchema!==schemaJSON)throw new TypeError('Conflicting native model schema identity');
+    const scope=this.#reflectionScope;
+    const proof=ticket&&scope?.tickets.get(ticket);
+    if(proof)scope.tickets.delete(ticket);
+    const authenticated=!!proof&&proof.schema===schema;
+    const reflection=authenticated?proof.reflection:undefined;
+    const identity=authenticated?JSON.stringify(reflection.map(entry=>[entry.prototype,entry.identity])):null;
+    const key = `${schema.id}:${schema.version}:${identity??'local'}`;
     if (this.schemas.has(key)) {
       const known=this.schemas.get(key);
       if (JSON.stringify(known.schema)!==JSON.stringify(schema)) throw new TypeError('Conflicting native model schema identity');
+      this.#schemaIdentities.set(schemaKey,schemaJSON);
       return known;
     }
-    const registration = {schema, functions: new Map(), functionIds: new WeakMap(), prototypes: new Map(), prototypeIds: new WeakMap(), documents: [], sharedIds: new Map((schema.sharedFunctions??[]).map(entry=>[entry.identity,entry.method]))};
-    this.schemas.set(key, registration);
+    if(authenticated&&scope.registrations.has(identity)){
+      const known=scope.registrations.get(identity);
+      if(JSON.stringify(known.schema)!==JSON.stringify(schema))throw new TypeError('Conflicting authenticated native class schema');
+      this.schemas.set(key,known);this.registrations.add(known);this.#schemaIdentities.set(schemaKey,schemaJSON);return known;
+    }
+    const registration = {schema, functions: new Map(), functionIds: new WeakMap(), prototypes: new Map(), prototypeIds: new WeakMap(), documents: [], constructors: new Map(), sharedIds: new Map((schema.sharedFunctions??[]).map(entry=>[entry.identity,entry.method]))};
+    this.schemas.set(key, registration);this.registrations.add(registration);this.#schemaIdentities.set(schemaKey,schemaJSON);
+    const sharedFunctions=authenticated?scope.sharedFunctions:this.sharedFunctions;
     const aliases=new Map((schema.sharedFunctions??[]).map(entry=>[entry.method,entry.identity]));
     const shapes=new Map((schema.functionShapes??[]).map(entry=>[entry.method,entry.constructible]));
     const live=registration=>{
@@ -50,12 +68,12 @@ export class ModelRegistry {
     };
     for (const method of schema.methods) {
       const registry = this, identity=aliases.get(method.id), constructible=shapes.get(method.id)??false;
-      let shared=identity&&this.sharedFunctions.get(identity);
+      let shared=identity&&sharedFunctions.get(identity);
       if(shared&&(shared.name!==method.name||shared.arity!==method.arity||shared.constructible!==constructible))throw new TypeError('Conflicting shared native function descriptor');
-      if(identity&&!shared){shared={name:method.name,arity:method.arity,constructible,registrations:new Set(),callable:null};this.sharedFunctions.set(identity,shared);}
+      if(identity&&!shared){shared={name:method.name,arity:method.arity,constructible,registrations:new Set(),callable:null};sharedFunctions.set(identity,shared);}
       if(shared)shared.registrations.add(registration);
       const dispatch=(receiver,argumentsValue)=>{
-        const direct=receiver&&registry.owners.get(receiver);
+        const direct=receiver&&(authenticated?scope.owners:registry.owners).get(receiver);
         let owner;
         if(shared) {
           if(direct&&!direct.disposed&&direct.registration.sharedIds.has(identity))owner=direct;
@@ -79,19 +97,24 @@ export class ModelRegistry {
       registration.functionIds.set(callable, method.id);
     }
     for (const prototype of schema.prototypes) {
-      const value = Object.create(null);
+      // Shell owns JavaScript newTarget/receiver semantics. Only a captured
+      // native capability can install initialization; unimplemented classes
+      // retain the explicit construction error. Arguments are not inspected.
+      const initialize=(receiver,args)=>{
+        const construct=registration.constructors.get(prototype.id);
+        if(!construct)throw new TypeError('Public model construction is unavailable');
+        construct(receiver,args);
+      };
+      const reflected=authenticated?reflection.find(entry=>entry.prototype===prototype.id):undefined;
+      const constructor=reflected?namedConstructor(scope.name==='monolith'?reflected.monolithName:reflected.moduleName,initialize):class {constructor(){initialize(this,arguments);}};
+      if(!reflected)Object.defineProperty(constructor,'name',{value:prototype.name,configurable:true});
+      const value=constructor.prototype;
       registration.prototypes.set(prototype.id, value);
       registration.prototypeIds.set(value, prototype.id);
     }
     for (const prototype of schema.prototypes) {
       const value = registration.prototypes.get(prototype.id), parent = prototype.parent;
       Object.setPrototypeOf(value, parent.kind === 'null' ? null : parent.kind === 'prototype' ? registration.prototypes.get(parent.prototype) : Object.prototype);
-      // Construction remains an explicit native capability gap. The descriptor
-      // still exposes the correct class-shaped prototype and member flags.
-      const constructor = function () { throw new TypeError('Public model construction is unavailable'); };
-      Object.defineProperty(constructor, 'name', {value: prototype.name, configurable: true});
-      Object.defineProperty(constructor, 'prototype', {value, writable: false});
-      Object.defineProperty(value, 'constructor', {value: constructor, writable: true, configurable: true});
       for (const member of prototype.members) {
         const descriptor = {enumerable: !!(member.flags & 1), configurable: !!(member.flags & 4)};
         if (member.kind === 'method') {
@@ -105,74 +128,41 @@ export class ModelRegistry {
       }
     }
     registration.prototypeBaseline = [...registration.prototypes.values()].map(value => ({value, parent:Object.getPrototypeOf(value), descriptors:Object.getOwnPropertyDescriptors(value)}));
+    if(authenticated){scope.registrations.set(identity,registration);scope.authenticated.add(registration);}
     return registration;
   }
 }
 export class ModelBridge {
-  constructor(graph, schema, registry, invoke) {
+  constructor(graph, schema, registry, invoke, prevalidatedRegistration, rootBinding, hostLedger, liveDefinitions, deferLiveBinding=false) {
+    const publication=invalidateBridgeObservation(this);
     this.registry = registry;
-    this.registration = registry.registration(schema);
+    if(prevalidatedRegistration && (prevalidatedRegistration.schema !== schema || !registry.registrations.has(prevalidatedRegistration))) throw new TypeError('Invalid prevalidated model registration');
+    this.registration = prevalidatedRegistration ?? registry.registration(schema);
     if(this.registration.documents.length>256)this.registration.documents=this.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
     this.registration.documents.push(new WeakRef(this));
     this.disposed=false;
     this.invoke = (...args) => this.activeInvoke ? this.activeInvoke(...args) : invoke(...args);
     this.ids = new WeakMap();
-    this.hostIds = new Map();
-    this.hostValues = [];
+    this.hostLedger = hostLedger ?? createHostLedger();
+    this.hostIds = this.hostLedger.ids;
+    this.hostValues = this.hostLedger.values;
     this.objects = [];
-    this.reconcile(graph);
+    // Only this exact receiver/prototype pair aliases its native root codec.
+    // It does not authorize the subclass prototype for unrelated objects.
+    this.rootBinding = rootBinding;
+    if(graph instanceof LayoutGraph)Object.assign(this,layoutMethods);
+    if (graph instanceof LayoutGraph && tryInitializeSourceLayout(this,graph)) completeBridgePublication(this,graph,publication);
+    else this.reconcile(graph);
+    if(liveDefinitions?.length){this.liveFields=new LiveFieldBindings(this,liveDefinitions);if(!deferLiveBinding)this.liveFields.bind(this.root);}
   }
   reconcile(graph, changed) {
-    this.graph = graph;
-    if(changed) {
-      for(let i=this.strings.length;i<graph.strings.length;i++){const value=stringValue(graph.strings[i]);this.strings.push(value);this.stringIds.set(value,i);}
-    } else {
-      this.strings = graph.strings.map(stringValue);
-      this.stringIds = new Map(this.strings.map((value, index) => [value, index]));
-    }
-    while (this.objects.length < graph.nodes.length) {
-      const id = this.objects.length, node = graph.nodes[id];
-      let value;
-      switch (node.kind) {
-        case 'error': {const Constructor=errorConstructors[node.errorType];if(!Constructor)throw new TypeError('Unknown native Error brand');value=new Constructor(node.properties.some(p=>this.strings[p.key]==='message')?'':undefined);break;}
-        case 'instance': value = Object.create(this.registration.prototypes.get(node.prototype)); break;
-        case 'object': value = {}; break;
-        case 'array': value = new Array(node.length); break;
-        case 'map': value = new Map(); break;
-        case 'set': value = new Set(); break;
-        case 'date': value = new Date(numberValue(node.milliseconds)); break;
-        default: throw new TypeError('Unsupported public object kind');
-      }
-      this.objects.push(value); this.ids.set(value, id); this.registry.owners.set(value, this);
-    }
-    for (const id of changed ?? graph.nodes.keys()) {
-      const node = graph.nodes[id];
-      const object = this.objects[id], keys = new Set(node.properties.map(property => this.strings[property.key]));
-      for (const key of Object.getOwnPropertyNames(object)) {
-        if (node.kind === 'array' && key === 'length') continue;
-        if (node.kind === 'error' && errorDiagnostics.has(key) && !keys.has(key)) continue;
-        if (!keys.has(key) && !Reflect.deleteProperty(object, key)) throw new TypeError('Native graph removed a non-configurable property');
-      }
-      if (node.kind === 'map') {
-        Map.prototype.clear.call(object);
-        for (const [key, value] of node.entries) Map.prototype.set.call(object, this.value(key), this.value(value));
-      }
-      if (node.kind === 'set') {
-        Set.prototype.clear.call(object);
-        for (const value of node.values) Set.prototype.add.call(object, this.value(value));
-      }
-      if (node.kind === 'date') Date.prototype.setTime.call(object, numberValue(node.milliseconds));
-      // Set length before entries, preserving holes and existing non-index keys.
-      if (node.kind === 'array' && object.length !== node.length) object.length = node.length;
-      for (const property of node.properties) Object.defineProperty(object, this.strings[property.key], {
-        value: this.value(property.value), enumerable: !!(property.flags & 1),
-        writable: !!(property.flags & 2), configurable: !!(property.flags & 4)
-      });
-    }
-    this.root = this.value(graph.root);
-    return this.root;
+    return reconcileGraph(this, graph, changed);
+  }
+  matchesPublishedGraph() {
+    return matchesGraph(this);
   }
   reconcileDelta(delta) {
+    invalidateBridgeObservation(this);
     if (delta.stringsStart !== this.graph.strings.length || delta.nodesStart !== this.graph.nodes.length) throw new TypeError('Stale native model delta');
     const nodes=this.graph.nodes.slice();
     for(const [id,node] of delta.nodes) nodes[id]=node;
@@ -205,92 +195,6 @@ export class ModelBridge {
   // All retained nodes are scanned, including externally held detached arrays.
   // Extra arguments join the same arena; calls never serialize nested objects.
   snapshot(values = [], delta = false) {
-    for (const baseline of this.registration.prototypeBaseline) {
-      const descriptors = Object.getOwnPropertyDescriptors(baseline.value), original = baseline.descriptors;
-      if (Object.getPrototypeOf(baseline.value) !== baseline.parent || Reflect.ownKeys(descriptors).length !== Reflect.ownKeys(original).length || Reflect.ownKeys(original).some(key => {
-        const a=original[key],b=descriptors[key];
-        return !b || a.value!==b.value || a.get!==b.get || a.set!==b.set || a.enumerable!==b.enumerable || a.writable!==b.writable || a.configurable!==b.configurable;
-      })) throw new TypeError('Prototype edits require an explicit native prototype mutation codec');
-    }
-    const baseline=this.graph, changes=[];
-    const pending = [], seen = new Set(), nodes = baseline.nodes.slice();
-    const store=(id,node)=>{if(!delta||!sameNode(nodes[id],node)){nodes[id]=node;changes.push([id,node]);}};
-    let codeUnits = this.strings.reduce((n,s)=>n+s.length,0), propertiesCount = 0;
-    const budget = () => { throw new RangeError('Public model graph exceeds host exchange budget'); };
-    const string = value => {
-      if (this.stringIds.has(value)) return this.stringIds.get(value);
-      const id = this.strings.length;
-      codeUnits += value.length;
-      if (id >= 1_000_000 || codeUnits > 16_000_000) budget();
-      this.strings.push(value); this.stringIds.set(value, id);
-      return id;
-    };
-    const host = value => this.hostReference(value);
-    const atom = value => {
-      if (value === undefined) return {kind: 'undefined'};
-      if (value === null) return {kind: 'null'};
-      switch (typeof value) {
-        case 'boolean': return {kind: 'bool', value};
-        case 'number': return {kind: 'number', value: numberBits(value)};
-        case 'string': return {kind: 'string', value: string(value)};
-        case 'function': {
-          const id = this.registration.functionIds.get(value);
-          return id === undefined ? host(value) : {kind: 'builtinFunction', value: id};
-        }
-        case 'object': {
-          const prototype = Object.getPrototypeOf(value);
-          if (!(Array.isArray(value) || value instanceof Map || value instanceof Set || value instanceof Date || errorKind(value) || prototype === Object.prototype || this.registration.prototypeIds.has(prototype))) return host(value);
-          let id = this.ids.get(value);
-          if (id === undefined) {
-            id = this.objects.length; if (id >= 1_000_000) budget(); this.objects.push(value); this.ids.set(value, id);
-          }
-          if (!seen.has(id)) { seen.add(id); pending.push([id, value]); }
-          return {kind: 'ref', value: id};
-        }
-        default: return host(value);
-      }
-    };
-    const root = atom(this.root), argumentsValue = values.map(atom);
-    // Detaching an array does not detach references that the caller still holds.
-    for (const object of this.objects) atom(object);
-    while (pending.length) {
-      const [id, value] = pending.pop(), properties = [];
-      for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(value))) {
-        if (Array.isArray(value) && key === 'length') {
-          if (descriptor.writable) continue;
-        }
-        if (!Object.hasOwn(descriptor, 'value')) {
-          if(errorKind(value)&&errorDiagnostics.has(key))continue; // Host-generated lazy stack accessors stay local.
-          throw new TypeError('Accessor properties require an explicit public model codec');
-        }
-        if (++propertiesCount > 8_000_000) budget();
-        properties.push({key: string(key), value: atom(descriptor.value), flags:
-          (descriptor.enumerable ? 1 : 0) | (descriptor.writable ? 2 : 0) | (descriptor.configurable ? 4 : 0)});
-      }
-      if (value instanceof Map) {
-        const entries = [];
-        for (const [key, item] of Map.prototype.entries.call(value)) {
-          propertiesCount += 2; if (propertiesCount > 8_000_000) budget();
-          entries.push([atom(key), atom(item)]);
-        }
-        store(id, {kind: 'map', entries, properties});
-      } else if (value instanceof Set) {
-        const values = [];
-        for (const item of Set.prototype.values.call(value)) {
-          if (++propertiesCount > 8_000_000) budget(); values.push(atom(item));
-        }
-        store(id, {kind:'set', values, properties});
-      }
-      else if (value instanceof Date) store(id, {kind: 'date', milliseconds: numberBits(Date.prototype.getTime.call(value)), properties});
-      else if (errorKind(value)) store(id,{kind:'error',errorType:errorKind(value),properties});
-      else if (Array.isArray(value)) store(id, {kind: 'array', length: value.length, properties});
-      else {
-        const prototype = this.registration.prototypeIds.get(Object.getPrototypeOf(value));
-        store(id, prototype === undefined ? {kind: 'object', properties} : {kind: 'instance', prototype, properties});
-      }
-    }
-    const appended=this.strings.slice(baseline.strings.length).map(units);
-    this.graph = {version: 1, root, strings: delta ? baseline.strings.concat(appended) : this.strings.map(units), nodes};
-    return {graph: this.graph, values: argumentsValue, ...(delta?{delta:{stringsStart:baseline.strings.length,strings:appended,nodesStart:baseline.nodes.length,nodes:changes.sort((a,b)=>a[0]-b[0])}}:{})};
+    return snapshotGraph(this, values, delta);
   }
 }

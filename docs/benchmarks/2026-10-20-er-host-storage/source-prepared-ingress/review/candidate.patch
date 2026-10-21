@@ -1,0 +1,533 @@
+--- a/crates/pele/src/compat/diagrams/sankey/public_model.rs
++++ b/crates/pele/src/compat/diagrams/sankey/public_model.rs
+@@ -238,11 +238,23 @@
+     }
+     stored_field(reader, id, name)
+ }
+-fn string<R: CapturedRead>(reader: &mut R, atom: &Atom) -> Result<String, PeleError> {
++fn string<R: CapturedRead>(
++    reader: &mut R,
++    atom: &Atom,
++    source: Option<&dyn crate::compat::public::source_input::LogicalCapturedText>,
++) -> Result<String, PeleError> {
+     let Atom::String(id) = atom else {
+         return Err(captured_error("Expected a public string"));
+     };
+     let length = reader.string_length(*id)? as usize;
++    // Only imported_source pairs this private policy with the exact same
++    // immutable candidate reader. Public/custom CapturedRead implementations
++    // always retain strict chunk/length/surrogate validation below.
++    if let Some(source) = source {
++        if let Some(text) = source.original_utf8(*id)? {
++            return Ok(text.to_owned());
++        }
++    }
+     let mut text = String::with_capacity(length);
+     let mut seen = 0usize;
+     let mut high = None;
+@@ -280,12 +292,16 @@
+     }
+     Ok(text)
+ }
+-fn optional_text<R: CapturedRead>(reader: &mut R, key: &str) -> Result<Option<String>, PeleError> {
++fn optional_text<R: CapturedRead>(
++    reader: &mut R,
++    key: &str,
++    source: Option<&dyn crate::compat::public::source_input::LogicalCapturedText>,
++) -> Result<Option<String>, PeleError> {
+     match root_field(reader, key)? {
+         None => Ok(None),
+         Some(value) => match value.borrow() {
+             Atom::Undefined | Atom::Null => Ok(None),
+-            atom => string(reader, atom).map(Some),
++            atom => string(reader, atom, source).map(Some),
+         },
+     }
+ }
+@@ -376,6 +392,20 @@
+     imported_from(&mut ArenaRead::new(graph))
+ }
+ pub(crate) fn imported_from<R: CapturedRead>(reader: &mut R) -> Result<SankeyModel, PeleError> {
++    imported_with_text(reader, None)
++}
++fn imported_source(
++    candidate: &super::source_store::SourceCandidate<'_>,
++) -> Result<SankeyModel, PeleError> {
++    imported_with_text(
++        &mut crate::compat::public::source_input::CapturedLogical(candidate),
++        Some(candidate),
++    )
++}
++fn imported_with_text<R: CapturedRead>(
++    reader: &mut R,
++    text_source: Option<&dyn crate::compat::public::source_input::LogicalCapturedText>,
++) -> Result<SankeyModel, PeleError> {
+     let mut scratch: [PropertyPrefix<R::Value>; PROPERTY_CHUNK] =
+         std::array::from_fn(|_| PropertyPrefix::default());
+     let array_nodes = array(reader, "nodes", &mut scratch)?;
+@@ -405,7 +435,7 @@
+             let value = fields[0]
+                 .as_ref()
+                 .ok_or_else(|| invalid("Sankey node ID must be a string"))?;
+-            let label = string(reader, value.borrow())?;
++            let label = string(reader, value.borrow(), text_source)?;
+             reserve_text(&mut text_bytes, label.len().saturating_mul(2))?;
+             labels.insert(id, label.clone());
+             label
+@@ -462,9 +492,9 @@
+         diagram_type: DiagramType::Sankey,
+         nodes,
+         links,
+-        title: optional_text(reader, "title")?,
+-        acc_title: optional_text(reader, "accTitle")?,
+-        acc_descr: optional_text(reader, "accDescr")?,
++        title: optional_text(reader, "title", text_source)?,
++        acc_title: optional_text(reader, "accTitle", text_source)?,
++        acc_descr: optional_text(reader, "accDescr", text_source)?,
+     })
+ }
+ fn node(out: &mut impl InitialWriter, node: &SankeyNode) -> Result<u32, PeleError> {
+@@ -1014,10 +1044,7 @@
+             unreachable!("paired source ingress");
+         };
+         let candidate = graph.candidate(&input).expect("admitted source identity");
+-        let model = imported_from(&mut crate::compat::public::source_input::CapturedLogical(
+-            &candidate,
+-        ))
+-        .map(Projection::Legacy);
++        let model = imported_source(&candidate).map(Projection::Legacy);
+         graph.adopt_overlay(input);
+         self.model = model;
+     }
+--- a/crates/pele/src/compat/diagrams/sankey/source_store.rs
++++ b/crates/pele/src/compat/diagrams/sankey/source_store.rs
+@@ -1444,6 +1444,30 @@
+         self.patches.clear();
+     }
+ }
++impl crate::compat::public::source_input::LogicalCapturedText for SourceCandidate<'_> {
++    fn string_equals(&self, id: u32, text: &str) -> Result<bool, PeleError> {
++        let id = id as usize;
++        if id >= self.input.string_count {
++            return Err(graph_read::invalid());
++        }
++        if let Some(value) = self.input.strings.get(&id) {
++            return Ok(value.is(text));
++        }
++        let entry = self.base.catalog.get(id).ok_or_else(graph_read::invalid)?;
++        Ok(self.base.text(&entry.text) == text)
++    }
++    fn original_utf8(&self, id: u32) -> Result<Option<&str>, PeleError> {
++        let id = id as usize;
++        if id >= self.input.string_count {
++            return Err(graph_read::invalid());
++        }
++        if self.input.strings.contains_key(&id) {
++            return Ok(None);
++        }
++        let entry = self.base.catalog.get(id).ok_or_else(graph_read::invalid)?;
++        Ok(Some(self.base.text(&entry.text)))
++    }
++}
+ impl PublicGraphRead for SourceCandidate<'_> {
+     fn extent(&self) -> Extent {
+         Extent {
+--- a/crates/pele/src/compat/public/captured_transport.rs
++++ b/crates/pele/src/compat/public/captured_transport.rs
+@@ -143,6 +143,7 @@
+ }
+ /// Canonical observed slots have no malformed byte encodings. Keep the original
+ /// binary API's parser and its physical-length checks for actual byte input.
++#[cfg(feature = "web-host-sankey")]
+ pub fn admit_observed<S: AdmissionRead>(
+     store: &mut S,
+     metadata_bytes: usize,
+--- a/crates/pele/src/compat/public/engine.rs
++++ b/crates/pele/src/compat/public/engine.rs
+@@ -1209,7 +1209,7 @@
+         let input = super::source_input::BorrowedOverlay::decode(bytes)?;
+         let revision = self.revision;
+         let registration = &self.registration;
+-        let mut ingress = registration
++        let ingress = registration
+             .codec
+             .source_ingress(&mut self.state)
+             .ok_or_else(|| {
+@@ -1220,17 +1220,10 @@
+         }
+         // No replacement maps, UTF16 vectors, or Node/Atom vectors are
+         // allocated until complete virtual decoder allocation gates pass.
+-        let input = ingress.prepare(input)?;
++        let prepared = ingress.prepare(input)?;
+         let mut next = revision;
+-        ingress.with_candidate(&input, &mut |candidate| {
+-            // Full virtual decode precedes stale revision/schema, just as the
+-            // complete binary decoder does. No receipt skips these predicates.
+-            super::captured_transport::admit_observed(
+-                &mut super::graph_read::ReadAdapter(candidate),
+-                0,
+-                super::DEFAULT_BINARY_BUDGET,
+-            )?;
+-            if input.revision != revision {
++        let admitted = prepared.admit(&mut |candidate| {
++            if candidate.revision() != revision {
+                 return Err(PeleError::new(
+                     "Stale public model revision",
+                     ErrorCode::Semantic,
+@@ -1240,11 +1233,12 @@
+                 PeleError::new("Public model revision exhausted", ErrorCode::Limit)
+             })?;
+             let compiled = registration.compiled_schema()?;
+-            super::graph_read::validate_schema(candidate, registration.schema, compiled)?;
+-            // Preserve the module's apply-time structural admission as well.
+-            super::captured_admission::validate(&mut super::graph_read::ReadAdapter(candidate))
++            // The exact candidate already passed structure before revision.
++            // Reuse that scoped proof for registration and module structure;
++            // schema IDs still run here, after compilation, in original order.
++            candidate.validate_schema(compiled)
+         })?;
+-        ingress.commit(input);
++        admitted.commit();
+         self.revision = next;
+         Ok(())
+     }
+--- a/crates/pele/src/compat/public/source_input.rs
++++ b/crates/pele/src/compat/public/source_input.rs
+@@ -234,29 +234,83 @@
+     pub(crate) fn layout_id(&self) -> Option<u64> {
+         self.owner.layout_id()
+     }
+-    pub(crate) fn prepare(&self, input: BorrowedOverlay<'_>) -> Result<SourceOverlay, PeleError> {
+-        self.owner.prepare(input)
+-    }
+-    pub(crate) fn with_candidate(
+-        &mut self,
+-        input: &SourceOverlay,
+-        visit: &mut dyn FnMut(&dyn PublicGraphRead) -> Result<(), PeleError>,
++    pub(crate) fn prepare(
++        self,
++        input: BorrowedOverlay<'_>,
++    ) -> Result<PreparedSourceIngress<'a>, PeleError> {
++        let input = self.owner.prepare(input)?;
++        Ok(PreparedSourceIngress {
++            ingress: self,
++            input,
++        })
++    }
++}
++
++/// Allocation admission cannot be detached from its exact overlay or owner.
++/// The owner borrow excludes accepted-state mutation until this value commits
++/// or drops. Only the provenance-filtered ingress can construct it.
++pub(crate) struct PreparedSourceIngress<'a> {
++    ingress: SourceIngress<'a>,
++    input: SourceOverlay,
++}
++impl<'a> PreparedSourceIngress<'a> {
++    pub(crate) fn admit(
++        self,
++        visit: &mut dyn FnMut(&StructuredSourceInput<'_>) -> Result<(), PeleError>,
++    ) -> Result<AdmittedSourceIngress<'a>, PeleError> {
++        self.ingress
++            .owner
++            .with_candidate(&self.input, &mut |reader| {
++                // prepare already performed exact canonical size and decoder
++                // allocation gates. This remains the FIRST structural traversal,
++                // before stale revision, schema compilation or schema IDs.
++                super::captured_admission::validate(&mut super::graph_read::ReadAdapter(reader))?;
++                visit(&StructuredSourceInput {
++                    reader,
++                    revision: self.input.revision,
++                })
++            })?;
++        Ok(AdmittedSourceIngress(self))
++    }
++}
++pub(crate) struct AdmittedSourceIngress<'a>(PreparedSourceIngress<'a>);
++impl AdmittedSourceIngress<'_> {
++    pub(crate) fn commit(self) {
++        self.0.ingress.owner.commit_admitted(self.0.input);
++    }
++}
++
++/// Scoped to one immutable candidate visit. No caller can replace the reader,
++/// edit the overlay, mint this proof or persist it across the owner commit.
++/// It authorizes only repeated structure checks, never schema-ID admission.
++pub(crate) struct StructuredSourceInput<'a> {
++    reader: &'a dyn PublicGraphRead,
++    revision: u64,
++}
++impl StructuredSourceInput<'_> {
++    pub(crate) fn revision(&self) -> u64 {
++        self.revision
++    }
++    pub(super) fn validate_schema(
++        &self,
++        compiled: &super::schema::CompiledSchema,
+     ) -> Result<(), PeleError> {
+-        self.owner.with_candidate(input, visit)
+-    }
+-    pub(crate) fn commit(self, input: SourceOverlay) {
+-        self.owner.commit_admitted(input);
+-    }
+-}
+-
+-/// Storage-only adapter for an admitted borrowed logical candidate. It keeps the
+-/// existing eager Sankey importer without constructing a ModelGraph.
+-pub(crate) struct CapturedLogical<'a>(pub &'a dyn PublicGraphRead);
+-impl CapturedLogical<'_> {
+-    fn string_is(&self, id: u32, text: &str) -> Result<bool, PeleError> {
++        super::captured_admission::validate_schema_ids(
++            &mut super::graph_read::ReadAdapter(self.reader),
++            compiled.methods(),
++            compiled.prototypes(),
++        )
++    }
++}
++
++/// Optional source-text access does not change logical field/import policy.
++/// Implementations must return the same text as string_chunks. Original valid
++/// UTF8 may be borrowed; replacement JsStrings retain strict UTF16 decoding.
++pub(crate) trait LogicalCapturedText: PublicGraphRead {
++    fn string_equals(&self, id: u32, text: &str) -> Result<bool, PeleError> {
+         let mut expected = text.encode_utf16();
+         let mut same = true;
+-        self.0.string_chunks(id as usize, &mut |chunk| {
++        self.string_chunks(id as usize, &mut |chunk| {
+             for &unit in chunk {
+                 if expected.next() != Some(unit) {
+                     same = false;
+@@ -266,8 +320,15 @@
+         })?;
+         Ok(same && expected.next().is_none())
+     }
+-}
+-impl CapturedRead for CapturedLogical<'_> {
++    fn original_utf8(&self, _id: u32) -> Result<Option<&str>, PeleError> {
++        Ok(None)
++    }
++}
++
++/// Storage-only adapter for an admitted borrowed logical candidate. It keeps the
++/// existing eager Sankey importer without constructing a ModelGraph.
++pub(crate) struct CapturedLogical<'a, R: LogicalCapturedText + ?Sized>(pub &'a R);
++impl<R: LogicalCapturedText + ?Sized> CapturedRead for CapturedLogical<'_, R> {
+     type Value = Atom;
+     fn root(&self) -> Atom {
+         self.0.root()
+@@ -317,7 +378,7 @@
+                 used = properties.len();
+                 for p in properties {
+                     for (name, value) in names.iter().zip(out.iter_mut()) {
+-                        if value.is_none() && self.string_is(p.key, name)? {
++                        if value.is_none() && self.0.string_equals(p.key, name)? {
+                             *value = Some(p.value.clone());
+                             remaining -= 1;
+                         }
+--- a/crates/pele/tests/public_source_ingress.rs
++++ b/crates/pele/tests/public_source_ingress.rs
+@@ -191,6 +191,24 @@
+         expected_error
+     );
+     assert_eq!(actual.revision(), 0);
++    // Unknown schema IDs remain later than stale revision; with a current
++    // revision, root method membership precedes the detached prototype.
++    let mut both = wrong_schema.clone();
++    both[28] = 7;
++    both[29..33].copy_from_slice(&999u32.to_le_bytes());
++    let mut invalid = decode_binary_exchange(&canonical, DEFAULT_BINARY_BUDGET)
++        .unwrap()
++        .graph;
++    invalid.root = Atom::BuiltinFunction(999);
++    let schema_error = expected.apply(0, invalid.clone()).unwrap_err();
++    assert_eq!(actual.apply_source_input(&both).unwrap_err(), schema_error);
++    both[16..24].copy_from_slice(&999u64.to_le_bytes());
++    assert_eq!(
++        actual.apply_source_input(&both).unwrap_err(),
++        expected.apply(999, invalid).unwrap_err()
++    );
++    assert_eq!(actual.revision(), 0);
++    assert_eq!(bytes(&actual), bytes(&expected));
+     let mut locked = original.clone();
+     let r = root(&locked);
+     let Atom::Ref(nodes) = field(&mut locked, r, "nodes").clone() else {
+@@ -443,3 +461,179 @@
+             .is_ok());
+     }
+ }
++
++#[test]
++fn source_ingress_text_and_catalog_key_edits_keep_strict_conversion_and_first_match() {
++    let source = "---\ntitle: Original 漢😀 title\n---\nsankey\nA,B,5\nA,C,2";
++    let engine = PublicEngine::with_builtins();
++    let mut actual = engine.parse(source, &Default::default()).unwrap();
++    let mut expected = engine.parse(source, &Default::default()).unwrap();
++    let identity = actual.source_ingress_identity().unwrap();
++    let original = expected.snapshot().unwrap();
++    let id_key = original.strings.iter().position(|s| s.is("id")).unwrap();
++    let index_key = original.strings.iter().position(|s| s.is("index")).unwrap();
++    let Atom::String(label) = field(&mut original.clone(), 0, "id").clone() else {
++        panic!()
++    };
++    let mut cases = vec![original.clone()];
++    for text in [
++        JsString::from("Replacement 漢😀"),
++        JsString(vec![0xd800]),
++        JsString(vec![0xdc00]),
++        JsString::from(""),
++    ] {
++        let mut graph = original.clone();
++        graph.strings[label as usize] = text;
++        cases.push(graph);
++    }
++    // Original key ID now names another field. A new string ID named id and
++    // duplicate later field must respect first matching own-property order.
++    let mut shifted = original.clone();
++    shifted.strings[id_key] = JsString::from("ignored 漢😀");
++    let new_id_key = shifted.strings.len() as u32;
++    shifted.strings.push(JsString::from("id"));
++    for node in &mut shifted.nodes {
++        if let Some(value) = node
++            .properties()
++            .iter()
++            .find(|p| p.key == id_key as u32)
++            .map(|p| p.value.clone())
++        {
++            node.properties_mut().push(Property {
++                key: new_id_key,
++                value,
++                flags: 7,
++            });
++        }
++    }
++    shifted.nodes[0].properties_mut().push(Property {
++        key: new_id_key,
++        value: Atom::Number(7.),
++        flags: 7,
++    });
++    cases.push(shifted);
++    // Changing a different original key INTO id makes its numeric value the
++    // first actual ID; no source-key cache may keep the previous interpretation.
++    let mut swapped = original.clone();
++    swapped.strings[id_key] = JsString::from("index");
++    swapped.strings[index_key] = JsString::from("id");
++    cases.push(swapped);
++    cases.push(original.clone());
++    for (graph, succeeds) in cases
++        .into_iter()
++        .zip([true, true, false, false, true, true, false, true])
++    {
++        let revision = actual.revision();
++        expected.apply(revision, graph).unwrap();
++        actual
++            .apply_source_input(&ingress(&expected, identity, revision))
++            .unwrap();
++        assert_eq!(bytes(&actual), bytes(&expected));
++        let a = actual.render(&Default::default(), &mut MetricsResources);
++        let b = expected.render(&Default::default(), &mut MetricsResources);
++        assert_eq!(a, b);
++        assert_eq!(a.is_ok(), succeeds);
++        assert_eq!(bytes(&actual), bytes(&expected));
++    }
++    assert!(actual
++        .render(&Default::default(), &mut MetricsResources)
++        .is_ok());
++}
++
++#[test]
++fn source_ingress_original_utf8_repetition_preserves_latent_text_limit_and_repair() {
++    // Compact source/input, intentionally repeated node identity: imported
++    // owned labels exceed the existing128MiB budget, without a giant graph.
++    let label = "x".repeat(65536);
++    let source = format!("sankey\n{label},B,1");
++    let engine = PublicEngine::with_builtins();
++    let limits = ParseLimits {
++        source: Some(SourceLimit::Number(1_000_000.)),
++        max_edges: None,
++    };
++    let mut actual = engine
++        .parse_with_limits(&source, &Default::default(), limits)
++        .unwrap();
++    let mut expected = engine
++        .parse_with_limits(&source, &Default::default(), limits)
++        .unwrap();
++    let identity = actual.source_ingress_identity().unwrap();
++    let original = expected.snapshot().unwrap();
++    let mut graph = original.clone();
++    let r = root(&graph);
++    let Atom::Ref(nodes) = field(&mut graph, r, "nodes").clone() else {
++        panic!()
++    };
++    let Atom::Ref(links) = field(&mut graph, r, "links").clone() else {
++        panic!()
++    };
++    let mut properties = Vec::new();
++    for i in 0..2049 {
++        let key = graph.strings.len() as u32;
++        graph.strings.push(JsString::from(i.to_string().as_str()));
++        properties.push(Property {
++            key,
++            value: Atom::Ref(0),
++            flags: 7,
++        });
++    }
++    graph.nodes[nodes as usize] = Node::Array {
++        length: 2049,
++        properties,
++    };
++    graph.nodes[links as usize] = Node::Array {
++        length: 0,
++        properties: vec![],
++    };
++    expected.apply(0, graph).unwrap();
++    actual
++        .apply_source_input(&ingress(&expected, identity, 0))
++        .unwrap();
++    assert_eq!(actual.revision(), 1);
++    let a = actual
++        .render(&Default::default(), &mut MetricsResources)
++        .unwrap_err();
++    let b = expected
++        .render(&Default::default(), &mut MetricsResources)
++        .unwrap_err();
++    assert_eq!(a, b);
++    assert_eq!(a.code, ErrorCode::Limit);
++    assert_eq!(
++        a.message,
++        "Sankey imported text exceeds native allocation budget"
++    );
++    assert_eq!(bytes(&actual), bytes(&expected));
++    let revision = actual.revision();
++    expected.apply(revision, original).unwrap();
++    actual
++        .apply_source_input(&ingress(&expected, identity, revision))
++        .unwrap();
++    // Do not render the enormous source label: a successful alias-preserving
++    // helper proves repaired native state without expensive SVG construction.
++    let call = MethodCall {
++        method: MethodId(1),
++        receiver: actual.snapshot().unwrap().root,
++        arguments: vec![Atom::String(
++            actual
++                .snapshot()
++                .unwrap()
++                .strings
++                .iter()
++                .position(|s| s.is(&label))
++                .unwrap() as u32,
++        )],
++    };
++    let revision = actual.revision();
++    let a = actual
++        .invoke(revision, call.clone(), &mut MetricsResources)
++        .unwrap();
++    let b = expected
++        .invoke(revision, call, &mut MetricsResources)
++        .unwrap();
++    assert_eq!(
++        serde_json::to_vec(&a.result).unwrap(),
++        serde_json::to_vec(&b.result).unwrap()
++    );
++    assert!(a.result.is_ok());
++    assert_eq!(bytes(&actual), bytes(&expected));
++}

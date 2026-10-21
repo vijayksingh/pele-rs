@@ -2,6 +2,9 @@
 mod db;
 mod graph;
 mod json;
+mod json_budget;
+mod live_phase;
+pub(crate) use live_phase::{render_detached, UsecaseDetachedInput};
 mod lexer;
 mod model;
 mod parser;

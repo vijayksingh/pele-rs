@@ -11,6 +11,72 @@ use crate::compat::{
     text::{layout_label, measure},
     Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
+pub(super) trait PhaseInput: layout::Input {
+    fn metadata(&mut self, key: &'static str) -> Result<Option<String>, Self::Error>;
+    fn styles(&mut self, node: &Self::Node, slot: usize) -> Result<Vec<String>, Self::Error>;
+    fn text(
+        &mut self,
+        node: &Self::Node,
+        key: &'static str,
+        slot: usize,
+    ) -> Result<Option<String>, Self::Error>;
+    fn section(&mut self, node: &Self::Node) -> Result<bool, Self::Error>;
+}
+struct Typed<'a>(&'a TreemapModel);
+impl<'a> layout::Input for Typed<'a> {
+    type Node = &'a super::TreemapNode;
+    type Error = PeleError;
+    fn roots(&mut self) -> Result<Vec<Self::Node>, PeleError> {
+        Ok(self.0.roots.iter().collect())
+    }
+    fn children(&mut self, node: &Self::Node) -> Result<Vec<Self::Node>, PeleError> {
+        Ok(node
+            .children
+            .as_ref()
+            .map(|v| v.iter().collect())
+            .unwrap_or_default())
+    }
+    fn initial_value(&mut self, node: &Self::Node) -> Result<f64, PeleError> {
+        Ok(if node.children.is_none() {
+            node.value
+                .filter(|v| v.is_finite() && *v > 0.)
+                .unwrap_or(0.)
+        } else {
+            0.
+        })
+    }
+}
+impl PhaseInput for Typed<'_> {
+    fn metadata(&mut self, key: &'static str) -> Result<Option<String>, PeleError> {
+        Ok(match key {
+            "title" => self.0.title.clone(),
+            "accTitle" => self.0.acc_title.clone(),
+            _ => self.0.acc_descr.clone(),
+        })
+    }
+    fn styles(&mut self, node: &Self::Node, _: usize) -> Result<Vec<String>, PeleError> {
+        Ok(node
+            .css_compiled_styles
+            .as_deref()
+            .cloned()
+            .unwrap_or_default())
+    }
+    fn text(
+        &mut self,
+        node: &Self::Node,
+        key: &'static str,
+        _: usize,
+    ) -> Result<Option<String>, PeleError> {
+        Ok(if key == "name" {
+            Some(node.name.clone())
+        } else {
+            node.class_selector.clone()
+        })
+    }
+    fn section(&mut self, node: &Self::Node) -> Result<bool, PeleError> {
+        Ok(node.children.is_some())
+    }
+}
 fn option(c: Option<&Object>, key: &str, fallback: f64, min: f64, max: f64) -> f64 {
     match c.and_then(|c| c.get(key)) {
         Some(Value::Number(n)) if *n >= min => n.js_min(max),
@@ -78,6 +144,14 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(m), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let tiny = round(size * 0.75);
@@ -104,17 +178,13 @@ pub(super) fn render(
         _ => ",",
     };
     let format = Formatter::new(spec);
-    let boxes = layout::layout(
-        &m.roots,
-        width,
-        height,
-        option(conf, "padding", 4., 0., 200.),
-    );
+    let boxes = layout::layout(m, width, height, option(conf, "padding", 4., 0., 200.))?;
     let room = o
         .max_width
         .filter(|v| *v > 0.)
         .map_or(4000., |v| 80_f64.js_max(v - 2. * o.padding.unwrap_or(8.)));
-    let title = layout_label(m.title.as_deref(), false, r, o, size, room, 1)?;
+    let title_text = m.metadata("title")?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 8.
     } else {
@@ -123,25 +193,23 @@ pub(super) fn render(
     let left = pad + 0_f64.js_max((title.width - width) / 2.);
     let top = pad + title_height;
     let (mut sections, mut leaves) = (String::new(), String::new());
-    for b in boxes {
+    for (slot, b) in boxes.into_iter().enumerate() {
         let node = b.node;
-        let style = resolve_style(
-            node.css_compiled_styles
-                .as_deref()
-                .map(Vec::as_slice)
-                .unwrap_or(&[]),
-        );
+        let style = resolve_style(&m.styles(&node, slot)?);
         let color = series_color(b.series);
         let x = left + b.x;
         let y = top + b.y;
-        let name = decode_entities(&node.name)?;
+        let name = decode_entities(&m.text(&node, "name", slot)?.unwrap_or_default())?;
         let name = name.trim_matches(space);
         let value = if show {
             format.format(b.value)
         } else {
             String::new()
         };
-        let group = format!("data-id=\"{}\">", esc_text(&node.name)?);
+        let group = format!(
+            "data-id=\"{}\">",
+            esc_text(&m.text(&node, "name", slot)?.unwrap_or_default())?
+        );
         let rect = format!(
             "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"{color}\"",
             num(x),
@@ -149,8 +217,7 @@ pub(super) fn render(
             num(b.w),
             num(b.h)
         );
-        let classes = class_names(node.class_selector.as_deref().unwrap_or(""));
-        if node.children.is_some() {
+        if m.section(&node)? {
             let mut text = String::new();
             if b.h >= 28. {
                 let room = b.w - 16.;
@@ -192,6 +259,11 @@ pub(super) fn render(
             } else {
                 " fill-opacity=\"0.12\""
             };
+            let classes = class_names(
+                m.text(&node, "classSelector", slot)?
+                    .as_deref()
+                    .unwrap_or(""),
+            );
             sections.push_str(&format!("<g class=\"pele-node pele-section{classes}\" {group}{rect}{tint} stroke=\"{color}\"{}/>{text}</g>",style.shape));
             continue;
         }
@@ -225,6 +297,11 @@ pub(super) fn render(
                 );
             }
         }
+        let classes = class_names(
+            m.text(&node, "classSelector", slot)?
+                .as_deref()
+                .unwrap_or(""),
+        );
         leaves.push_str(&format!(
             "<g class=\"pele-node pele-leaf{classes}\" {group}{rect}{}/>{text}</g>",
             style.shape
@@ -256,14 +333,16 @@ pub(super) fn render(
             )
         }
     );
+    let acc_title = m.metadata("accTitle")?;
+    let acc_descr = m.metadata("accDescr")?;
     let svg = svg::document(
         "treemap",
         total_width,
         total_height,
         size,
         o,
-        m.acc_title.as_deref(),
-        m.acc_descr.as_deref(),
+        acc_title.as_deref(),
+        acc_descr.as_deref(),
         &content,
     )?;
     Ok(Rendered {

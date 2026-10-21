@@ -115,16 +115,9 @@ fn register(
     Ok(())
 }
 pub fn populate(a: Ast, title: Option<&str>) -> Result<ArchitectureModel, PeleError> {
-    let mut m = ArchitectureModel {
-        title: title.map(str::to_string),
-        acc_title: a.acc_title.filter(|s| !s.is_empty()),
-        acc_descr: a.acc_descr.filter(|s| !s.is_empty()),
-        nodes: vec![],
-        groups: vec![],
-        edges: vec![],
-        layout_hints: vec![],
-        registered: vec![],
-    };
+    let mut m = ArchitectureModel::empty(title);
+    m.acc_title = a.acc_title.filter(|s| !s.is_empty());
+    m.acc_descr = a.acc_descr.filter(|s| !s.is_empty());
     if let Some(t) = a.title.filter(|s| !s.is_empty()) {
         m.title = Some(t)
     }
@@ -199,4 +192,20 @@ pub fn populate(a: Ast, title: Option<&str>) -> Result<ArchitectureModel, PeleEr
         m.layout_hints.push(h)
     }
     Ok(m)
+}
+
+impl ArchitectureModel {
+    /// Empty class state shared by parser population and native construction.
+    pub(super) fn empty(title: Option<&str>) -> Self {
+        Self {
+            title: title.map(str::to_owned),
+            acc_title: None,
+            acc_descr: None,
+            nodes: vec![],
+            groups: vec![],
+            edges: vec![],
+            layout_hints: vec![],
+            registered: vec![],
+        }
+    }
 }

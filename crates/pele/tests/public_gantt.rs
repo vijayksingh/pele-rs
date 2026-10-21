@@ -41,6 +41,189 @@ fn reference(value: &Atom) -> u32 {
         panic!("object reference expected")
     }
 }
+
+#[test]
+fn gantt_construction_preserves_complete_native_arena_representation() {
+    // Typed adaptation retains its original storage layout. Direct parsing may
+    // choose fresh opaque IDs; freeze that layout separately, never renumber a
+    // live/imported graph. The independent corpus checks Pele behavior.
+    let fixture: Json = serde_json::from_str(include_str!(
+        "../../../fixtures/pele/gantt-construction.json"
+    ))
+    .unwrap();
+    let typed_engine = Engine::with_builtins();
+    let public_engine = PublicEngine::with_builtins();
+    for case in fixture["cases"].as_array().unwrap() {
+        let options: RenderOptions = serde_json::from_value(case["options"].clone()).unwrap();
+        let source = case["source"].as_str().unwrap();
+        let typed = typed_engine.parse(source, &options.parse).unwrap();
+        let adapted = PublicDocument::from_module(
+            Gantt,
+            typed.model::<GanttModel>().unwrap(),
+            typed.config().clone(),
+        )
+        .unwrap();
+        let direct = public_engine.parse(source, &options.parse).unwrap();
+        for (document, expected) in [(adapted, "graphSHA256"), (direct, "directGraphSHA256")] {
+            let graph = document.snapshot().unwrap();
+            let binary = pele::compat::public::encode_binary_exchange(
+                0,
+                &graph,
+                b"",
+                pele::compat::public::DEFAULT_BINARY_BUDGET,
+            )
+            .unwrap();
+            assert_eq!(graph.nodes.len(), case["nodes"].as_u64().unwrap() as usize);
+            assert_eq!(
+                graph.strings.len(),
+                case["strings"].as_u64().unwrap() as usize
+            );
+            assert_eq!(binary.len(), case["binaryBytes"].as_u64().unwrap() as usize);
+            assert_eq!(
+                format!("{:x}", Sha256::digest(&binary)),
+                case[expected].as_str().unwrap(),
+                "complete arena differs for {} {expected}",
+                case["id"]
+            );
+        }
+    }
+}
+#[test]
+fn typed_gantt_adaptation_preserves_dates_missing_fields_and_owned_records() {
+    let mut model = GanttModel::new(Some("Typed schedule"), String::new());
+    model.add_section("Section".into());
+    model
+        .add_task("First".into(), ":a,2024-01-01,1d".into())
+        .unwrap();
+    model
+        .add_task("Second".into(), ":b,after a,2d".into())
+        .unwrap();
+    let payload = 0x7ff8_0000_0000_0042;
+    model.tasks[0].start_time = Some(f64::from_bits(payload));
+    model.tasks[0].end_time = Some(-0.0);
+    model.tasks[0].render_end_time = Some(-0.0);
+    model.tasks[0].raw.start = None;
+    model.tasks[0].classes = vec!["startTime".into(), "Café 😀".into(), "startTime".into()];
+    model.tasks[1].start_time = None;
+    model.tasks[1].end_time = None;
+    model.tasks[1].render_end_time = None;
+    model.tasks[1].prev_task_id = Some("a".into());
+
+    let document = PublicDocument::from_module(Gantt, &model, Object::default()).unwrap();
+    assert_eq!(document.revision(), 0);
+    let graph = document.snapshot().unwrap();
+    let root = reference(&graph.root);
+    let tasks = array(&graph, reference(field(&graph, root, "tasks")));
+    assert_eq!(tasks.len(), 2);
+    let first = reference(&tasks[0]);
+    let second = reference(&tasks[1]);
+    let by_id = reference(field(&graph, root, "byId"));
+    assert_eq!(reference(&mapped(&graph, by_id, "a")), first);
+    assert_eq!(reference(&mapped(&graph, by_id, "b")), second);
+    let start = reference(field(&graph, first, "startTime"));
+    let end = reference(field(&graph, first, "endTime"));
+    let render_end = reference(field(&graph, first, "renderEndTime"));
+    assert_ne!(start, end);
+    assert_ne!(end, render_end, "equal Date values remain distinct objects");
+    assert_ne!(start, render_end);
+    for (id, expected) in [
+        // Fresh Date construction already clips invalid milliseconds to NaN.
+        // The typed input's payload must not be mistaken for a graph bit promise.
+        (start, f64::NAN.to_bits()),
+        (end, (-0.0_f64).to_bits()),
+        (render_end, (-0.0_f64).to_bits()),
+    ] {
+        let Node::Date {
+            milliseconds,
+            properties,
+        } = &graph.nodes[id as usize]
+        else {
+            panic!("typed milliseconds must produce a Date node");
+        };
+        assert_eq!(milliseconds.to_bits(), expected);
+        assert!(properties.is_empty());
+    }
+    assert_eq!(model.tasks[0].start_time.unwrap().to_bits(), payload);
+    assert!(matches!(
+        field(&graph, second, "startTime"),
+        Atom::Undefined
+    ));
+    assert!(matches!(field(&graph, second, "endTime"), Atom::Undefined));
+    assert!(matches!(field(&graph, second, "renderEndTime"), Atom::Null));
+    assert!(matches!(
+        field(&graph, first, "prevTaskId"),
+        Atom::Undefined
+    ));
+    assert_eq!(
+        graph
+            .text(field(&graph, second, "prevTaskId"))
+            .unwrap()
+            .well_formed()
+            .unwrap(),
+        "a"
+    );
+    let raw = reference(field(&graph, first, "raw"));
+    assert_eq!(keys(&graph, raw), ["data", "start", "end"]);
+    assert!(matches!(field(&graph, raw, "start"), Atom::Undefined));
+    assert_eq!(
+        graph
+            .text(field(&graph, raw, "data"))
+            .unwrap()
+            .well_formed()
+            .unwrap(),
+        ":a,2024-01-01,1d"
+    );
+    assert_eq!(
+        graph
+            .text(field(&graph, raw, "end"))
+            .unwrap()
+            .well_formed()
+            .unwrap(),
+        "1d"
+    );
+    let classes = reference(field(&graph, first, "classes"));
+    assert_eq!(
+        texts_of(&graph, classes),
+        ["startTime", "Café 😀", "startTime"]
+    );
+    for id in [first, second, raw] {
+        assert!(graph.nodes[id as usize]
+            .properties()
+            .iter()
+            .all(|p| p.flags == 7));
+    }
+
+    let encode = |graph: &ModelGraph| {
+        pele::compat::public::encode_binary_exchange(
+            0,
+            graph,
+            b"",
+            pele::compat::public::DEFAULT_BINARY_BUDGET,
+        )
+        .unwrap()
+    };
+    let bytes = encode(&graph);
+    let decoded = pele::compat::public::decode_binary_exchange(
+        &bytes,
+        pele::compat::public::DEFAULT_BINARY_BUDGET,
+    )
+    .unwrap();
+    assert_eq!(
+        encode(&decoded.graph),
+        bytes,
+        "binary preserves every retained ID and Date bit"
+    );
+    model.tasks[0].task = "Changed after adaptation".into();
+    model.tasks[0].classes.clear();
+    model.tasks[0].start_time = None;
+    assert_eq!(
+        encode(&document.snapshot().unwrap()),
+        bytes,
+        "document owns its records independently of typed input"
+    );
+    assert_eq!(document.revision(), 0);
+}
+
 fn string(g: &mut ModelGraph, text: &str) -> Atom {
     let id = g.strings.len() as u32;
     g.strings.push(JsString::from(text));

@@ -391,6 +391,12 @@ impl PublicDiagramModule for TreeView {
         let cache = imported(&graph);
         Ok(TreeViewPublicState { graph, cache })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &TreeViewPublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }
@@ -398,6 +404,14 @@ impl PublicDiagramModule for TreeView {
         s.cache = imported(&g);
         s.graph = g;
         Ok(())
+    }
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::tree_view())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::tree_view(
+            super::TreeViewDetachedInput::new(state.cache.as_ref().err().cloned()),
+        ))
     }
     fn render_public(
         &self,

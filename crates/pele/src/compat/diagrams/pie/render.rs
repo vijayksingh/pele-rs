@@ -57,12 +57,66 @@ fn slice(start: f64, end: f64, outer: f64, inner: f64) -> String {
         point(start, inner)
     )
 }
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Entry;
+    type Entries: AsRef<[Self::Entry]>;
+    type Text: AsRef<str>;
+    fn entries(&mut self) -> Result<Self::Entries, Self::Error>;
+    fn value(&mut self, entry: &Self::Entry) -> Result<f64, Self::Error>;
+    fn legend_label(&mut self, entry: &Self::Entry) -> Result<Self::Text, Self::Error>;
+    fn data_id(&mut self, entry: &Self::Entry) -> Result<Self::Text, Self::Error>;
+    fn title(&mut self) -> Result<Option<Self::Text>, Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<Self::Text>, Self::Error>;
+}
+struct Typed<'a>(&'a PieModel);
+impl<'a> PhaseInput for Typed<'a> {
+    type Error = PeleError;
+    type Entry = super::PieSection;
+    type Entries = &'a [super::PieSection];
+    type Text = std::borrow::Cow<'a, str>;
+    fn entries(&mut self) -> Result<Self::Entries, PeleError> {
+        Ok(&self.0.sections)
+    }
+    fn value(&mut self, entry: &Self::Entry) -> Result<f64, PeleError> {
+        Ok(entry.value)
+    }
+    fn legend_label(&mut self, entry: &Self::Entry) -> Result<Self::Text, PeleError> {
+        Ok(if self.0.show_data {
+            format!("{} [{}]", entry.label, js_num(entry.value)).into()
+        } else {
+            entry.label.clone().into()
+        })
+    }
+    fn data_id(&mut self, entry: &Self::Entry) -> Result<Self::Text, PeleError> {
+        Ok(entry.label.clone().into())
+    }
+    fn title(&mut self) -> Result<Option<Self::Text>, PeleError> {
+        Ok(self.0.title.as_deref().map(Into::into))
+    }
+    fn accessibility(&mut self, description: bool) -> Result<Option<Self::Text>, PeleError> {
+        Ok(if description {
+            self.0.acc_descr.as_deref()
+        } else {
+            self.0.acc_title.as_deref()
+        }
+        .map(Into::into))
+    }
+}
 pub(super) fn render(
     model: &PieModel,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(model), config, options, resources)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    model: &mut P,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let mut result = draw(model, config, options, resources, 120., false)?;
     let Some(available) = options.max_width.filter(|n| *n > 0.) else {
         return Ok(result);
@@ -81,14 +135,14 @@ pub(super) fn render(
     }
     Ok(result)
 }
-fn draw(
-    model: &PieModel,
+fn draw<P: PhaseInput>(
+    model: &mut P,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     radius: f64,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
     let get = |key: &str| {
         config
             .get("pie")
@@ -114,17 +168,17 @@ fn draw(
     } else {
         placed.as_str()
     };
-    let entries = &model.sections;
-    let sum: f64 = entries.iter().map(|s| s.value).sum();
+    let captured = model.entries()?;
+    let entries = captured.as_ref();
+    let mut sum = 0.;
+    for entry in entries {
+        sum += model.value(entry)?;
+    }
     let mut legend = Vec::new();
     for entry in entries {
-        let label = if model.show_data {
-            format!("{} [{}]", entry.label, js_num(entry.value))
-        } else {
-            entry.label.clone()
-        };
+        let label = model.legend_label(entry)?;
         legend.push(layout_label(
-            Some(&label),
+            Some(label.as_ref()),
             false,
             resources,
             options,
@@ -140,8 +194,9 @@ fn draw(
         .max_width
         .filter(|n| *n > 0.)
         .map_or(4000., |w| (w - 2. * pad).js_max(80.));
+    let title_text = model.title()?;
     let title = layout_label(
-        model.title.as_deref(),
+        title_text.as_ref().map(AsRef::as_ref),
         false,
         resources,
         options,
@@ -154,17 +209,16 @@ fn draw(
     } else {
         0.
     };
-    let shares: Vec<_> = entries
-        .iter()
-        .map(|s| {
-            let share = if sum > 0. { s.value / sum } else { 0. };
-            if share * 100. >= 1. && (share * 100.).round() != 0. {
-                share
-            } else {
-                0.
-            }
-        })
-        .collect();
+    let mut shares = Vec::with_capacity(entries.len());
+    for entry in entries {
+        let value = model.value(entry)?;
+        let share = if sum > 0. { value / sum } else { 0. };
+        shares.push(if share * 100. >= 1. && (share * 100.).round() != 0. {
+            share
+        } else {
+            0.
+        });
+    }
     let mut narrow = Vec::new();
     for share in &shares {
         let v = if *share == 0. || *share >= 0.5 {
@@ -237,7 +291,7 @@ fn draw(
         let end = angle + share * PI * 2.;
         slices.push_str(&format!(
             "<path class=\"pele-slice\" data-id=\"{}\" d=\"{}\" fill=\"{}\"/>",
-            esc_text(&entry.label)?,
+            esc_text(model.data_id(entry)?.as_ref())?,
             slice(angle, end, radius, inner),
             series_color(index)
         ));
@@ -300,7 +354,7 @@ fn draw(
     let mut legend_out = String::new();
     for (index, label) in legend.iter().enumerate() {
         let y = ly + index as f64 * 26. + 13.;
-        legend_out.push_str(&format!("<g class=\"pele-legend-item\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"12\" height=\"12\" rx=\"2\" fill=\"{}\"/>{}</g>",esc_text(&entries[index].label)?,num(lx),num(y-6.),series_color(index),label_svg(label,lx+20.+label.width/2.,y,"")))
+        legend_out.push_str(&format!("<g class=\"pele-legend-item\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"12\" height=\"12\" rx=\"2\" fill=\"{}\"/>{}</g>",esc_text(model.data_id(&entries[index])?.as_ref())?,num(lx),num(y-6.),series_color(index),label_svg(label,lx+20.+label.width/2.,y,"")))
     }
     let total_width = (width + 2. * pad).ceil();
     let total_height = (height + title_height + 2. * pad).ceil();
@@ -323,6 +377,8 @@ fn draw(
             js_num(small)
         ))
     }
+    let acc_title = model.accessibility(false)?;
+    let acc_descr = model.accessibility(true)?;
     Ok(Rendered {
         svg: svg::document(
             "pie",
@@ -330,8 +386,8 @@ fn draw(
             total_height,
             size,
             options,
-            model.acc_title.as_deref(),
-            model.acc_descr.as_deref(),
+            acc_title.as_ref().map(AsRef::as_ref),
+            acc_descr.as_ref().map(AsRef::as_ref),
             &content,
         )?,
         width: total_width,

@@ -840,10 +840,26 @@ fn invoke(g: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
     }
     Err(invalid("XYChart public method is unavailable").into())
 }
+fn construct_default() -> Result<XyChartPublicState, PeleError> {
+    // Implicit Pele constructor: field defaults only, no source or argument reads.
+    XyChart.create_public(&XyChartModel::new(None))
+}
+
 impl PublicDiagramModule for XyChart {
     type PublicState = XyChartPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<crate::compat::public::PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTOTYPE).then(|| {
+            crate::compat::public::PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTOTYPE,
+                construct_default,
+            )
+        })
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;
@@ -905,6 +921,12 @@ impl PublicDiagramModule for XyChart {
         let imported = imported(&graph);
         Ok(XyChartPublicState { graph, imported })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }
@@ -923,6 +945,19 @@ impl PublicDiagramModule for XyChart {
         let result = invoke(&mut s.graph, call);
         s.imported = imported(&s.graph);
         result
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::xychart())
+    }
+    fn detached_public_render(
+        &self,
+        s: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::xychart(
+            super::XYChartDetachedInput::new(s.imported.as_ref().err()),
+        ))
     }
     fn render_public(
         &self,

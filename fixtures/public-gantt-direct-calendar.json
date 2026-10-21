@@ -1,0 +1,130 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "75edd692b5e250ca7a7e76815d9d3716071e843b575c196ff6b28a5c9d2c1b4c",
+  "timezone": "UTC",
+  "bodies": {
+    "parse": "parse(e,n){return this.spend((n.length+1)*(e.length+1)),Ct(e,n,new Date(this.now))}",
+    "today": "today(){let e=new Date(this.now);return e.setHours(0,0,0,0),e}"
+  },
+  "cases": [
+    {
+      "id": "parse-date",
+      "method": 22,
+      "args": [
+        "2024-01-09",
+        "YYYY-MM-DD"
+      ],
+      "now": 1704813630000,
+      "result": {
+        "kind": "date",
+        "bits": "4278ceb84d400000"
+      },
+      "work": 121,
+      "error": null
+    },
+    {
+      "id": "parse-invalid",
+      "method": 22,
+      "args": [
+        "2024-02-31",
+        "YYYY-MM-DD"
+      ],
+      "now": 1704813630000,
+      "result": {
+        "kind": "undefined"
+      },
+      "work": 121,
+      "error": null
+    },
+    {
+      "id": "parse-month",
+      "method": 22,
+      "args": [
+        "Jan 09",
+        "MMM DD"
+      ],
+      "now": 1704813630000,
+      "result": {
+        "kind": "date",
+        "bits": "4278ceb84d400000"
+      },
+      "work": 49,
+      "error": null
+    },
+    {
+      "id": "parse-epoch",
+      "method": 22,
+      "args": [
+        "0",
+        "x"
+      ],
+      "now": 1704813630000,
+      "result": {
+        "kind": "date",
+        "bits": "0000000000000000"
+      },
+      "work": 4,
+      "error": null
+    },
+    {
+      "id": "parse-empty",
+      "method": 22,
+      "args": [
+        "",
+        ""
+      ],
+      "now": 1704813630000,
+      "result": {
+        "kind": "undefined"
+      },
+      "work": 1,
+      "error": null
+    },
+    {
+      "id": "parse-limit",
+      "method": 22,
+      "args": [
+        "2024-01-09",
+        "YYYY-MM-DD"
+      ],
+      "now": 1704813630000,
+      "work": 400000121,
+      "result": {
+        "kind": "undefined"
+      },
+      "error": {
+        "name": "PeleError",
+        "message": "The gantt chart takes too much work to schedule.",
+        "code": "limit",
+        "type": "gantt",
+        "line": 0,
+        "column": 0,
+        "snippet": ""
+      }
+    },
+    {
+      "id": "today",
+      "method": 23,
+      "args": [],
+      "now": 1704813630000,
+      "result": {
+        "kind": "date",
+        "bits": "4278ceb84d400000"
+      },
+      "work": 0,
+      "error": null
+    },
+    {
+      "id": "today-invalid",
+      "method": 23,
+      "args": [],
+      "now": null,
+      "result": {
+        "kind": "date",
+        "bits": "7ff8000000000000"
+      },
+      "work": 0,
+      "error": null
+    }
+  ]
+}

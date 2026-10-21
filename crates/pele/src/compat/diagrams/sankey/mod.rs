@@ -1,9 +1,12 @@
 //! Sankey diagrams, direct Pele sankey/* 458322a5 translation (MIT, kepano).
+mod indexed;
 mod layout;
 mod model;
 mod parser;
 mod public_model;
 pub use public_model::SankeyPublicState;
+#[cfg(feature = "web-host-sankey")]
+pub(crate) use public_model::{imported_from, initial_into, invoke_store, normalized_source};
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,
@@ -30,3 +33,12 @@ impl DiagramModule for Sankey {
         render::render(m, c, o, r)
     }
 }
+
+mod source_store;
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, SankeyDetachedInput};
+#[doc(hidden)]
+pub use live_phase::{
+    LiveCallArgument, LiveGeometryError, LiveRenderRead, LiveStringUse, LiveValueKind,
+};

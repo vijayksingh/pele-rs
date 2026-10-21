@@ -5,16 +5,43 @@ use crate::compat::{
     text::layout_label,
     PeleError, RenderResources, RenderSettings, Rendered,
 };
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, Self::Error>;
+}
+struct Typed<'a>(&'a InfoModel);
+impl PhaseInput for Typed<'_> {
+    type Error = PeleError;
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, PeleError> {
+        Ok(if description {
+            self.0.acc_descr.clone()
+        } else {
+            self.0.acc_title.clone()
+        })
+    }
+}
 // Layout resolves host icons; rendering preserves their reserved slots with empty markup.
 pub(super) fn render(
     model: &InfoModel,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(model), options, resources)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let title_text = input.title()?;
     let size = options.font_size.unwrap_or(16.);
     let pad = options.padding.unwrap_or(8.);
     let title = layout_label(
-        model.title.as_deref(),
+        title_text.as_deref(),
         false,
         resources,
         options,
@@ -53,6 +80,8 @@ pub(super) fn render(
             " class=\"pele-version\" fill=\"var(--_m)\""
         )
     );
+    let acc_title = input.accessibility(false)?;
+    let acc_descr = input.accessibility(true)?;
     Ok(Rendered {
         svg: document(
             "info",
@@ -60,8 +89,8 @@ pub(super) fn render(
             height,
             size,
             options,
-            model.acc_title.as_deref(),
-            model.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width,

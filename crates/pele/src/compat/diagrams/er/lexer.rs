@@ -2,9 +2,9 @@
 use super::tokens::T;
 use crate::compat::source::space;
 #[derive(Clone, Debug)]
-pub(super) struct Token {
+pub(super) struct Token<'a> {
     pub kind: T,
-    pub text: String,
+    pub text: &'a str,
     pub start: usize,
 }
 #[derive(Clone, Copy, PartialEq)]
@@ -38,14 +38,14 @@ struct Scanner<'a> {
     src: &'a str,
     p: usize,
     state: S,
-    out: Vec<Token>,
+    out: Vec<Token<'a>>,
     failed_dir: usize,
     tilde_next: Option<usize>,
     whitespace_next: usize,
     tilde_line: usize,
     tilde_last: Option<usize>,
 }
-impl Scanner<'_> {
+impl<'a> Scanner<'a> {
     fn ch(&self, at: usize) -> Option<char> {
         self.src.get(at..)?.chars().next()
     }
@@ -58,7 +58,7 @@ impl Scanner<'_> {
     fn emit(&mut self, t: T, end: usize) {
         self.out.push(Token {
             kind: t,
-            text: self.src[self.p..end].into(),
+            text: &self.src[self.p..end],
             start: self.p,
         });
         self.p = end
@@ -81,32 +81,51 @@ impl Scanner<'_> {
             .find(['\n', '\r', '\u{2028}', '\u{2029}'])
             .map_or(self.src.len(), |i| i + self.p);
         let line = &self.src[self.p..end];
-        let lower = line.to_ascii_lowercase();
-        for (dir, t) in [
+        // Scan candidates once, right to left. Priority belongs to the direction
+        // rule (TB, BT, RL, LR), not its position; equal priorities keep the
+        // rightmost match. Both comparisons retain the original ASCII folding.
+        let directions = [
             ("TB", T::direction_tb),
             ("BT", T::direction_bt),
             ("RL", T::direction_rl),
             ("LR", T::direction_lr),
-        ] {
-            for (at, _) in lower.rmatch_indices("direction") {
-                let mut q = self.p + at + 9;
-                let ws = q;
-                q = self.until(q, space);
-                if q == ws {
-                    continue;
-                }
-                if self
-                    .src
-                    .get(q..q + 2)
-                    .is_some_and(|s| s.eq_ignore_ascii_case(dir))
-                {
-                    let tail = self.src[q + 2..]
-                        .find('\n')
-                        .map_or(self.src.len(), |i| i + q + 2);
-                    self.emit(t, tail);
-                    return true;
+        ];
+        let mut matched = None;
+        let mut best = directions.len();
+        for (at, _) in line.rmatch_indices(['d', 'D']) {
+            if !line
+                .get(at..at + 9)
+                .is_some_and(|candidate| candidate.eq_ignore_ascii_case("direction"))
+            {
+                continue;
+            }
+            let ws = self.p + at + 9;
+            // Whitespace may cross the candidate line's CR/LF/Unicode boundary.
+            let q = self.until(ws, space);
+            if q == ws {
+                continue;
+            }
+            let Some(label) = self.src.get(q..q + 2) else {
+                continue;
+            };
+            for (priority, &(direction, token)) in directions[..best].iter().enumerate() {
+                if label.eq_ignore_ascii_case(direction) {
+                    best = priority;
+                    matched = Some((token, q + 2));
+                    break;
                 }
             }
+            if best == 0 {
+                break;
+            }
+        }
+        if let Some((token, after)) = matched {
+            // The original matched span terminates at LF only.
+            let tail = self.src[after..]
+                .find('\n')
+                .map_or(self.src.len(), |i| i + after);
+            self.emit(token, tail);
+            return true;
         }
         self.failed_dir = end;
         false
@@ -230,27 +249,32 @@ impl Scanner<'_> {
             return;
         }
         // Lexical precedence follows keyword(), including cardinality spellings before generic names.
-        for (kw, t, bound) in [
-            ("erdiagram", T::ER_DIAGRAM, true),
-            ("end", T::END_KW, true),
-            ("style", T::STYLE, true),
-            ("subgraph", T::SUBGRAPH, true),
-            ("classdef", T::CLASSDEF, true),
-            ("class", T::CLASS, true),
-            ("one or zero", T::ZERO_OR_ONE, true),
-            ("one or more", T::ONE_OR_MORE, true),
-            ("one or many", T::ONE_OR_MORE, true),
-            ("one", T::ONLY_ONE, true),
-            ("only one", T::ONLY_ONE, true),
-            ("optionally to", T::NON_IDENTIFYING, true),
-            ("zero or one", T::ZERO_OR_ONE, true),
-            ("zero or more", T::ZERO_OR_MORE, true),
-            ("zero or many", T::ZERO_OR_MORE, true),
-            ("many(0)", T::ZERO_OR_MORE, false),
-            ("many(1)", T::ONE_OR_MORE, false),
-            ("many", T::ZERO_OR_MORE, true),
-            ("to", T::IDENTIFYING, true),
-        ] {
+        let keywords: &[(&str, T, bool)] = match c.to_ascii_lowercase() {
+            'e' => &[("erdiagram", T::ER_DIAGRAM, true), ("end", T::END_KW, true)],
+            's' => &[("style", T::STYLE, true), ("subgraph", T::SUBGRAPH, true)],
+            'c' => &[("classdef", T::CLASSDEF, true), ("class", T::CLASS, true)],
+            'o' => &[
+                ("one or zero", T::ZERO_OR_ONE, true),
+                ("one or more", T::ONE_OR_MORE, true),
+                ("one or many", T::ONE_OR_MORE, true),
+                ("one", T::ONLY_ONE, true),
+                ("only one", T::ONLY_ONE, true),
+                ("optionally to", T::NON_IDENTIFYING, true),
+            ],
+            'z' => &[
+                ("zero or one", T::ZERO_OR_ONE, true),
+                ("zero or more", T::ZERO_OR_MORE, true),
+                ("zero or many", T::ZERO_OR_MORE, true),
+            ],
+            'm' => &[
+                ("many(0)", T::ZERO_OR_MORE, false),
+                ("many(1)", T::ONE_OR_MORE, false),
+                ("many", T::ZERO_OR_MORE, true),
+            ],
+            't' => &[("to", T::IDENTIFYING, true)],
+            _ => &[],
+        };
+        for &(kw, t, bound) in keywords {
             if self.kw(kw, bound) {
                 if matches!(t, T::STYLE | T::CLASSDEF) {
                     self.state = S::Style
@@ -266,19 +290,28 @@ impl Scanner<'_> {
         }
         let tail = &self.src[self.p..];
         let mut matched = None;
-        for (s, t, b) in [
-            ("o|", T::ZERO_OR_ONE, false),
-            ("o{", T::ZERO_OR_MORE, false),
-            ("|o", T::ZERO_OR_ONE, true),
-            ("||", T::ONLY_ONE, false),
-            ("|{", T::ONE_OR_MORE, false),
-            ("}o", T::ZERO_OR_MORE, true),
-            ("}|", T::ONE_OR_MORE, false),
-            ("..", T::NON_IDENTIFYING, false),
-            (".-", T::NON_IDENTIFYING, false),
-            ("--", T::IDENTIFYING, false),
-            ("-.", T::NON_IDENTIFYING, false),
-        ] {
+        let relations: &[(&str, T, bool)] = match c.to_ascii_lowercase() {
+            'o' => &[
+                ("o|", T::ZERO_OR_ONE, false),
+                ("o{", T::ZERO_OR_MORE, false),
+            ],
+            '|' => &[
+                ("|o", T::ZERO_OR_ONE, true),
+                ("||", T::ONLY_ONE, false),
+                ("|{", T::ONE_OR_MORE, false),
+            ],
+            '}' => &[("}o", T::ZERO_OR_MORE, true), ("}|", T::ONE_OR_MORE, false)],
+            '.' => &[
+                ("..", T::NON_IDENTIFYING, false),
+                (".-", T::NON_IDENTIFYING, false),
+            ],
+            '-' => &[
+                ("--", T::IDENTIFYING, false),
+                ("-.", T::NON_IDENTIFYING, false),
+            ],
+            _ => &[],
+        };
+        for &(s, t, b) in relations {
             if tail
                 .get(..s.len())
                 .is_some_and(|v| v.eq_ignore_ascii_case(s))
@@ -365,7 +398,7 @@ impl Scanner<'_> {
         self.emit(T::CHAR, self.p + c.len_utf8())
     }
 }
-pub(super) fn tokenize(src: &str) -> Vec<Token> {
+pub(super) fn tokenize<'a>(src: &'a str) -> Vec<Token<'a>> {
     let mut s = Scanner {
         src,
         p: 0,
@@ -429,7 +462,7 @@ pub(super) fn tokenize(src: &str) -> Vec<Token> {
                 } else {
                     s.out.push(Token {
                         kind: T::ERROR,
-                        text: String::new(),
+                        text: "",
                         start: s.p,
                     });
                     return s.out;

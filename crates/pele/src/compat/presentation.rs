@@ -128,6 +128,13 @@ impl<'a> PresentationCapture<'a> {
     }
 }
 impl RenderResources for PresentationCapture<'_> {
+    fn javascript_failure(
+        &mut self,
+        operation: crate::compat::JavaScriptFailure,
+    ) -> crate::compat::public::PublicError {
+        self.host.javascript_failure(operation)
+    }
+
     fn host_function(
         &mut self,
         reference: u32,

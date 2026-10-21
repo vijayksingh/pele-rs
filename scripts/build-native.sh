@@ -2,9 +2,25 @@
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 export MACOSX_DEPLOYMENT_TARGET=14.0
-cargo build --locked --release -p pele-ffi
+pele_native_mode="${1:-}"
+case "$pele_native_mode" in
+    ''|--universal|--host) ;;
+    *) echo 'Usage: scripts/build-native.sh [--universal|--host]' >&2; exit 2 ;;
+esac
+if [[ "$pele_native_mode" == --host ]]; then
+    # Use the same explicit host target checked by the Swift consumer, avoiding
+    # duplicate untargeted and Intel builds during local correctness iteration.
+    pele_native_target="$(rustc -vV | sed -n 's/^host: //p')"
+    [[ -n "$pele_native_target" ]] || { echo 'Rust host target unavailable' >&2; exit 1; }
+    cargo build --locked --release -p pele-ffi --target "$pele_native_target"
+else
+    cargo build --locked --release -p pele-ffi
+fi
 if [[ "$(uname -s)" == Darwin ]]; then
     library="$repo_dir/target/release/libpele_ffi.a"
+    if [[ "$pele_native_mode" == --host ]]; then
+        library="$repo_dir/target/$pele_native_target/release/libpele_ffi.a"
+    fi
     if [[ "${1:-}" == --universal ]]; then
         cargo build --locked --release -p pele-ffi --target aarch64-apple-darwin
         cargo build --locked --release -p pele-ffi --target x86_64-apple-darwin
@@ -12,8 +28,6 @@ if [[ "$(uname -s)" == Darwin ]]; then
         xcrun lipo -create target/aarch64-apple-darwin/release/libpele_ffi.a \
           target/x86_64-apple-darwin/release/libpele_ffi.a -output target/universal/libpele_ffi.a
         library="$repo_dir/target/universal/libpele_ffi.a"
-    elif [[ -n "${1:-}" ]]; then
-        echo 'Usage: scripts/build-native.sh [--universal]' >&2; exit 2
     fi
     artifact="$repo_dir/bindings/swift/Artifacts/CPele.xcframework"
     mkdir -p "$(dirname "$artifact")"

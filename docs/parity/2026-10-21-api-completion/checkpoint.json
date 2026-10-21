@@ -1,0 +1,486 @@
+{
+  "status": "functional-api-checkpoint-verified-no-release",
+  "scope": "All33 diagram modules and selected declared public API features, native/Swift and packed WASM. General JavaScript metaprogramming and Firefox lazy constructor intrinsic key order are not certified.",
+  "observed": {
+    "browserInitial": {
+      "attempted": 372,
+      "passed": 352,
+      "failed": 20,
+      "status": "failed"
+    },
+    "nativeGUI": {
+      "executed": 31,
+      "failures": 0,
+      "status": "passed"
+    },
+    "strictCInitial": {
+      "passed": [
+        17,
+        18,
+        19
+      ],
+      "failed": [
+        15
+      ]
+    },
+    "strictC15Repair": {
+      "status": "pass-recorded-in-repaired-client-log"
+    },
+    "swiftBroadCorpus": {
+      "status": "interrupted-not-passed"
+    },
+    "swiftBroadAPI": {
+      "status": "interrupted-not-passed"
+    },
+    "browserRebuildAttempt1": {
+      "passed": 249,
+      "failed": 5,
+      "didNotRun": 127,
+      "exitCode": 130,
+      "status": "interrupted-not-passed"
+    },
+    "swiftAttempt3": {
+      "status": "interrupted-not-passed",
+      "physicalFootprint": "48.3 GiB",
+      "cause": "XYChart unordered NaN loop; fixed in73b0988"
+    },
+    "swiftFinal": {
+      "passed": 99,
+      "failed": 0,
+      "skipped": 0,
+      "classes": 55
+    },
+    "strictCFinal": {
+      "clients": 7,
+      "compileAndRunPassed": 7
+    },
+    "browserFinal": {
+      "passed": 387,
+      "failed": 0,
+      "skipped": 0,
+      "perEngine": {
+        "chromium": 129,
+        "firefox": 129,
+        "webkit": 129
+      }
+    },
+    "runtimeAuditFinal": {
+      "families": 33,
+      "callbackMatches": 33,
+      "callbackMismatches": [],
+      "classRoots": 22,
+      "nativeClassConstructionFailures": []
+    },
+    "release": {
+      "published": false,
+      "version03": "held until existing performance gate passes"
+    },
+    "nativeRustFinal": {
+      "passed": 7,
+      "failed": 0,
+      "targets": 4
+    }
+  },
+  "checks": [
+    {
+      "id": "browser-initial-passed",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-completion-web-attempt1.log",
+      "value": "352 passed"
+    },
+    {
+      "id": "browser-initial-failed",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-completion-web-attempt1.log",
+      "value": "20 failed"
+    },
+    {
+      "id": "browser-initial-exit",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-completion-web-result-attempt1.json",
+      "path": [
+        "exitCode"
+      ],
+      "value": 1
+    },
+    {
+      "id": "gui-executed",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/native-ui/run-v79amrgm/result.json",
+      "path": [
+        "executed"
+      ],
+      "value": 31
+    },
+    {
+      "id": "gui-failures",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/native-ui/run-v79amrgm/result.json",
+      "path": [
+        "failures"
+      ],
+      "value": 0
+    },
+    {
+      "id": "gui-success",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/native-ui/run-v79amrgm/runner-result.json",
+      "path": [
+        "succeeded"
+      ],
+      "value": true
+    },
+    {
+      "id": "c17",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-completion-final-c17.log",
+      "value": "C17 constructor host values, nested phases, original throw, cancellation PASS"
+    },
+    {
+      "id": "c18",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-completion-final-c18.log",
+      "value": "C18 ordered getters, partial error owner, cancellation and transfer policy PASS"
+    },
+    {
+      "id": "c19",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-completion-final-c19.log",
+      "value": "native resource operation lifecycle passed"
+    },
+    {
+      "id": "c15-initial-failure",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-completion-final-c15.log",
+      "value": "Assertion failed:"
+    },
+    {
+      "id": "c15-repaired-client",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-completion-c15-client-repair.log",
+      "value": "native detached render lifecycle passed"
+    },
+    {
+      "id": "swift-corpus-interruption",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-completion-swift-corpus-interruption.json",
+      "path": [
+        "run"
+      ],
+      "value": "api-completion-swift-attempt1.log"
+    },
+    {
+      "id": "swift-api-interruption",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-completion-swift-api-interruption.json",
+      "path": [
+        "run"
+      ],
+      "value": "api-completion-swift-api-attempt2.log"
+    },
+    {
+      "id": "swift-api-sample-retained",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-completion-swift-api-interruption.json",
+      "path": [
+        "sample"
+      ],
+      "value": "api-completion-swift-api-sample.txt"
+    },
+    {
+      "id": "swift-final",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-final-swift-attempt4.log",
+      "value": "Executed 99 tests, with 0 failures"
+    },
+    {
+      "id": "browser-final",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-final-web-attempt2.log",
+      "value": "387 passed"
+    },
+    {
+      "id": "browser-final-exit",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-web-result-attempt2.json",
+      "path": [
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "browser-interrupted-exit",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-web-result-attempt1.json",
+      "path": [
+        "exitCode"
+      ],
+      "value": 130
+    },
+    {
+      "id": "browser-interrupted-failures",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-final-web-attempt1.log",
+      "value": "5 failed"
+    },
+    {
+      "id": "browser-interrupted-passes",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-final-web-attempt1.log",
+      "value": "249 passed"
+    },
+    {
+      "id": "swift-memory-interruption",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-swift-attempt3-interruption.json",
+      "path": [
+        "status"
+      ],
+      "value": "interrupted-not-passed"
+    },
+    {
+      "id": "native-final-command-0",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        0,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-1",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        1,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-2",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        2,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-3",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        3,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-4",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        4,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-5",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        5,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-6",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        6,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-7",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        7,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-8",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        8,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-9",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        9,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-10",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        10,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-11",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        11,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-12",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        12,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-13",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        13,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "native-final-command-14",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "commands",
+        14,
+        "exitCode"
+      ],
+      "value": 0
+    },
+    {
+      "id": "runtime-families",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-runtime-audit2.json",
+      "path": [
+        "summary",
+        "families"
+      ],
+      "value": 33
+    },
+    {
+      "id": "runtime-callbackMatches",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-runtime-audit2.json",
+      "path": [
+        "summary",
+        "callbackMatches"
+      ],
+      "value": 33
+    },
+    {
+      "id": "runtime-nativeClassConstructionFailures",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-runtime-audit2.json",
+      "path": [
+        "summary",
+        "nativeClassConstructionFailures"
+      ],
+      "value": []
+    },
+    {
+      "id": "types-final",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-final-types-package2.log",
+      "value": "PASS: package root/full/lazy/core/registry public type catalog and 33 model names"
+    },
+    {
+      "id": "native-nativeInputsUnchanged",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "nativeInputsUnchanged"
+      ],
+      "value": 427
+    },
+    {
+      "id": "native-sdkFilesUnchanged",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-native-result-attempt2.json",
+      "path": [
+        "sdkFilesUnchanged"
+      ],
+      "value": 13
+    },
+    {
+      "id": "web-sourceInputsUnchanged",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-web-result-attempt2.json",
+      "path": [
+        "sourceInputsUnchanged"
+      ],
+      "value": 499
+    },
+    {
+      "id": "web-packageFilesUnchanged",
+      "kind": "json_equals",
+      "evidence": "dist/evidence/api-final-web-result-attempt2.json",
+      "path": [
+        "packageFilesUnchanged"
+      ],
+      "value": 119
+    },
+    {
+      "id": "rust-xychart-regression",
+      "kind": "contains",
+      "evidence": "dist/evidence/api-final-native-features-consolidated.log",
+      "value": "test nan_category_stride_stops_at_unordered_comparison_and_preserves_public_output_limits ... ok"
+    }
+  ],
+  "pending": []
+}

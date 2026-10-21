@@ -1,0 +1,566 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-20T04:50:35.254Z",
+  "mode": "native-three-way-diagnostic",
+  "artifacts": {
+    "control": {
+      "binarySHA256": "9e3772a3a8a59df1fda0c7932f53331d03160105ffbc13255678f656ddb9e174",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "a81c89b02eccb359b288c4af2de85b8d465c9f770c4979033a958c91c69376a9",
+        "revision": "175daa8fd76fc1e25f488e4957b6970b4b6d4fe2",
+        "builtAt": "2026-10-20T04:07:26.697Z",
+        "binaries": {
+          "pele-perf": "9e3772a3a8a59df1fda0c7932f53331d03160105ffbc13255678f656ddb9e174",
+          "pele-perf-alloc": "c527c1e523433880b85d290906c032e45c40807e23c083fbaf78f1a2da2e1038"
+        }
+      }
+    },
+    "candidate": {
+      "binarySHA256": "98b22aed6e015e0001fe1e83dcb3cc3a36e7c7120db2f0316e56c5aba3646902",
+      "manifest": {
+        "schemaVersion": 1,
+        "sourceInputSha256": "6b573f513ea6ed3739824213143b5fc29c45ddf7ba1bb229569a0db7d85c78dd",
+        "revision": "0b32797d5e5f6ded562c61de7acbd35ca4643839",
+        "builtAt": "2026-10-20T04:44:13.822Z",
+        "binaries": {
+          "pele-perf": "98b22aed6e015e0001fe1e83dcb3cc3a36e7c7120db2f0316e56c5aba3646902",
+          "pele-perf-alloc": "d23d31488999fbfa92be9ba4b11c7d176660b7d3a646583b1e046a73d18c6576"
+        }
+      }
+    }
+  },
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "harnessSHA256": "01b5e3437b4e7cc342b38a7da785b11343a28a27c20ea2467fc99a0eda129ad2",
+  "casesSHA256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "settings": {
+    "trials": 15,
+    "warmupMs": 1000,
+    "matchedNativeBatchCounts": true,
+    "balancedCyclicAndReverseOrder": true,
+    "nativeTypedDocumentRetainedAcrossBatches": true,
+    "nativePublicStateFreshPerBatch": true,
+    "jsRetainedModelFreshPerBatch": true,
+    "stages": [
+      "render-retained"
+    ],
+    "selectedCases": [
+      "er/medium"
+    ],
+    "separateAllocationBinaries": false,
+    "fixedBatchCount": 16
+  },
+  "host": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "loadBefore": [
+      6.23095703125,
+      6.6455078125,
+      6.54541015625
+    ],
+    "processesBefore": [
+      {
+        "pid": 410,
+        "cpuPercent": 30.7,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 38603,
+        "cpuPercent": 19.3,
+        "name": "metal"
+      },
+      {
+        "pid": 38801,
+        "cpuPercent": 10.9,
+        "name": "node"
+      },
+      {
+        "pid": 69848,
+        "cpuPercent": 45.9,
+        "name": "Google Chrome Helper (Renderer)"
+      }
+    ],
+    "loadAfter": [
+      6.29248046875,
+      6.6513671875,
+      6.5478515625
+    ],
+    "processesAfter": [
+      {
+        "pid": 410,
+        "cpuPercent": 29.3,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 23368,
+        "cpuPercent": 17.9,
+        "name": "Claude Helper (Renderer)"
+      },
+      {
+        "pid": 38801,
+        "cpuPercent": 36.1,
+        "name": "node"
+      },
+      {
+        "pid": 38835,
+        "cpuPercent": 15.2,
+        "name": "pele-perf"
+      },
+      {
+        "pid": 38836,
+        "cpuPercent": 15.7,
+        "name": "pele-perf"
+      },
+      {
+        "pid": 69848,
+        "cpuPercent": 48.2,
+        "name": "Google Chrome Helper (Renderer)"
+      },
+      {
+        "pid": 98531,
+        "cpuPercent": 12.5,
+        "name": "claude"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "er/medium",
+      "family": "er",
+      "scale": "medium",
+      "units": 48,
+      "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSHA256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "jsRetainedBeforeVerified": true
+    }
+  ],
+  "rows": [
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "counts": {
+        "js": 16,
+        "control": 16,
+        "candidate": 16
+      },
+      "warmups": {
+        "js": {
+          "elapsedNs": 1002076922,
+          "operations": 1126
+        },
+        "control": {
+          "elapsedNs": 1016367541,
+          "operations": 1382
+        },
+        "candidate": {
+          "elapsedNs": 1093467835,
+          "operations": 1382
+        }
+      },
+      "samples": {
+        "js": [
+          0.72298175,
+          0.7836953125,
+          0.68465625,
+          0.676296875,
+          0.6801953125,
+          0.6710365,
+          0.6973984375,
+          0.67780725,
+          0.66059375,
+          0.690125,
+          0.6803203125,
+          0.68121875,
+          0.68834375,
+          0.699921875,
+          0.68065625
+        ],
+        "control": [
+          0.7356875,
+          0.7618645625,
+          0.751046875,
+          0.736362,
+          0.7259453125,
+          0.7438515625,
+          0.7535703125,
+          0.7360181875,
+          0.7411301875,
+          0.7055703125,
+          0.7589505,
+          0.7386614375,
+          0.733734375,
+          0.7285260625,
+          0.73971875
+        ],
+        "candidate": [
+          0.74410675,
+          0.7715833125,
+          0.753752625,
+          0.7496145625,
+          0.7422578125,
+          0.7293489375,
+          0.7322734375,
+          0.747513,
+          0.7497890625,
+          0.7324661875,
+          0.7234244375,
+          0.7795051875,
+          0.7590260625,
+          0.721747375,
+          0.731841125
+        ]
+      },
+      "raw": {
+        "js": [
+          {
+            "elapsedNs": 11567708,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 12539125,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10954500,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10820750,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10883125,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10736584,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11158375,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10844916,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10569500,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11042000,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10885125,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10899500,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11013500,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 11198750,
+            "count": 16,
+            "checksum": 1274848
+          },
+          {
+            "elapsedNs": 10890500,
+            "count": 16,
+            "checksum": 1274848
+          }
+        ],
+        "control": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11771000,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12189833,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12016750,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11781792,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11615125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11901625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12057125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11776291,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11858083,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11289125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12143208,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11818583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11739750,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11656417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11835500,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ],
+        "candidate": [
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11905708,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12345333,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12060042,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11993833,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11876125,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11669583,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11716375,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11960208,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11996625,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11719459,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11574791,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12472083,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 12144417,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11547958,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          },
+          {
+            "checksum": 754977460190261200,
+            "count": 16,
+            "elapsedNs": 11709458,
+            "graphNodesAfter": 437,
+            "graphNodesBefore": 437,
+            "textMeasurements": 5360
+          }
+        ]
+      },
+      "medians": {
+        "js": 0.68121875,
+        "control": 0.7386614375,
+        "candidate": 0.74410675
+      },
+      "candidateOverControl": 1.0073718651381474,
+      "candidateOverJS": 1.0923168952704254,
+      "jsRetainedPostBatchVerified": true
+    }
+  ],
+  "allocationRows": [],
+  "completedAt": "2026-10-20T04:50:40.231Z",
+  "succeeded": true
+}

@@ -1,0 +1,41 @@
+{
+  "baselineHead": "f8ba779ed90634e2e4eaf2baa9bfac7cf4fa50a7",
+  "scope": "Private owned public construction; Sankey-only source-provenance normalization",
+  "files": [
+    {
+      "path": "crates/pele/src/compat/diagrams/sankey/public_model.rs",
+      "originalSha256": "c69f5b2772653c757d6cd4754fde3831a6f4d6195745582a99784edf2c4fe65c",
+      "candidateSha256": "d0f063a648184c00beecbd25f89bbe7fc31de5fc8dfd64473460e52952589ddf"
+    },
+    {
+      "path": "crates/pele/src/compat/engine.rs",
+      "originalSha256": "a8c393bdb8fc44c09dcd854331ebf38535c3bd836d88e98f8afd86b24be49b76",
+      "candidateSha256": "f28d61ac0ff8e6d9fc5ae9742c110a007f195947a5c46bbfb54c7d705f649b76"
+    },
+    {
+      "path": "crates/pele/src/compat/public/engine.rs",
+      "originalSha256": "100b3c55f912d62962b94088b8821173df0ecbd8bdac1c0b815ad3d76fb68dc9",
+      "candidateSha256": "ad015d3d85197a997c9eccc6b7aeb04ea0c63a333ab7d3b62645223a91f7f410"
+    },
+    {
+      "path": "crates/pele/src/compat/public/mod.rs",
+      "originalSha256": "633f4b872e6af272f8ecd8a82f6028d4cdd9d4bd6c8bb7b86ff90450ce768bee",
+      "candidateSha256": "02eabe828172c4b409d62bdb370f58c212ee97470be0b9d9e37127ceeb1c3e49"
+    },
+    {
+      "path": "crates/pele/tests/public_sankey_owned_parse.rs",
+      "originalSha256": null,
+      "candidateSha256": "d2c243f6be6b2d28b3465ffe71617d0016345b5a52bfb3eb00b4025fedd128bd"
+    }
+  ],
+  "patchSha256": "005070c6535aea57dace447df853c24f6f919c289e82283a37b82471ddbae753",
+  "validation": {
+    "rustfmt": "passed (private files only)",
+    "gitApplyCheck": "passed against current production",
+    "originalHashes": "all match production",
+    "graphBuilderStatements": "identical modulo whitespace through existing finish call",
+    "compile": "not run",
+    "integrationTests": "authored, not run",
+    "benchmarks": "not run"
+  }
+}

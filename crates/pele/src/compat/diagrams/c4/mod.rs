@@ -18,6 +18,9 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<C4Model, PeleError>
         max_edges: options.max_edges,
     })
 }
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{render_detached, C4DetachedInput};
 mod layout;
 mod render;
 mod route;

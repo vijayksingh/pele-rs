@@ -1,0 +1,659 @@
+{
+  "oracleRevision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "inputFixtureSHA256": "3ee945b34cf1a9405e86a285a2ab1b4ebdd4fe36195096e56eb98cef2d12bcc7",
+  "source": "sankey\nA,B,5\nB,C,3",
+  "measurement": "text.length * size * 0.6",
+  "scriptSHA256": "b77445d0b4fe3dbe16d0d4aff390652d4d7ed9530a35bbc51a8f90a5cc710bf0",
+  "rows": [
+    {
+      "mode": "partial-helper-readonly-length",
+      "trace": [
+        {
+          "event": "width",
+          "phase": "outer",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "helper-call",
+          "method": "findOrCreateNode",
+          "argument": "D"
+        },
+        {
+          "event": "helper-caught",
+          "name": "TypeError",
+          "message": "Cannot assign to read only property 'length' of object '[object Array]'"
+        },
+        {
+          "event": "width",
+          "phase": "outer",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "width",
+          "phase": "outer",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "outer-complete"
+        },
+        {
+          "event": "repair-nodes-array"
+        },
+        {
+          "event": "width",
+          "phase": "recovery",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "width",
+          "phase": "recovery",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "width",
+          "phase": "recovery",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "width",
+          "phase": "recovery",
+          "text": "D 0",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "recovery-complete"
+        }
+      ],
+      "measurements": [
+        {
+          "phase": "outer",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "outer",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "outer",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "recovery",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "recovery",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "recovery",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "recovery",
+          "text": "D 0",
+          "size": 14,
+          "style": 0
+        }
+      ],
+      "initial": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 3,
+          "writable": true,
+          "enumerable": false,
+          "configurable": false
+        }
+      },
+      "helperError": {
+        "name": "TypeError",
+        "message": "Cannot assign to read only property 'length' of object '[object Array]'"
+      },
+      "afterCaught": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          },
+          {
+            "key": "D",
+            "id": "D",
+            "index": 3,
+            "nodeIndex": -1
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 3,
+          "writable": false,
+          "enumerable": false,
+          "configurable": false
+        }
+      },
+      "partial": {
+        "lookupContainsD": true,
+        "nodesContainD": false,
+        "originalArray": true,
+        "orphan": {
+          "id": "D",
+          "index": 3
+        }
+      },
+      "first": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-sankey\" viewBox=\"0 0 616 416\" width=\"616\" height=\"416\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"sankey\"><g transform=\"translate(8,8)\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\"><path class=\"pele-sankey-link\" data-id=\"A-&gt;B\" d=\"M10,0C152.5,0 152.5,0 295,0L295,400C152.5,400 152.5,400 10,400Z\" fill=\"var(--pele-series-1,#4c78a8)\"><title>A → B: 5</title></path><path class=\"pele-sankey-link\" data-id=\"B-&gt;C\" d=\"M305,0C447.5,0 447.5,0 590,0L590,240C447.5,240 447.5,240 305,240Z\" fill=\"var(--pele-series-2,#f58518)\"><title>B → C: 3</title></path></g><g class=\"pele-sankey-nodes\"><rect class=\"pele-sankey-node\" data-id=\"A\" x=\"0\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-1,#4c78a8)\"/><rect class=\"pele-sankey-node\" data-id=\"B\" x=\"295\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-2,#f58518)\"/><rect class=\"pele-sankey-node\" data-id=\"C\" x=\"590\" y=\"0\" width=\"10\" height=\"240\" rx=\"2\" fill=\"var(--pele-series-3,#54a24b)\"/></g><g class=\"pele-labels\" font-size=\"14\"><g class=\"pele-label\" data-id=\"A\"><text x=\"16\" y=\"204.9\" text-anchor=\"start\">A <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"B\"><text x=\"311\" y=\"204.9\" text-anchor=\"start\">B <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"C\"><text x=\"584\" y=\"124.9\" text-anchor=\"end\">C <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">3</tspan></text></g></g></g></svg>",
+        "svgSHA256": "7c1351dfb290c92991b82b3988c319e53c58bc4320da89e151e5555f943bdaf7",
+        "width": 616,
+        "height": 416,
+        "type": "sankey",
+        "links": []
+      },
+      "afterFirst": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          },
+          {
+            "key": "D",
+            "id": "D",
+            "index": 3,
+            "nodeIndex": -1
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 3,
+          "writable": false,
+          "enumerable": false,
+          "configurable": false
+        }
+      },
+      "repair": {
+        "newArray": true,
+        "oldArrayLength": 3,
+        "oldLengthWritable": false,
+        "orphanAlias": true
+      },
+      "afterRepair": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          },
+          {
+            "id": "D",
+            "index": 3
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          },
+          {
+            "key": "D",
+            "id": "D",
+            "index": 3,
+            "nodeIndex": 3
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 4,
+          "writable": true,
+          "enumerable": false,
+          "configurable": false
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-sankey\" viewBox=\"0 0 616 416\" width=\"616\" height=\"416\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"sankey\"><g transform=\"translate(8,8)\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\"><path class=\"pele-sankey-link\" data-id=\"A-&gt;B\" d=\"M10,0C152.5,0 152.5,0 295,0L295,400C152.5,400 152.5,400 10,400Z\" fill=\"var(--pele-series-1,#4c78a8)\"><title>A → B: 5</title></path><path class=\"pele-sankey-link\" data-id=\"B-&gt;C\" d=\"M305,0C447.5,0 447.5,0 590,0L590,240C447.5,240 447.5,240 305,240Z\" fill=\"var(--pele-series-2,#f58518)\"><title>B → C: 3</title></path></g><g class=\"pele-sankey-nodes\"><rect class=\"pele-sankey-node\" data-id=\"A\" x=\"0\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-1,#4c78a8)\"/><rect class=\"pele-sankey-node\" data-id=\"B\" x=\"295\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-2,#f58518)\"/><rect class=\"pele-sankey-node\" data-id=\"C\" x=\"590\" y=\"0\" width=\"10\" height=\"240\" rx=\"2\" fill=\"var(--pele-series-3,#54a24b)\"/><rect class=\"pele-sankey-node\" data-id=\"D\" x=\"590\" y=\"355.67\" width=\"10\" height=\"1\" rx=\"0.5\" fill=\"var(--pele-series-4,#e45756)\"/></g><g class=\"pele-labels\" font-size=\"14\"><g class=\"pele-label\" data-id=\"A\"><text x=\"16\" y=\"204.9\" text-anchor=\"start\">A <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"B\"><text x=\"311\" y=\"204.9\" text-anchor=\"start\">B <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"C\"><text x=\"584\" y=\"124.9\" text-anchor=\"end\">C <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">3</tspan></text></g><g class=\"pele-label\" data-id=\"D\"><text x=\"584\" y=\"360.57\" text-anchor=\"end\">D <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">0</tspan></text></g></g></g></svg>",
+        "svgSHA256": "6866a6941d2193f52454db6eb7e63302acd248f68873b68cb0f0a76be91be735",
+        "width": 616,
+        "height": 416,
+        "type": "sankey",
+        "links": []
+      },
+      "afterRecovery": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          },
+          {
+            "id": "D",
+            "index": 3
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          },
+          {
+            "key": "D",
+            "id": "D",
+            "index": 3,
+            "nodeIndex": 3
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 4,
+          "writable": true,
+          "enumerable": false,
+          "configurable": false
+        }
+      }
+    },
+    {
+      "mode": "nested-render-original-throw",
+      "trace": [
+        {
+          "event": "width",
+          "phase": "outer",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "nested-render-call"
+        },
+        {
+          "event": "width",
+          "phase": "inner",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "nested-render-caught",
+          "original": true
+        },
+        {
+          "event": "width",
+          "phase": "outer",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "width",
+          "phase": "outer",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "outer-complete"
+        },
+        {
+          "event": "width",
+          "phase": "recovery",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "width",
+          "phase": "recovery",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "width",
+          "phase": "recovery",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "event": "recovery-complete"
+        }
+      ],
+      "measurements": [
+        {
+          "phase": "outer",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "inner",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "outer",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "outer",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "recovery",
+          "text": "A 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "recovery",
+          "text": "B 5",
+          "size": 14,
+          "style": 0
+        },
+        {
+          "phase": "recovery",
+          "text": "C 3",
+          "size": 14,
+          "style": 0
+        }
+      ],
+      "initial": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 3,
+          "writable": true,
+          "enumerable": false,
+          "configurable": false
+        }
+      },
+      "innerOriginal": true,
+      "innerThrownType": "object",
+      "first": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-sankey\" viewBox=\"0 0 616 416\" width=\"616\" height=\"416\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"sankey\"><g transform=\"translate(8,8)\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\"><path class=\"pele-sankey-link\" data-id=\"A-&gt;B\" d=\"M10,0C152.5,0 152.5,0 295,0L295,400C152.5,400 152.5,400 10,400Z\" fill=\"var(--pele-series-1,#4c78a8)\"><title>A → B: 5</title></path><path class=\"pele-sankey-link\" data-id=\"B-&gt;C\" d=\"M305,0C447.5,0 447.5,0 590,0L590,240C447.5,240 447.5,240 305,240Z\" fill=\"var(--pele-series-2,#f58518)\"><title>B → C: 3</title></path></g><g class=\"pele-sankey-nodes\"><rect class=\"pele-sankey-node\" data-id=\"A\" x=\"0\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-1,#4c78a8)\"/><rect class=\"pele-sankey-node\" data-id=\"B\" x=\"295\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-2,#f58518)\"/><rect class=\"pele-sankey-node\" data-id=\"C\" x=\"590\" y=\"0\" width=\"10\" height=\"240\" rx=\"2\" fill=\"var(--pele-series-3,#54a24b)\"/></g><g class=\"pele-labels\" font-size=\"14\"><g class=\"pele-label\" data-id=\"A\"><text x=\"16\" y=\"204.9\" text-anchor=\"start\">A <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"B\"><text x=\"311\" y=\"204.9\" text-anchor=\"start\">B <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"C\"><text x=\"584\" y=\"124.9\" text-anchor=\"end\">C <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">3</tspan></text></g></g></g></svg>",
+        "svgSHA256": "7c1351dfb290c92991b82b3988c319e53c58bc4320da89e151e5555f943bdaf7",
+        "width": 616,
+        "height": 416,
+        "type": "sankey",
+        "links": []
+      },
+      "afterFirst": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 3,
+          "writable": true,
+          "enumerable": false,
+          "configurable": false
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-sankey\" viewBox=\"0 0 616 416\" width=\"616\" height=\"416\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"sankey\"><g transform=\"translate(8,8)\"><g class=\"pele-sankey-links\" fill-opacity=\"0.4\"><path class=\"pele-sankey-link\" data-id=\"A-&gt;B\" d=\"M10,0C152.5,0 152.5,0 295,0L295,400C152.5,400 152.5,400 10,400Z\" fill=\"var(--pele-series-1,#4c78a8)\"><title>A → B: 5</title></path><path class=\"pele-sankey-link\" data-id=\"B-&gt;C\" d=\"M305,0C447.5,0 447.5,0 590,0L590,240C447.5,240 447.5,240 305,240Z\" fill=\"var(--pele-series-2,#f58518)\"><title>B → C: 3</title></path></g><g class=\"pele-sankey-nodes\"><rect class=\"pele-sankey-node\" data-id=\"A\" x=\"0\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-1,#4c78a8)\"/><rect class=\"pele-sankey-node\" data-id=\"B\" x=\"295\" y=\"0\" width=\"10\" height=\"400\" rx=\"2\" fill=\"var(--pele-series-2,#f58518)\"/><rect class=\"pele-sankey-node\" data-id=\"C\" x=\"590\" y=\"0\" width=\"10\" height=\"240\" rx=\"2\" fill=\"var(--pele-series-3,#54a24b)\"/></g><g class=\"pele-labels\" font-size=\"14\"><g class=\"pele-label\" data-id=\"A\"><text x=\"16\" y=\"204.9\" text-anchor=\"start\">A <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"B\"><text x=\"311\" y=\"204.9\" text-anchor=\"start\">B <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">5</tspan></text></g><g class=\"pele-label\" data-id=\"C\"><text x=\"584\" y=\"124.9\" text-anchor=\"end\">C <tspan class=\"pele-sankey-value\" fill=\"var(--_m)\">3</tspan></text></g></g></g></svg>",
+        "svgSHA256": "7c1351dfb290c92991b82b3988c319e53c58bc4320da89e151e5555f943bdaf7",
+        "width": 616,
+        "height": 416,
+        "type": "sankey",
+        "links": []
+      },
+      "afterRecovery": {
+        "nodes": [
+          {
+            "id": "A",
+            "index": 0
+          },
+          {
+            "id": "B",
+            "index": 1
+          },
+          {
+            "id": "C",
+            "index": 2
+          }
+        ],
+        "lookup": [
+          {
+            "key": "A",
+            "id": "A",
+            "index": 0,
+            "nodeIndex": 0
+          },
+          {
+            "key": "B",
+            "id": "B",
+            "index": 1,
+            "nodeIndex": 1
+          },
+          {
+            "key": "C",
+            "id": "C",
+            "index": 2,
+            "nodeIndex": 2
+          }
+        ],
+        "lengthDescriptor": {
+          "value": 3,
+          "writable": true,
+          "enumerable": false,
+          "configurable": false
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+Building for production...
+[Pre-planning 1 / 125]
+[Planning deferred tasks]
+[2 / 2]
+[5 / 5] pele-smoke-product
+[7 / 9] PeleTests-product
+[8 / 8] pele-smoke-product
+Build complete! (1.64 secs)
+Test Suite 'Selected tests' started at 2026-10-20 22:13:46.237.
+Test Suite 'PeleTests.xctest' started at 2026-10-20 22:13:46.239.
+Test Suite 'AdditionalDiagramTests' started at 2026-10-20 22:13:46.239.
+Test Case '-[PeleTests.AdditionalDiagramTests testPinnedDiagramsThroughNativeDocuments]' started.
+Swift corpus: er
+Swift corpus: sankey
+Swift mutable corpus: 12481 drawings, 16572 errors, 0 explicit budget differences
+Test Case '-[PeleTests.AdditionalDiagramTests testPinnedDiagramsThroughNativeDocuments]' passed (43.386 seconds).
+Test Suite 'AdditionalDiagramTests' passed at 2026-10-20 22:14:29.625.
+	 Executed 1 test, with 0 failures (0 unexpected) in 43.386 (43.386) seconds
+Test Suite 'EagerProjectionIntegrationTests' started at 2026-10-20 22:14:29.625.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testCAbortAfterPublishedBatchesDiscardsDocumentAndKeepsParseErrorOrder]' started.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testCAbortAfterPublishedBatchesDiscardsDocumentAndKeepsParseErrorOrder]' passed (0.001 seconds).
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testCMetadataSizeAbortAndOwnedHandleContract]' started.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testCMetadataSizeAbortAndOwnedHandleContract]' passed (0.000 seconds).
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testExpandedModelBudgetFailsBeforePublicParseReturns]' started.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testExpandedModelBudgetFailsBeforePublicParseReturns]' passed (0.194 seconds).
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testJSONNormalizationUnicodeAndBatchBoundariesThroughPublicParse]' started.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testJSONNormalizationUnicodeAndBatchBoundariesThroughPublicParse]' passed (0.077 seconds).
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testParseFailuresStayEagerAndMatchLegacy]' started.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testParseFailuresStayEagerAndMatchLegacy]' passed (0.000 seconds).
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testProjectionDepthBoundaryMatchesLegacyAdmission]' started.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testProjectionDepthBoundaryMatchesLegacyAdmission]' passed (0.046 seconds).
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testRetainedRenderConfigAndQueryAfterEngineLifetime]' started.
+Test Case '-[PeleTests.EagerProjectionIntegrationTests testRetainedRenderConfigAndQueryAfterEngineLifetime]' passed (0.001 seconds).
+Test Suite 'EagerProjectionIntegrationTests' passed at 2026-10-20 22:14:29.946.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 0.320 (0.321) seconds
+Test Suite 'NonfiniteDiagramTests' started at 2026-10-20 22:14:29.946.
+Test Case '-[PeleTests.NonfiniteDiagramTests testSankeyOwnedRenderAndCodableKeepNonfiniteHeight]' started.
+Test Case '-[PeleTests.NonfiniteDiagramTests testSankeyOwnedRenderAndCodableKeepNonfiniteHeight]' passed (0.000 seconds).
+Test Suite 'NonfiniteDiagramTests' passed at 2026-10-20 22:14:29.947.
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+Test Suite 'PreparedDocumentTests' started at 2026-10-20 22:14:29.947.
+Test Case '-[PeleTests.PreparedDocumentTests testAllThirtyThreeCallerBuiltModelsMatchPinnedGraphsSVGErrorsAndCallbacks]' started.
+Test Case '-[PeleTests.PreparedDocumentTests testAllThirtyThreeCallerBuiltModelsMatchPinnedGraphsSVGErrorsAndCallbacks]' passed (0.995 seconds).
+Test Case '-[PeleTests.PreparedDocumentTests testAllThirtyThreeRawEntriesPreservePinnedModelsSVGAndCallbacks]' started.
+Test Case '-[PeleTests.PreparedDocumentTests testAllThirtyThreeRawEntriesPreservePinnedModelsSVGAndCallbacks]' passed (1.638 seconds).
+Test Case '-[PeleTests.PreparedDocumentTests testCallerBuiltModelPreservesAliasesWithoutParsingSource]' started.
+Test Case '-[PeleTests.PreparedDocumentTests testCallerBuiltModelPreservesAliasesWithoutParsingSource]' passed (0.001 seconds).
+Test Case '-[PeleTests.PreparedDocumentTests testNamedSchemasAndInvalidFreshModelsNeedNoSourceBootstrap]' started.
+Test Case '-[PeleTests.PreparedDocumentTests testNamedSchemasAndInvalidFreshModelsNeedNoSourceBootstrap]' passed (1.368 seconds).
+Test Case '-[PeleTests.PreparedDocumentTests testRawBoundMethodUsesSameOwnerAndPreservesOriginalFailureAfterPartialEdit]' started.
+Test Case '-[PeleTests.PreparedDocumentTests testRawBoundMethodUsesSameOwnerAndPreservesOriginalFailureAfterPartialEdit]' passed (0.006 seconds).
+Test Case '-[PeleTests.PreparedDocumentTests testRawEdgeUndefinedAndExplicitContextHaveIndependentPolicies]' started.
+Test Case '-[PeleTests.PreparedDocumentTests testRawEdgeUndefinedAndExplicitContextHaveIndependentPolicies]' passed (0.031 seconds).
+Test Case '-[PeleTests.PreparedDocumentTests testRawRenderIgnoresCoreOutputLimitAndRetainsHostFailureRevision]' started.
+Test Case '-[PeleTests.PreparedDocumentTests testRawRenderIgnoresCoreOutputLimitAndRetainsHostFailureRevision]' passed (0.001 seconds).
+Test Suite 'PreparedDocumentTests' passed at 2026-10-20 22:14:33.987.
+	 Executed 7 tests, with 0 failures (0 unexpected) in 4.039 (4.040) seconds
+Test Suite 'PeleTests.xctest' passed at 2026-10-20 22:14:33.987.
+	 Executed 16 tests, with 0 failures (0 unexpected) in 47.746 (47.748) seconds
+Test Suite 'Selected tests' passed at 2026-10-20 22:14:33.987.
+	 Executed 16 tests, with 0 failures (0 unexpected) in 47.746 (47.750) seconds

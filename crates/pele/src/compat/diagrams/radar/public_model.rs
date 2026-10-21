@@ -1,6 +1,6 @@
 //! Mutable Radar's plain objects/arrays. Import concrete values, retain the exact identity graph.
 //! This native codec does not provide JavaScript prototype dispatch or TypeError identity.
-//! Sparse active arrays, active lone surrogates and unsupported numeric coercions report gaps.
+//! Sparse axes retain holes through public phase reads; other unsupported coercions report gaps.
 //! Independent geometry/text work budgets do not reapply the parser's 32-tick clamp.
 use super::{Radar, RadarAxis, RadarCurve, RadarModel, RadarOptions};
 use crate::compat::{
@@ -281,6 +281,12 @@ impl PublicDiagramModule for Radar {
         let model = imported(&graph);
         Ok(RadarPublicState { graph, model })
     }
+    fn borrow_public_graph<'a>(&self, state: &'a Self::PublicState) -> Option<&'a ModelGraph> {
+        Some(&state.graph)
+    }
+    fn unchanged_public_graph_is_noop(&self) -> bool {
+        true
+    }
     fn export_public(&self, state: &RadarPublicState) -> Result<ModelGraph, PeleError> {
         Ok(state.graph.clone())
     }
@@ -293,6 +299,41 @@ impl PublicDiagramModule for Radar {
         state.graph = graph;
         Ok(())
     }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::radar())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::radar(
+            super::RadarDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
+    }
+    fn render_public_operation(
+        &self,
+        state: &mut RadarPublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, crate::compat::public::PublicError> {
+        // Keep existing typed projection on its supported domain. Sparse/empty
+        // geometry requires phase-local failures rather than eager DTO errors.
+        if let Ok(model) = &state.model {
+            return self
+                .render(model, config, options, host)
+                .map_err(Into::into);
+        }
+        super::live_phase::render_graph(
+            &state.graph,
+            &super::RadarDetachedInput::new(state.model.as_ref().err().cloned()),
+            config,
+            options,
+            host,
+        )
+    }
     fn render_public(
         &self,
         state: &mut RadarPublicState,
@@ -300,11 +341,18 @@ impl PublicDiagramModule for Radar {
         options: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        self.render(
-            state.model.as_ref().map_err(Clone::clone)?,
-            config,
-            options,
-            host,
-        )
+        self.render_public_operation(state, config, options, host)
+            .map_err(|error| {
+                use crate::compat::public::PublicError;
+                match error {
+                    PublicError::Pele(error) => error,
+                    PublicError::JavaScript { name, message } => {
+                        let mut error = invalid(&message.well_formed().unwrap_or_default());
+                        error.name = format!("{name:?}");
+                        error
+                    }
+                    _ => invalid("Radar host exception requires operation API"),
+                }
+            })
     }
 }

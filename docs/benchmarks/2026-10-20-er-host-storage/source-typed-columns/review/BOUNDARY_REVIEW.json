@@ -1,0 +1,21 @@
+{
+  "verdict": "GO for separate integration/validation after parent e518 benchmark decision; no source blocker",
+  "patchSHA256": "b7cfd9d9bf285a8aa0cfcf59a16d9c7f26fedbab175c328d3e8a436b82410c87",
+  "manifestSHA256": "a55d60aa48afb4cd45b8d6509435787ed68e55d141c420decaaf92177c610691",
+  "verifiedFiles": 7,
+  "currentOriginalsMatch": true,
+  "exactUpstreamDeltaPreserved": true,
+  "applyCheck": "passed whitespace=error-all",
+  "executed": [
+    "hash and source comparison",
+    "git apply --check"
+  ],
+  "notExecuted": [
+    "build",
+    "tests",
+    "browser",
+    "Swift",
+    "VM",
+    "timings"
+  ]
+}

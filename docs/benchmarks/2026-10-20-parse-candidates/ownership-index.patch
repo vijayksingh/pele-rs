@@ -1,0 +1,65 @@
+--- a/bindings/web/graph.js
++++ b/bindings/web/graph.js
+@@ -55,7 +55,7 @@
+       if(identity&&!shared){shared={name:method.name,arity:method.arity,constructible,registrations:new Set(),callable:null};this.sharedFunctions.set(identity,shared);}
+       if(shared)shared.registrations.add(registration);
+       const dispatch=(receiver,argumentsValue)=>{
+-        const direct=receiver&&registry.owners.get(receiver);
++        const direct=receiver&&registry.owners.get(receiver)?.owner;
+         let owner;
+         if(shared) {
+           if(direct&&!direct.disposed&&direct.registration.sharedIds.has(identity))owner=direct;
+@@ -117,7 +117,9 @@
+     this.registration.documents.push(new WeakRef(this));
+     this.disposed=false;
+     this.invoke = (...args) => this.activeInvoke ? this.activeInvoke(...args) : invoke(...args);
+-    this.ids = new WeakMap();
++    // Native-owned nodes already have an eager registry identity record.
++    // Only caller-created/borrowed values need an additional document-local ID.
++    this.ids = undefined;
+     this.hostIds = new Map();
+     this.hostValues = [];
+     this.objects = [];
+@@ -145,7 +147,7 @@
+         case 'date': value = new Date(numberValue(node.milliseconds)); break;
+         default: throw new TypeError('Unsupported public object kind');
+       }
+-      this.objects.push(value); this.ids.set(value, id); this.registry.owners.set(value, this);
++      this.objects.push(value); this.registry.owners.set(value, {owner:this, id});
+     }
+     for (const id of changed ?? graph.nodes.keys()) {
+       const node = graph.nodes[id];
+@@ -194,6 +196,12 @@
+     this.root = this.value(graph.root);
+     return this.root;
+   }
++  nodeId(value) {
++    const identity = this.registry.owners.get(value);
++    // Importing another document's object must not steal its dispatch owner.
++    // Its arena ID is local to this bridge, just like a caller-created object.
++    return identity?.owner === this ? identity.id : this.ids?.get(value);
++  }
+   matchesPublishedGraph() {
+     const graph=this.graph;
+     if(this.objects.length!==graph.nodes.length||this.strings.length!==graph.strings.length)return false;
+@@ -208,7 +216,7 @@
+         case 'bool':return value===atom.value;
+         case 'number':return typeof value==='number'&&numberBits(value)===atom.value;
+         case 'string':return typeof value==='string'&&value===this.strings[atom.value]&&this.stringIds.get(value)===atom.value;
+-        case 'ref':return value===this.objects[atom.value]&&this.ids.get(value)===atom.value;
++        case 'ref':return value===this.objects[atom.value]&&this.nodeId(value)===atom.value;
+         case 'builtinFunction':return value===this.registration.functions.get(atom.value)&&this.registration.functionIds.get(value)===atom.value;
+         default:return false;
+       }
+@@ -314,9 +322,9 @@
+         case 'object': {
+           const prototype = Object.getPrototypeOf(value);
+           if (!(Array.isArray(value) || value instanceof Map || value instanceof Set || value instanceof Date || errorKind(value) || prototype === Object.prototype || this.registration.prototypeIds.has(prototype))) return host(value);
+-          let id = this.ids.get(value);
++          let id = this.nodeId(value);
+           if (id === undefined) {
+-            id = this.objects.length; if (id >= 1_000_000) budget(); this.objects.push(value); this.ids.set(value, id);
++            id = this.objects.length; if (id >= 1_000_000) budget(); this.objects.push(value); (this.ids ??= new WeakMap()).set(value, id);
+           }
+           if (!seen.has(id)) { seen.add(id); pending.push([id, value]); }
+           return {kind: 'ref', value: id};

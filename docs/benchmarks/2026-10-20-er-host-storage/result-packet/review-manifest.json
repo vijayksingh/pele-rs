@@ -1,0 +1,51 @@
+{
+  "status": "static runtime review closed; corrected current production tests reviewed",
+  "appliedPatchSha256": "edd4c8ef5bfb42a47dde0a52fccf891e5bda09e154af6719527acc6333c7cb68",
+  "frozenCandidateManifestSha256": "afb497a1c4bada57a511a7c93e2e0a701b2878cea810ba5c152fc4647f12d480",
+  "reviewSha256": "ab9357b07c05c188a5ec3caa03fc48c3d6e26ae114b4bc8202fd6bd6f30d64df",
+  "runtimeFiles": [
+    {
+      "path": "bindings/web/full.js",
+      "sha256": "99d53d183509e4211a076803e440c0eb51ffb5f5330900166e0082238008bee7",
+      "matchesFrozenCandidate": true
+    },
+    {
+      "path": "bindings/web/host-er-store.js",
+      "sha256": "367b12d31775547bb37f89efc3277442878438aded6ecd80ff1d4132297cf433",
+      "matchesFrozenCandidate": true
+    },
+    {
+      "path": "crates/pele-wasm/src/host_er.rs",
+      "sha256": "a808ab851a0c804468b8654a7666532100f4be0a953213e2c0f47c5a9f33119e",
+      "matchesFrozenCandidate": true
+    },
+    {
+      "path": "crates/pele-wasm/src/render_numbers.rs",
+      "sha256": "dd650a815e7195a59d6fb7bc6baec27e9265fce6e83a1b48353b1edfc2f089ca",
+      "matchesFrozenCandidate": true
+    }
+  ],
+  "currentPublicTest": {
+    "path": "tests/web/er-result-packet.spec.js",
+    "sha256": "c61f3987745fe148c917766c32cc36af07b49dffdacc64579b64c8c350124d1c",
+    "differsFromFrozenPatchTest": true
+  },
+  "reviewerExecution": "none",
+  "parentReportedAttempts": {
+    "initial": {
+      "checks": 54,
+      "passed": 48,
+      "fixtureFailures": 6,
+      "transportDifferentialMismatchReported": false
+    },
+    "correctedChromium": {
+      "passed": 3
+    },
+    "correctedAllEngines": "running at request"
+  },
+  "remainingProof": [
+    "all-engine corrected artifacts not independently inspected",
+    "nonempty ER links currently unreachable"
+  ],
+  "testFinding": "Normal overflow target may exactly equal ceiling for one remainder; parent notified of strict-overflow formula and assertion. Runtime unaffected."
+}

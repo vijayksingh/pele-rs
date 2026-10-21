@@ -7,6 +7,7 @@ mod parser;
 pub(crate) mod render;
 pub(crate) mod shapes;
 mod tokens;
+mod topology;
 use crate::compat::{Engine, ParseContext, ParseOptions, PeleError};
 pub use model::{FlowClassDef, FlowEdge, FlowNode, FlowSubgraph, FlowchartModel, LabelType};
 /// Parse through the same bounded preparation, directive, encoding and configuration path as Engine.
@@ -68,4 +69,16 @@ impl DiagramModule for Flowchart {
 }
 
 mod public_model;
+pub(crate) use public_model::imported as import_public_graph;
 pub use public_model::{FlowchartPublicOrigin, FlowchartPublicState};
+
+pub(crate) use public_model::{
+    construct_with as construct_flow_with, detached_method as detached_flow_method,
+    LIVE_FIELDS as FLOW_LIVE_FIELDS,
+};
+
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{
+    render_detached, render_variant as render_live_variant, FlowchartDetachedInput,
+};

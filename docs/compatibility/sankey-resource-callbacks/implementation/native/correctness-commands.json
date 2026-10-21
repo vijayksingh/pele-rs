@@ -1,0 +1,233 @@
+[
+  {
+    "phase": "freeze-before-sdk",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/sankey-live-correctness/runtime/freeze.mjs",
+      "before-sdk",
+      "8175006345f3b66a6c9fd942814ed0ba5ff3014d"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-freeze-before-sdk.log",
+    "startedAt": "2026-10-20T20:28:16.788408+00:00",
+    "endedAt": "2026-10-20T20:28:17.318345+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "native-features",
+    "command": [
+      "bash",
+      "-c",
+      "source scripts/env.sh; CARGO_BUILD_JOBS=2 cargo test --locked -p pele-rs --test public_binary --test public_methods --test public_model_construction --test public_registry --test public_sankey --test public_sankey_owned_parse --test public_schema_registration --test public_shared_functions --test public_source_ingress --test sankey_compat --test public_detached_render"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/sankey-live-correctness-native-features.log",
+    "startedAt": "2026-10-20T20:28:17.319868+00:00",
+    "endedAt": "2026-10-20T20:30:27.284240+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "sdk-build",
+    "command": [
+      "bash",
+      "scripts/build-native.sh",
+      "--host"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/sankey-live-correctness-sdk-build.log",
+    "startedAt": "2026-10-20T20:30:27.289139+00:00",
+    "endedAt": "2026-10-20T20:33:59.181470+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-after-sdk",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/sankey-live-correctness/runtime/freeze.mjs",
+      "after-sdk",
+      "8175006345f3b66a6c9fd942814ed0ba5ff3014d"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-freeze-after-sdk.log",
+    "startedAt": "2026-10-20T20:33:59.182969+00:00",
+    "endedAt": "2026-10-20T20:33:59.637205+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-build",
+    "command": [
+      "node",
+      "scripts/perf/swift/build.mjs"
+    ],
+    "environmentOverrides": {
+      "CARGO_BUILD_JOBS": "2"
+    },
+    "log": "dist/evidence/sankey-live-correctness-swift-build.log",
+    "startedAt": "2026-10-20T20:33:59.637634+00:00",
+    "endedAt": "2026-10-20T20:34:07.123229+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-before-correctness",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/sankey-live-correctness/runtime/freeze.mjs",
+      "before-correctness",
+      "8175006345f3b66a6c9fd942814ed0ba5ff3014d"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-freeze-before-correctness.log",
+    "startedAt": "2026-10-20T20:34:07.123961+00:00",
+    "endedAt": "2026-10-20T20:34:07.384439+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-corpus",
+    "command": [
+      "swift",
+      "test",
+      "-c",
+      "release",
+      "--package-path",
+      "bindings/swift",
+      "--filter",
+      "AdditionalDiagramTests/testPinnedDiagramsThroughNativeDocuments|EagerProjectionIntegrationTests|PreparedDocumentTests|NonfiniteDiagramTests/testSankeyOwnedRenderAndCodableKeepNonfiniteHeight"
+    ],
+    "environmentOverrides": {
+      "PELE_VERIFY_MUTABLE": "1",
+      "PELE_FAMILIES": "er,sankey"
+    },
+    "log": "dist/evidence/sankey-live-correctness-swift-corpus.log",
+    "startedAt": "2026-10-20T20:34:07.384882+00:00",
+    "endedAt": "2026-10-20T20:35:05.828279+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/sankey-live-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-ffi-compile.log",
+    "startedAt": "2026-10-20T20:35:05.829156+00:00",
+    "endedAt": "2026-10-20T20:35:06.148792+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-run",
+    "command": [
+      "dist/evidence/sankey-live-correctness-ffi"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-ffi-run.log",
+    "startedAt": "2026-10-20T20:35:06.149306+00:00",
+    "endedAt": "2026-10-20T20:35:06.716539+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-public.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/sankey-live-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-ffi-public-compile.log",
+    "startedAt": "2026-10-20T20:35:06.716977+00:00",
+    "endedAt": "2026-10-20T20:35:06.866037+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-public-run",
+    "command": [
+      "dist/evidence/sankey-live-correctness-ffi-public"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-ffi-public-run.log",
+    "startedAt": "2026-10-20T20:35:06.867120+00:00",
+    "endedAt": "2026-10-20T20:35:07.473875+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-compile",
+    "command": [
+      "cc",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-std=c11",
+      "-I",
+      "include",
+      "tests/ffi-parse-limits.c",
+      "bindings/swift/Artifacts/CPele.xcframework/macos-arm64/libpele_ffi.a",
+      "-o",
+      "dist/evidence/sankey-live-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-ffi-parse-limits-compile.log",
+    "startedAt": "2026-10-20T20:35:07.474397+00:00",
+    "endedAt": "2026-10-20T20:35:07.609688+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "ffi-parse-limits-run",
+    "command": [
+      "dist/evidence/sankey-live-correctness-ffi-parse-limits"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-ffi-parse-limits-run.log",
+    "startedAt": "2026-10-20T20:35:07.610124+00:00",
+    "endedAt": "2026-10-20T20:35:08.157970+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "swift-api",
+    "command": [
+      "node",
+      "scripts/perf/swift/run.mjs",
+      "--output",
+      "dist/evidence/sankey-live-correctness-swift-api.json"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-swift-api.log",
+    "startedAt": "2026-10-20T20:35:08.159275+00:00",
+    "endedAt": "2026-10-20T20:35:10.089741+00:00",
+    "exitCode": 0
+  },
+  {
+    "phase": "freeze-after-correctness",
+    "command": [
+      "node",
+      "dist/perf-patches/parse-architecture/sankey-live-correctness/runtime/freeze.mjs",
+      "after-correctness",
+      "8175006345f3b66a6c9fd942814ed0ba5ff3014d"
+    ],
+    "environmentOverrides": {},
+    "log": "dist/evidence/sankey-live-correctness-freeze-after-correctness.log",
+    "startedAt": "2026-10-20T20:35:10.090231+00:00",
+    "endedAt": "2026-10-20T20:35:10.435233+00:00",
+    "exitCode": 0
+  }
+]

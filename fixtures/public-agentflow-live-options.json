@@ -1,0 +1,435 @@
+{
+  "rawGuards": [
+    {
+      "kind": "plain",
+      "result": {
+        "ok": false,
+        "name": "TypeError",
+        "message": "n.vertexKind is not a function"
+      }
+    },
+    {
+      "kind": "shadowed",
+      "result": {
+        "ok": false,
+        "name": "TypeError",
+        "message": "n.vertexKind is not a function"
+      }
+    }
+  ],
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "641bd6e4e3312113c96356e1e3df1848b38cfd7c8b1cd97f57291708021cd5ad",
+  "cache": {
+    "first": {
+      "ok": true,
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 64\" width=\"172\" height=\"64\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,32)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g></g></svg>",
+      "width": "4065800000000000",
+      "height": "4050000000000000"
+    },
+    "second": {
+      "ok": true,
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 64\" width=\"172\" height=\"64\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,32)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g></g></svg>",
+      "width": "4065800000000000",
+      "height": "4050000000000000"
+    },
+    "freshBoth": {
+      "ok": true,
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 368 64\" width=\"368\" height=\"64\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,32)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(282,32)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+      "width": "4077000000000000",
+      "height": "4050000000000000"
+    },
+    "sameAfterEdit": true,
+    "newOwnerDiffers": true
+  },
+  "cases": [
+    {
+      "mode": "normal",
+      "trace": [
+        [
+          "get",
+          "lineOffset"
+        ],
+        [
+          "get",
+          "maxEdges",
+          0
+        ],
+        [
+          "get",
+          "inheritDir",
+          0
+        ],
+        [
+          "get",
+          "direction"
+        ],
+        [
+          "get",
+          "log",
+          1
+        ],
+        [
+          "call",
+          "log",
+          true,
+          "warning",
+          "agentflow[test]: message"
+        ]
+      ],
+      "operations": [
+        {
+          "name": "addSingleLink",
+          "ok": true
+        },
+        {
+          "name": "addSubGraph",
+          "value": "G",
+          "ok": true
+        },
+        {
+          "name": "emitWarning",
+          "ok": true
+        }
+      ],
+      "state": {
+        "nodes": [
+          "A",
+          "B"
+        ],
+        "edges": 1,
+        "subCount": 1,
+        "subgraphs": [
+          {
+            "id": "G",
+            "nodes": [
+              "A",
+              "B"
+            ],
+            "title": "Group",
+            "classes": [],
+            "dir": "LR",
+            "labelType": "text",
+            "type": "flow"
+          }
+        ],
+        "diagnostics": [
+          {
+            "id": "test",
+            "severity": "warning",
+            "message": "message",
+            "nodeId": "A"
+          }
+        ]
+      }
+    },
+    {
+      "mode": "max-throw",
+      "trace": [
+        [
+          "get",
+          "lineOffset"
+        ],
+        [
+          "get",
+          "maxEdges",
+          0
+        ],
+        [
+          "get",
+          "inheritDir",
+          0
+        ],
+        [
+          "get",
+          "direction"
+        ],
+        [
+          "get",
+          "log",
+          1
+        ],
+        [
+          "call",
+          "log",
+          true,
+          "warning",
+          "agentflow[test]: message"
+        ]
+      ],
+      "operations": [
+        {
+          "name": "addSingleLink",
+          "ok": false,
+          "original": true,
+          "error": {}
+        },
+        {
+          "name": "addSubGraph",
+          "value": "G",
+          "ok": true
+        },
+        {
+          "name": "emitWarning",
+          "ok": true
+        }
+      ],
+      "state": {
+        "nodes": [
+          "A",
+          "B"
+        ],
+        "edges": 0,
+        "subCount": 1,
+        "subgraphs": [
+          {
+            "id": "G",
+            "nodes": [
+              "A",
+              "B"
+            ],
+            "title": "Group",
+            "classes": [],
+            "dir": "LR",
+            "labelType": "text",
+            "type": "flow"
+          }
+        ],
+        "diagnostics": [
+          {
+            "id": "test",
+            "severity": "warning",
+            "message": "message",
+            "nodeId": "A"
+          }
+        ]
+      }
+    },
+    {
+      "mode": "inherit-throw",
+      "trace": [
+        [
+          "get",
+          "lineOffset"
+        ],
+        [
+          "get",
+          "maxEdges",
+          0
+        ],
+        [
+          "get",
+          "inheritDir",
+          0
+        ],
+        [
+          "get",
+          "log",
+          1
+        ],
+        [
+          "call",
+          "log",
+          true,
+          "warning",
+          "agentflow[test]: message"
+        ]
+      ],
+      "operations": [
+        {
+          "name": "addSingleLink",
+          "ok": true
+        },
+        {
+          "name": "addSubGraph",
+          "ok": false,
+          "original": true,
+          "error": {}
+        },
+        {
+          "name": "emitWarning",
+          "ok": true
+        }
+      ],
+      "state": {
+        "nodes": [
+          "A",
+          "B"
+        ],
+        "edges": 1,
+        "subCount": 0,
+        "subgraphs": [],
+        "diagnostics": [
+          {
+            "id": "test",
+            "severity": "warning",
+            "message": "message",
+            "nodeId": "A"
+          }
+        ]
+      }
+    },
+    {
+      "mode": "log-throw",
+      "trace": [
+        [
+          "get",
+          "lineOffset"
+        ],
+        [
+          "get",
+          "maxEdges",
+          0
+        ],
+        [
+          "get",
+          "inheritDir",
+          0
+        ],
+        [
+          "get",
+          "direction"
+        ],
+        [
+          "get",
+          "log",
+          1
+        ],
+        [
+          "call",
+          "log",
+          true,
+          "warning",
+          "agentflow[test]: message"
+        ]
+      ],
+      "operations": [
+        {
+          "name": "addSingleLink",
+          "ok": true
+        },
+        {
+          "name": "addSubGraph",
+          "value": "G",
+          "ok": true
+        },
+        {
+          "name": "emitWarning",
+          "ok": false,
+          "original": true,
+          "error": {}
+        }
+      ],
+      "state": {
+        "nodes": [
+          "A",
+          "B"
+        ],
+        "edges": 1,
+        "subCount": 1,
+        "subgraphs": [
+          {
+            "id": "G",
+            "nodes": [
+              "A",
+              "B"
+            ],
+            "title": "Group",
+            "classes": [],
+            "dir": "LR",
+            "labelType": "text",
+            "type": "flow"
+          }
+        ],
+        "diagnostics": [
+          {
+            "id": "test",
+            "severity": "warning",
+            "message": "message",
+            "nodeId": "A"
+          }
+        ]
+      }
+    },
+    {
+      "mode": "log-reentry",
+      "trace": [
+        [
+          "get",
+          "lineOffset"
+        ],
+        [
+          "get",
+          "maxEdges",
+          0
+        ],
+        [
+          "get",
+          "inheritDir",
+          0
+        ],
+        [
+          "get",
+          "direction"
+        ],
+        [
+          "get",
+          "log",
+          1
+        ],
+        [
+          "call",
+          "log",
+          true,
+          "warning",
+          "agentflow[test]: message"
+        ]
+      ],
+      "operations": [
+        {
+          "name": "addSingleLink",
+          "ok": true
+        },
+        {
+          "name": "addSubGraph",
+          "value": "G",
+          "ok": true
+        },
+        {
+          "name": "emitWarning",
+          "ok": true
+        }
+      ],
+      "state": {
+        "nodes": [
+          "A",
+          "B",
+          "Nested"
+        ],
+        "edges": 1,
+        "subCount": 1,
+        "subgraphs": [
+          {
+            "id": "G",
+            "nodes": [
+              "A",
+              "B"
+            ],
+            "title": "Group",
+            "classes": [],
+            "dir": "LR",
+            "labelType": "text",
+            "type": "flow"
+          }
+        ],
+        "diagnostics": [
+          {
+            "id": "test",
+            "severity": "warning",
+            "message": "message",
+            "nodeId": "A"
+          }
+        ]
+      }
+    }
+  ]
+}

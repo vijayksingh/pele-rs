@@ -4,6 +4,7 @@ import CPele
 private struct PublicDocumentMetadata: Decodable {
     let type: String
     let revision: String
+    let constructorCreated: Bool?
 }
 func ownedPublicDocument(_ result: OpaquePointer?, document: OpaquePointer?) throws -> Pele.MutableDocument {
     do {
@@ -11,7 +12,8 @@ func ownedPublicDocument(_ result: OpaquePointer?, document: OpaquePointer?) thr
         guard let handle = document, let revision = UInt64(metadata.revision), String(revision) == metadata.revision else {
             throw PeleError(code: "internal", message: "Invalid mutable document metadata")
         }
-        return Pele.MutableDocument(handle: handle, type: metadata.type, revision: revision)
+        return Pele.MutableDocument(handle: handle, type: metadata.type, revision: revision,
+                                    isConstructorCreated: metadata.constructorCreated ?? false)
     } catch {
         if let document { pele_public_document_free_v4(document) }
         throw error
@@ -25,26 +27,58 @@ extension Pele {
     public final class MutableDocument {
         private var handle: OpaquePointer?
         private var active = false
+        private var detachedDepth = 0
         var hostFunctions: [UInt32: HostFunctionBox] = [:]
+        var hostValueStore = PublicHostStore()
+        var hostValueAccess: HostValueAccessBox?
+        var usesHostValues = false
         public let type: String
+        public let isConstructorCreated: Bool
         public private(set) var revision: UInt64
-        fileprivate init(handle: OpaquePointer, type: String, revision: UInt64) {
+        internal init(handle: OpaquePointer, type: String, revision: UInt64, isConstructorCreated: Bool = false) {
             self.handle = handle; self.type = type; self.revision = revision
+            self.isConstructorCreated = isConstructorCreated
         }
         deinit { if let handle { pele_public_document_free_v4(handle) } }
         public func close() throws {
-            guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
+            guard !active && detachedDepth == 0 else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
             if let handle {
                 active = true; self.handle = nil
                 defer { active = false }
-                pele_public_document_free_v4(handle); hostFunctions.removeAll()
+                pele_public_document_free_v4(handle); hostFunctions.removeAll(); hostValueStore = PublicHostStore(); hostValueAccess = nil
             }
         }
         func withHandle<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
             guard let handle else { throw PeleError(code: "semantic", message: "Mutable document is closed") }
             guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
             active = true; defer { active = false }
-            return try withExtendedLifetime(self) { try operation(handle) }
+            return try withHostFunctionErrorScope {
+                try withExtendedLifetime(self) {
+                    // Native-owned helper phases can advance the owner during a
+                    // detached callback. Refresh only metadata before an implicit
+                    // revision-dependent nested operation; explicit apply packets
+                    // retain their caller-supplied expected revision.
+                    if detachedDepth > 0 {
+                        let current = try Pele.compatibilityResult(pele_public_revision_v15(handle), as: AppliedRevision.self)
+                        guard let value = UInt64(current.revision), String(value) == current.revision else {
+                            throw PeleError(code: "internal", message: "Invalid mutable revision")
+                        }
+                        revision = value
+                    }
+                    return try operation(handle)
+                }
+            }
+        }
+        // Retain ownership across callbacks while allowing short nested native calls.
+        // Disposal remains forbidden for the complete detached lifecycle.
+        func withDetachedLifetime<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
+            guard let handle else { throw PeleError(code: "semantic", message: "Mutable document is closed") }
+            guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
+            try ensureHostValueAccess(handle)
+            detachedDepth += 1; defer { detachedDepth -= 1 }
+            return try withHostFunctionErrorScope {
+                try withExtendedLifetime(self) { try operation(handle) }
+            }
         }
         internal func acceptPreparedRevision(_ revision: UInt64) { self.revision = revision }
         public func snapshot() throws -> PublicSnapshot {
@@ -83,6 +117,8 @@ extension Pele {
             struct Call: Encodable { let method: UInt32; let receiver: PublicGraph.Atom; let arguments: [PublicGraph.Atom] }
             let bytes = try JSONEncoder().encode(Call(method: method, receiver: receiver, arguments: arguments))
             guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public method exceeds 64 MiB JSON budget") }
+            let liveCalendar = type == "gantt" && [19, 20, 22, 23, 25, 26, 28, 30].contains(method)
+            if usesHostValues || liveCalendar, let detached = try invokeDetached(bytes, resources: resources) { return detached }
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in withHostFunctionResources(takeError) { bytes.withUnsafeBytes { input in
                     pele_public_invoke_with_functions_v12(handle, revision, input.bindMemory(to: UInt8.self).baseAddress, input.count, host)
@@ -107,10 +143,25 @@ extension Pele {
         public func renderOperation(outputLimit: OutputLimit, options: Engine.Options = .init(), resources: HostResources = .init()) throws -> PublicRenderOutcome {
             try renderOperation(options: options, resources: resources, outputLimit: outputLimit)
         }
+        // C v11/v14 select the authenticated owned renderer internally. Keep
+        // the owner alive and disposal blocked while resource callbacks make
+        // short nested operations; acknowledge current revision on export error.
+        private func withPresentationHandle<T>(_ detached: Bool,
+            _ operation: (OpaquePointer) throws -> T) throws -> T {
+            if !detached { return try withHandle(operation) }
+            return try withDetachedLifetime { handle in
+                _ = try withHandle { _ in () }
+                defer { _ = try? withHandle { _ in () } }
+                return try operation(handle)
+            }
+        }
         private func renderOperation(options: Engine.Options, resources: HostResources, outputLimit: OutputLimit?, presentationBudget: PresentationBudget? = nil) throws -> PublicRenderOutcome {
             let settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
             let presentation = try presentationBudget?.packet()
-            return try withHandle { handle in
+            if presentation == nil, let detached = try renderDetached(settings: settings, resources: resources) {
+                return detached
+            }
+            return try withPresentationHandle(presentation != nil) { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in
                     withHostFunctionResources(takeError) {
                         return settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
@@ -148,7 +199,7 @@ extension Pele {
             let limit = outputLimit ?? options.outputLimit.map { OutputLimit.number(Double($0)) } ?? .undefined
             let settings = try RenderNumberEncoding(options, outputLimit: limit)
             var presentation = try budget.packet()
-            return try withHandle { handle in
+            return try withPresentationHandle(true) { handle in
                 let (response, imageError) = nativeResources.captured { native in resources.withCapturedNativeResources { host, takeError in
                     withHostFunctionResources(takeError) { withUnsafePointer(to: &presentation) { presentation in settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
                         pele_public_render_native_v14(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count,

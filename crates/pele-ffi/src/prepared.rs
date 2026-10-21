@@ -50,7 +50,7 @@ unsafe fn packet(
         .map_err(|_| public::invalid("Native prepared line offset is out of range"))?;
     Ok((offset, value.title_present != 0, edge))
 }
-unsafe fn config(bytes: *const u8, len: usize) -> Result<Object, PeleError> {
+pub(super) unsafe fn config(bytes: *const u8, len: usize) -> Result<Object, PeleError> {
     let text = unsafe { compatibility_input(bytes, len, 1024 * 1024) }?;
     if text.is_empty() {
         return Ok(Object::default());
@@ -147,7 +147,7 @@ pub unsafe extern "C" fn pele_render_prepared_v13(
         let kind = document.diagram_type().clone();
         let outcome = unsafe {
             host_functions::with_resources(handle, resources, |host| {
-                document.render_raw_operation(expected_revision, &config, &settings, host)
+                document.render_raw_operation_read(expected_revision, &config, &settings, host)
             })
         }?;
         let result = outcome.result.map(|rendered| compat::RenderResult {
