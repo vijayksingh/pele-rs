@@ -64,10 +64,19 @@ impl PublicConstructor {
     }
     /// Captured builtin identity only; arbitrary schemas cannot supply it.
     pub fn reflection(&self) -> Option<String> {
-        self.inner.reflection().map(|value| {
-            super::public_result(
-                &serde_json::json!({"reflection":value,"schema":self.inner.schema_view()}),
-            )
+        #[derive(serde::Serialize)]
+        struct ReflectionProof {
+            reflection: pele::compat::public::ConstructorReflection,
+            schema: pele::compat::public::ModelSchemaView,
+        }
+        self.inner.reflection().map(|reflection| {
+            // Serialize the schema through its authoritative struct visitor.
+            // A serde_json::Value would sort object keys and invalidate the
+            // host's exact captured-schema binding before publication.
+            super::public_result(&ReflectionProof {
+                reflection,
+                schema: self.inner.schema_view(),
+            })
         })
     }
 
