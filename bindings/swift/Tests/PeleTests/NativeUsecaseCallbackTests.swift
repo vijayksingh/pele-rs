@@ -58,7 +58,7 @@ private final class UsecaseCallbackFailure: Error {}
     private static func state(_ graph:Pele.PublicGraph) throws -> [String:Any] {
         var result:[String:Any]=[:]
         for key in ["title","accTitle","accDescr","direction","actors","useCases","relationships","jsonNodes","classDefs"] {
-            let value=graph.field(key) ?? .undefined
+            let value=try graph.field(key) ?? .undefined
             if ["actors","useCases","jsonNodes","classDefs"].contains(key) {
                 let id=try ref(value);guard case .map(let entries,_)=graph.nodes[Int(id)] else{throw UsecaseCallbackFailure()}
                 result[key]=try entries.map{[try encoded(graph,$0.key),try encoded(graph,$0.value)]}
