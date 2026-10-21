@@ -1,5 +1,13 @@
 # Current functional parity — incomplete (2026-10-21)
 
+Flowchart, Swimlane and XYChart pass the new owned-job checkpoint: native26
+scoped features, fresh Swift36/C3 and browser30 distinct checks. All192 new rows
+pass Swift; browsers compare576 paired rows. Native C15 Array capture was fixed
+and the SDK rebuilt after the first Swift run exposed it. The fresh audit matches
+29/33 edit/throw cases; Agentflow, Gantt, Sequence and Class remain. Full API
+parity is incomplete. See [flow-family evidence](parity/2026-10-21-owned-flow-families/README.md).
+
+
 C4, Requirement, Railroad, GitGraph, Usecase, Eventmodeling, Architecture, State
 and Block pass the new nine-family checkpoint: native75 scoped/final11,
 Swift33 distinct features (32 in one run plus repaired Railroad JSON observer),

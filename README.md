@@ -19,7 +19,7 @@ web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
 **The full API port is unfinished.** The current functional audit confirms
-web callback mutation gaps in seven families (one edit/throw case per family). All 22 class-root families plus ClassMember
+web callback mutation gaps in four families (one edit/throw case per family). All 22 class-root families plus ClassMember
 now have constructor factories verified through Rust, Swift and the web.
 The [constructor checkpoint](docs/parity/2026-10-21-ordered-constructors/README.md)
 records fresh artifacts and platform results. Constructor metadata and shared prototype identity remain
@@ -28,13 +28,11 @@ Passing tests include checks that explicitly expect unsupported behavior;
 they do not establish complete Pele parity. See the
 [remaining-work audit](docs/parity/2026-10-21-runtime-audit/README.md).
 
-The latest nine-family callback checkpoint covers C4, Requirement, Railroad,
-GitGraph, Usecase, Eventmodeling, Architecture, State and Block: 75 scoped native
-features, 33 distinct Swift features, three strict C clients and 45 browser
-checks. All 496 new oracle rows pass Swift; browsers compare 1,488 paired rows.
-The fresh web audit matches **26/33** edit/throw cases. Remaining: Flowchart,
-Swimlane, Agentflow, Gantt, Sequence, XYChart and Class.
-[Verification and retained failures](docs/parity/2026-10-21-owned-graph-families/README.md).
+The latest Flowchart, Swimlane and XYChart checkpoint passes 26 scoped native
+features, 36 Swift features, three strict C clients and 30 browser checks. All
+192 new oracle rows pass Swift; browsers compare 576 paired rows. The fresh web
+audit matches **29/33** edit/throw cases. Remaining: Agentflow, Gantt, Sequence and
+Class. [Verification and retained failures](docs/parity/2026-10-21-owned-flow-families/README.md).
 These counts describe scoped behavior, not completed modules or full API parity.
 
 Native normal/prepared Sankey resource callbacks support same-document helpers,
