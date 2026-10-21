@@ -14,6 +14,82 @@ use crate::compat::{
     text::{layout_label, measure, Label, Span},
     LinkInfo, Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Collection;
+    type Node: Clone;
+    fn sections(&mut self) -> Result<Self::Collection, Self::Error>;
+    fn count(&mut self, value: &Self::Collection) -> Result<usize, Self::Error>;
+    fn node(&mut self, value: &Self::Collection, index: usize) -> Result<Self::Node, Self::Error>;
+    fn items(&mut self, section: &Self::Node) -> Result<Self::Collection, Self::Error>;
+    fn text(&mut self, node: &Self::Node, key: &'static str)
+        -> Result<Option<String>, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+}
+struct Typed<'a>(&'a KanbanModel);
+enum TypedCollection<'a> {
+    Sections(&'a [super::KanbanSection]),
+    Items(&'a [KanbanNode]),
+}
+#[derive(Clone)]
+enum TypedNode<'a> {
+    Section(&'a super::KanbanSection),
+    Item(&'a KanbanNode),
+}
+impl<'a> PhaseInput for Typed<'a> {
+    type Error = PeleError;
+    type Collection = TypedCollection<'a>;
+    type Node = TypedNode<'a>;
+    fn sections(&mut self) -> Result<Self::Collection, PeleError> {
+        Ok(TypedCollection::Sections(&self.0.sections))
+    }
+    fn count(&mut self, value: &Self::Collection) -> Result<usize, PeleError> {
+        Ok(match value {
+            TypedCollection::Sections(v) => v.len(),
+            TypedCollection::Items(v) => v.len(),
+        })
+    }
+    fn node(&mut self, value: &Self::Collection, i: usize) -> Result<Self::Node, PeleError> {
+        Ok(match value {
+            TypedCollection::Sections(v) => TypedNode::Section(&v[i]),
+            TypedCollection::Items(v) => TypedNode::Item(&v[i]),
+        })
+    }
+    fn items(&mut self, section: &Self::Node) -> Result<Self::Collection, PeleError> {
+        match section {
+            TypedNode::Section(v) => Ok(TypedCollection::Items(&v.items)),
+            _ => Err(PeleError::new(
+                "Kanban section required",
+                crate::compat::ErrorCode::Semantic,
+            )),
+        }
+    }
+    fn text(&mut self, node: &Self::Node, key: &'static str) -> Result<Option<String>, PeleError> {
+        let n = match node {
+            TypedNode::Section(v) => &v.node,
+            TypedNode::Item(v) => v,
+        };
+        Ok(match key {
+            "id" => Some(n.id.clone()),
+            "label" => Some(n.label.clone()),
+            "icon" => n.icon.clone(),
+            "ticket" => n.ticket.clone(),
+            "assigned" => n.assigned.clone(),
+            "priority" => n.priority.clone(),
+            "cssClasses" => n.css_classes.clone(),
+            _ => None,
+        })
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+}
+fn changed_shape() -> PeleError {
+    PeleError::new(
+        "Kanban section layout is absent after callback mutation",
+        crate::compat::ErrorCode::Semantic,
+    )
+}
 const RADIUS: &str = "var(--pele-radius,4px)";
 fn fit(
     raw: Option<&str>,
@@ -148,8 +224,8 @@ fn has(name: Option<&str>, r: &mut dyn RenderResources) -> Result<bool, PeleErro
         Ok(false)
     }
 }
-struct Card<'a> {
-    item: &'a KanbanNode,
+struct Card<N> {
+    item: N,
     label: Label,
     ticket: Label,
     assigned: Label,
@@ -162,6 +238,14 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(m), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let line = round(size * 1.5);
@@ -176,7 +260,8 @@ pub(super) fn render(
         .max_width
         .filter(|n| *n > 0.)
         .map_or(f64::INFINITY, |n| n - 2. * pad);
-    let count = m.sections.len();
+    let initial_sections = m.sections()?;
+    let count = m.count(&initial_sections)?;
     let fits = count as f64 * (own + 12.) - 12. <= room;
     // Keep NaN as a number: JavaScript does not coerce this row count to an
     // integer. In that case one empty row is accumulated and indexed row
@@ -205,17 +290,23 @@ pub(super) fn render(
     let mut cards = Vec::new();
     let mut head_height = line;
     let mut body_heights = Vec::new();
-    for section in &m.sections {
-        let count_width = measure(r, o, &section.items.len().to_string(), small, 0)?;
+    let sections = m.sections()?;
+    let mut section_index = 0;
+    while section_index < m.count(&sections)? {
+        let section = m.node(&sections, section_index)?;
+        let initial_items = m.items(&section)?;
+        let item_count = m.count(&initial_items)?;
+        let count_width = measure(r, o, &item_count.to_string(), small, 0)?;
         let reserved = count_width
             + 12.
-            + if has(section.node.icon.as_deref(), r)? {
+            + if has(m.text(&section, "icon")?.as_deref(), r)? {
                 glyph + 6.
             } else {
                 0.
             };
+        let section_label = m.text(&section, "label")?;
         let title = fit(
-            Some(&section.node.label),
+            section_label.as_deref(),
             true,
             r,
             o,
@@ -228,14 +319,19 @@ pub(super) fn render(
         titles.push(title);
         let mut list = Vec::new();
         let mut height = 0.;
-        for item in &section.items {
-            let icon_room = if has(item.icon.as_deref(), r)? {
+        let items = m.items(&section)?;
+        let mut item_index = 0;
+        while item_index < m.count(&items)? {
+            let item = m.node(&items, item_index)?;
+            // JavaScript evaluates the label argument before the icon-width argument.
+            let item_label = m.text(&item, "label")?;
+            let icon_room = if has(m.text(&item, "icon")?.as_deref(), r)? {
                 glyph + 6.
             } else {
                 0.
             };
             let label = fit(
-                Some(&item.label),
+                item_label.as_deref(),
                 true,
                 r,
                 o,
@@ -243,8 +339,10 @@ pub(super) fn render(
                 text_width - icon_room,
                 0,
             )?;
-            let ticket = fit(item.ticket.as_deref(), false, r, o, small, text_width, 0)?;
-            let assigned = fit(item.assigned.as_deref(), false, r, o, small, text_width, 0)?;
+            let ticket_text = m.text(&item, "ticket")?;
+            let ticket = fit(ticket_text.as_deref(), false, r, o, small, text_width, 0)?;
+            let assigned_text = m.text(&item, "assigned")?;
+            let assigned = fit(assigned_text.as_deref(), false, r, o, small, text_width, 0)?;
             let meta = if ticket.width + assigned.width + 8. > text_width {
                 ticket.height + assigned.height
             } else {
@@ -265,22 +363,29 @@ pub(super) fn render(
                 meta,
                 height: card_height,
             });
-            height += card_height + 8.
+            height += card_height + 8.;
+            item_index += 1;
         }
         cards.push(list);
-        body_heights.push(height)
+        body_heights.push(height);
+        section_index += 1;
     }
     head_height += 16.;
     let mut row_heights = Vec::new();
     let mut row_tops = Vec::new();
     let mut y = 0.;
     let mut first = 0.;
-    while first < count as f64 {
+    while first < m.count(&sections)? as f64 {
         let mut tallest = 8_f64;
-        let end = (first + per_row).js_min(count as f64);
+        let end = (first + per_row).js_min(m.count(&sections)? as f64);
         let mut index = first;
         while index < end {
-            tallest = tallest.js_max(body_heights[index as usize]);
+            tallest = tallest.js_max(
+                body_heights
+                    .get(index as usize)
+                    .copied()
+                    .unwrap_or(f64::NAN),
+            );
             index += 1.;
         }
         row_tops.push(y);
@@ -296,31 +401,42 @@ pub(super) fn render(
         .max_width
         .filter(|n| *n > 0.)
         .map_or(4000., |n| (n - 2. * pad).js_max(80.));
-    let title = layout_label(m.title.as_deref(), false, r, o, size, title_room, 1)?;
+    let title_text = m.title()?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, title_room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 16.
     } else {
         0.
     };
-    let board_width = ((count as f64).js_min(per_row) * (column_width + 12.) - 12.).js_max(0.);
+    let board_width =
+        ((m.count(&sections)? as f64).js_min(per_row) * (column_width + 12.) - 12.).js_max(0.);
     let width = board_width.js_max(title.width);
     let total_width = (width + 2. * pad).ceil();
     let total_height = (board_height + title_height + 2. * pad).ceil();
+    let presentation_title = if r.presentation_budget().is_some() {
+        m.title()?
+    } else {
+        None
+    };
     let mut presentation = r.presentation_budget().map(|budget| {
         crate::compat::presentation::FrameBuilder::new(
             budget,
             total_width,
             total_height,
-            m.title.as_deref(),
+            presentation_title.as_deref(),
             None,
         )
     });
     let left = pad + (width - board_width) / 2.;
     let edge = column_width - 12.;
     let mut out = String::new();
-    for (index, section) in m.sections.iter().enumerate() {
+    let mut index = 0;
+    while index < m.count(&sections)? {
+        let section = m.node(&sections, index)?;
+        let section_title = titles.get(index).ok_or_else(changed_shape)?;
+        let section_cards = cards.get(index).ok_or_else(changed_shape)?;
         if let Some(frame) = &mut presentation {
-            frame.label(&section.node.id, &titles[index]);
+            frame.label(&m.text(&section, "id")?.unwrap_or_default(), section_title);
         }
         let row = (index as f64 / per_row).floor();
         let row_height = if row.is_nan() {
@@ -338,7 +454,7 @@ pub(super) fn render(
             js_num(column_width),
             num(row_height),
             text_block(
-                &titles[index],
+                section_title,
                 12.,
                 8.,
                 " class=\"pele-cluster-label\" font-weight=\"var(--_hw)\"",
@@ -348,11 +464,11 @@ pub(super) fn render(
             js_num(edge),
             num(8. + line / 2. + small * 0.35),
             js_num(small),
-            section.items.len()
+            {let items=m.items(&section)?;m.count(&items)?}
         );
-        if has(section.node.icon.as_deref(), r)? {
+        if has(m.text(&section, "icon")?.as_deref(), r)? {
             body.push_str(&icon_svg(
-                section.node.icon.as_ref().unwrap(),
+                &m.text(&section, "icon")?.unwrap_or_default(),
                 edge - count_widths[index] - 6. - glyph,
                 8. + (line - glyph) / 2.,
                 glyph,
@@ -360,15 +476,15 @@ pub(super) fn render(
             )?)
         }
         let mut y = head_height;
-        for card in &cards[index] {
-            let item = card.item;
+        for card in section_cards {
+            let item = &card.item;
             if let Some(frame) = &mut presentation {
-                frame.label(&item.id, &card.label);
-                frame.label(&item.id, &card.ticket);
-                frame.label(&item.id, &card.assigned);
+                frame.label(&m.text(item, "id")?.unwrap_or_default(), &card.label);
+                frame.label(&m.text(item, "id")?.unwrap_or_default(), &card.ticket);
+                frame.label(&m.text(item, "id")?.unwrap_or_default(), &card.assigned);
             }
-            let priority = item
-                .priority
+            let priority = m
+                .text(item, "priority")?
                 .as_deref()
                 .unwrap_or("")
                 .trim_matches(space)
@@ -396,9 +512,9 @@ pub(super) fn render(
                 r,
                 false,
             )?);
-            if has(item.icon.as_deref(), r)? {
+            if has(m.text(item, "icon")?.as_deref(), r)? {
                 inner.push_str(&icon_svg(
-                    item.icon.as_ref().unwrap(),
+                    &m.text(item, "icon")?.unwrap_or_default(),
                     card_width - 10. - glyph,
                     10. + (small_line - glyph) / 2.,
                     glyph,
@@ -406,12 +522,19 @@ pub(super) fn render(
                 )?)
             }
             let bottom = card.height - 10.;
-            if let Some(ticket) = item.ticket.as_deref().filter(|s| !s.is_empty()) {
+            if m.text(item, "ticket")?.is_some_and(|s| !s.is_empty()) {
                 let top = bottom - card.meta;
                 let href = if base_url.is_empty() {
                     None
                 } else {
-                    link_url(&safe_url(&base_url.replacen("#TICKET#", ticket, 1))?, o)
+                    link_url(
+                        &safe_url(&base_url.replacen(
+                            "#TICKET#",
+                            &m.text(item, "ticket")?.unwrap_or_default(),
+                            1,
+                        ))?,
+                        o,
+                    )
                 };
                 if let Some(href) = href {
                     inner.push_str(&format!(
@@ -429,7 +552,7 @@ pub(super) fn render(
                     ));
                     if let Some(frame) = &mut presentation {
                         frame.link(
-                            &item.id,
+                            &m.text(item, "id")?.unwrap_or_default(),
                             &href,
                             false,
                             crate::compat::PresentationRect {
@@ -444,7 +567,7 @@ pub(super) fn render(
                         );
                     }
                     links.push(LinkInfo {
-                        id: item.id.clone(),
+                        id: m.text(item, "id")?.unwrap_or_default(),
                         href,
                         internal: false,
                     })
@@ -459,7 +582,7 @@ pub(super) fn render(
                     )?);
                 }
             }
-            if item.assigned.as_deref().is_some_and(|s| !s.is_empty()) {
+            if m.text(item, "assigned")?.is_some_and(|s| !s.is_empty()) {
                 inner.push_str(&text_block(
                     &card.assigned,
                     card_width - 10.,
@@ -469,10 +592,11 @@ pub(super) fn render(
                     true,
                 )?)
             }
-            body.push_str(&format!("<g class=\"pele-node pele-card{}{}\" data-id=\"{}\" transform=\"translate(8,{})\" font-size=\"{}\">{inner}</g>",if color.is_some(){format!(" pele-priority-{}",priority.replacen(' ',"-",1))}else{String::new()},class_names(item.css_classes.as_deref().unwrap_or("")),esc_text(&item.id)?,num(y),js_num(small)));
+            body.push_str(&format!("<g class=\"pele-node pele-card{}{}\" data-id=\"{}\" transform=\"translate(8,{})\" font-size=\"{}\">{inner}</g>",if color.is_some(){format!(" pele-priority-{}",priority.replacen(' ',"-",1))}else{String::new()},class_names(m.text(item,"cssClasses")?.as_deref().unwrap_or("")),esc_text(&m.text(item,"id")?.unwrap_or_default())?,num(y),js_num(small)));
             y += card.height + 8.;
         }
-        out.push_str(&format!("<g class=\"pele-cluster pele-column{}\" data-id=\"{}\" transform=\"translate({},{})\">{body}</g>",class_names(section.node.css_classes.as_deref().unwrap_or("")),esc_text(&section.node.id)?,num(left+(index as f64%per_row)*(column_width+12.)),num(pad+title_height+row_top)));
+        out.push_str(&format!("<g class=\"pele-cluster pele-column{}\" data-id=\"{}\" transform=\"translate({},{})\">{body}</g>",class_names(m.text(&section,"cssClasses")?.as_deref().unwrap_or("")),esc_text(&m.text(&section,"id")?.unwrap_or_default())?,num(left+(index as f64%per_row)*(column_width+12.)),num(pad+title_height+row_top)));
+        index += 1;
     }
 
     let content = label_svg(

@@ -1,10 +1,12 @@
 //! Pele kanban/{index,db}.ts, 458322a5 (MIT, kepano).
+mod live_phase;
 mod render;
 use super::common::outline::{parse_outline, OutlineDb};
 use crate::compat::{
     source::yaml, DiagramModule, DiagramType, ErrorCode, ModuleDescriptor, Object, ParseContext,
     PeleError, RenderResources, RenderSettings, Rendered,
 };
+pub(crate) use live_phase::{render_detached, KanbanDetachedInput};
 use serde::Serialize;
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]

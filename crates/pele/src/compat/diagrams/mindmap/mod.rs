@@ -1,4 +1,6 @@
 //! Pele diagrams/mindmap/{index,db,parser}.ts, 458322a5 (MIT, kepano).
+mod live_phase;
+pub(crate) use live_phase::{render_detached, MindmapDetachedInput};
 mod render;
 use super::common::outline::{parse_outline, OutlineDb};
 use crate::compat::{

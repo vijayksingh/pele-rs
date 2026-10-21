@@ -5,11 +5,13 @@ mod model;
 mod parser;
 mod public_model;
 pub use public_model::TreemapPublicState;
+mod live_phase;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ErrorCode, ModuleDescriptor, Object, ParseContext, PeleError,
     RenderResources, RenderSettings, Rendered,
 };
+pub(crate) use live_phase::{render_detached, TreemapDetachedInput};
 pub use model::{TreemapModel, TreemapNode};
 #[derive(Default)]
 pub struct Treemap;

@@ -1,8 +1,18 @@
 //! Pele treemap/layout.ts squarified rows, hierarchy sums and section insets.
-use super::TreemapNode;
+use crate::compat::PeleError;
+pub(super) trait Input {
+    type Node: Clone;
+    type Error: From<PeleError>;
+    fn roots(&mut self) -> Result<Vec<Self::Node>, Self::Error>;
+    fn children(&mut self, node: &Self::Node) -> Result<Vec<Self::Node>, Self::Error>;
+    fn initial_value(&mut self, node: &Self::Node) -> Result<f64, Self::Error>;
+    fn reserve(&mut self, _count: usize) -> Result<(), Self::Error> {
+        Ok(())
+    }
+}
 use crate::compat::number_math::{round, NumberMath};
-pub(super) struct Box<'a> {
-    pub node: &'a TreemapNode,
+pub(super) struct Box<N> {
+    pub node: N,
     parent: Option<usize>,
     pub series: usize,
     pub value: f64,
@@ -12,19 +22,13 @@ pub(super) struct Box<'a> {
     pub w: f64,
     pub h: f64,
 }
-impl<'a> Box<'a> {
-    fn new(node: &'a TreemapNode, parent: Option<usize>, series: usize) -> Self {
+impl<N> Box<N> {
+    fn new(node: N, parent: Option<usize>, series: usize, value: f64) -> Self {
         Self {
             node,
             parent,
             series,
-            value: if node.children.is_none() {
-                node.value
-                    .filter(|v| v.is_finite() && *v > 0.)
-                    .unwrap_or(0.)
-            } else {
-                0.
-            },
+            value,
             children: vec![],
             x: 0.,
             y: 0.,
@@ -36,8 +40,8 @@ impl<'a> Box<'a> {
 fn max(a: f64, b: f64) -> f64 {
     a.js_max(b)
 }
-fn squarify(
-    all: &mut [Box<'_>],
+fn squarify<N>(
+    all: &mut [Box<N>],
     boxes: &[usize],
     total: f64,
     mut x: f64,
@@ -102,8 +106,8 @@ fn squarify(
         from = to;
     }
 }
-fn place(
-    all: &mut [Box<'_>],
+fn place<N>(
+    all: &mut [Box<N>],
     children: &[usize],
     placed: &mut Vec<usize>,
     x: f64,
@@ -146,23 +150,31 @@ fn place(
         }
     }
 }
-pub(super) fn layout(roots: &[TreemapNode], width: f64, height: f64, gap: f64) -> Vec<Box<'_>> {
-    let mut all: Vec<_> = roots
-        .iter()
-        .enumerate()
-        .map(|(i, n)| Box::new(n, None, i))
-        .collect();
+pub(super) fn layout<P: Input>(
+    input: &mut P,
+    width: f64,
+    height: f64,
+    gap: f64,
+) -> Result<Vec<Box<P::Node>>, P::Error> {
+    let roots = input.roots()?;
+    let mut all = Vec::new();
+    for (series, node) in roots.into_iter().enumerate() {
+        input.reserve(all.len())?;
+        let value = input.initial_value(&node)?;
+        all.push(Box::new(node, None, series, value));
+    }
     let top: Vec<_> = (0..all.len()).collect();
     let mut i = 0;
     while i < all.len() {
         let parent = i;
         let series = all[i].series;
-        if let Some(children) = &all[i].node.children {
-            for node in children {
-                let k = all.len();
-                all[parent].children.push(k);
-                all.push(Box::new(node, Some(parent), series));
-            }
+        let node = all[i].node.clone();
+        for child in input.children(&node)? {
+            input.reserve(all.len())?;
+            let value = input.initial_value(&child)?;
+            let k = all.len();
+            all[parent].children.push(k);
+            all.push(Box::new(child, Some(parent), series, value));
         }
         i += 1;
     }
@@ -189,8 +201,8 @@ pub(super) fn layout(roots: &[TreemapNode], width: f64, height: f64, gap: f64) -
         i += 1;
     }
     let mut values: Vec<_> = all.into_iter().map(Some).collect();
-    placed
+    Ok(placed
         .into_iter()
         .map(|i| values[i].take().unwrap())
-        .collect()
+        .collect())
 }

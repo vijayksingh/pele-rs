@@ -4,7 +4,10 @@
 //! and export use worklists; neither serialization nor recursive Clone is used.
 use super::{Treemap, TreemapModel, TreemapNode};
 use crate::compat::{
-    public::{Atom, GraphWriter, ModelGraph, Node, PublicDiagramModule},
+    public::{
+        Atom, DetachedPublicRender, DetachedRenderCapability, GraphWriter, ModelGraph, Node,
+        PublicDiagramModule,
+    },
     DiagramModule, DiagramType, ErrorCode, Object, PeleError, RenderResources, RenderSettings,
     Rendered,
 };
@@ -355,6 +358,14 @@ impl PublicDiagramModule for Treemap {
         s.graph = g;
         s.model = model;
         Ok(())
+    }
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::treemap())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::treemap(
+            super::TreemapDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
     }
     fn render_public(
         &self,

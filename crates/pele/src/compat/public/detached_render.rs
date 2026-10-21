@@ -20,6 +20,9 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Mindmap,
+    Treemap,
+    Kanban,
     TreeView,
     Journey,
     Timeline,
@@ -39,6 +42,27 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn mindmap() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::mindmap::Mindmap>(),
+            kind: Kind::Mindmap,
+        }
+    }
+
+    pub(crate) fn treemap() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::treemap::Treemap>(),
+            kind: Kind::Treemap,
+        }
+    }
+
+    pub(crate) fn kanban() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::kanban::Kanban>(),
+            kind: Kind::Kanban,
+        }
+    }
+
     pub(crate) fn tree_view() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::tree_view::TreeView>(),
@@ -123,6 +147,9 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Mindmap(crate::compat::diagrams::mindmap::MindmapDetachedInput),
+    Treemap(crate::compat::diagrams::treemap::TreemapDetachedInput),
+    Kanban(crate::compat::diagrams::kanban::KanbanDetachedInput),
     TreeView(crate::compat::diagrams::tree_view::TreeViewDetachedInput),
     Journey(crate::compat::diagrams::journey::JourneyDetachedInput),
     Timeline(crate::compat::diagrams::timeline::TimelineDetachedInput),
@@ -136,6 +163,27 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn mindmap(input: crate::compat::diagrams::mindmap::MindmapDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::mindmap::Mindmap>(),
+            body: Body::Mindmap(input),
+        }
+    }
+
+    pub(crate) fn treemap(input: crate::compat::diagrams::treemap::TreemapDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::treemap::Treemap>(),
+            body: Body::Treemap(input),
+        }
+    }
+
+    pub(crate) fn kanban(input: crate::compat::diagrams::kanban::KanbanDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::kanban::Kanban>(),
+            body: Body::Kanban(input),
+        }
+    }
+
     pub(crate) fn tree_view(
         input: crate::compat::diagrams::tree_view::TreeViewDetachedInput,
     ) -> Self {
@@ -218,6 +266,9 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Mindmap(_) => Kind::Mindmap,
+            Body::Treemap(_) => Kind::Treemap,
+            Body::Kanban(_) => Kind::Kanban,
             Body::TreeView(_) => Kind::TreeView,
             Body::Timeline(_) => Kind::Timeline,
             Body::Ishikawa(_) => Kind::Ishikawa,
@@ -243,6 +294,15 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Mindmap(input) => crate::compat::diagrams::mindmap::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Treemap(input) => crate::compat::diagrams::treemap::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Kanban(input) => crate::compat::diagrams::kanban::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::TreeView(input) => crate::compat::diagrams::tree_view::render_detached(
                 input, config, settings, read, resources,
             ),

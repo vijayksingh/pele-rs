@@ -648,6 +648,14 @@ impl PublicDiagramModule for Kanban {
     }
 
     type PublicState = KanbanPublicState;
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::kanban())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::kanban(
+            super::KanbanDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
