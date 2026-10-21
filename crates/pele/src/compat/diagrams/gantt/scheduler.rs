@@ -205,11 +205,16 @@ pub(super) fn invalid<S: Store>(
     }
     Ok(Some(listed(false)?))
 }
-pub(super) fn references<S: Store>(
+pub(super) struct ReferenceLookup<'a, T> {
+    pub found: Vec<T>,
+    pub unknown: Vec<&'a str>,
+}
+// Resolve once before warning evaluation. The returned task handles remain the
+// same objects even when a warning getter or callback edits the lookup table.
+pub(super) fn lookup_references<'a, S: Store>(
     s: &mut S,
-    keyword: &str,
-    list: &str,
-) -> Result<Vec<S::Task>, S::Error> {
+    list: &'a str,
+) -> Result<ReferenceLookup<'a, S::Task>, S::Error> {
     s.method("references")?;
     let mut found = vec![];
     let mut unknown = vec![];
@@ -220,6 +225,14 @@ pub(super) fn references<S: Store>(
             unknown.push(id)
         }
     }
+    Ok(ReferenceLookup { found, unknown })
+}
+pub(super) fn references<S: Store>(
+    s: &mut S,
+    keyword: &str,
+    list: &str,
+) -> Result<Vec<S::Task>, S::Error> {
+    let ReferenceLookup { found, unknown } = lookup_references(s, list)?;
     if !unknown.is_empty() {
         s.warn(format!(
             "Gantt: \"{keyword}\" refers to task ids that do not exist: {}.",

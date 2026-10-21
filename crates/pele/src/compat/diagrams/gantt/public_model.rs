@@ -3012,30 +3012,105 @@ fn construct_with(argument: ConstructorArgument) -> Result<GanttPublicState, Pel
 }
 const LIVE_FIELDS: &[LiveConstructorField] = &[LiveConstructorField {
     key: "options",
-    methods: &[MethodId(24)],
+    methods: &[MethodId(24), MethodId(27)],
 }];
 // Preserve this.options.warn && this.options.warn(producer()) evaluation.
 // Each request owns values and runs after the graph borrow has ended.
+enum WarningProducer {
+    Host(Atom),
+    References { keyword: Atom, missing: Vec<String> },
+}
 enum WarningPhase {
-    Start { receiver: Atom, producer: Atom },
-    FirstOptions { receiver: Atom, producer: Atom },
-    FirstWarn { receiver: Atom, producer: Atom },
-    FirstTest { receiver: Atom, producer: Atom },
-    SecondOptions { producer: Atom },
-    SecondWarn { receiver: Atom, producer: Atom },
-    Producer { receiver: Atom, function: Atom },
+    References {
+        receiver: Atom,
+        keyword: Atom,
+        list: Atom,
+    },
+    Start {
+        receiver: Atom,
+        producer: WarningProducer,
+    },
+    FirstOptions {
+        receiver: Atom,
+        producer: WarningProducer,
+    },
+    FirstWarn {
+        receiver: Atom,
+        producer: WarningProducer,
+    },
+    FirstTest {
+        receiver: Atom,
+        producer: WarningProducer,
+    },
+    SecondOptions {
+        producer: WarningProducer,
+    },
+    SecondWarn {
+        receiver: Atom,
+        producer: WarningProducer,
+    },
+    ReferenceMessage {
+        receiver: Atom,
+        function: Atom,
+        missing: Vec<String>,
+    },
+    Producer {
+        receiver: Atom,
+        function: Atom,
+    },
     Callback,
     Done,
 }
 struct WarningInvocation {
     phase: WarningPhase,
+    references: Option<Vec<Atom>>,
 }
 impl WarningInvocation {
-    fn step(&mut self, _graph: &ModelGraph, reply: Option<Atom>) -> PublicInvocationPhase {
+    fn call(&mut self, receiver: Atom, function: Atom, message: Atom) -> PublicInvocationPhase {
+        self.phase = WarningPhase::Callback;
+        PublicInvocationPhase::Host(PublicHostOperation::Call {
+            function,
+            result: PublicHostResult::Discard,
+            not_callable_error: "this.options.warn is not a function",
+            receiver,
+            arguments: vec![message],
+        })
+    }
+    fn step(
+        &mut self,
+        graph: &mut ModelGraph,
+        reply: Option<Atom>,
+    ) -> Result<PublicInvocationPhase, PublicError> {
         use WarningPhase::*;
         let get =
             |receiver, key| PublicInvocationPhase::Host(PublicHostOperation::Get { receiver, key });
-        match std::mem::replace(&mut self.phase, Done) {
+        Ok(match std::mem::replace(&mut self.phase, Done) {
+            References {
+                receiver,
+                keyword,
+                list,
+            } => {
+                let mut arena = Arena {
+                    c: Context::new(graph),
+                    receiver: receiver.clone(),
+                    direct_entry: Some("references"),
+                };
+                let list = arena.c.scalar(&list, "list.split")?;
+                let lookup = scheduler::lookup_references(&mut arena, &list)?;
+                self.references = Some(lookup.found);
+                if lookup.unknown.is_empty() {
+                    return Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)));
+                }
+                arena.native_method("warn")?;
+                self.phase = Start {
+                    receiver,
+                    producer: WarningProducer::References {
+                        keyword,
+                        missing: lookup.unknown.into_iter().map(str::to_owned).collect(),
+                    },
+                };
+                return self.step(graph, None);
+            }
             Start { receiver, producer } => {
                 self.phase = FirstOptions {
                     receiver: receiver.clone(),
@@ -3055,7 +3130,7 @@ impl WarningInvocation {
             }
             FirstTest { receiver, producer } => {
                 if !matches!(reply, Some(Atom::Bool(true))) {
-                    return PublicInvocationPhase::Complete(Ok(Atom::Undefined));
+                    return Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)));
                 }
                 self.phase = SecondOptions { producer };
                 get(receiver, "options")
@@ -3069,34 +3144,60 @@ impl WarningInvocation {
                 get(receiver, "warn")
             }
             SecondWarn { receiver, producer } => {
-                self.phase = Producer {
-                    receiver,
-                    function: reply.expect("awaited second warn"),
-                };
-                PublicInvocationPhase::Host(PublicHostOperation::Call {
-                    function: producer,
-                    result: PublicHostResult::Retain,
-                    not_callable_error: "e is not a function",
-                    receiver: Atom::Undefined,
-                    arguments: vec![],
-                })
+                let function = reply.expect("awaited second warn");
+                match producer {
+                    WarningProducer::Host(producer) => {
+                        self.phase = Producer { receiver, function };
+                        PublicInvocationPhase::Host(PublicHostOperation::Call {
+                            function: producer,
+                            result: PublicHostResult::Retain,
+                            not_callable_error: "e is not a function",
+                            receiver: Atom::Undefined,
+                            arguments: vec![],
+                        })
+                    }
+                    WarningProducer::References { keyword, missing } => {
+                        self.phase = ReferenceMessage {
+                            receiver,
+                            function,
+                            missing,
+                        };
+                        PublicInvocationPhase::Host(PublicHostOperation::ToString {
+                            value: keyword,
+                        })
+                    }
+                }
+            }
+            ReferenceMessage {
+                receiver,
+                function,
+                missing,
+            } => {
+                let mut context = Context::new(graph);
+                let keyword =
+                    context.string_units(&reply.expect("awaited keyword"), "warning keyword")?;
+                let mut message: Vec<u16> = "Gantt: \"".encode_utf16().collect();
+                message.extend(keyword);
+                message.extend("\" refers to task ids that do not exist: ".encode_utf16());
+                for (index, id) in missing.iter().enumerate() {
+                    if index != 0 {
+                        message.extend(", ".encode_utf16());
+                    }
+                    message.extend(id.encode_utf16());
+                }
+                message.push(46);
+                let message = context.intern(JsString(message))?;
+                self.call(receiver, function, message)
             }
             Producer { receiver, function } => {
-                self.phase = Callback;
-                PublicInvocationPhase::Host(PublicHostOperation::Call {
-                    function,
-                    result: PublicHostResult::Discard,
-                    not_callable_error: "this.options.warn is not a function",
-                    receiver,
-                    arguments: vec![reply.expect("awaited message producer")],
-                })
+                self.call(receiver, function, reply.expect("awaited message producer"))
             }
             Callback => PublicInvocationPhase::Complete(Ok(Atom::Undefined)),
             Done => PublicInvocationPhase::Complete(Err(invalid(
                 "Gantt warning invocation already finished",
             )
             .into())),
-        }
+        })
     }
 }
 fn resume_warning(
@@ -3104,13 +3205,21 @@ fn resume_warning(
     invocation: &mut WarningInvocation,
     reply: Option<PublicHostValue>,
 ) -> PublicInvocationPhase {
-    let reply = reply
-        .map(|value| value.into_atom(|value| Context::new(&mut state.graph).intern(value)))
-        .transpose();
-    match reply {
-        Ok(reply) => invocation.step(&state.graph, reply),
-        Err(error) => PublicInvocationPhase::Complete(Err(error)),
-    }
+    let result = (|| {
+        let reply = reply
+            .map(|value| value.into_atom(|value| Context::new(&mut state.graph).intern(value)))
+            .transpose()?;
+        let phase = invocation.step(&mut state.graph, reply)?;
+        if matches!(phase, PublicInvocationPhase::Complete(Ok(_))) {
+            if let Some(found) = invocation.references.take() {
+                return Ok(PublicInvocationPhase::Complete(
+                    Context::new(&mut state.graph).array(found),
+                ));
+            }
+        }
+        Ok(phase)
+    })();
+    result.unwrap_or_else(|error| PublicInvocationPhase::Complete(Err(error)))
 }
 
 impl PublicDiagramModule for Gantt {
@@ -3123,18 +3232,26 @@ impl PublicDiagramModule for Gantt {
         })
     }
     fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
-        (call.method == MethodId(24)).then(|| {
-            let producer = call.arguments.first().cloned().unwrap_or(Atom::Undefined);
-            DetachedPublicInvocation::new::<Self, GanttPublicState, _>(
-                WarningInvocation {
-                    phase: WarningPhase::Start {
-                        receiver: call.receiver,
-                        producer,
-                    },
-                },
-                resume_warning,
-            )
-        })
+        let first = call.arguments.first().cloned().unwrap_or(Atom::Undefined);
+        let phase = match call.method.0 {
+            24 => WarningPhase::Start {
+                receiver: call.receiver,
+                producer: WarningProducer::Host(first),
+            },
+            27 => WarningPhase::References {
+                receiver: call.receiver,
+                keyword: first,
+                list: call.arguments.get(1).cloned().unwrap_or(Atom::Undefined),
+            },
+            _ => return None,
+        };
+        Some(DetachedPublicInvocation::new::<Self, GanttPublicState, _>(
+            WarningInvocation {
+                phase,
+                references: None,
+            },
+            resume_warning,
+        ))
     }
 
     type PublicState = GanttPublicState;

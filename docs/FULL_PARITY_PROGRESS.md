@@ -23,6 +23,20 @@ Its title is captured before layout; accessibility is read after resource calls.
 Fresh Swift/web verification is pending. The existing UTF-16 rendering gate and
 presentation/image limitations remain unchanged.
 
+Pie now shares typed/live draw and responsive-fit geometry. Its native feature
+matches 36 pinned callback scenarios; retained entries, per-label showData, late
+title/accessibility, responsive Map replacement and nested/error recovery are
+covered. The generic live-reader interface gains bounded iterable snapshots;
+C15 owns fresh pair values before releasing its short graph read. Existing Pie
+and Info regressions and C/Swift/WASM bridge compilation pass. Fresh platform
+execution is pending this batch.
+
+Gantt's `references` helper (27) now shares native task lookup and the explicit
+warning evaluation phases. Twelve oracle cases and the prior warning feature
+pass, covering lazy keyword coercion, captured warning callee, original throws,
+partial mutations and task aliases. Calendar-driven scheduling entry points
+still need their own continuation; this slice does not certify those callbacks.
+
 The earlier fifteen-factory checkpoint covered Sankey, Venn, Ishikawa,
 Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
 Journey, QuadrantChart and State. The latest seven-family extension passes nine
