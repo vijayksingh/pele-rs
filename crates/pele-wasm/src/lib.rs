@@ -1,3 +1,4 @@
+mod browser_calendar;
 #[cfg(feature = "captured-sankey")]
 mod captured_sankey;
 #[cfg(feature = "captured-sankey")]
@@ -627,68 +628,22 @@ impl pele::compat::RenderResources for BrowserResources {
             })
     }
     fn parse_date(&mut self, input: &str) -> Result<Option<f64>, pele::compat::PeleError> {
-        let instant = js_sys::Date::parse(input);
-        Ok(instant.is_finite().then_some(instant))
+        browser_calendar::parse_date(input).map_err(callback_error)
     }
     fn calendar_fields(
         &mut self,
         instant_ms: f64,
     ) -> Result<Option<pele::compat::CalendarFields>, pele::compat::PeleError> {
-        let date = js_sys::Date::new(&instant_ms.into());
-        if !date.get_time().is_finite() {
-            return Ok(None);
-        }
-        Ok(Some(pele::compat::CalendarFields {
-            civil: pele::compat::CivilDateTime {
-                year: date.get_full_year() as i32,
-                month: (date.get_month() + 1) as u8,
-                day: date.get_date() as u8,
-                hour: date.get_hours() as u8,
-                minute: date.get_minutes() as u8,
-                second: date.get_seconds() as u8,
-                millisecond: date.get_milliseconds() as u16,
-            },
-            weekday: date.get_day() as u8,
-            utc_offset_minutes: -date.get_timezone_offset() as i32,
-        }))
+        browser_calendar::calendar_fields(instant_ms).map_err(callback_error)
     }
     fn calendar_instant(
         &mut self,
         c: pele::compat::CivilDateTime,
     ) -> Result<Option<f64>, pele::compat::PeleError> {
-        // Construct with a full 400-year cycle for years 0..99, then restore the
-        // exact year; Date's historical constructor adjustment belongs to core.
-        let year = if (0..100).contains(&c.year) {
-            c.year + 400
-        } else {
-            c.year
-        };
-        let args = js_sys::Array::new();
-        for value in [
-            year,
-            i32::from(c.month) - 1,
-            i32::from(c.day),
-            i32::from(c.hour),
-            i32::from(c.minute),
-            i32::from(c.second),
-            i32::from(c.millisecond),
-        ] {
-            args.push(&JsValue::from_f64(f64::from(value)));
-        }
-        let constructor = js_sys::Reflect::get(&js_sys::global(), &"Date".into())
-            .map_err(callback_error)?
-            .unchecked_into::<js_sys::Function>();
-        let date = js_sys::Reflect::construct(&constructor, &args)
-            .map_err(callback_error)?
-            .unchecked_into::<js_sys::Date>();
-        if (0..100).contains(&c.year) {
-            date.set_full_year(c.year as u32);
-        }
-        let instant = date.get_time();
-        Ok(instant.is_finite().then_some(instant))
+        browser_calendar::calendar_instant(c).map_err(callback_error)
     }
     fn now_millis(&mut self) -> Result<f64, pele::compat::PeleError> {
-        Ok(js_sys::Date::now())
+        browser_calendar::now_millis().map_err(callback_error)
     }
 }
 #[wasm_bindgen]

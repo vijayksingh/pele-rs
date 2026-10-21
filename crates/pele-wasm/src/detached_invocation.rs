@@ -208,10 +208,21 @@ impl PublicInvocationResource {
             width: None,
             icons: None,
         };
+        let mut calendar = super::browser_calendar::Resources {
+            browser: &mut host,
+            error: None,
+        };
         self.result = Some(operation.run(&mut super::host_functions::Resources {
-            host: &mut host,
+            host: &mut calendar,
             dispatcher,
         }));
+        // Return the original JS value only after operation.run has unwound its
+        // native borrows. wasm-bindgen then releases this resource's borrow
+        // before JS observes the throw and executes its resource.free finally.
+        if let Some(error) = calendar.error.take() {
+            self.result = None;
+            return Err(error);
+        }
         Ok(())
     }
 }

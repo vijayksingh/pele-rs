@@ -37,7 +37,7 @@ test('stateful WASM render outcomes retain graph ownership through failure and r
   expect(report).toEqual({revisions:['1','2','3','3','4'],stale:'Stale public model revision',initial:'info',limit:'limit',host:'host failure',retained:true,recovered:true,failures:[]});
 });
 
-test('mutable imports retry rejected edits and restore callback mutations before reuse',async({page})=>{
+test('mutable imports retry rejected edits and preserve live callback mutations through reuse',async({page})=>{
   await page.goto('/examples/web/');
   const report=await page.evaluate(async()=>{
     const {loadRenderer,metricsMeasurer}=await import('/dist/package-web/package/full.js');
@@ -60,8 +60,7 @@ test('mutable imports retry rejected edits and restore callback mutations before
       }
       if(JSON.stringify(engine.render(model,options))!==JSON.stringify(oracle.render(expected,options)))failures.push('retried SVG');
       if(uploads!==3||model.extra!==extra||extra.self!==extra||!Number.isNaN(extra.value))failures.push('pending identity');
-      const beforeReuse=uploads;engine.render(model,options);
-      if(wasm.MutableDocument.prototype.unchanged_public_graph_is_noop&&uploads!==beforeReuse)failures.push('redundant confirmed upload');
+      if(JSON.stringify(engine.render(model,options))!==JSON.stringify(oracle.render(expected,options)))failures.push('confirmed reuse before callback');
       model.extra.scanFailure={text:'interned before scan failure'};
       Object.defineProperty(model.extra.scanFailure,'accessor',{get(){return 1;},configurable:true});
       for(let attempt=0;attempt<2;attempt++){
@@ -69,9 +68,12 @@ test('mutable imports retry rejected edits and restore callback mutations before
       }
       delete model.extra.scanFailure.accessor;
       if(JSON.stringify(engine.render(model,options))!==JSON.stringify(oracle.render(expected,options)))failures.push('scan recovery');
-      let called=false;
-      engine.render(model,{measurer:{width(...args){called=true;model.title='callback-only mutation';model.extra.transient=true;return metricsMeasurer.width(...args);}}});
-      if(!called||model.title!==expected.title||Object.hasOwn(extra,'transient'))failures.push('callback restoration');
+      const referenceExtra={};expected.extra=referenceExtra;
+      let called=false,referenceCalled=false;
+      const actualDrawing=engine.render(model,{measurer:{width(...args){called=true;model.title='callback-only mutation';model.extra.transient=true;return metricsMeasurer.width(...args);}}});
+      const referenceDrawing=oracle.render(expected,{measurer:{width(...args){referenceCalled=true;expected.title='callback-only mutation';expected.extra.transient=true;return metricsMeasurer.width(...args);}}});
+      if(JSON.stringify(actualDrawing)!==JSON.stringify(referenceDrawing))failures.push('live callback SVG');
+      if(!called||!referenceCalled||model.title!==expected.title||model.title!=='callback-only mutation'||extra.transient!==referenceExtra.transient||!extra.transient||model.extra!==extra)failures.push('live callback state');
       if(JSON.stringify(engine.render(model,options))!==JSON.stringify(oracle.render(expected,options)))failures.push('confirmed reuse');
       return {failures,rejected};
     }finally{wasm.MutableDocument.prototype.apply_binary=original;engine.dispose(model);}
