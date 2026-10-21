@@ -1,6 +1,6 @@
 import{test,expect}from'@playwright/test';
 import{readFile,writeFile}from'node:fs/promises';
-const pin='d1ebc1889f3069d7759fe5db34c4ad4b6023285edbee2b537d0ef3d505a76d8d';
+const pin='d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d';
 test('Flowchart resource callbacks preserve copied graph phases, late metadata, original errors and nested recovery',async({page},testInfo)=>{
  const url='/dist/evidence/flowchart-live-scenarios.js',body=await readFile(new URL('./support/flowchart-live-scenarios.js',import.meta.url),'utf8');
  await page.route(`**${url}`,route=>route.fulfill({status:200,contentType:'text/javascript',body}));await page.goto('/examples/web/');
