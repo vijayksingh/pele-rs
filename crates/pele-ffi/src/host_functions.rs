@@ -154,9 +154,15 @@ struct Resources<'a> {
 }
 impl RenderResources for Resources<'_> {
     fn host_function(&mut self, id: u32) -> Result<Rc<dyn HostFunction>, PublicError> {
-        self.bindings.try_borrow().map_err(|_| public::invalid("Host function bindings are already in use"))?.functions.get(&id).cloned().ok_or_else(|| {
-            public::invalid("Unbound or foreign-owner host function reference").into()
-        })
+        self.bindings
+            .try_borrow()
+            .map_err(|_| public::invalid("Host function bindings are already in use"))?
+            .functions
+            .get(&id)
+            .cloned()
+            .ok_or_else(|| {
+                public::invalid("Unbound or foreign-owner host function reference").into()
+            })
     }
     fn image(&mut self, uri: &str) -> Result<pele::compat::ImageResource, PeleError> {
         self.host.image(uri)

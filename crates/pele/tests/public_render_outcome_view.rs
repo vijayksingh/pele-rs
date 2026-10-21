@@ -247,7 +247,12 @@ fn raw_owned_and_viewed_outcomes_keep_exact_bits_and_retained_errors() {
                 .render_raw_operation(0, &Object::default(), &RenderSettings::default(), &mut a)
                 .unwrap();
             let new = viewed
-                .render_raw_operation_view(0, &Object::default(), &RenderSettings::default(), &mut b)
+                .render_raw_operation_view(
+                    0,
+                    &Object::default(),
+                    &RenderSettings::default(),
+                    &mut b,
+                )
                 .unwrap();
             assert!(matches!(&new.graph, Cow::Borrowed(_)) == borrowed);
             assert_eq!(
