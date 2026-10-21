@@ -500,6 +500,173 @@ impl LiveRenderRead for Reader {
         }
         Ok(values)
     }
+    fn snapshot_map_values(
+        &mut self,
+        value: &Value,
+        max_count: usize,
+    ) -> Result<Vec<Value>, PublicError> {
+        let Value::Atom(Atom::Ref(id)) = value else {
+            return Err(type_error("value.values is not a function".into()));
+        };
+        let document = unsafe { public::document(self.owner) }?;
+        let graph = document.snapshot_read()?;
+        let read = graph.reader();
+        let header = read.header(*id as usize)?;
+        let GraphNodeKind::Map(items) = header.kind else {
+            return Err(type_error("value.values is not a function".into()));
+        };
+        let mut start = 0;
+        while start < header.properties {
+            let mut count = 0;
+            read.properties(*id as usize, start, &mut |properties| {
+                count = properties.len();
+                if count == 0 || count > header.properties - start {
+                    return Err(invalid("Invalid captured property batch"));
+                }
+                for p in properties {
+                    if string(read, p.key)?.is("values") {
+                        return Err(invalid(
+                            "Native live Map values override is not implemented",
+                        ));
+                    }
+                }
+                Ok(())
+            })?;
+            start += count;
+        }
+        if items > max_count.min(8_000_000) {
+            return Err(
+                PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        let mut strings = HashMap::<u32, Arc<JsString>>::new();
+        let mut values = Vec::with_capacity(items);
+        let mut start = 0;
+        while start < items {
+            let mut count = 0;
+            read.map_entries(*id as usize, start, &mut |entries| {
+                count = entries.len();
+                if count == 0 || count > items - start {
+                    return Err(invalid("Invalid captured Map batch"));
+                }
+                for (_, value) in entries {
+                    values.push(capture_value(read, value, &mut strings)?);
+                }
+                Ok(())
+            })?;
+            start += count;
+        }
+        Ok(values)
+    }
+    fn is_array(&mut self, value: &Value) -> Result<bool, PublicError> {
+        match value {
+            Value::Sequence(_) => Ok(true),
+            Value::Atom(Atom::Ref(id)) => {
+                let document = unsafe { public::document(self.owner) }?;
+                let graph = document.snapshot_read()?;
+                Ok(matches!(
+                    graph.reader().header(*id as usize)?.kind,
+                    GraphNodeKind::Array(_)
+                ))
+            }
+            _ => Ok(false),
+        }
+    }
+    fn own_keys(&mut self, value: &Value) -> Result<Vec<JsString>, PublicError> {
+        let mut keys = Vec::<Arc<JsString>>::new();
+        let mut seen = std::collections::HashSet::<Arc<JsString>>::new();
+        let mut units = 0usize;
+        let mut add = |key: Arc<JsString>| -> Result<(), PeleError> {
+            if seen.contains(&key) {
+                return Ok(());
+            }
+            if keys.len() == 1_000_000 || key.0.len() > 16_000_000 - units {
+                return Err(PeleError::new(
+                    "Public model graph exceeds work budget",
+                    ErrorCode::Limit,
+                ));
+            }
+            units += key.0.len();
+            seen.insert(Arc::clone(&key));
+            keys.push(key);
+            Ok(())
+        };
+        match value {
+            Value::Atom(Atom::Undefined | Atom::Null) => {
+                return Err(type_error(
+                    "Cannot convert undefined or null to object".into(),
+                ))
+            }
+            Value::Object(properties) => {
+                for (key, _) in properties.iter() {
+                    add(Arc::clone(key))?;
+                }
+            }
+            Value::Sequence(values) => {
+                if values.len() > 1_000_000 {
+                    return Err(PeleError::new(
+                        "Public model graph exceeds work budget",
+                        ErrorCode::Limit,
+                    )
+                    .into());
+                }
+                for index in 0..values.len() {
+                    add(Arc::new(JsString::from(index.to_string().as_str())))?;
+                }
+            }
+            Value::String(text) => {
+                if text.0.len() > 1_000_000 {
+                    return Err(PeleError::new(
+                        "Public model graph exceeds work budget",
+                        ErrorCode::Limit,
+                    )
+                    .into());
+                }
+                for index in 0..text.0.len() {
+                    add(Arc::new(JsString::from(index.to_string().as_str())))?;
+                }
+            }
+            Value::Atom(Atom::Ref(id)) => {
+                let document = unsafe { public::document(self.owner) }?;
+                let graph = document.snapshot_read()?;
+                let read = graph.reader();
+                let header = read.header(*id as usize)?;
+                let mut start = 0;
+                let mut strings = HashMap::new();
+                while start < header.properties {
+                    let mut count = 0;
+                    read.properties(*id as usize, start, &mut |properties| {
+                        count = properties.len();
+                        if count == 0 || count > header.properties - start {
+                            return Err(invalid("Invalid captured property batch"));
+                        }
+                        for p in properties.iter().filter(|p| p.flags & 1 != 0) {
+                            add(capture_text(read, p.key, &mut strings)?)?;
+                        }
+                        Ok(())
+                    })?;
+                    start += count;
+                }
+            }
+            _ => {}
+        }
+        fn index(key: &JsString) -> Option<u32> {
+            if key.0.is_empty() || key.0.len() > 10 || (key.0.len() > 1 && key.0[0] == 48) {
+                return None;
+            }
+            let mut value = 0u32;
+            for unit in &key.0 {
+                if !(48..=57).contains(unit) {
+                    return None;
+                }
+                value = value.checked_mul(10)?.checked_add(u32::from(*unit - 48))?;
+            }
+            (value < u32::MAX).then_some(value)
+        }
+        // Stable sort: array-index keys first, other names retain property order.
+        keys.sort_by_key(|key| index(key).map_or((1, 0), |index| (0, index)));
+        Ok(keys.into_iter().map(|key| key.as_ref().clone()).collect())
+    }
     fn kind(&self, value: &Value) -> LiveValueKind {
         match value {
             Value::String(_) => LiveValueKind::String,

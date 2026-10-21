@@ -35,6 +35,9 @@ enum ReadCommand {
     MapGet = 7,
     ObjectIdentity = 8,
     ArrayJoin = 9,
+    OwnKeys = 10,
+    SnapshotMapValues = 11,
+    IsArray = 12,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -193,6 +196,71 @@ impl LiveRenderRead for Reader {
             return Err(invalid("Invalid captured iterable length").into());
         }
         Ok(array.iter().collect())
+    }
+    fn is_array(&mut self, value: &JsValue) -> Result<bool, PublicError> {
+        self.call(ReadCommand::IsArray, value, &JsValue::UNDEFINED, 0)?
+            .as_bool()
+            .ok_or_else(|| invalid("Invalid live Array classification").into())
+    }
+    fn own_keys(&mut self, receiver: &JsValue) -> Result<Vec<JsString>, PublicError> {
+        let result = self.call(ReadCommand::OwnKeys, receiver, &JsValue::UNDEFINED, 0)?;
+        if result.is_null() {
+            return Err(
+                PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        let keys: js_sys::Array = result
+            .dyn_into()
+            .map_err(|_| invalid("Invalid live own-key reply"))?;
+        if keys.length() > 1_000_000 {
+            return Err(invalid("Invalid live own-key count").into());
+        }
+        // Verify the complete transfer length before allocating any UTF16 key.
+        let mut total = 0usize;
+        for value in keys.iter() {
+            if !value.is_string() {
+                return Err(invalid("Invalid live own-key value").into());
+            }
+            let text: &js_sys::JsString = value.unchecked_ref();
+            total = total.saturating_add(text.length() as usize);
+            if total > 16_000_000 {
+                return Err(PeleError::new(
+                    "Public model graph exceeds work budget",
+                    ErrorCode::Limit,
+                )
+                .into());
+            }
+        }
+        keys.iter()
+            .map(|key| {
+                Self::units(&key)?.ok_or_else(|| invalid("Invalid live own-key value").into())
+            })
+            .collect()
+    }
+    fn snapshot_map_values(
+        &mut self,
+        receiver: &JsValue,
+        max_count: usize,
+    ) -> Result<Vec<JsValue>, PublicError> {
+        let bound = max_count.min(8_000_000);
+        let result = self.call(
+            ReadCommand::SnapshotMapValues,
+            receiver,
+            &JsValue::from_f64(bound as f64),
+            0,
+        )?;
+        if result.is_null() {
+            return Err(
+                PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        let values: js_sys::Array = result
+            .dyn_into()
+            .map_err(|_| invalid("Invalid live Map values reply"))?;
+        if values.length() as usize > bound {
+            return Err(invalid("Invalid live Map values count").into());
+        }
+        Ok(values.iter().collect())
     }
     fn kind(&self, value: &JsValue) -> LiveValueKind {
         if value.is_undefined() {

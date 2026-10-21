@@ -50,6 +50,25 @@ export function liveRenderRead(capture) {
         case 6: return {...value};
         case 7: return value.get(key);
         case 9: return boundedOrdinaryJoin(value, key);
+        case 12: return Array.isArray(value);
+        case 10: {
+          const keys = Object.keys(value);
+          if (keys.length > 1_000_000) return null;
+          let units = 0;
+          for (const name of keys) {
+            units += name.length;
+            if (units > 16_000_000) return null;
+          }
+          return keys;
+        }
+        case 11: {
+          const captured = [];
+          for (const item of value.values()) {
+            if (captured.length === key) return null;
+            captured.push(item);
+          }
+          return captured;
+        }
         case 8: {
           if ((typeof value !== 'object' || value === null) && typeof value !== 'function') return undefined;
           const existing = identities.get(value);

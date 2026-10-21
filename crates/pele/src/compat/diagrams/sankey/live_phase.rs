@@ -46,6 +46,43 @@ pub trait LiveRenderRead {
         )
         .into())
     }
+    /// Array identity without property access or coercion.
+    fn is_array(&mut self, value: &Self::Value) -> Result<bool, PublicError> {
+        if !matches!(
+            self.kind(value),
+            LiveValueKind::Object | LiveValueKind::Function
+        ) {
+            return Ok(false);
+        }
+        Err(PeleError::new(
+            "Live Array classification is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    /// Own enumerable string keys, in ECMAScript key order. No value reads.
+    fn own_keys(
+        &mut self,
+        _receiver: &Self::Value,
+    ) -> Result<Vec<crate::compat::public::JsString>, PublicError> {
+        Err(PeleError::new(
+            "Live own-key capture is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    /// Call receiver.values() once, then capture its yielded values in order.
+    fn snapshot_map_values(
+        &mut self,
+        _receiver: &Self::Value,
+        _max_count: usize,
+    ) -> Result<Vec<Self::Value>, PublicError> {
+        Err(PeleError::new(
+            "Live Map value capture is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
     /// JavaScript HasProperty for an indexed key, including inherited entries.
     fn has_index(&mut self, _receiver: &Self::Value, _index: usize) -> Result<bool, PublicError> {
         Err(PeleError::new(
