@@ -11,6 +11,9 @@ export function liveRenderRead(capture) {
       switch (operation) {
         case 0: case 1: return value[key];
         case 2: return `${value}`;
+        case 5: return key in value;
+        case 6: return {...value};
+        case 7: return value.get(key);
         case 4: {
           const captured=[];
           for(const item of value){

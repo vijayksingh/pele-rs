@@ -46,6 +46,26 @@ pub trait LiveRenderRead {
         )
         .into())
     }
+    /// JavaScript HasProperty for an indexed key, including inherited entries.
+    fn has_index(&mut self, _receiver: &Self::Value, _index: usize) -> Result<bool, PublicError> {
+        Err(PeleError::new(
+            "Live indexed membership is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    /// Object spread into a fresh ordinary object. Child identities stay shared.
+    fn shallow_copy(&mut self, _value: &Self::Value) -> Result<Self::Value, PublicError> {
+        Err(PeleError::new("Live shallow copy is not implemented", ErrorCode::Semantic).into())
+    }
+    /// Ordinary dynamic receiver.get(key), including its method lookup and this.
+    fn map_get(
+        &mut self,
+        _receiver: &Self::Value,
+        _key: &Self::Value,
+    ) -> Result<Self::Value, PublicError> {
+        Err(PeleError::new("Live map lookup is not implemented", ErrorCode::Semantic).into())
+    }
     fn kind(&self, value: &Self::Value) -> LiveValueKind;
     fn number(&self, value: &Self::Value) -> Option<f64>;
     fn truthy(&self, value: &Self::Value) -> bool;

@@ -30,6 +30,9 @@ enum ReadCommand {
     ToString = 2,
     RequireString = 3,
     SnapshotIterable = 4,
+    HasIndex = 5,
+    ShallowCopy = 6,
+    MapGet = 7,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -110,6 +113,22 @@ impl LiveRenderRead for Reader {
             &JsValue::from_f64(index as f64),
             0,
         )
+    }
+    fn has_index(&mut self, receiver: &JsValue, index: usize) -> Result<bool, PublicError> {
+        self.call(
+            ReadCommand::HasIndex,
+            receiver,
+            &JsValue::from_f64(index as f64),
+            0,
+        )?
+        .as_bool()
+        .ok_or_else(|| invalid("Invalid live membership reply").into())
+    }
+    fn shallow_copy(&mut self, value: &JsValue) -> Result<JsValue, PublicError> {
+        self.call(ReadCommand::ShallowCopy, value, &JsValue::UNDEFINED, 0)
+    }
+    fn map_get(&mut self, receiver: &JsValue, key: &JsValue) -> Result<JsValue, PublicError> {
+        self.call(ReadCommand::MapGet, receiver, key, 0)
     }
     fn snapshot_iterable(
         &mut self,
