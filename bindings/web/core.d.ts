@@ -20,3 +20,7 @@ export interface Core {
   capabilities(): Capability[];
 }
 export function loadCore(moduleOrPath?: string | URL | Response | BufferSource | WebAssembly.Module): Promise<Core>;
+
+export type {
+  TextMeasurer, IconResolver, LinkInfo, RenderOptions, RenderResult, MountOptions, Mounted, Zoom, ZoomOptions, ParseOptions
+} from './full.js';

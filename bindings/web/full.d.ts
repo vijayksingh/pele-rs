@@ -398,3 +398,10 @@ export interface TextMeasurer { width(text: string, size: number, style: number)
 export const metricsMeasurer: TextMeasurer;
 export function canvasMeasurer(fontFamily?: string, monoFamily?: string): TextMeasurer | null;
 export function forgetTextWidths(): void;
+
+/** Upstream public names; preserve the existing binding result and resource shapes. */
+export type IconResolver = NonNullable<RenderOptions['icons']>;
+export type LinkInfo = Rendered['links'][number];
+export type RenderResult = Rendered;
+export type {DiagramType} from './core.js';
+export type SwimlaneModel = FlowchartModel;
