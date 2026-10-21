@@ -2003,6 +2003,20 @@ fn construct_default() -> Result<StatePublicState, PeleError> {
 }
 
 impl PublicDiagramModule for State {
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::state())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::state(
+            super::StateDetachedInput::new(state.projected.as_ref().err()),
+        ))
+    }
+
     type PublicState = StatePublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA

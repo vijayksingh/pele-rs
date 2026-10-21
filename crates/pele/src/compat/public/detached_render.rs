@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    State,
     Architecture,
     EventModeling,
     Usecase,
@@ -52,6 +53,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn state() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::state::State>(),
+            kind: Kind::State,
+        }
+    }
+
     pub(crate) fn architecture() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::architecture::Architecture>(),
@@ -227,6 +235,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    State(crate::compat::diagrams::state::StateDetachedInput),
     Architecture(crate::compat::diagrams::architecture::ArchitectureDetachedInput),
     EventModeling(crate::compat::diagrams::event_modeling::EventModelingDetachedInput),
     Usecase(crate::compat::diagrams::usecase::UsecaseDetachedInput),
@@ -253,6 +262,13 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn state(input: crate::compat::diagrams::state::StateDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::state::State>(),
+            body: Body::State(input),
+        }
+    }
+
     pub(crate) fn architecture(
         input: crate::compat::diagrams::architecture::ArchitectureDetachedInput,
     ) -> Self {
@@ -436,6 +452,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::State(_) => Kind::State,
             Body::Architecture(_) => Kind::Architecture,
             Body::EventModeling(_) => Kind::EventModeling,
             Body::Usecase(_) => Kind::Usecase,
@@ -474,6 +491,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::State(input) => crate::compat::diagrams::state::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Architecture(input) => crate::compat::diagrams::architecture::render_detached(
                 input, read, config, settings, resources,
             ),

@@ -1,5 +1,8 @@
 //! Pele state/render.ts compound state renderer, 458322a5 (MIT, kepano).
-use super::{graph::StateNode, model::StateModel};
+use super::{
+    model::StateModel,
+    phase::{PhaseInput, Typed},
+};
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
@@ -53,8 +56,8 @@ const CLASSES: [&str; 9] = [
     "pele-note",
     "pele-cluster pele-state-composite",
 ];
-struct View<'a> {
-    node: Option<&'a StateNode>,
+struct View<V> {
+    node: Option<V>,
     kind: K,
     style: Option<ResolvedStyle>,
     label: Label,
@@ -63,8 +66,8 @@ struct View<'a> {
     h: f64,
     title_h: f64,
 }
-impl<'a> View<'a> {
-    fn new(node: Option<&'a StateNode>, kind: K, label: &Label) -> Self {
+impl<V> View<V> {
+    fn new(node: Option<V>, kind: K, label: &Label) -> Self {
         Self {
             node,
             kind,
@@ -116,18 +119,25 @@ fn group(dir: Dir, pad_x: f64, pad_top: f64, pad_bottom: f64) -> CNode {
     c.pad_bottom = pad_bottom;
     c
 }
-fn across(i: usize, logical: &[isize], views: &[View<'_>], root: Dir) -> bool {
-    !if logical[i] < 0 {
+fn across<P: PhaseInput>(
+    phase: &mut P,
+    i: usize,
+    logical: &[isize],
+    views: &[View<P::Value>],
+    root: Dir,
+) -> Result<bool, P::Error> {
+    Ok(!if logical[i] < 0 {
         root
     } else {
         direction(
-            views[logical[i] as usize]
-                .node
-                .and_then(|n| n.dir.as_deref()),
+            phase
+                .field(views[logical[i] as usize].node.as_ref().unwrap(), "dir")?
+                .as_deref(),
         )
     }
-    .sideways()
+    .sideways())
 }
+
 fn encloses(composite: usize, item: usize, logical: &[isize], nodes: &[CNode]) -> bool {
     if !nodes[composite].is_group {
         return false;
@@ -203,9 +213,9 @@ fn cleaned_classes(text: &str) -> String {
     }
     out
 }
-fn divide(
+fn divide<V>(
     items: &[usize],
-    views: &[View<'_>],
+    views: &[View<V>],
     nodes: &[CNode],
     pad: f64,
     left: f64,
@@ -272,7 +282,7 @@ fn divide(
         })
         .collect()
 }
-fn attach(route: &mut [f64], at: usize, i: usize, nodes: &[CNode], views: &[View<'_>], pad: f64) {
+fn attach<V>(route: &mut [f64], at: usize, i: usize, nodes: &[CNode], views: &[View<V>], pad: f64) {
     let c = &nodes[i];
     if c.is_group {
         return;
@@ -308,8 +318,17 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let first = draw(db, config, options, resources, false)?;
-    if !matches!(db.direction.as_str(), "LR" | "RL") {
+    render_phases(&mut Typed(db), config, options, resources)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    phase: &mut P,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let responsive = matches!(phase.direction()?.as_str(), "LR" | "RL");
+    let first = draw(phase, config, options, resources, false)?;
+    if !responsive {
         return Ok(first);
     }
     let Some(available) = options.max_width.filter(|w| *w > 0.) else {
@@ -325,21 +344,22 @@ pub(super) fn render(
     {
         return Ok(first);
     }
-    let down = draw(db, config, options, resources, true)?;
+    let down = draw(phase, config, options, resources, true)?;
     Ok(if down.width < first.width {
         down
     } else {
         first
     })
 }
-fn draw(
-    db: &StateModel,
+fn draw<P: PhaseInput>(
+    phase: &mut P,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     turned: bool,
-) -> Result<Rendered, PeleError> {
-    let graph = &db.graph;
+) -> Result<Rendered, P::Error> {
+    phase.begin_draw();
+    let graph = phase.get(&phase.root(), "graph")?;
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let wrap = number_option(config, "wrappingWidth", 200.);
@@ -347,24 +367,31 @@ fn draw(
     let root_dir = if turned {
         Dir::TB
     } else {
-        direction(Some(&db.direction))
+        direction(Some(&phase.direction()?))
     };
     let no_label = layout_label(None, false, resources, options, size, 0., 0)?;
     let mut index = HashMap::new();
     let mut views = Vec::new();
     let mut nodes = Vec::new();
-    for node in &graph.nodes {
-        if node.shape.as_deref() == Some("noteGroup") {
+    let node_values = phase.get(&graph, "nodes")?;
+    let mut cursor = 0;
+    while cursor < phase.count(&node_values)? {
+        phase.step()?;
+        let node = phase.index(&node_values, cursor)?;
+        cursor += 1;
+        let shape = phase.field(&node, "shape")?;
+        let group = phase.get(&node, "isGroup")?;
+        if shape.as_deref() == Some("noteGroup") {
             continue;
         }
-        let kind = if node.is_group {
-            if node.shape.as_deref() == Some("divider") {
+        let kind = if phase.truthy(&group) {
+            if shape.as_deref() == Some("divider") {
                 K::Region
             } else {
                 K::Composite
             }
         } else {
-            match node.shape.as_deref() {
+            match shape.as_deref() {
                 Some("rectWithTitle") => K::Described,
                 Some("stateStart") => K::Start,
                 Some("stateEnd") => K::End,
@@ -376,24 +403,27 @@ fn draw(
                 _ => K::State,
             }
         };
-        index.insert(node.id.as_str(), views.len());
+        index.insert(phase.string(&node, "id")?, views.len());
         views.push(View::new(Some(node), kind, &no_label));
     }
     let states = views.len();
     let mut logical = Vec::new();
     for i in 0..states {
-        let p = views[i]
-            .node
-            .unwrap()
-            .parent_id
-            .as_deref()
-            .and_then(|id| index.get(id))
-            .copied();
-        logical.push(
-            p.filter(|&p| p != i && views[p].node.unwrap().is_group)
-                .map_or(-1, |p| p as isize),
-        );
+        let parent = phase.field(views[i].node.as_ref().unwrap(), "parentId")?;
+        let p = parent.as_ref().and_then(|id| index.get(id)).copied();
+        let p = if let Some(p) = p.filter(|p| *p != i) {
+            let value = phase.get(views[p].node.as_ref().unwrap(), "isGroup")?;
+            if phase.truthy(&value) {
+                p as isize
+            } else {
+                -1
+            }
+        } else {
+            -1
+        };
+        logical.push(p);
     }
+
     {
         let mut kids = vec![Vec::new(); states];
         let mut queue = Vec::new();
@@ -437,15 +467,10 @@ fn draw(
     }
     let mut owners = vec![-1isize; states];
     for i in 0..states {
-        if let Some(&owner) = views[i]
-            .node
-            .unwrap()
-            .note_for
-            .as_deref()
-            .and_then(|id| index.get(id))
-        {
+        let owner = phase.field(views[i].node.as_ref().unwrap(), "noteFor")?;
+        if let Some(&owner) = owner.as_ref().and_then(|id| index.get(id)) {
             owners[i] = owner as isize;
-            logical[i] = logical[owner]
+            logical[i] = logical[owner];
         }
     }
     let mut degree = vec![0usize; states];
@@ -453,13 +478,18 @@ fn draw(
     let mut appear = vec![f64::INFINITY; states];
     let mut appeared = 0.;
     let mut counts = vec![0usize; 2 * states];
-    for edge in &graph.edges {
-        let (Some(&src), Some(&dst)) =
-            (index.get(edge.start.as_str()), index.get(edge.end.as_str()))
-        else {
+    let edge_values = phase.get(&graph, "edges")?;
+    let mut cursor = 0;
+    while cursor < phase.count(&edge_values)? {
+        phase.step()?;
+        let edge = phase.index(&edge_values, cursor)?;
+        cursor += 1;
+        let start = phase.string(&edge, "start")?;
+        let end = phase.string(&edge, "end")?;
+        let (Some(&src), Some(&dst)) = (index.get(start.as_str()), index.get(end.as_str())) else {
             continue;
         };
-        if edge.pattern.as_deref() == Some("dashed") {
+        if phase.field(&edge, "pattern")?.as_deref() == Some("dashed") {
             noted[if views[src].kind == K::Note { dst } else { src }] = true;
             continue;
         }
@@ -475,12 +505,21 @@ fn draw(
         }
     }
     for i in 0..states {
-        let side = across(i, &logical, &views, root_dir);
-        let inner = direction(views[i].node.unwrap().dir.as_deref());
+        let node = views[i].node.as_ref().unwrap().clone();
+        let styles = phase.get(&node, "cssStyles")?;
+        let count = phase.count(&styles)?;
+        let compiled = phase.get(&node, "cssCompiledStyles")?;
+        let mut styles_all = phase.strings(&compiled)?;
+        if count > 0 {
+            styles_all.extend(phase.strings(&styles)?)
+        }
+        let side = if matches!(views[i].kind, K::Fork | K::Join) {
+            across(phase, i, &logical, &views, root_dir)?
+        } else {
+            false
+        };
         let view = &mut views[i];
-        let node = view.node.unwrap();
-        let mut styles = node.css_compiled_styles.clone();
-        styles.extend(node.css_styles.iter().cloned());
+        let styles = styles_all;
         let style = resolve_style(&styles);
         let bits = u8::from(style.bold) | if style.italic { 2 } else { 0 };
         let font = style.font_size.unwrap_or(size);
@@ -488,7 +527,7 @@ fn draw(
         match view.kind {
             K::Composite => {
                 view.label = layout_label(
-                    node.label.as_deref(),
+                    phase.field(&node, "label")?.as_deref(),
                     true,
                     resources,
                     options,
@@ -501,11 +540,23 @@ fn draw(
                 } else {
                     0.
                 };
-                let mut g = group(inner, 16., view.title_h + 16., 16.);
+                let mut g = group(
+                    direction(phase.field(&node, "dir")?.as_deref()),
+                    16.,
+                    view.title_h + 16.,
+                    16.,
+                );
                 g.min_w = view.label.width + 32.;
                 c = Some(g)
             }
-            K::Region => c = Some(group(inner, 10., 10., 10.)),
+            K::Region => {
+                c = Some(group(
+                    direction(phase.field(&node, "dir")?.as_deref()),
+                    10.,
+                    10.,
+                    10.,
+                ))
+            }
             K::Start => {
                 view.w = 14.;
                 view.h = 14.
@@ -526,7 +577,7 @@ fn draw(
             K::Hidden => {}
             K::Note => {
                 view.label = layout_label(
-                    node.label.as_deref(),
+                    phase.field(&node, "label")?.as_deref(),
                     true,
                     resources,
                     options,
@@ -539,7 +590,7 @@ fn draw(
             }
             _ => {
                 view.label = layout_label(
-                    node.label.as_deref(),
+                    phase.field(&node, "label")?.as_deref(),
                     true,
                     resources,
                     options,
@@ -551,9 +602,15 @@ fn draw(
                 let mut height = view.label.height + 20.;
                 if view.kind == K::Described {
                     height += 14.;
-                    for line in &node.description {
+                    let descriptions = phase.get(&node, "description")?;
+                    let mut cursor = 0;
+                    while cursor < phase.count(&descriptions)? {
+                        phase.step()?;
+                        let value = phase.index(&descriptions, cursor)?;
+                        cursor += 1;
+                        let line = phase.text(&value)?.unwrap_or_default();
                         let label = layout_label(
-                            Some(if line.is_empty() { " " } else { line }),
+                            Some(if line.is_empty() { " " } else { &line }),
                             true,
                             resources,
                             options,
@@ -573,10 +630,19 @@ fn draw(
             }
         }
         let mut c = c.unwrap_or_else(|| CNode::new(view.w, view.h, -1));
-        if matches!(view.kind, K::State | K::Described) {
-            c.span = if side { view.w } else { view.h } - 24.
-        }
+        let dimensions = if matches!(view.kind, K::State | K::Described) {
+            Some((view.w, view.h))
+        } else {
+            None
+        };
         view.style = Some(style);
+        if let Some((w, h)) = dimensions {
+            c.span = if across(phase, i, &logical, &views, root_dir)? {
+                w
+            } else {
+                h
+            } - 24.;
+        }
         nodes.push(c)
     }
     let mut edges = Vec::new();
@@ -586,13 +652,27 @@ fn draw(
     let mut loop_width = vec![0_f64; states];
     let mut loop_height = vec![0.; states];
     let mut anchors = HashMap::new();
-    for edge in &graph.edges {
-        let (Some(&a), Some(&b)) = (index.get(edge.start.as_str()), index.get(edge.end.as_str()))
-        else {
+    let edge_values = phase.get(&graph, "edges")?;
+    let mut cursor = 0;
+    while cursor < phase.count(&edge_values)? {
+        phase.step()?;
+        let edge = phase.index(&edge_values, cursor)?;
+        cursor += 1;
+        let start = phase.string(&edge, "start")?;
+        let end = phase.string(&edge, "end")?;
+        let (Some(&a), Some(&b)) = (index.get(start.as_str()), index.get(end.as_str())) else {
             continue;
         };
         let (mut src, mut dst) = (a, b);
-        let label = layout_label(Some(&edge.label), true, resources, options, small, wrap, 0)?;
+        let label = layout_label(
+            phase.field(&edge, "label")?.as_deref(),
+            true,
+            resources,
+            options,
+            small,
+            wrap,
+            0,
+        )?;
         let label_w = if label.width > 0. {
             label.width + 12.
         } else {
@@ -644,7 +724,7 @@ fn draw(
         if owners[i] >= 0 {
             continue;
         }
-        let side = across(i, &logical, &views, root_dir);
+        let side = across(phase, i, &logical, &views, root_dir)?;
         let item = &mut nodes[i];
         let mut room = 0.;
         if loop_count[i] > 0 {
@@ -769,7 +849,7 @@ fn draw(
     let mut notes_out = String::new();
     for i in order {
         let view = &views[i];
-        let (Some(node), Some(style)) = (view.node, view.style.as_ref()) else {
+        let (Some(node), Some(style)) = (view.node.as_ref(), view.style.as_ref()) else {
             continue;
         };
         if view.kind >= K::Region {
@@ -779,15 +859,16 @@ fn draw(
         let (x, y, w, h) = (c.x + pad, c.y + pad, view.w, view.h);
         let attrs = format!(" class=\"pele-label\"{}", style.text);
         let mut body=match view.kind{K::Composite=>{let(left,top)=(x-c.w/2.,y-c.h/2.);let mut body=rect(left,top,c.w,c.h,&format!(" rx=\"10\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"{}",style.shape));if view.title_h>0.{body+=&format!("<path d=\"M{},{}H{}\"{RULE}{}/>",num(left),num(top+view.title_h),num(left+c.w),style.line);body+=&label_svg(&view.label,title_x(c,view.label.width,&crossings)+pad,top+view.title_h/2.,&format!(" class=\"pele-cluster-label\"{}",style.text),resources)?}dividers+=&divide(&children[i],&views,&nodes,pad,left,top+view.title_h,left+c.w,top+c.h);body},K::Start=>format!("<circle r=\"7\" fill=\"var(--_l)\"{}/>",style.shape),K::End=>format!("<circle r=\"8.5\" fill=\"var(--_bg)\" stroke=\"var(--_l)\"{}/><circle r=\"5\" fill=\"var(--_l)\"{}/>",style.line,style.shape),K::Choice=>format!("<polygon points=\"0,{} {},0 0,{} {},0\"{SURFACE}{}/>",num(-h/2.),num(w/2.),num(h/2.),num(-w/2.),style.shape),K::Fork|K::Join=>rect(-w/2.,-h/2.,w,h,&format!(" rx=\"2\" fill=\"var(--_l)\"{}",style.shape)),K::Note=>{let(r,b,fold,corner)=(num(w/2.),num(h/2.),num(w/2.-8.),num(8.-h/2.));format!("<path d=\"M-{r},-{b}H{fold}L{r},{corner}V{b}H-{r}Z\" fill=\"var(--_bg)\" stroke=\"var(--_b)\"/><path d=\"M{fold},-{b}V{corner}H{r}\"{RULE}/>{}",label_svg(&view.label,0.,0.,&format!(" class=\"pele-label\" font-size=\"{}\" fill=\"var(--_m)\"",svg::js_num(small)),resources)?)},_=>{let mut body=rect(-w/2.,-h/2.,w,h,&format!(" rx=\"{}\"{SURFACE}{}",num(10_f64.js_min(h/2.)),style.shape));if view.kind==K::State{body+=&label_svg(&view.label,0.,0.,&attrs,resources)?}else{let mut at=10.-h/2.+view.label.height;body+=&format!("<path d=\"M{},{}H{}\"{RULE}{}/>",num(-w/2.),num(at+6.),num(w/2.),style.line);body+=&label_svg(&view.label,0.,at-view.label.height/2.,&attrs,resources)?;at+=14.;for line in &view.lines{body+=&label_svg(line,0.,at+line.height/2.,&format!(" class=\"pele-state-description\" font-size=\"{}\"{}",svg::js_num(small),style.text),resources)?;at+=line.height}}body}};
-        if let Some((_, link)) = db.links.iter().find(|(id, _)| id == &node.id) {
-            let tip = decode_entities(link.tooltip.trim_matches('"'))?;
+        let id = phase.string(node, "id")?;
+        if let Some((url, tooltip)) = phase.link(&id)? {
+            let tip = decode_entities(tooltip.trim_matches('"'))?;
             if !tip.is_empty() {
                 body = format!("<title>{}</title>{body}", esc(&tip))
             }
             body = linked(
                 &body,
-                &safe_url(link.url.trim_matches('"'))?,
-                &node.id,
+                &safe_url(url.trim_matches('"'))?,
+                &phase.string(node, "id")?,
                 &mut links,
                 options,
                 " target=\"_blank\"",
@@ -796,8 +877,8 @@ fn draw(
         let open = format!(
             "<g class=\"{}{}\" data-id=\"{}\"",
             CLASSES[view.kind as usize],
-            class_names(&cleaned_classes(&node.css_classes)),
-            esc_text(&node.id)?
+            class_names(&cleaned_classes(&phase.string(node, "cssClasses")?)),
+            esc_text(&phase.string(node, "id")?)?
         );
         if view.kind == K::Composite {
             clusters += &format!("{open}>{body}</g>")
@@ -816,7 +897,10 @@ fn draw(
     }
     let mut reach = SideReach::default();
     for (i, ce) in edges.iter().enumerate() {
-        if ce.src == ce.dst || ce.route.len() < 6 || drawn[i].pattern.as_deref() == Some("dashed") {
+        if ce.src == ce.dst
+            || ce.route.len() < 6
+            || phase.field(&drawn[i], "pattern")?.as_deref() == Some("dashed")
+        {
             continue;
         }
         let c = &nodes[ce.dst];
@@ -831,16 +915,16 @@ fn draw(
     let mut loop_seen = vec![0usize; states];
     let mut loop_text = vec![0.; states];
     for (i, ce) in edges.iter_mut().enumerate() {
-        let edge = drawn[i];
+        let edge = &drawn[i];
         let label = &labels[i];
-        let note = edge.pattern.as_deref() == Some("dashed");
+        let note = phase.field(&edge, "pattern")?.as_deref() == Some("dashed");
         let end_type = if note { "none" } else { "arrow_point" };
         let path = if ce.src == ce.dst {
             let a = &nodes[ce.src];
             let view = &views[ce.src];
             let k = loop_seen[ce.src] as f64;
             loop_seen[ce.src] += 1;
-            let side = across(ce.src, &logical, &views, root_dir);
+            let side = across(phase, ce.src, &logical, &views, root_dir)?;
             let (w, h) = if a.is_group {
                 (a.w, a.h)
             } else {
@@ -952,13 +1036,13 @@ fn draw(
             } else {
                 "pele-transition"
             },
-            esc_text(&edge.id)?,
+            esc_text(&phase.string(edge, "id")?)?,
             path.d,
             marker(end_type, path.ex, path.ey, path.edx, path.edy, "var(--_l)")
         );
         if label.width > 0. {
             labels_out += &edge_label_svg(
-                &edge.id,
+                &phase.string(edge, "id")?,
                 label,
                 ce.label_x + pad,
                 ce.label_y + pad,
@@ -986,7 +1070,7 @@ fn draw(
     }
     content += &format!("<g class=\"pele-nodes\">{nodes_out}{notes_out}</g>");
     let titled = with_title(
-        db.title.as_deref(),
+        phase.metadata("title")?.as_deref(),
         resources,
         options,
         size,
@@ -1001,8 +1085,8 @@ fn draw(
         titled.height,
         size,
         options,
-        db.acc_title.as_deref(),
-        db.acc_descr.as_deref(),
+        phase.metadata("accTitle")?.as_deref(),
+        phase.metadata("accDescr")?.as_deref(),
         &titled.content,
     )?;
     Ok(Rendered {
