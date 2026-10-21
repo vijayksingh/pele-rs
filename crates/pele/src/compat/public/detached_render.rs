@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    C4,
     Wardley,
     Cynefin,
     Er,
@@ -45,6 +46,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn c4() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::c4::C4>(),
+            kind: Kind::C4,
+        }
+    }
+
     pub(crate) fn wardley() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::wardley::Wardley>(),
@@ -171,6 +179,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    C4(crate::compat::diagrams::c4::C4DetachedInput),
     Wardley(crate::compat::diagrams::wardley::WardleyDetachedInput),
     Cynefin(crate::compat::diagrams::cynefin::CynefinDetachedInput),
     Er(crate::compat::diagrams::er::ErDetachedInput),
@@ -190,6 +199,13 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn c4(input: crate::compat::diagrams::c4::C4DetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::c4::C4>(),
+            body: Body::C4(input),
+        }
+    }
+
     pub(crate) fn wardley(input: crate::compat::diagrams::wardley::WardleyDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::wardley::Wardley>(),
@@ -314,6 +330,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::C4(_) => Kind::C4,
             Body::Wardley(_) => Kind::Wardley,
             Body::Cynefin(_) => Kind::Cynefin,
             Body::Er(_) => Kind::Er,
@@ -345,6 +362,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::C4(input) => crate::compat::diagrams::c4::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Wardley(input) => crate::compat::diagrams::wardley::render_detached(
                 input, config, settings, read, resources,
             ),

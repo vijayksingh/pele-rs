@@ -2,6 +2,7 @@
 use super::{
     layout::{self, HEAD_LEFT, HEAD_TOP},
     model::{C4Model, ElementRef},
+    phase::{Collection, PhaseInput, Typed},
     route::{self, crosses, cyl_ry, queue_rx, Box, Lanes, HEAD, LANE},
 };
 use crate::compat::number_math::{round, NumberMath};
@@ -62,19 +63,33 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let loose = draw(db, options, resources, false, 36., true)?.0;
+    render_phases(
+        &mut Typed {
+            model: db,
+            shape_lookup: true,
+        },
+        options,
+        resources,
+    )
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let loose = draw(input, options, resources, false, 36.)?.0;
     let Some(available) = options.max_width.filter(|v| *v > 0.) else {
         return Ok(loose);
     };
     if loose.width <= available {
         return Ok(loose);
     }
-    let (mut best, mut squeezed) = draw(db, options, resources, true, 36., true)?;
+    let (mut best, mut squeezed) = draw(input, options, resources, true, 36.)?;
     for gap in [60., 84., 108.] {
         if squeezed == 0 {
             break;
         }
-        let (wider, left) = draw(db, options, resources, true, gap, true)?;
+        let (wider, left) = draw(input, options, resources, true, gap)?;
         if left < squeezed {
             best = wider;
             squeezed = left
@@ -120,20 +135,20 @@ fn offset(value: Option<f64>) -> f64 {
         _ => 0.,
     }
 }
-fn draw(
-    db: &C4Model,
+fn draw<P: PhaseInput>(
+    input: &mut P,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     tight: bool,
     gap: f64,
-    shape_lookup: bool,
-) -> Result<(Rendered, usize), PeleError> {
+) -> Result<(Rendered, usize), P::Error> {
+    input.begin_draw();
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.8125);
     let pad = options.padding.unwrap_or(8.);
     let mut links = Vec::new();
     let mut layout = layout::layout(
-        db,
+        input,
         resources,
         options,
         size,
@@ -148,40 +163,40 @@ fn draw(
     let mut bounds = Bounds {
         min_x: 0.,
         min_y: 0.,
-        max_x: layout.groups[0].bbox.w,
-        max_y: layout.groups[0].bbox.h,
+        max_x: layout.groups[layout.root].bbox.w,
+        max_y: layout.groups[layout.root].bbox.h,
     };
     let mut ends = Vec::new();
     let mut pairs: HashMap<ElementRef, HashSet<ElementRef>> = HashMap::new();
-    for rel in &db.rels {
-        if !shape_lookup && (rel.from_attr.is_none() || rel.to_attr.is_none()) {
-            return Err(PeleError::new(
-                "t.getC4Shape is not a function",
-                ErrorCode::Semantic,
-            ));
-        }
-        let from = if rel.from_attr.is_some() {
+    let rels = input.list(Collection::Relations)?;
+    let mut index = 0;
+    while index < input.len(&rels)? {
+        input.step()?;
+        let rel = input.at(&rels, index)?;
+        index += 1;
+        let from = if input.flag(&rel, "fromAttr")? {
             None
         } else {
-            db.find(&rel.from)
+            let key = input.text(&rel, "from")?.unwrap_or_default();
+            input.lookup(&key)?
         };
-        let to = if rel.to_attr.is_some() {
+        let to = if input.flag(&rel, "toAttr")? {
             None
         } else {
-            db.find(&rel.to)
+            let key = input.text(&rel, "to")?.unwrap_or_default();
+            input.lookup(&key)?
         };
         let a = from.and_then(|id| layout.boxes.get(&id));
         let b = to.and_then(|id| layout.boxes.get(&id));
         let (Some(a), Some(b)) = (a, b) else {
+            let from = input.text(&rel, "from")?.unwrap_or_default();
+            let to = input.text(&rel, "to")?.unwrap_or_default();
             let mut e = PeleError::new(
-                format!(
-                    "C4 rel \"{}\" -> \"{}\" references an unknown shape or boundary",
-                    rel.from, rel.to
-                ),
+                format!("C4 rel \"{from}\" -> \"{to}\" references an unknown shape or boundary"),
                 ErrorCode::Semantic,
             );
             e.diagram_type = Some("c4".into());
-            return Err(e);
+            return Err(e.into());
         };
         ends.push((a.clone(), b.clone()));
         pairs.entry(a.id).or_default().insert(b.id);
@@ -195,28 +210,40 @@ fn draw(
             taken.extend([b.x + 8., b.y + 8., b.x + b.w - 8., b.y + b.h - 8.])
         }
     }
-    let rel_count = db.rels.len() as u64;
+    let current_rels = input.list(Collection::Relations)?;
+    let rel_count = input.len(&current_rels)? as u64;
     let careful =
         rel_count * (nodes.len() as u64 + layout.order.len() as u64 + 3 * rel_count) <= 2_000_000;
     let mut edges_out = String::new();
     let trim = marker_trim("arrow_point");
     let mut lanes = Lanes::default();
     for &i in &layout.order {
-        if i != 0 {
+        if i != layout.root {
             lanes.frame(&layout.groups[i].bbox)
         }
     }
     let mut routes = Vec::new();
-    for (index, rel) in db.rels.iter().enumerate() {
-        let (a, b) = &ends[index];
-        let style = user_style(None, rel.line_color.as_deref(), None);
+    let route_rels = input.list(Collection::Relations)?;
+    let route_count = input.len(&route_rels)?;
+    for index in 0..route_count {
+        input.step()?;
+        let rel = input.at(&route_rels, index)?;
+        let (a, b) = ends.get(index).ok_or_else(|| {
+            PeleError::new(
+                "C4 live relation count changed before routing",
+                ErrorCode::Semantic,
+            )
+        })?;
+        let line_color = input.text(&rel, "lineColor")?;
+        let style = user_style(None, line_color.as_deref(), None);
         let color = style
             .stroke
             .as_deref()
             .map(esc)
             .unwrap_or_else(|| "var(--_l)".into());
-        let start_arrow = matches!(rel.rel_type.as_str(), "birel" | "rel_b");
-        let end_arrow = rel.rel_type != "rel_b";
+        let start_arrow = input.text(&rel, "type")?.as_deref() == Some("birel")
+            || input.text(&rel, "type")?.as_deref() == Some("rel_b");
+        let end_arrow = input.text(&rel, "type")?.as_deref() != Some("rel_b");
         let reverse = a.id != b.id
             && pairs
                 .get(&b.id)
@@ -244,7 +271,11 @@ fn draw(
         }
         edges_out += &format!(
             "<g class=\"pele-edge\" data-id=\"{}\"{}><path d=\"{}\"/>{}{}</g>",
-            esc_text(&format!("{}-{}", rel.from, rel.to))?,
+            esc_text(&format!(
+                "{}-{}",
+                input.text(&rel, "from")?.unwrap_or_default(),
+                input.text(&rel, "to")?.unwrap_or_default()
+            ))?,
             style.line,
             r.d,
             if start_arrow {
@@ -301,21 +332,46 @@ fn draw(
         ]);
     }
     let mut labels_out = String::new();
-    for (index, rel) in db.rels.iter().enumerate() {
-        let r = &routes[index];
-        let id = format!("{}-{}", rel.from, rel.to);
-        let style = user_style(None, None, rel.text_color.as_deref());
-        let text = if db.c4_type.as_deref() == Some("C4Dynamic") {
-            format!("{}: {}", index + 1, rel.label)
+    let label_rels = input.list(Collection::Relations)?;
+    let label_count = input.len(&label_rels)?;
+    for index in 0..label_count {
+        input.step()?;
+        if !input.present(&label_rels, index)? {
+            continue;
+        }
+        let rel = input.at(&label_rels, index)?;
+        let r = routes.get(index).ok_or_else(|| {
+            PeleError::new(
+                "C4 live relation count changed before labels",
+                ErrorCode::Semantic,
+            )
+        })?;
+        let id = format!(
+            "{}-{}",
+            input.text(&rel, "from")?.unwrap_or_default(),
+            input.text(&rel, "to")?.unwrap_or_default()
+        );
+        let text_color = input.text(&rel, "textColor")?;
+        let style = user_style(None, None, text_color.as_deref());
+        let owner = input.root();
+        let dynamic = input.text(&owner, "c4Type")?.as_deref() == Some("C4Dynamic");
+        let text = input.text(&rel, "label")?.unwrap_or_default();
+        let text = if dynamic {
+            format!("{}: {}", index + 1, text)
         } else {
-            rel.label.clone()
+            text
         };
+        input.retain_label(Some(&text))?;
         let label = layout_label(Some(&text), false, resources, options, small, r.room, 0)?;
-        let techn = rel
-            .techn
-            .as_ref()
-            .filter(|s| !s.is_empty())
-            .map(|s| format!("[{s}]"));
+        let techn = if input.flag(&rel, "techn")? {
+            Some(format!(
+                "[{}]",
+                input.text(&rel, "techn")?.unwrap_or_default()
+            ))
+        } else {
+            None
+        };
+        input.retain_label(techn.as_deref())?;
         let techn = layout_label(
             techn.as_deref(),
             false,
@@ -336,8 +392,18 @@ fn draw(
         } else {
             beside
         };
-        let mut dx = r.nx * aside + if tight { 0. } else { offset(rel.offset_x) };
-        let mut dy = r.ny * aside + if tight { 0. } else { offset(rel.offset_y) };
+        let mut dx = r.nx * aside
+            + if tight {
+                0.
+            } else {
+                offset(input.number(&rel, "offsetX")?)
+            };
+        let mut dy = r.ny * aside
+            + if tight {
+                0.
+            } else {
+                offset(input.number(&rel, "offsetY")?)
+            };
         let mut at = 0.5;
         if careful {
             let mut least = f64::INFINITY;
@@ -386,19 +452,18 @@ fn draw(
                 &format!(" class=\"pele-c4-techn\" fill=\"var(--_m)\"{}", style.text)
             )
         );
-        labels_out+=&format!("<g class=\"pele-edge-label\" data-id=\"{}\">{}<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"3\" fill=\"var(--_bg)\"/>{}</g>",esc_text(&id)?,if let Some(descr)=rel.descr.as_ref().filter(|s|!s.is_empty()){format!("<title>{}</title>",esc_text(descr)?)}else{String::new()},num(cx-lw/2.),num(top),num(lw),num(lh),link(&text,rel.link.as_deref(),&id,&mut links,options));
+        labels_out+=&format!("<g class=\"pele-edge-label\" data-id=\"{}\">{}<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"3\" fill=\"var(--_bg)\"/>{}</g>",esc_text(&id)?,if input.flag(&rel,"descr")?{let descr=input.text(&rel,"descr")?.unwrap_or_default();format!("<title>{}</title>",esc_text(&descr)?)}else{String::new()},num(cx-lw/2.),num(top),num(lw),num(lh),link(&text,input.text(&rel,"link")?.as_deref(),&id,&mut links,options));
     }
     let mut clusters = String::new();
     let mut nodes_out = String::new();
     for &i in &layout.order {
         let group = &layout.groups[i];
-        if i != 0 {
-            let boundary = &db.boundaries[group.boundary];
-            let style = user_style(
-                boundary.bg_color.as_deref(),
-                boundary.border_color.as_deref(),
-                boundary.font_color.as_deref(),
-            );
+        if i != layout.root {
+            let boundary = &group.boundary;
+            let bg = input.text(boundary, "bgColor")?;
+            let border = input.text(boundary, "borderColor")?;
+            let font = input.text(boundary, "fontColor")?;
+            let style = user_style(bg.as_deref(), border.as_deref(), font.as_deref());
             let x = group.bbox.x + group.head_x;
             let mut y = group.bbox.y + HEAD_TOP;
             let mut text = left_label_svg(
@@ -432,17 +497,19 @@ fn draw(
                     style.text
                 ),
             );
-            clusters+=&format!("<g class=\"pele-cluster pele-c4-{}\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"none\" stroke=\"var(--_b)\"{}{}/>{}</g>",if boundary.node_type.is_some(){"node"}else{"boundary"},esc_text(&boundary.alias)?,num(group.bbox.x),num(group.bbox.y),num(group.bbox.w),num(group.bbox.h),if boundary.node_type.is_some(){""}else{" stroke-dasharray=\"6 4\""},style.shape,link(&text,boundary.link.as_deref(),&boundary.alias,&mut links,options));
+            clusters+=&format!("<g class=\"pele-cluster pele-c4-{}\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"none\" stroke=\"var(--_b)\"{}{}/>{}</g>",if input.flag(boundary,"nodeType")?{"node"}else{"boundary"},esc_text(&input.text(boundary,"alias")?.unwrap_or_default())?,num(group.bbox.x),num(group.bbox.y),num(group.bbox.w),num(group.bbox.h),if input.flag(boundary,"nodeType")?{""}else{" stroke-dasharray=\"6 4\""},style.shape,link(&text,input.text(boundary,"link")?.as_deref(),&input.text(boundary,"alias")?.unwrap_or_default(),&mut links,options));
         }
         for &n in &group.nodes {
             let node = &layout.nodes[n];
-            let shape = &db.shapes[node.shape];
-            let external = shape.kind.starts_with("external");
-            let style = user_style(
-                shape.bg_color.as_deref(),
-                shape.border_color.as_deref(),
-                shape.font_color.as_deref(),
-            );
+            let shape = &node.shape;
+            let external = input
+                .text(shape, "kind")?
+                .unwrap_or_default()
+                .starts_with("external");
+            let bg = input.text(shape, "bgColor")?;
+            let border = input.text(shape, "borderColor")?;
+            let font = input.text(shape, "fontColor")?;
+            let style = user_style(bg.as_deref(), border.as_deref(), font.as_deref());
             let stroke = format!(
                 " stroke=\"var(--_b)\"{}",
                 if external {
@@ -522,11 +589,14 @@ fn draw(
                 ),
                 &format!("{stroke}{}", style.line),
             ) + &text;
-            nodes_out+=&format!("<g class=\"pele-node pele-shape-{form} pele-c4-{}{}\" data-id=\"{}\" transform=\"translate({},{})\">{}</g>",shape.kind,if external{" pele-c4-external"}else{""},esc_text(&shape.alias)?,num(node.bbox.x+w/2.),num(node.bbox.y+h/2.),link(&body,shape.link.as_deref(),&shape.alias,&mut links,options));
+            nodes_out+=&format!("<g class=\"pele-node pele-shape-{form} pele-c4-{}{}\" data-id=\"{}\" transform=\"translate({},{})\">{}</g>",input.text(shape,"kind")?.unwrap_or_default(),if external{" pele-c4-external"}else{""},esc_text(&input.text(shape,"alias")?.unwrap_or_default())?,num(node.bbox.x+w/2.),num(node.bbox.y+h/2.),link(&body,input.text(shape,"link")?.as_deref(),&input.text(shape,"alias")?.unwrap_or_default(),&mut links,options));
         }
     }
+    let owner = input.root();
+    let title_text = input.text(&owner, "title")?;
+    input.retain_label(title_text.as_deref())?;
     let title = layout_label(
-        db.title.as_deref(),
+        title_text.as_deref(),
         false,
         resources,
         options,
@@ -567,6 +637,8 @@ fn draw(
         )
     }
     content += "</g>";
+    let acc_title = input.text(&owner, "accTitle")?;
+    let acc_descr = input.text(&owner, "accDescr")?;
     Ok((
         Rendered {
             svg: svg::document(
@@ -575,8 +647,8 @@ fn draw(
                 height,
                 size,
                 options,
-                db.acc_title.as_deref(),
-                db.acc_descr.as_deref(),
+                acc_title.as_deref(),
+                acc_descr.as_deref(),
                 &content,
             )?,
             width,
@@ -602,7 +674,16 @@ pub(super) fn render_plain(
     {
         return render(db, config, options, host).map_err(Into::into);
     }
-    match draw(db, options, host, false, 36., false) {
+    match draw(
+        &mut Typed {
+            model: db,
+            shape_lookup: false,
+        },
+        options,
+        host,
+        false,
+        36.,
+    ) {
         Err(e) if e.message == "t.getC4Shape is not a function" => {
             Err(crate::compat::public::PublicError::JavaScript {
                 name: crate::compat::public::JavaScriptErrorKind::TypeError,

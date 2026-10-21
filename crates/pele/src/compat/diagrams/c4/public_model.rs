@@ -594,7 +594,7 @@ fn numeric(g: &ModelGraph, a: &Atom) -> Result<f64, PublicError> {
         _ => Err(invalid("C4 object-to-number coercion is not implemented").into()),
     }
 }
-fn js_number(raw: &str) -> f64 {
+pub(super) fn js_number(raw: &str) -> f64 {
     let raw = raw.trim_matches(space);
     if raw.is_empty() {
         return 0.;
@@ -2031,6 +2031,35 @@ fn construct_default() -> Result<C4PublicState, PeleError> {
 
 impl PublicDiagramModule for C4 {
     type PublicState = C4PublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::c4())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        let helper = if let Atom::Ref(root) = state.graph.root {
+            match property(&state.graph, root, "getC4Shape") {
+                Some(Atom::BuiltinFunction(15)) => true,
+                None => matches!(
+                    state.graph.nodes[root as usize],
+                    Node::Instance {
+                        prototype: PROTO,
+                        ..
+                    }
+                ),
+                _ => false,
+            }
+        } else {
+            false
+        };
+        Some(crate::compat::public::DetachedPublicRender::c4(
+            super::C4DetachedInput::new(state.model.as_ref().err(), helper),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
