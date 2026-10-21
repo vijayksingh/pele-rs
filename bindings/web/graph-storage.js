@@ -194,9 +194,21 @@ function reconcileGraph(bridge, graph, changed) {
       }
     }
     if (kind === 'map') {
-      if (!fresh) Map.prototype.clear.call(object);
-      if(nested)for(const [key,value] of node.entries)Map.prototype.set.call(object,bridge.value(key),bridge.value(value));
-      else for(let i=0;i<(cursor?cursor.itemCount:storage.itemCount(graph,id));i++)Map.prototype.set.call(object,(cursor?cursorItemValue(bridge,cursor,2*i):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,2*i))),(cursor?cursorItemValue(bridge,cursor,2*i+1):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,2*i+1))));
+      const count=nested?node.entries.length:(cursor?cursor.itemCount:storage.itemCount(graph,id));
+      const entryValue=(index,part)=>nested?bridge.value(node.entries[index][part]):cursor?cursorItemValue(bridge,cursor,2*index+part):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,2*index+part));
+      if (!fresh) {
+        // Preserve existing slots for the target's ordered prefix. Clearing the
+        // Map would make an iterator suspended in a callback visit unchanged
+        // keys again after a nested helper publishes an append or value edit.
+        // Displaced keys are deleted and later appended in the target order.
+        let retained=0,next=count?entryValue(0,0):undefined;
+        for(const key of Map.prototype.keys.call(object)){
+          if(retained<count&&(key===next||(key!==key&&next!==next))){
+            retained++;next=retained<count?entryValue(retained,0):undefined;
+          }else Map.prototype.delete.call(object,key);
+        }
+      }
+      for(let i=0;i<count;i++)Map.prototype.set.call(object,entryValue(i,0),entryValue(i,1));
     }
     if (kind === 'set') {
       if (!fresh) Set.prototype.clear.call(object);
