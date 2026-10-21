@@ -18,12 +18,17 @@ import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';
 export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
 import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
-import {bridgeObservationToken,completedObservationToken,completedPublicationToken,releaseBridgeObservation} from './graph-storage.js';
+import {bridgeObservationToken,completedObservationToken,completedPublicationToken,releaseBridgeObservation,withDeclaredGetterScope,captureDeclaredGetterScope,isDeclaredGetter} from './graph-storage.js';
 import { defaultMeasurer } from './resources.js';
 export { canvasMeasurer, metricsMeasurer, forgetTextWidths } from './resources.js';
 // These scopes and tickets never escape this module. JSON returned by an
 // arbitrary provider or passed to exported ModelRegistry cannot select them.
 const reflectionRealms=new Map(['esm','monolith'].map(name=>[name,{name,registrations:new Map(),sharedFunctions:new Map(),owners:new WeakMap(),authenticated:new WeakSet(),tickets:new WeakMap()}]));
+const nativeLiveAccessorSource=nativeCapabilities.MutableDocument && {
+  type:nativeCapabilities.MutableDocument,
+  normal:nativeCapabilities.MutableDocument.prototype.prepare_detached_render_numbers,
+  raw:nativeCapabilities.MutableDocument.prototype.prepare_detached_render_raw
+};
 const nativeConstructorReflection=nativeCapabilities.PublicConstructor?.prototype.reflection;
 const nativeConstructorFree=nativeCapabilities.PublicConstructor?.prototype.free;
 const nativeReflectionSources=[nativeCapabilities.MutableDocument,nativeCapabilities.HostErDocument].filter(Boolean).map(type=>({type,capture:type.prototype.capture_constructor}));
@@ -203,9 +208,21 @@ export function createRenderer(nativeRegistry, canonicalProviders = [], reflecti
     if (registryBusy) throw new TypeError('Registry is already in use');
     registryBusy = true; try { return operation(); } finally { registryBusy = false; }
   };
-  function nativeModelCall(entry, run) {
+  function nativeModelCall(entry, run, operation) {
     if(entry.nativeBusy)throw new TypeError("Public model document is already in use");
-    entry.nativeBusy=true;try{return run();}finally{entry.nativeBusy=false;}
+    entry.nativeBusy=true;
+    try{
+      const accessors=entry.liveAccessors,native=nativeLiveAccessorSource;
+      if(operation==='normal'||operation==='raw'||operation==='legacy'){
+        // A disabled/overridden prepare method selects the legacy lane, which
+        // must not inherit a live getter allowance from an outer render.
+        const prepare=operation==='normal'?'prepare_detached_render_numbers':'prepare_detached_render_raw';
+        const scope=operation!=='legacy' && accessors && entry.handle[prepare]===native?.[operation]?accessors:undefined;
+        return withDeclaredGetterScope(entry.bridge,scope,run);
+      }
+      if(isDeclaredGetter(entry.bridge,accessors,operation))return withDeclaredGetterScope(entry.bridge,accessors,run);
+      return run();
+    }finally{entry.nativeBusy=false;}
   }
   function nativeDetachedCall(run) {
     try { return run(); }
@@ -557,10 +574,11 @@ export function createRenderer(nativeRegistry, canonicalProviders = [], reflecti
             publishMutableOutcome(entry, outcome);
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
-          });
+          },method);
           const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke,registration,rootBinding,construction?.hostLedger,construction?.liveDefinitions,construction?.deferLiveBinding);
           if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
+          entry.liveAccessors = captureDeclaredGetterScope(mutable,bridge);
           entry.confirmedGraph = true;
           acceptBaseline(entry,completedPublicationToken(bridge,snapshot.graph));
           const model = bridge.root;
@@ -766,7 +784,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = [], reflecti
         if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,entry.bridge);
         return renderedValue(outcome.result.Ok);
       } catch(error){if(callbackFailed)throw callbackError;throw error;}
-      });
+      },entry.rawType===type?'raw':'legacy');
     },
     parse(source, options = {}) {
       let foreign;
@@ -949,7 +967,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = [], reflecti
                 ?arenaRenderResult(()=>packet.call(document.handle,document.revision,...numericArguments,dispatcher),document.revision,false,document.rawType)
                 :binaryResult(()=>document.handle.render_numbers_operation_binary_with_functions(document.revision,...numericArguments,dispatcher));
               publishMutableOutcome(document, outcome);return outcome.result;
-            });
+            },'normal');
           } else json = document.handle.render_numbers_with_resources(...numericArguments);
         }
         // Publish native partial state before restoring the original host throw.

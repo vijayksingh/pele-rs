@@ -324,7 +324,7 @@ fn detached_frames_reject_foreign_and_out_of_order_finish_and_release_dropped_jo
     assert_eq!(outcome.revision, 3);
 }
 
-struct Forwarding;
+struct Forwarding(bool);
 impl DiagramModule for Forwarding {
     type Model = SankeyModel;
     fn descriptor(&self) -> ModuleDescriptor {
@@ -371,7 +371,11 @@ impl PublicDiagramModule for Forwarding {
         Sankey.render_public(state, config, settings, host)
     }
     fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
-        Sankey.detached_public_render_capability()
+        if self.0 {
+            pele::compat::diagrams::state::State.detached_public_render_capability()
+        } else {
+            Sankey.detached_public_render_capability()
+        }
     }
     fn detached_public_render(&self, state: &SankeyPublicState) -> Option<DetachedPublicRender> {
         Sankey.detached_public_render(state)
@@ -390,9 +394,16 @@ fn captured_creator_rejects_forwarded_detached_capability_without_changing_provi
         })
         .unwrap();
     let mut direct = PublicDocument::from_module(Sankey, &model, config.clone()).unwrap();
-    let mut forwarded = PublicDocument::from_module(Forwarding, &model, config).unwrap();
+    let mut forwarded = PublicDocument::from_module(Forwarding(false), &model, config).unwrap();
     assert!(direct.has_detached_public_render());
     assert!(!forwarded.has_detached_public_render());
+    assert!(forwarded.detached_public_accessors().is_empty());
+    // A concrete builtin token with a nonempty getter grant still cannot be
+    // forwarded by a different provider, even when its schema IDs overlap.
+    let forged_getter =
+        PublicDocument::from_module(Forwarding(true), &model, Object::default()).unwrap();
+    assert!(!forged_getter.has_detached_public_render());
+    assert!(forged_getter.detached_public_accessors().is_empty());
     assert!(forwarded
         .prepare_detached_render(0, request())
         .unwrap()

@@ -1493,6 +1493,15 @@ impl PublicDocument {
     pub fn has_detached_public_render(&self) -> bool {
         self.registration.codec.detached_capability().is_some()
     }
+    /// Creator-authenticated getter metadata for the owned live-reader lane.
+    /// Merely forwarding a builtin schema or another provider's token grants none.
+    #[doc(hidden)]
+    pub fn detached_public_accessors(&self) -> &'static [(PrototypeId, super::MethodId)] {
+        self.registration
+            .codec
+            .detached_capability()
+            .map_or(&[], |capability| capability.live_accessors())
+    }
     #[doc(hidden)]
     pub fn has_active_detached_render(&self) -> bool {
         detached_render::has_active(self.render_book.as_ref())

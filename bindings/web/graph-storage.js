@@ -1,4 +1,5 @@
 import {PeleError} from './errors.js';
+import {MutableDocument} from './pkg/pele.js';
 // Host values only: diagram state transitions and rendering remain in Rust.
 const errorConstructors={error:Error,pele:PeleError,type:TypeError,range:RangeError,syntax:SyntaxError,reference:ReferenceError,eval:EvalError,uri:URIError};
 const errorDiagnostics=new Set(['stack','fileName','lineNumber','columnNumber','sourceURL']);
@@ -69,6 +70,60 @@ export function completedPublicationToken(bridge, graph) {
     proof.graph===bridge.graph && proof.root===bridge.root ? proof.token : undefined;
 }
 
+
+// Operation-local exception for creator-authenticated callback-safe getters.
+// The prototype is never read through the getter, flattened into a graph node,
+// or rewritten. Nested scopes restore their predecessor even on host throws.
+const declaredGetterScopes = new WeakMap(), declaredGetterCapabilities = new WeakMap();
+const nativeGetterMetadata=MutableDocument.prototype.detached_public_accessors;
+const nativeGetterSchema=MutableDocument.prototype.schema;
+export function captureDeclaredGetterScope(handle,bridge){
+  if(!(handle instanceof MutableDocument)||typeof nativeGetterMetadata!=='function')return;
+  const pairs=nativeGetterMetadata.call(handle);
+  if(!pairs.length)return;
+  const envelope=JSON.parse(nativeGetterSchema.call(handle));
+  if(!envelope.ok || JSON.stringify(envelope.result)!==JSON.stringify(bridge.registration.schema))
+    throw new TypeError('Invalid native live getter schema');
+  const scope=new Map(),methods=new Set();
+  for(let i=0;i<pairs.length;i+=2){
+    const prototype=envelope.result.prototypes.find(item=>item.id===pairs[i]);
+    const member=prototype?.members.find(item=>item.kind==='accessor'&&item.get===pairs[i+1]);
+    if(!member)throw new TypeError('Invalid native live getter capability');
+    const object=bridge.registration.prototypes.get(prototype.id);
+    if(!scope.has(object))scope.set(object,new Set());
+    scope.get(object).add(member.name);methods.add(member.get);
+  }
+  const token=Object.freeze({});declaredGetterCapabilities.set(token,{bridge,scope,methods});return token;
+}
+export function isDeclaredGetter(bridge,token,method){
+  const capability=declaredGetterCapabilities.get(token);
+  return !!capability && capability.bridge===bridge && capability.methods.has(method);
+}
+export function withDeclaredGetterScope(bridge, token, run) {
+  const capability=declaredGetterCapabilities.get(token);
+  const scope=capability && capability.bridge===bridge?capability.scope:undefined;
+  const previous=declaredGetterScopes.get(bridge);
+  if(scope)declaredGetterScopes.set(bridge,scope);else declaredGetterScopes.delete(bridge);
+  try{return run();}finally{
+    if(previous)declaredGetterScopes.set(bridge,previous);else declaredGetterScopes.delete(bridge);
+  }
+}
+function validatePrototypeBaseline(bridge) {
+  const scope=declaredGetterScopes.get(bridge);
+  for(const baseline of bridge.registration.prototypeBaseline){
+    const descriptors=Object.getOwnPropertyDescriptors(baseline.value),original=baseline.descriptors;
+    if(Object.getPrototypeOf(baseline.value)!==baseline.parent ||
+       Reflect.ownKeys(descriptors).length!==Reflect.ownKeys(original).length ||
+       Reflect.ownKeys(original).some(key=>{
+         const a=original[key],b=descriptors[key];
+         const liveGetter=scope?.get(baseline.value)?.has(key) &&
+           Object.hasOwn(a,'get') && b && Object.hasOwn(b,'get');
+         return !b || a.value!==b.value || (!liveGetter&&a.get!==b.get) ||
+           a.set!==b.set || a.enumerable!==b.enumerable ||
+           a.writable!==b.writable || a.configurable!==b.configurable;
+       }))throw new TypeError('Prototype edits require an explicit native prototype mutation codec');
+  }
+}
 
 function flatValue(bridge, storage, graph, slot) {
   const tag = storage.atomTag(graph, slot);
@@ -260,10 +315,7 @@ function matchesGraph(bridge) {
   const graph=bridge.graph,cursor=createNodeCursor?createNodeCursor(graph):null;
   const propertyWords=readProperty&&!cursor?new Uint32Array(5):null;
   if(bridge.objects.length!==(nested?graph.nodes.length:storage.nodeCount(graph))||bridge.strings.length!==(nested?graph.strings.length:storage.stringCount(graph)))return false;
-  for (const baseline of bridge.registration.prototypeBaseline) {
-    const descriptors=Object.getOwnPropertyDescriptors(baseline.value),original=baseline.descriptors;
-    if(Object.getPrototypeOf(baseline.value)!==baseline.parent||Reflect.ownKeys(descriptors).length!==Reflect.ownKeys(original).length||Reflect.ownKeys(original).some(key=>{const a=original[key],b=descriptors[key];return !b||a.value!==b.value||a.get!==b.get||a.set!==b.set||a.enumerable!==b.enumerable||a.writable!==b.writable||a.configurable!==b.configurable;}))throw new TypeError('Prototype edits require an explicit native prototype mutation codec');
-  }
+  validatePrototypeBaseline(bridge);
   const matches=nested?(atom,value)=>{
     switch(atom.kind){
       case 'undefined':return value===undefined;
@@ -332,13 +384,7 @@ function matchesGraph(bridge) {
 
 function snapshotGraph(bridge, values = [], delta = false) {
   const observation = invalidateBridgeObservation(bridge);
-  for (const baseline of bridge.registration.prototypeBaseline) {
-    const descriptors = Object.getOwnPropertyDescriptors(baseline.value), original = baseline.descriptors;
-    if (Object.getPrototypeOf(baseline.value) !== baseline.parent || Reflect.ownKeys(descriptors).length !== Reflect.ownKeys(original).length || Reflect.ownKeys(original).some(key => {
-      const a=original[key],b=descriptors[key];
-      return !b || a.value!==b.value || a.get!==b.get || a.set!==b.set || a.enumerable!==b.enumerable || a.writable!==b.writable || a.configurable!==b.configurable;
-    })) throw new TypeError('Prototype edits require an explicit native prototype mutation codec');
-  }
+  validatePrototypeBaseline(bridge);
   const baseline=bridge.graph, changes=nested?[]:null;
   const pending=[],seen=new Set(),nodes=nested?baseline.nodes.slice():null;
   const capture=nested?null:storage.beginCapture(baseline,delta);

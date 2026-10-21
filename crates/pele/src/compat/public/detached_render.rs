@@ -290,6 +290,14 @@ impl DetachedRenderCapability {
             kind: Kind::Sankey,
         }
     }
+    /// Callback-safe prototype getters consumed by this owned live renderer.
+    /// This capability is creator-checked before the document exposes it.
+    pub(super) fn live_accessors(&self) -> &'static [(super::PrototypeId, super::MethodId)] {
+        match self.kind {
+            Kind::State => &[(super::PrototypeId(1), super::MethodId(1))],
+            _ => &[],
+        }
+    }
     pub(super) fn for_creator<D: 'static>(self) -> Option<Self> {
         (self.creator == TypeId::of::<D>()).then_some(self)
     }

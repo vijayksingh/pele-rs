@@ -724,6 +724,10 @@ fn state_declared_direction_getter_preserves_own_shadowing_and_callback_repair()
         let mut document = PublicEngine::with_builtins()
             .parse(fixture["source"].as_str().unwrap(), &Default::default())
             .unwrap();
+        assert_eq!(
+            document.detached_public_accessors(),
+            &[(PrototypeId(1), MethodId(1))]
+        );
         let mut graph = document.snapshot().unwrap();
         let root = id(&graph.root);
         if mode == "last-direction" {

@@ -626,6 +626,13 @@ impl NativeDetachedRenderAck {
 
 #[wasm_bindgen]
 impl MutableDocument {
+    pub fn detached_public_accessors(&self) -> Vec<u32> {
+        self.inner
+            .detached_public_accessors()
+            .iter()
+            .flat_map(|(prototype, getter)| [prototype.0, getter.0])
+            .collect()
+    }
     #[allow(clippy::too_many_arguments)]
     pub fn prepare_detached_render_numbers(
         &mut self,
