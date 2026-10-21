@@ -6,6 +6,8 @@ export function executeLiveRead(read, operation, value, key, context) {
   return read(operation, value, key, context);
 }
 export function liveRenderRead(capture) {
+  const identities = new WeakMap();
+  let nextIdentity = 1;
   return (operation, value, key, context) => {
     try {
       switch (operation) {
@@ -14,6 +16,15 @@ export function liveRenderRead(capture) {
         case 5: return key in value;
         case 6: return {...value};
         case 7: return value.get(key);
+        case 8: {
+          if ((typeof value !== 'object' || value === null) && typeof value !== 'function') return undefined;
+          const existing = identities.get(value);
+          if (existing !== undefined) return existing;
+          if (nextIdentity > 1_000_000) return null; // Native budget error, not host throw.
+          const identity = nextIdentity++;
+          identities.set(value, identity);
+          return identity;
+        }
         case 4: {
           const captured=[];
           for(const item of value){

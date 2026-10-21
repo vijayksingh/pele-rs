@@ -86,6 +86,9 @@ fn capture_value(
 struct Reader {
     owner: *const PelePublicDocument,
     root: Value,
+    // Retain the allocation alongside its token: a dropped temporary's address
+    // must never be reused as another object's identity during the same job.
+    identities: HashMap<(u8, usize), (u64, Value)>,
 }
 impl Reader {
     fn field(&self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
@@ -181,6 +184,31 @@ impl LiveRenderRead for Reader {
     fn index(&mut self, value: &Value, index: usize) -> Result<Value, PublicError> {
         self.field(value, &index.to_string())
     }
+    fn object_identity(&mut self, value: &Value) -> Result<Option<u64>, PublicError> {
+        let key = match value {
+            Value::Atom(Atom::Ref(id)) => return Ok(Some(u64::from(*id))),
+            Value::Atom(Atom::BuiltinFunction(id)) => {
+                return Ok(Some((1u64 << 32) + u64::from(*id)))
+            }
+            Value::Atom(Atom::HostReference(id)) => return Ok(Some((2u64 << 32) + u64::from(*id))),
+            Value::Sequence(values) => (0, Arc::as_ptr(values) as *const () as usize),
+            Value::Object(values) => (1, Arc::as_ptr(values) as *const () as usize),
+            _ => return Ok(None),
+        };
+        if let Some((token, _)) = self.identities.get(&key) {
+            return Ok(Some(*token));
+        }
+        if self.identities.len() >= 1_000_000 {
+            return Err(PeleError::new(
+                "Public model graph exceeds identity budget",
+                ErrorCode::Limit,
+            )
+            .into());
+        }
+        let token = (3u64 << 32) + self.identities.len() as u64;
+        self.identities.insert(key, (token, value.clone()));
+        Ok(Some(token))
+    }
     fn has_index(&mut self, receiver: &Value, index: usize) -> Result<bool, PublicError> {
         let key = index.to_string();
         match receiver {
@@ -230,7 +258,7 @@ impl LiveRenderRead for Reader {
     fn shallow_copy(&mut self, value: &Value) -> Result<Value, PublicError> {
         let mut fields = Vec::new();
         match value {
-            Value::Object(properties) => return Ok(Value::Object(Arc::clone(properties))),
+            Value::Object(properties) => return Ok(Value::Object(Arc::from(properties.to_vec()))),
             Value::Sequence(values) => {
                 for (index, value) in values.iter().enumerate() {
                     fields.push((
@@ -602,6 +630,7 @@ pub unsafe extern "C" fn pele_detached_render_run_v15(
                 let mut reader = Reader {
                     owner: job.owner,
                     root: job.root.clone(),
+                    identities: HashMap::new(),
                 };
                 let completion = inner.run(&mut reader, host);
                 *job.state

@@ -33,6 +33,7 @@ enum ReadCommand {
     HasIndex = 5,
     ShallowCopy = 6,
     MapGet = 7,
+    ObjectIdentity = 8,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -129,6 +130,26 @@ impl LiveRenderRead for Reader {
     }
     fn map_get(&mut self, receiver: &JsValue, key: &JsValue) -> Result<JsValue, PublicError> {
         self.call(ReadCommand::MapGet, receiver, key, 0)
+    }
+    fn object_identity(&mut self, value: &JsValue) -> Result<Option<u64>, PublicError> {
+        let identity = self.call(ReadCommand::ObjectIdentity, value, &JsValue::UNDEFINED, 0)?;
+        if identity.is_undefined() {
+            return Ok(None);
+        }
+        if identity.is_null() {
+            return Err(PeleError::new(
+                "Public model graph exceeds identity budget",
+                ErrorCode::Limit,
+            )
+            .into());
+        }
+        let number = identity
+            .as_f64()
+            .ok_or_else(|| invalid("Invalid live identity reply"))?;
+        if !number.is_finite() || number.fract() != 0. || !(1. ..=1_000_000.).contains(&number) {
+            return Err(invalid("Invalid live identity reply").into());
+        }
+        Ok(Some(number as u64))
     }
     fn snapshot_iterable(
         &mut self,

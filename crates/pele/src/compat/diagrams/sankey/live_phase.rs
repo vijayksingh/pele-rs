@@ -66,6 +66,21 @@ pub trait LiveRenderRead {
     ) -> Result<Self::Value, PublicError> {
         Err(PeleError::new("Live map lookup is not implemented", ErrorCode::Semantic).into())
     }
+    /// Stable opaque identity within this job; no coercion or object traversal.
+    /// Native graph references retain the existing graph-coordinate domain.
+    fn object_identity(&mut self, value: &Self::Value) -> Result<Option<u64>, PublicError> {
+        if !matches!(
+            self.kind(value),
+            LiveValueKind::Object | LiveValueKind::Function
+        ) {
+            return Ok(None);
+        }
+        Err(PeleError::new(
+            "Live object identity is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
     fn kind(&self, value: &Self::Value) -> LiveValueKind;
     fn number(&self, value: &Self::Value) -> Option<f64>;
     fn truthy(&self, value: &Self::Value) -> bool;
