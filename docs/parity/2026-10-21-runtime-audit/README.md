@@ -4,6 +4,12 @@
 parsers/renderers and mutable adapters; successful source corpora do not establish
 all mutable runtime behavior.
 
+Subsequent work implements all 22 exposed root constructors plus ClassMember;
+fresh Rust, Swift, C and three-browser evidence is recorded in the
+[ordered constructor checkpoint](../2026-10-21-ordered-constructors/README.md).
+The audit observations below remain the original `d7caf8c` results. They are not
+a current claim that constructor stubs remain.
+
 At runtime `d7caf8c684ac6b6fda3918a2bcbd91c5953b92c9`, actual public per-type
 prepared-entry comparisons against pinned Pele find:
 

@@ -5,8 +5,9 @@ ClassMember (`PrototypeId(2)` on Class). The latest native layer adds Sequence,
 Block and Agentflow and completes the root-factory inventory. They
 complement [caller-authored graph construction](DECLARED_MODEL_CONSTRUCTION.md):
 construction supplies real class defaults; graph adoption never invents defaults.
-Fresh Swift/web verification of this latest layer remains pending; native
-factory coverage does not establish full public API parity.
+Fresh Rust, Swift/C and three-browser verification is recorded in the
+[ordered constructor checkpoint](parity/2026-10-21-ordered-constructors/README.md).
+Factory coverage does not establish full public API parity.
 
 `PublicEngine::capture_constructor(&DiagramId, PrototypeId)` returns an optional
 `CapturedPublicConstructor`. `PublicDocument::capture_constructor(PrototypeId)`
@@ -200,13 +201,28 @@ live options and logging. Nested helpers and original host exceptions retain
 partial mutations. Graph-build diagnostic callbacks, arbitrary virtual helper
 overrides and callback mutation of input arrays remain outside this slice.
 
-The consolidated native batch passes thirteen public feature tests: ordered
+The consolidated native batch passes twenty-four public feature tests: ordered
 Sequence/Block/Agentflow construction, ClassMember dispatch and escaped receivers,
 Agentflow live options/raw rendering, and Class/Flow/Swimlane/Gantt/shared-class
-regressions. Fixtures come from the pinned Pele entry modules. Modified string
+and Block warning/hierarchy regressions. Fixtures come from the pinned Pele entry modules. Modified string
 prototype methods, shared readonly Class enum mutation and complete constructor
 reflection identity remain explicit gaps. C/Swift and web adapters are verified
 separately against fresh artifacts.
+
+Swift exposes `beginConstruct(arguments:)` for provisional-owner access and
+`construct(arguments:)` / `constructPrepared(arguments:)` for ordinary evaluation.
+The existing `firstArgument:` overload uses the same generic job for every
+family. `PublicHostObject` and `PublicHostCallable` express foreign getters,
+coercion and calls explicitly, without reflection or family-specific adapter
+logic. The actor-confined host store follows the completed owner; close and run
+reentry are rejected while short snapshot/apply/helper calls remain available.
+
+C18 provides matching begin/resume/snapshot/apply/invoke/finish/free operations.
+Finish can transfer a partial owner alongside an error; every non-null returned
+owner must be freed. Its bounded apply accepts and ignores snapshot metadata,
+allowing C18 snapshot roundtrips; C5/WASM apply retain their stricter empty-metadata
+contract. No metadata supplies graph or registration authority. Existing C16 and
+C17 entry points remain available.
 
 ## Web retained options and compatible raw owners
 

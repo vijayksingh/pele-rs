@@ -20,9 +20,9 @@ crates.io or the npm registry.
 
 **The full API port is unfinished.** The current functional audit confirms
 callback mutation gaps in 31 families. All 22 class-root families plus ClassMember
-now have native constructor factories. Fifteen root families have accepted
-cross-platform constructor proof; the latest ordered-body Swift/web verification
-is pending. Constructor metadata and shared prototype identity also remain
+now have constructor factories verified through Rust, Swift and the web.
+The [constructor checkpoint](docs/parity/2026-10-21-ordered-constructors/README.md)
+records fresh artifacts and platform results. Constructor metadata and shared prototype identity remain
 incomplete. See the [constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md).
 Passing tests include checks that explicitly expect unsupported behavior;
 they do not establish complete Pele parity. See the

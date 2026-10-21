@@ -1,22 +1,25 @@
 # Current functional parity — incomplete (2026-10-21)
 
-Native factories now cover all 22 class-root families plus nested ClassMember.
-The latest integrated batch passes 13 public feature tests, including ordered
-constructor getters, virtual member parser dispatch, escaped partial receivers,
-live options and raw rendering. Fresh Swift/web verification of the ordered-body
-layer remains pending; the cross-platform checkpoint below stays separate.
+All 22 class-root factories plus nested ClassMember now have Rust, Swift and web
+feature proof. The latest batch passes 24 native integrations, eight Swift
+constructor features, an additional Swift Block warning feature, two strict C
+clients, a 99-case Swift regression across all 33 entries, and 51 browser checks
+across Chromium, Firefox and WebKit. Native build inputs (366), SDK files (13),
+web inputs (442) and package files (118) remain bound to their recorded artifacts.
+See the [ordered constructor checkpoint](parity/2026-10-21-ordered-constructors/README.md).
+These checks do not establish full callback, coercion or reflection parity.
 
-Fifteen class-root factories are implemented: Sankey, Venn, Ishikawa,
+The earlier fifteen-factory checkpoint covered Sankey, Venn, Ishikawa,
 Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
 Journey, QuadrantChart and State. The latest seven-family extension passes nine
 native integrations, ten Swift features against a fresh ARM64 SDK and a strict
 C client exercising all fifteen factories. Six browser executions across
 Chromium, Firefox and WebKit cover 21 construction scenarios and seven retained
 registry lifetimes. State preserves its initially empty drawing cache until
-explicit extraction. The seven remaining root families are Class, Flowchart,
-Swimlane, Agentflow, Gantt, Sequence and Block; nested ClassMember is additional.
-Constructor reflection/shared identities and callback mutation behavior also
-remain work. See [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
+explicit extraction. Class, Flowchart, Swimlane, Agentflow, Gantt, Sequence,
+Block and ClassMember are covered by the newer checkpoint above. Constructor
+reflection/shared identities and callback mutation behavior remain work.
+See [constructor scope](LLD_PUBLIC_CONSTRUCTORS.md).
 
 The earlier seven-family extension passed four native features, ten Swift
 features, a strict C client and six browser executions. A broader browser run
@@ -45,7 +48,7 @@ records these concrete gaps at runtime `d7caf8c`:
   retains the edit; native restores the previous title. All 33 preserve throw
   identity and call width once. Sankey and ER retain the edit in this case.
 - **The audit found 22 constructor stubs.** Subsequent slices implement 15;
-  all 22 now have native factories, with the latest platform verification pending.
+  all 22 and nested ClassMember now have scoped native/Swift/web proof.
   Plain-object families are separate.
 - Native codecs still explicitly reject active lone UTF-16, sparse collection,
   dynamic coercion and overridden-dispatch cases. Some integration tests
