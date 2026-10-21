@@ -7,6 +7,22 @@ Pie captures section iteration for each draw, reads showData per legend label,
 then title/accessibility at their upstream phases; responsive draws recapture
 the current collection. No model borrow spans a resource callback.
 
+Packet, Radar and Quadrant also share their typed/live render algorithms.
+Packet retains ordinary rows per draw and captures responsive copied records;
+its post-measurement field reads observe edits at the source phases. Radar
+retains axes/curves per draw, reads late legend/title/accessibility fields and
+reacquires root collections on responsive draws. Quadrant retains each current
+point through its label callback, then rereads its circle identity fields; class
+styles resolve through ordinary Map lookup. Each family keeps its own geometry
+and text budgets. [Fresh platform proof](parity/2026-10-21-chart-callbacks/README.md).
+
+Venn captures geometry, styles and region identities before measurement, then
+reads its current text-node collection and late title. Its upstream renderer
+has no accessibility read. Ishikawa captures horizontal root before title,
+while vertical traversal starts after title; node/child handles survive resource
+callbacks. Their native feature checks pass; platform verification follows with
+a fresh shared SDK/package, rather than reusing earlier artifacts.
+
 `LiveRenderRead::snapshot_iterable` adds bounded host iteration. JavaScript
 retains yielded values; C15 creates owned pair sequences from a short Map read,
 including owned UTF-16 strings. The default rejects unsupported readers explicitly.
