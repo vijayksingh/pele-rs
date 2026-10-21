@@ -6,6 +6,7 @@ private final class Marker: Error {}
 @MainActor private final class State {
     var mode = 0, calls = 0, clocks = 0, measurements = 0
     var view: Pele.ActiveModel?
+    var nested: FullRenderedDiagram?
     var original: UInt32 = 19
     var first: UInt32?
     var caught = false
@@ -28,11 +29,23 @@ private final class Marker: Error {}
         h.textWidth = { request in MainActor.assumeIsolated { state.measurements += 1; return Double(request.text.utf16.count) * request.size * 0.6 } }
         return h
     }
+    @discardableResult
+    private func currentRevision(_ document: Pele.MutableDocument, after previous: UInt64) throws -> UInt64 {
+        let published = document.revision
+        XCTAssertGreaterThan(published, previous)
+        let snapshot = try document.snapshot()
+        XCTAssertEqual(snapshot.revision, published)
+        XCTAssertEqual(document.revision, published)
+        return published
+    }
     func testOriginalDelegationAliasesAlternateResultsAndLiveClosure() throws {
         let state = State(), document = try Pele.Engine().parseMutable(source)
+        defer { try? document.close() }
         let function = Pele.HostFunction { view, receiver, arguments in
             state.view = view; state.calls += 1
-            XCTAssertThrowsError(try document.snapshot())
+            let snapshot = try document.snapshot()
+            XCTAssertEqual(try self.reference(snapshot.graph.root), try self.reference(receiver))
+            XCTAssertEqual(snapshot.revision, document.revision)
             XCTAssertThrowsError(try document.close())
             XCTAssertEqual(arguments.count, 1)
             guard case .number(let now) = arguments[0] else { throw Marker() }; XCTAssertEqual(now, self.now)
@@ -44,16 +57,32 @@ private final class Marker: Error {}
             XCTAssertEqual(try self.reference(end), try self.reference(start))
             XCTAssertEqual(try view.dateMilliseconds(end), self.now + 86_400_000)
             try view.set("task", on: a, to: view.intern("Changed live"))
+            if state.calls == 1 {
+                // A nested owned render is permitted; explicit now avoids an
+                // unrelated second clock call and keeps both drawings comparable.
+                var options = Pele.Engine.Options(); options.now = self.now
+                state.nested = try document.render(outputLimit: .undefined, options: options, resources: self.resources(state))
+                // The outer borrowed view remains usable after the child closes.
+                XCTAssertEqual(try self.reference(view.read("0", on: tasks)), aid)
+            }
             if state.mode == 1 { let array = try view.array(); try view.append(a, to: array); return array }
             return tasks
         }
         try install(function, on: document)
+        let beforeFull = document.revision
         let full = try document.render(outputLimit: .undefined, resources: resources(state))
         XCTAssertTrue(full.svg.contains("Changed live")); XCTAssertEqual(state.clocks, 1)
+        let nested = try XCTUnwrap(state.nested)
+        XCTAssertEqual(nested.svg, full.svg)
+        XCTAssertEqual(nested.width.bitPattern, full.width.bitPattern)
+        XCTAssertEqual(nested.height.bitPattern, full.height.bitPattern)
+        XCTAssertEqual(state.calls, 2)
+        let fullRevision = try currentRevision(document, after: beforeFull)
         XCTAssertThrowsError(try state.view!.root())
         state.mode = 1
         let short = try document.render(outputLimit: .undefined, resources: resources(state))
         XCTAssertLessThan(short.height, full.height)
+        let shortRevision = try currentRevision(document, after: fullRevision)
         function.call = { view, receiver, args in
             let tasks = try view.invokeBuiltin(method: 19, receiver: receiver, arguments: args)
             let a = try view.read("0", on: tasks)
@@ -62,12 +91,12 @@ private final class Marker: Error {}
         }
         let changed = try document.renderPresentation(resources: resources(state))
         XCTAssertTrue(changed.svg.contains("Live replacement")); XCTAssertNotNil(changed.presentation)
-        let snapshot = try document.snapshot()
-        XCTAssertEqual(snapshot.revision, 4)
+        try currentRevision(document, after: shortRevision)
         try document.close(); XCTAssertThrowsError(try document.render())
     }
     func testOriginalErrorPartialMutationsAndLateLimitRecovery() throws {
         let state = State(), error = Marker(), document = try Pele.Engine().parseMutable(source)
+        defer { try? document.close() }
         let function = Pele.HostFunction { view, receiver, arguments in
             state.view = view
             let tasks = try view.invokeBuiltin(method: 19, receiver: receiver, arguments: arguments)
@@ -77,8 +106,10 @@ private final class Marker: Error {}
             return tasks
         }
         try install(function, on: document)
+        let beforeFailure = document.revision
         XCTAssertThrowsError(try document.renderOperation(outputLimit: .undefined, resources: resources(state))) { XCTAssertTrue(($0 as AnyObject) === error) }
-        XCTAssertEqual(document.revision, 2); XCTAssertEqual(state.measurements, 0)
+        let failureRevision = try currentRevision(document, after: beforeFailure)
+        XCTAssertEqual(state.measurements, 0)
         let graph = try document.snapshot().graph
         let tasks = try reference(try XCTUnwrap(graph.field("tasks")))
         let task = try reference(try XCTUnwrap(graph.field("0", on: tasks)))
@@ -86,12 +117,15 @@ private final class Marker: Error {}
         XCTAssertEqual(graph.strings[Int(id)].stringIfWellFormed, "Mutation survives")
         state.mode = 1
         XCTAssertThrowsError(try document.render(outputLimit: .number(0), resources: resources(state)))
-        XCTAssertEqual(document.revision, 3); XCTAssertGreaterThan(state.measurements, 0)
+        let limitRevision = try currentRevision(document, after: failureRevision)
+        XCTAssertGreaterThan(state.measurements, 0)
         XCTAssertTrue(try document.render(outputLimit: .undefined, resources: resources(state)).svg.contains("Mutation survives"))
+        try currentRevision(document, after: limitRevision)
         XCTAssertThrowsError(try state.view!.array())
     }
     func testCaughtCalendarErrorReentryAndLosslessArenaValues() throws {
         let state = State(), error = Marker(), document = try Pele.Engine().parseMutable(source)
+        defer { try? document.close() }
         let function = Pele.HostFunction { view, receiver, arguments in
             state.view = view
             do { _ = try view.invokeBuiltin(method: 19, receiver: receiver, arguments: arguments); XCTFail() }
@@ -137,9 +171,11 @@ private final class Marker: Error {}
         var host = resources(state)
         host.nowMillis = { try MainActor.assumeIsolated { state.clocks += 1; throw marker } }
         var options = Pele.Engine.Options(); options.now = now
+        let beforeRender = document.revision
         let drawing = try document.render(outputLimit: .undefined, options: options, resources: host)
         XCTAssertTrue(state.caught); XCTAssertEqual(state.clocks, 1)
-        XCTAssertTrue(drawing.svg.contains("A")); XCTAssertEqual(document.revision, 2)
+        XCTAssertTrue(drawing.svg.contains("A"))
+        try currentRevision(document, after: beforeRender)
     }
 
     func testOwnerBindingsAndCloseReleaseWithoutEscapedLeaseRetention() throws {
