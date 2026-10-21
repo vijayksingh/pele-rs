@@ -121,7 +121,22 @@ test(title('Gantt warning reads current options twice, retains selected callee a
   equal(report.candidate,report.oracle);
   equal(report.retainedCandidate,report.retainedOracle);
   for(const row of report.retainedCandidate)expect(row.reads,row.name).toBe(0);
-  expect(report.candidate).toEqual({initial:report.fixture.initial,drawing:report.fixture.drawing,cases:report.fixture.cases});
+  // This fixture was captured in Node/V8. Generated intrinsic TypeError text
+  // belongs to its engine; the full same-engine comparisons above remain exact.
+  // Only top-level generated case errors use category continuity here. No model,
+  // trace, original throw, or PeleError diagnostic is normalized.
+  expect(report.oracle.initial).toEqual(report.fixture.initial);
+  expect(report.oracle.drawing).toEqual(report.fixture.drawing);
+  expect(report.oracle.cases.map(row=>row.id)).toEqual(report.fixture.cases.map(row=>row.id));
+  for(let i=0;i<report.fixture.cases.length;i++){
+    const {error,...actual}=report.oracle.cases[i],{error:pinned,...expected}=report.fixture.cases[i];
+    expect(actual,expected.id+' pinned behavior').toEqual(expected);
+    if(pinned?.name==='TypeError'){
+      const {message,...category}=error,{message:pinnedMessage,...pinnedCategory}=pinned;
+      expect(category,expected.id+' pinned error category').toEqual(pinnedCategory);
+      expect(typeof message).toBe('string');expect(typeof pinnedMessage).toBe('string');
+    }else expect(error,expected.id+' pinned original/typed error').toEqual(pinned);
+  }
 });
 
 }
