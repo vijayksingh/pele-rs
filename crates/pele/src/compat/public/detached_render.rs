@@ -3,7 +3,9 @@ use super::{engine::Registration, GraphReadView, PublicError};
 use crate::compat::diagrams::radar::{Radar, RadarDetachedInput};
 use crate::compat::{
     diagrams::info::{Info, InfoDetachedInput},
+    diagrams::packet::{Packet, PacketDetachedInput},
     diagrams::pie::{Pie, PieDetachedInput},
+    diagrams::quadrant_chart::{QuadrantChart, QuadrantDetachedInput},
     diagrams::sankey::{render_detached, Sankey, SankeyDetachedInput},
     ErrorCode, Object, OutputLimit, PeleError, PresentationCapture, PresentationOutcome,
     RenderOptions, RenderResources, RenderResult, RenderSettings, Rendered,
@@ -17,6 +19,8 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Quadrant,
+    Packet,
     Radar,
     Info,
     Sankey,
@@ -29,6 +33,19 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn quadrant() -> Self {
+        Self {
+            creator: TypeId::of::<QuadrantChart>(),
+            kind: Kind::Quadrant,
+        }
+    }
+
+    pub(crate) fn packet() -> Self {
+        Self {
+            creator: TypeId::of::<Packet>(),
+            kind: Kind::Packet,
+        }
+    }
     pub(crate) fn radar() -> Self {
         Self {
             creator: TypeId::of::<Radar>(),
@@ -66,12 +83,27 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Quadrant(QuadrantDetachedInput),
+    Packet(PacketDetachedInput),
     Radar(RadarDetachedInput),
     Info(InfoDetachedInput),
     Sankey(SankeyDetachedInput),
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn quadrant(input: QuadrantDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<QuadrantChart>(),
+            body: Body::Quadrant(input),
+        }
+    }
+
+    pub(crate) fn packet(input: PacketDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<Packet>(),
+            body: Body::Packet(input),
+        }
+    }
     pub(crate) fn radar(input: RadarDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<Radar>(),
@@ -103,7 +135,9 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Quadrant(_) => Kind::Quadrant,
             Body::Radar(_) => Kind::Radar,
+            Body::Packet(_) => Kind::Packet,
             Body::Info(_) => Kind::Info,
             Body::Sankey(_) => Kind::Sankey,
             Body::Pie(_) => Kind::Pie,
@@ -121,7 +155,13 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Quadrant(input) => crate::compat::diagrams::quadrant_chart::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Radar(input) => crate::compat::diagrams::radar::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Packet(input) => crate::compat::diagrams::packet::render_detached(
                 input, config, settings, read, resources,
             ),
             Body::Info(input) => crate::compat::diagrams::info::render_detached(
