@@ -1,0 +1,44 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "rows": [
+    {
+      "kind": "undefined",
+      "error": {
+        "name": "TypeError",
+        "message": "Cannot read properties of undefined (reading 'getDay')"
+      }
+    },
+    {
+      "kind": "null",
+      "error": {
+        "name": "TypeError",
+        "message": "Cannot read properties of null (reading 'getDay')"
+      }
+    },
+    {
+      "kind": "number",
+      "error": {
+        "name": "TypeError",
+        "message": "e.getDay is not a function"
+      }
+    },
+    {
+      "kind": "object",
+      "error": {
+        "name": "TypeError",
+        "message": "e.getDay is not a function"
+      }
+    },
+    {
+      "kind": "date-shadowed",
+      "error": {
+        "name": "TypeError",
+        "message": "e.getDay is not a function"
+      }
+    },
+    {
+      "kind": "date",
+      "result": null
+    }
+  ]
+}

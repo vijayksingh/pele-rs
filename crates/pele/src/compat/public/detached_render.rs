@@ -22,6 +22,7 @@ pub use crate::compat::diagrams::sankey::{
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Gantt,
     Agentflow,
     Sequence,
     Class,
@@ -62,6 +63,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn gantt() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::gantt::Gantt>(),
+            kind: Kind::Gantt,
+        }
+    }
+
     pub(crate) fn agentflow() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::agentflow::AgentFlow>(),
@@ -293,6 +301,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Gantt(crate::compat::diagrams::gantt::GanttDetachedInput),
     Agentflow(crate::compat::diagrams::agentflow::AgentflowDetachedInput),
     Sequence(crate::compat::diagrams::sequence::SequenceDetachedInput),
     Class(crate::compat::diagrams::class_diagram::ClassDetachedInput),
@@ -327,6 +336,13 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn gantt(input: crate::compat::diagrams::gantt::GanttDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::gantt::Gantt>(),
+            body: Body::Gantt(input),
+        }
+    }
+
     pub(crate) fn agentflow(
         input: crate::compat::diagrams::agentflow::AgentflowDetachedInput,
     ) -> Self {
@@ -574,6 +590,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Gantt(_) => Kind::Gantt,
             Body::Agentflow(_) => Kind::Agentflow,
             Body::Sequence(_) => Kind::Sequence,
             Body::XYChart(_) => Kind::XYChart,
@@ -620,6 +637,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Gantt(input) => crate::compat::diagrams::gantt::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Agentflow(input) => crate::compat::diagrams::agentflow::render_detached(
                 input, config, settings, read, resources,
             ),

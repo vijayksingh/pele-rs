@@ -35,16 +35,16 @@ enum InvalidPhase<D> {
     },
     Done,
 }
-pub(super) struct Invalid<D> {
+pub(in crate::compat::diagrams::gantt) struct Invalid<D> {
     phase: InvalidPhase<D>,
 }
 impl<D: Clone> Invalid<D> {
-    pub(super) fn new(date: D) -> Self {
+    pub(in crate::compat::diagrams::gantt) fn new(date: D) -> Self {
         Self {
             phase: InvalidPhase::Begin(date),
         }
     }
-    pub(super) fn advance<S: Store<Date = D>>(
+    pub(in crate::compat::diagrams::gantt) fn advance<S: Store<Date = D>>(
         &mut self,
         s: &mut S,
         mut reply: Option<CalendarReply>,

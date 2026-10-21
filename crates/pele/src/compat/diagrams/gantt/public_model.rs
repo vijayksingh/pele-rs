@@ -763,6 +763,28 @@ impl Context<'_> {
         }
     }
 }
+// Shared direct/owned validation at the Date.getDay call site. The expression
+// label is pinned to the upstream public implementation, not adapter wording.
+fn check_date_get_day(c: &mut Context<'_>, a: &Atom) -> Result<(), PublicError> {
+    if !matches!(a,Atom::Ref(n)if matches!(c.g.nodes[*n as usize],Node::Date{..})) {
+        c.read(a, "getDay")?;
+        return Err(type_error("e.getDay is not a function"));
+    }
+    let own_method = c.read(a, "getDay")?;
+    if !matches!(own_method, Atom::Undefined) {
+        return Err(
+            if matches!(
+                own_method,
+                Atom::HostReference(_) | Atom::BuiltinFunction(_)
+            ) {
+                invalid("Gantt overridden Date.getDay requires callback dispatch").into()
+            } else {
+                type_error("e.getDay is not a function")
+            },
+        );
+    }
+    Ok(())
+}
 impl Arena<'_> {
     fn get(&mut self, key: &str) -> Result<Atom, PublicError> {
         self.c.read(&self.receiver, key)
@@ -2360,25 +2382,7 @@ impl Arena<'_> {
                 return self.get("tasks");
             }
             20 => {
-                if !matches!(&a,Atom::Ref(n)if matches!(self.c.g.nodes[*n as usize],Node::Date{..}))
-                {
-                    self.c.read(&a, "getDay")?;
-                    return Err(type_error("date.getDay is not a function"));
-                }
-                let own_method = self.c.read(&a, "getDay")?;
-                if !matches!(own_method, Atom::Undefined) {
-                    return Err(
-                        if matches!(
-                            own_method,
-                            Atom::HostReference(_) | Atom::BuiltinFunction(_)
-                        ) {
-                            invalid("Gantt overridden Date.getDay requires callback dispatch")
-                                .into()
-                        } else {
-                            type_error("date.getDay is not a function")
-                        },
-                    );
-                }
+                check_date_get_day(&mut self.c, &a)?;
                 let milliseconds = self.c.numeric(&a)?;
                 let mut cal = Calendar::public(host);
                 let key = cal
@@ -3023,6 +3027,7 @@ const LIVE_FIELDS: &[LiveConstructorField] = &[LiveConstructorField {
     key: "options",
     methods: &[
         MethodId(19),
+        MethodId(20),
         MethodId(24),
         MethodId(25),
         MethodId(26),
@@ -3245,6 +3250,37 @@ fn resume_warning(
 }
 
 impl PublicDiagramModule for Gantt {
+    fn active_public_operation(
+        &self,
+        state: &mut GanttPublicState,
+        operation: crate::compat::public::PublicActiveOperation,
+        budget: &mut crate::compat::public::PublicActiveBudget,
+    ) -> Result<crate::compat::public::PublicActiveValue, PublicError> {
+        let root = state.graph.root.clone();
+        let mut arena = Arena {
+            c: Context::new(&mut state.graph),
+            receiver: root,
+            direct_entry: None,
+        };
+        arena.c.work = 1_000_000 - budget.remaining;
+        let result = operation.run(&mut arena);
+        budget.remaining = 1_000_000 - arena.c.work.min(1_000_000);
+        result
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::gantt())
+    }
+    fn detached_public_render(
+        &self,
+        _state: &GanttPublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::gantt(
+            super::GanttDetachedInput::new(None),
+        ))
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,
@@ -3254,7 +3290,7 @@ impl PublicDiagramModule for Gantt {
         })
     }
     fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
-        if matches!(call.method.0, 19 | 25 | 26 | 28 | 30) {
+        if matches!(call.method.0, 19 | 20 | 25 | 26 | 28 | 30) {
             return Some(calendar_start::invocation(call));
         }
         let first = call.arguments.first().cloned().unwrap_or(Atom::Undefined);

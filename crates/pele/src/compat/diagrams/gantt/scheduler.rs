@@ -221,7 +221,7 @@ pub(super) fn references<S: Store>(
 mod end;
 mod program;
 mod tasks;
-pub(super) use tasks::{Schedule, Task, Tasks};
+pub(super) use tasks::{Invalid, Schedule, Task, Tasks};
 mod start;
 pub(super) use end::End;
 pub(super) use program::{CalendarReply, Step, Warning};

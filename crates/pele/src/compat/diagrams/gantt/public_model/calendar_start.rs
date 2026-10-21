@@ -2,6 +2,7 @@
 use super::*;
 use crate::compat::public::PublicResourceOperation;
 enum Program {
+    Invalid(scheduler::Invalid<DateValue>),
     Start(scheduler::Start<Atom>),
     End(scheduler::End<Atom, DateValue>),
     Task(scheduler::Task<Atom, DateValue>),
@@ -26,6 +27,7 @@ struct Invocation {
 pub(super) fn invocation(call: MethodCall) -> DetachedPublicInvocation {
     let direct_entry = Some(match call.method.0 {
         19 => "getTasks",
+        20 => "isInvalidDate",
         25 => "compileTasks",
         26 => "compileTask",
         28 => "getStartDate",
@@ -105,6 +107,10 @@ impl Invocation {
                 let a = arguments.first().cloned().unwrap_or(Atom::Undefined);
                 let b = arguments.get(1).cloned().unwrap_or(Atom::Undefined);
                 self.program = Some(match self.method {
+                    20 => {
+                        check_date_get_day(&mut arena.c, &a)?;
+                        Program::Invalid(scheduler::Invalid::new(DateValue::Existing(a)))
+                    }
                     28 => Program::Start(scheduler::Start::new(arena.c.scalar(&a, "raw.trim")?)),
                     30 => Program::End(scheduler::End::new(
                         DateValue::Existing(a),
@@ -134,6 +140,13 @@ impl Invocation {
                 .as_mut()
                 .expect("initialized scheduler program")
             {
+                Program::Invalid(program) => match program.advance(&mut arena, calendar_reply)? {
+                    scheduler::Step::Complete(value) => {
+                        scheduler::Step::Complete(value.map_or(Atom::Undefined, Atom::Bool))
+                    }
+                    scheduler::Step::Resource(op) => scheduler::Step::Resource(op),
+                    scheduler::Step::Warning(w) => scheduler::Step::Warning(w),
+                },
                 Program::Start(program) => match program.advance(&mut arena, calendar_reply)? {
                     scheduler::Step::Complete(date) => scheduler::Step::Complete(
                         date.map_or(Ok(Atom::Undefined), |d| arena.c.date_value(d))?,

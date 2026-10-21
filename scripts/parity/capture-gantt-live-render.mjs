@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+const sha=b=>createHash('sha256').update(b).digest('hex');
+const pin='d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d';
+if(sha(fs.readFileSync('node_modules/pele/dist/pele.js'))!==pin)throw Error('Oracle changed');
+const core=await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/core.js'))),entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/gantt.js')))).default;core.register(entry);
+const support=process.argv[2]??'tests/web/support/gantt-live-scenarios.js';
+const {cases,runGantt,SOURCE}=await import(pathToFileURL(path.resolve(support)));
+const rows=[];for(const {raw,responsive,mode} of cases())rows.push(runGantt(core,entry,()=>{},raw,responsive,mode));
+const report={oracleSHA256:pin,source:SOURCE,driverSHA256:sha(fs.readFileSync(support)),rows};
+fs.writeFileSync(process.argv[3]??'fixtures/public-gantt-live-render.json',JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify({rows:rows.length,firstErrors:rows.filter(r=>!r.first.ok).map(r=>[r.raw,r.responsive,r.mode,r.first]),recoveryErrors:rows.filter(r=>!r.recovery.ok).map(r=>[r.raw,r.responsive,r.mode,r.recovery])}));

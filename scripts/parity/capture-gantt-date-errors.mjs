@@ -1,0 +1,5 @@
+import fs from 'node:fs';import {createHash}from'node:crypto';import {pathToFileURL}from'node:url';import path from'node:path';
+const pin='d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d';if(createHash('sha256').update(fs.readFileSync('node_modules/pele/dist/pele.js')).digest('hex')!==pin)throw Error('oracle');
+const entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/gantt.js')))).default;
+const rows=[];for(const kind of ['undefined','null','number','object','date-shadowed','date']){const m=entry.parse('gantt\n dateFormat YYYY-MM-DD\n Alpha :a,2024-01-01,2d',{},undefined,0,{});let value=kind==='undefined'?undefined:kind==='null'?null:kind==='number'?0:kind==='object'?{}:new Date(0);if(kind==='date-shadowed')value.getDay=0;try{rows.push({kind,result:m.isInvalidDate(value)??null});}catch(e){rows.push({kind,error:{name:e.name,message:e.message}});}}
+fs.writeFileSync(process.argv[2]??'fixtures/public-gantt-date-errors.json',JSON.stringify({oracleSHA256:pin,rows},null,2)+'\n');console.log(rows);

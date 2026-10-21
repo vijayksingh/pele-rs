@@ -136,3 +136,10 @@ Agentflow retains its parse-time graph cache, including original style-array
 identities when callers later replace the current vertex field. These are
 functional capabilities; platform acceptance and remaining foreign-object
 behavior must be verified separately.
+
+Gantt uses the shared native scheduler through owned `getTasks` and
+`isInvalidDate` calls. It retains the selected task handles across measurement,
+then reads dates, labels, flags, links, exclusions and accessibility at their
+original phases. Fresh Date arguments and numeric coercion preserve f64 bits.
+The typed renderer uses this same drawing algorithm. Date receiver validation is
+shared with ordinary public invocation and precedes any calendar callback.
