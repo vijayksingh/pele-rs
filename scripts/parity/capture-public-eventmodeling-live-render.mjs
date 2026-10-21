@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import {runEventmodeling,ORACLE_SHA256,SOURCE,MODES} from '../../tests/web/support/eventmodeling-live-scenarios.js';
+const sha=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+if(sha('node_modules/pele/dist/pele.js')!==ORACLE_SHA256)throw Error('Oracle changed');
+const core=await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/core.js')));
+const entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/eventmodeling.js')))).default;core.register(entry);
+const rows=[];for(const raw of [false,true])for(const responsive of [false,true])for(const mode of MODES)rows.push(runEventmodeling(core,entry,()=>{},SOURCE,raw,responsive,mode));
+fs.writeFileSync(process.argv[2]??'fixtures/public-eventmodeling-live-render.json',JSON.stringify({oracleSHA256:ORACLE_SHA256,scriptSHA256:sha(new URL(import.meta.url)),scenarioSHA256:sha(new URL('../../tests/web/support/eventmodeling-live-scenarios.js',import.meta.url)),chunkSHA256:sha('node_modules/pele/dist/esm/chunks/XU65PNPB.js'),source:SOURCE,rows},null,2)+'\n');
+console.log(JSON.stringify({rows:rows.length,originalThrows:rows.filter(r=>r.first.original).length,unexpected:rows.filter(r=>!r.first.ok&&!r.first.original).length}));

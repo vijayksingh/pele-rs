@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    EventModeling,
     Usecase,
     GitGraph,
     Railroad,
@@ -50,6 +51,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn eventmodeling() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::event_modeling::EventModeling>(),
+            kind: Kind::EventModeling,
+        }
+    }
+
     pub(crate) fn usecase() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::usecase::Usecase>(),
@@ -211,6 +219,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    EventModeling(crate::compat::diagrams::event_modeling::EventModelingDetachedInput),
     Usecase(crate::compat::diagrams::usecase::UsecaseDetachedInput),
     GitGraph(crate::compat::diagrams::git_graph::GitGraphDetachedInput),
     Railroad(crate::compat::diagrams::railroad::RailroadDetachedInput),
@@ -235,6 +244,15 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn eventmodeling(
+        input: crate::compat::diagrams::event_modeling::EventModelingDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::event_modeling::EventModeling>(),
+            body: Body::EventModeling(input),
+        }
+    }
+
     pub(crate) fn usecase(input: crate::compat::diagrams::usecase::UsecaseDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::usecase::Usecase>(),
@@ -400,6 +418,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::EventModeling(_) => Kind::EventModeling,
             Body::Usecase(_) => Kind::Usecase,
             Body::GitGraph(_) => Kind::GitGraph,
             Body::Railroad(_) => Kind::Railroad,
@@ -436,6 +455,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::EventModeling(input) => crate::compat::diagrams::event_modeling::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Usecase(input) => crate::compat::diagrams::usecase::render_detached(
                 input, config, settings, read, resources,
             ),

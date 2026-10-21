@@ -35,3 +35,7 @@ impl DiagramModule for EventModeling {
 
 mod public_model;
 pub use public_model::EventModelingPublicState;
+
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{render_detached, EventModelingDetachedInput};

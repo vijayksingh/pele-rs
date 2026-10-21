@@ -556,6 +556,19 @@ impl Export {
 }
 impl PublicDiagramModule for EventModeling {
     type PublicState = EventModelingPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::eventmodeling())
+    }
+    fn detached_public_render(
+        &self,
+        s: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::eventmodeling(
+            super::EventModelingDetachedInput::new(s.model.as_ref().err()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
