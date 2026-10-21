@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Timeline,
     Ishikawa,
     Venn,
     Quadrant,
@@ -36,6 +37,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn timeline() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::timeline::Timeline>(),
+            kind: Kind::Timeline,
+        }
+    }
+
     pub(crate) fn ishikawa() -> Self {
         Self {
             creator: TypeId::of::<Ishikawa>(),
@@ -100,6 +108,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Timeline(crate::compat::diagrams::timeline::TimelineDetachedInput),
     Ishikawa(IshikawaDetachedInput),
     Venn(crate::compat::diagrams::venn::VennDetachedInput),
     Quadrant(QuadrantDetachedInput),
@@ -110,6 +119,15 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn timeline(
+        input: crate::compat::diagrams::timeline::TimelineDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::timeline::Timeline>(),
+            body: Body::Timeline(input),
+        }
+    }
+
     pub(crate) fn ishikawa(input: IshikawaDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<Ishikawa>(),
@@ -168,6 +186,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Timeline(_) => Kind::Timeline,
             Body::Ishikawa(_) => Kind::Ishikawa,
             Body::Venn(_) => Kind::Venn,
             Body::Quadrant(_) => Kind::Quadrant,
@@ -190,6 +209,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Timeline(input) => crate::compat::diagrams::timeline::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Ishikawa(input) => crate::compat::diagrams::ishikawa::render_detached(
                 input, config, settings, read, resources,
             ),

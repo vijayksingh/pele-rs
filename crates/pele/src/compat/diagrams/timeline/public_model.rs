@@ -582,6 +582,14 @@ impl PublicDiagramModule for Timeline {
         s.imported = imported(&s.graph);
         out
     }
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::timeline())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::timeline(
+            super::TimelineDetachedInput::new(state.imported.as_ref().err().cloned()),
+        ))
+    }
     fn render_public(
         &self,
         s: &mut Self::PublicState,

@@ -69,3 +69,6 @@ impl TimelineModel {
         }
     }
 }
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, TimelineDetachedInput};
