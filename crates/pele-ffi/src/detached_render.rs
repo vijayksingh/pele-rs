@@ -202,7 +202,7 @@ impl Reader {
                             match document.read_declared_getter(&Atom::Ref(id as u32), method) {
                                 Some(result) => match result? {
                                     pele::compat::public::PublicActiveValue::Atom(atom) => {
-                                        own(read, atom)
+                                        Ok(own(read, atom)?)
                                     }
                                     pele::compat::public::PublicActiveValue::String(text) => {
                                         Ok(Value::String(Arc::new(text)))
