@@ -10,8 +10,8 @@ private final class StateCallbackFailure: Error {}
     func apply(_ graph: Pele.PublicGraph) throws {
         switch self { case .normal(let d): _ = try d.apply(graph, expectedRevision: d.revision); case .prepared(let d): _ = try d.apply(graph, expectedRevision: d.revision) }
     }
-    func render(_ resources: Pele.HostResources, responsive: Bool = false) throws -> FullRenderedDiagram {
-        var options = Pele.Engine.Options(); options.maxWidth = responsive ? 160 : nil
+    func render(_ resources: Pele.HostResources, responsive: Bool = false, maxWidth: Double? = nil) throws -> FullRenderedDiagram {
+        var options = Pele.Engine.Options(); options.maxWidth = maxWidth ?? (responsive ? 160 : nil)
         switch self { case .normal(let d): return try d.render(options: options, resources: resources); case .prepared(let d): return try d.render(options: options, resources: resources) }
     }
     func invoke(_ method:UInt32,_ arguments:[Pele.PublicGraph.Atom])throws{let root=try snapshot().graph.root;switch self{case .normal(let d):let out=try d.invoke(method:method,receiver:root,arguments:arguments);guard case .returned = out.result else {throw PeleError(code:"test",message:"State helper failed")};case .prepared(let d):let out=try d.invoke(method:method,receiver:root,arguments:arguments);guard case .returned = out.result else {throw PeleError(code:"test",message:"State helper failed")};}}
@@ -157,4 +157,44 @@ private final class StateCallbackFailure: Error {}
             XCTAssertTrue(NSArray(array: recovery.trace).isEqual(to: try XCTUnwrap(row["recoveryTrace"] as? [[Any]])), mode + " recovery trace")
         }
     }
+    func testStateDirectionOwnUndefinedAndDeclaredGetterMatch14OracleRows() throws {
+        var path=URL(fileURLWithPath:#filePath);for _ in 0..<5 {path.deleteLastPathComponent()}
+        let fixture=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:path.appendingPathComponent("fixtures/public-state-direction-accessor.json"))) as? [String:Any])
+        XCTAssertEqual(fixture["oracleSHA256"] as? String,"d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d")
+        let source=try XCTUnwrap(fixture["source"] as? String),all=try XCTUnwrap(fixture["rows"] as? [[String:Any]])
+        let rows=all.filter{!(($0["mode"] as? String)?.hasPrefix("getter-") ?? false)};XCTAssertEqual(rows.count,14)
+        for row in rows {
+            let mode=try XCTUnwrap(row["mode"] as? String),raw=try XCTUnwrap(row["raw"] as? Bool),engine=Pele.Engine()
+            let document:StateCallbackDocument=try raw ? .prepared(engine.parsePrepared("state",source:source)) : .normal(engine.parseMutable(source));defer{try? document.close()}
+            var graph=try document.snapshot().graph
+            if mode=="last-direction" {let doc=try Self.ref(graph.field("rootDoc")),item=try Self.input(&graph,["stmt":"dir","value":"TB"]);try Self.append(&graph,on:doc,value:item)}
+            if mode=="own-undefined"||mode.hasPrefix("nonenumerable-") {
+                let value:Pele.PublicGraph.Atom=mode=="nonenumerable-TB" ? .string(try graph.intern("TB")) : .undefined
+                try graph.setField("direction",value:value)
+                if mode.hasPrefix("nonenumerable-"){let root=try Self.ref(graph.root);var properties=graph.nodes[Int(root)].properties;let index=try XCTUnwrap(properties.firstIndex{graph.strings[Int($0.key)]==Pele.JSString("direction")});properties[index].flags=6;graph.nodes[Int(root)].properties=properties}
+            }
+            try document.apply(graph)
+            let observed=StateCallbackState();var resources=pure()
+            resources.textWidth={request in try MainActor.assumeIsolated {
+                observed.trace.append([request.text,String(format:"%016llx",request.size.bitPattern),Int(request.style)])
+                if !observed.fired {
+                    observed.fired=true
+                    if mode=="callback-undefined" {
+                        var changed=try document.snapshot().graph;try changed.setField("direction",value:.undefined)
+                        let root=try Self.ref(changed.root);var properties=changed.nodes[Int(root)].properties;let index=try XCTUnwrap(properties.firstIndex{changed.strings[Int($0.key)]==Pele.JSString("direction")});properties[index].flags=6;changed.nodes[Int(root)].properties=properties;try document.apply(changed)
+                    }else if mode=="callback-helper" {
+                        var changed=try document.snapshot().graph;let text=try changed.intern("TB");try document.apply(changed);try document.invoke(14,[.string(text)])
+                    }
+                }
+                return Double(request.text.utf16.count)*request.size*0.6
+            }}
+            try compare(document.render(resources,maxWidth:180),XCTUnwrap(row["first"] as? [String:Any]));XCTAssertTrue(observed.fired)
+            XCTAssertTrue(NSArray(array:observed.trace).isEqual(to:try XCTUnwrap(row["trace"] as? [[Any]])),mode+" trace")
+            var repaired=try document.snapshot().graph;let root=try Self.ref(repaired.root);repaired.nodes[Int(root)].properties.removeAll{repaired.strings[Int($0.key)]==Pele.JSString("direction")}
+            let text=try repaired.intern("LR");try document.apply(repaired);try document.invoke(14,[.string(text)])
+            let recovery=StateCallbackState();var plain=pure();plain.textWidth={request in MainActor.assumeIsolated{recovery.trace.append([request.text,String(format:"%016llx",request.size.bitPattern),Int(request.style)]);return Double(request.text.utf16.count)*request.size*0.6}}
+            try compare(document.render(plain,maxWidth:180),XCTUnwrap(row["recovery"] as? [String:Any]));XCTAssertTrue(NSArray(array:recovery.trace).isEqual(to:try XCTUnwrap(row["recoveryTrace"] as? [[Any]])),mode+" recovery")
+        }
+    }
+
 }

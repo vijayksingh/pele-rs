@@ -88,6 +88,18 @@ pub trait PublicDiagramModule: DiagramModule {
     fn detached_public_invocation(&self, _call: MethodCall) -> Option<DetachedPublicInvocation> {
         None
     }
+    /// Optional callback-free implementation of a declared prototype getter.
+    /// The captured module owns dispatch and validates its receiver. Returning
+    /// None leaves the host's existing unsupported-accessor behavior unchanged.
+    #[doc(hidden)]
+    fn read_public_getter(
+        &self,
+        _state: &Self::PublicState,
+        _receiver: &Atom,
+        _method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>> {
+        None
+    }
     /// Callback-free owner access used by an active host facade between yields.
     #[doc(hidden)]
     fn active_public_operation(
@@ -376,6 +388,12 @@ trait Erased: Send + Sync {
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn constructor(&self, prototype: PrototypeId) -> Option<Constructor>;
     fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation>;
+    fn read_getter(
+        &self,
+        state: &State,
+        receiver: &Atom,
+        method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>>;
     fn active_operation(
         &self,
         state: &mut State,
@@ -499,6 +517,18 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     }
     fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
         self.0.detached_public_invocation(call)?.for_creator::<D>()
+    }
+    fn read_getter(
+        &self,
+        state: &State,
+        receiver: &Atom,
+        method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>> {
+        self.0.read_public_getter(
+            state.downcast_ref().expect("paired public state"),
+            receiver,
+            method,
+        )
     }
     fn active_operation(
         &self,
@@ -1565,6 +1595,19 @@ impl PublicDocument {
     }
     pub fn diagram_type(&self) -> &DiagramId {
         &self.registration.descriptor.id
+    }
+    /// Read a native getter selected from this document's prototype schema.
+    /// No state writes, revision advance, publication, or host callback occurs.
+    /// The returned string owns its UTF-16; graph atoms retain current IDs.
+    #[doc(hidden)]
+    pub fn read_declared_getter(
+        &self,
+        receiver: &Atom,
+        method: super::MethodId,
+    ) -> Option<Result<super::PublicActiveValue, PublicError>> {
+        self.registration
+            .codec
+            .read_getter(&self.state, receiver, method)
     }
     /// Each access is callback-free; a host may release its owner guard on return.
     /// Mutating failures retain their partial edits and current revision.

@@ -1,11 +1,11 @@
-import {createHostLedger,retainHostValue,LiveFieldBindings,hostReply,performHostOperation,retainJobValue,releaseJobValues} from './host-values.js';
+import {createHostLedger,retainHostValue,LiveFieldBindings,hostReply,performHostOperation,retainJobValue,releaseJobValues,materializeHostError} from './host-values.js';
 import {LayoutGraph,encodeSourceInput} from './layout-storage.js';
 import {decodeLayoutOutcome} from './layout-packet.js';
 import {CapturedOwner,capturedSankeyAvailable,rememberCapturedModel,capturedObservedFrame} from './captured-owner.js';
 import {HostErOwner} from './host-er-store.js';
 import initialize from './initialize.js';
 import {modelHostFunctions} from "./host-functions.js";
-import {liveRenderRead,detachedRenderResult} from './live-render.js';
+import {liveRenderRead,detachedRenderResult,releaseLiveRenderValues} from './live-render.js';
 import {builtinDiagramType,builtinDiagramOrigin,ownRawModel,withBuiltinIcons,builtinInlineIcons} from './builtin-entries.js';
 import {parseLimitOptions, parseLimitValues} from './parse-limits.js';
 export {loadRegistry} from './registry.js';
@@ -124,6 +124,7 @@ function renderError(error) {
 // containers. Keep registry identity for helpers borrowed by another document.
 function disposedBridgeInvoke() { throw new TypeError('Public model document is disposed'); }
 function releaseDisposedBridge(bridge) {
+  releaseLiveRenderValues(bridge);
   releaseBridgeObservation(bridge);
   bridge.graph = null;
   bridge.strings = null;
@@ -409,7 +410,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     return ownedDefinitions;
   }
   function runDetachedInvocation(entry,job,construction=false){
-    let replyState=0,valueTag=0,value,original,originalFailed=false,observationFailed=false,finishedGraph;
+    let replyState=0,valueTag=0,value,original,originalFailed=false,observationFailed=false,finishedGraph,errorContext;
     const temporaryValues=new Set();
     const bridge=entry.bridge;
     const unlocked=run=>{entry.nativeBusy=false;try{return run();}finally{entry.nativeBusy=true;}};
@@ -423,7 +424,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       for(;;){
         const outcome=binaryResult(()=>construction?job.resume(replyState,valueTag,value):entry.handle.resume_detached_invocation(job,replyState,valueTag,value));
         entry.revision=outcome.revision;
-        if(outcome.result?.complete===true)break;
+        if(outcome.result?.complete===true){errorContext=outcome.result.errorContext;break;}
         const operation=outcome.result?.host, resourceStep=outcome.result?.resource===true;
         if((!operation&&!resourceStep)||(operation&&resourceStep))throw new TypeError('Invalid detached invocation step');
         // Native mutation is visible before the next user operation. Publishing
@@ -464,7 +465,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       else acceptedBaselines.delete(entry);
       if(construction)bridge.liveFields?.bind(bridge.root);
       if(originalFailed)throw original;
-      if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,bridge);
+      if(Object.hasOwn(outcome.result,'Err'))throw errorContext?materializeHostError(bridge,errorContext):operationError(outcome.result.Err,bridge);
       return construction?bridge.root:bridge.value(outcome.result.Ok);
     }catch(error){if(originalFailed)throw original;throw error;}
     finally{
@@ -935,6 +936,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       const document = documents.get(model)??constructedDocuments.get(model);
       if (document?.busy || document?.nativeBusy || document?.detachedDepth) throw new TypeError('Public model document is already in use');
       if (document) acceptedBaselines.delete(document);
+      if(document?.bridge)releaseLiveRenderValues(document.bridge);
       if(document?.hostStore){document.hostStore.dispose();rawDisposed.add(model);documents.delete(model);document.disposed=true;finalizer?.unregister(model);document.handle.free();document.policy?.free();return;}
       if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); constructedDocuments.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free();if(document.capturedOwner)document.capturedOwner.release();else if(document.bridge)releaseDisposedBridge(document.bridge); }
     }

@@ -19,8 +19,8 @@ use crate::compat::{
         JavaScriptErrorKind, JsString, LiveConstructorField, MemberKind, MemberSchema, MethodCall,
         MethodId, MethodSchema, ModelDelta, ModelGraph, ModelSchema, Node, Property, PrototypeId,
         PrototypeParent, PrototypeSchema, PublicConstructorFactory, PublicDiagramModule,
-        PublicError, PublicHostOperation, PublicHostResult, PublicHostValue, PublicInvocationPhase,
-        RecordId, RecordKind, RecordSchema,
+        PublicError, PublicHostErrorExpression, PublicHostOperation, PublicHostResult,
+        PublicHostValue, PublicInvocationPhase, RecordId, RecordKind, RecordSchema,
     },
     ErrorCode,
 };
@@ -2118,6 +2118,30 @@ impl Arena<'_> {
         }
         Err(type_error(&format!("this.{name} is not a function")))
     }
+    // Preserve terminal native failure and revision/publication cadence. Hosts
+    // only recreate its engine-specific TypeError from the captured bad value.
+    fn warning_expression_guard(
+        &mut self,
+        expression: PublicHostErrorExpression,
+    ) -> Result<Option<PublicInvocationPhase>, PublicError> {
+        match self.native_method("warn") {
+            Ok(()) => Ok(None),
+            Err(
+                error @ PublicError::JavaScript {
+                    name: JavaScriptErrorKind::TypeError,
+                    ..
+                },
+            ) => {
+                let value = self.c.read(&self.receiver, "warn")?;
+                Ok(Some(PublicInvocationPhase::FailedWithContext {
+                    error,
+                    expression,
+                    value,
+                }))
+            }
+            Err(error) => Err(error),
+        }
+    }
     fn merge_tokens(&mut self, include: bool, input: &Atom) -> Result<(), PublicError> {
         let existing = self.get(if include { "includes" } else { "excludes" })?;
         let values = self.c.values(&existing)?;
@@ -3091,13 +3115,16 @@ struct WarningInvocation {
 impl WarningInvocation {
     fn call(&mut self, receiver: Atom, function: Atom, message: Atom) -> PublicInvocationPhase {
         self.phase = WarningPhase::Callback;
-        PublicInvocationPhase::Host(PublicHostOperation::Call {
-            function,
-            result: PublicHostResult::Discard,
-            not_callable_error: "this.options.warn is not a function",
-            receiver,
-            arguments: vec![message],
-        })
+        PublicInvocationPhase::HostWithContext {
+            operation: PublicHostOperation::Call {
+                function,
+                result: PublicHostResult::Discard,
+                not_callable_error: "this.options.warn is not a function",
+                receiver,
+                arguments: vec![message],
+            },
+            expression: PublicHostErrorExpression::WarnProducer,
+        }
     }
     fn step(
         &mut self,
@@ -3107,6 +3134,13 @@ impl WarningInvocation {
         use WarningPhase::*;
         let get =
             |receiver, key| PublicInvocationPhase::Host(PublicHostOperation::Get { receiver, key });
+        let get_warn = |receiver| PublicInvocationPhase::HostWithContext {
+            operation: PublicHostOperation::Get {
+                receiver,
+                key: "warn",
+            },
+            expression: PublicHostErrorExpression::ThisOptionsWarn,
+        };
         Ok(match std::mem::replace(&mut self.phase, Done) {
             References {
                 receiver,
@@ -3124,7 +3158,11 @@ impl WarningInvocation {
                 if lookup.unknown.is_empty() {
                     return Ok(PublicInvocationPhase::Complete(Ok(Atom::Undefined)));
                 }
-                arena.native_method("warn")?;
+                if let Some(failure) =
+                    arena.warning_expression_guard(PublicHostErrorExpression::WarnReferences)?
+                {
+                    return Ok(failure);
+                }
                 self.phase = Start {
                     receiver,
                     producer: WarningProducer::References {
@@ -3143,7 +3181,7 @@ impl WarningInvocation {
             }
             FirstOptions { receiver, producer } => {
                 self.phase = FirstWarn { receiver, producer };
-                get(reply.expect("awaited options"), "warn")
+                get_warn(reply.expect("awaited options"))
             }
             FirstWarn { receiver, producer } => {
                 self.phase = FirstTest { receiver, producer };
@@ -3164,20 +3202,23 @@ impl WarningInvocation {
                     receiver: receiver.clone(),
                     producer,
                 };
-                get(receiver, "warn")
+                get_warn(receiver)
             }
             SecondWarn { receiver, producer } => {
                 let function = reply.expect("awaited second warn");
                 match producer {
                     WarningProducer::Host(producer) => {
                         self.phase = Producer { receiver, function };
-                        PublicInvocationPhase::Host(PublicHostOperation::Call {
-                            function: producer,
-                            result: PublicHostResult::Retain,
-                            not_callable_error: "e is not a function",
-                            receiver: Atom::Undefined,
-                            arguments: vec![],
-                        })
+                        PublicInvocationPhase::HostWithContext {
+                            operation: PublicHostOperation::Call {
+                                function: producer,
+                                result: PublicHostResult::Retain,
+                                not_callable_error: "e is not a function",
+                                receiver: Atom::Undefined,
+                                arguments: vec![],
+                            },
+                            expression: PublicHostErrorExpression::Producer,
+                        }
                     }
                     WarningProducer::Scheduler(warning) => {
                         let message = Context::new(graph).text(&warning.message())?;

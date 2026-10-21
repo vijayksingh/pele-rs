@@ -77,8 +77,9 @@ pub use constructor::{
 };
 #[doc(hidden)]
 pub use detached_invocation::{
-    DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation, PublicHostOperation,
-    PublicHostResult, PublicInvocationPhase, PublicResourceOperation,
+    DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation,
+    PublicHostErrorContext, PublicHostErrorExpression, PublicHostOperation, PublicHostResult,
+    PublicInvocationPhase, PublicResourceOperation,
 };
 
 mod active_operation;

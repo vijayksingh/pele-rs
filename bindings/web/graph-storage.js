@@ -211,9 +211,19 @@ function reconcileGraph(bridge, graph, changed) {
       for(let i=0;i<count;i++)Map.prototype.set.call(object,entryValue(i,0),entryValue(i,1));
     }
     if (kind === 'set') {
-      if (!fresh) Set.prototype.clear.call(object);
-      if(nested)for(const value of node.values)Set.prototype.add.call(object,bridge.value(value));
-      else for(let i=0;i<(cursor?cursor.itemCount:storage.itemCount(graph,id));i++)Set.prototype.add.call(object,cursor?cursorItemValue(bridge,cursor,i):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,i)));
+      const count=nested?node.values.length:(cursor?cursor.itemCount:storage.itemCount(graph,id));
+      const itemValue=index=>nested?bridge.value(node.values[index]):cursor?cursorItemValue(bridge,cursor,index):flatValue(bridge,storage,graph,storage.itemAtomSlot(graph,id,index));
+      if(!fresh){
+        // Keep the target's ordered prefix in its existing Set slots so a
+        // suspended iterator does not revisit values after helper publication.
+        let retained=0,next=count?itemValue(0):undefined;
+        for(const value of Set.prototype.values.call(object)){
+          if(retained<count&&(value===next||(value!==value&&next!==next))){
+            retained++;next=retained<count?itemValue(retained):undefined;
+          }else Set.prototype.delete.call(object,value);
+        }
+      }
+      for(let i=0;i<count;i++)Set.prototype.add.call(object,itemValue(i));
     }
     if (kind === 'date' && !fresh) Date.prototype.setTime.call(object, numberValue(nested?node.milliseconds:(cursor?cursor.aux:storage.nodeAux(graph,id))));
     if (kind === 'array' && object.length !== (nested?node.length:(cursor?cursor.aux:storage.nodeAux(graph,id)))) object.length=nested?node.length:(cursor?cursor.aux:storage.nodeAux(graph,id));

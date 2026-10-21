@@ -2450,10 +2450,13 @@ impl FlowInvocation {
             FlowStage::WarnOptions(pending) => {
                 let receiver = reply.expect("protocol requires reply");
                 self.stage = FlowStage::WarnGet(pending, receiver.clone());
-                Ok(PublicInvocationPhase::Host(PublicHostOperation::Get {
-                    receiver,
-                    key: "warn",
-                }))
+                Ok(PublicInvocationPhase::HostWithContext {
+                    operation: PublicHostOperation::Get {
+                        receiver,
+                        key: "warn",
+                    },
+                    expression: PublicHostErrorExpression::ThisOptionsWarn,
+                })
             }
             FlowStage::MaxOptions(pending) => {
                 let receiver = reply.expect("protocol requires reply");
@@ -2472,13 +2475,16 @@ impl FlowInvocation {
                 let name = text(a.g, &pending.id)?;
                 let message=a.string(format!("Style applied to unknown node \"{name}\". This may indicate a typo. The node will be created automatically.").as_str())?;
                 self.stage = FlowStage::WarnCall(pending);
-                Ok(PublicInvocationPhase::Host(PublicHostOperation::Call {
-                    function,
-                    receiver,
-                    arguments: vec![message],
-                    not_callable_error: "this.options.warn is not a function",
-                    result: PublicHostResult::Discard,
-                }))
+                Ok(PublicInvocationPhase::HostWithContext {
+                    operation: PublicHostOperation::Call {
+                        function,
+                        receiver,
+                        arguments: vec![message],
+                        not_callable_error: "this.options.warn is not a function",
+                        result: PublicHostResult::Discard,
+                    },
+                    expression: PublicHostErrorExpression::OptionalWarnStyle,
+                })
             }
             FlowStage::WarnCall(pending) => {
                 a.vertex_finish(pending)?;

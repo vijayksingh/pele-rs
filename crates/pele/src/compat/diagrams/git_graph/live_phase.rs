@@ -28,6 +28,10 @@ struct HostValue<V> {
     raw: V,
     slot: Option<Slot>,
 }
+struct TagIterator<V> {
+    raw: V,
+    count: usize,
+}
 struct Host<'a, R: LiveRenderRead> {
     read: &'a mut R,
     text: HashMap<Slot, usize>,
@@ -75,6 +79,32 @@ impl<R: LiveRenderRead> Host<'_, R> {
 impl<R: LiveRenderRead> PhaseInput for Host<'_, R> {
     type Value = HostValue<R::Value>;
     type Error = PublicError;
+    type TagIterator = TagIterator<R::Value>;
+    fn tags_begin(&mut self, value: &Self::Value) -> Result<Self::TagIterator, PublicError> {
+        Ok(TagIterator {
+            raw: self.read.iterator_begin(&value.raw)?,
+            count: 0,
+        })
+    }
+    fn tags_next(
+        &mut self,
+        iterator: &mut Self::TagIterator,
+    ) -> Result<Option<Self::Value>, PublicError> {
+        let Some(raw) = self.read.iterator_next(&iterator.raw)? else {
+            return Ok(None);
+        };
+        // Iterator-next failures do not close. A native body bound does.
+        iterator.count += 1;
+        if iterator.count > 1_000_000 {
+            let _ = self.read.iterator_close(&iterator.raw);
+            return Err(limit().into());
+        }
+        Ok(Some(HostValue { raw, slot: None }))
+    }
+    fn tags_close(&mut self, iterator: &mut Self::TagIterator) -> Result<(), PublicError> {
+        self.read.iterator_close(&iterator.raw)
+    }
+
     fn begin_draw(&mut self) {
         self.text.clear();
         self.arrays.clear();

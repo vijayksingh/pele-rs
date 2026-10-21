@@ -16,6 +16,7 @@ pub enum PublicActiveOperation {
     Intern(JsString),
     String(Atom),
     Object,
+    Record(Vec<(JsString, Atom)>),
     Array,
     Date(f64),
     DateMillis(Atom),
@@ -64,7 +65,7 @@ impl PublicActiveOperation {
                 model.push(&receiver, value)?;
                 Atom::Undefined
             }
-            Self::Builtin(_) => {
+            Self::Record(_) | Self::Builtin(_) => {
                 return Err(PeleError::new(
                     "Owned builtin access is unavailable",
                     ErrorCode::Semantic,

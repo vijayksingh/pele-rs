@@ -1,6 +1,7 @@
 //! Owned C jobs: no document or binding borrow crosses a resource callback.
 mod call;
 mod iterator;
+pub(super) mod retained;
 use super::{
     host_functions, public, PeleHostResourcesV3, PelePublicDocument, PeleRenderNumbersV9,
     PeleResult,
@@ -192,9 +193,24 @@ impl Reader {
                         pele::compat::public::MemberKind::Method { method } => {
                             Ok(Value::Atom(Atom::BuiltinFunction(method.0)))
                         }
-                        // The native live reader exposes declared methods, but does not
-                        // execute inherited accessors. Family phase sources retain
-                        // their existing ordinary-graph derivations for those reads.
+                        pele::compat::public::MemberKind::Accessor {
+                            get: Some(method), ..
+                        } => {
+                            // Own fields (including Undefined and non-enumerable fields)
+                            // returned above. Only a schema-selected native getter runs
+                            // here, with an immutable owner and no host callbacks.
+                            match document.read_declared_getter(&Atom::Ref(id as u32), method) {
+                                Some(result) => match result? {
+                                    pele::compat::public::PublicActiveValue::Atom(atom) => {
+                                        own(read, atom)
+                                    }
+                                    pele::compat::public::PublicActiveValue::String(text) => {
+                                        Ok(Value::String(Arc::new(text)))
+                                    }
+                                },
+                                None => Ok(Value::Atom(Atom::Undefined)),
+                            }
+                        }
                         _ => Ok(Value::Atom(Atom::Undefined)),
                     };
                 }
@@ -222,15 +238,31 @@ impl LiveRenderRead for Reader {
                 PeleError::new("Live call argument budget exceeded", ErrorCode::Limit).into(),
             );
         }
-        let units = arguments.iter().fold(0usize, |total, value| {
-            total.saturating_add(match value {
-                pele::compat::public::LiveCallArgument::Text(s) => s.0.len(),
-                pele::compat::public::LiveCallArgument::Value(Value::String(s)) => s.0.len(),
-                _ => 0,
-            })
-        });
-        if units > 16_000_000 {
-            return Err(PeleError::new("Live call text budget exceeded", ErrorCode::Limit).into());
+        let (mut units, mut fields) = (0usize, 0usize);
+        for argument in arguments {
+            match argument {
+                pele::compat::public::LiveCallArgument::Text(s) => {
+                    units = units.saturating_add(s.0.len())
+                }
+                pele::compat::public::LiveCallArgument::Value(Value::String(s)) => {
+                    units = units.saturating_add(s.0.len())
+                }
+                pele::compat::public::LiveCallArgument::Record(values) => {
+                    fields = fields.saturating_add(values.len());
+                    for (key, value) in values {
+                        units = units.saturating_add(key.0.len());
+                        if let Value::String(s) = value {
+                            units = units.saturating_add(s.0.len());
+                        }
+                    }
+                }
+                _ => (),
+            }
+        }
+        if units > 16_000_000 || fields > 1_000_000 {
+            return Err(
+                PeleError::new("Live call record/text budget exceeded", ErrorCode::Limit).into(),
+            );
         }
         let mut args = Vec::with_capacity(arguments.len());
         for argument in arguments {
@@ -241,6 +273,9 @@ impl LiveRenderRead for Reader {
                 }
                 pele::compat::public::LiveCallArgument::Number(value) => {
                     Value::Atom(Atom::Number(*value))
+                }
+                pele::compat::public::LiveCallArgument::Record(fields) => {
+                    self.record_argument(fields)?
                 }
                 pele::compat::public::LiveCallArgument::Date(value) => {
                     self.date_argument(*value)?
@@ -302,6 +337,24 @@ impl LiveRenderRead for Reader {
     }
     fn iterator_close(&mut self, v: &Value) -> Result<(), PublicError> {
         self.close_iterator(v)
+    }
+    fn retain_value(&mut self, value: &Value) -> Result<u32, PublicError> {
+        let owner =
+            unsafe { self.owner.as_ref() }.ok_or_else(|| invalid("Null public document"))?;
+        let mut values = owner
+            .retained_values
+            .try_borrow_mut()
+            .map_err(|_| invalid("Retained values are already in use"))?;
+        values.retain(value)
+    }
+    fn retained_value(&mut self, token: u32) -> Result<Value, PublicError> {
+        let owner =
+            unsafe { self.owner.as_ref() }.ok_or_else(|| invalid("Null public document"))?;
+        let values = owner
+            .retained_values
+            .try_borrow()
+            .map_err(|_| invalid("Retained values are already in use"))?;
+        values.get(token)
     }
     fn retained_graph_value(&mut self, node: u32) -> Result<Value, PublicError> {
         let document = unsafe { public::document(self.owner) }?;

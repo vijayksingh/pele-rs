@@ -1,0 +1,2473 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "driverSHA256": "a0bca05b3436bcaa6d818e1c15c9af78afee43eac5ef12c002b00c2c70d841bf",
+  "source": "stateDiagram-v2\ndirection LR\nstate \"Alpha\" as A\nstate \"Beta\" as B\nA --> B: transition",
+  "rows": [
+    {
+      "raw": false,
+      "mode": "inherited",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "last-direction",
+      "before": {
+        "direction": "TB",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          },
+          {
+            "stmt": "dir",
+            "value": "TB"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "own-undefined",
+      "before": {
+        "direction": {
+          "$undefined": true
+        },
+        "descriptor": {
+          "enumerable": true,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        }
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": true,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "nonenumerable-undefined",
+      "before": {
+        "direction": {
+          "$undefined": true
+        },
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        }
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "nonenumerable-TB",
+      "before": {
+        "direction": "TB",
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": "TB",
+          "writable": true
+        }
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": "TB",
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "callback-undefined",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "getter-return",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [
+        "getter-return",
+        "getter-return"
+      ],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "getter-throw",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": false,
+      "first": {
+        "ok": false,
+        "original": true,
+        "error": "sentinel"
+      },
+      "trace": [],
+      "getterTrace": [
+        "getter-throw"
+      ],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "getter-reentry",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry"
+      ],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "nested": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 307 60\" width=\"307\" height=\"60\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M88,30L221,30\"/><path class=\"pele-marker\" d=\"M228,30L220,33.36L220,26.64Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"108.5\" y=\"19.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"154.5\" y=\"34.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(48,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(263.2,30)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4073300000000000",
+        "height": "404e000000000000",
+        "links": []
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "callback-helper",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "TB"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "inherited",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "last-direction",
+      "before": {
+        "direction": "TB",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          },
+          {
+            "stmt": "dir",
+            "value": "TB"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "own-undefined",
+      "before": {
+        "direction": {
+          "$undefined": true
+        },
+        "descriptor": {
+          "enumerable": true,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        }
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": true,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "nonenumerable-undefined",
+      "before": {
+        "direction": {
+          "$undefined": true
+        },
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        }
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "nonenumerable-TB",
+      "before": {
+        "direction": "TB",
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": "TB",
+          "writable": true
+        }
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": "TB",
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "callback-undefined",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": {
+          "enumerable": false,
+          "configurable": true,
+          "value": {
+            "$undefined": true
+          },
+          "writable": true
+        },
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "getter-return",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [
+        "getter-return",
+        "getter-return"
+      ],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "getter-throw",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": false,
+      "first": {
+        "ok": false,
+        "original": true,
+        "error": "sentinel"
+      },
+      "trace": [],
+      "getterTrace": [
+        "getter-throw"
+      ],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "getter-reentry",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry",
+        "getter-reentry"
+      ],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "LR"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "nested": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 307 60\" width=\"307\" height=\"60\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M88,30L221,30\"/><path class=\"pele-marker\" d=\"M228,30L220,33.36L220,26.64Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"108.5\" y=\"19.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"154.5\" y=\"34.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(48,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(263.2,30)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4073300000000000",
+        "height": "404e000000000000",
+        "links": []
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "callback-helper",
+      "before": {
+        "direction": "LR",
+        "descriptor": null
+      },
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ],
+      "getterTrace": [],
+      "after": {
+        "descriptor": null,
+        "rootDoc": [
+          {
+            "stmt": "dir",
+            "value": "TB"
+          },
+          {
+            "stmt": "state",
+            "id": "A",
+            "type": "default",
+            "description": "Alpha"
+          },
+          {
+            "stmt": "state",
+            "id": "B",
+            "type": "default",
+            "description": "Beta"
+          },
+          {
+            "stmt": "relation",
+            "state1": {
+              "stmt": "state",
+              "id": "A",
+              "type": "default",
+              "description": ""
+            },
+            "state2": {
+              "stmt": "state",
+              "id": "B",
+              "type": "default",
+              "description": ""
+            },
+            "description": "transition"
+          }
+        ],
+        "title": {
+          "$undefined": true
+        }
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-state\" viewBox=\"0 0 112 173\" width=\"112\" height=\"173\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"state\"><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-transition\" data-id=\"edge0\"><path d=\"M56,52L56,114\"/><path class=\"pele-marker\" d=\"M56,121L52.64,113L59.36,113Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-edge-labels\" font-size=\"14\"><g class=\"pele-edge-label\" data-id=\"edge0\"><rect x=\"10\" y=\"72.5\" width=\"92\" height=\"21\" rx=\"3\" fill=\"var(--_bg)\"/><text x=\"56\" y=\"87.9\" text-anchor=\"middle\">transition</text></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-state\" data-id=\"A\" transform=\"translate(56,30)\"><rect x=\"-40\" y=\"-22\" width=\"80\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-state\" data-id=\"B\" transform=\"translate(56,143)\"><rect x=\"-35.2\" y=\"-22\" width=\"70.4\" height=\"44\" rx=\"10\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "405c000000000000",
+        "height": "4065a00000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "transition",
+          "402c000000000000",
+          0
+        ]
+      ]
+    }
+  ]
+}

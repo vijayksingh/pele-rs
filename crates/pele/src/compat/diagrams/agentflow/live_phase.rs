@@ -11,6 +11,7 @@ use crate::compat::{
 pub(crate) struct AgentflowDetachedInput {
     graph: Result<AgentGraph, PeleError>,
     styles: Vec<Option<u32>>,
+    cache: Option<super::live_builder::Cache>,
 }
 impl AgentflowDetachedInput {
     pub(super) fn new(
@@ -41,15 +42,37 @@ impl AgentflowDetachedInput {
         Self {
             graph,
             styles: styles.to_vec(),
+            cache: None,
+        }
+    }
+    pub(super) fn constructed(
+        cache: super::live_builder::Cache,
+        error: Option<&PeleError>,
+    ) -> Self {
+        Self {
+            graph: error
+                .filter(|e| e.code == ErrorCode::Limit)
+                .cloned()
+                .map_or_else(
+                    || {
+                        Ok(AgentGraph {
+                            nodes: vec![],
+                            edges: vec![],
+                        })
+                    },
+                    Err,
+                ),
+            styles: vec![],
+            cache: Some(cache),
         }
     }
 }
-fn error(message: &str) -> PeleError {
+pub(super) fn error(message: &str) -> PeleError {
     let mut e = PeleError::new(message, ErrorCode::Semantic);
     e.diagram_type = Some("agentflow".into());
     e
 }
-fn limit() -> PeleError {
+pub(super) fn limit() -> PeleError {
     let mut e = error("AgentFlow public model expansion exceeds the work budget");
     e.code = ErrorCode::Limit;
     e
@@ -114,12 +137,40 @@ pub(crate) fn render_detached<R: LiveRenderRead>(
     read: &mut R,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PublicError> {
-    let graph = input.graph.as_ref().map_err(Clone::clone)?;
-    let styles = input
-        .styles
-        .iter()
-        .map(|id| id.map(|id| read.retained_graph_value(id)).transpose())
-        .collect::<Result<Vec<_>, _>>()?;
+    let parsed_graph = input.graph.as_ref().map_err(Clone::clone)?;
+    let built = if let Some(cache) = &input.cache {
+        let existing = cache
+            .lock()
+            .map_err(|_| error("Agentflow graph cache unavailable"))?
+            .clone();
+        Some(if let Some(existing) = existing {
+            existing
+        } else {
+            // No cache lock, owner borrow or placeholder is held while log can
+            // reenter. A failed outer build leaves any completed nested cache.
+            let built = std::sync::Arc::new(super::live_builder::build(read, resources, config)?);
+            *cache
+                .lock()
+                .map_err(|_| error("Agentflow graph cache unavailable"))? = Some(built.clone());
+            built
+        })
+    } else {
+        None
+    };
+    let graph = built.as_ref().map_or(parsed_graph, |b| &b.graph);
+    let styles = if let Some(built) = &built {
+        built
+            .styles
+            .iter()
+            .map(|id| id.map(|id| read.retained_value(id)).transpose())
+            .collect::<Result<Vec<_>, _>>()?
+    } else {
+        input
+            .styles
+            .iter()
+            .map(|id| id.map(|id| read.retained_graph_value(id)).transpose())
+            .collect::<Result<Vec<_>, _>>()?
+    };
     super::render::render_phases(
         &mut Host {
             read,

@@ -45,10 +45,14 @@ export function hostReply(bridge,value){
   return [5,retainHostValue(bridge.hostLedger,value)];
 }
 export function performHostOperation(bridge,operation){
-  if(operation.kind==='get')return bridge.value(operation.receiver)[operation.key];
+  if(operation.kind==='get'){
+    const receiver=bridge.value(operation.receiver);
+    if(receiver==null&&operation.errorExpression)throw expressionError(operation.errorExpression,receiver);
+    return receiver[operation.key];
+  }
   if(operation.kind==='call'){
     const callable=bridge.value(operation.function),receiver=bridge.value(operation.receiver);
-    if(typeof callable!=='function')throw new TypeError(operation.notCallableError);
+    if(typeof callable!=='function')throw operation.errorExpression?expressionError(operation.errorExpression,callable):new TypeError(operation.notCallableError);
     const returned=Reflect.apply(callable,receiver,operation.arguments.map(value=>bridge.value(value)));
     return operation.result==='discard'?undefined:returned;
   }
@@ -79,3 +83,29 @@ export function releaseJobValues(ledger,tokens,graph){
   }
   for(const id of tokens)if(!referenced.has(id)){delete ledger.values[id];ledger.freeTemporary.push(id);}
 }
+
+// These fixed expressions only run on an already-proven invalid operand. They
+// perform no caller getter, coercion, producer call or diagram computation.
+// Keep source spelling: JS engines include it in their native TypeError text.
+function optionsWarn(){return this.options.warn;}
+function optionalWarnStyle(s){return this.options.warn?.(`Style applied to unknown node "${s}". This may indicate a typo. The node will be created automatically.`);}
+function warnProducer(e){return this.options.warn(e());}
+function producer(e){return e();}
+function warnReferences(e,a){return this.warn(()=>`Gantt: "${e}" refers to task ids that do not exist: ${a.join(", ")}.`);}
+function warnDuration(s,a){return this.warn(()=>`Gantt: "${s}" is neither a date in the "${a}" format nor a duration such as "3d", so the task gets no duration.`);}
+function expressionError(expression,value){
+  if(expression==='thisOptionsWarn' ? value!=null : typeof value==='function')throw new TypeError('Invalid native error expression operand');
+  try {
+    switch(expression){
+      case 'thisOptionsWarn':Reflect.apply(optionsWarn,{options:value},[]);break;
+      case 'optionalWarnStyle':Reflect.apply(optionalWarnStyle,{options:{warn:value}},['']);break;
+      case 'warnProducer':Reflect.apply(warnProducer,{options:{warn:value}},[()=>undefined]);break;
+      case 'producer':producer(value);break;
+      case 'warnReferences':Reflect.apply(warnReferences,{warn:value},['',[]]);break;
+      case 'warnDuration':Reflect.apply(warnDuration,{warn:value},['','']);break;
+      default:throw new TypeError('Unknown native error expression');
+    }
+  }catch(error){return error;}
+  throw new TypeError('Native error expression did not throw');
+}
+export function materializeHostError(bridge,context){return expressionError(context.expression,bridge.value(context.value));}

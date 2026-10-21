@@ -1,6 +1,8 @@
 //! AgentFlow, complete Pele agentflow/* 458322a5 translation (MIT, kepano).
 mod graph;
+mod graph_source;
 mod lexer;
+mod live_builder;
 mod model;
 mod parser;
 mod render;

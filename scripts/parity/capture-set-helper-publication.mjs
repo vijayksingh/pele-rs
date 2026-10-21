@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+const sha=b=>createHash('sha256').update(b).digest('hex'),pin='d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d';
+if(sha(fs.readFileSync('node_modules/pele/dist/pele.js'))!==pin)throw Error('Oracle changed');
+const support=process.argv[2]??'tests/web/support/set-helper-publication.js',output=process.argv[3]??'fixtures/public-set-helper-publication.json';
+const {MODES,runSetHelper}=await import(pathToFileURL(path.resolve(support)));
+const core=await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/core.js'))),entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/sequence.js')))).default;core.register(entry);
+const rows=[];for(const raw of [false,true])for(const mode of MODES)rows.push(runSetHelper(core,entry,()=>{},raw,mode));
+fs.writeFileSync(output,JSON.stringify({oracleSHA256:pin,driverSHA256:sha(fs.readFileSync(support)),rows},null,2)+'\n');
+console.log(JSON.stringify({rows:rows.length,fired:rows.filter(r=>r.fired).length,aliases:rows.filter(r=>r.identity&&r.hasAddedActor).length,remaining:rows.map(r=>({raw:r.raw,mode:r.mode,remaining:r.remaining}))}));

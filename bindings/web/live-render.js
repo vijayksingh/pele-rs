@@ -8,6 +8,15 @@
 // explicit unsupported cases, never invoked as part of this preflight.
 const intrinsicArrayJoin = Array.prototype.join;
 const IntrinsicDate = Date;
+const intrinsicDefineProperty = Object.defineProperty;
+// The allocator owns no values. Tokens are unique across owners and never reused.
+let nextRetainedToken = 1;
+const retainedValues = new WeakMap();
+export function releaseLiveRenderValues(bridge) {
+  const values = retainedValues.get(bridge);
+  if (values) values.clear();
+  retainedValues.delete(bridge);
+}
 function boundedOrdinaryJoin(value, separator) {
   const unsupported = () => { throw new TypeError('Live array join requires ordinary scalar data entries'); };
   if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype ||
@@ -63,10 +72,16 @@ export function liveRenderRead(capture, bridge) {
         case 7: return value.get(key);
         case 9: return boundedOrdinaryJoin(value, key);
         case 13: {
-          const [receiver, args, notCallable, dateIndices = []] = key;
+          const [receiver, args, notCallable, dateIndices = [], records = []] = key;
           // Native code supplies scalar milliseconds. Each argument becomes one
           // fresh Date before the call, so retained host references keep identity.
           for (const index of dateIndices) args[index] = new IntrinsicDate(args[index]);
+          for (const [index, fields] of records) {
+            const record = {};
+            for (const [name, field] of fields) intrinsicDefineProperty(record, name,
+              {value: field, writable: true, enumerable: true, configurable: true});
+            args[index] = record;
+          }
           if (typeof value !== 'function') throw new TypeError(notCallable);
           return Reflect.apply(value, receiver, args);
         }
@@ -107,6 +122,21 @@ export function liveRenderRead(capture, bridge) {
             throw new TypeError('Invalid retained graph node');
           }
           return bridge.objects[key];
+        }
+        case 19: {
+          if (!bridge || bridge.disposed) throw new TypeError('Retained live value owner is disposed');
+          let values = retainedValues.get(bridge);
+          if ((values?.size ?? 0) >= 1_000_000 || nextRetainedToken > 0xffffffff) return null;
+          if (!values) { values = new Map(); retainedValues.set(bridge, values); }
+          const token = nextRetainedToken++;
+          values.set(token, value);
+          return token;
+        }
+        case 20: {
+          const values = bridge && !bridge.disposed && retainedValues.get(bridge);
+          if (!Number.isInteger(key) || key < 1 || key > 0xffffffff || !values || !values.has(key))
+            throw new TypeError('Foreign or disposed retained live value');
+          return values.get(key);
         }
         case 18: return +value;
         case 12: return Array.isArray(value);

@@ -107,7 +107,8 @@ impl MutableDocument {
             let step = self
                 .inner
                 .resume_detached_invocation(&mut job.inner, reply)?;
-            let metadata = job.resource.metadata(step);
+            let mut metadata = job.resource.metadata(step);
+            error_context_metadata(&mut metadata, job.inner.error_context());
             let metadata = render_numbers::encode(&metadata)?;
             let graph = self.inner.snapshot_read()?.into_model()?;
             pele::compat::public::encode_binary_exchange(
@@ -302,5 +303,19 @@ impl PublicInvocationJob {
         resource: &mut PublicInvocationResource,
     ) -> Result<(), JsValue> {
         self.resource.accept(resource)
+    }
+}
+
+/// Expression metadata changes no operation, graph, revision or native result.
+pub(super) fn error_context_metadata(
+    metadata: &mut serde_json::Value,
+    context: Option<&pele::compat::public::PublicHostErrorContext>,
+) {
+    if let Some(context) = context {
+        if let Some(host) = metadata.get_mut("host") {
+            host["errorExpression"] = serde_json::json!(context.expression);
+        } else if metadata.get("complete") == Some(&serde_json::Value::Bool(true)) {
+            metadata["errorContext"] = serde_json::json!(context);
+        }
     }
 }

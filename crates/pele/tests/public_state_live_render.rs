@@ -80,6 +80,38 @@ impl LiveRenderRead for Read {
     }
     fn get(&mut self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
         self.reads.borrow_mut().push(json!(key));
+        if key == "direction" {
+            if let Value::Atom(Atom::Ref(id)) = receiver {
+                let graph = self.graph.borrow();
+                let node = &graph.nodes[*id as usize];
+                if matches!(
+                    node,
+                    Node::Instance {
+                        prototype: PrototypeId(1),
+                        ..
+                    }
+                ) && !node
+                    .properties()
+                    .iter()
+                    .any(|p| graph.strings[p.key as usize].is(key))
+                {
+                    // Test host uses the public native getter capability, not a
+                    // second handwritten State direction algorithm.
+                    let owner = PublicDocument::from_graph(
+                        pele::compat::diagrams::state::State,
+                        graph.clone(),
+                        Object::default(),
+                    )?;
+                    return match owner
+                        .read_declared_getter(&Atom::Ref(*id), MethodId(1))
+                        .expect("State getter")?
+                    {
+                        PublicActiveValue::String(text) => Ok(Value::String(text)),
+                        PublicActiveValue::Atom(atom) => Ok(self.own(atom)),
+                    };
+                }
+            }
+        }
         Ok(match receiver {
             Value::Atom(atom) => self.own(field(&self.graph.borrow(), atom, key)),
             _ => Value::Atom(Atom::Undefined),
@@ -622,5 +654,215 @@ fn state_live_identity_fields_nested_callbacks_and_recovery_match_oracle() {
             &case["recovery"],
         );
         assert_json(&json!(plain.trace), &case["recoveryTrace"]);
+    }
+}
+
+struct DirectionCallback<'a> {
+    doc: &'a mut PublicDocument,
+    graph: Rc<RefCell<ModelGraph>>,
+    mode: &'a str,
+    fired: bool,
+    plain: Plain,
+}
+impl RenderResources for DirectionCallback<'_> {
+    fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
+        let width = self.plain.text_width(request)?;
+        if !self.fired {
+            self.fired = true;
+            if self.mode == "callback-undefined" {
+                let mut graph = self.doc.snapshot()?;
+                let root = id(&graph.root);
+                set(&mut graph, root, "direction", Atom::Undefined);
+                let key = graph
+                    .strings
+                    .iter()
+                    .position(|s| s.is("direction"))
+                    .unwrap() as u32;
+                graph.nodes[root as usize]
+                    .properties_mut()
+                    .iter_mut()
+                    .find(|p| p.key == key)
+                    .unwrap()
+                    .flags = 6;
+                self.doc.apply(self.doc.revision(), graph)?;
+            } else if self.mode == "callback-helper" {
+                let mut graph = self.doc.snapshot()?;
+                let argument = text(&mut graph, "TB");
+                self.doc.apply(self.doc.revision(), graph)?;
+                self.doc
+                    .invoke(
+                        self.doc.revision(),
+                        MethodCall {
+                            method: MethodId(14),
+                            receiver: self.doc.snapshot()?.root,
+                            arguments: vec![argument],
+                        },
+                        &mut Plain::default(),
+                    )
+                    .map_err(|e| PeleError::new(format!("{e:?}"), ErrorCode::Semantic))?
+                    .result
+                    .map_err(|e| PeleError::new(format!("{e:?}"), ErrorCode::Semantic))?;
+            }
+            *self.graph.borrow_mut() = self.doc.snapshot()?;
+        }
+        Ok(width)
+    }
+}
+#[test]
+fn state_declared_direction_getter_preserves_own_shadowing_and_callback_repair() {
+    let fixture: Json = serde_json::from_str(include_str!(
+        "../../../fixtures/public-state-direction-accessor.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["rows"].as_array().unwrap().len(), 20);
+    for expected in fixture["rows"].as_array().unwrap() {
+        let mode = expected["mode"].as_str().unwrap();
+        if mode.starts_with("getter-") {
+            continue;
+        } // Browser exercises live host accessors.
+        let raw = expected["raw"].as_bool().unwrap();
+        let mut document = PublicEngine::with_builtins()
+            .parse(fixture["source"].as_str().unwrap(), &Default::default())
+            .unwrap();
+        let mut graph = document.snapshot().unwrap();
+        let root = id(&graph.root);
+        if mode == "last-direction" {
+            let doc = field(&graph, &graph.root, "rootDoc");
+            let item = input(&mut graph, &json!({"stmt":"dir","value":"TB"}));
+            append(&mut graph, id(&doc), item);
+        }
+        if mode == "own-undefined" || mode.starts_with("nonenumerable-") {
+            let value = if mode == "nonenumerable-TB" {
+                text(&mut graph, "TB")
+            } else {
+                Atom::Undefined
+            };
+            set(&mut graph, root, "direction", value);
+            if mode.starts_with("nonenumerable-") {
+                let key = graph
+                    .strings
+                    .iter()
+                    .position(|s| s.is("direction"))
+                    .unwrap() as u32;
+                graph.nodes[root as usize]
+                    .properties_mut()
+                    .iter_mut()
+                    .find(|p| p.key == key)
+                    .unwrap()
+                    .flags = 6;
+            }
+        }
+        document.apply(document.revision(), graph).unwrap();
+        let original = document.snapshot().unwrap();
+        let revision = document.revision();
+        let getter = document
+            .read_declared_getter(&original.root, MethodId(1))
+            .unwrap()
+            .unwrap();
+        assert!(
+            matches!(getter,PublicActiveValue::String(ref s) if s.is(if mode=="last-direction"{"TB"}else{"LR"}))
+        );
+        assert_eq!(document.revision(), revision);
+        assert_eq!(
+            serde_json::to_value(document.snapshot().unwrap()).unwrap(),
+            serde_json::to_value(&original).unwrap()
+        );
+        assert!(document
+            .read_declared_getter(&original.root, MethodId(u32::MAX))
+            .is_none());
+        let graph = Rc::new(RefCell::new(original));
+        let mut read = Read {
+            graph: graph.clone(),
+            reads: Rc::new(RefCell::new(vec![])),
+        };
+        let make_request = || {
+            let settings = RenderSettings {
+                max_width: Some(180.),
+                ..Default::default()
+            };
+            if raw {
+                DetachedRenderRequest::Raw {
+                    config: Object::default(),
+                    settings,
+                }
+            } else {
+                DetachedRenderRequest::Normal {
+                    options: RenderOptions {
+                        render: settings,
+                        ..Default::default()
+                    },
+                    limit: None,
+                    enforce_native_bytes: true,
+                }
+            }
+        };
+        let job = document
+            .prepare_detached_render(document.revision(), make_request())
+            .unwrap()
+            .unwrap();
+        let mut resources = DirectionCallback {
+            doc: &mut document,
+            graph: graph.clone(),
+            mode,
+            fired: false,
+            plain: Plain::default(),
+        };
+        let completed = job.run(&mut read, &mut resources);
+        let trace = resources.plain.trace.clone();
+        assert!(resources.fired);
+        drop(resources);
+        let output = document
+            .finish_detached_render(completed)
+            .unwrap()
+            .result
+            .unwrap();
+        let actual = drawing(&rendered(output));
+        for key in ["svg", "width", "height", "links"] {
+            assert_eq!(actual[key], expected["first"][key], "{raw}/{mode}/{key}");
+        }
+        assert_eq!(json!(trace), expected["trace"], "{raw}/{mode}/trace");
+        let mut repaired = document.snapshot().unwrap();
+        let root = id(&repaired.root);
+        let key = repaired
+            .strings
+            .iter()
+            .position(|s| s.is("direction"))
+            .map(|i| i as u32);
+        repaired.nodes[root as usize]
+            .properties_mut()
+            .retain(|p| Some(p.key) != key);
+        let value = text(&mut repaired, "LR");
+        document.apply(document.revision(), repaired).unwrap();
+        document
+            .invoke(
+                document.revision(),
+                MethodCall {
+                    method: MethodId(14),
+                    receiver: Atom::Ref(root),
+                    arguments: vec![value],
+                },
+                &mut Plain::default(),
+            )
+            .unwrap()
+            .result
+            .unwrap();
+        *graph.borrow_mut() = document.snapshot().unwrap();
+        let job = document
+            .prepare_detached_render(document.revision(), make_request())
+            .unwrap()
+            .unwrap();
+        let mut plain = Plain::default();
+        let completed = job.run(&mut read, &mut plain);
+        let output = document
+            .finish_detached_render(completed)
+            .unwrap()
+            .result
+            .unwrap();
+        assert_eq!(
+            drawing(&rendered(output)),
+            expected["recovery"],
+            "{raw}/{mode}/recovery"
+        );
+        assert_eq!(json!(plain.trace), expected["recoveryTrace"]);
     }
 }

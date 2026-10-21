@@ -111,7 +111,11 @@ impl PublicConstructorJob {
         let mut run = || -> Result<Vec<u8>, PeleError> {
             let reply = self.resource.reply(reply_state, value_tag, &value)?;
             let step = self.inner.resume(reply)?;
-            let metadata = self.resource.metadata(step);
+            let mut metadata = self.resource.metadata(step);
+            super::detached_invocation::error_context_metadata(
+                &mut metadata,
+                self.inner.error_context(),
+            );
             self.frame(&metadata)
         };
         run().map_err(failure)

@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import {pathToFileURL} from 'node:url';
+import path from 'node:path';
+import {createHash} from 'node:crypto';
+import {MODES,runConstructedAgentflow} from '../../tests/web/support/agentflow-constructed-scenarios.js';
+const hash=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const oracleSHA256='d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d';
+if(hash('node_modules/pele/dist/pele.js')!==oracleSHA256)throw Error('Oracle changed');
+const entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/agentflow.js')))).default;
+const C=entry.parse('agentflow-beta LR\nA[Alpha] --> B[Beta]',{},undefined,0,{maxEdges:500}).constructor,rows=[];
+for(const trigger of ['shape','containment'])for(const mode of MODES)rows.push(runConstructedAgentflow(entry,C,()=>{},trigger,mode));
+fs.writeFileSync('fixtures/public-agentflow-constructed-live.json',JSON.stringify({oracleSHA256,scriptSHA256:hash(new URL(import.meta.url)),rows},null,2)+'\n');
+console.log(JSON.stringify({rows:rows.length,activated:rows.filter(r=>r.fired).length,originalThrows:rows.filter(r=>r.first.original).length,unexpected:rows.filter(r=>!r.first.ok&&!r.first.original).length}));

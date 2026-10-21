@@ -437,27 +437,6 @@ impl PublicDiagramModule for GitGraph {
         &self,
         state: &Self::PublicState,
     ) -> Option<crate::compat::public::DetachedPublicRender> {
-        // The existing typed importer supports Set and String tags. Until the live reader has
-        // an iterator carrier, retain that renderer rather than reject admitted iterables.
-        if let Ok(Some(Atom::Ref(commits))) = state.graph.field("commits") {
-            if let Some(Node::Map { entries, .. }) = state.graph.nodes.get(*commits as usize) {
-                if entries.iter().any(|(_, value)| {
-                    let Atom::Ref(commit) = value else {
-                        return false;
-                    };
-                    match field(&state.graph, *commit, "tags") {
-                        Some(Atom::String(_)) => true,
-                        Some(Atom::Ref(tags)) => matches!(
-                            state.graph.nodes.get(*tags as usize),
-                            Some(Node::Set { .. })
-                        ),
-                        _ => false,
-                    }
-                }) {
-                    return None;
-                }
-            }
-        }
         Some(crate::compat::public::DetachedPublicRender::git_graph(
             super::GitGraphDetachedInput::new(state.model.as_ref().err()),
         ))

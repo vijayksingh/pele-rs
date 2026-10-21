@@ -29,6 +29,7 @@ enum Val {
     Atom(Atom),
     Text(JsString),
     Copy(Arc<Vec<(String, Val)>>),
+    Iterator(Rc<RefCell<(Val, usize, bool)>>),
 }
 struct Read(Rc<RefCell<ModelGraph>>);
 impl Read {
@@ -78,6 +79,73 @@ impl LiveRenderRead for Read {
             Val::Copy(p) => p.iter().any(|(key, _)| key == &k),
             _ => false,
         })
+    }
+    fn iterator_begin(&mut self, value: &Val) -> Result<Val, PublicError> {
+        Ok(Val::Iterator(Rc::new(RefCell::new((
+            value.clone(),
+            0,
+            false,
+        )))))
+    }
+    fn iterator_next(&mut self, value: &Val) -> Result<Option<Val>, PublicError> {
+        let Val::Iterator(cursor) = value else {
+            panic!("iterator")
+        };
+        let mut cursor = cursor.borrow_mut();
+        if cursor.2 {
+            return Ok(None);
+        }
+        let index = cursor.1;
+        let (value, step) = match &cursor.0 {
+            Val::Text(text) => {
+                if let Some(&first) = text.0.get(index) {
+                    let step = if (0xd800..=0xdbff).contains(&first)
+                        && text
+                            .0
+                            .get(index + 1)
+                            .is_some_and(|unit| (0xdc00..=0xdfff).contains(unit))
+                    {
+                        2
+                    } else {
+                        1
+                    };
+                    (
+                        Some(Val::Text(JsString(text.0[index..index + step].to_vec()))),
+                        step,
+                    )
+                } else {
+                    (None, 0)
+                }
+            }
+            Val::Atom(Atom::Ref(id)) => {
+                let graph = self.0.borrow();
+                match &graph.nodes[*id as usize] {
+                    Node::Set { values, .. } => {
+                        (values.get(index).cloned().map(|value| self.own(value)), 1)
+                    }
+                    Node::Array { length, .. } if index < *length as usize => (
+                        Some(self.own(field(&graph, &Atom::Ref(*id), &index.to_string()))),
+                        1,
+                    ),
+                    Node::Array { .. } => (None, 0),
+                    _ => panic!("ordinary iterable"),
+                }
+            }
+            _ => panic!("ordinary iterable"),
+        };
+        if value.is_some() {
+            cursor.1 += step;
+        } else {
+            cursor.2 = true;
+        }
+        Ok(value)
+    }
+    fn iterator_close(&mut self, value: &Val) -> Result<(), PublicError> {
+        let Val::Iterator(cursor) = value else {
+            panic!("iterator")
+        };
+        cursor.borrow_mut().2 = true;
+        Ok(())
     }
     fn snapshot_map_values(&mut self, v: &Val, max: usize) -> Result<Vec<Val>, PublicError> {
         let Val::Atom(Atom::Ref(id)) = v else {

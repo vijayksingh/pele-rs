@@ -19,6 +19,13 @@ impl SequenceKey {
 pub(super) trait PhaseInput {
     type Error: From<PeleError>;
     type Value: Clone;
+    type TagIterator;
+    fn tags_begin(&mut self, value: &Self::Value) -> Result<Self::TagIterator, Self::Error>;
+    fn tags_next(
+        &mut self,
+        iterator: &mut Self::TagIterator,
+    ) -> Result<Option<Self::Value>, Self::Error>;
+    fn tags_close(&mut self, iterator: &mut Self::TagIterator) -> Result<(), Self::Error>;
     fn begin_draw(&mut self) {}
     fn root(&mut self) -> Self::Value;
     fn get(&mut self, v: &Self::Value, key: &'static str) -> Result<Self::Value, Self::Error>;
@@ -106,6 +113,23 @@ pub(super) struct Typed<'a>(pub &'a GitModel);
 impl<'a> PhaseInput for Typed<'a> {
     type Error = PeleError;
     type Value = TypedValue<'a>;
+    type TagIterator = std::slice::Iter<'a, String>;
+    fn tags_begin(&mut self, value: &Self::Value) -> Result<Self::TagIterator, PeleError> {
+        let TypedValue::Strings(values) = value else {
+            unreachable!("typed tags")
+        };
+        Ok(values.iter())
+    }
+    fn tags_next(
+        &mut self,
+        iterator: &mut Self::TagIterator,
+    ) -> Result<Option<Self::Value>, PeleError> {
+        Ok(iterator.next().map(|value| TypedValue::Text(value)))
+    }
+    fn tags_close(&mut self, _: &mut Self::TagIterator) -> Result<(), PeleError> {
+        Ok(())
+    }
+
     fn root(&mut self) -> Self::Value {
         TypedValue::Root(self.0)
     }

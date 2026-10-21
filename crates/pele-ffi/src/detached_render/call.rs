@@ -142,6 +142,16 @@ impl Reader {
     pub(super) fn date_argument(&self, milliseconds: f64) -> Result<Value, PublicError> {
         atom(self.owner, &self.access, Op::Date(milliseconds)).map(Value::Atom)
     }
+    pub(super) fn record_argument(
+        &self,
+        fields: &[(JsString, Value)],
+    ) -> Result<Value, PublicError> {
+        let mut values = Vec::with_capacity(fields.len());
+        for (key, value) in fields {
+            values.push((key.clone(), self.argument_atom(value)?));
+        }
+        atom(self.owner, &self.access, Op::Record(values)).map(Value::Atom)
+    }
     pub(super) fn argument_atom(&self, v: &Value) -> Result<Atom, PublicError> {
         match v {
             Value::Atom(v) => Ok(v.clone()),

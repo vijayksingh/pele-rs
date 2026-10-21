@@ -8,6 +8,7 @@ use super::{
 #[derive(Clone, Copy)]
 enum Kind {
     Map,
+    Set,
     Array,
 }
 enum Source {
@@ -33,23 +34,23 @@ impl Reader {
                 let document = unsafe { public::document(self.owner) }?;
                 let graph = document.snapshot_read()?;
                 let read = graph.reader();
-                let kind = match read.header(*id as usize)?.kind {
-                    GraphNodeKind::Map(_) => Kind::Map,
-                    GraphNodeKind::Array(_) => Kind::Array,
-                    _ => {
-                        return Err(invalid(
-                            "Native live iteration requires an ordinary Map, Array or String",
+                let kind =
+                    match read.header(*id as usize)?.kind {
+                        GraphNodeKind::Map(_) => Kind::Map,
+                        GraphNodeKind::Set(_) => Kind::Set,
+                        GraphNodeKind::Array(_) => Kind::Array,
+                        _ => return Err(invalid(
+                            "Native live iteration requires an ordinary Map, Set, Array or String",
                         )
-                        .into())
-                    }
-                };
+                        .into()),
+                    };
                 Source::Node(*id, kind)
             }
             Value::Sequence(v) => Source::Sequence(Arc::clone(v)),
             Value::String(v) => Source::String(Arc::clone(v)),
             _ => {
                 return Err(invalid(
-                    "Native live iteration requires an ordinary Map, Array or String",
+                    "Native live iteration requires an ordinary Map, Set, Array or String",
                 )
                 .into())
             }
@@ -128,6 +129,24 @@ impl Reader {
                                 Ok(())
                             })?;
                             Ok((pair, 1))
+                        }
+                        (Kind::Set, GraphNodeKind::Set(length)) => {
+                            if index >= length {
+                                return Ok((None, 0));
+                            }
+                            let mut value = None;
+                            let mut strings = HashMap::new();
+                            read.set_values(*id as usize, index, &mut |values| {
+                                if values.len() > length - index {
+                                    return Err(invalid("Invalid captured Set batch"));
+                                }
+                                let item = values
+                                    .first()
+                                    .ok_or_else(|| invalid("Invalid captured Set batch"))?;
+                                value = Some(capture_value(read, item, &mut strings)?);
+                                Ok(())
+                            })?;
+                            Ok((value, 1))
                         }
                         (Kind::Array, GraphNodeKind::Array(length)) => {
                             if index >= length as usize {

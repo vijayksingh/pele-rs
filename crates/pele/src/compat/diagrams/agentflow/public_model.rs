@@ -203,6 +203,7 @@ static SCHEMA: ModelSchema = ModelSchema {
 pub struct AgentflowPublicState {
     graph: ModelGraph,
     base: Option<AgentflowModel>,
+    constructed_cache: super::live_builder::Cache,
     style_bindings: Vec<Option<u32>>,
     projected: Result<AgentflowModel, PeleError>,
 }
@@ -3051,6 +3052,7 @@ fn create_state(
     Ok(AgentflowPublicState {
         graph,
         base: Some(m.clone()),
+        constructed_cache: super::live_builder::cache(),
         style_bindings,
         projected,
     })
@@ -3076,6 +3078,7 @@ fn constructor_state(
     Ok(AgentflowPublicState {
         graph,
         base: None,
+        constructed_cache: super::live_builder::cache(),
         style_bindings: vec![],
         projected: Err(error("AgentFlow constructed graph has not been projected")),
     })
@@ -3152,7 +3155,14 @@ impl PublicDiagramModule for AgentFlow {
         Some(DetachedRenderCapability::agentflow())
     }
     fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
-        let base = state.base.as_ref()?;
+        let Some(base) = state.base.as_ref() else {
+            return Some(DetachedPublicRender::agentflow(
+                super::AgentflowDetachedInput::constructed(
+                    state.constructed_cache.clone(),
+                    state.projected.as_ref().err(),
+                ),
+            ));
+        };
         let graph = base.graph.as_ref()?;
         Some(DetachedPublicRender::agentflow(
             super::AgentflowDetachedInput::new(
@@ -3161,6 +3171,118 @@ impl PublicDiagramModule for AgentFlow {
                 state.projected.as_ref().err(),
             ),
         ))
+    }
+
+    fn active_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        operation: PublicActiveOperation,
+        budget: &mut PublicActiveBudget,
+    ) -> Result<PublicActiveValue, PublicError> {
+        fn validate(g: &ModelGraph, v: &Atom) -> Result<(), PublicError> {
+            g.validate_atom(v)?;
+            if let Atom::BuiltinFunction(id) = v {
+                if SCHEMA.method(MethodId(*id)).is_none() {
+                    return Err(error("Unknown public builtin function").into());
+                }
+            }
+            Ok(())
+        }
+        fn charge(b: &mut PublicActiveBudget, n: usize) -> Result<(), PublicError> {
+            if n > b.remaining {
+                return Err(limit().into());
+            }
+            b.remaining -= n;
+            Ok(())
+        }
+        charge(budget, 1)?;
+        let result = (|| {
+            Ok(PublicActiveValue::Atom(match operation {
+                PublicActiveOperation::Validate(v) => {
+                    validate(&state.graph, &v)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Intern(s) => {
+                    charge(budget, s.0.len())?;
+                    Arena::new(&mut state.graph).string(s)?
+                }
+                PublicActiveOperation::String(v) => {
+                    validate(&state.graph, &v)?;
+                    let Atom::String(id) = v else {
+                        return Err(ty("Active model value is not a string"));
+                    };
+                    let s = &state.graph.strings[id as usize];
+                    charge(budget, s.0.len())?;
+                    return Ok(PublicActiveValue::String(s.clone()));
+                }
+                PublicActiveOperation::Object => Atom::Ref(Arena::new(&mut state.graph).object()?),
+                PublicActiveOperation::Record(fields) => {
+                    let units = fields
+                        .iter()
+                        .fold(fields.len(), |n, (k, _)| n.saturating_add(k.0.len()));
+                    charge(budget, units)?;
+                    for (_, value) in &fields {
+                        validate(&state.graph, value)?;
+                    }
+                    let mut arena = Arena::new(&mut state.graph);
+                    if arena.work.saturating_add(fields.len()) > MAX_WORK {
+                        return Err(limit().into());
+                    }
+                    let id = arena.object()?;
+                    for (key, value) in fields {
+                        let key = arena.intern(key)?;
+                        let properties = arena.g.nodes[id as usize].properties_mut();
+                        if let Some(p) = properties.iter_mut().find(|p| p.key == key) {
+                            p.value = value
+                        } else {
+                            properties.push(Property {
+                                key,
+                                value,
+                                flags: 7,
+                            });
+                        }
+                    }
+                    Atom::Ref(id)
+                }
+                PublicActiveOperation::Read { receiver, key } => {
+                    validate(&state.graph, &receiver)?;
+                    charge(budget, key.len())?;
+                    let id = reference(&receiver)?;
+                    get(&state.graph, id, &key).clone()
+                }
+                PublicActiveOperation::Set {
+                    receiver,
+                    key,
+                    value,
+                } => {
+                    validate(&state.graph, &receiver)?;
+                    validate(&state.graph, &value)?;
+                    charge(budget, key.len())?;
+                    let id = reference(&receiver)?;
+                    if matches!(state.graph.nodes[id as usize], Node::Array { .. }) {
+                        return Err(error(
+                            "Active Agentflow array structural edits are unavailable",
+                        )
+                        .into());
+                    }
+                    Arena::new(&mut state.graph).assign(id, &key, value)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Builtin(call) if matches!(call.method.0, 21 | 22) => {
+                    validate(&state.graph, &call.receiver)?;
+                    for v in &call.arguments {
+                        validate(&state.graph, v)?;
+                    }
+                    charge(budget, state.graph.nodes.len())?;
+                    invoke(&mut state.graph, call)?
+                }
+                _ => return Err(error("Owned Agentflow active operation is unavailable").into()),
+            }))
+        })();
+        if let Some(base) = &state.base {
+            state.projected = project_render(&state.graph, base, &state.style_bindings);
+        }
+        result
     }
 
     fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
@@ -3190,6 +3312,7 @@ impl PublicDiagramModule for AgentFlow {
         Ok(AgentflowPublicState {
             graph,
             base: None,
+            constructed_cache: super::live_builder::cache(),
             style_bindings: vec![],
             projected: Err(error("AgentFlow graph has not been built")),
         })

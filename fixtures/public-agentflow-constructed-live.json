@@ -1,0 +1,2810 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "c771f9ba7871dbd08f71cd2dee8b1ce23afae11f821890d9266bee6e8d7060e2",
+  "rows": [
+    {
+      "trigger": "shape",
+      "mode": "baseline",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "title",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Changed title",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Changed title",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Changed title",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Changed title",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "later-label",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Changed Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "style-replace",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": [
+                "fill:red"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "fill:red"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "add-node",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ],
+          [
+            "C",
+            {
+              "text": "Gamma",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ],
+          [
+            "C",
+            {
+              "text": "Gamma",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "throw-object",
+      "fired": true,
+      "first": {
+        "ok": false,
+        "original": true,
+        "undefined": false
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">After cache</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "After cache",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "throw-undefined",
+      "fired": true,
+      "first": {
+        "ok": false,
+        "original": true,
+        "undefined": true
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">After cache</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "After cache",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "nested",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "shape",
+      "mode": "nested-throw",
+      "fired": true,
+      "first": {
+        "ok": false,
+        "original": true,
+        "undefined": false
+      },
+      "firstTrace": [
+        [
+          "log",
+          "error",
+          "agentflow[SHAPE_REMOVED]: shape \"circle\" was removed in v0.8.1, using \"roundedRect\""
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 172 196\" width=\"172\" height=\"196\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"86\" y=\"25.6\">Initial</tspan></text><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M86,92L86,133\"/><path class=\"pele-marker\" d=\"M86,140L82.64,132L89.36,132Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(86,68)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(86,164)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "4065800000000000",
+        "height": "4068800000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "SHAPE_REMOVED",
+            "severity": "error",
+            "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+            "nodeId": "A"
+          }
+        ],
+        "reported": [
+          [
+            "A",
+            [
+              {
+                "id": "SHAPE_REMOVED",
+                "severity": "error",
+                "message": "shape \"circle\" was removed in v0.8.1, using \"roundedRect\"",
+                "nodeId": "A"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "baseline",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "title",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Changed title",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Changed title",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Changed title",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Changed title",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "later-label",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Changed Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Changed Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Changed Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Changed Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Changed Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "style-replace",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" stroke=\"var(--pele-series-2,#f58518)\" style=\"fill:red;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": [
+                "fill:red"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" stroke=\"var(--pele-series-2,#f58518)\" style=\"fill:red;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "fill:red"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "add-node",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 448 336\" width=\"448\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"224\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"C\" transform=\"translate(362,186)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Gamma</text></g></g></svg>",
+        "width": "407c000000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Gamma",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ],
+          [
+            "C",
+            {
+              "text": "Gamma",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 448 336\" width=\"448\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"224\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"C\" transform=\"translate(362,186)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Gamma</text></g></g></svg>",
+        "width": "407c000000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Gamma",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ],
+          [
+            "C",
+            {
+              "text": "Gamma",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "throw-object",
+      "fired": true,
+      "first": {
+        "ok": false,
+        "original": true,
+        "undefined": false
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">After cache</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "After cache",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "throw-undefined",
+      "fired": true,
+      "first": {
+        "ok": false,
+        "original": true,
+        "undefined": true
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": null,
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">After cache</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "After cache",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "nested",
+      "fired": true,
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    },
+    {
+      "trigger": "containment",
+      "mode": "nested-throw",
+      "fired": true,
+      "first": {
+        "ok": false,
+        "original": true,
+        "undefined": false
+      },
+      "firstTrace": [
+        [
+          "log",
+          "warning",
+          "agentflow[CONTAINMENT_VIOLATION]: Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped."
+        ],
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "Beta",
+              "styles": []
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": []
+      },
+      "nested": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recovery": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-agentflow\" viewBox=\"0 0 252 336\" width=\"252\" height=\"336\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_r:var(--pele-radius,4px);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"agentflow\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"126\" y=\"25.6\">Initial</tspan></text><g class=\"pele-clusters\"><g class=\"pele-cluster pele-flow\" data-id=\"Y\"><rect x=\"8\" y=\"44\" width=\"236\" height=\"284\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"55.6\" y=\"69.6\" text-anchor=\"middle\">Group Y</text></g><g class=\"pele-cluster pele-flow\" data-id=\"X\"><rect x=\"28\" y=\"84\" width=\"196\" height=\"128\" fill=\"var(--pele-series-8,#9d755d)\" fill-opacity=\"0.06\" stroke=\"var(--pele-series-8,#9d755d)\" style=\"rx:var(--_r)\"/><text class=\"pele-cluster-label\" fill=\"var(--_m)\" x=\"75.6\" y=\"109.6\" text-anchor=\"middle\">Group X</text></g></g><g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\"><g class=\"pele-edge pele-edge-sequence\" data-id=\"L_A_B_0\"><path d=\"M126,172L126,253\"/><path class=\"pele-marker\" d=\"M126,260L122.64,252L129.36,252Z\" fill=\"var(--_l)\" stroke=\"none\"/></g></g><g class=\"pele-nodes\"><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"A\" transform=\"translate(126,148)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-node pele-shape-rounded pele-kind-task\" data-id=\"B\" transform=\"translate(126,284)\"><rect x=\"-78\" y=\"-24\" width=\"156\" height=\"48\" rx=\"12\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.14\" stroke=\"var(--pele-series-2,#f58518)\" style=\"stroke:blue;\"/><text class=\"pele-label\" x=\"0\" y=\"5.6\" text-anchor=\"middle\">Beta</text></g></g></svg>",
+        "width": "406f800000000000",
+        "height": "4075000000000000",
+        "links": []
+      },
+      "recoveryTrace": [
+        [
+          "width",
+          "Group Y",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Group X",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Alpha",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Beta",
+          "4030000000000000"
+        ],
+        [
+          "width",
+          "Initial",
+          "4030000000000000"
+        ]
+      ],
+      "afterRecovery": {
+        "title": "Initial",
+        "nodes": [
+          [
+            "A",
+            {
+              "text": "Alpha",
+              "styles": []
+            }
+          ],
+          [
+            "B",
+            {
+              "text": "After cache",
+              "styles": [
+                "stroke:blue"
+              ]
+            }
+          ]
+        ],
+        "diagnostics": [
+          {
+            "id": "CONTAINMENT_VIOLATION",
+            "severity": "warning",
+            "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+            "nodeId": "Y"
+          }
+        ],
+        "reported": [
+          [
+            "Y",
+            [
+              {
+                "id": "CONTAINMENT_VIOLATION",
+                "severity": "warning",
+                "message": "Container \"X\" cannot contain \"Y\" because \"Y\" already contains it. The nesting that would close the loop is dropped.",
+                "nodeId": "Y"
+              }
+            ]
+          ]
+        ],
+        "oldStyles": [
+          "stroke:blue"
+        ]
+      }
+    }
+  ]
+}

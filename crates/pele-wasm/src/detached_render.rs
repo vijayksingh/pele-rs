@@ -45,6 +45,8 @@ enum ReadCommand {
     IteratorClose = 16,
     RetainedGraphValue = 17,
     ToNumber = 18,
+    RetainValue = 19,
+    RetainedValue = 20,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -123,20 +125,39 @@ impl LiveRenderRead for Reader {
             return Err(PeleError::new("Live call exceeds work budget", ErrorCode::Limit).into());
         }
         let mut total = 0usize;
+        let mut fields = 0usize;
         for argument in arguments {
-            if let LiveCallArgument::Text(text) = argument {
-                total = total.checked_add(text.0.len()).ok_or_else(|| {
-                    PeleError::new("Live call exceeds text budget", ErrorCode::Limit)
-                })?;
-                if total > 16_000_000 {
-                    return Err(
-                        PeleError::new("Live call exceeds text budget", ErrorCode::Limit).into(),
-                    );
+            match argument {
+                LiveCallArgument::Text(text) => total = total.saturating_add(text.0.len()),
+                LiveCallArgument::Record(properties) => {
+                    fields = fields.saturating_add(properties.len());
+                    for (key, _) in properties {
+                        total = total.saturating_add(key.0.len());
+                    }
                 }
+                _ => {}
             }
+            if fields > 1_000_000 {
+                return Err(
+                    PeleError::new("Live call exceeds field budget", ErrorCode::Limit).into(),
+                );
+            }
+            if total > 16_000_000 {
+                return Err(
+                    PeleError::new("Live call exceeds text budget", ErrorCode::Limit).into(),
+                );
+            }
+        }
+        fn text_value(text: &JsString) -> JsValue {
+            let mut result = js_sys::JsString::from("");
+            for chunk in text.0.chunks(4096) {
+                result = result.concat(&js_sys::JsString::from_char_code(chunk));
+            }
+            result.into()
         }
         let args = js_sys::Array::new();
         let dates = js_sys::Array::new();
+        let records = js_sys::Array::new();
         for argument in arguments {
             args.push(&match argument {
                 LiveCallArgument::Value(v) => v.clone(),
@@ -145,13 +166,20 @@ impl LiveRenderRead for Reader {
                     dates.push(&JsValue::from_f64(args.length() as f64));
                     JsValue::from_f64(*value)
                 }
-                LiveCallArgument::Text(text) => {
-                    // Bounded chunks avoid spreading an unbounded argument list in JS.
-                    let mut result = js_sys::JsString::from("");
-                    for chunk in text.0.chunks(4096) {
-                        result = result.concat(&js_sys::JsString::from_char_code(chunk));
+                LiveCallArgument::Text(text) => text_value(text),
+                LiveCallArgument::Record(properties) => {
+                    let fields = js_sys::Array::new();
+                    for (key, value) in properties {
+                        let field = js_sys::Array::new();
+                        field.push(&text_value(key));
+                        field.push(value);
+                        fields.push(&field);
                     }
-                    result.into()
+                    let record = js_sys::Array::new();
+                    record.push(&JsValue::from_f64(args.length() as f64));
+                    record.push(&fields);
+                    records.push(&record);
+                    JsValue::UNDEFINED
                 }
             });
         }
@@ -160,6 +188,7 @@ impl LiveRenderRead for Reader {
         packet.push(&args);
         packet.push(&JsValue::from_str(not_callable_error));
         packet.push(&dates);
+        packet.push(&records);
         Reader::primitive(self, ReadCommand::Call, function, &packet, 0)
     }
     fn to_number(
@@ -170,6 +199,36 @@ impl LiveRenderRead for Reader {
         Reader::primitive(self, ReadCommand::ToNumber, value, &JsValue::UNDEFINED, 0)?
             .as_f64()
             .ok_or_else(|| invalid("Invalid live numeric conversion reply").into())
+    }
+    fn retain_value(&mut self, value: &JsValue) -> Result<u32, PublicError> {
+        let slot = Reader::primitive(
+            self,
+            ReadCommand::RetainValue,
+            value,
+            &JsValue::UNDEFINED,
+            0,
+        )?;
+        if slot.is_null() {
+            return Err(
+                PeleError::new("Retained live value budget exceeded", ErrorCode::Limit).into(),
+            );
+        }
+        let slot = slot
+            .as_f64()
+            .ok_or_else(|| invalid("Invalid retained live value token"))?;
+        if !slot.is_finite() || slot < 1. || slot > u32::MAX as f64 || slot.fract() != 0. {
+            return Err(invalid("Invalid retained live value token").into());
+        }
+        Ok(slot as u32)
+    }
+    fn retained_value(&mut self, slot: u32) -> Result<JsValue, PublicError> {
+        Reader::primitive(
+            self,
+            ReadCommand::RetainedValue,
+            &JsValue::UNDEFINED,
+            &JsValue::from_f64(slot as f64),
+            0,
+        )
     }
     fn iterator_begin(&mut self, receiver: &JsValue) -> Result<JsValue, PublicError> {
         let value = Reader::primitive(

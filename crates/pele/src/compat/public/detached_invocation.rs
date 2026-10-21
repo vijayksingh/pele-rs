@@ -18,6 +18,25 @@ pub enum PublicHostResult {
     Retain,
     Value,
 }
+/// A fixed host expression whose engine-generated TypeError is observable.
+/// No expression text is executed or supplied by the caller.
+#[doc(hidden)]
+#[derive(Clone, Copy, Debug, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum PublicHostErrorExpression {
+    ThisOptionsWarn,
+    OptionalWarnStyle,
+    WarnProducer,
+    Producer,
+    WarnReferences,
+    WarnDuration,
+}
+#[doc(hidden)]
+#[derive(Clone, Debug, serde::Serialize)]
+pub struct PublicHostErrorContext {
+    pub expression: PublicHostErrorExpression,
+    pub value: Option<Atom>,
+}
 /// A primitive requested at an exact point in a native method. Hosts execute no
 /// diagram decisions; values retain their document-local graph/foreign identity.
 #[doc(hidden)]
@@ -79,6 +98,15 @@ pub enum DetachedInvocationStep {
 #[doc(hidden)]
 pub enum PublicInvocationPhase {
     Host(PublicHostOperation),
+    HostWithContext {
+        operation: PublicHostOperation,
+        expression: PublicHostErrorExpression,
+    },
+    FailedWithContext {
+        error: PublicError,
+        expression: PublicHostErrorExpression,
+        value: Atom,
+    },
     Resource(PublicResourceOperation),
     Complete(Result<Atom, PublicError>),
 }
@@ -121,9 +149,15 @@ pub struct DetachedInvocationJob {
     lease: RenderLease,
     program: DetachedPublicInvocation,
     awaiting_reply: bool,
+    error_context: Option<PublicHostErrorContext>,
     result: Option<Result<Atom, PublicError>>,
 }
 impl DetachedInvocationJob {
+    /// Metadata for the just-completed step. A reply clears it before advancing.
+    pub fn error_context(&self) -> Option<&PublicHostErrorContext> {
+        self.error_context.as_ref()
+    }
+
     pub(super) fn new(
         owner: &Arc<Mutex<RenderBook>>,
         revision: u64,
@@ -133,6 +167,7 @@ impl DetachedInvocationJob {
             lease: RenderLease::reserve(owner, revision)?,
             program,
             awaiting_reply: false,
+            error_context: None,
             result: None,
         })
     }
@@ -167,7 +202,32 @@ impl DetachedInvocationJob {
             Some(Err(error)) => PublicInvocationPhase::Complete(Err(error)),
             other => (self.program.resume)(state, other.map(Result::unwrap)),
         };
+        self.error_context = None;
         match phase {
+            PublicInvocationPhase::HostWithContext {
+                operation,
+                expression,
+            } => {
+                self.error_context = Some(PublicHostErrorContext {
+                    expression,
+                    value: None,
+                });
+                self.awaiting_reply = true;
+                Ok(DetachedInvocationStep::Host(operation))
+            }
+            PublicInvocationPhase::FailedWithContext {
+                error,
+                expression,
+                value,
+            } => {
+                self.error_context = Some(PublicHostErrorContext {
+                    expression,
+                    value: Some(value),
+                });
+                self.awaiting_reply = false;
+                self.result = Some(Err(error));
+                Ok(DetachedInvocationStep::Complete)
+            }
             PublicInvocationPhase::Host(operation) => {
                 self.awaiting_reply = true;
                 Ok(DetachedInvocationStep::Host(operation))

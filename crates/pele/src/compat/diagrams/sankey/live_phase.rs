@@ -34,6 +34,9 @@ pub enum LiveCallArgument<V> {
     Number(f64),
     /// A fresh Date, with the host's ordinary TimeClip semantics.
     Date(f64),
+    /// A fresh ordinary record with ordered, writable/enumerable/configurable
+    /// own data properties. Values are retained without inspection.
+    Record(Vec<(JsString, V)>),
 }
 /// Scalar operations only. Rust owns field selection, ordering and layout.
 #[doc(hidden)]
@@ -60,6 +63,22 @@ pub trait LiveRenderRead {
     ) -> Result<f64, PublicError> {
         Err(PeleError::new(
             "Live numeric conversion is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    /// Keep an opaque value across render jobs of this exact document. Tokens
+    /// are owner-bound and never identify canonical graph nodes.
+    fn retain_value(&mut self, _value: &Self::Value) -> Result<u32, PublicError> {
+        Err(PeleError::new(
+            "Live value retention is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    fn retained_value(&mut self, _slot: u32) -> Result<Self::Value, PublicError> {
+        Err(PeleError::new(
+            "Retained live values are not implemented",
             ErrorCode::Semantic,
         )
         .into())

@@ -51,29 +51,9 @@ impl<R: LiveRenderRead> PhaseInput for Host<'_, R> {
     fn direction(&mut self) -> Result<String, PublicError> {
         let root = self.read.root();
         let direct = self.read.get(&root, "direction")?;
-        if self.read.kind(&direct) != LiveValueKind::Undefined {
-            return Ok(self.text(&direct)?.unwrap_or_default());
-        }
-        // C15 graph coordinates cannot execute StateDb's inherited getter. Preserve its
-        // existing rootDoc derivation; own Undefined versus inherited is a scoped gap.
-        let doc = self.read.get(&root, "rootDoc")?;
-        let mut value = "TB".to_string();
-        let mut i = 0;
-        while i < self.count(&doc)? {
-            self.step()?;
-            let item = self.read.index(&doc, i)?;
-            i += 1;
-            if self.read.kind(&item) != LiveValueKind::Object {
-                continue;
-            }
-            let kind = self.read.get(&item, "stmt")?;
-            if self.text(&kind)?.as_deref() == Some("dir") {
-                let v = self.read.get(&item, "value")?;
-                value = self.text(&v)?.unwrap_or_default();
-            }
-        }
-        Ok(value)
+        Ok(self.text(&direct)?.unwrap_or_default())
     }
+
     fn link(&mut self, id: &str) -> Result<Option<(String, String)>, PublicError> {
         let root = self.read.root();
         let map = self.read.get(&root, "links")?;

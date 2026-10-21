@@ -40,6 +40,11 @@ impl PublicConstructionJob {
     }
     /// A provisional graph for the host's allocated receiver and requested values;
     /// this grants no parsed-document provenance or public constructor success.
+    pub fn error_context(&self) -> Option<&super::PublicHostErrorContext> {
+        self.invocation
+            .as_ref()
+            .and_then(DetachedInvocationJob::error_context)
+    }
     pub fn snapshot(&self) -> Result<ModelGraph, PeleError> {
         self.live()?.snapshot()
     }

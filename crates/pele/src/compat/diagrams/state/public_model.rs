@@ -604,6 +604,22 @@ fn replace(s: &JsString, from: &[u16], to: &[u16], all: bool) -> JsString {
     }
     JsString(out)
 }
+// Shared by the public getter, getDirection(), and the native live reader.
+// This reads admitted ordinary graph values only; no host call occurs here.
+fn direction_value(g: &ModelGraph, root: u32, last: bool) -> Result<Option<Atom>, PublicError> {
+    let mut result = None;
+    for item in native_dense(g, get(g, root, "rootDoc"))? {
+        if let Atom::Ref(i) = item {
+            if is(g, get(g, i, "stmt"), "dir") {
+                result = Some(get(g, i, "value").clone());
+                if !last {
+                    break;
+                }
+            }
+        }
+    }
+    Ok(result)
+}
 impl Arena<'_> {
     fn guard(&self, root: u32, name: &str, method: u32) -> Result<(), PublicError> {
         let p = self.g.nodes[root as usize]
@@ -638,18 +654,7 @@ impl Arena<'_> {
         self.map_get(self.field_id(root, key)?, id)
     }
     fn direction(&self, root: u32, last: bool) -> Result<Option<Atom>, PublicError> {
-        let mut result = None;
-        for item in native_dense(self.g, &self.field(root, "rootDoc"))? {
-            if let Atom::Ref(i) = item {
-                if is(self.g, &self.field(i, "stmt"), "dir") {
-                    result = Some(self.field(i, "value"));
-                    if !last {
-                        break;
-                    }
-                }
-            }
-        }
-        Ok(result)
+        direction_value(self.g, root, last)
     }
     fn add_state(&mut self, root: u32, args: &[Atom]) -> Result<(), PublicError> {
         let arg = |i: usize| args.get(i).cloned().unwrap_or(Atom::Undefined);
@@ -2003,6 +2008,27 @@ fn construct_default() -> Result<StatePublicState, PeleError> {
 }
 
 impl PublicDiagramModule for State {
+    fn read_public_getter(
+        &self,
+        state: &Self::PublicState,
+        receiver: &Atom,
+        method: MethodId,
+    ) -> Option<Result<PublicActiveValue, PublicError>> {
+        if method != MethodId(1) {
+            return None;
+        }
+        Some((|| {
+            state.graph.validate_atom(receiver)?;
+            let root = reference(receiver)?;
+            match direction_value(&state.graph, root, true)? {
+                Some(Atom::String(id)) => Ok(PublicActiveValue::String(
+                    state.graph.strings[id as usize].clone(),
+                )),
+                Some(value) => Ok(PublicActiveValue::Atom(value)),
+                None => Ok(PublicActiveValue::String("TB".into())),
+            }
+        })())
+    }
     fn detached_public_render_capability(
         &self,
     ) -> Option<crate::compat::public::DetachedRenderCapability> {

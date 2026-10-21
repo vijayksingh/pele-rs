@@ -16,11 +16,13 @@ const GRAPH_JSON_BUDGET: usize = 64 * 1024 * 1024;
 pub struct PelePublicDocument {
     document: Mutex<PublicDocument>,
     pub(super) host_functions: std::cell::RefCell<super::host_functions::Bindings>,
+    pub(super) retained_values: std::cell::RefCell<super::detached_render::retained::Values>,
 }
 pub(super) fn owned_document(document: PublicDocument) -> *mut PelePublicDocument {
     Box::into_raw(Box::new(PelePublicDocument {
         document: Mutex::new(document),
         host_functions: Default::default(),
+        retained_values: Default::default(),
     }))
 }
 pub(super) fn invalid(message: &str) -> PeleError {

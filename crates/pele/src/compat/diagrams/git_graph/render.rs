@@ -196,16 +196,22 @@ fn draw<P: PhaseInput>(
             });
         let mut tags = Vec::new();
         let list = input.get(&commit, "tags")?;
-        let mut i = 0;
-        while i < input.count(&list)? {
-            input.work(1)?;
-            let value = input.index(&list, i)?;
-            i += 1;
-            let tag = input.text(&value)?;
-            input.keep_label(tag.encode_utf16().count())?;
-            let label = plain_label(Some(&tag), resources, options, small, 4000., 0)?;
-            if !label.lines.is_empty() {
-                tags.push(label)
+        let mut iterator = input.tags_begin(&list)?;
+        while let Some(value) = input.tags_next(&mut iterator)? {
+            let body = (|| -> Result<_, P::Error> {
+                input.work(1)?;
+                let tag = input.text(&value)?;
+                input.keep_label(tag.encode_utf16().count())?;
+                let label = plain_label(Some(&tag), resources, options, small, 4000., 0)?;
+                if !label.lines.is_empty() {
+                    tags.push(label);
+                }
+                Ok(())
+            })();
+            if let Err(error) = body {
+                // For-of closes on abrupt body completion. The original error wins.
+                let _ = input.tags_close(&mut iterator);
+                return Err(error);
             }
         }
         // Branch is read before the commit-id label's callbacks in the object literal.

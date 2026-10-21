@@ -180,7 +180,17 @@ impl Invocation {
             Ok(match step {
                 scheduler::Step::Complete(value) => PublicInvocationPhase::Complete(Ok(value)),
                 scheduler::Step::Warning(warning) => {
-                    arena.native_method("warn")?;
+                    let expression = match &warning {
+                        scheduler::Warning::References { .. } => {
+                            PublicHostErrorExpression::WarnReferences
+                        }
+                        scheduler::Warning::Duration { .. } => {
+                            PublicHostErrorExpression::WarnDuration
+                        }
+                    };
+                    if let Some(failure) = arena.warning_expression_guard(expression)? {
+                        return Ok(failure);
+                    }
                     let mut warning = WarningInvocation {
                         phase: WarningPhase::Start {
                             receiver: self.receiver.clone(),
