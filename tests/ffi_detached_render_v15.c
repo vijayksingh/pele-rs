@@ -43,6 +43,19 @@ static void failure(PeleResult *result, const char *message) {
     pele_result_free(result);
 }
 
+static uint64_t current_revision(PelePublicDocument *document) {
+    PeleResult *result = pele_public_revision_v15(document);
+    assert(result && pele_result_status(result) == 0);
+    char *body = text(result);
+    const char *revision = strstr(body, "\"revision\":\"");
+    assert(revision);
+    revision += strlen("\"revision\":\"");
+    char *end = NULL;
+    const uint64_t value = strtoull(revision, &end, 10);
+    assert(end && *end == '\"');
+    free(body); pele_result_free(result); return value;
+}
+
 struct Context {
     PelePublicDocument *document;
     uint64_t revision;
@@ -110,10 +123,14 @@ static uint32_t flow_width(void *opaque,const uint8_t *bytes,size_t length,doubl
     struct Context *context=opaque;context->widths++;
     if(!context->entered){
         context->entered=1;success(pele_public_snapshot_v4(context->document));
+        /* Owned builtin phases may advance revision before the first width. */
+        context->revision=current_revision(context->document);
+        const uint64_t before_nested=context->revision;
         PeleDetachedRenderJobV15 *nested=NULL;
         success(pele_public_prepare_detached_render_v15(context->document,context->revision,NULL,0,NULL,3,0,&nested));assert(nested);
         success(pele_detached_render_run_v15(nested,NULL));
         outcome(pele_public_finish_detached_render_v15(context->document,nested,&context->revision),"\"Ok\":");
+        assert(context->revision>before_nested);
         pele_detached_render_job_free_v15(nested);
     }
     *value=(double)length*size*.6;return 0;
@@ -124,8 +141,10 @@ static void flow_array_consumers(void){
         PelePublicDocument *document=NULL;success(pele_public_parse_v4((const uint8_t *)sources[i],strlen(sources[i]),NULL,0,&document));
         struct Context context={document,0,0,0};PeleHostResourcesV3 resources={0};resources.base.context=&context;resources.base.width=flow_width;PeleDetachedRenderJobV15 *job=NULL;
         success(pele_public_prepare_detached_render_v15(document,0,NULL,0,NULL,3,0,&job));assert(job);success(pele_detached_render_run_v15(job,&resources));
-        assert(context.entered&&context.widths>0&&context.revision==1);
-        assert(outcome(pele_public_finish_detached_render_v15(document,job,&context.revision),"\"Ok\":")==2);
+        assert(context.entered&&context.widths>0&&context.revision>0);
+        const uint64_t before_finish=current_revision(document);
+        assert(outcome(pele_public_finish_detached_render_v15(document,job,&context.revision),"\"Ok\":")==before_finish+1);
+        assert(context.revision==before_finish+1);
         pele_detached_render_job_free_v15(job);pele_public_document_free_v4(document);
     }
 }
