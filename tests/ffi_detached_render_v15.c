@@ -140,8 +140,14 @@ int main(void) {
     success(pele_public_parse_v4((const uint8_t *)source, strlen(source), NULL, 0, &pie));
     job = NULL;
     success(pele_public_prepare_detached_render_v15(pie, 0, NULL, 0, NULL, 3, 0, &job));
-    assert(!job);
-    assert(outcome(pele_public_render_operation_with_numbers_v9(pie, 0, NULL, 0, NULL, 3, 0, NULL), "\"Ok\":") == 1);
+    /* Pie now exposes the same owned lifecycle; it no longer falls back. */
+    assert(job);
+    success(pele_detached_render_run_v15(job, NULL));
+    uint64_t pie_revision = 0;
+    assert(outcome(pele_public_finish_detached_render_v15(pie, job, &pie_revision), "\"Ok\":") == 1);
+    assert(pie_revision == 1);
+    pele_detached_render_job_free_v15(job);
+    assert(outcome(pele_public_render_operation_with_numbers_v9(pie, pie_revision, NULL, 0, NULL, 3, 0, NULL), "\"Ok\":") == 2);
     pele_public_document_free_v4(pie);
     puts("native detached render lifecycle passed");
     return 0;
