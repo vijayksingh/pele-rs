@@ -899,7 +899,7 @@ fn direction(g: &ModelGraph, a: Option<&Atom>) -> Result<char, PeleError> {
         )),
     }
 }
-fn ancestry(groups: &[(String, ArchGroup)]) -> Result<(), PeleError> {
+pub(super) fn ancestry(groups: &[(String, ArchGroup)]) -> Result<(), PeleError> {
     let ids: HashMap<_, _> = groups
         .iter()
         .enumerate()
@@ -1127,6 +1127,20 @@ fn construct_default() -> Result<ArchitecturePublicState, PeleError> {
 }
 
 impl PublicDiagramModule for Architecture {
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::architecture())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::architecture(
+            super::live_phase::ArchitectureDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,

@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Architecture,
     EventModeling,
     Usecase,
     GitGraph,
@@ -51,6 +52,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn architecture() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::architecture::Architecture>(),
+            kind: Kind::Architecture,
+        }
+    }
+
     pub(crate) fn eventmodeling() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::event_modeling::EventModeling>(),
@@ -219,6 +227,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Architecture(crate::compat::diagrams::architecture::ArchitectureDetachedInput),
     EventModeling(crate::compat::diagrams::event_modeling::EventModelingDetachedInput),
     Usecase(crate::compat::diagrams::usecase::UsecaseDetachedInput),
     GitGraph(crate::compat::diagrams::git_graph::GitGraphDetachedInput),
@@ -244,6 +253,15 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn architecture(
+        input: crate::compat::diagrams::architecture::ArchitectureDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::architecture::Architecture>(),
+            body: Body::Architecture(input),
+        }
+    }
+
     pub(crate) fn eventmodeling(
         input: crate::compat::diagrams::event_modeling::EventModelingDetachedInput,
     ) -> Self {
@@ -418,6 +436,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Architecture(_) => Kind::Architecture,
             Body::EventModeling(_) => Kind::EventModeling,
             Body::Usecase(_) => Kind::Usecase,
             Body::GitGraph(_) => Kind::GitGraph,
@@ -455,6 +474,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Architecture(input) => crate::compat::diagrams::architecture::render_detached(
+                input, read, config, settings, resources,
+            ),
             Body::EventModeling(input) => crate::compat::diagrams::event_modeling::render_detached(
                 input, config, settings, read, resources,
             ),

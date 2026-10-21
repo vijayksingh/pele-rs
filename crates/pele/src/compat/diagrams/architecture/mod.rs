@@ -31,3 +31,6 @@ impl DiagramModule for Architecture {
 
 mod public_model;
 pub use public_model::ArchitecturePublicState;
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, ArchitectureDetachedInput};
