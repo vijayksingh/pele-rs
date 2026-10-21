@@ -1,5 +1,15 @@
 # Current functional parity — incomplete (2026-10-21)
 
+C4, Requirement, Railroad, GitGraph, Usecase, Eventmodeling, Architecture, State
+and Block pass the new nine-family checkpoint: native75 scoped/final11,
+Swift33 distinct features (32 in one run plus repaired Railroad JSON observer),
+strict C3 and browser45. All496 new rows pass Swift; browsers compare1488 paired
+rows. Fresh audit matches26/33 edit/throw cases, leaving seven mismatches:
+Flowchart, Swimlane, Agentflow, Gantt, Sequence, XYChart and Class. This does not
+certify complete modules or full API parity. See
+[nine-family evidence](parity/2026-10-21-owned-graph-families/README.md).
+
+
 Kanban, Treemap, Mindmap, ER, Cynefin and Wardley now pass the fresh owned-job
 checkpoint: native46 scoped features/final8, Swift24 distinct features (23 in
 one run plus one repaired assertion rerun), strict C3 and browser54. All318 new
