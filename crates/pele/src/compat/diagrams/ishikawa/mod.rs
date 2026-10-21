@@ -1,5 +1,7 @@
 //! Ishikawa source grammar, flat outline model and dedicated fishbone geometry.
 //! Translated from Pele ishikawa/*, 458322a5 (MIT, Copyright 2026 kepano).
+mod live_phase;
+pub(crate) use live_phase::{render_detached, IshikawaDetachedInput};
 mod model;
 mod parser;
 mod render;
