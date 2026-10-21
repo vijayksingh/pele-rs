@@ -23,6 +23,7 @@ enum Value {
     Atom(Atom),
     String(Arc<JsString>),
     Sequence(Arc<[Value]>),
+    Object(Arc<[(Arc<JsString>, Value)]>),
 }
 fn invalid(message: &str) -> PeleError {
     public::invalid(message)
@@ -60,12 +61,40 @@ fn own(reader: &dyn PublicGraphRead, atom: Atom) -> Result<Value, PeleError> {
         atom => Ok(Value::Atom(atom)),
     }
 }
+fn capture_text(
+    read: &dyn PublicGraphRead,
+    id: u32,
+    strings: &mut HashMap<u32, Arc<JsString>>,
+) -> Result<Arc<JsString>, PeleError> {
+    if let Some(text) = strings.get(&id) {
+        return Ok(Arc::clone(text));
+    }
+    let text = Arc::new(string(read, id)?);
+    strings.insert(id, Arc::clone(&text));
+    Ok(text)
+}
+fn capture_value(
+    read: &dyn PublicGraphRead,
+    atom: &Atom,
+    strings: &mut HashMap<u32, Arc<JsString>>,
+) -> Result<Value, PeleError> {
+    Ok(match atom {
+        Atom::String(id) => Value::String(capture_text(read, *id, strings)?),
+        atom => Value::Atom(atom.clone()),
+    })
+}
 struct Reader {
     owner: *const PelePublicDocument,
     root: Value,
 }
 impl Reader {
     fn field(&self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
+        if let Value::Object(properties) = receiver {
+            return Ok(properties
+                .iter()
+                .find(|(name, _)| name.is(key))
+                .map_or(Value::Atom(Atom::Undefined), |(_, value)| value.clone()));
+        }
         if let Value::Sequence(values) = receiver {
             if key == "length" {
                 return Ok(Value::Atom(Atom::Number(values.len() as f64)));
@@ -152,6 +181,178 @@ impl LiveRenderRead for Reader {
     fn index(&mut self, value: &Value, index: usize) -> Result<Value, PublicError> {
         self.field(value, &index.to_string())
     }
+    fn has_index(&mut self, receiver: &Value, index: usize) -> Result<bool, PublicError> {
+        let key = index.to_string();
+        match receiver {
+            Value::Sequence(values) => return Ok(index < values.len()),
+            Value::Object(properties) => {
+                return Ok(properties.iter().any(|(name, _)| name.is(&key)))
+            }
+            Value::Atom(Atom::Ref(_)) => {}
+            _ => {
+                return Err(type_error(format!(
+                    "Cannot use 'in' operator to search for '{index}' in a primitive value"
+                )))
+            }
+        }
+        let Value::Atom(Atom::Ref(id)) = receiver else {
+            unreachable!()
+        };
+        let document = unsafe { public::document(self.owner) }?;
+        let graph = document.snapshot_read()?;
+        let read = graph.reader();
+        let header = read.header(*id as usize)?;
+        let mut start = 0;
+        while start < header.properties {
+            let mut found = false;
+            let mut count = 0;
+            read.properties(*id as usize, start, &mut |properties| {
+                count = properties.len();
+                for property in properties {
+                    if string(read, property.key)?.is(&key) {
+                        found = true;
+                        break;
+                    }
+                }
+                Ok(())
+            })?;
+            if found {
+                return Ok(true);
+            }
+            if count == 0 || count > header.properties - start {
+                return Err(invalid("Invalid captured property batch").into());
+            }
+            start += count;
+        }
+        // Native declared prototypes contain named methods, never indexed data.
+        Ok(false)
+    }
+    fn shallow_copy(&mut self, value: &Value) -> Result<Value, PublicError> {
+        let mut fields = Vec::new();
+        match value {
+            Value::Object(properties) => return Ok(Value::Object(Arc::clone(properties))),
+            Value::Sequence(values) => {
+                for (index, value) in values.iter().enumerate() {
+                    fields.push((
+                        Arc::new(JsString::from(index.to_string().as_str())),
+                        value.clone(),
+                    ));
+                }
+            }
+            Value::String(text) => {
+                if text.0.len() > 8_000_000 {
+                    return Err(PeleError::new(
+                        "Public model graph exceeds work budget",
+                        ErrorCode::Limit,
+                    )
+                    .into());
+                }
+                for (index, unit) in text.0.iter().enumerate() {
+                    fields.push((
+                        Arc::new(JsString::from(index.to_string().as_str())),
+                        Value::String(Arc::new(JsString(vec![*unit]))),
+                    ));
+                }
+            }
+            Value::Atom(Atom::Ref(id)) => {
+                let document = unsafe { public::document(self.owner) }?;
+                let graph = document.snapshot_read()?;
+                let read = graph.reader();
+                let header = read.header(*id as usize)?;
+                let mut strings = HashMap::<u32, Arc<JsString>>::new();
+                let mut start = 0;
+                while start < header.properties {
+                    let mut count = 0;
+                    read.properties(*id as usize, start, &mut |properties| {
+                        count = properties.len();
+                        if count == 0 || count > header.properties - start {
+                            return Err(invalid("Invalid captured property batch"));
+                        }
+                        for property in properties.iter().filter(|p| p.flags & 1 != 0) {
+                            let name = capture_text(read, property.key, &mut strings)?;
+                            let value = capture_value(read, &property.value, &mut strings)?;
+                            fields.push((name, value));
+                        }
+                        Ok(())
+                    })?;
+                    start += count;
+                }
+            }
+            // Object spread boxes other primitives, which own no enumerable keys.
+            _ => {}
+        }
+        Ok(Value::Object(Arc::from(fields)))
+    }
+    fn map_get(&mut self, value: &Value, key: &Value) -> Result<Value, PublicError> {
+        let Value::Atom(Atom::Ref(id)) = value else {
+            return Err(type_error("value.get is not a function".into()));
+        };
+        let document = unsafe { public::document(self.owner) }?;
+        let graph = document.snapshot_read()?;
+        let read = graph.reader();
+        let header = read.header(*id as usize)?;
+        let GraphNodeKind::Map(items) = header.kind else {
+            return Err(type_error("value.get is not a function".into()));
+        };
+        let mut start = 0;
+        while start < header.properties {
+            let mut count = 0;
+            let mut shadowed = false;
+            read.properties(*id as usize, start, &mut |properties| {
+                count = properties.len();
+                for property in properties {
+                    if string(read, property.key)?.is("get") {
+                        shadowed = true;
+                        break;
+                    }
+                }
+                Ok(())
+            })?;
+            if shadowed {
+                return Err(invalid("Native live Map get override is not implemented").into());
+            }
+            if count == 0 || count > header.properties - start {
+                return Err(invalid("Invalid captured property batch").into());
+            }
+            start += count;
+        }
+        let mut start = 0;
+        while start < items {
+            let mut count = 0;
+            let mut found = None;
+            read.map_entries(*id as usize, start, &mut |entries| {
+                count = entries.len();
+                for (entry, value) in entries {
+                    let matches = match (entry, key) {
+                        (Atom::String(id), Value::String(text)) => string(read, *id)? == **text,
+                        (Atom::Number(a), Value::Atom(Atom::Number(b))) => {
+                            a == b || (a.is_nan() && b.is_nan())
+                        }
+                        (Atom::Bool(a), Value::Atom(Atom::Bool(b))) => a == b,
+                        (Atom::Ref(a), Value::Atom(Atom::Ref(b)))
+                        | (Atom::BuiltinFunction(a), Value::Atom(Atom::BuiltinFunction(b)))
+                        | (Atom::HostReference(a), Value::Atom(Atom::HostReference(b))) => a == b,
+                        (Atom::Undefined, Value::Atom(Atom::Undefined))
+                        | (Atom::Null, Value::Atom(Atom::Null)) => true,
+                        _ => false,
+                    };
+                    if matches {
+                        found = Some(own(read, value.clone())?);
+                        break;
+                    }
+                }
+                Ok(())
+            })?;
+            if let Some(found) = found {
+                return Ok(found);
+            }
+            if count == 0 || count > items - start {
+                return Err(invalid("Invalid captured Map batch").into());
+            }
+            start += count;
+        }
+        Ok(Value::Atom(Atom::Undefined))
+    }
     fn snapshot_iterable(
         &mut self,
         value: &Value,
@@ -178,22 +379,6 @@ impl LiveRenderRead for Reader {
         // share ownership: copying each occurrence multiplies admitted text by
         // the number of Map entries before the renderer can reject a value.
         let mut strings = HashMap::<u32, Arc<JsString>>::new();
-        let mut capture = |atom: &Atom| -> Result<Value, PeleError> {
-            match atom {
-                Atom::String(id) => {
-                    let text = match strings.get(id) {
-                        Some(text) => Arc::clone(text),
-                        None => {
-                            let text = Arc::new(string(read, *id)?);
-                            strings.insert(*id, Arc::clone(&text));
-                            text
-                        }
-                    };
-                    Ok(Value::String(text))
-                }
-                atom => Ok(Value::Atom(atom.clone())),
-            }
-        };
         let mut values = Vec::with_capacity(items);
         let mut start = 0;
         while start < items {
@@ -204,7 +389,10 @@ impl LiveRenderRead for Reader {
                     return Err(invalid("Invalid captured Map batch"));
                 }
                 for (key, value) in entries {
-                    values.push(Value::Sequence(Arc::from([capture(key)?, capture(value)?])));
+                    values.push(Value::Sequence(Arc::from([
+                        capture_value(read, key, &mut strings)?,
+                        capture_value(read, value, &mut strings)?,
+                    ])));
                 }
                 Ok(())
             })?;
@@ -215,7 +403,7 @@ impl LiveRenderRead for Reader {
     fn kind(&self, value: &Value) -> LiveValueKind {
         match value {
             Value::String(_) => LiveValueKind::String,
-            Value::Sequence(_) => LiveValueKind::Object,
+            Value::Sequence(_) | Value::Object(_) => LiveValueKind::Object,
             Value::Atom(atom) => match atom {
                 Atom::Undefined => LiveValueKind::Undefined,
                 Atom::Null => LiveValueKind::Null,
