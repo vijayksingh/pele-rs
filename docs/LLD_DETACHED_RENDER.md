@@ -13,6 +13,25 @@ including owned UTF-16 strings. The default rejects unsupported readers explicit
 No C ABI or JavaScript diagram algorithm is added. Existing malformed UTF-16,
 coercion and native graph-coordinate lifetime limits remain separate.
 
+The native reader owns captured UTF-16 through snapshot-local `Arc` values.
+Repeated Map string IDs share one retained allocation, so copying entry pairs
+cannot multiply admitted catalog text before scalar validation. Each snapshot
+has a fresh cache; later graph reads observe current values.
+
+Generic live operations also include indexed membership (`has_index`), ordinary
+object spread (`shallow_copy`) and dynamic `map_get`. Their defaults explicitly
+reject readers that have not opted in. WASM requests numeric operations5/6/7;
+JavaScript executes `key in value`, `{...value}` and `value.get(key)`. Rust
+chooses all operands, ordering and family policy.
+
+C15 implements declared graph membership, captures own enumerable fields into
+an owned immutable record, and looks up admitted Map keys with SameValueZero.
+Captured records preserve child references; no document guard crosses resource
+calls. Native custom indexed prototypes, accessors and overridden Map get are
+outside this carrier's declared graph contract and are not silently emulated.
+String spread retains the existing eight-million-property work bound. These
+operations do not add a C ABI or host-side diagram algorithm.
+
 Internal builtin capability for Sankey resource callbacks. The [oracle audit](compatibility/sankey-resource-callbacks/AUDIT.md) records the previous restoration, read-order and reentry mismatches. This design is not a claim of complete compatibility or improved performance.
 
 ## Boundary
