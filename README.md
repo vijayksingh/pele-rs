@@ -18,22 +18,21 @@ v1-only engine and wrappers are removed. A new release remains on hold while the
 web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
-**The full API port is unfinished.** The current functional audit confirms
-web callback mutation gaps in four families (one edit/throw case per family). All 22 class-root families plus ClassMember
-now have constructor factories verified through Rust, Swift and the web.
-The [constructor checkpoint](docs/parity/2026-10-21-ordered-constructors/README.md)
-records fresh artifacts and platform results. Constructor metadata and shared prototype identity remain
-incomplete. See the [constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md).
-Passing tests include checks that explicitly expect unsupported behavior;
-they do not establish complete Pele parity. See the
-[remaining-work audit](docs/parity/2026-10-21-runtime-audit/README.md).
+**The full API port is unfinished.** All 33 families now have owned callback
+render paths, and the fresh web edit/throw audit matches **33/33** cases. All 22
+class-root factories plus ClassMember have Rust, Swift and web feature proof.
+Constructed-model logging, iterable edge cases, constructor reflection and exact
+browser error expressions remain active API work. See the
+[constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md).
 
-The latest Flowchart, Swimlane and XYChart checkpoint passes 26 scoped native
-features, 36 Swift features, three strict C clients and 30 browser checks. All
-192 new oracle rows pass Swift; browsers compare 576 paired rows. The fresh web
-audit matches **29/33** edit/throw cases. Remaining: Agentflow, Gantt, Sequence and
-Class. [Verification and retained failures](docs/parity/2026-10-21-owned-flow-families/README.md).
-These counts describe scoped behavior, not completed modules or full API parity.
+The latest checkpoint verifies 55 native features, 44 distinct Swift features and
+four strict C clients against fresh artifacts. Browsers pass 201 distinct checks
+across 207 attempted; six exact TypeError-message checks remain. The new matrices
+record 987 paired browser cases, with two WebKit warning rows differing only in
+error text. [Evidence, repairs and retained failures](docs/parity/2026-10-21-owned-remaining-families/README.md).
+These counts describe scoped behavior, not full API parity. Passing tests also
+include explicit unsupported-behavior checks; see the
+[remaining-work audit](docs/parity/2026-10-21-runtime-audit/README.md).
 
 Native normal/prepared Sankey resource callbacks support same-document helpers,
 edits and nested rendering. [Scoped verification](docs/parity/2026-10-21-native-sankey-callbacks/README.md)

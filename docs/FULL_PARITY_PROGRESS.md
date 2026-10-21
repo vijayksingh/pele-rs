@@ -1,5 +1,17 @@
 # Current functional parity — incomplete (2026-10-21)
 
+All 33 families now expose owned callback rendering. The fresh edit/throw audit
+matches 33/33 cases; all 22 class-root factories construct. Current checkpoint:
+native 55 distinct/final 8, Swift 44 distinct (43 together plus corrected observer),
+strict C 4, browsers 201/207 distinct. Six exact Firefox/WebKit TypeError-message
+features remain. The 987 new paired rows include 985 exact matches and two WebKit
+warning-message differences. Full API parity remains incomplete; constructed
+Agentflow, iterable tags, reflection and error expressions remain active. See
+[current evidence and retained failures](parity/2026-10-21-owned-remaining-families/README.md).
+
+## Previous checkpoints
+
+
 Flowchart, Swimlane and XYChart pass the new owned-job checkpoint: native26
 scoped features, fresh Swift36/C3 and browser30 distinct checks. All192 new rows
 pass Swift; browsers compare576 paired rows. Native C15 Array capture was fixed
