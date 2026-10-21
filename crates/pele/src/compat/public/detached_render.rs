@@ -1,5 +1,6 @@
 //! Sealed, detached builtin rendering. No document borrow survives a host call.
 use super::{engine::Registration, GraphReadView, PublicError};
+use crate::compat::diagrams::radar::{Radar, RadarDetachedInput};
 use crate::compat::{
     diagrams::info::{Info, InfoDetachedInput},
     diagrams::pie::{Pie, PieDetachedInput},
@@ -16,6 +17,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Radar,
     Info,
     Sankey,
     Pie,
@@ -27,6 +29,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn radar() -> Self {
+        Self {
+            creator: TypeId::of::<Radar>(),
+            kind: Kind::Radar,
+        }
+    }
+
     pub(crate) fn pie() -> Self {
         Self {
             creator: TypeId::of::<Pie>(),
@@ -57,11 +66,19 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Radar(RadarDetachedInput),
     Info(InfoDetachedInput),
     Sankey(SankeyDetachedInput),
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn radar(input: RadarDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<Radar>(),
+            body: Body::Radar(input),
+        }
+    }
+
     pub(crate) fn pie(input: PieDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<Pie>(),
@@ -86,6 +103,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Radar(_) => Kind::Radar,
             Body::Info(_) => Kind::Info,
             Body::Sankey(_) => Kind::Sankey,
             Body::Pie(_) => Kind::Pie,
@@ -103,6 +121,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Radar(input) => crate::compat::diagrams::radar::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Info(input) => crate::compat::diagrams::info::render_detached(
                 input, config, settings, read, resources,
             ),

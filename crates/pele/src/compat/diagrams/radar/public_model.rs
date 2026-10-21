@@ -299,6 +299,19 @@ impl PublicDiagramModule for Radar {
         state.graph = graph;
         Ok(())
     }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::radar())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::radar(
+            super::RadarDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
+    }
     fn render_public(
         &self,
         state: &mut RadarPublicState,
