@@ -33,8 +33,12 @@ static char *end_value(char *p) {
     } assert(!"incomplete JSON"); return NULL;
 }
 static uint32_t identity(void) {
-    char *s=json(pele_host_identity_v17());char *p=strstr(s,"\"Ok\":");assert(p);
-    uint32_t id=(uint32_t)strtoul(p+5,NULL,10);assert(id);free(s);return id;
+    char *s=json(pele_host_identity_v17());
+    const char *prefix="{\"version\":2,\"ok\":true,\"result\":";
+    assert(!strncmp(s,prefix,strlen(prefix)));
+    char *end=NULL;unsigned long id=strtoul(s+strlen(prefix),&end,10);
+    assert(end && !strcmp(end,"}") && id>0 && id<=UINT32_MAX);
+    free(s);return (uint32_t)id;
 }
 static PelePublicDocument *construct(uint32_t options) {
     PeleRegistry *registry=NULL;okay(pele_registry_create_v8(1,&registry));
