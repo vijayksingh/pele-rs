@@ -61,11 +61,12 @@ private final class RailroadCallbackFailure: Error {}
         for (i, a) in values.enumerated() { try g.setArrayElement(UInt32(i), value: a, on: id) }; return id
     }
     // Fixture uses JSON.stringify on acyclic grammar records. Undefined object
-    // fields are omitted; array holes/undefined become null, as in the oracle.
+    // fields are omitted; array holes/undefined and nonfinite numbers become
+    // null, matching JSON.stringify (including unbounded repetition.max).
     private static func encoded(_ g: Pele.PublicGraph, _ a: Pele.PublicGraph.Atom?) throws -> Any {
         switch a {
         case .string(let id): return try XCTUnwrap(g.strings[Int(id)].stringIfWellFormed)
-        case .number(let n): return n
+        case .number(let n): return n.isFinite ? n : NSNull()
         case .bool(let b): return b
         case .ref(let id):
             let node = g.nodes[Int(id)]
