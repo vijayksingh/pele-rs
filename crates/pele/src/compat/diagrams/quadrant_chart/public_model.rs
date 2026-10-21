@@ -677,6 +677,20 @@ fn construct_default() -> Result<QuadrantPublicState, PeleError> {
 }
 
 impl PublicDiagramModule for QuadrantChart {
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::quadrant())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::quadrant(
+            super::QuadrantDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,

@@ -1,5 +1,5 @@
 //! Pele diagrams/quadrant/render.ts, pinned 458322a5 (MIT, kepano).
-use super::{QuadrantModel, QuadrantText};
+use super::{PointStyle, QuadrantModel, QuadrantText};
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{self, edges::theme::resolve_style, esc_text, label_svg, num, series_color},
@@ -138,12 +138,153 @@ struct Dot {
     reach: f64,
     text: Label,
 }
+#[derive(Clone, Copy)]
+pub(super) enum Axis {
+    XLeft,
+    XRight,
+    YBottom,
+    YTop,
+}
+pub(super) struct PointGeometry {
+    pub x: f64,
+    pub y: f64,
+    pub style: PointStyle,
+}
+/// Captures only values already read by the pinned renderer. Model handles stay
+/// live across resource calls; the geometry and SVG algorithm below is shared.
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Text;
+    type Point;
+    type Points;
+    fn has_points(&mut self) -> Result<bool, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn axis_has_text(&mut self, axis: Axis) -> Result<bool, Self::Error>;
+    fn axis(&mut self, axis: Axis) -> Result<Self::Text, Self::Error>;
+    fn present(&self, text: &Self::Text) -> bool;
+    fn text(&mut self, text: &Self::Text) -> Result<Option<QuadrantText>, Self::Error>;
+    fn quadrant(&mut self, index: usize) -> Result<Self::Text, Self::Error>;
+    fn points(&mut self) -> Result<Self::Points, Self::Error>;
+    fn next_point(
+        &mut self,
+        points: &Self::Points,
+        index: usize,
+    ) -> Result<Option<Self::Point>, Self::Error>;
+    fn geometry(&mut self, point: &Self::Point) -> Result<Option<PointGeometry>, Self::Error>;
+    fn point_text(&mut self, point: &Self::Point) -> Result<Self::Text, Self::Error>;
+    fn point_identity(&mut self, point: &Self::Point) -> Result<(String, String), Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, Self::Error>;
+}
+struct Typed<'a>(&'a QuadrantModel);
+impl Typed<'_> {
+    fn axis_value(&self, axis: Axis) -> &Option<QuadrantText> {
+        match axis {
+            Axis::XLeft => &self.0.x_axis_left,
+            Axis::XRight => &self.0.x_axis_right,
+            Axis::YBottom => &self.0.y_axis_bottom,
+            Axis::YTop => &self.0.y_axis_top,
+        }
+    }
+}
+impl PhaseInput for Typed<'_> {
+    type Error = PeleError;
+    type Text = Option<QuadrantText>;
+    type Point = usize;
+    type Points = ();
+    fn has_points(&mut self) -> Result<bool, PeleError> {
+        Ok(!self.0.points.is_empty())
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn axis_has_text(&mut self, a: Axis) -> Result<bool, PeleError> {
+        Ok(self
+            .axis_value(a)
+            .as_ref()
+            .is_some_and(|t| !t.text.is_empty()))
+    }
+    fn axis(&mut self, a: Axis) -> Result<Self::Text, PeleError> {
+        Ok(self.axis_value(a).clone())
+    }
+    fn present(&self, t: &Self::Text) -> bool {
+        t.is_some()
+    }
+    fn text(&mut self, t: &Self::Text) -> Result<Self::Text, PeleError> {
+        Ok(t.clone())
+    }
+    fn quadrant(&mut self, k: usize) -> Result<Self::Text, PeleError> {
+        Ok(self.0.quadrants[k].clone())
+    }
+    fn points(&mut self) -> Result<(), PeleError> {
+        Ok(())
+    }
+    fn next_point(&mut self, _: &(), i: usize) -> Result<Option<usize>, PeleError> {
+        Ok((i < self.0.points.len()).then_some(i))
+    }
+    fn geometry(&mut self, i: &usize) -> Result<Option<PointGeometry>, PeleError> {
+        let p = &self.0.points[*i];
+        if !(p.x >= 0. && p.x <= 1. && p.y >= 0. && p.y <= 1.) {
+            return Ok(None);
+        }
+        let shared = self
+            .0
+            .classes
+            .iter()
+            .find(|e| e.0 == p.class_name)
+            .map(|e| &e.1);
+        Ok(Some(PointGeometry {
+            x: p.x,
+            y: p.y,
+            style: PointStyle {
+                radius: p.style.radius.or(shared.and_then(|s| s.radius)),
+                color: p
+                    .style
+                    .color
+                    .clone()
+                    .or_else(|| shared.and_then(|s| s.color.clone())),
+                stroke_color: p
+                    .style
+                    .stroke_color
+                    .clone()
+                    .or_else(|| shared.and_then(|s| s.stroke_color.clone())),
+                stroke_width: p
+                    .style
+                    .stroke_width
+                    .clone()
+                    .or_else(|| shared.and_then(|s| s.stroke_width.clone())),
+                order: Vec::new(),
+            },
+        }))
+    }
+    fn point_text(&mut self, i: &usize) -> Result<Self::Text, PeleError> {
+        Ok(Some(self.0.points[*i].text.clone()))
+    }
+    fn point_identity(&mut self, i: &usize) -> Result<(String, String), PeleError> {
+        let p = &self.0.points[*i];
+        Ok((p.class_name.clone(), p.text.text.clone()))
+    }
+    fn accessibility(&mut self, d: bool) -> Result<Option<String>, PeleError> {
+        Ok(if d {
+            self.0.acc_descr.clone()
+        } else {
+            self.0.acc_title.clone()
+        })
+    }
+}
 pub(super) fn render(
     m: &QuadrantModel,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_phases(&mut Typed(m), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    m: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let axis_size = round(size * 0.875);
     let point_size = round(size * 0.75);
@@ -158,9 +299,10 @@ pub(super) fn render(
     let outer = length(c, "quadrantPadding", o.padding.unwrap_or(8.), 200.);
     let x_pad = length(c, "xAxisLabelPadding", 5., 200.);
     let y_pad = length(c, "yAxisLabelPadding", 5., 200.);
-    let has_points = !m.points.is_empty();
+    let has_points = m.has_points()?;
+    let title_text = m.title()?;
     let title = layout_label(
-        m.title.as_deref(),
+        title_text.as_deref(),
         false,
         r,
         o,
@@ -174,18 +316,22 @@ pub(super) fn render(
     } else {
         0.
     };
-    let has_x = m.x_axis_left.as_ref().is_some_and(|t| !t.text.is_empty())
-        || m.x_axis_right.as_ref().is_some_and(|t| !t.text.is_empty());
-    let has_y = m.y_axis_bottom.as_ref().is_some_and(|t| !t.text.is_empty())
-        || m.y_axis_top.as_ref().is_some_and(|t| !t.text.is_empty());
+    let has_x = m.axis_has_text(Axis::XLeft)? || m.axis_has_text(Axis::XRight)?;
+    let has_y = m.axis_has_text(Axis::YBottom)? || m.axis_has_text(Axis::YTop)?;
     let x_below =
         has_points || matches!(setting(c,"xAxisPosition"),Some(Value::String(s))if s=="bottom");
     let y_right = matches!(setting(c,"yAxisPosition"),Some(Value::String(s))if s=="right");
     let side = width - 2. * outer;
+    let x_left_handle = m.axis(Axis::XLeft)?;
+    let x_right_present = {
+        let value = m.axis(Axis::XRight)?;
+        m.present(&value)
+    };
+    let x_left_text = m.text(&x_left_handle)?;
     let x_left = label(
-        m.x_axis_left.as_ref(),
+        x_left_text.as_ref(),
         axis_size,
-        if m.x_axis_right.is_some() {
+        if x_right_present {
             side / 2. - 16.
         } else {
             side
@@ -193,22 +339,28 @@ pub(super) fn render(
         r,
         o,
     )?;
-    let x_right = label(m.x_axis_right.as_ref(), axis_size, side / 2. - 16., r, o)?;
+    let x_right_handle = m.axis(Axis::XRight)?;
+    let x_right_text = m.text(&x_right_handle)?;
+    let x_right = label(x_right_text.as_ref(), axis_size, side / 2. - 16., r, o)?;
     let x_height = x_left.height.js_max(x_right.height);
     let x_space = if has_x { x_height + x_pad } else { 0. };
     let tall = height - 2. * outer - title_space - x_space;
+    let y_bottom_handle = m.axis(Axis::YBottom)?;
+    let y_top_present = {
+        let value = m.axis(Axis::YTop)?;
+        m.present(&value)
+    };
+    let y_bottom_text = m.text(&y_bottom_handle)?;
     let y_bottom = label(
-        m.y_axis_bottom.as_ref(),
+        y_bottom_text.as_ref(),
         axis_size,
-        if m.y_axis_top.is_some() {
-            tall / 2. - 16.
-        } else {
-            tall
-        },
+        if y_top_present { tall / 2. - 16. } else { tall },
         r,
         o,
     )?;
-    let y_top = label(m.y_axis_top.as_ref(), axis_size, tall / 2. - 16., r, o)?;
+    let y_top_handle = m.axis(Axis::YTop)?;
+    let y_top_text = m.text(&y_top_handle)?;
+    let y_top = label(y_top_text.as_ref(), axis_size, tall / 2. - 16., r, o)?;
     let y_height = y_bottom.height.js_max(y_top.height);
     let y_space = if has_y { y_height + y_pad } else { 0. };
     let left = outer + if y_right { 0. } else { y_space };
@@ -236,7 +388,9 @@ pub(super) fn render(
             left
         };
         let y = if k < 2 { top } else { top + h - tile_h };
-        let text = label(m.quadrants[k].as_ref(), size, tile_w - 16., r, o)?;
+        let quadrant = m.quadrant(k)?;
+        let text_value = m.text(&quadrant)?;
+        let text = label(text_value.as_ref(), size, tile_w - 16., r, o)?;
         let cx = x + tile_w / 2.;
         let cy = if has_points {
             y + text_top + text.height / 2.
@@ -303,35 +457,24 @@ pub(super) fn render(
     let fill = series_color(0);
     let mut dots = Vec::new();
     let mut circles = Vec::new();
-    for point in &m.points {
-        let (x, y) = (&point.x, &point.y);
-        if !(*x >= 0. && *x <= 1. && *y >= 0. && *y <= 1.) {
+    let points = m.points()?;
+    let mut point_index = 0;
+    while let Some(point) = m.next_point(&points, point_index)? {
+        point_index += 1;
+        let Some(geometry) = m.geometry(&point)? else {
             continue;
-        }
-        let shared = m
-            .classes
-            .iter()
-            .find(|e| e.0 == point.class_name)
-            .map(|e| &e.1);
-        let p = &point.style;
-        let radius = p.radius.or(shared.and_then(|s| s.radius)).unwrap_or(radius);
+        };
+        let (x, y) = (geometry.x, geometry.y);
+        let p = &geometry.style;
+        let radius = p.radius.unwrap_or(radius);
         let radius = if radius.is_nan() {
             radius
         } else {
             radius.js_min(2000.)
         };
-        let color = p
-            .color
-            .as_ref()
-            .or_else(|| shared.and_then(|s| s.color.as_ref()));
-        let stroke_color = p
-            .stroke_color
-            .as_ref()
-            .or_else(|| shared.and_then(|s| s.stroke_color.as_ref()));
-        let stroke_width = p
-            .stroke_width
-            .as_ref()
-            .or_else(|| shared.and_then(|s| s.stroke_width.as_ref()));
+        let color = p.color.as_ref();
+        let stroke_color = p.stroke_color.as_ref();
+        let stroke_width = p.stroke_width.as_ref();
         let mut styles = Vec::new();
         if let Some(color) = color.filter(|s| !s.is_empty()) {
             styles.push(format!("fill:{}", hex(color)))
@@ -354,16 +497,19 @@ pub(super) fn render(
                     n.js_min(400.) / 2.
                 }
             });
+        let point_text_handle = m.point_text(&point)?;
+        let point_text = m.text(&point_text_handle)?;
         dots.push(Dot {
             cx,
             cy,
             reach,
-            text: label(Some(&point.text), point_size, 200., r, o)?,
+            text: label(point_text.as_ref(), point_size, 200., r, o)?,
         });
+        let (class_name, data_id) = m.point_identity(&point)?;
         circles.push(format!(
             "<circle class=\"pele-point{}\" data-id=\"{}\" cx=\"{}\" cy=\"{}\" r=\"{}\"{}{shape}/>",
-            class_names(&point.class_name),
-            esc_text(&point.text.text)?,
+            class_names(&class_name),
+            esc_text(&data_id)?,
             num(cx),
             num(cy),
             num(radius),
@@ -472,6 +618,8 @@ pub(super) fn render(
             format!("<g class=\"pele-points\" fill=\"{fill}\">{}</g><g class=\"pele-point-labels\" font-size=\"{}\">{labels}</g>",circles.join(""),svg::js_num(point_size))
         }
     );
+    let acc_title = m.accessibility(false)?;
+    let acc_descr = m.accessibility(true)?;
     Ok(Rendered {
         svg: svg::document(
             "quadrantChart",
@@ -479,8 +627,8 @@ pub(super) fn render(
             height,
             size,
             o,
-            m.acc_title.as_deref(),
-            m.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width,

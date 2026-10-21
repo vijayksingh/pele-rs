@@ -3,11 +3,13 @@
 mod parser;
 mod public_model;
 pub use public_model::QuadrantPublicState;
+mod live_phase;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,
     RenderSettings, Rendered, Value,
 };
+pub(crate) use live_phase::{render_detached, QuadrantDetachedInput};
 use serde::{Serialize, Serializer};
 #[derive(Clone, Debug, Serialize)]
 pub struct QuadrantText {
