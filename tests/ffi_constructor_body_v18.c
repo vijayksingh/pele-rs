@@ -79,7 +79,7 @@ int main(void) {
     char *policy = json(pele_public_constructor_policy_v18(member));
     assert(strstr(policy, "\"argumentTransfers\":[\"value\",\"value\"]"));
     assert(strstr(policy, "\"arity\":2")); free(policy); pele_public_constructor_free_v16(member);
-    PelePublicConstructorV16 *ignored = capture(registry, "pie", 1);
+    PelePublicConstructorV16 *ignored = capture(registry, "sankey", 1);
     PeleHostValueV17 malformed = value(99, 0); PeleConstructionJobV18 *job = NULL;
     okay(pele_public_constructor_begin_v18(ignored, &malformed, &malformed, &job)); assert(job);
     pele_public_construction_free_v18(job);

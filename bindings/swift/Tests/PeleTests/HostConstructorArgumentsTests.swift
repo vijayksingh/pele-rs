@@ -128,4 +128,129 @@ final class HostConstructorArgumentsTests: XCTestCase {
             XCTAssertFalse(final.graph.strings.contains(malformed), "Producer return must not be copied into model strings")
         }
     }
+    private func blockInput(_ value: Any, graph: inout Pele.PublicGraph) throws -> Pele.PublicGraph.Atom {
+        if value is NSNull { return .undefined }
+        if let text = value as? String { return .string(try graph.intern(text)) }
+        if let number = value as? NSNumber { return .number(number.doubleValue) }
+        var fields: [(String, Any)], length: UInt32?
+        if let array = value as? [Any] { fields = array.enumerated().map { (String($0.offset), $0.element) }; length = UInt32(array.count) }
+        else if let object = value as? [String: Any] { fields = object.sorted { $0.key < $1.key }.map { ($0.key, $0.value) } }
+        else { throw PeleError(code: "test", message: "Unexpected Block fixture value") }
+        let id = UInt32(graph.nodes.count); graph.nodes.append(.object(properties: []))
+        var properties: [Pele.PublicGraph.Property] = []
+        for (name, value) in fields {
+            let key = try graph.intern(name), atom = try blockInput(value, graph: &graph)
+            properties.append(.init(key: key, value: atom))
+        }
+        graph.nodes[Int(id)] = length.map { .array(length: $0, properties: properties) } ?? .object(properties: properties)
+        return .ref(id)
+    }
+    private func blockState(_ graph: Pele.PublicGraph, statements: Pele.PublicGraph.Atom) throws -> [String: Any] {
+        func id(_ atom: Pele.PublicGraph.Atom) throws -> UInt32 {
+            guard case .ref(let id) = atom else { throw PeleError(code: "test", message: "Expected Block reference") }; return id
+        }
+        func at(_ atom: Pele.PublicGraph.Atom, _ key: String) throws -> Pele.PublicGraph.Atom { try graph.field(key, on: id(atom)) ?? .undefined }
+        func list(_ atom: Pele.PublicGraph.Atom) throws -> [Pele.PublicGraph.Atom] {
+            guard case .array(let length, _) = graph.nodes[Int(try id(atom))] else { throw PeleError(code: "test", message: "Expected Block array") }
+            return try (0..<length).map { try at(atom, String($0)) }
+        }
+        func value(_ atom: Pele.PublicGraph.Atom) throws -> Any {
+            switch atom {
+            case .undefined, .null: return NSNull()
+            case .bool(let v): return v
+            case .number(let v): return v
+            case .string(let i): return try XCTUnwrap(graph.strings[Int(i)].stringIfWellFormed)
+            case .ref(let i):
+                if case .array = graph.nodes[Int(i)] { return try list(atom).map(value) }
+                var object: [String: Any] = [:]
+                for property in graph.nodes[Int(i)].properties {
+                    if case .undefined = property.value { continue }
+                    object[try XCTUnwrap(graph.strings[Int(property.key)].stringIfWellFormed)] = try value(property.value)
+                }
+                return object
+            default: throw PeleError(code: "test", message: "Unexpected callable in Block state")
+            }
+        }
+        func same(_ a: Pele.PublicGraph.Atom, _ b: Pele.PublicGraph.Atom) -> Bool {
+            if case .ref(let a) = a, case .ref(let b) = b { return a == b }; return false
+        }
+        let root = try at(graph.root, "root"), blocks = try at(graph.root, "blocks")
+        guard case .map(let entries, _) = graph.nodes[Int(try id(at(graph.root, "byId")))],
+              case .set(let pending, _) = graph.nodes[Int(try id(at(graph.root, "pending")))] else { throw PeleError(code: "test", message: "Missing Block collections") }
+        var aliases: [[Any]] = []
+        for statement in try list(statements) {
+            guard let name = try value(at(statement, "id")) as? String else { continue }
+            if let entry = try entries.first(where: { try value($0.key) as? String == name }) { aliases.append([name, same(entry.value, statement)]) }
+        }
+        return ["root": try value(root), "blocks": try value(blocks), "edges": try value(at(graph.root, "edges")),
+                "byId": try entries.map { [try value($0.key), try value($0.value)] }, "pending": try pending.map(value),
+                "ids": try value(at(graph.root, "ids")), "colors": try value(at(graph.root, "colors")), "spaces": try value(at(graph.root, "spaces")),
+                "statements": try value(statements), "blocksAliasRoot": same(blocks, try at(root, "children")), "byIdAlias": aliases]
+    }
+    func testBlockRetainedWarningPreservesNestedHelpersPartialHierarchyAndRecovery() throws {
+        var path = URL(fileURLWithPath: #filePath); for _ in 0..<5 { path.deleteLastPathComponent() }
+        let oracle = try XCTUnwrap(JSONSerialization.jsonObject(with: Data(contentsOf: path.appendingPathComponent("fixtures/public-block-live-warning.json"))) as? [String: Any])
+        XCTAssertEqual(oracle["oracleSHA256"] as? String, "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d")
+        let cases = try XCTUnwrap(oracle["cases"] as? [[String: Any]])
+        for mode in ["normal", "throw", "mutate", "nested"] {
+            let expected = try XCTUnwrap(cases.first { $0["mode"] as? String == mode })
+            let expectedTrace = try XCTUnwrap(expected["trace"] as? [[Any]])
+            let input = try XCTUnwrap((expectedTrace.first?[3] as? [String: Any])?["statements"])
+            let registry = try Pele.Registry.allBuiltins(), options = HostArgumentsObject(), warning = HostArgumentsObject()
+            let factory = try XCTUnwrap(registry.captureConstructor(for: "block", prototype: 1))
+            var gets = 0
+            options.get = { key in gets += 1; XCTAssertEqual(key, .init("warn")); return .host(warning) }
+            let document = try factory.construct(firstArgument: .host(options))
+            factory.close(); try registry.close(); defer { try? document.close() }
+            XCTAssertEqual(gets, 1)
+            var graph = try document.snapshot().graph
+            guard case .host(let retained) = try document.resolveHostValue(XCTUnwrap(graph.field("warn"))) else { return XCTFail("Missing retained warning") }
+            XCTAssertTrue(retained === warning)
+            let statements = try blockInput(input, graph: &graph), receiver = graph.root
+            try document.apply(graph, expectedRevision: document.revision)
+            let schema = try document.schema()
+            let hierarchy = try XCTUnwrap(schema.methods.first { $0.name == "setHierarchy" }?.id)
+            let named = try XCTUnwrap(schema.methods.first { $0.name == "named" }?.id)
+            let original = HostArgumentsError(); var trace: [[Any]] = [], calls = 0
+            warning.call = { current, args in
+                guard case .graphReference(let currentID) = current, case .ref(let rootID) = receiver,
+                      case .string(let message) = args.first else { throw PeleError(code: "test", message: "Block warning receiver/value lost") }
+                XCTAssertEqual(currentID, rootID); calls += 1
+                var graph = try document.snapshot().graph
+                trace.append(["warn", currentID == rootID, message.stringReplacingInvalidCodeUnits, try self.blockState(graph, statements: statements)])
+                XCTAssertThrowsError(try document.close())
+                if mode == "throw" { throw original }
+                if mode == "mutate" {
+                    guard case .ref(let listID) = statements else { throw PeleError(code: "test", message: "Missing statements") }
+                    if calls == 1 {
+                        guard case .ref(let a) = try graph.field("1", on: listID) else { throw PeleError(code: "test", message: "Missing A") }
+                        let kind = try graph.intern("column-setting"); try graph.setField("type", value: .string(kind), on: a)
+                        try graph.setField("columns", value: .number(4), on: a); try document.apply(graph, expectedRevision: document.revision)
+                    } else if calls == 2 {
+                        guard case .ref(let b) = try graph.field("2", on: listID) else { throw PeleError(code: "test", message: "Missing B") }
+                        let label = try graph.intern("Changed"), name = try graph.intern("Pending")
+                        try graph.setField("label", value: .string(label), on: b); try document.apply(graph, expectedRevision: document.revision)
+                        try self.returned(document.invoke(method: named, receiver: receiver, arguments: [.string(name)]))
+                    }
+                } else if mode == "nested" && calls == 1 {
+                    let nested = try self.blockInput([["id": "Nested", "type": "square", "widthInColumns": 1]], graph: &graph)
+                    try document.apply(graph, expectedRevision: document.revision)
+                    try self.returned(document.invoke(method: hierarchy, receiver: receiver, arguments: [nested]))
+                }
+                return .host(HostArgumentsObject())
+            }
+            if mode == "throw" {
+                XCTAssertThrowsError(try document.invoke(method: hierarchy, receiver: receiver, arguments: [statements])) { XCTAssertTrue(($0 as AnyObject) === original) }
+            } else { try returned(document.invoke(method: hierarchy, receiver: receiver, arguments: [statements])) }
+            XCTAssertEqual(gets, 1, "Warning is retained, not reacquired from constructor options")
+            XCTAssertTrue(NSArray(array: trace).isEqual(to: expectedTrace), mode + " callback trace")
+            XCTAssertTrue(NSDictionary(dictionary: try blockState(document.snapshot().graph, statements: statements)).isEqual(to: try XCTUnwrap(expected["after"] as? [String: Any])), mode + " partial state")
+            var repair = try document.snapshot().graph; try repair.setField("warn", value: .undefined)
+            try document.apply(repair, expectedRevision: document.revision)
+            try returned(document.invoke(method: hierarchy, receiver: receiver, arguments: [statements]))
+            XCTAssertTrue(NSDictionary(dictionary: try blockState(document.snapshot().graph, statements: statements)).isEqual(to: try XCTUnwrap(expected["recovered"] as? [String: Any])), mode + " recovered state")
+            XCTAssertEqual(try document.snapshot().revision, document.revision)
+        }
+    }
+
 }
