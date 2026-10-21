@@ -1,6 +1,7 @@
 //! Direct Pele xychart/render.ts axis layout and clipped series rendering, 458322a5 (MIT, kepano).
 use super::{
-    model::{Orientation, PlotType, XAxis, XyChartModel},
+    model::XyChartModel,
+    phase::{PhaseInput, Typed},
     ticks::*,
 };
 use crate::compat::number_math::{round, NumberMath};
@@ -118,8 +119,9 @@ fn value_marks(
         .collect()
 }
 #[allow(clippy::too_many_arguments)]
-fn category_marks(
-    x: &XAxis,
+fn category_marks<P: PhaseInput>(
+    input: &mut P,
+    x: &P::Value,
     categories: &[Label],
     length: f64,
     slot: f64,
@@ -133,12 +135,9 @@ fn category_marks(
     small: f64,
     r: &mut dyn RenderResources,
     o: &RenderSettings,
-) -> Result<Vec<Mark>, PeleError> {
+) -> Result<Vec<Mark>, P::Error> {
     let mut marks = vec![];
-    if let XAxis::Band {
-        categories: names, ..
-    } = x
-    {
+    if input.field_is(x, "type", "band")? {
         let need = if categories.is_empty() {
             8.
         } else if horizontal {
@@ -148,7 +147,12 @@ fn category_marks(
         };
         let every = (need / (length * slot)).ceil().js_max(1.);
         let mut i = 0.;
-        while i < (names.len() as f64) {
+        loop {
+            let names = input.get(x, "categories")?;
+            if i >= input.count(&names)? as f64 {
+                break;
+            }
+            input.work(1)?;
             let n = i as usize;
             marks.push(Mark {
                 at: (i + 0.5) * slot,
@@ -186,13 +190,24 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    if model.plots.is_empty() {
+    render_phases(&mut Typed(model), config, options, resources)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    input.begin_draw();
+    let root = input.root();
+    let initial_plots = input.get(&root, "plots")?;
+    if input.count(&initial_plots)? == 0 {
         let mut e = PeleError::new(
             "No Plot to render, please provide a plot with some data",
             ErrorCode::Semantic,
         );
         e.diagram_type = Some("xychart".into());
-        return Err(e);
+        return Err(e.into());
     }
     let chart = config.get("xyChart").and_then(Value::as_object);
     let size = options.font_size.unwrap_or(16.);
@@ -208,18 +223,27 @@ pub(super) fn render(
     let height = round(
         dimension(chart.and_then(|c| c.get("height")), 500.) * 0.6_f64.js_max(width / natural),
     );
-    let horizontal=model.orientation.map_or_else(||matches!(chart.and_then(|c|c.get("chartOrientation")),Some(Value::String(s))if s=="horizontal"),|d|d==Orientation::Horizontal);
+    let orientation = input.get(&root, "orientation")?;
+    let horizontal = if input.nullish(&orientation) {
+        matches!(chart.and_then(|c|c.get("chartOrientation")),Some(Value::String(s))if s=="horizontal")
+    } else {
+        input.is_text(&orientation, "horizontal")?
+    };
     let show_values = on(chart, "showDataLabel", false);
-    let x = &model.x_axis;
-    let plots = &model.plots;
+    let x = input.get(&root, "xAxis")?;
+    let plots = input.get(&root, "plots")?;
     let line_height = text(Some("0"), small, 4000., resources, options)?.height;
     let tiny_height = text(Some("0"), tiny, 4000., resources, options)?.height;
+    let title_raw = if on(chart, "showTitle", true) {
+        input.field_text(&root, "title")?
+    } else {
+        None
+    };
+    if let Some(t) = &title_raw {
+        input.keep_text(t.encode_utf16().count())?;
+    }
     let title = layout_label(
-        if on(chart, "showTitle", true) {
-            model.title.as_deref()
-        } else {
-            None
-        },
+        title_raw.as_deref(),
         false,
         resources,
         options,
@@ -235,11 +259,22 @@ pub(super) fn render(
     let mut legend = vec![];
     let mut legend_width = 0_f64;
     if on(chart, "showLegend", true) {
-        for (index, plot) in plots.iter().enumerate() {
-            if plot.title.is_empty() {
+        let length = input.count(&plots)?;
+        for index in 0..length {
+            input.work(1)?;
+            if !input.has(&plots, index)? {
                 continue;
             }
-            let label = text(Some(&plot.title), small, width * 0.3, resources, options)?;
+            let plot = input.index(&plots, index)?;
+            let check = input.get(&plot, "title")?;
+            if input.is_text(&check, "")? {
+                continue;
+            }
+            let raw = input.field_text(&plot, "title")?;
+            if let Some(t) = &raw {
+                input.keep_text(t.encode_utf16().count())?;
+            }
+            let label = text(raw.as_deref(), small, width * 0.3, resources, options)?;
             legend_width = legend_width.js_max(label.width + SWATCH + 8.);
             legend.push((index, label));
         }
@@ -249,22 +284,46 @@ pub(super) fn render(
     } else {
         0.
     };
-    let bars = plots
-        .iter()
-        .filter(|p| p.plot_type == PlotType::Bar)
-        .count();
-    let mut lo = model.y_axis.min;
-    let mut hi = model.y_axis.max;
-    let exact = model.has_set_y_axis && lo.is_finite() && hi.is_finite() && lo != hi;
+    let mut bars = 0usize;
+    let length = input.count(&plots)?;
+    for i in 0..length {
+        input.work(1)?;
+        if input.has(&plots, i)? {
+            let p = input.index(&plots, i)?;
+            if input.field_is(&p, "type", "bar")? {
+                bars += 1;
+            }
+        }
+    }
+    let y = input.get(&root, "yAxis")?;
+    let min = input.get(&y, "min")?;
+    let mut lo = input.number(&min).unwrap_or(f64::NAN);
+    let y = input.get(&root, "yAxis")?;
+    let max = input.get(&y, "max")?;
+    let mut hi = input.number(&max).unwrap_or(f64::NAN);
+    let set = input.get(&root, "hasSetYAxis")?;
+    let exact = input.truthy(&set) && lo.is_finite() && hi.is_finite() && lo != hi;
     if exact {
         lo = finite(Some(lo)).unwrap();
         hi = finite(Some(hi)).unwrap();
     } else {
         lo = f64::INFINITY;
         hi = f64::NEG_INFINITY;
-        for p in plots {
-            for (_, raw) in &p.data {
-                let Some(v) = finite(*raw) else { continue };
+        let mut pi = 0;
+        while pi < input.count(&plots)? {
+            input.work(1)?;
+            let p = input.index(&plots, pi)?;
+            pi += 1;
+            let data = input.get(&p, "data")?;
+            let mut i = 0;
+            while i < input.count(&data)? {
+                input.work(1)?;
+                let point = input.index(&data, i)?;
+                i += 1;
+                let raw = input.index(&point, 1)?;
+                let Some(v) = finite(input.number(&raw)) else {
+                    continue;
+                };
                 if v < lo {
                     lo = v
                 }
@@ -291,26 +350,40 @@ pub(super) fn render(
         }
     }
     let mut count = 1;
-    if let XAxis::Band { categories, .. } = x {
-        count = count.max(categories.len())
+    if input.field_is(&x, "type", "band")? {
+        let cats = input.get(&x, "categories")?;
+        count = count.max(input.count(&cats)?);
     } else {
-        for p in plots {
-            count = count.max(p.data.len())
+        let mut i = 0;
+        while i < input.count(&plots)? {
+            input.work(1)?;
+            let p = input.index(&plots, i)?;
+            i += 1;
+            let data = input.get(&p, "data")?;
+            count = count.max(input.count(&data)?);
         }
     }
     let slot = 1. / count as f64;
-    let inset = if matches!(x, XAxis::Band { .. }) || bars > 0 {
+    let inset = if input.field_is(&x, "type", "band")? || bars > 0 {
         slot / 2.
     } else {
         0.
     };
-    let (x0, x1) = match x {
-        XAxis::Linear { min, max, .. } => (finite(Some(*min)), finite(Some(*max))),
-        _ => (None, None),
+    let x0 = if input.field_is(&x, "type", "linear")? {
+        let v = input.get(&x, "min")?;
+        finite(input.number(&v))
+    } else {
+        None
+    };
+    let x1 = if input.field_is(&x, "type", "linear")? {
+        let v = input.get(&x, "max")?;
+        finite(input.number(&v))
+    } else {
+        None
     };
     let ranged = x0.is_some() && x1.is_some() && x0 != x1;
-    let place = |i: usize, n: usize| {
-        if matches!(x, XAxis::Band { .. }) {
+    let place = |input: &mut P, i: usize, n: usize| -> Result<f64, P::Error> {
+        Ok(if input.field_is(&x, "type", "band")? {
             (i as f64 + 0.5) * slot
         } else {
             inset
@@ -321,7 +394,7 @@ pub(super) fn render(
                 } else {
                     0.5
                 } * (1. - 2. * inset)
-        }
+        })
     };
     let category_conf = chart
         .and_then(|c| c.get("xAxis"))
@@ -339,31 +412,35 @@ pub(super) fn render(
     } else {
         category_conf
     };
-    let left_title = text(
-        if on(left_conf, "showTitle", true) {
-            Some(if horizontal {
-                x.title()
-            } else {
-                &model.y_axis.title
-            })
+    let left_raw = if on(left_conf, "showTitle", true) {
+        let axis = if horizontal {
+            x.clone()
         } else {
-            None
-        },
-        small,
-        height * 0.8,
-        resources,
-        options,
-    )?;
+            input.get(&root, "yAxis")?
+        };
+        input.field_text(&axis, "title")?
+    } else {
+        None
+    };
+    if let Some(t) = &left_raw {
+        input.keep_text(t.encode_utf16().count())?;
+    }
+    let left_title = text(left_raw.as_deref(), small, height * 0.8, resources, options)?;
+    let bottom_raw = if on(bottom_conf, "showTitle", true) {
+        let axis = if horizontal {
+            input.get(&root, "yAxis")?
+        } else {
+            x.clone()
+        };
+        input.field_text(&axis, "title")?
+    } else {
+        None
+    };
+    if let Some(t) = &bottom_raw {
+        input.keep_text(t.encode_utf16().count())?;
+    }
     let bottom_title = text(
-        if on(bottom_conf, "showTitle", true) {
-            Some(if horizontal {
-                &model.y_axis.title
-            } else {
-                x.title()
-            })
-        } else {
-            None
-        },
+        bottom_raw.as_deref(),
         small,
         width * 0.8,
         resources,
@@ -386,36 +463,61 @@ pub(super) fn render(
     } else {
         48_f64.js_max((width - 2. * pad - 64. - legend_space) * slot - 8.)
     };
-    let categories = if let XAxis::Band { categories, .. } = x {
-        if on(category_conf, "showLabel", true) {
-            categories
-                .iter()
-                .map(|s| text(Some(s), small, wrap_at, resources, options))
-                .collect::<Result<Vec<_>, _>>()?
-        } else {
-            vec![]
+    let mut categories = vec![];
+    if input.field_is(&x, "type", "band")? && on(category_conf, "showLabel", true) {
+        let cats = input.get(&x, "categories")?;
+        let length = input.count(&cats)?;
+        for i in 0..length {
+            input.work(1)?;
+            if !input.has(&cats, i)? {
+                categories.push(Label::default());
+                continue;
+            }
+            let v = input.index(&cats, i)?;
+            let t = input.optional_text(&v)?;
+            if let Some(t) = &t {
+                input.keep_text(t.encode_utf16().count())?;
+            }
+            categories.push(text(t.as_deref(), small, wrap_at, resources, options)?);
         }
-    } else {
-        vec![]
-    };
+    }
     let category_width = categories.iter().fold(0_f64, |w, l| w.js_max(l.width));
     let category_height = categories.iter().fold(0_f64, |h, l| h.js_max(l.height));
     let mut point_label_width = 0_f64;
     let mut value_width = 0_f64;
-    for plot in plots {
-        for label in plot.point_labels.as_deref().unwrap_or_default() {
-            point_label_width = point_label_width.js_max(measure(label, tiny, resources, options)?)
+    let mut pi = 0;
+    while pi < input.count(&plots)? {
+        input.work(1)?;
+        let plot = input.index(&plots, pi)?;
+        pi += 1;
+        let point_labels = input.get(&plot, "pointLabels")?;
+        if !input.nullish(&point_labels) {
+            let mut i = 0;
+            while i < input.count(&point_labels)? {
+                input.work(1)?;
+                let v = input.index(&point_labels, i)?;
+                i += 1;
+                let label = input.text(&v)?;
+                point_label_width =
+                    point_label_width.js_max(measure(&label, tiny, resources, options)?);
+            }
         }
-        if show_values && horizontal && plot.plot_type == PlotType::Bar {
-            for (_, value) in &plot.data {
-                let s = finite(*value).map(js_num).unwrap_or_default();
+        if show_values && horizontal && input.field_is(&plot, "type", "bar")? {
+            let data = input.get(&plot, "data")?;
+            let mut i = 0;
+            while i < input.count(&data)? {
+                input.work(1)?;
+                let point = input.index(&data, i)?;
+                i += 1;
+                let v = input.index(&point, 1)?;
+                let s = finite(input.number(&v)).map(js_num).unwrap_or_default();
                 value_width = value_width.js_max(measure(&s, tiny, resources, options)?);
             }
         }
     }
     let bottom_label_height = if !bottom_labels {
         0.
-    } else if horizontal || !matches!(x, XAxis::Band { .. }) {
+    } else if horizontal || !input.field_is(&x, "type", "band")? {
         line_height
     } else {
         category_height
@@ -445,7 +547,8 @@ pub(super) fn render(
     let bottom = top + plot_height;
     let left_marks = if horizontal {
         category_marks(
-            x,
+            input,
+            &x,
             &categories,
             plot_height,
             slot,
@@ -505,7 +608,8 @@ pub(super) fn render(
         )?
     } else {
         category_marks(
-            x,
+            input,
+            &x,
             &categories,
             plot_width,
             slot,
@@ -616,28 +720,39 @@ pub(super) fn render(
     let mut outside = String::new();
     let mut point_labels = String::new();
     let mut bar = 0;
-    for (index, plot) in plots.iter().enumerate() {
+    let length = input.count(&plots)?;
+    for index in 0..length {
+        input.work(1)?;
+        if !input.has(&plots, index)? {
+            continue;
+        }
+        let plot = input.index(&plots, index)?;
         let color = series_color(index);
-        let id = if plot.title.is_empty() {
+        let t = input.get(&plot, "title")?;
+        let id = if input.truthy(&t) {
+            let t = input.field_text(&plot, "title")?.unwrap_or_default();
+            format!(" data-id=\"{}\"", esc_text(&t)?)
+        } else {
             String::new()
-        } else {
-            format!(" data-id=\"{}\"", esc_text(&plot.title)?)
         };
-        let n = if matches!(x, XAxis::Band { .. }) {
-            plot.data.len().min(count)
-        } else {
-            plot.data.len()
-        };
-        if plot.plot_type == PlotType::Bar {
+        let band = input.field_is(&x, "type", "band")?;
+        let data = input.get(&plot, "data")?;
+        let data_len = input.count(&data)?;
+        let n = if band { data_len.min(count) } else { data_len };
+        if input.field_is(&plot, "type", "bar")? {
             let offset =
                 (bar as f64 - (bars as f64 - 1.) / 2.) * thickness - (thickness - gap) / 2.;
             bar += 1;
             let mut rects = String::new();
             for i in 0..n {
-                let Some(value) = finite(plot.data[i].1) else {
+                input.work(1)?;
+                let data = input.get(&plot, "data")?;
+                let point = input.index(&data, i)?;
+                let raw = input.index(&point, 1)?;
+                let Some(value) = finite(input.number(&raw)) else {
                     continue;
                 };
-                let c = place(i, n);
+                let c = place(input, i, n)?;
                 let v = clamp(scale(value));
                 let from = base.js_min(v);
                 let to = base.js_max(v);
@@ -706,11 +821,15 @@ pub(super) fn render(
         let mut pc = 0.;
         let mut pv = f64::NAN;
         for i in 0..n {
-            let Some(value) = finite(plot.data[i].1) else {
+            input.work(1)?;
+            let data = input.get(&plot, "data")?;
+            let point = input.index(&data, i)?;
+            let raw = input.index(&point, 1)?;
+            let Some(value) = finite(input.number(&raw)) else {
                 pv = f64::NAN;
                 continue;
             };
-            let c = place(i, n);
+            let c = place(input, i, n)?;
             let v = scale(value);
             let visible = (0. ..=1.).contains(&v);
             if pv.is_nan() {
@@ -756,16 +875,17 @@ pub(super) fn render(
                     num(cy)
                 ))
             }
-            let label = text(
-                plot.point_labels
-                    .as_ref()
-                    .and_then(|v| v.get(i))
-                    .map(String::as_str),
-                tiny,
-                4000.,
-                resources,
-                options,
-            )?;
+            let labels = input.get(&plot, "pointLabels")?;
+            let raw = if input.nullish(&labels) {
+                None
+            } else {
+                let v = input.index(&labels, i)?;
+                input.optional_text(&v)?
+            };
+            if let Some(t) = &raw {
+                input.keep_text(t.encode_utf16().count())?;
+            }
+            let label = text(raw.as_deref(), tiny, 4000., resources, options)?;
             if label.height > 0. {
                 let half = label.width / 2.;
                 point_labels.push_str(&if horizontal {
@@ -811,7 +931,10 @@ pub(super) fn render(
         }
         let y = ly + row / 2.;
         let color = series_color(*index);
-        let shape = if plots[*index].plot_type == PlotType::Bar {
+        let plot = input.index(&plots, *index)?;
+        let legend_title = input.field_text(&plot, "title")?.unwrap_or_default();
+        let plot = input.index(&plots, *index)?;
+        let shape = if input.field_is(&plot, "type", "bar")? {
             format!(
                 "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"2\" fill=\"{color}\"/>",
                 num(lx),
@@ -824,7 +947,7 @@ pub(super) fn render(
         };
         legend_out.push_str(&format!(
             "<g class=\"pele-legend-item\" data-id=\"{}\">{shape}{}</g>",
-            esc_text(&plots[*index].title)?,
+            esc_text(&legend_title)?,
             label_svg(label, lx + SWATCH + 8. + label.width / 2., y, "")
         ));
         ly += row;
@@ -853,14 +976,16 @@ pub(super) fn render(
         group_text("pele-point-labels", tiny, None, &point_labels),
         group_text("pele-legend", small, None, &legend_out)
     );
+    let acc_title = input.field_text(&root, "accTitle")?;
+    let acc_descr = input.field_text(&root, "accDescr")?;
     let svg = svg::document(
         "xychart",
         width,
         height,
         size,
         options,
-        model.acc_title.as_deref(),
-        model.acc_descr.as_deref(),
+        acc_title.as_deref(),
+        acc_descr.as_deref(),
         &content,
     )?;
     Ok(Rendered {

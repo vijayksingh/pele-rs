@@ -946,6 +946,19 @@ impl PublicDiagramModule for XyChart {
         s.imported = imported(&s.graph);
         result
     }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::xychart())
+    }
+    fn detached_public_render(
+        &self,
+        s: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::xychart(
+            super::XYChartDetachedInput::new(s.imported.as_ref().err()),
+        ))
+    }
     fn render_public(
         &self,
         s: &mut Self::PublicState,

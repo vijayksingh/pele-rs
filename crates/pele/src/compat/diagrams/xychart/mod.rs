@@ -4,7 +4,10 @@ mod model;
 mod parser;
 mod public_model;
 pub use public_model::XyChartPublicState;
+mod live_phase;
+mod phase;
 mod render;
+pub(crate) use live_phase::{render_detached, XYChartDetachedInput};
 mod ticks;
 mod tokens;
 use crate::compat::{

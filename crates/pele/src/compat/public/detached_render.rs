@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    XYChart,
     Swimlane,
     Flowchart,
     Block,
@@ -56,6 +57,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn xychart() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::xychart::XyChart>(),
+            kind: Kind::XYChart,
+        }
+    }
+
     pub(crate) fn swimlane() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::swimlane::Swimlane>(),
@@ -259,6 +267,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    XYChart(crate::compat::diagrams::xychart::XYChartDetachedInput),
     Swimlane(crate::compat::diagrams::swimlane::SwimlaneDetachedInput),
     Flowchart(crate::compat::diagrams::flowchart::FlowchartDetachedInput),
     Block(crate::compat::diagrams::block::BlockDetachedInput),
@@ -289,6 +298,13 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn xychart(input: crate::compat::diagrams::xychart::XYChartDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::xychart::XyChart>(),
+            body: Body::XYChart(input),
+        }
+    }
+
     pub(crate) fn swimlane(
         input: crate::compat::diagrams::swimlane::SwimlaneDetachedInput,
     ) -> Self {
@@ -504,6 +520,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::XYChart(_) => Kind::XYChart,
             Body::Swimlane(_) => Kind::Swimlane,
             Body::Flowchart(_) => Kind::Flowchart,
             Body::Block(_) => Kind::Block,
@@ -546,6 +563,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::XYChart(input) => crate::compat::diagrams::xychart::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Swimlane(input) => crate::compat::diagrams::swimlane::render_detached(
                 input, config, settings, read, resources,
             ),
