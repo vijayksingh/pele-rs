@@ -3,6 +3,7 @@ use super::{engine::Registration, GraphReadView, PublicError};
 use crate::compat::diagrams::radar::{Radar, RadarDetachedInput};
 use crate::compat::{
     diagrams::info::{Info, InfoDetachedInput},
+    diagrams::ishikawa::{Ishikawa, IshikawaDetachedInput},
     diagrams::packet::{Packet, PacketDetachedInput},
     diagrams::pie::{Pie, PieDetachedInput},
     diagrams::quadrant_chart::{QuadrantChart, QuadrantDetachedInput},
@@ -19,6 +20,8 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Ishikawa,
+    Venn,
     Quadrant,
     Packet,
     Radar,
@@ -33,6 +36,20 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn ishikawa() -> Self {
+        Self {
+            creator: TypeId::of::<Ishikawa>(),
+            kind: Kind::Ishikawa,
+        }
+    }
+
+    pub(crate) fn venn() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::venn::Venn>(),
+            kind: Kind::Venn,
+        }
+    }
+
     pub(crate) fn quadrant() -> Self {
         Self {
             creator: TypeId::of::<QuadrantChart>(),
@@ -83,6 +100,8 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Ishikawa(IshikawaDetachedInput),
+    Venn(crate::compat::diagrams::venn::VennDetachedInput),
     Quadrant(QuadrantDetachedInput),
     Packet(PacketDetachedInput),
     Radar(RadarDetachedInput),
@@ -91,6 +110,20 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn ishikawa(input: IshikawaDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<Ishikawa>(),
+            body: Body::Ishikawa(input),
+        }
+    }
+
+    pub(crate) fn venn(input: crate::compat::diagrams::venn::VennDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::venn::Venn>(),
+            body: Body::Venn(input),
+        }
+    }
+
     pub(crate) fn quadrant(input: QuadrantDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<QuadrantChart>(),
@@ -135,6 +168,8 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Ishikawa(_) => Kind::Ishikawa,
+            Body::Venn(_) => Kind::Venn,
             Body::Quadrant(_) => Kind::Quadrant,
             Body::Radar(_) => Kind::Radar,
             Body::Packet(_) => Kind::Packet,
@@ -155,6 +190,12 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Ishikawa(input) => crate::compat::diagrams::ishikawa::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Venn(input) => crate::compat::diagrams::venn::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Quadrant(input) => crate::compat::diagrams::quadrant_chart::render_detached(
                 input, config, settings, read, resources,
             ),
