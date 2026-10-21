@@ -52,7 +52,20 @@ extension Pele {
             guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
             active = true; defer { active = false }
             return try withHostFunctionErrorScope {
-                try withExtendedLifetime(self) { try operation(handle) }
+                try withExtendedLifetime(self) {
+                    // Native-owned helper phases can advance the owner during a
+                    // detached callback. Refresh only metadata before an implicit
+                    // revision-dependent nested operation; explicit apply packets
+                    // retain their caller-supplied expected revision.
+                    if detachedDepth > 0 {
+                        let current = try Pele.compatibilityResult(pele_public_revision_v15(handle), as: AppliedRevision.self)
+                        guard let value = UInt64(current.revision), String(value) == current.revision else {
+                            throw PeleError(code: "internal", message: "Invalid mutable revision")
+                        }
+                        revision = value
+                    }
+                    return try operation(handle)
+                }
             }
         }
         // Retain ownership across callbacks while allowing short nested native calls.

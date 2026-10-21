@@ -308,6 +308,11 @@ void pele_public_document_free_v4(PelePublicDocument *);
  * or rethrowing their original resource exception. Job free is required once
  * after finish, or to abandon a prepared/completed job. Null free is safe.
  * All options/resource input spans have the same bounds as v9/v13. */
+/* Metadata-only read: returns {revision:"<decimal u64>"}. Does not export or
+ * validate the graph, advance revision, or run callbacks. Same live-handle and
+ * short-operation exclusion rules as snapshot. Useful before nested operations
+ * after native-owned helper phases advanced the revision during a callback. */
+PeleResult *pele_public_revision_v15(const PelePublicDocument *document);
 typedef struct PeleDetachedRenderJobV15 PeleDetachedRenderJobV15;
 PeleResult *pele_public_prepare_detached_render_v15(PelePublicDocument *, uint64_t,
     const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t,

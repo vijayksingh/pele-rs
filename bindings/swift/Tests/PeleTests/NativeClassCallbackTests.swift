@@ -24,6 +24,12 @@ private final class ClassCallbackFailure: Error {}
     case .prepared(let d): _ = try d.apply(graph, expectedRevision: d.revision)
     }
   }
+  func apply(_ graph: Pele.PublicGraph, expectedRevision: UInt64) throws {
+    switch self {
+    case .normal(let d): _ = try d.apply(graph, expectedRevision: expectedRevision)
+    case .prepared(let d): _ = try d.apply(graph, expectedRevision: expectedRevision)
+    }
+  }
   func render(_ resources: Pele.HostResources, responsive: Bool) throws -> FullRenderedDiagram {
     var options = Pele.Engine.Options()
     options.maxWidth = responsive ? 180 : nil
@@ -379,4 +385,50 @@ private final class ClassCallbackFailure: Error {}
       try compare(document.render(Self.resources(), responsive: responsive), recovery)
     }
   }
+  func testMemberCallbackNativeWritesPermitNestedRenderButKeepExplicitStaleApply() throws {
+    let source = "classDiagram\nclass A {\n+String first\n+String second\n}\nclass B\nA --> B"
+    for raw in [false, true] {
+      let engine = Pele.Engine()
+      let document: ClassCallbackDocument = try raw
+        ? .prepared(engine.parsePrepared("class", source: source))
+        : .normal(engine.parseMutable(source))
+      defer { try? document.close() }
+      var initial = try document.snapshot().graph
+      let member = try Self.nodes(initial).member
+      let observed = ClassCallbackState()
+      var nestedCount = 0
+      let display = Pele.HostFunction { view, _, _ in
+        if !observed.inside {
+          observed.inside = true
+          defer { observed.inside = false }
+          let before = try document.snapshot()
+          // This changes native revision without updating Swift's owner cache.
+          _ = try view.intern("nested revision marker")
+          let nested = try document.render(Self.resources(), responsive: false)
+          XCTAssertFalse(nested.svg.isEmpty)
+          XCTAssertGreaterThan(document.revision, before.revision)
+          nestedCount += 1
+          // The implicit refresh must never replace an explicit stale revision.
+          XCTAssertThrowsError(try document.apply(before.graph, expectedRevision: before.revision)) {
+            XCTAssertEqual(($0 as? PeleError)?.message, "Stale public model revision")
+          }
+        }
+        let output = try view.object()
+        try view.set("displayText", on: output, to: view.intern("custom display"))
+        try view.set("cssStyle", on: output, to: view.intern(""))
+        return output
+      }
+      observed.functions.append(display)
+      try initial.setField("getDisplayDetails", value: document.bind(display), on: member)
+      try document.apply(initial)
+      let rendered = try document.render(Self.resources(), responsive: false)
+      XCTAssertFalse(rendered.svg.isEmpty)
+      XCTAssertEqual(nestedCount, 1)
+      let acknowledged = document.revision
+      XCTAssertEqual(try document.snapshot().revision, acknowledged)
+      XCTAssertFalse(try document.render(Self.resources(), responsive: false).svg.isEmpty)
+      XCTAssertEqual(nestedCount, 2)
+    }
+  }
+
 }

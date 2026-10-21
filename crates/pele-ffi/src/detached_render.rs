@@ -192,7 +192,10 @@ impl Reader {
                         pele::compat::public::MemberKind::Method { method } => {
                             Ok(Value::Atom(Atom::BuiltinFunction(method.0)))
                         }
-                        _ => Err(invalid("Native live accessor dispatch is unavailable").into()),
+                        // The native live reader exposes declared methods, but does not
+                        // execute inherited accessors. Family phase sources retain
+                        // their existing ordinary-graph derivations for those reads.
+                        _ => Ok(Value::Atom(Atom::Undefined)),
                     };
                 }
                 match descriptor.parent {

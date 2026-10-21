@@ -414,6 +414,24 @@ pub unsafe extern "C" fn pele_public_snapshot_v4(
         })
     })
 }
+/// Read only the current committed revision, without graph export or validation.
+/// # Safety
+/// handle must be null or a live owned document, not concurrently freed.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_revision_v15(
+    handle: *const PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let revision = unsafe { document(handle) }?.revision();
+        #[derive(Serialize)]
+        struct Revision {
+            revision: String,
+        }
+        success(Revision {
+            revision: revision.to_string(),
+        })
+    })
+}
 /// Schema-declared fields, prototypes and native method IDs for this document.
 /// # Safety
 /// handle must be null or live and not concurrently freed.
