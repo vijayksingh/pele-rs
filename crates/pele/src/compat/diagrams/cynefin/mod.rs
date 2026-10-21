@@ -43,3 +43,6 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<CynefinModel, PeleE
 
 mod public_model;
 pub use public_model::CynefinPublicState;
+
+mod live_phase;
+pub(crate) use live_phase::{render_detached, CynefinDetachedInput};

@@ -20,6 +20,8 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Wardley,
+    Cynefin,
     Er,
     Mindmap,
     Treemap,
@@ -43,6 +45,20 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn wardley() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::wardley::Wardley>(),
+            kind: Kind::Wardley,
+        }
+    }
+
+    pub(crate) fn cynefin() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::cynefin::Cynefin>(),
+            kind: Kind::Cynefin,
+        }
+    }
+
     pub(crate) fn er() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::er::Er>(),
@@ -155,6 +171,8 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Wardley(crate::compat::diagrams::wardley::WardleyDetachedInput),
+    Cynefin(crate::compat::diagrams::cynefin::CynefinDetachedInput),
     Er(crate::compat::diagrams::er::ErDetachedInput),
     Mindmap(crate::compat::diagrams::mindmap::MindmapDetachedInput),
     Treemap(crate::compat::diagrams::treemap::TreemapDetachedInput),
@@ -172,6 +190,20 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn wardley(input: crate::compat::diagrams::wardley::WardleyDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::wardley::Wardley>(),
+            body: Body::Wardley(input),
+        }
+    }
+
+    pub(crate) fn cynefin(input: crate::compat::diagrams::cynefin::CynefinDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::cynefin::Cynefin>(),
+            body: Body::Cynefin(input),
+        }
+    }
+
     pub(crate) fn er(input: crate::compat::diagrams::er::ErDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::er::Er>(),
@@ -282,6 +314,8 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Wardley(_) => Kind::Wardley,
+            Body::Cynefin(_) => Kind::Cynefin,
             Body::Er(_) => Kind::Er,
             Body::Mindmap(_) => Kind::Mindmap,
             Body::Treemap(_) => Kind::Treemap,
@@ -311,6 +345,12 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Wardley(input) => crate::compat::diagrams::wardley::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Cynefin(input) => crate::compat::diagrams::cynefin::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Er(input) => crate::compat::diagrams::er::render_detached(
                 input, config, settings, read, resources,
             ),

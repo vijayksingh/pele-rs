@@ -372,6 +372,14 @@ fn project(g: &ModelGraph) -> Result<CynefinModel, PublicError> {
 }
 impl PublicDiagramModule for Cynefin {
     type PublicState = CynefinPublicState;
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::cynefin())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::cynefin(
+            super::CynefinDetachedInput::new(state.projected.as_ref().err().cloned().map(legacy)),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }

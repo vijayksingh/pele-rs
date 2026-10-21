@@ -3,6 +3,9 @@ mod lexer;
 mod model;
 mod parser;
 mod render;
+mod phase;
+mod live_phase;
+pub(crate) use live_phase::{render_detached,WardleyDetachedInput};
 use crate::compat::{
     DiagramModule, DiagramType, Engine, ModuleDescriptor, Object, ParseContext, ParseOptions,
     PeleError, RenderResources, RenderSettings, Rendered,

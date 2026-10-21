@@ -612,6 +612,15 @@ fn project(g: &ModelGraph) -> Result<WardleyModel, PublicError> {
 }
 impl PublicDiagramModule for Wardley {
     type PublicState = WardleyPublicState;
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::wardley())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::wardley(
+            super::WardleyDetachedInput::new(state.projected.as_ref().err()),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }

@@ -77,13 +77,13 @@ fn badge(
         overflow,
     })
 }
-fn block(
+fn block<I: PhaseInput>(
     name: DomainName,
-    model: &CynefinModel,
+    input: &mut I,
     m: &Metrics,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
-) -> Result<Block, PeleError> {
+) -> Result<Block, I::Error> {
     let meta = meta(name);
     let title = layout_label(Some(meta[0]), false, r, o, m.size, 4000., 1)?;
     let mut subtitles = vec![];
@@ -94,24 +94,23 @@ fn block(
             }
         }
     }
-    let items = model.domain(name).map_or(&[][..], |b| b.items.as_slice());
-    let shown = if name == Confusion && items.len() > 3 {
+    // Source captures the items receiver and initial shown length after the
+    // domain heading callbacks, then reads each label as it reaches that slot.
+    let items = input.items(name)?;
+    let count = input.item_count(&items)?;
+    let shown = if name == Confusion && count > 3 {
         3
     } else {
-        items.len()
+        count
     };
     let mut badges = vec![];
-    for item in &items[..shown] {
-        badges.push(badge(item.label.clone(), false, m, o, r)?)
+    for i in 0..shown {
+        let text = input.item_label(&items, i)?;
+        badges.push(badge(text, false, m, o, r)?);
     }
-    if shown < items.len() {
-        badges.push(badge(
-            format!("+{} more", items.len() - shown),
-            true,
-            m,
-            o,
-            r,
-        )?)
+    let count = input.item_count(&items)?;
+    if shown < count {
+        badges.push(badge(format!("+{} more", count - shown), true, m, o, r)?);
     }
     let mut w = title.width;
     let mut h = title.height;
@@ -175,12 +174,12 @@ fn point(t: f64, from: &Block, to: &Block, px: f64, py: f64) -> (f64, f64) {
         u * u * from.cy + 2. * u * t * py + t * t * to.cy,
     )
 }
-pub(super) fn render(
-    model: &CynefinModel,
+pub(crate) fn render_phases<I: PhaseInput>(
+    input: &mut I,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, I::Error> {
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.8125);
     let item_size = round(size * 0.875);
@@ -205,9 +204,9 @@ pub(super) fn render(
     };
     let mut quadrants = vec![];
     for &(name, ..) in &QUADRANTS {
-        quadrants.push(block(name, model, &m, o, r)?);
+        quadrants.push(block(name, input, &m, o, r)?);
     }
-    let mut confusion = block(Confusion, model, &m, o, r)?;
+    let mut confusion = block(Confusion, input, &m, o, r)?;
     let rx = 88f64.js_max(confusion.w * 0.71 + 8.);
     let ry = 64f64.js_max(confusion.h * 0.71 + 6.);
     let mut quad_w = setting(c, "width", 640., 100., 10000.) / 2.;
@@ -230,7 +229,8 @@ pub(super) fn render(
             quad_h = quad_h.js_max(taller)
         }
     }
-    let title = layout_label(model.title.as_deref(), false, r, o, size, 4000., 1)?;
+    let title_text = input.metadata("title")?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, 4000., 1)?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
@@ -305,20 +305,24 @@ pub(super) fn render(
     let blocks = quadrants;
     let mut seen: HashMap<(DomainName, DomainName), usize> = HashMap::new();
     let mut edges = String::new();
-    for t in &model.transitions {
-        let Some(from) = blocks.iter().find(|b| b.name == t.from) else {
+    let transitions = input.transitions()?;
+    let mut next = 0;
+    while let Some(t) = input.next_transition(&transitions, next)? {
+        next += 1;
+        let (start, end) = input.endpoints(&t)?;
+        let Some(from) = blocks.iter().find(|b| Some(b.name) == start) else {
             continue;
         };
-        let Some(to) = blocks.iter().find(|b| b.name == t.to) else {
+        let Some(to) = blocks.iter().find(|b| Some(b.name) == end) else {
             continue;
         };
         if from.name == to.name {
             continue;
         }
-        let key = if t.from.as_str() < t.to.as_str() {
-            (t.from, t.to)
+        let key = if from.name.as_str() < to.name.as_str() {
+            (from.name, to.name)
         } else {
-            (t.to, t.from)
+            (to.name, from.name)
         };
         let repeat = seen.entry(key).or_default();
         let rep = *repeat;
@@ -393,7 +397,8 @@ pub(super) fn render(
         ex -= ux * marker_trim("arrow_point");
         ey -= uy * marker_trim("arrow_point");
         let mut text = String::new();
-        if let Some(s) = t.label.as_deref().filter(|s| !s.is_empty()) {
+        let raw_label = input.transition_label(&t)?;
+        if let Some(s) = raw_label.as_deref() {
             let label = layout_label(Some(s), false, r, o, small, 200., 0)?;
             let (lx, ly) = point((t0 + t1) / 2.);
             let away = (nx.abs() * label.width) / 2. + (ny.abs() * label.height) / 2. + 6.;
@@ -412,7 +417,8 @@ pub(super) fn render(
                 r,
             )?;
         }
-        edges+=&format!("<g class=\"pele-edge\" data-id=\"{}-{}\"><path d=\"M{},{}Q{},{} {},{}\" fill=\"none\" stroke=\"var(--_l)\"/>{head}{text}</g>",t.from.as_str(),t.to.as_str(),num(sx),num(sy),num(qx),num(qy),num(ex),num(ey));
+        let (from_id, to_id) = input.transition_id(&t)?;
+        edges+=&format!("<g class=\"pele-edge\" data-id=\"{}-{}\"><path d=\"M{},{}Q{},{} {},{}\" fill=\"none\" stroke=\"var(--_l)\"/>{head}{text}</g>",from_id,to_id,num(sx),num(sy),num(qx),num(qy),num(ex),num(ey));
     }
     let total_width = (width.js_max(title.width) + 2. * pad).ceil();
     let total_height = (height + title_height + 2. * pad).ceil();
@@ -429,6 +435,8 @@ pub(super) fn render(
             format!("<g class=\"pele-edges\">{edges}</g>")
         }
     );
+    let acc_title = input.metadata("accTitle")?;
+    let acc_descr = input.metadata("accDescr")?;
     Ok(Rendered {
         svg: svg::document(
             "cynefin",
@@ -436,12 +444,89 @@ pub(super) fn render(
             total_height,
             size,
             o,
-            model.acc_title.as_deref(),
-            model.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width: total_width,
         height: total_height,
         links: vec![],
     })
+}
+
+/// Source observation phases shared by immutable Rust models and owned jobs.
+pub(crate) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Items;
+    type Transitions;
+    type Transition;
+    fn items(&mut self, name: DomainName) -> Result<Self::Items, Self::Error>;
+    fn item_count(&mut self, items: &Self::Items) -> Result<usize, Self::Error>;
+    fn item_label(&mut self, items: &Self::Items, index: usize) -> Result<String, Self::Error>;
+    fn metadata(&mut self, key: &'static str) -> Result<Option<String>, Self::Error>;
+    fn transitions(&mut self) -> Result<Self::Transitions, Self::Error>;
+    fn next_transition(
+        &mut self,
+        rows: &Self::Transitions,
+        index: usize,
+    ) -> Result<Option<Self::Transition>, Self::Error>;
+    fn endpoints(
+        &mut self,
+        row: &Self::Transition,
+    ) -> Result<(Option<DomainName>, Option<DomainName>), Self::Error>;
+    fn transition_label(&mut self, row: &Self::Transition) -> Result<Option<String>, Self::Error>;
+    fn transition_id(&mut self, row: &Self::Transition) -> Result<(String, String), Self::Error>;
+}
+struct TypedPhase<'a>(&'a CynefinModel);
+impl<'a> PhaseInput for TypedPhase<'a> {
+    type Error = PeleError;
+    type Items = &'a [CynefinItem];
+    type Transitions = &'a [CynefinTransition];
+    type Transition = &'a CynefinTransition;
+    fn items(&mut self, name: DomainName) -> Result<Self::Items, PeleError> {
+        Ok(self.0.domain(name).map_or(&[], |d| d.items.as_slice()))
+    }
+    fn item_count(&mut self, items: &Self::Items) -> Result<usize, PeleError> {
+        Ok(items.len())
+    }
+    fn item_label(&mut self, items: &Self::Items, index: usize) -> Result<String, PeleError> {
+        Ok(items[index].label.clone())
+    }
+    fn metadata(&mut self, key: &'static str) -> Result<Option<String>, PeleError> {
+        Ok(match key {
+            "title" => self.0.title.clone(),
+            "accTitle" => self.0.acc_title.clone(),
+            _ => self.0.acc_descr.clone(),
+        })
+    }
+    fn transitions(&mut self) -> Result<Self::Transitions, PeleError> {
+        Ok(&self.0.transitions)
+    }
+    fn next_transition(
+        &mut self,
+        rows: &Self::Transitions,
+        index: usize,
+    ) -> Result<Option<Self::Transition>, PeleError> {
+        Ok(rows.get(index))
+    }
+    fn endpoints(
+        &mut self,
+        row: &Self::Transition,
+    ) -> Result<(Option<DomainName>, Option<DomainName>), PeleError> {
+        Ok((Some(row.from), Some(row.to)))
+    }
+    fn transition_label(&mut self, row: &Self::Transition) -> Result<Option<String>, PeleError> {
+        Ok(row.label.clone().filter(|s| !s.is_empty()))
+    }
+    fn transition_id(&mut self, row: &Self::Transition) -> Result<(String, String), PeleError> {
+        Ok((row.from.as_str().into(), row.to.as_str().into()))
+    }
+}
+pub(super) fn render(
+    model: &CynefinModel,
+    config: &Object,
+    settings: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, PeleError> {
+    render_phases(&mut TypedPhase(model), config, settings, resources)
 }
