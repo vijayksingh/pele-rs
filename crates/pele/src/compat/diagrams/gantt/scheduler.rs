@@ -88,27 +88,43 @@ pub(super) fn spend<S: Store>(s: &mut S, units: f64) -> Result<(), S::Error> {
     }
     Ok(())
 }
+pub(super) fn parse_request<S: Store>(
+    s: &mut S,
+    text: String,
+    template: String,
+) -> Result<CalendarRequest, S::Error> {
+    s.method("parse")?;
+    spend(
+        s,
+        (template.encode_utf16().count() + 1) as f64 * (text.encode_utf16().count() + 1) as f64,
+    )?;
+    Ok(CalendarRequest::Parse {
+        text,
+        template,
+        now: s.now()?,
+    })
+}
+pub(super) fn today_request<S: Store>(s: &mut S) -> Result<CalendarRequest, S::Error> {
+    s.method("today")?;
+    Ok(CalendarRequest::Today(s.now()?))
+}
 pub(super) fn parse<S: Store>(
     s: &mut S,
     text: &str,
     template: &str,
     cal: &mut Calendar<'_>,
 ) -> Result<Option<S::Date>, S::Error> {
-    s.method("parse")?;
-    spend(
-        s,
-        (template.encode_utf16().count() + 1) as f64 * (text.encode_utf16().count() + 1) as f64,
-    )?;
-    let now = s.now()?;
-    let parsed = cal.parse_strict(text, template, now);
-    cal.check().map_err(S::Error::from)?;
+    let request = parse_request(s, text.to_owned(), template.to_owned())?;
+    let parsed = request.run(cal).map_err(S::Error::from)?.number();
     parsed.map(|ms| s.date(ms)).transpose()
 }
 pub(super) fn today<S: Store>(s: &mut S, cal: &mut Calendar<'_>) -> Result<S::Date, S::Error> {
-    s.method("today")?;
-    let now = s.now()?;
-    let value = cal.today(now);
-    cal.check().map_err(S::Error::from)?;
+    let request = today_request(s)?;
+    let value = request
+        .run(cal)
+        .map_err(S::Error::from)?
+        .number()
+        .expect("today returns a date");
     s.date(value)
 }
 fn prepare_schedule<S: Store>(s: &mut S, now: f64) -> Result<(), S::Error> {
@@ -224,7 +240,7 @@ mod tasks;
 pub(super) use tasks::{Invalid, Schedule, Task, Tasks};
 mod start;
 pub(super) use end::End;
-pub(super) use program::{CalendarReply, Step, Warning};
+pub(super) use program::{CalendarReply, CalendarRequest, Step, Warning};
 pub(super) use start::Start;
 pub(super) fn start<S: Store>(
     s: &mut S,

@@ -31,7 +31,7 @@ pub(in crate::compat::diagrams::gantt) enum CalendarReply {
     Text(Option<String>),
 }
 impl CalendarReply {
-    pub(super) fn number(self) -> Option<f64> {
+    pub(in crate::compat::diagrams::gantt) fn number(self) -> Option<f64> {
         match self {
             Self::Number(v) => v,
             _ => unreachable!("native calendar reply kind"),

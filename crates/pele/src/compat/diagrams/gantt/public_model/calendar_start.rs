@@ -2,6 +2,7 @@
 use super::*;
 use crate::compat::public::PublicResourceOperation;
 enum Program {
+    Date(Option<scheduler::CalendarRequest>),
     Invalid(scheduler::Invalid<DateValue>),
     Start(scheduler::Start<Atom>),
     End(scheduler::End<Atom, DateValue>),
@@ -28,6 +29,8 @@ pub(super) fn invocation(call: MethodCall) -> DetachedPublicInvocation {
     let direct_entry = Some(match call.method.0 {
         19 => "getTasks",
         20 => "isInvalidDate",
+        22 => "parse",
+        23 => "today",
         25 => "compileTasks",
         26 => "compileTask",
         28 => "getStartDate",
@@ -111,6 +114,12 @@ impl Invocation {
                         check_date_get_day(&mut arena.c, &a)?;
                         Program::Invalid(scheduler::Invalid::new(DateValue::Existing(a)))
                     }
+                    22 => {
+                        let text = arena.c.scalar(&a, "str.length")?;
+                        let template = arena.c.scalar(&b, "template.length")?;
+                        Program::Date(Some(scheduler::parse_request(&mut arena, text, template)?))
+                    }
+                    23 => Program::Date(Some(scheduler::today_request(&mut arena)?)),
                     28 => Program::Start(scheduler::Start::new(arena.c.scalar(&a, "raw.trim")?)),
                     30 => Program::End(scheduler::End::new(
                         DateValue::Existing(a),
@@ -140,6 +149,16 @@ impl Invocation {
                 .as_mut()
                 .expect("initialized scheduler program")
             {
+                Program::Date(request) => {
+                    if let Some(request) = request.take() {
+                        scheduler::Step::Resource(request)
+                    } else {
+                        let date = calendar_reply.expect("native calendar date reply").number();
+                        scheduler::Step::Complete(date.map_or(Ok(Atom::Undefined), |ms| {
+                            arena.c.date_value(DateValue::Fresh(ms))
+                        })?)
+                    }
+                }
                 Program::Invalid(program) => match program.advance(&mut arena, calendar_reply)? {
                     scheduler::Step::Complete(value) => {
                         scheduler::Step::Complete(value.map_or(Atom::Undefined, Atom::Bool))

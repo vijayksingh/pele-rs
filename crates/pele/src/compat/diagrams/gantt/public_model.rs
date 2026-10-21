@@ -3331,7 +3331,7 @@ impl PublicDiagramModule for Gantt {
         })
     }
     fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
-        if matches!(call.method.0, 19 | 20 | 25 | 26 | 28 | 30) {
+        if matches!(call.method.0, 19 | 20 | 22 | 23 | 25 | 26 | 28 | 30) {
             return Some(calendar_start::invocation(call));
         }
         let first = call.arguments.first().cloned().unwrap_or(Atom::Undefined);

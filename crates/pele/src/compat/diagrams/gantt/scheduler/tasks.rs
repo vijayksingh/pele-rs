@@ -2,25 +2,9 @@
 //! Store; Calendar and warning requests never retain a borrowed Store.
 use super::super::model::error;
 use super::program::{CalendarReply, CalendarRequest, Step};
-use super::{prepare_schedule, spend, trimmed, End, Flag, Start, Store, Time};
+use super::{parse_request, prepare_schedule, spend, trimmed, End, Flag, Start, Store, Time};
 use crate::compat::ErrorCode;
 
-fn parse_request<S: Store>(
-    s: &mut S,
-    text: String,
-    template: String,
-) -> Result<CalendarRequest, S::Error> {
-    s.method("parse")?;
-    spend(
-        s,
-        (template.encode_utf16().count() + 1) as f64 * (text.encode_utf16().count() + 1) as f64,
-    )?;
-    Ok(CalendarRequest::Parse {
-        text,
-        template,
-        now: s.now()?,
-    })
-}
 enum InvalidPhase<D> {
     Begin(D),
     Weekday(f64),

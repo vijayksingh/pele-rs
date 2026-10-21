@@ -117,7 +117,7 @@ extension Pele {
             struct Call: Encodable { let method: UInt32; let receiver: PublicGraph.Atom; let arguments: [PublicGraph.Atom] }
             let bytes = try JSONEncoder().encode(Call(method: method, receiver: receiver, arguments: arguments))
             guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public method exceeds 64 MiB JSON budget") }
-            let liveCalendar = type == "gantt" && [19, 20, 25, 26, 28, 30].contains(method)
+            let liveCalendar = type == "gantt" && [19, 20, 22, 23, 25, 26, 28, 30].contains(method)
             if usesHostValues || liveCalendar, let detached = try invokeDetached(bytes, resources: resources) { return detached }
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in withHostFunctionResources(takeError) { bytes.withUnsafeBytes { input in
