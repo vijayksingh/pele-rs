@@ -1,5 +1,13 @@
 # Current functional parity — incomplete (2026-10-21)
 
+Kanban, Treemap, Mindmap, ER, Cynefin and Wardley now pass the fresh owned-job
+checkpoint: native46 scoped features/final8, Swift24 distinct features (23 in
+one run plus one repaired assertion rerun), strict C3 and browser54. All318 new
+scenarios pass Swift; browsers compare954 paired rows. Fresh audit matches17/33
+edit/throw cases, leaving16 mismatches. This does not certify complete modules
+or full API parity. See [six-family evidence](parity/2026-10-21-owned-domain-families/README.md).
+
+
 Venn, Ishikawa, Timeline, Journey and TreeView now pass fresh Swift17/C3/web39
 checks, including all234 new scenarios in Swift and702 paired browser comparisons.
 Native feature slices cover45 distinct checks; final6 include callback-expanded
