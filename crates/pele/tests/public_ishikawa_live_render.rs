@@ -42,6 +42,12 @@ impl Read {
 }
 impl LiveRenderRead for Read {
     type Value = Val;
+    fn object_identity(&mut self, value: &Val) -> Result<Option<u64>, PublicError> {
+        Ok(match value {
+            Val::Atom(Atom::Ref(id)) => Some(u64::from(*id)),
+            _ => None,
+        })
+    }
     fn root(&self) -> Val {
         self.own(self.0.borrow().root.clone())
     }
@@ -473,5 +479,100 @@ fn ishikawa_live_callbacks_keep_phase_reads_aliases_nested_errors_and_recovery()
             recovery,
             "{context}/typed geometry"
         );
+    }
+}
+
+// Native budget extension: repeated reads of the same node are not charged
+// twice, but a callback cannot expand unique active nodes past16m text units.
+#[test]
+fn ishikawa_callback_unique_node_text_budget_retains_writes_and_recovers() {
+    struct Expand<'a> {
+        doc: &'a mut PublicDocument,
+        graph: Rc<RefCell<ModelGraph>>,
+        fired: bool,
+    }
+    impl RenderResources for Expand<'_> {
+        fn text_width(&mut self, _: TextRequest<'_>) -> Result<f64, PeleError> {
+            if !self.fired {
+                self.fired = true;
+                let mut g = self.doc.snapshot()?;
+                let (root, _, _) = first(&g);
+                let label = text(&mut g, &"x".repeat(8192));
+                let empty = array(&mut g, vec![]);
+                let mut children = Vec::new();
+                for _ in 0..2049 {
+                    let node = g.nodes.len() as u32;
+                    g.nodes.push(Node::Object { properties: vec![] });
+                    set(&mut g, node, "text", label.clone());
+                    set(&mut g, node, "children", Atom::Ref(empty));
+                    children.push(Atom::Ref(node));
+                }
+                let children = array(&mut g, children);
+                set(&mut g, root, "children", Atom::Ref(children));
+                self.doc.apply(self.doc.revision(), g)?;
+                *self.graph.borrow_mut() = self.doc.snapshot()?;
+            }
+            Ok(1.)
+        }
+    }
+    let mut doc = PublicEngine::with_builtins()
+        .parse(SOURCE, &Default::default())
+        .unwrap();
+    let mut initial = doc.snapshot().unwrap();
+    let document = id(initial.root.clone());
+    set_text(&mut initial, document, "title", "Initial title");
+    doc.apply(doc.revision(), initial).unwrap();
+    let initial = doc.snapshot().unwrap();
+    let (root, _, _) = first(&initial);
+    let original = field(&initial, &Atom::Ref(root), "children");
+    let graph = Rc::new(RefCell::new(initial));
+    let mut read = Read(graph.clone());
+    let job = doc
+        .prepare_detached_render(doc.revision(), request(false, false))
+        .unwrap()
+        .unwrap();
+    let mut host = Expand {
+        doc: &mut doc,
+        graph: graph.clone(),
+        fired: false,
+    };
+    let done = job.run(&mut read, &mut host);
+    assert!(host.fired);
+    drop(host);
+    let completion = doc.finish_detached_render(done).unwrap();
+    let PublicError::Pele(error) = completion.result.err().unwrap() else {
+        panic!("native limit")
+    };
+    assert_eq!(error.code, ErrorCode::Limit);
+    assert!(!doc.has_active_detached_render());
+    let mut after = doc.snapshot().unwrap();
+    let children = id(field(&after, &Atom::Ref(root), "children"));
+    assert!(matches!(
+        after.nodes[children as usize],
+        Node::Array { length: 2049, .. }
+    ));
+    set(&mut after, root, "children", original);
+    doc.apply(doc.revision(), after).unwrap();
+    *graph.borrow_mut() = doc.snapshot().unwrap();
+    let job = doc
+        .prepare_detached_render(doc.revision(), request(false, false))
+        .unwrap()
+        .unwrap();
+    let done = job.run(&mut read, &mut Plain::default());
+    let draw = drawing(&rendered(
+        doc.finish_detached_render(done).unwrap().result.unwrap(),
+    ));
+    let fixture: Json = serde_json::from_str(include_str!(
+        "../../../fixtures/public-ishikawa-live-render.json"
+    ))
+    .unwrap();
+    let expected = fixture["rows"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|r| r["raw"] == false && r["responsive"] == false && r["mode"] == "baseline")
+        .unwrap();
+    for key in ["svg", "width", "height"] {
+        assert_eq!(draw[key], expected["first"][key]);
     }
 }

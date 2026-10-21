@@ -11,6 +11,7 @@ pub(super) trait PhaseInput {
     type Error: From<PeleError>;
     type Node: Clone;
     type Children;
+    fn begin_draw(&mut self) {}
     fn title(&mut self) -> Result<Option<String>, Self::Error>;
     fn root(&mut self, repeat: bool) -> Result<Option<Self::Node>, Self::Error>;
     fn text(&mut self, node: &Self::Node) -> Result<String, Self::Error>;
@@ -222,6 +223,7 @@ fn horizontal<P: PhaseInput>(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, P::Error> {
+    input.begin_draw();
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
@@ -395,6 +397,7 @@ fn vertical<P: PhaseInput>(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, P::Error> {
+    input.begin_draw();
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
