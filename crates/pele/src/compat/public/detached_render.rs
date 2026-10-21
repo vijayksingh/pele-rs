@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    GitGraph,
     Railroad,
     Requirement,
     C4,
@@ -48,6 +49,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn git_graph() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::git_graph::GitGraph>(),
+            kind: Kind::GitGraph,
+        }
+    }
+
     pub(crate) fn railroad() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::railroad::Railroad>(),
@@ -195,6 +203,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    GitGraph(crate::compat::diagrams::git_graph::GitGraphDetachedInput),
     Railroad(crate::compat::diagrams::railroad::RailroadDetachedInput),
     Requirement(crate::compat::diagrams::requirement::RequirementDetachedInput),
     C4(crate::compat::diagrams::c4::C4DetachedInput),
@@ -217,6 +226,15 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn git_graph(
+        input: crate::compat::diagrams::git_graph::GitGraphDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::git_graph::GitGraph>(),
+            body: Body::GitGraph(input),
+        }
+    }
+
     pub(crate) fn railroad(
         input: crate::compat::diagrams::railroad::RailroadDetachedInput,
     ) -> Self {
@@ -366,6 +384,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::GitGraph(_) => Kind::GitGraph,
             Body::Railroad(_) => Kind::Railroad,
             Body::Requirement(_) => Kind::Requirement,
             Body::C4(_) => Kind::C4,
@@ -400,6 +419,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::GitGraph(input) => crate::compat::diagrams::git_graph::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Railroad(input) => crate::compat::diagrams::railroad::render_detached(
                 input, config, settings, read, resources,
             ),

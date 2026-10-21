@@ -1,5 +1,8 @@
 //! Pele git/render.ts commit lanes, symbols and connectors, 458322a5 (MIT, kepano).
-use super::model::{GitCommit, GitModel};
+use super::{
+    model::GitModel,
+    phase::{PhaseInput, Typed},
+};
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     diagrams::common::plain_label::plain_label,
@@ -11,8 +14,8 @@ use std::collections::HashMap;
 const HALF: f64 = std::f64::consts::FRAC_1_SQRT_2;
 const RADIUS: &str = "var(--pele-radius,4px)";
 const CLASSES: [&str; 5] = ["normal", "reverse", "highlight", "merge", "cherry-pick"];
-struct View<'a> {
-    commit: &'a GitCommit,
+struct View<V> {
+    commit: V,
     lane: usize,
     m: f64,
     label: Option<Label>,
@@ -80,10 +83,27 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let first = draw(model, config, options, resources, &model.direction)?;
-    if model.direction != "LR" {
-        return Ok(first);
+    render_phases(&mut Typed(model), config, options, resources)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let root = input.root();
+    let direction = {
+        let value = input.get(&root, "direction")?;
+        input.string_key(&value)?.unwrap_or_default()
+    };
+    if direction != "LR" {
+        let direction = {
+            let value = input.get(&root, "direction")?;
+            input.string_key(&value)?.unwrap_or_default()
+        };
+        return draw(input, config, options, resources, &direction);
     }
+    let first = draw(input, config, options, resources, "LR")?;
     let Some(available) = options.max_width.filter(|w| *w > 0.) else {
         return Ok(first);
     };
@@ -97,20 +117,22 @@ pub(super) fn render(
     {
         return Ok(first);
     }
-    let down = draw(model, config, options, resources, "TB")?;
+    let down = draw(input, config, options, resources, "TB")?;
     Ok(if down.width < first.width {
         down
     } else {
         first
     })
 }
-fn draw(
-    model: &GitModel,
+fn draw<P: PhaseInput>(
+    input: &mut P,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     direction: &str,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
+    input.begin_draw();
+    let root = input.root();
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.75);
     let pad = options.padding.unwrap_or(8.);
@@ -120,61 +142,103 @@ fn draw(
     let parallel = flag(config, "parallelCommits", false);
     let vertical = direction != "LR";
     let flip = direction == "BT";
-    let lane_of: HashMap<_, _> = model
-        .lanes
-        .iter()
-        .enumerate()
-        .map(|(i, n)| (n.as_str(), i))
-        .collect();
-    let lane_count = model.lanes.len();
+    let mut lane_of = HashMap::new();
+    let lanes = input.get(&root, "lanes")?;
+    let count = input.count(&lanes)?;
+    for i in 0..count {
+        input.work(1)?;
+        if input.present(&lanes, i)? {
+            let value = input.index(&lanes, i)?;
+            lane_of.insert(input.text(&value)?, i);
+        }
+    }
+    let lanes = input.get(&root, "lanes")?;
+    let lane_count = input.count(&lanes)?;
     let medium = round(size * 0.875);
     let mut names = Vec::new();
-    for name in &model.lanes {
+    let lanes = input.get(&root, "lanes")?;
+    let count = input.count(&lanes)?;
+    for i in 0..count {
+        input.work(1)?;
+        let value = input.index(&lanes, i)?;
+        let name = if show_branches {
+            input.text(&value)?
+        } else {
+            String::new()
+        };
+        input.keep_label(name.encode_utf16().count())?;
         names.push(plain_label(
-            Some(if show_branches { name } else { "" }),
+            Some(&name),
             resources,
             options,
             medium,
             4000.,
             0,
-        )?)
+        )?);
     }
     let mut views = Vec::new();
     let mut by_id = HashMap::new();
-    let mut commits: Vec<_> = model.commits.iter().map(|(_, c)| c).collect();
-    commits.sort_by_key(|c| c.seq);
+    let map = input.get(&root, "commits")?;
+    let commits = input.map_values(&map)?;
+    let mut sorted = Vec::with_capacity(commits.len());
     for commit in commits {
+        input.work(1)?;
+        let seq = input.sequence(&commit)?;
+        sorted.push((commit, seq));
+    }
+    sorted.sort_by(|a, b| a.1.compare(&b.1));
+    for (commit, _) in sorted {
         let labelled = show_label
-            && commit.commit_type != 4
-            && (commit.commit_type != 3 || commit.custom_id == Some(true));
+            && input.kind(&commit, "type")? != 4
+            && (input.kind(&commit, "type")? != 3 || {
+                let v = input.get(&commit, "customId")?;
+                input.is_true(&v)
+            });
         let mut tags = Vec::new();
-        for tag in &commit.tags {
-            let label = plain_label(Some(tag), resources, options, small, 4000., 0)?;
+        let list = input.get(&commit, "tags")?;
+        let mut i = 0;
+        while i < input.count(&list)? {
+            input.work(1)?;
+            let value = input.index(&list, i)?;
+            i += 1;
+            let tag = input.text(&value)?;
+            input.keep_label(tag.encode_utf16().count())?;
+            let label = plain_label(Some(&tag), resources, options, small, 4000., 0)?;
             if !label.lines.is_empty() {
                 tags.push(label)
             }
         }
+        // Branch is read before the commit-id label's callbacks in the object literal.
+        let branch = input.get(&commit, "branch")?;
+        let branch = input.string_key(&branch)?;
+        let lane = branch
+            .as_ref()
+            .and_then(|key| lane_of.get(key))
+            .copied()
+            .unwrap_or(0);
+        if lane >= lane_count {
+            return Err(PeleError::new(
+                "GitGraph live lane is outside captured lanes",
+                crate::compat::ErrorCode::Semantic,
+            )
+            .into());
+        }
         let label = if labelled {
-            Some(plain_label(
-                Some(&commit.id),
-                resources,
-                options,
-                small,
-                4000.,
-                0,
-            )?)
+            let id = input.field_text(&commit, "id")?.unwrap_or_default();
+            input.keep_label(id.encode_utf16().count())?;
+            Some(plain_label(Some(&id), resources, options, small, 4000., 0)?)
         } else {
             None
         };
-        let view = View {
+        let id = input.field_text(&commit, "id")?.unwrap_or_default();
+        by_id.insert(id, views.len());
+        views.push(View {
             commit,
-            lane: lane_of.get(commit.branch.as_str()).copied().unwrap_or(0),
+            lane,
             m: 0.,
             label,
             tags,
-        };
-        by_id.insert(commit.id.as_str(), views.len());
-        views.push(view)
+        });
     }
     let mut half = vec![0.; views.len()];
     let mut tag_half = vec![0.; views.len()];
@@ -221,8 +285,9 @@ fn draw(
             if tag_half[k] == 0. {
                 continue;
             }
-            for id in &view.commit.parents {
-                if let Some(&p) = by_id.get(id.as_str()) {
+            let list = input.get(&view.commit, "parents")?;
+            for id in input.strings(&list)? {
+                if let Some(&p) = id.as_ref().and_then(|key| by_id.get(key)) {
                     if views[p].lane < view.lane {
                         lead[k] = tag_half[k] + 4.
                     }
@@ -249,8 +314,9 @@ fn draw(
             continue;
         }
         let mut m = 0_f64;
-        for id in &views[k].commit.parents {
-            if let Some(&p) = by_id.get(id.as_str()) {
+        let list = input.get(&views[k].commit, "parents")?;
+        for id in input.strings(&list)? {
+            if let Some(&p) = id.as_ref().and_then(|key| by_id.get(key)) {
                 if p < k {
                     m = m.js_max(views[p].m + space(p, k))
                 }
@@ -319,7 +385,7 @@ fn draw(
                 px(end + 20., c),
                 py(end + 20., c),
             );
-            branches+=&format!("<g class=\"pele-branch\" data-id=\"{}\"><path class=\"pele-lane\" d=\"M{}L{}\" stroke=\"{color}\" stroke-dasharray=\"2 4\"/>",esc_text(&model.lanes[i])?,point(-20.,c),point(end+20.,c));
+            branches+=&format!("<g class=\"pele-branch\" data-id=\"{}\"><path class=\"pele-lane\" d=\"M{}L{}\" stroke=\"{color}\" stroke-dasharray=\"2 4\"/>",esc_text(&{let lanes=input.get(&root,"lanes")?;let value=input.index(&lanes,i)?;input.text(&value)?})?,point(-20.,c),point(end+20.,c));
             if !name.lines.is_empty() {
                 bounds.grow(cx - w / 2., cy - h / 2., cx + w / 2., cy + h / 2.);
                 branches+=&format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"{color}\"/>{}",num(cx-w/2.),num(cy-h/2.),num(w),num(h),label_svg(name,cx,cy," class=\"pele-label\" fill=\"var(--_bg)\""))
@@ -344,11 +410,12 @@ fn draw(
     let mut curves = String::new();
     let mut lines = String::new();
     for (k, view) in views.iter().enumerate() {
-        let commit = view.commit;
+        let commit = &view.commit;
         let c2 = cross[view.lane];
         let m2 = view.m;
-        for (j, id) in commit.parents.iter().enumerate() {
-            let Some(&p) = by_id.get(id.as_str()) else {
+        let parents = input.get(commit, "parents")?;
+        for (j, id) in input.strings(&parents)?.into_iter().enumerate() {
+            let Some(&p) = id.as_ref().and_then(|key| by_id.get(key)) else {
                 continue;
             };
             if p == k {
@@ -366,7 +433,7 @@ fn draw(
                 );
                 continue;
             }
-            let merged = j > 0 && commit.commit_type == 3;
+            let merged = j > 0 && input.kind(commit, "type")? == 3;
             let picked = j > 0 && !merged;
             let mut d = format!("M{}", point(m1, c1));
             if m2 <= m1 {
@@ -434,14 +501,26 @@ fn draw(
     }
     let mut commits = String::new();
     for view in &views {
-        let commit = view.commit;
+        let commit = &view.commit;
         let x = px(view.m, cross[view.lane]);
         let y = py(view.m, cross[view.lane]);
-        let kind = commit.custom_type.unwrap_or(commit.commit_type);
+        let custom = input.get(commit, "customType")?;
+        let kind = if input.nullish(&custom) {
+            input.kind(commit, "type")?
+        } else {
+            input.cached_kind(&custom)?
+        };
         bounds.grow(x - 8., y - 8., x + 8., y + 8.);
-        let written = commit.commit_type < 3 && !commit.message.is_empty();
+        let written = input.kind(commit, "type")? < 3
+            && !input
+                .field_text(commit, "message")?
+                .unwrap_or_default()
+                .is_empty();
         let mut body = if written {
-            format!("<title>{}</title>", esc_text(&commit.message)?)
+            format!(
+                "<title>{}</title>",
+                esc_text(&input.field_text(commit, "message")?.unwrap_or_default())?
+            )
         } else {
             String::new()
         };
@@ -496,7 +575,7 @@ fn draw(
             bounds.grow(left, cy - h / 2., left + w, cy + h / 2.);
             body+=&format!("<g class=\"pele-tag\"><path d=\"M{},{}L{},{}H{}V{}H{}Z\" fill=\"var(--_s)\" stroke=\"var(--_b)\" stroke-linejoin=\"round\"/><circle cx=\"{}\" cy=\"{}\" r=\"1.5\" fill=\"var(--_b)\"/>{}</g>",num(left),num(cy),num(left+7.),num(cy-h/2.),num(left+w),num(cy+h/2.),num(left+7.),num(left+7.),num(cy),label_svg(tag,left+7.+4.+tag.width/2.,cy," fill=\"var(--_fg)\""))
         }
-        let merge = if commit.commit_type == 3 && kind != 3 {
+        let merge = if input.kind(commit, "type")? == 3 && kind != 3 {
             " pele-commit-merge"
         } else {
             ""
@@ -504,21 +583,15 @@ fn draw(
         commits += &format!(
             "<g class=\"pele-commit pele-commit-{}{merge}\" data-id=\"{}\">{body}</g>",
             CLASSES.get(kind as usize).unwrap_or(&CLASSES[0]),
-            esc_text(&commit.id)?
+            esc_text(&input.field_text(commit, "id")?.unwrap_or_default())?
         )
     }
     if bounds.min_x > bounds.max_x {
         bounds.grow(0., 0., 0., 0.)
     }
-    let title = layout_label(
-        model.title.as_deref(),
-        false,
-        resources,
-        options,
-        size,
-        4000.,
-        1,
-    )?;
+    let title = input.field_text(&root, "title")?;
+    input.keep_label(title.as_ref().map_or(0, |s| s.encode_utf16().count()))?;
+    let title = layout_label(title.as_deref(), false, resources, options, size, 4000., 1)?;
     let title_height = if title.height > 0. {
         title.height + 16.
     } else {
@@ -559,8 +632,8 @@ fn draw(
             height,
             size,
             options,
-            model.acc_title.as_deref(),
-            model.acc_descr.as_deref(),
+            input.field_text(&root, "accTitle")?.as_deref(),
+            input.field_text(&root, "accDescr")?.as_deref(),
             &content,
         )?,
         width,
