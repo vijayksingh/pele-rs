@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Block,
     State,
     Architecture,
     EventModeling,
@@ -53,6 +54,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn block() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::block::Block>(),
+            kind: Kind::Block,
+        }
+    }
+
     pub(crate) fn state() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::state::State>(),
@@ -235,6 +243,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Block(crate::compat::diagrams::block::BlockDetachedInput),
     State(crate::compat::diagrams::state::StateDetachedInput),
     Architecture(crate::compat::diagrams::architecture::ArchitectureDetachedInput),
     EventModeling(crate::compat::diagrams::event_modeling::EventModelingDetachedInput),
@@ -262,6 +271,13 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn block(input: crate::compat::diagrams::block::BlockDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::block::Block>(),
+            body: Body::Block(input),
+        }
+    }
+
     pub(crate) fn state(input: crate::compat::diagrams::state::StateDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::state::State>(),
@@ -452,6 +468,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Block(_) => Kind::Block,
             Body::State(_) => Kind::State,
             Body::Architecture(_) => Kind::Architecture,
             Body::EventModeling(_) => Kind::EventModeling,
@@ -491,6 +508,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Block(input) => crate::compat::diagrams::block::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::State(input) => crate::compat::diagrams::state::render_detached(
                 input, config, settings, read, resources,
             ),
