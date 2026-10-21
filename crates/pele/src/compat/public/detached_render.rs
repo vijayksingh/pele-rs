@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Requirement,
     C4,
     Wardley,
     Cynefin,
@@ -46,6 +47,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn requirement() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::requirement::RequirementDiagram>(),
+            kind: Kind::Requirement,
+        }
+    }
+
     pub(crate) fn c4() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::c4::C4>(),
@@ -179,6 +187,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Requirement(crate::compat::diagrams::requirement::RequirementDetachedInput),
     C4(crate::compat::diagrams::c4::C4DetachedInput),
     Wardley(crate::compat::diagrams::wardley::WardleyDetachedInput),
     Cynefin(crate::compat::diagrams::cynefin::CynefinDetachedInput),
@@ -199,6 +208,15 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn requirement(
+        input: crate::compat::diagrams::requirement::RequirementDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::requirement::RequirementDiagram>(),
+            body: Body::Requirement(input),
+        }
+    }
+
     pub(crate) fn c4(input: crate::compat::diagrams::c4::C4DetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::c4::C4>(),
@@ -330,6 +348,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Requirement(_) => Kind::Requirement,
             Body::C4(_) => Kind::C4,
             Body::Wardley(_) => Kind::Wardley,
             Body::Cynefin(_) => Kind::Cynefin,
@@ -362,6 +381,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Requirement(input) => crate::compat::diagrams::requirement::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::C4(input) => crate::compat::diagrams::c4::render_detached(
                 input, config, settings, read, resources,
             ),

@@ -486,6 +486,19 @@ fn construct_default() -> Result<RequirementPublicState, PeleError> {
 
 impl PublicDiagramModule for RequirementDiagram {
     type PublicState = RequirementPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::requirement())
+    }
+    fn detached_public_render(
+        &self,
+        s: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::requirement(
+            super::RequirementDetachedInput::new(s.model.as_ref().err()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }

@@ -33,3 +33,7 @@ impl DiagramModule for RequirementDiagram {
 mod public_model;
 pub use model::RequirementProvenance;
 pub use public_model::RequirementPublicState;
+
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{render_detached, RequirementDetachedInput};
