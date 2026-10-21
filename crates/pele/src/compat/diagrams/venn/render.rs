@@ -2,7 +2,7 @@
 use super::math::{hypot, max, min};
 use super::{
     layout::{self, Circle, Spot},
-    model::{normalize, semantic, VennModel},
+    model::{normalize, semantic, VennModel, VennStyle, VennSubset, VennText},
 };
 use crate::compat::number_math::round;
 use crate::compat::{
@@ -42,29 +42,98 @@ fn style_of(key: &str, styles: &HashMap<String, Vec<(String, String)>>) -> Resol
     });
     resolve_style(&list)
 }
+/// Geometry/styles and the ordered region map are captured before the first
+/// width callback. Region records and the later text iterator remain live.
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Subset;
+    type Texts;
+    fn geometry(&mut self) -> Result<Vec<VennSubset>, Self::Error>;
+    fn styles(&mut self) -> Result<Vec<VennStyle>, Self::Error>;
+    fn stated(&mut self) -> Result<Vec<(String, Self::Subset)>, Self::Error>;
+    fn subset(&mut self, value: &Self::Subset) -> Result<VennSubset, Self::Error>;
+    fn texts(&mut self) -> Result<Self::Texts, Self::Error>;
+    fn next_text(
+        &mut self,
+        values: &Self::Texts,
+        index: usize,
+        regions: &HashMap<String, usize>,
+    ) -> Result<Option<Option<VennText>>, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+}
+struct Typed<'a>(&'a VennModel);
+impl PhaseInput for Typed<'_> {
+    type Error = PeleError;
+    type Subset = usize;
+    type Texts = ();
+    fn geometry(&mut self) -> Result<Vec<VennSubset>, PeleError> {
+        Ok(self.0.subsets.clone())
+    }
+    fn styles(&mut self) -> Result<Vec<VennStyle>, PeleError> {
+        Ok(self.0.styles.clone())
+    }
+    fn stated(&mut self) -> Result<Vec<(String, usize)>, PeleError> {
+        let mut values = Vec::new();
+        let mut positions = HashMap::new();
+        for (i, s) in self.0.subsets.iter().enumerate() {
+            let k = key(&s.sets);
+            if let Some(&slot) = positions.get(&k) {
+                values[slot] = (k, i);
+            } else {
+                positions.insert(k.clone(), values.len());
+                values.push((k, i));
+            }
+        }
+        Ok(values)
+    }
+    fn subset(&mut self, i: &usize) -> Result<VennSubset, PeleError> {
+        Ok(self.0.subsets[*i].clone())
+    }
+    fn texts(&mut self) -> Result<(), PeleError> {
+        Ok(())
+    }
+    fn next_text(
+        &mut self,
+        _: &(),
+        i: usize,
+        _: &HashMap<String, usize>,
+    ) -> Result<Option<Option<VennText>>, PeleError> {
+        Ok(self.0.text_nodes.get(i).cloned().map(Some))
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+}
 pub(super) fn render(
     model: &VennModel,
-    _c: &Object,
+    c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    if model.subsets.iter().any(|s| s.sets.is_empty()) {
-        return Err(semantic(
-            "Venn subsets require at least one set identifier.",
-        ));
+    render_phases(&mut Typed(model), c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    model: &mut P,
+    _c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let subsets = model.geometry()?;
+    if subsets.iter().any(|s| s.sets.is_empty()) {
+        return Err(semantic("Venn subsets require at least one set identifier.").into());
     }
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let tiny = round(size * 0.8125);
     let pad = o.padding.unwrap_or(8.);
-    let circles = layout::layout(&model.subsets)?;
+    let circles = layout::layout(&subsets)?;
     let index: HashMap<_, _> = circles
         .iter()
         .enumerate()
         .map(|(i, c)| (c.id.clone(), i))
         .collect();
     let mut styles: HashMap<String, Vec<(String, String)>> = HashMap::new();
-    for declared in &model.styles {
+    for declared in model.styles()? {
         let merged = styles.entry(key(&declared.targets)).or_default();
         for (prop, value) in &declared.styles {
             if let Some((_, old)) = merged.iter_mut().find(|(p, _)| p == prop) {
@@ -85,19 +154,15 @@ pub(super) fn render(
             }
         }
     }
-    let mut stated = vec![];
-    let mut positions: HashMap<String, usize> = HashMap::new();
-    for s in &model.subsets {
-        let k = key(&s.sets);
-        if let Some(&i) = positions.get(&k) {
-            stated[i] = (k, s)
-        } else {
-            positions.insert(k.clone(), stated.len());
-            stated.push((k, s))
-        }
-    }
+    let stated = model.stated()?;
+    let positions: HashMap<String, usize> = stated
+        .iter()
+        .enumerate()
+        .map(|(i, (k, _))| (k.clone(), i))
+        .collect();
     let mut regions = vec![];
-    for (k, s) in stated {
+    for (k, handle) in stated {
+        let s = model.subset(&handle)?;
         let mut seen = HashSet::new();
         let sets: Vec<_> = s
             .sets
@@ -105,7 +170,10 @@ pub(super) fn render(
             .filter(|id| seen.insert((*id).clone()))
             .cloned()
             .collect();
-        let inside: Vec<_> = sets.iter().map(|id| index[id]).collect();
+        let inside: Vec<_> = sets.iter().map(|id| index.get(id).copied().ok_or_else(|| semantic("Venn callback introduced a region identifier absent from captured geometry"))).collect::<Result<_,_>>()?;
+        if inside.is_empty() {
+            return Err(semantic("Venn subsets require at least one set identifier.").into());
+        }
         let within: HashSet<_> = inside.iter().copied().collect();
         let mut smallest = inside[0];
         for &i in &inside {
@@ -147,7 +215,11 @@ pub(super) fn render(
         }
         regions.push(region);
     }
-    for node in &model.text_nodes {
+    let texts = model.texts()?;
+    let mut text_index = 0;
+    while let Some(node) = model.next_text(&texts, text_index, &positions)? {
+        text_index += 1;
+        let Some(node) = node else { continue };
         let raw = node.label.as_deref().unwrap_or(&node.id);
         if let Some(&i) = positions.get(&key(&node.sets)) {
             regions[i].lines.push(Line {
@@ -217,8 +289,8 @@ pub(super) fn render(
         max_x = 0.;
         max_y = 0.;
     }
-    let title_text = model
-        .title
+    let current_title = model.title()?;
+    let title_text = current_title
         .as_deref()
         .filter(|s| !s.is_empty())
         .map(normalize);

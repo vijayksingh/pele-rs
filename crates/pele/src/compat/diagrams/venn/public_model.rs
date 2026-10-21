@@ -392,7 +392,7 @@ fn numeric(g: &ModelGraph, a: &Atom) -> Result<f64, PublicError> {
         _ => Err(invalid("Venn object-to-number coercion is not implemented").into()),
     }
 }
-fn js_number(raw: &str) -> f64 {
+pub(super) fn js_number(raw: &str) -> f64 {
     let raw = raw.trim_matches(space);
     if raw.is_empty() {
         return 0.;
@@ -1247,6 +1247,19 @@ impl PublicDiagramModule for Venn {
         let result = invoke(&mut s.graph, c);
         s.model = imported(&s.graph);
         result
+    }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::venn())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::venn(
+            super::VennDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
     }
     fn render_public(
         &self,

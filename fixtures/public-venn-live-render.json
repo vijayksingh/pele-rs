@@ -1,0 +1,3491 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "340f52ed6d88dadda6cb4401ae4dd2719174f590a6b806a8e92e952377ed009b",
+  "scenarioSHA256": "7732cebd7e31c6445e1a22fcb101ee0b2fd69621d9c0543598fd7286649d2347",
+  "chunkSHA256": "753b9e4b5501e8303b0072e24d17110b0445dd5588815d6b87d988c7986bea2e",
+  "source": "venn-beta\ntitle Initial\nset A[Alpha]:10\nset B[Beta]:10\nunion A,B[Both]:3\ntext A note[Note]\nstyle A fill:red",
+  "rows": [
+    {
+      "raw": false,
+      "mode": "baseline",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "subset-edit",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 357 268\" width=\"357\" height=\"268\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"178.5\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"115.56\" cy=\"151.56\" r=\"107.56\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"241.44\" cy=\"151.56\" r=\"107.56\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"71.11\" y=\"152.1\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"71.11\" y=\"173.05\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"285.89\" y=\"150.1\">Changed</tspan><tspan x=\"285.89\" y=\"174.1\">Beta</tspan></text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"178.5\" y=\"156.46\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4076500000000000",
+        "height": "4070c00000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Changed Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed ",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 20,
+            "label": "Changed Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 20,
+          "label": "Changed Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 303 252\" width=\"303\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"151.5\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"78.71\" cy=\"144\" r=\"70.71\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"194.01\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"51.31\" y=\"144.93\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"51.31\" y=\"165.88\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"220.47\" y=\"160.3\" text-anchor=\"middle\">Changed Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"121.71\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4072f00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "subsets-replace",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 20,
+            "label": "New Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "New Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "New Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": false,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 421 335\" width=\"421\" height=\"335\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"210.5\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"149.49\" cy=\"185.49\" r=\"141.49\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"312.62\" cy=\"185.49\" r=\"100.05\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"112.04\" y=\"196.23\" text-anchor=\"middle\">New Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"112.04\" y=\"217.18\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"351.75\" y=\"194.08\" text-anchor=\"middle\">New Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"251.77\" y=\"190.39\" text-anchor=\"middle\">New Both</text></g></g></svg>",
+        "width": "407a500000000000",
+        "height": "4074f00000000000"
+      },
+      "recoveryTrace": [
+        [
+          "New Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "New Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "New Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "subset-append",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          },
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Last Alpha"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        },
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Last Alpha"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Last Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Last Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "texts-edit",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"changed-note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Changed Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Changed Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "changed-note",
+            "label": "Changed Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "changed-note",
+          "label": "Changed Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"changed-note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Changed Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Changed Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "texts-replace",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"154.19\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"other\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Other</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Other",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "B"
+            ],
+            "id": "other",
+            "label": "Other"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": false,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"154.19\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"other\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Other</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Other",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "texts-append",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"appended\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Appended</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Appended",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "id": "appended",
+            "label": "Appended"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "id": "appended",
+          "label": "Appended"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"appended\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Appended</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Appended",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "styles",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "blue"
+              ]
+            ]
+          },
+          {
+            "targets": [
+              "B"
+            ],
+            "styles": [
+              [
+                "font-weight",
+                "bold"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_w:var(--pele-bold-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:blue;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" style=\"font-weight:bold;\" font-weight=\"var(--_w)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"266.35\" y=\"154.19\">Beta</tspan></text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          1
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "title",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Changed title",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Changed title",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Changed title",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "throw",
+      "first": {
+        "ok": false,
+        "original": true,
+        "error": "sentinel"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ]
+      ],
+      "after": {
+        "title": "Before throw",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Saved Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Saved Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Before throw</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Saved Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Saved Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Before throw",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": false,
+      "mode": "nested",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">After nested</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "After nested",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "After nested",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "nested": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Nested title</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">After nested</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "After nested",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "baseline",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "subset-edit",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 357 268\" width=\"357\" height=\"268\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"178.5\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"115.56\" cy=\"151.56\" r=\"107.56\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"241.44\" cy=\"151.56\" r=\"107.56\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"71.11\" y=\"152.1\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"71.11\" y=\"173.05\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"285.89\" y=\"150.1\">Changed</tspan><tspan x=\"285.89\" y=\"174.1\">Beta</tspan></text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"178.5\" y=\"156.46\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4076500000000000",
+        "height": "4070c00000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Changed Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed ",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 20,
+            "label": "Changed Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 20,
+          "label": "Changed Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 303 252\" width=\"303\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"151.5\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"78.71\" cy=\"144\" r=\"70.71\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"194.01\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"51.31\" y=\"144.93\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"51.31\" y=\"165.88\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"220.47\" y=\"160.3\" text-anchor=\"middle\">Changed Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"121.71\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4072f00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Changed Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "subsets-replace",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 20,
+            "label": "New Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "New Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "New Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": false,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 421 335\" width=\"421\" height=\"335\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"210.5\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"149.49\" cy=\"185.49\" r=\"141.49\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"312.62\" cy=\"185.49\" r=\"100.05\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"112.04\" y=\"196.23\" text-anchor=\"middle\">New Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"112.04\" y=\"217.18\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"351.75\" y=\"194.08\" text-anchor=\"middle\">New Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"251.77\" y=\"190.39\" text-anchor=\"middle\">New Both</text></g></g></svg>",
+        "width": "407a500000000000",
+        "height": "4074f00000000000"
+      },
+      "recoveryTrace": [
+        [
+          "New Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "New Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "New Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "subset-append",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          },
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Last Alpha"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        },
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Last Alpha"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Last Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Last Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "texts-edit",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"changed-note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Changed Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Changed Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "changed-note",
+            "label": "Changed Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "changed-note",
+          "label": "Changed Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"changed-note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Changed Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Changed Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "texts-replace",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"154.19\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"other\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Other</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Other",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "B"
+            ],
+            "id": "other",
+            "label": "Other"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": false,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"154.19\" text-anchor=\"middle\">Alpha</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"other\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Other</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Other",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "texts-append",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"appended\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Appended</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Appended",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "id": "appended",
+            "label": "Appended"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "id": "appended",
+          "label": "Appended"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"144.19\" text-anchor=\"middle\">Beta</text><text class=\"pele-venn-text\" data-id=\"appended\" font-size=\"13\" fill=\"var(--_m)\" x=\"266.35\" y=\"165.14\" text-anchor=\"middle\">Appended</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Appended",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "styles",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Initial",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "blue"
+              ]
+            ]
+          },
+          {
+            "targets": [
+              "B"
+            ],
+            "styles": [
+              [
+                "font-weight",
+                "bold"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_w:var(--pele-bold-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Initial</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:blue;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" style=\"font-weight:bold;\" font-weight=\"var(--_w)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"266.35\" y=\"154.19\">Beta</tspan></text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          1
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Initial",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "title",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Changed title",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "Changed title",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Changed title</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Changed title",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "throw",
+      "first": {
+        "ok": false,
+        "original": true,
+        "error": "sentinel"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ]
+      ],
+      "after": {
+        "title": "Before throw",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Saved Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Saved Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Before throw</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Saved Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Saved Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "Before throw",
+          "4030000000000000",
+          1
+        ]
+      ]
+    },
+    {
+      "raw": true,
+      "mode": "nested",
+      "first": {
+        "ok": true,
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">After nested</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "trace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "After nested",
+          "4030000000000000",
+          1
+        ]
+      ],
+      "after": {
+        "title": "After nested",
+        "subsets": [
+          {
+            "sets": [
+              "A"
+            ],
+            "size": 10,
+            "label": "Alpha"
+          },
+          {
+            "sets": [
+              "B"
+            ],
+            "size": 10,
+            "label": "Beta"
+          },
+          {
+            "sets": [
+              "A",
+              "B"
+            ],
+            "size": 3,
+            "label": "Both"
+          }
+        ],
+        "textNodes": [
+          {
+            "sets": [
+              "A"
+            ],
+            "id": "note",
+            "label": "Note"
+          }
+        ],
+        "styles": [
+          {
+            "targets": [
+              "A"
+            ],
+            "styles": [
+              [
+                "fill",
+                "red"
+              ]
+            ]
+          }
+        ]
+      },
+      "originalSubsets": [
+        {
+          "sets": [
+            "A"
+          ],
+          "size": 10,
+          "label": "Alpha"
+        },
+        {
+          "sets": [
+            "B"
+          ],
+          "size": 10,
+          "label": "Beta"
+        },
+        {
+          "sets": [
+            "A",
+            "B"
+          ],
+          "size": 3,
+          "label": "Both"
+        }
+      ],
+      "originalTexts": [
+        {
+          "sets": [
+            "A"
+          ],
+          "id": "note",
+          "label": "Note"
+        }
+      ],
+      "subsetsCurrent": true,
+      "textsCurrent": true,
+      "nested": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">Nested title</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recovery": {
+        "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"pele pele-venn\" viewBox=\"0 0 334 252\" width=\"334\" height=\"252\" style=\"max-width:100%;height:auto;--_bg:var(--pele-bg,#fff);--_fg:var(--pele-fg,#1f1f1f);--_m:var(--pele-muted,#6e6e6e);--_l:var(--pele-line,#1f1f1f);--_s:var(--pele-surface,#f3f3f3);--_a:var(--pele-surface-alt,#e6e6e6);--_b:var(--pele-border,#8a8a8a);--_c:var(--pele-accent,#5b7bd5);color:var(--_fg);--_tw:var(--pele-title-weight,bold);--_fm:var(--pele-font-mono,monospace);font:16px sans-serif;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;font-family:var(--pele-font,sans-serif)\" fill=\"var(--_fg)\" role=\"graphics-document document\" aria-roledescription=\"venn\"><text class=\"pele-title\" font-weight=\"var(--_tw)\" text-anchor=\"middle\" xml:space=\"preserve\"><tspan x=\"167\" y=\"25.6\">After nested</tspan></text><g class=\"pele-venn-sets\"><circle class=\"pele-venn-set\" data-id=\"A\" cx=\"108\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-1,#4c78a8)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-1,#4c78a8)\" style=\"fill:red;\"/><circle class=\"pele-venn-set\" data-id=\"B\" cx=\"225.03\" cy=\"144\" r=\"100\" fill=\"var(--pele-series-2,#f58518)\" fill-opacity=\"0.2\" stroke=\"var(--pele-series-2,#f58518)\"/></g><g class=\"pele-venn-labels\"><g class=\"pele-venn-region\" data-id=\"A\"><text class=\"pele-label\" x=\"66.67\" y=\"144.19\" text-anchor=\"middle\">Alpha</text><text class=\"pele-venn-text\" data-id=\"note\" font-size=\"13\" fill=\"var(--_m)\" x=\"66.67\" y=\"165.14\" text-anchor=\"middle\">Note</text></g><g class=\"pele-venn-region\" data-id=\"B\"><text class=\"pele-label\" x=\"266.35\" y=\"154.19\" text-anchor=\"middle\">Beta</text></g><g class=\"pele-venn-region\" data-id=\"A|B\"><text class=\"pele-label\" font-size=\"14\" x=\"166.51\" y=\"148.9\" text-anchor=\"middle\">Both</text></g></g></svg>",
+        "width": "4074e00000000000",
+        "height": "406f800000000000"
+      },
+      "recoveryTrace": [
+        [
+          "Alpha",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Beta",
+          "4030000000000000",
+          0
+        ],
+        [
+          "Both",
+          "402c000000000000",
+          0
+        ],
+        [
+          "Note",
+          "402a000000000000",
+          0
+        ],
+        [
+          "After nested",
+          "4030000000000000",
+          1
+        ]
+      ]
+    }
+  ]
+}
