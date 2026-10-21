@@ -25,28 +25,11 @@ extension Pele {
                 return try ownedPublicDocument(result, document: document)
             }
         }
-        /// Retains the supplied value without property reads or eager enumeration.
-        /// The value store belongs to the returned document; ignored factories do
-        /// not retain the argument. Callbacks may reenter that document.
+        /// Uses the native argument-transfer policy without eager enumeration.
+        /// Ordered constructor getters execute only when requested by native code.
+        /// Use beginConstruct to expose a provisional receiver to callbacks.
         public func construct(firstArgument: PublicHostValue) throws -> MutableDocument {
-            guard let handle else { throw PeleError(code: "semantic", message: "Public constructor is closed") }
-            return try withExtendedLifetime(self) {
-                struct Policy: Decodable { let ignoresArguments: Bool }
-                let policy = try Pele.compatibilityResult(pele_public_constructor_policy_v17(handle), as: Policy.self)
-                let store = PublicHostStore()
-                var packet = PeleHostValueV17()
-                packet.version = 17; packet.struct_size = UInt32(MemoryLayout<PeleHostValueV17>.size)
-                if !policy.ignoresArguments {
-                    if case .undefined = firstArgument { packet.tag = 0 }
-                    else { packet.tag = 5; packet.payload = UInt64(try store.retain(firstArgument)) }
-                }
-                var document: OpaquePointer?
-                let response = pele_public_constructor_construct_with_v17(handle, &packet, &document)
-                let result = try ownedPublicDocument(response, document: document)
-                result.hostValueStore = store
-                result.usesHostValues = !policy.ignoresArguments
-                return result
-            }
+            try construct(arguments: [firstArgument])
         }
         public func constructPrepared(firstArgument: PublicHostValue) throws -> PreparedDocument {
             PreparedDocument(try construct(firstArgument: firstArgument))

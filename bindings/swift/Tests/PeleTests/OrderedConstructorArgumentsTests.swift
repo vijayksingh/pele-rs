@@ -3,6 +3,12 @@ import XCTest
 import Pele
 
 private final class OrderedConstructorError: Error {}
+private final class OrderedConstructorTrace: @unchecked Sendable {
+    private let lock = NSLock()
+    private var rows: [[String]] = []
+    func append(_ row: [String]) { lock.lock(); defer { lock.unlock() }; rows.append(row) }
+    func snapshot() -> [[String]] { lock.lock(); defer { lock.unlock() }; return rows }
+}
 private final class OrderedConstructorHost: Pele.PublicHostCallable {
     var get: (Pele.JSString) throws -> Pele.PublicHostValue = { _ in .undefined }
     var call: (Pele.PublicHostValue, [Pele.PublicHostValue]) throws -> Pele.PublicHostValue = { _, _ in .undefined }
@@ -20,8 +26,45 @@ final class OrderedConstructorArgumentsTests: XCTestCase {
         guard case .string(let id) = atom else { throw PeleError(code: "test", message: "Expected string field") }
         return try XCTUnwrap(graph.strings[Int(id)].stringIfWellFormed)
     }
+    private func argument(_ value: Any, graph: inout Pele.PublicGraph) throws -> Pele.PublicGraph.Atom {
+        if let text = value as? String { return .string(try graph.intern(text)) }
+        if let number = value as? NSNumber { return .number(number.doubleValue) }
+        guard let object = value as? [String: Any] else { throw PeleError(code: "test", message: "Unsupported oracle argument") }
+        if object["undefined"] as? Bool == true { return .undefined }
+        let id = UInt32(graph.nodes.count); graph.nodes.append(.object(properties: []))
+        var properties: [Pele.PublicGraph.Property] = []
+        if let array = object["array"] as? [Any] {
+            for (index, item) in array.enumerated() {
+                let key = try graph.intern(String(index)), atom = try argument(item, graph: &graph)
+                properties.append(.init(key: key, value: atom))
+            }
+            graph.nodes[Int(id)] = .array(length: UInt32(array.count), properties: properties)
+        } else if let fields = object["object"] as? [[Any]] {
+            for field in fields {
+                let key = try graph.intern(XCTUnwrap(field[0] as? String)), atom = try argument(field[1], graph: &graph)
+                properties.append(.init(key: key, value: atom))
+            }
+            graph.nodes[Int(id)] = .object(properties: properties)
+        } else { throw PeleError(code: "test", message: "Unsupported oracle object") }
+        return .ref(id)
+    }
+    private func assertRaw(_ document: Pele.PreparedDocument, expected: [String: Any], family: String) throws {
+        let trace = OrderedConstructorTrace()
+        var resources = Pele.HostResources()
+        resources.textWidth = { request in
+            trace.append([request.text, String(format: "%016llx", request.size.bitPattern)])
+            return Double(request.text.utf16.count) * request.size * 0.6
+        }
+        let drawing = try document.render(resources: resources)
+        XCTAssertEqual(expected["ok"] as? Bool, true, family)
+        XCTAssertEqual(drawing.svg, expected["svg"] as? String, family)
+        XCTAssertEqual(String(format: "%016llx", drawing.width.bitPattern), expected["width"] as? String, family)
+        XCTAssertEqual(String(format: "%016llx", drawing.height.bitPattern), expected["height"] as? String, family)
+        XCTAssertEqual(trace.snapshot(), expected["trace"] as? [[String]], family)
+    }
     func testOrderedOptionsConstructorsReadOnlyRequestedFieldsAndPreserveOriginalErrors() throws {
-        _ = try fixture("public-ordered-constructors.json")
+        let oracle = try fixture("public-ordered-constructors.json")
+        let rows = try XCTUnwrap(oracle["cases"] as? [[String: Any]])
         for (family, keys) in [("sequence", ["wrap", "sequenceWrap"]), ("block", ["warn"]), ("agentflow", ["lineOffset"])] {
             let registry = try Pele.Registry.allBuiltins()
             let factory = try XCTUnwrap(registry.captureConstructor(for: family, prototype: 1))
@@ -33,6 +76,46 @@ final class OrderedConstructorArgumentsTests: XCTestCase {
             XCTAssertEqual(reads, keys); XCTAssertTrue(document.isConstructorCreated)
             XCTAssertThrowsError(try construction.run())
             try document.close(); try construction.close()
+            let row = try XCTUnwrap(rows.first { $0["family"] as? String == family })
+            let initial = try factory.constructPrepared(arguments: [])
+            try assertRaw(initial, expected: XCTUnwrap((row["initial"] as? [String: Any])?["render"] as? [String: Any]), family: family)
+            try initial.close()
+            let populated = try factory.constructPrepared(arguments: [])
+            let schema = try populated.schema()
+            for action in try XCTUnwrap(row["actions"] as? [[String: Any]]) {
+                var graph = try populated.snapshot().graph
+                let name = try XCTUnwrap(action["name"] as? String)
+                let method = try XCTUnwrap(schema.methods.first { $0.name == name }?.id)
+                let args = try XCTUnwrap(action["args"] as? [Any]).map { try argument($0, graph: &graph) }
+                try populated.apply(graph, expectedRevision: populated.revision)
+                let result = try populated.invoke(method: method, receiver: graph.root, arguments: args)
+                if case .thrown(let error) = result.result { XCTFail("\(family).\(name): \(error)") }
+            }
+            try assertRaw(populated, expected: XCTUnwrap((row["freshPopulated"] as? [String: Any])?["render"] as? [String: Any]), family: family)
+            try populated.close()
+            let warning = OrderedConstructorHost()
+            options.get = { key in
+                switch key.stringReplacingInvalidCodeUnits {
+                case "wrap": return .bool(true)
+                case "sequenceWrap": return .bool(false)
+                case "lineOffset": return .number(9)
+                case "warn": return .host(warning)
+                default: throw PeleError(code: "test", message: "Unexpected options read")
+                }
+            }
+            let configured = try factory.construct(firstArgument: .host(options))
+            let configuredGraph = try configured.snapshot().graph
+            switch family {
+            case "sequence":
+                guard case .bool(true) = try configuredGraph.field("wrapEnabled"), case .bool(false) = try configuredGraph.field("sequenceWrap") else { return XCTFail("Sequence option scalars changed") }
+            case "agentflow":
+                guard case .number(9) = try configuredGraph.field("lineOffset") else { return XCTFail("AgentFlow line offset changed") }
+            default:
+                let warn = try XCTUnwrap(configuredGraph.field("warn"))
+                guard case .host(let retained) = try configured.resolveHostValue(warn) else { return XCTFail("Block warning identity lost") }
+                XCTAssertTrue(retained === warning)
+            }
+            try configured.close()
             let original = OrderedConstructorError()
             options.get = { _ in throw original }
             let failed = try factory.beginConstruct(arguments: [.host(options)])

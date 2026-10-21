@@ -23,10 +23,10 @@ final class DirectConstructorTests: XCTestCase {
         let cases: [Case]
     }
 
-    func testFourteenCapturedConstructorsUseNativeDefaultsAndRawRenderingAfterClosure() throws {
+    func testFifteenCapturedConstructorsUseNativeDefaultsAndRawRenderingAfterClosure() throws {
         var path = URL(fileURLWithPath: #filePath)
         for _ in 0..<5 { path.deleteLastPathComponent() }
-        let files = ["public-direct-constructors.json", "public-next-six-constructors.json", "public-state-constructor.json"]
+        let files = ["public-direct-constructors.json", "public-next-six-constructors.json", "public-state-constructor.json", "public-class-constructor.json"]
         let fixtures = try files.map {
             try JSONDecoder().decode(Fixture.self, from: Data(contentsOf: path.appendingPathComponent("fixtures/" + $0)))
         }
@@ -35,7 +35,7 @@ final class DirectConstructorTests: XCTestCase {
         }
         let cases = fixtures.flatMap(\.cases)
         XCTAssertEqual(cases.map(\.family).sorted(),
-                       ["architecture", "c4", "er", "ishikawa", "journey", "kanban", "mindmap", "quadrantChart", "railroad", "requirement", "state", "timeline", "venn", "xychart"])
+                       ["architecture", "c4", "class", "er", "ishikawa", "journey", "kanban", "mindmap", "quadrantChart", "railroad", "requirement", "state", "timeline", "venn", "xychart"])
         let registry = try Pele.Registry.allBuiltins()
         let factories = try cases.map {
             try XCTUnwrap(registry.captureConstructor(for: $0.family, prototype: $0.prototype), $0.family)
