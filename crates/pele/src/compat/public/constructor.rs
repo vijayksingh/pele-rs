@@ -47,6 +47,10 @@ pub enum PublicHostValue {
     Number(f64),
     String(JsString),
     Opaque(u32),
+    /// Native graph-coordinate reply. Bindings never accept this from a wire tag;
+    /// the owning document validates it before advancing a continuation.
+    #[doc(hidden)]
+    Graph(Atom),
 }
 impl PublicHostValue {
     /// Import one owned scalar. Only strings require the owning graph's interner.
@@ -59,6 +63,7 @@ impl PublicHostValue {
             Self::Number(value) => Atom::Number(value),
             Self::String(value) => return intern(value),
             Self::Opaque(id) => Atom::HostReference(id),
+            Self::Graph(atom) => atom,
         })
     }
 }

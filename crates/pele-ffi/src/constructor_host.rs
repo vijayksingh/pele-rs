@@ -5,14 +5,14 @@ use super::{
 use pele::compat::{
     public::{
         DetachedInvocationJob, DetachedInvocationStep, HostExceptionToken, JsString, PublicError,
-        PublicHostOperation, PublicHostResult, PublicHostValue,
+        PublicHostOperation, PublicHostResult, PublicHostValue, PublicResourceOperation,
     },
     ErrorCode, PeleError,
 };
 use std::{
     panic::{catch_unwind, AssertUnwindSafe},
     ptr,
-    sync::Mutex,
+    sync::{Arc, Mutex},
 };
 
 /// UTF16 is borrowed only during a call. Numbers carry all IEEE bits; opaque
@@ -98,6 +98,7 @@ pub unsafe extern "C" fn pele_public_constructor_construct_with_v17(
 pub struct PeleInvocationJobV17 {
     owner: *const PelePublicDocument,
     inner: Mutex<DetachedInvocationJob>,
+    resource: Mutex<JobResource>,
 }
 /// # Safety
 /// Document remains live until the job is freed. JSON readable <=64MiB. The job
@@ -127,6 +128,7 @@ pub unsafe extern "C" fn pele_public_invocation_prepare_v17(
         *out = Box::into_raw(Box::new(PeleInvocationJobV17 {
             owner,
             inner: Mutex::new(job),
+            resource: Mutex::new(JobResource::Idle),
         }));
         Ok(result)
     })
@@ -177,17 +179,51 @@ pub unsafe extern "C" fn pele_public_invocation_resume_v17(
                 "Public invocation belongs to another document",
             ));
         }
+        let invocation = job;
         let mut job = job
             .inner
             .try_lock()
             .map_err(|_| public::invalid("Invocation job is already in use"))?;
-        let reply = unsafe { host_reply(reply_state, reply) }?;
         let mut document = unsafe { public::document(owner) }?;
+        let reply = {
+            let mut resource = invocation
+                .resource
+                .try_lock()
+                .map_err(|_| public::invalid("Resource state is in use"))?;
+            match (&*resource, reply_state) {
+                (JobResource::Idle, 4) => return Err(public::invalid("Missing resource reply")),
+                (JobResource::Idle, _) => unsafe { host_reply(reply_state, reply) }?,
+                (JobResource::Ready(_), 4) => {
+                    let JobResource::Ready(reply) =
+                        std::mem::replace(&mut *resource, JobResource::Idle)
+                    else {
+                        unreachable!()
+                    };
+                    Some(reply)
+                }
+                _ => {
+                    return Err(public::invalid(
+                        "Resource operation must complete before resume",
+                    ))
+                }
+            }
+        };
         let result = (|| {
             let step = document.resume_detached_invocation(&mut job, reply)?;
             let metadata = match step {
                 DetachedInvocationStep::Complete => serde_json::json!({"complete":true}),
                 DetachedInvocationStep::Host(op) => serde_json::json!({"host":operation(op)}),
+                DetachedInvocationStep::Resource(op) => {
+                    let mut resource = invocation
+                        .resource
+                        .try_lock()
+                        .map_err(|_| public::invalid("Resource state is in use"))?;
+                    if !matches!(*resource, JobResource::Idle) {
+                        return Err(public::invalid("Resource operation already pending"));
+                    }
+                    *resource = JobResource::Pending(op);
+                    serde_json::json!({"resource":true})
+                }
             };
             let graph = document.snapshot_read()?;
             public::binary_metadata(document.revision(), &graph, &metadata)
@@ -266,7 +302,7 @@ pub unsafe extern "C" fn pele_public_constructor_policy_v17(
 fn js_space(unit: u16) -> bool {
     matches!(unit, 0x0009..=0x000d | 0x0020 | 0x00a0 | 0x1680 | 0x2000..=0x200a | 0x2028 | 0x2029 | 0x202f | 0x205f | 0x3000 | 0xfeff)
 }
-fn string_number(units: &[u16]) -> f64 {
+pub(super) fn string_number(units: &[u16]) -> f64 {
     let start = units
         .iter()
         .position(|u| !js_space(*u))
@@ -396,7 +432,7 @@ pub unsafe extern "C" fn pele_host_primitive_number_v17(
             PublicHostValue::Bool(v) => u8::from(v) as f64,
             PublicHostValue::Number(v) => v,
             PublicHostValue::String(v) => string_number(&v.0),
-            PublicHostValue::Opaque(_) => {
+            PublicHostValue::Opaque(_) | PublicHostValue::Graph(_) => {
                 return Err(public::invalid("Expected primitive host value"))
             }
         };
@@ -434,4 +470,145 @@ pub(super) unsafe fn host_reply(
         }
         _ => return Err(public::invalid("Invalid host reply state")),
     })
+}
+
+// Resource execution is separate from invocation/constructor jobs: callbacks may
+// reenter their owner while no job, document or resource-state lock is held.
+enum JobResource {
+    Idle,
+    Pending(PublicResourceOperation),
+    Taken(Arc<()>),
+    Ready(Result<PublicHostValue, PublicError>),
+}
+enum ResourceState {
+    Ready(PublicResourceOperation),
+    Running,
+    Done(Result<PublicHostValue, PublicError>),
+    Consumed,
+}
+pub struct PeleResourceOperationV19 {
+    owner: *const PelePublicDocument,
+    origin: Arc<()>,
+    state: Mutex<ResourceState>,
+}
+/// # Safety
+/// Job, owner and output remain live. The returned resource extends the owner's
+/// required lifetime until resource free; take each pending operation once.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_invocation_take_resource_v19(
+    job: *mut PeleInvocationJobV17,
+    out: *mut *mut PeleResourceOperationV19,
+) -> *mut PeleResult {
+    if !out.is_null() {
+        unsafe { *out = ptr::null_mut() };
+    }
+    public::bounded_call(|| {
+        let out = unsafe { out.as_mut() }.ok_or_else(|| public::invalid("Null resource output"))?;
+        let job = unsafe { job.as_ref() }.ok_or_else(|| public::invalid("Null invocation job"))?;
+        let mut state = job
+            .resource
+            .try_lock()
+            .map_err(|_| public::invalid("Resource state is in use"))?;
+        if !matches!(*state, JobResource::Pending(_)) {
+            return Err(public::invalid("Missing pending resource"));
+        }
+        let origin = Arc::new(());
+        let JobResource::Pending(operation) =
+            std::mem::replace(&mut *state, JobResource::Taken(origin.clone()))
+        else {
+            unreachable!()
+        };
+        let result = public::success(serde_json::json!({"selected":true}))?;
+        *out = Box::into_raw(Box::new(PeleResourceOperationV19 {
+            owner: job.owner,
+            origin,
+            state: Mutex::new(ResourceState::Ready(operation)),
+        }));
+        Ok(result)
+    })
+}
+/// # Safety
+/// Resource, owner, callback context and borrowed outputs remain live throughout
+/// synchronous execution. No concurrent free; callbacks must not unwind through C.
+#[no_mangle]
+pub unsafe extern "C" fn pele_resource_operation_run_v19(
+    resource: *mut PeleResourceOperationV19,
+    resources: *const super::PeleHostResourcesV3,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let resource = unsafe { resource.as_ref() }
+            .ok_or_else(|| public::invalid("Null resource operation"))?;
+        unsafe {
+            super::host_functions::with_resources(resource.owner, resources, |host| {
+                let operation = {
+                    let mut state = resource
+                        .state
+                        .try_lock()
+                        .map_err(|_| public::invalid("Resource operation is in use"))?;
+                    if !matches!(*state, ResourceState::Ready(_)) {
+                        return Err(public::invalid("Resource operation already executed"));
+                    }
+                    let ResourceState::Ready(operation) =
+                        std::mem::replace(&mut *state, ResourceState::Running)
+                    else {
+                        unreachable!()
+                    };
+                    operation
+                };
+                let reply = operation.run(host);
+                *resource
+                    .state
+                    .try_lock()
+                    .map_err(|_| public::invalid("Resource operation is in use"))? =
+                    ResourceState::Done(reply);
+                public::success(serde_json::json!({"completed":true}))
+            })
+        }
+    })
+}
+/// # Safety
+/// Exact live job/resource pair; completed resource may be accepted once. This
+/// moves the native scalar/error unchanged. Resume v17 with reply_state4 next.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_invocation_accept_resource_v19(
+    job: *mut PeleInvocationJobV17,
+    resource: *mut PeleResourceOperationV19,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let job = unsafe { job.as_ref() }.ok_or_else(|| public::invalid("Null invocation job"))?;
+        let resource = unsafe { resource.as_ref() }
+            .ok_or_else(|| public::invalid("Null resource operation"))?;
+        let mut pending = job
+            .resource
+            .try_lock()
+            .map_err(|_| public::invalid("Resource state is in use"))?;
+        if !matches!(&*pending,JobResource::Taken(origin)if Arc::ptr_eq(origin,&resource.origin)) {
+            return Err(public::invalid(
+                "Resource belongs to another invocation phase",
+            ));
+        }
+        let mut result = resource
+            .state
+            .try_lock()
+            .map_err(|_| public::invalid("Resource operation is in use"))?;
+        if !matches!(*result, ResourceState::Done(_)) {
+            return Err(public::invalid("Resource result is unavailable"));
+        }
+        let ResourceState::Done(reply) = std::mem::replace(&mut *result, ResourceState::Consumed)
+        else {
+            unreachable!()
+        };
+        *pending = JobResource::Ready(reply);
+        public::success(serde_json::json!({"accepted":true}))
+    })
+}
+/// # Safety
+/// Free once after calls return. Owner must stay live until this call completes.
+#[no_mangle]
+pub unsafe extern "C" fn pele_resource_operation_free_v19(resource: *mut PeleResourceOperationV19) {
+    let _ = catch_unwind(AssertUnwindSafe(|| {
+        if !resource.is_null() {
+            drop(unsafe { Box::from_raw(resource) });
+        }
+    }));
 }

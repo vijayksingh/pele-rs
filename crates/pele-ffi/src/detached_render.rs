@@ -1,4 +1,6 @@
 //! Owned C jobs: no document or binding borrow crosses a resource callback.
+mod call;
+mod iterator;
 use super::{
     host_functions, public, PeleHostResourcesV3, PelePublicDocument, PeleRenderNumbersV9,
     PeleResult,
@@ -21,6 +23,7 @@ use std::{
 #[derive(Clone)]
 enum Value {
     Atom(Atom),
+    Iterator(Arc<Mutex<iterator::Cursor>>),
     String(Arc<JsString>),
     Sequence(Arc<[Value]>),
     Object(Arc<[(Arc<JsString>, Value)]>),
@@ -84,6 +87,9 @@ fn capture_value(
     })
 }
 struct Reader {
+    access: call::Access,
+    iterator_handles: usize,
+    iterator_advances: usize,
     owner: *const PelePublicDocument,
     root: Value,
     // Retain the allocation alongside its token: a dropped temporary's address
@@ -165,9 +171,34 @@ impl Reader {
             }
             start += count;
         }
+        if key == "size" {
+            if let GraphNodeKind::Map(count) = header.kind {
+                return Ok(Value::Atom(Atom::Number(count as f64)));
+            }
+        }
         if key == "length" {
             if let GraphNodeKind::Array(length) = header.kind {
                 return Ok(Value::Atom(Atom::Number(f64::from(length))));
+            }
+        }
+        if let GraphNodeKind::Instance(mut prototype) = header.kind {
+            let schema = document.model_schema();
+            for _ in 0..schema.prototypes.len() {
+                let Some(descriptor) = schema.prototype(prototype) else {
+                    break;
+                };
+                if let Some(member) = descriptor.members.iter().find(|m| m.name == key) {
+                    return match member.member {
+                        pele::compat::public::MemberKind::Method { method } => {
+                            Ok(Value::Atom(Atom::BuiltinFunction(method.0)))
+                        }
+                        _ => Err(invalid("Native live accessor dispatch is unavailable").into()),
+                    };
+                }
+                match descriptor.parent {
+                    pele::compat::public::PrototypeParent::Prototype(parent) => prototype = parent,
+                    _ => break,
+                }
             }
         }
         Ok(Value::Atom(Atom::Undefined))
@@ -175,6 +206,106 @@ impl Reader {
 }
 impl LiveRenderRead for Reader {
     type Value = Value;
+    fn call(
+        &mut self,
+        function: &Value,
+        receiver: &Value,
+        arguments: &[pele::compat::public::LiveCallArgument<Value>],
+        resources: &mut dyn pele::compat::RenderResources,
+        not_callable_error: &'static str,
+    ) -> Result<Value, PublicError> {
+        if arguments.len() > 1_000_000 {
+            return Err(
+                PeleError::new("Live call argument budget exceeded", ErrorCode::Limit).into(),
+            );
+        }
+        let units = arguments.iter().fold(0usize, |total, value| {
+            total.saturating_add(match value {
+                pele::compat::public::LiveCallArgument::Text(s) => s.0.len(),
+                pele::compat::public::LiveCallArgument::Value(Value::String(s)) => s.0.len(),
+                _ => 0,
+            })
+        });
+        if units > 16_000_000 {
+            return Err(PeleError::new("Live call text budget exceeded", ErrorCode::Limit).into());
+        }
+        let mut args = Vec::with_capacity(arguments.len());
+        for argument in arguments {
+            args.push(match argument {
+                pele::compat::public::LiveCallArgument::Value(v) => v.clone(),
+                pele::compat::public::LiveCallArgument::Text(s) => {
+                    Value::String(Arc::new(s.clone()))
+                }
+                pele::compat::public::LiveCallArgument::Number(value) => {
+                    Value::Atom(Atom::Number(*value))
+                }
+                pele::compat::public::LiveCallArgument::Date(value) => {
+                    self.date_argument(*value)?
+                }
+            });
+        }
+        self.call_owned(function, receiver, &args, resources, not_callable_error)
+    }
+    fn to_number(
+        &mut self,
+        value: &Value,
+        _: &mut dyn pele::compat::RenderResources,
+    ) -> Result<f64, PublicError> {
+        match value {
+            Value::Atom(Atom::Undefined) => Ok(f64::NAN),
+            Value::Atom(Atom::Null) => Ok(0.),
+            Value::Atom(Atom::Bool(v)) => Ok(u8::from(*v) as f64),
+            Value::Atom(Atom::Number(v)) => Ok(*v),
+            Value::String(v) => Ok(super::constructor_host::string_number(&v.0)),
+            Value::Atom(Atom::Ref(id)) => {
+                let document = unsafe { public::document(self.owner) }?;
+                let graph = document.snapshot_read()?;
+                let reader = graph.reader();
+                let header = reader.header(*id as usize)?;
+                let GraphNodeKind::Date(bits) = header.kind else {
+                    return Err(invalid(
+                        "Native numeric coercion supports ordinary Dates and scalars",
+                    )
+                    .into());
+                };
+                let mut start = 0;
+                while start < header.properties {
+                    let mut count = 0;
+                    reader.properties(*id as usize, start, &mut |properties| {
+                        count = properties.len();
+                        for property in properties {
+                            let key = string(reader, property.key)?;
+                            if key.is("valueOf") || key.is("toString") {
+                                return Err(invalid("Native numeric coercion does not support overridden Date methods"));
+                            }
+                        }
+                        Ok(())
+                    })?;
+                    if count == 0 || count > header.properties - start {
+                        return Err(invalid("Invalid captured Date property batch").into());
+                    }
+                    start += count;
+                }
+                Ok(f64::from_bits(bits))
+            }
+            _ => Err(invalid("Native numeric coercion supports ordinary Dates and scalars").into()),
+        }
+    }
+    fn iterator_begin(&mut self, v: &Value) -> Result<Value, PublicError> {
+        self.begin_iterator(v)
+    }
+    fn iterator_next(&mut self, v: &Value) -> Result<Option<Value>, PublicError> {
+        self.next_iterator(v)
+    }
+    fn iterator_close(&mut self, v: &Value) -> Result<(), PublicError> {
+        self.close_iterator(v)
+    }
+    fn retained_graph_value(&mut self, node: u32) -> Result<Value, PublicError> {
+        let document = unsafe { public::document(self.owner) }?;
+        let graph = document.snapshot_read()?;
+        graph.reader().header(node as usize)?;
+        Ok(Value::Atom(Atom::Ref(node)))
+    }
     fn root(&self) -> Value {
         self.root.clone()
     }
@@ -265,6 +396,7 @@ impl LiveRenderRead for Reader {
             Value::Atom(Atom::HostReference(id)) => return Ok(Some((2u64 << 32) + u64::from(*id))),
             Value::Sequence(values) => (0, Arc::as_ptr(values) as *const () as usize),
             Value::Object(values) => (1, Arc::as_ptr(values) as *const () as usize),
+            Value::Iterator(value) => (2, Arc::as_ptr(value) as usize),
             _ => return Ok(None),
         };
         if let Some((token, _)) = self.identities.get(&key) {
@@ -715,7 +847,7 @@ impl LiveRenderRead for Reader {
     fn kind(&self, value: &Value) -> LiveValueKind {
         match value {
             Value::String(_) => LiveValueKind::String,
-            Value::Sequence(_) | Value::Object(_) => LiveValueKind::Object,
+            Value::Sequence(_) | Value::Object(_) | Value::Iterator(_) => LiveValueKind::Object,
             Value::Atom(atom) => match atom {
                 Atom::Undefined => LiveValueKind::Undefined,
                 Atom::Null => LiveValueKind::Null,
@@ -915,6 +1047,9 @@ pub unsafe extern "C" fn pele_detached_render_run_v15(
                     owner: job.owner,
                     root: job.root.clone(),
                     identities: HashMap::new(),
+                    access: call::Access::default(),
+                    iterator_handles: 0,
+                    iterator_advances: 0,
                 };
                 let completion = inner.run(&mut reader, host);
                 *job.state

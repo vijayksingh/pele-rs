@@ -795,6 +795,7 @@ impl Arena<'_> {
 }
 impl Store for Arena<'_> {
     type Task = Atom;
+    type TaskIterator = Iter;
     type Date = DateValue;
     type Token = Atom;
     type Error = PublicError;
@@ -892,6 +893,13 @@ impl Store for Arena<'_> {
     fn inclusive(&mut self) -> Result<bool, PublicError> {
         let value = self.get("inclusiveEndDates")?;
         Ok(truth(self.c.g, &value))
+    }
+    fn task_iterator(&mut self) -> Result<Iter, PublicError> {
+        let value = self.get("tasks")?;
+        self.c.iter(&value)
+    }
+    fn next_task(&mut self, iterator: &mut Iter) -> Result<Option<Atom>, PublicError> {
+        self.c.next(iterator)
     }
     fn tasks(&mut self) -> Result<Vec<Atom>, PublicError> {
         let value = self.get("tasks")?;
@@ -3010,14 +3018,24 @@ fn construct_with(argument: ConstructorArgument) -> Result<GanttPublicState, Pel
     }
     Ok(GanttPublicState { graph })
 }
+mod calendar_start;
 const LIVE_FIELDS: &[LiveConstructorField] = &[LiveConstructorField {
     key: "options",
-    methods: &[MethodId(24), MethodId(27)],
+    methods: &[
+        MethodId(19),
+        MethodId(24),
+        MethodId(25),
+        MethodId(26),
+        MethodId(27),
+        MethodId(28),
+        MethodId(30),
+    ],
 }];
 // Preserve this.options.warn && this.options.warn(producer()) evaluation.
 // Each request owns values and runs after the graph borrow has ended.
 enum WarningProducer {
     Host(Atom),
+    Scheduler(scheduler::Warning),
     References { keyword: Atom, missing: Vec<String> },
 }
 enum WarningPhase {
@@ -3156,6 +3174,10 @@ impl WarningInvocation {
                             arguments: vec![],
                         })
                     }
+                    WarningProducer::Scheduler(warning) => {
+                        let message = Context::new(graph).text(&warning.message())?;
+                        self.call(receiver, function, message)
+                    }
                     WarningProducer::References { keyword, missing } => {
                         self.phase = ReferenceMessage {
                             receiver,
@@ -3232,6 +3254,9 @@ impl PublicDiagramModule for Gantt {
         })
     }
     fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
+        if matches!(call.method.0, 19 | 25 | 26 | 28 | 30) {
+            return Some(calendar_start::invocation(call));
+        }
         let first = call.arguments.first().cloned().unwrap_or(Atom::Undefined);
         let phase = match call.method.0 {
             24 => WarningPhase::Start {

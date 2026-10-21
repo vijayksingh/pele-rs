@@ -182,6 +182,10 @@ fn run(
             .unwrap()
         {
             DetachedInvocationStep::Complete => break,
+            DetachedInvocationStep::Resource(operation) => {
+                reply = Some(operation.run(&mut Host));
+                continue;
+            }
             DetachedInvocationStep::Host(op) => op,
         };
         reply = Some(match op {

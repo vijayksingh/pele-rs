@@ -451,6 +451,7 @@ fn compiled_regex(pattern: &str) -> Result<Regex, regex::Error> {
 
 impl super::scheduler::Store for GanttModel {
     type Task = usize;
+    type TaskIterator = std::ops::Range<usize>;
     type Date = f64;
     type Token = String;
     type Error = PeleError;
@@ -528,6 +529,12 @@ impl super::scheduler::Store for GanttModel {
     }
     fn inclusive(&mut self) -> Result<bool, PeleError> {
         Ok(self.inclusive_end_dates)
+    }
+    fn task_iterator(&mut self) -> Result<Self::TaskIterator, PeleError> {
+        Ok(0..self.tasks.len())
+    }
+    fn next_task(&mut self, iterator: &mut Self::TaskIterator) -> Result<Option<usize>, PeleError> {
+        Ok(iterator.next())
     }
     fn tasks(&mut self) -> Result<Vec<usize>, PeleError> {
         Ok((0..self.tasks.len()).collect())

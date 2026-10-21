@@ -104,6 +104,11 @@ pub unsafe extern "C" fn pele_public_construction_resume_v18(
         let result = (|| {
             let step = job.resume(reply)?;
             let metadata = match step {
+                DetachedInvocationStep::Resource(_) => {
+                    return Err(public::invalid(
+                        "Constructor resource steps are unavailable",
+                    ))
+                }
                 DetachedInvocationStep::Complete => serde_json::json!({"complete":true}),
                 DetachedInvocationStep::Host(op) => serde_json::json!({"host":operation(op)}),
             };

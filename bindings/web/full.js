@@ -216,7 +216,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     entry.detachedDepth = (entry.detachedDepth ?? 0) + 1;
     try {
       try {
-        unlocked(() => job.run(entry.bridge.root, liveRenderRead(capture), resource(width),
+        unlocked(() => job.run(entry.bridge.root, liveRenderRead(capture, entry.bridge), resource(width),
           resource(icons), resource(clock), resource(inline), dispatcher));
       } catch (value) { fail(value); }
       // Every dispatched frame finishes, including resource/read failures. This
@@ -424,17 +424,25 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         const outcome=binaryResult(()=>construction?job.resume(replyState,valueTag,value):entry.handle.resume_detached_invocation(job,replyState,valueTag,value));
         entry.revision=outcome.revision;
         if(outcome.result?.complete===true)break;
-        const operation=outcome.result?.host;
-        if(!operation)throw new TypeError('Invalid detached invocation step');
+        const operation=outcome.result?.host, resourceStep=outcome.result?.resource===true;
+        if((!operation&&!resourceStep)||(operation&&resourceStep))throw new TypeError('Invalid detached invocation step');
         // Native mutation is visible before the next user operation. Publishing
         // itself may reenter through caller descriptors; no native borrow lives.
         unlocked(()=>publishMutableOutcome(entry,outcome));
         let returned,thrown,failed=false;
-        try{returned=unlocked(()=>performHostOperation(bridge,operation));}
-        catch(error){failed=true;thrown=error;}
+        try {
+          if(resourceStep){
+            const resource=foreignValue(()=>job.take_resource());
+            try {
+              unlocked(()=>resource.run(modelHostFunctions(bridge,operationError)));
+              foreignValue(()=>job.accept_resource(resource));
+            } finally {resource.free();}
+          }else returned=unlocked(()=>performHostOperation(bridge,operation));
+        } catch(error){failed=true;thrown=error;}
         try{prepareMutableInput(entry);}
         catch(error){observationFailed=true;if(!failed){failed=true;thrown=error;}}
         if(failed)retainFailure(thrown);
+        else if(resourceStep){replyState=4;valueTag=0;value=undefined;}
         else {replyState=1;[valueTag,value]=operation.kind==='call'&&operation.result==='retain'?[5,retainJobValue(bridge.hostLedger,returned,temporaryValues)]:hostReply(bridge,returned);}
       }
       let outcome;

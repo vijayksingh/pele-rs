@@ -176,6 +176,10 @@ fn construct(trace: &mut Vec<Value>, opaque: bool) -> PublicDocument {
     loop {
         match job.resume(reply.take()).unwrap() {
             DetachedInvocationStep::Complete => break,
+            DetachedInvocationStep::Resource(operation) => {
+                reply = Some(operation.run(&mut Host));
+                continue;
+            }
             DetachedInvocationStep::Host(PublicHostOperation::Get { receiver, key }) => {
                 let g = job.snapshot().unwrap();
                 reply = Some(Ok(if matches!(receiver, Atom::HostReference(900)) {
@@ -212,6 +216,10 @@ fn run(
             .unwrap()
         {
             DetachedInvocationStep::Complete => break,
+            DetachedInvocationStep::Resource(operation) => {
+                reply = Some(operation.run(&mut Host));
+                continue;
+            }
             DetachedInvocationStep::Host(op) => op,
         };
         let g = doc.snapshot().unwrap();

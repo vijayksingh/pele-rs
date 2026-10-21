@@ -7,6 +7,7 @@
 // must not create an unchecked product allocation. Exotic joins/accessors are
 // explicit unsupported cases, never invoked as part of this preflight.
 const intrinsicArrayJoin = Array.prototype.join;
+const IntrinsicDate = Date;
 function boundedOrdinaryJoin(value, separator) {
   const unsupported = () => { throw new TypeError('Live array join requires ordinary scalar data entries'); };
   if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype ||
@@ -38,9 +39,20 @@ function boundedOrdinaryJoin(value, separator) {
 export function executeLiveRead(read, operation, value, key, context) {
   return read(operation, value, key, context);
 }
-export function liveRenderRead(capture) {
+export function liveRenderRead(capture, bridge) {
   const identities = new WeakMap();
   let nextIdentity = 1;
+  const iterators = new WeakMap();
+  let iteratorCount = 0, advances = 0;
+  const object = value => value !== null && (typeof value === 'object' || typeof value === 'function');
+  const close = record => {
+    if (record.done) return;
+    record.done = true;
+    const method = record.iterator.return;
+    if (method === undefined || method === null) return;
+    const result = Reflect.apply(method, record.iterator, []);
+    if (!object(result)) throw new TypeError('Iterator return result is not an object');
+  };
   return (operation, value, key, context) => {
     try {
       switch (operation) {
@@ -50,6 +62,53 @@ export function liveRenderRead(capture) {
         case 6: return {...value};
         case 7: return value.get(key);
         case 9: return boundedOrdinaryJoin(value, key);
+        case 13: {
+          const [receiver, args, notCallable, dateIndices = []] = key;
+          // Native code supplies scalar milliseconds. Each argument becomes one
+          // fresh Date before the call, so retained host references keep identity.
+          for (const index of dateIndices) args[index] = new IntrinsicDate(args[index]);
+          if (typeof value !== 'function') throw new TypeError(notCallable);
+          return Reflect.apply(value, receiver, args);
+        }
+        case 14: {
+          if (iteratorCount === 1_000_000) return null;
+          const method = value[Symbol.iterator];
+          const iterator = Reflect.apply(method, value, []);
+          if (!object(iterator)) throw new TypeError('Iterator result is not an object');
+          const next = iterator.next;
+          const token = Object.create(null);
+          iterators.set(token, {iterator, next, done: false});
+          iteratorCount++;
+          return token;
+        }
+        case 15: {
+          const record = iterators.get(value);
+          if (record === undefined) throw new TypeError('Foreign live iterator');
+          if (record.done) return [true, undefined];
+          if (advances === 8_000_000) return null;
+          advances++;
+          let result;
+          try {
+            result = Reflect.apply(record.next, record.iterator, []);
+            if (!object(result)) throw new TypeError('Iterator next result is not an object');
+            if (result.done) { record.done = true; return [true, undefined]; }
+            return [false, result.value];
+          } catch (error) { record.done = true; throw error; }
+        }
+        case 16: {
+          const record = iterators.get(value);
+          if (record === undefined) throw new TypeError('Foreign live iterator');
+          close(record);
+          return undefined;
+        }
+        case 17: {
+          if (!Number.isInteger(key) || key < 0 || key > 0xffffffff ||
+              !bridge || !Object.hasOwn(bridge.objects, key)) {
+            throw new TypeError('Invalid retained graph node');
+          }
+          return bridge.objects[key];
+        }
+        case 18: return +value;
         case 12: return Array.isArray(value);
         case 10: {
           const keys = Object.keys(value);
@@ -106,7 +165,12 @@ export function liveRenderRead(capture) {
         }
         default: throw new TypeError('Unknown live render operation');
       }
-    } catch (error) { capture(error); throw error; }
+    } catch (error) {
+      // IteratorClose runs with an existing abrupt completion. Its secondary
+      // failure must not replace a native original error in the JS throw lane.
+      if (operation !== 16) capture(error);
+      throw error;
+    }
   };
 }
 

@@ -202,6 +202,10 @@ fn drive(
     loop {
         match job.resume(reply.take()).unwrap() {
             DetachedInvocationStep::Complete => break,
+            DetachedInvocationStep::Resource(operation) => {
+                reply = Some(operation.run(&mut Width::default()));
+                continue;
+            }
             DetachedInvocationStep::Host(PublicHostOperation::Get { receiver, key }) => {
                 let value = match receiver {
                     Atom::Ref(id) => {

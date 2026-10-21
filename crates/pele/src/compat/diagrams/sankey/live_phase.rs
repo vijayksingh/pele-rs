@@ -25,10 +25,74 @@ pub struct LiveStringUse {
     pub method: &'static str,
     pub expression_receiver: &'static str,
 }
+/// Owned native argument text or an opaque value already belonging to this job.
+#[doc(hidden)]
+pub enum LiveCallArgument<V> {
+    Value(V),
+    Text(JsString),
+    /// An IEEE number transferred without formatting or coercion.
+    Number(f64),
+    /// A fresh Date, with the host's ordinary TimeClip semantics.
+    Date(f64),
+}
 /// Scalar operations only. Rust owns field selection, ordering and layout.
 #[doc(hidden)]
 pub trait LiveRenderRead {
     type Value: Clone;
+    /// Invoke the already-captured function with its exact receiver. No member
+    /// lookup or callback may occur while a document guard is held.
+    fn call(
+        &mut self,
+        _function: &Self::Value,
+        _receiver: &Self::Value,
+        _arguments: &[LiveCallArgument<Self::Value>],
+        _resources: &mut dyn RenderResources,
+        _not_callable_error: &'static str,
+    ) -> Result<Self::Value, PublicError> {
+        Err(PeleError::new("Live calls are not implemented", ErrorCode::Semantic).into())
+    }
+    /// Apply numeric conversion at this phase, including live Date coercion.
+    /// Host callbacks run outside every document or operation borrow.
+    fn to_number(
+        &mut self,
+        _value: &Self::Value,
+        _resources: &mut dyn RenderResources,
+    ) -> Result<f64, PublicError> {
+        Err(PeleError::new(
+            "Live numeric conversion is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    /// Retain an IteratorRecord, including the next method read exactly once.
+    fn iterator_begin(&mut self, _receiver: &Self::Value) -> Result<Self::Value, PublicError> {
+        Err(PeleError::new("Live iteration is not implemented", ErrorCode::Semantic).into())
+    }
+    /// Advance once, without prefetch; None latches normal completion.
+    fn iterator_next(
+        &mut self,
+        _iterator: &Self::Value,
+    ) -> Result<Option<Self::Value>, PublicError> {
+        Err(PeleError::new("Live iteration is not implemented", ErrorCode::Semantic).into())
+    }
+    /// Abrupt body completion only. Callers preserve their original error over
+    /// failures while closing; next failures and normal completion do not close.
+    fn iterator_close(&mut self, _iterator: &Self::Value) -> Result<(), PublicError> {
+        Err(PeleError::new(
+            "Live iterator close is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
+    /// Resolve a node from this job's admitted host object directory. The value
+    /// is owned independently of the document guard, including detached nodes.
+    fn retained_graph_value(&mut self, _node: u32) -> Result<Self::Value, PublicError> {
+        Err(PeleError::new(
+            "Retained graph values are not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
     fn root(&self) -> Self::Value;
     fn get(&mut self, receiver: &Self::Value, key: &str) -> Result<Self::Value, PublicError>;
     fn index(&mut self, receiver: &Self::Value, index: usize) -> Result<Self::Value, PublicError>;

@@ -180,6 +180,10 @@ fn drive(
         assert!(doc.revision() > before);
         let value = match step {
             DetachedInvocationStep::Complete => break,
+            DetachedInvocationStep::Resource(operation) => {
+                reply = Some(operation.run(&mut Host));
+                continue;
+            }
             DetachedInvocationStep::Host(PublicHostOperation::Get { receiver, key }) => {
                 if key == "options" {
                     assert!(matches!(receiver, Atom::Ref(_)));

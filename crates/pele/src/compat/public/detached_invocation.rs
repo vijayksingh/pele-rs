@@ -3,7 +3,7 @@ use super::{
     detached_render::{RenderBook, RenderLease},
     Atom, PublicError, PublicHostValue,
 };
-use crate::compat::{ErrorCode, PeleError};
+use crate::compat::{ErrorCode, PeleError, RenderResources};
 use std::{
     any::{Any, TypeId},
     sync::{Arc, Mutex},
@@ -49,14 +49,37 @@ pub enum PublicHostOperation {
         result: PublicHostResult,
     },
 }
+/// One owned native resource computation. Only builtin code can mint it;
+/// execution consumes it and never borrows the document or its graph. Adapters
+/// retain their normal callback error/identity handling around the resource set.
+#[doc(hidden)]
+pub struct PublicResourceOperation {
+    run: Box<dyn FnOnce(&mut dyn RenderResources) -> Result<PublicHostValue, PublicError> + Send>,
+}
+impl PublicResourceOperation {
+    pub(crate) fn new(
+        run: impl FnOnce(&mut dyn RenderResources) -> Result<PublicHostValue, PublicError>
+            + Send
+            + 'static,
+    ) -> Self {
+        Self { run: Box::new(run) }
+    }
+    /// Run after releasing the short document borrow. Pass its result unchanged
+    /// to the existing invocation resume operation; a failure terminates there.
+    pub fn run(self, resources: &mut dyn RenderResources) -> Result<PublicHostValue, PublicError> {
+        (self.run)(resources)
+    }
+}
 #[doc(hidden)]
 pub enum DetachedInvocationStep {
     Host(PublicHostOperation),
+    Resource(PublicResourceOperation),
     Complete,
 }
 #[doc(hidden)]
 pub enum PublicInvocationPhase {
     Host(PublicHostOperation),
+    Resource(PublicResourceOperation),
     Complete(Result<Atom, PublicError>),
 }
 type Resume =
@@ -148,6 +171,10 @@ impl DetachedInvocationJob {
             PublicInvocationPhase::Host(operation) => {
                 self.awaiting_reply = true;
                 Ok(DetachedInvocationStep::Host(operation))
+            }
+            PublicInvocationPhase::Resource(operation) => {
+                self.awaiting_reply = true;
+                Ok(DetachedInvocationStep::Resource(operation))
             }
             PublicInvocationPhase::Complete(result) => {
                 self.awaiting_reply = false;

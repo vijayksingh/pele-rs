@@ -3148,6 +3148,21 @@ fn constructor_body(_: ConstructorArgument) -> DetachedPublicInvocation {
 }
 
 impl PublicDiagramModule for AgentFlow {
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::agentflow())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        let base = state.base.as_ref()?;
+        let graph = base.graph.as_ref()?;
+        Some(DetachedPublicRender::agentflow(
+            super::AgentflowDetachedInput::new(
+                graph,
+                &state.style_bindings,
+                state.projected.as_ref().err(),
+            ),
+        ))
+    }
+
     fn detached_public_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
         live_options::program(call)
     }

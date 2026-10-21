@@ -2111,6 +2111,20 @@ fn constructor_body(argument: ConstructorArgument) -> DetachedPublicInvocation {
 }
 
 impl PublicDiagramModule for Sequence {
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::sequence())
+    }
+    fn detached_public_render(
+        &self,
+        state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::sequence(
+            super::SequenceDetachedInput::new(state.projected.as_ref().err()),
+        ))
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,

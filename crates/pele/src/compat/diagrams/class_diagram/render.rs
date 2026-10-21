@@ -42,6 +42,11 @@ pub(super) trait LiveMembers {
     fn begin_draw(&mut self) -> Result<ClassModel, PeleError>;
     fn class(&mut self, index: usize) -> Result<ClassNode, PeleError>;
     fn definition(&mut self, name: &str) -> Result<Vec<String>, PeleError>;
+    /// Read after the class label has completed its resource callbacks.
+    fn annotations(&mut self, index: usize) -> Result<Vec<String>, PeleError>;
+    /// Read after the class label has been painted, before linking/wrapping it.
+    fn paint(&mut self, index: usize) -> Result<ClassNode, PeleError>;
+    fn metadata(&mut self, key: &str) -> Result<Option<String>, PeleError>;
     fn lines(
         &mut self,
         index: usize,
@@ -253,8 +258,14 @@ fn class_view(
         4000.,
         1 | if style.italic { 2 } else { 0 },
     )?;
-    let annotations = cls
-        .annotations
+    let current_annotations;
+    let annotation_source = if let Some(live) = live.as_deref_mut() {
+        current_annotations = live.annotations(index)?;
+        &current_annotations
+    } else {
+        &cls.annotations
+    };
+    let annotations = annotation_source
         .iter()
         .map(|a| {
             Ok(format!(
@@ -938,6 +949,8 @@ fn draw(
             nodes_out += &class_svg(
                 v,
                 &db.classes[at_class].1,
+                at_class,
+                live,
                 &id,
                 &at,
                 size,
@@ -1072,7 +1085,14 @@ fn draw(
         )
     }
     content += &format!("<g class=\"pele-nodes\">{nodes_out}</g>");
-    let title = layout_label(db.title.as_deref(), false, r, o, size, 4000., 1)?;
+    let current_title;
+    let title_text = if let Some(live) = live.as_deref_mut() {
+        current_title = live.metadata("title")?;
+        current_title.as_deref()
+    } else {
+        db.title.as_deref()
+    };
+    let title = layout_label(title_text, false, r, o, size, 4000., 1)?;
     if title.height > 0. {
         let shift = title.height + 12.;
         let full = width.js_max((title.width + 2. * pad).ceil());
@@ -1091,15 +1111,18 @@ fn draw(
         width = full;
         height = (height + shift).ceil()
     }
+    let current_accessibility;
+    let (acc_title, acc_descr) = if let Some(live) = live.as_deref_mut() {
+        current_accessibility = (live.metadata("accTitle")?, live.metadata("accDescr")?);
+        (
+            current_accessibility.0.as_deref(),
+            current_accessibility.1.as_deref(),
+        )
+    } else {
+        (db.acc_title.as_deref(), db.acc_descr.as_deref())
+    };
     let svg = document(
-        "class",
-        width,
-        height,
-        size,
-        o,
-        db.acc_title.as_deref(),
-        db.acc_descr.as_deref(),
-        &content,
+        "class", width, height, size, o, acc_title, acc_descr, &content,
     )?;
     Ok(Rendered {
         svg,
@@ -1111,6 +1134,8 @@ fn draw(
 fn class_svg(
     v: &View,
     cls: &ClassNode,
+    index: usize,
+    live: &mut Option<&mut dyn LiveMembers>,
     id: &str,
     at: &str,
     size: f64,
@@ -1196,6 +1221,13 @@ fn class_svg(
             lines(&v.methods, "method", second)
         )
     }
+    let current;
+    let cls = if let Some(live) = live.as_deref_mut() {
+        current = live.paint(index)?;
+        &current
+    } else {
+        cls
+    };
     if let Some(t) = cls.tooltip.as_deref().filter(|s| !s.is_empty()) {
         body = format!("<title>{}</title>{body}", esc_text(t)?)
     }

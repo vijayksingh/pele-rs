@@ -4,7 +4,8 @@ use super::{prepared_entries, render_numbers, render_packet, MutableDocument};
 use pele::compat::{
     public::{
         DetachedRenderCompletion, DetachedRenderJob, DetachedRenderRequest, DetachedRenderValue,
-        JsString, LiveRenderRead, LiveStringUse, LiveValueKind, PublicError, DEFAULT_BINARY_BUDGET,
+        JsString, LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind, PublicError,
+        DEFAULT_BINARY_BUDGET,
     },
     ErrorCode, PeleError,
 };
@@ -38,6 +39,12 @@ enum ReadCommand {
     OwnKeys = 10,
     SnapshotMapValues = 11,
     IsArray = 12,
+    Call = 13,
+    IteratorBegin = 14,
+    IteratorNext = 15,
+    IteratorClose = 16,
+    RetainedGraphValue = 17,
+    ToNumber = 18,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -73,7 +80,7 @@ impl Reader {
         }
         value
     }
-    fn call(
+    fn primitive(
         &self,
         command: ReadCommand,
         receiver: &JsValue,
@@ -104,15 +111,141 @@ impl Reader {
 }
 impl LiveRenderRead for Reader {
     type Value = JsValue;
+    fn call(
+        &mut self,
+        function: &JsValue,
+        receiver: &JsValue,
+        arguments: &[LiveCallArgument<JsValue>],
+        _resources: &mut dyn pele::compat::RenderResources,
+        not_callable_error: &'static str,
+    ) -> Result<JsValue, PublicError> {
+        if arguments.len() > 1_000_000 {
+            return Err(PeleError::new("Live call exceeds work budget", ErrorCode::Limit).into());
+        }
+        let mut total = 0usize;
+        for argument in arguments {
+            if let LiveCallArgument::Text(text) = argument {
+                total = total.checked_add(text.0.len()).ok_or_else(|| {
+                    PeleError::new("Live call exceeds text budget", ErrorCode::Limit)
+                })?;
+                if total > 16_000_000 {
+                    return Err(
+                        PeleError::new("Live call exceeds text budget", ErrorCode::Limit).into(),
+                    );
+                }
+            }
+        }
+        let args = js_sys::Array::new();
+        let dates = js_sys::Array::new();
+        for argument in arguments {
+            args.push(&match argument {
+                LiveCallArgument::Value(v) => v.clone(),
+                LiveCallArgument::Number(value) => JsValue::from_f64(*value),
+                LiveCallArgument::Date(value) => {
+                    dates.push(&JsValue::from_f64(args.length() as f64));
+                    JsValue::from_f64(*value)
+                }
+                LiveCallArgument::Text(text) => {
+                    // Bounded chunks avoid spreading an unbounded argument list in JS.
+                    let mut result = js_sys::JsString::from("");
+                    for chunk in text.0.chunks(4096) {
+                        result = result.concat(&js_sys::JsString::from_char_code(chunk));
+                    }
+                    result.into()
+                }
+            });
+        }
+        let packet = js_sys::Array::new();
+        packet.push(receiver);
+        packet.push(&args);
+        packet.push(&JsValue::from_str(not_callable_error));
+        packet.push(&dates);
+        Reader::primitive(self, ReadCommand::Call, function, &packet, 0)
+    }
+    fn to_number(
+        &mut self,
+        value: &JsValue,
+        _resources: &mut dyn pele::compat::RenderResources,
+    ) -> Result<f64, PublicError> {
+        Reader::primitive(self, ReadCommand::ToNumber, value, &JsValue::UNDEFINED, 0)?
+            .as_f64()
+            .ok_or_else(|| invalid("Invalid live numeric conversion reply").into())
+    }
+    fn iterator_begin(&mut self, receiver: &JsValue) -> Result<JsValue, PublicError> {
+        let value = Reader::primitive(
+            self,
+            ReadCommand::IteratorBegin,
+            receiver,
+            &JsValue::UNDEFINED,
+            0,
+        )?;
+        if value.is_null() {
+            return Err(
+                PeleError::new("Live iteration exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        Ok(value)
+    }
+    fn iterator_next(&mut self, iterator: &JsValue) -> Result<Option<JsValue>, PublicError> {
+        let value = Reader::primitive(
+            self,
+            ReadCommand::IteratorNext,
+            iterator,
+            &JsValue::UNDEFINED,
+            0,
+        )?;
+        if value.is_null() {
+            let _ = Reader::primitive(
+                self,
+                ReadCommand::IteratorClose,
+                iterator,
+                &JsValue::UNDEFINED,
+                0,
+            );
+            return Err(
+                PeleError::new("Live iteration exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        let packet: js_sys::Array = value
+            .dyn_into()
+            .map_err(|_| invalid("Invalid live iterator reply"))?;
+        if packet.length() != 2 {
+            return Err(invalid("Invalid live iterator reply").into());
+        }
+        match packet.get(0).as_bool() {
+            Some(true) => Ok(None),
+            Some(false) => Ok(Some(packet.get(1))),
+            None => Err(invalid("Invalid live iterator completion").into()),
+        }
+    }
+    fn iterator_close(&mut self, iterator: &JsValue) -> Result<(), PublicError> {
+        Reader::primitive(
+            self,
+            ReadCommand::IteratorClose,
+            iterator,
+            &JsValue::UNDEFINED,
+            0,
+        )
+        .map(|_| ())
+    }
+    fn retained_graph_value(&mut self, node: u32) -> Result<JsValue, PublicError> {
+        Reader::primitive(
+            self,
+            ReadCommand::RetainedGraphValue,
+            &JsValue::UNDEFINED,
+            &JsValue::from_f64(node as f64),
+            0,
+        )
+    }
     fn root(&self) -> JsValue {
         self.root.clone()
     }
     fn get(&mut self, receiver: &JsValue, key: &str) -> Result<JsValue, PublicError> {
         let key = self.key(key);
-        self.call(ReadCommand::Get, receiver, &key, 0)
+        self.primitive(ReadCommand::Get, receiver, &key, 0)
     }
     fn index(&mut self, receiver: &JsValue, index: usize) -> Result<JsValue, PublicError> {
-        self.call(
+        self.primitive(
             ReadCommand::Index,
             receiver,
             &JsValue::from_f64(index as f64),
@@ -120,7 +253,7 @@ impl LiveRenderRead for Reader {
         )
     }
     fn has_index(&mut self, receiver: &JsValue, index: usize) -> Result<bool, PublicError> {
-        self.call(
+        self.primitive(
             ReadCommand::HasIndex,
             receiver,
             &JsValue::from_f64(index as f64),
@@ -130,16 +263,16 @@ impl LiveRenderRead for Reader {
         .ok_or_else(|| invalid("Invalid live membership reply").into())
     }
     fn shallow_copy(&mut self, value: &JsValue) -> Result<JsValue, PublicError> {
-        self.call(ReadCommand::ShallowCopy, value, &JsValue::UNDEFINED, 0)
+        self.primitive(ReadCommand::ShallowCopy, value, &JsValue::UNDEFINED, 0)
     }
     fn map_get(&mut self, receiver: &JsValue, key: &JsValue) -> Result<JsValue, PublicError> {
-        self.call(ReadCommand::MapGet, receiver, key, 0)
+        self.primitive(ReadCommand::MapGet, receiver, key, 0)
     }
     fn map_get_text(&mut self, receiver: &JsValue, key: &str) -> Result<JsValue, PublicError> {
-        self.call(ReadCommand::MapGet, receiver, &JsValue::from_str(key), 0)
+        self.primitive(ReadCommand::MapGet, receiver, &JsValue::from_str(key), 0)
     }
     fn array_join(&mut self, receiver: &JsValue, separator: &str) -> Result<JsString, PublicError> {
-        let result = self.call(
+        let result = self.primitive(
             ReadCommand::ArrayJoin,
             receiver,
             &JsValue::from_str(separator),
@@ -153,7 +286,8 @@ impl LiveRenderRead for Reader {
         Self::units(&result)?.ok_or_else(|| invalid("Invalid live array join reply").into())
     }
     fn object_identity(&mut self, value: &JsValue) -> Result<Option<u64>, PublicError> {
-        let identity = self.call(ReadCommand::ObjectIdentity, value, &JsValue::UNDEFINED, 0)?;
+        let identity =
+            self.primitive(ReadCommand::ObjectIdentity, value, &JsValue::UNDEFINED, 0)?;
         if identity.is_undefined() {
             return Ok(None);
         }
@@ -178,7 +312,7 @@ impl LiveRenderRead for Reader {
         max_count: usize,
     ) -> Result<Vec<JsValue>, PublicError> {
         let bound = max_count.min(8_000_000);
-        let values = self.call(
+        let values = self.primitive(
             ReadCommand::SnapshotIterable,
             value,
             &JsValue::from_f64(bound as f64),
@@ -198,12 +332,12 @@ impl LiveRenderRead for Reader {
         Ok(array.iter().collect())
     }
     fn is_array(&mut self, value: &JsValue) -> Result<bool, PublicError> {
-        self.call(ReadCommand::IsArray, value, &JsValue::UNDEFINED, 0)?
+        self.primitive(ReadCommand::IsArray, value, &JsValue::UNDEFINED, 0)?
             .as_bool()
             .ok_or_else(|| invalid("Invalid live Array classification").into())
     }
     fn own_keys(&mut self, receiver: &JsValue) -> Result<Vec<JsString>, PublicError> {
-        let result = self.call(ReadCommand::OwnKeys, receiver, &JsValue::UNDEFINED, 0)?;
+        let result = self.primitive(ReadCommand::OwnKeys, receiver, &JsValue::UNDEFINED, 0)?;
         if result.is_null() {
             return Err(
                 PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
@@ -243,7 +377,7 @@ impl LiveRenderRead for Reader {
         max_count: usize,
     ) -> Result<Vec<JsValue>, PublicError> {
         let bound = max_count.min(8_000_000);
-        let result = self.call(
+        let result = self.primitive(
             ReadCommand::SnapshotMapValues,
             receiver,
             &JsValue::from_f64(bound as f64),
@@ -293,7 +427,7 @@ impl LiveRenderRead for Reader {
         Self::units(value)
     }
     fn to_string(&mut self, value: &JsValue) -> Result<JsString, PublicError> {
-        let text = self.call(ReadCommand::ToString, value, &JsValue::UNDEFINED, 0)?;
+        let text = self.primitive(ReadCommand::ToString, value, &JsValue::UNDEFINED, 0)?;
         Self::units(&text)?
             .ok_or_else(|| invalid("Live reader returned a non-string conversion").into())
     }
@@ -304,7 +438,7 @@ impl LiveRenderRead for Reader {
     ) -> Result<JsString, PublicError> {
         let method = self.key(site.method);
         let context = u32::from(site.expression_receiver == "t");
-        let text = self.call(ReadCommand::RequireString, value, &method, context)?;
+        let text = self.primitive(ReadCommand::RequireString, value, &method, context)?;
         Self::units(&text)?.ok_or_else(|| invalid("Live reader returned a non-string value").into())
     }
 }

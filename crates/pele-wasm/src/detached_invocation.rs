@@ -3,10 +3,12 @@ use super::{render_numbers, MutableDocument};
 use pele::compat::{
     public::{
         DetachedInvocationJob, DetachedInvocationStep, HostExceptionToken, JsString, PublicError,
-        PublicHostOperation, PublicHostResult, PublicHostValue, DEFAULT_BINARY_BUDGET,
+        PublicHostOperation, PublicHostResult, PublicHostValue, PublicResourceOperation,
+        DEFAULT_BINARY_BUDGET,
     },
     ErrorCode, PeleError,
 };
+use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
 fn invalid(message: &str) -> PeleError {
@@ -62,6 +64,7 @@ pub(super) fn host_value(tag: u32, value: &JsValue) -> Result<PublicHostValue, P
 #[wasm_bindgen(js_name=PublicInvocationJob)]
 pub struct PublicInvocationJob {
     inner: DetachedInvocationJob,
+    resource: ResourceSlot,
 }
 #[wasm_bindgen]
 impl MutableDocument {
@@ -83,7 +86,12 @@ impl MutableDocument {
                 .map_err(|_| invalid("Invalid public model method call"))?;
             self.inner
                 .prepare_detached_invocation(revision, call)
-                .map(|job| job.map(|inner| PublicInvocationJob { inner }))
+                .map(|job| {
+                    job.map(|inner| PublicInvocationJob {
+                        inner,
+                        resource: ResourceSlot::default(),
+                    })
+                })
         };
         run().map_err(failure)
     }
@@ -95,11 +103,11 @@ impl MutableDocument {
         value: JsValue,
     ) -> Result<Vec<u8>, JsValue> {
         let mut run = || -> Result<Vec<u8>, PeleError> {
-            let reply = host_reply(reply_state, value_tag, &value)?;
+            let reply = job.resource.reply(reply_state, value_tag, &value)?;
             let step = self
                 .inner
                 .resume_detached_invocation(&mut job.inner, reply)?;
-            let metadata = step_metadata(step);
+            let metadata = job.resource.metadata(step);
             let metadata = render_numbers::encode(&metadata)?;
             let graph = self.inner.snapshot_read()?.into_model()?;
             pele::compat::public::encode_binary_exchange(
@@ -149,6 +157,9 @@ pub(super) fn host_reply(
 
 pub(super) fn step_metadata(step: DetachedInvocationStep) -> serde_json::Value {
     match step {
+        DetachedInvocationStep::Resource(_) => {
+            unreachable!("resource step retained before metadata")
+        }
         DetachedInvocationStep::Complete => serde_json::json!({"complete":true}),
         DetachedInvocationStep::Host(PublicHostOperation::GreaterEqual { left, right }) => {
             serde_json::json!({"host":{"kind":"greaterEqual","left":left,"right":right}})
@@ -174,5 +185,122 @@ pub(super) fn step_metadata(step: DetachedInvocationStep) -> serde_json::Value {
         }) => {
             serde_json::json!({"host":{"kind":"call","function":function,"receiver":receiver,"arguments":arguments,"notCallableError":not_callable_error,"result":match result {PublicHostResult::Discard=>"discard",PublicHostResult::Retain=>"retain",PublicHostResult::Value=>"value"}}})
         }
+    }
+}
+
+/// The resource is a separate owner so neither the document nor a provisional
+/// constructor job is borrowed during callbacks. Replies never traverse JS.
+#[wasm_bindgen(js_name=PublicInvocationResource)]
+pub struct PublicInvocationResource {
+    origin: Rc<()>,
+    operation: Option<PublicResourceOperation>,
+    result: Option<Result<PublicHostValue, PublicError>>,
+}
+#[wasm_bindgen]
+impl PublicInvocationResource {
+    pub fn run(&mut self, dispatcher: js_sys::Function) -> Result<(), JsValue> {
+        let operation = self
+            .operation
+            .take()
+            .ok_or_else(|| failure(invalid("Resource operation already consumed")))?;
+        let mut host = super::BrowserResources {
+            width: None,
+            icons: None,
+        };
+        self.result = Some(operation.run(&mut super::host_functions::Resources {
+            host: &mut host,
+            dispatcher,
+        }));
+        Ok(())
+    }
+}
+#[derive(Default)]
+pub(super) struct ResourceSlot {
+    origin: Option<Rc<()>>,
+    operation: Option<PublicResourceOperation>,
+    result: Option<Result<PublicHostValue, PublicError>>,
+    waiting: bool,
+}
+impl ResourceSlot {
+    pub(super) fn metadata(&mut self, step: DetachedInvocationStep) -> serde_json::Value {
+        match step {
+            DetachedInvocationStep::Resource(operation) => {
+                self.origin = Some(Rc::new(()));
+                self.operation = Some(operation);
+                self.waiting = true;
+                serde_json::json!({"resource":true})
+            }
+            other => step_metadata(other),
+        }
+    }
+    pub(super) fn take(&mut self) -> Result<PublicInvocationResource, JsValue> {
+        let operation = self
+            .operation
+            .take()
+            .ok_or_else(|| failure(invalid("No pending resource operation")))?;
+        Ok(PublicInvocationResource {
+            origin: Rc::clone(self.origin.as_ref().expect("pending resource origin")),
+            operation: Some(operation),
+            result: None,
+        })
+    }
+    pub(super) fn accept(
+        &mut self,
+        resource: &mut PublicInvocationResource,
+    ) -> Result<(), JsValue> {
+        if !self.waiting
+            || self.operation.is_some()
+            || self.result.is_some()
+            || !self
+                .origin
+                .as_ref()
+                .is_some_and(|origin| Rc::ptr_eq(origin, &resource.origin))
+        {
+            return Err(failure(invalid("Unexpected resource reply")));
+        }
+        self.result = Some(
+            resource
+                .result
+                .take()
+                .ok_or_else(|| failure(invalid("Resource operation has not completed")))?,
+        );
+        Ok(())
+    }
+    pub(super) fn reply(
+        &mut self,
+        state: u32,
+        tag: u32,
+        value: &JsValue,
+    ) -> Result<Option<Result<PublicHostValue, PublicError>>, PeleError> {
+        if self.waiting {
+            let reply = match state {
+                4 => Some(
+                    self.result
+                        .take()
+                        .ok_or_else(|| invalid("Resource reply is not ready"))?,
+                ),
+                2 => host_reply(state, tag, value)?,
+                _ => return Err(invalid("Resource operation requires its owned reply")),
+            };
+            self.operation = None;
+            self.result = None;
+            self.waiting = false;
+            self.origin = None;
+            Ok(reply)
+        } else {
+            host_reply(state, tag, value)
+        }
+    }
+}
+#[wasm_bindgen]
+impl PublicInvocationJob {
+    pub fn take_resource(&mut self) -> Result<PublicInvocationResource, JsValue> {
+        self.resource.take()
+    }
+    pub fn accept_resource(
+        &mut self,
+        resource: &mut PublicInvocationResource,
+    ) -> Result<(), JsValue> {
+        self.resource.accept(resource)
     }
 }

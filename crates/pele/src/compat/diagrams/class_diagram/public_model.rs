@@ -18,6 +18,8 @@ use crate::compat::{
     ErrorCode,
 };
 use std::collections::{BTreeSet, HashMap, HashSet};
+#[path = "public_model/display_continuation.rs"]
+mod display_continuation;
 #[path = "public_model/member_constructor.rs"]
 mod member_constructor;
 const PROTO: PrototypeId = PrototypeId(1);
@@ -1500,6 +1502,19 @@ fn construct_default() -> Result<ClassPublicState, PeleError> {
 }
 impl PublicDiagramModule for Class {
     type PublicState = ClassPublicState;
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::class())
+    }
+    fn detached_public_render(
+        &self,
+        state: &ClassPublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::class(
+            super::live_phase::ClassDetachedInput::new(state.model.as_ref().err()),
+        ))
+    }
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
@@ -1540,6 +1555,35 @@ impl PublicDiagramModule for Class {
         s.model = imported(&g);
         s.graph = g;
         Ok(())
+    }
+    fn active_public_operation(
+        &self,
+        state: &mut ClassPublicState,
+        operation: crate::compat::public::PublicActiveOperation,
+        budget: &mut crate::compat::public::PublicActiveBudget,
+    ) -> Result<crate::compat::public::PublicActiveValue, PublicError> {
+        use crate::compat::public::{PublicActiveOperation, PublicActiveValue};
+        let mut context = Context::new(&mut state.graph);
+        context.work = 1_000_000 - budget.remaining;
+        let result = match operation {
+            PublicActiveOperation::Builtin(call) if call.method.0 != 26 => (|| {
+                context.validate(&call.receiver)?;
+                for atom in &call.arguments {
+                    context.validate(atom)?;
+                }
+                context.invoke(call).map(PublicActiveValue::Atom)
+            })(),
+            operation => operation.run(&mut context),
+        };
+        budget.remaining = 1_000_000 - context.work.min(1_000_000);
+        state.model = imported(&state.graph);
+        result
+    }
+    fn detached_public_invocation(
+        &self,
+        call: MethodCall,
+    ) -> Option<crate::compat::public::DetachedPublicInvocation> {
+        display_continuation::prepare(call)
     }
     fn invoke_public(
         &self,
@@ -3010,6 +3054,29 @@ impl super::render::LiveMembers for Live<'_> {
             },
             tooltip: i.optional(&a, "tooltip")?,
         })
+    }
+    fn annotations(&mut self, index: usize) -> Result<Vec<String>, PeleError> {
+        let value = self.class_value(index);
+        let class = self.result(value)?;
+        let graph = &*self.context.g;
+        let mut import = Import {
+            g: graph,
+            bytes: 0,
+            work: 0,
+        };
+        import.texts(required(graph, &class, "annotations")?)
+    }
+    fn paint(&mut self, index: usize) -> Result<ClassNode, PeleError> {
+        self.class(index)
+    }
+    fn metadata(&mut self, key: &str) -> Result<Option<String>, PeleError> {
+        let graph = &*self.context.g;
+        let mut import = Import {
+            g: graph,
+            bytes: 0,
+            work: 0,
+        };
+        import.optional(&graph.root, key)
     }
     fn definition(&mut self, name: &str) -> Result<Vec<String>, PeleError> {
         let result = (|| {

@@ -2,8 +2,11 @@ import Foundation
 import CPele
 
 private struct InvocationSelection: Decodable { let selected: Bool }
+private struct InvocationResourceCompletion: Decodable { let completed: Bool }
+private struct InvocationResourceAcceptance: Decodable { let accepted: Bool }
 struct InvocationStep: Decodable {
     let complete: Bool?
+    let resource: Bool?
     let host: HostOperation?
 }
 struct HostOperation: Decodable {
@@ -22,7 +25,7 @@ struct HostTypeError: Error { let message: String }
 func invalidHost(_ message: String) -> PeleError { PeleError(code: "semantic", message: message) }
 
 extension Pele.MutableDocument {
-    func invokeDetached(_ call: Data) throws -> Pele.PublicInvocationOutcome? {
+    func invokeDetached(_ call: Data, resources: Pele.HostResources) throws -> Pele.PublicInvocationOutcome? {
         var job: OpaquePointer?
         let selected: InvocationSelection
         do {
@@ -47,7 +50,9 @@ extension Pele.MutableDocument {
                     let exchange = try withHandle { handle in
                         var acknowledged = revision
                         let response: OpaquePointer?
-                        if replyState == 2 || retainedReply != nil {
+                        if replyState == 4 {
+                            response = pele_public_invocation_resume_v17(handle, job, replyState, nil, &acknowledged)
+                        } else if replyState == 2 || retainedReply != nil {
                             var packet = PeleHostValueV17()
                             packet.version = 17; packet.struct_size = UInt32(MemoryLayout<PeleHostValueV17>.size)
                             packet.tag = 5; packet.payload = UInt64(retainedReply ?? 0)
@@ -64,6 +69,31 @@ extension Pele.MutableDocument {
                     acceptPreparedRevision(exchange.revision)
                     let step = try JSONDecoder().decode(InvocationStep.self, from: exchange.metadata)
                     if step.complete == true { break }
+                    if step.resource == true {
+                        guard step.host == nil else { throw invalidHost("Conflicting native invocation step") }
+                        var resource: OpaquePointer?
+                        defer { if let resource { pele_resource_operation_free_v19(resource) } }
+                        do {
+                            let selected = try Pele.compatibilityResult(pele_public_invocation_take_resource_v19(job, &resource), as: InvocationSelection.self)
+                            guard selected.selected, let resource else { throw invalidHost("Missing native resource operation") }
+                            // No withHandle or native job borrow spans this call.
+                            // The lifetime guard still prevents close/disposal.
+                            let response = resources.withCapturedNativeResources { host, takeError in
+                                withHostFunctionResources(takeError) {
+                                    pele_resource_operation_run_v19(resource, host)
+                                }
+                            }
+                            original = original ?? response.error
+                            let completed = try Pele.compatibilityResult(response.handle, as: InvocationResourceCompletion.self)
+                            guard completed.completed else { throw invalidHost("Resource operation did not complete") }
+                            let accepted = try Pele.compatibilityResult(pele_public_invocation_accept_resource_v19(job, resource), as: InvocationResourceAcceptance.self)
+                            guard accepted.accepted else { throw invalidHost("Resource operation was not accepted") }
+                        } catch {
+                            throw original ?? error
+                        }
+                        replyState = 4; reply = .undefined
+                        continue
+                    }
                     guard let operation = step.host else { throw invalidHost("Missing native host operation") }
                     do {
                         let returned = try perform(operation, graph: exchange.graph)
@@ -76,7 +106,7 @@ extension Pele.MutableDocument {
                     } catch let failure as HostTypeError {
                         replyState = 3; reply = .string(.init(failure.message))
                     } catch {
-                        original = error; replyState = 2; reply = .undefined
+                        original = original ?? error; replyState = 2; reply = .undefined
                     }
                 }
                 let exchange = try withHandle { handle in

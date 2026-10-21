@@ -147,6 +147,19 @@ PeleResult *pele_public_invocation_prepare_v17(PelePublicDocument *, uint64_t, c
 PeleResult *pele_public_invocation_resume_v17(PelePublicDocument *, PeleInvocationJobV17 *, uint32_t reply_state, const PeleHostValueV17 *, uint64_t *revision);
 PeleResult *pele_public_invocation_finish_v17(PelePublicDocument *, PeleInvocationJobV17 *, uint64_t *revision);
 void pele_public_invocation_free_v17(PeleInvocationJobV17 *);
+/* Native owned resource carrier (v19). A v17 step can return {resource:true}.
+ * Take once, run outside every job/document borrow, accept exactly once into the
+ * originating invocation phase, then resume_v17(reply_state=4,reply=NULL).
+ * Native scalar/exception values remain in Rust; no host-number/JSON roundtrip.
+ * Keep document and invocation alive through resource free; no concurrent use/free.
+ * Run can call host resources, including reentry into that document. Take/accept
+ * never call hosts. Free cancels a carrier without undoing accepted mutations.
+ */
+typedef struct PeleResourceOperationV19 PeleResourceOperationV19;
+PeleResult *pele_public_invocation_take_resource_v19(PeleInvocationJobV17 *, PeleResourceOperationV19 **);
+PeleResult *pele_resource_operation_run_v19(PeleResourceOperationV19 *, const PeleHostResourcesV3 *);
+PeleResult *pele_public_invocation_accept_resource_v19(PeleInvocationJobV17 *, PeleResourceOperationV19 *);
+void pele_resource_operation_free_v19(PeleResourceOperationV19 *);
 PeleResult *pele_host_number_string_v17(uint64_t ieee_bits);
 /* Shared identity namespace with v12 bound functions; IDs never repeat. */
 PeleResult *pele_host_identity_v17(void);

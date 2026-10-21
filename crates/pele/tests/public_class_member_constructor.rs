@@ -83,6 +83,10 @@ fn drive(job: &mut PublicConstructionJob, mode: Option<&str>) -> Vec<Value> {
         let step = job.resume(reply.take()).unwrap();
         let operation = match step {
             DetachedInvocationStep::Complete => break,
+            DetachedInvocationStep::Resource(operation) => {
+                reply = Some(operation.run(&mut Host));
+                continue;
+            }
             DetachedInvocationStep::Host(op) => op,
         };
         let graph = job.snapshot().unwrap();

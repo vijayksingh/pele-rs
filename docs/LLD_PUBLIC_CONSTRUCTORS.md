@@ -314,3 +314,18 @@ comparisons, existing constructor semantic checks, all 33 prepared entries and
 source-initializer regressions. Runtime source (442 paths) and package hashes
 match the after-tests proof; the mask fix changed only full.js and graph.js,
 without rebuilding WASM. Existing diagnostic/reflection gaps remain explicit.
+
+## Owned calendar resource operations
+
+`DetachedInvocationStep::Resource` carries a sealed one-use operation. Hosts run
+it outside document and job borrows, then resume with its native result. Gantt's
+start-date and scheduling methods reuse the same scheduler and calendar parser
+as synchronous invocation. Resource failures retain their original host error,
+while finish still releases the invocation reservation.
+
+C19 transfers the operation into a separate owner-authenticated carrier.
+`take_resource`, `run`, `accept_resource` and resume state4 consume each phase
+once. A fresh phase identity rejects foreign jobs and old replies. No native
+calendar result passes through JSON, preserving Date/number bits. Swift and WASM
+provide generic resource execution; date parsing and task scheduling stay in
+Rust. Dropping a carrier does not synthesize a successful callback result.

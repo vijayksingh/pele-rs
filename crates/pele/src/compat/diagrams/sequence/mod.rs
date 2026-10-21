@@ -5,9 +5,12 @@ mod json;
 mod kinds;
 pub use json::SeqValue;
 mod lexer;
+mod live_phase;
 mod model;
 mod parser;
+mod phase;
 mod render;
+pub(crate) use live_phase::{render_detached, SequenceDetachedInput};
 mod tokens;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,

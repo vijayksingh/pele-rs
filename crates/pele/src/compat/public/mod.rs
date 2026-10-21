@@ -15,7 +15,7 @@ mod engine;
 pub use detached_render::{
     live_number_string, DetachedPublicRender, DetachedRenderCapability, DetachedRenderCompletion,
     DetachedRenderJob, DetachedRenderOutcome, DetachedRenderRequest, DetachedRenderValue,
-    LiveRenderRead, LiveStringUse, LiveValueKind,
+    LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind,
 };
 mod graph;
 pub(crate) mod graph_read;
@@ -78,5 +78,9 @@ pub use constructor::{
 #[doc(hidden)]
 pub use detached_invocation::{
     DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation, PublicHostOperation,
-    PublicHostResult, PublicInvocationPhase,
+    PublicHostResult, PublicInvocationPhase, PublicResourceOperation,
 };
+
+mod active_operation;
+#[doc(hidden)]
+pub use active_operation::{PublicActiveBudget, PublicActiveOperation, PublicActiveValue};

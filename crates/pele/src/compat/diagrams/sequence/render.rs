@@ -3,7 +3,8 @@ use super::super::common::literal_label::break_label;
 use super::{
     actors::{actor_kind, actor_size, draw_actor, is_figure, ActorSize},
     kinds::*,
-    model::{MessageText, SeqActor, SequenceModel},
+    model::SequenceModel,
+    phase::{PhaseInput, Typed},
 };
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
@@ -160,34 +161,41 @@ struct Numbering {
     index: Vec<f64>,
     shown: Vec<bool>,
 }
-fn number_messages(db: &SequenceModel, always: bool) -> Numbering {
-    let mut current = 1.;
-    let mut step = 1.;
-    let mut visible = false;
-    let mut index = vec![f64::NAN; db.messages.len()];
-    let mut shown = vec![false; db.messages.len()];
-    for (i, m) in db.messages.iter().enumerate() {
-        if m.r#type == Some(AUTONUMBER) {
-            if let MessageText::Numbering(spec) = &m.message {
-                if let Some(n) = spec.start.filter(|n| *n != 0. && !n.is_nan()) {
-                    current = n
-                }
-                if let Some(n) = spec.step.filter(|n| *n != 0. && !n.is_nan()) {
-                    step = n
-                }
-                visible = spec.visible;
+fn number_messages<P: PhaseInput>(
+    input: &mut P,
+    messages: &P::Value,
+    count: usize,
+    always: bool,
+) -> Result<Numbering, P::Error> {
+    let (mut current, mut step, mut visible) = (1., 1., false);
+    let mut index = vec![f64::NAN; count];
+    let mut shown = vec![false; count];
+    for i in 0..count {
+        input.step()?;
+        let m = input.index(messages, i)?;
+        let kind = input.byte(&m, "type")?;
+        if kind == Some(AUTONUMBER) {
+            let spec = input.get(&m, "message")?;
+            let n = input.get(&spec, "start")?;
+            if let Some(n) = input.number(&n).filter(|n| *n != 0. && !n.is_nan()) {
+                current = n;
             }
-        } else if line(m.r#type) {
+            let n = input.get(&spec, "step")?;
+            if let Some(n) = input.number(&n).filter(|n| *n != 0. && !n.is_nan()) {
+                step = n;
+            }
+            visible = input.flag(&spec, "visible")?;
+        } else if line(kind) {
             index[i] = current;
             shown[i] = visible || always;
             current = round((current + step) * 100.) / 100.;
         }
     }
-    Numbering { index, shown }
+    Ok(Numbering { index, shown })
 }
-struct Column {
+struct Column<T> {
     id: String,
-    actor: SeqActor,
+    actor: T,
     kind: String,
     label: Label,
     size: ActorSize,
@@ -225,8 +233,9 @@ struct Frame {
     divider_y: Vec<f64>,
     divider_labels: Vec<Label>,
 }
-struct BoxRun {
-    index: usize,
+struct BoxRun<T> {
+    value: T,
+    identity: u64,
     first: usize,
     last: usize,
     title: Label,
@@ -305,7 +314,7 @@ fn badge_width(
         Ok(0.)
     }
 }
-fn place(cols: &mut [Column], gaps: &[f64]) {
+fn place<T>(cols: &mut [Column<T>], gaps: &[f64]) {
     for i in 1..cols.len() {
         cols[i].x = cols[i - 1].x + gaps[i - 1]
     }
@@ -339,14 +348,14 @@ fn backed(
     };
     Ok(back + &ctx.svg(label, cx, cy, attrs)?)
 }
-fn left_edge(c: &Column, extra: usize) -> f64 {
+fn left_edge<T>(c: &Column<T>, extra: usize) -> f64 {
     if c.activations.len() + extra > 0 {
         c.x - ACT_W / 2.
     } else {
         c.x
     }
 }
-fn right_edge(c: &Column, extra: usize) -> f64 {
+fn right_edge<T>(c: &Column<T>, extra: usize) -> f64 {
     let depth = c.activations.len() + extra;
     if depth > 0 {
         c.x + ACT_W / 2. + (depth - 1) as f64 * ACT_STEP
@@ -354,8 +363,8 @@ fn right_edge(c: &Column, extra: usize) -> f64 {
         c.x
     }
 }
-fn end_activation(
-    col: &mut Column,
+fn end_activation<T>(
+    col: &mut Column<T>,
     end: f64,
     min_x: &mut f64,
     max_x: &mut f64,
@@ -368,7 +377,7 @@ fn end_activation(
     out.push(format!("<rect class=\"pele-activation\" data-id=\"{}\" x=\"{}\" y=\"{}\" width=\"{ACT_W}\" height=\"{}\" rx=\"2\"/>",esc_text(&col.id)?,num(x),num(start),num(bottom-start)));
     Ok(bottom)
 }
-fn destroy(col: &mut Column, line_y: f64, out: &mut String) -> Result<f64, PeleError> {
+fn destroy<T>(col: &mut Column<T>, line_y: f64, out: &mut String) -> Result<f64, PeleError> {
     let cx = col.x;
     let cy = line_y + 16.;
     col.life_end = cy;
@@ -386,19 +395,18 @@ fn destroy(col: &mut Column, line_y: f64, out: &mut String) -> Result<f64, PeleE
     ));
     Ok(cy + 6.)
 }
-fn actor_svg(
-    col: &Column,
+fn actor_svg<P: PhaseInput>(
+    input: &mut P,
+    col: &Column<P::Value>,
     top: f64,
     footer: bool,
     ctx: &mut TextContext<'_>,
-) -> Result<String, PeleError> {
-    let cls = col
-        .actor
-        .properties
-        .iter()
-        .find(|(k, _)| k == "class")
-        .and_then(|(_, v)| v.as_str())
-        .map(class_names)
+) -> Result<String, P::Error> {
+    let properties = input.get(&col.actor, "properties")?;
+    let value = input.lookup(&properties, "class")?;
+    let cls = input
+        .text(&value)?
+        .map(|s| class_names(&s))
         .unwrap_or_default();
     Ok(format!(
         "<g class=\"pele-node pele-actor pele-actor-{}{}{cls}\" data-id=\"{}\">{}</g>",
@@ -408,6 +416,7 @@ fn actor_svg(
         draw_actor(&col.kind, col.x, top, col.size, &col.label, ctx.resources)?
     ))
 }
+
 fn badge(i: usize, cx: f64, cy: f64, w: f64, tiny: f64, n: &Numbering) -> String {
     format!("<g class=\"pele-sequence-number\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{BADGE_H}\" rx=\"8\" fill=\"var(--_l)\" stroke=\"none\"/><text x=\"{}\" y=\"{}\" text-anchor=\"middle\" font-size=\"{}\" fill=\"var(--_bg)\" stroke=\"none\">{}</text></g>",num(cx-w/2.),num(cy-BADGE_H/2.),num(w),num(cx),num(cy+tiny*0.35),js_num(tiny),esc(&js_num(n.index[i])))
 }
@@ -420,27 +429,37 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let loose = draw(db, config, options, resources, false)?;
+    render_phases(&mut Typed(db), config, options, resources)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let loose = draw(input, config, options, resources, false)?;
     let Some(available) = options.max_width.filter(|n| *n > 0.) else {
         return Ok(loose);
     };
     if loose.width <= available {
         return Ok(loose);
     }
-    let tight = draw(db, config, options, resources, true)?;
+    let tight = draw(input, config, options, resources, true)?;
     Ok(if tight.width < loose.width {
         tight
     } else {
         loose
     })
 }
-fn draw(
-    db: &SequenceModel,
+fn draw<P: PhaseInput>(
+    input: &mut P,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
+    input.begin_draw();
+    let root = input.root();
     let conf = config.get("sequence").and_then(Value::as_object);
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
@@ -454,8 +473,11 @@ fn draw(
     let min_h = option(conf, "height", round(size * 1.5) + 20.);
     let wrap_w = option(conf, "width", 160.).js_min(if tight {
         32_f64.js_max(
-            (options.max_width.unwrap_or(320.) - 2. * pad) / db.actors.len().max(1) as f64
-                - actor_margin
+            (options.max_width.unwrap_or(320.) - 2. * pad) / {
+                let a = input.get(&root, "actors")?;
+                let n = input.get(&a, "size")?;
+                input.number(&n).unwrap_or(0.).max(1.)
+            } - actor_margin
                 - 24.,
         )
     } else {
@@ -473,9 +495,9 @@ fn draw(
     let note_over = if tight { 8. } else { 16. };
     let frame_pad = if tight { 12. } else { 20. };
     let frame_nest = if tight { 6. } else { 10. };
-    let messages = &db.messages;
-    let count = messages.len();
-    let numbering = number_messages(db, truth(conf, "showSequenceNumbers"));
+    let messages = input.get(&root, "messages")?;
+    let count = input.count(&messages)?;
+    let numbering = number_messages(input, &messages, count, truth(conf, "showSequenceNumbers"))?;
     let mut ctx = TextContext {
         resources,
         options,
@@ -483,19 +505,25 @@ fn draw(
         wrap_w,
     };
     let used = if truth(conf, "hideUnusedParticipants") {
-        Some(
-            messages
-                .iter()
-                .flat_map(|m| m.from.iter().chain(m.to.iter()))
-                .cloned()
-                .collect::<HashSet<_>>(),
-        )
+        let mut used = HashSet::new();
+        let mut i = 0;
+        while i < input.count(&messages)? {
+            input.step()?;
+            let m = input.index(&messages, i)?;
+            i += 1;
+            for k in ["from", "to"] {
+                if let Some(v) = input.field(&m, k)? {
+                    used.insert(v);
+                }
+            }
+        }
+        Some(used)
     } else {
         None
     };
     let mut next_line = vec![-1; count + 1];
     for i in (0..count).rev() {
-        next_line[i] = if line(messages[i].r#type) {
+        next_line[i] = if line(input.at_byte(&messages, i, "type")?) {
             i as isize
         } else {
             next_line[i + 1]
@@ -503,64 +531,93 @@ fn draw(
     }
     let mut cols = vec![];
     let mut col_of = HashMap::new();
-    for (id, actor) in &db.actors {
-        if used.as_ref().is_some_and(|u| !u.contains(id)) {
-            continue;
+    let actors = input.get(&root, "actors")?;
+    let mut iterator = input.entries(&actors)?;
+    while let Some((key, actor)) = input.next(&mut iterator)? {
+        let body = (|| -> Result<(), P::Error> {
+            input.step()?;
+            let id = input.text(&key)?.unwrap_or_default();
+            if used.as_ref().is_some_and(|u| !u.contains(&id)) {
+                return Ok(());
+            }
+            let kind = actor_kind(&input.field(&actor, "type")?.unwrap_or_default()).to_owned();
+            let description = input.label_field(&actor, "description")?;
+            let wrap = input.flag(&actor, "wrap")?;
+            input.keep_text(description.as_deref().unwrap_or("").encode_utf16().count())?;
+            let label = ctx.text(description.as_deref(), size, wrap, None, 0)?;
+            let created = input.get(&root, "createdActors")?;
+            let created = input.lookup(&created, &id)?;
+            let destroyed = input.get(&root, "destroyedActors")?;
+            let destroyed = input.lookup(&destroyed, &id)?;
+            let position = |n: Option<f64>| {
+                n.filter(|n| n.is_finite() && *n >= 0. && n.fract() == 0.)
+                    .map(|n| n.min(count as f64) as usize)
+            };
+            let mut create_at = position(input.number(&created)).map_or(-1, |n| next_line[n]);
+            if create_at >= 0
+                && input
+                    .at_field(&messages, create_at as usize, "to")?
+                    .as_ref()
+                    != Some(&id)
+            {
+                create_at = -1;
+            }
+            let mut destroy_at = position(input.number(&destroyed)).map_or(-1, |n| next_line[n]);
+            if destroy_at >= 0
+                && input
+                    .at_field(&messages, destroy_at as usize, "to")?
+                    .as_ref()
+                    != Some(&id)
+                && input
+                    .at_field(&messages, destroy_at as usize, "from")?
+                    .as_ref()
+                    != Some(&id)
+            {
+                destroy_at = -1;
+            }
+            col_of.insert(id.clone(), cols.len());
+            let actor_size = actor_size(&kind, &label, min_w, min_h, if tight { 8. } else { 16. });
+            cols.push(Column {
+                id: id.clone(),
+                actor: actor.clone(),
+                kind,
+                label,
+                size: actor_size,
+                x: 0.,
+                create_at,
+                destroy_at,
+                top: 0.,
+                life_start: 0.,
+                life_end: -1.,
+                activations: vec![],
+            });
+            Ok(())
+        })();
+        if let Err(error) = body {
+            let _ = input.close(&mut iterator);
+            return Err(error);
         }
-        let kind = actor_kind(&actor.r#type).to_owned();
-        let label = ctx.text(Some(&actor.description), size, actor.wrap, None, 0)?;
-        let created = db
-            .created_actors
-            .iter()
-            .find(|(k, _)| k == id)
-            .map(|(_, n)| *n);
-        let destroyed = db
-            .destroyed_actors
-            .iter()
-            .find(|(k, _)| k == id)
-            .map(|(_, n)| *n);
-        let mut create_at = created.map_or(-1, |n| next_line[n.min(count)]);
-        if create_at >= 0 && messages[create_at as usize].to.as_ref() != Some(id) {
-            create_at = -1
-        }
-        let mut destroy_at = destroyed.map_or(-1, |n| next_line[n.min(count)]);
-        if destroy_at >= 0
-            && messages[destroy_at as usize].to.as_ref() != Some(id)
-            && messages[destroy_at as usize].from.as_ref() != Some(id)
-        {
-            destroy_at = -1
-        }
-        col_of.insert(id.clone(), cols.len());
-        let actor_size = actor_size(&kind, &label, min_w, min_h, if tight { 8. } else { 16. });
-        cols.push(Column {
-            id: id.clone(),
-            actor: actor.clone(),
-            kind,
-            label,
-            size: actor_size,
-            x: 0.,
-            create_at,
-            destroy_at,
-            top: 0.,
-            life_start: 0.,
-            life_end: -1.,
-            activations: vec![],
-        });
     }
     let mut needs = vec![];
     let mut views: Vec<Option<View>> = (0..count).map(|_| None).collect();
-    for (i, m) in messages.iter().enumerate() {
+    for i in 0..count {
+        input.step()?;
+        let m = input.index(&messages, i)?;
         let (Some(&a), Some(&b), Some(raw)) = (
-            m.from.as_ref().and_then(|s| col_of.get(s)),
-            m.to.as_ref().and_then(|s| col_of.get(s)),
-            m.message.text(),
+            input
+                .field(&m, "from")?
+                .as_ref()
+                .and_then(|s| col_of.get(s)),
+            input.field(&m, "to")?.as_ref().and_then(|s| col_of.get(s)),
+            input.field(&m, "message")?,
         ) else {
             continue;
         };
-        if m.r#type == Some(NOTE) {
-            let label = ctx.text(Some(raw), small, m.wrap, None, 0)?;
+        if input.byte(&m, "type")? == Some(NOTE) {
+            input.keep_text(raw.encode_utf16().count())?;
+            let label = ctx.text(Some(&raw), small, input.flag(&m, "wrap")?, None, 0)?;
             let w = label.width + 2. * note_pad;
-            match m.placement {
+            match input.byte(&m, "placement")? {
                 Some(0) => need(
                     &mut needs,
                     cols.len(),
@@ -610,8 +667,9 @@ fn draw(
                 x: 0.,
                 w,
             });
-        } else if line(m.r#type) {
-            let label = ctx.text(Some(raw), small, m.wrap, None, 0)?;
+        } else if line(input.byte(&m, "type")?) {
+            input.keep_text(raw.encode_utf16().count())?;
+            let label = ctx.text(Some(&raw), small, input.flag(&m, "wrap")?, None, 0)?;
             let badge = badge_width(i, &numbering, tiny, &mut ctx)?;
             let kind = if a == b {
                 need(
@@ -628,7 +686,7 @@ fn draw(
                 } else {
                     0.
                 };
-                let central = if m.central_connection.is_some_and(|n| n != 0) {
+                let central = if input.byte(&m, "centralConnection")?.is_some_and(|n| n != 0) {
                     4. * CENTRAL_R
                 } else {
                     0.
@@ -660,23 +718,28 @@ fn draw(
             });
         }
     }
-    let mut runs: Vec<BoxRun> = vec![];
+    let mut runs: Vec<BoxRun<P::Value>> = vec![];
     for (i, col) in cols.iter().enumerate() {
-        if let Some(index) = col.actor.box_index {
+        let value = input.get(&col.actor, "box")?;
+        if let Some(identity) = input.identity(&value)? {
             if let Some(run) = runs
                 .last_mut()
-                .filter(|r| r.index == index && r.last + 1 == i)
+                .filter(|r| r.identity == identity && r.last + 1 == i)
             {
-                run.last = i
+                run.last = i;
             } else {
-                let b = &db.boxes[index];
+                let name = input.label_field(&value, "name")?;
+                let wrap = input.flag(&value, "wrap")?;
+                input.keep_text(name.as_deref().unwrap_or("").encode_utf16().count())?;
+                let title = ctx.text(name.as_deref(), small, wrap, None, 0)?;
                 runs.push(BoxRun {
-                    index,
+                    value,
+                    identity,
                     first: i,
                     last: i,
-                    title: ctx.text(b.name.as_deref(), small, b.wrap, None, 0)?,
+                    title,
                     grow: 0.,
-                })
+                });
             }
         }
     }
@@ -684,16 +747,13 @@ fn draw(
     for i in 0..gaps.len() {
         let l = &cols[i];
         let r = &cols[i + 1];
-        let boxed = if l.actor.box_index != r.actor.box_index {
-            (if l.actor.box_index.is_some() {
-                box_pad
-            } else {
-                0.
-            }) + (if r.actor.box_index.is_some() {
-                box_pad
-            } else {
-                0.
-            })
+        let lb = input.get(&l.actor, "box")?;
+        let rb = input.get(&r.actor, "box")?;
+        let boxed = if input.identity(&lb)? != input.identity(&rb)? {
+            let lb = input.get(&l.actor, "box")?;
+            let rb = input.get(&r.actor, "box")?;
+            (if input.truthy(&lb) { box_pad } else { 0. })
+                + (if input.truthy(&rb) { box_pad } else { 0. })
         } else {
             0.
         };
@@ -764,9 +824,17 @@ fn draw(
     let mut frames: Vec<Frame> = vec![];
     let mut frame_of = vec![None; count];
     let mut open: Vec<usize> = vec![];
-    for (i, m) in messages.iter().enumerate() {
-        if let Some(kind) = frame_kind(m.r#type) {
+    for i in 0..count {
+        input.step()?;
+        let m = input.index(&messages, i)?;
+        if let Some(kind) = frame_kind(input.byte(&m, "type")?) {
             let index = frames.len();
+            let fill = if kind == "rect" {
+                input.field(&m, "message")?.unwrap_or_default()
+            } else {
+                String::new()
+            };
+            input.keep_text(fill.encode_utf16().count())?;
             frames.push(Frame {
                 kind,
                 x0: f64::INFINITY,
@@ -774,22 +842,18 @@ fn draw(
                 top: 0.,
                 title: Label::default(),
                 tab_w: 0.,
-                fill: if kind == "rect" {
-                    m.message.text().unwrap_or_default().into()
-                } else {
-                    String::new()
-                },
+                fill,
                 dividers: vec![i],
                 divider_y: vec![],
                 divider_labels: vec![],
             });
             frame_of[i] = Some(index);
             open.push(index);
-        } else if divider(m.r#type) {
+        } else if divider(input.byte(&m, "type")?) {
             if let Some(index) = open.last() {
                 frames[*index].dividers.push(i)
             }
-        } else if frame_end(m.r#type) {
+        } else if frame_end(input.byte(&m, "type")?) {
             let Some(index) = open.pop() else { continue };
             frame_of[i] = Some(index);
             let f = &mut frames[index];
@@ -805,7 +869,10 @@ fn draw(
             if f.kind != "rect" {
                 f.tab_w = ctx.width(f.kind, tiny, 1)? + 14.;
                 for k in 0..f.dividers.len() {
-                    let raw = messages[f.dividers[k]].message.text().unwrap_or_default();
+                    let raw = input
+                        .at_field(&messages, f.dividers[k], "message")?
+                        .unwrap_or_default();
+                    input.keep_text(raw.encode_utf16().count().saturating_add(2))?;
                     let tab = if k == 0 { f.tab_w + 8. } else { 0. };
                     let room = f.x1 - f.x0 - 16. - tab;
                     let label = if raw.is_empty() {
@@ -844,18 +911,20 @@ fn draw(
             let b = &cols[v.b];
             let (x0, x1);
             if v.kind == V::Note {
-                if m.placement == Some(0) {
+                if input.byte(&m, "placement")? == Some(0) {
                     v.x = a.x - NOTE_GAP - v.w
-                } else if m.placement == Some(1) {
+                } else if input.byte(&m, "placement")? == Some(1) {
                     v.x = a.x + NOTE_GAP
                 } else if v.a == v.b {
                     v.x = a.x - v.w / 2.
                 } else {
                     let lo = a.x.js_min(b.x) - note_over;
                     let hi = a.x.js_max(b.x) + note_over;
-                    if tight || m.wrap {
+                    if tight || input.flag(&m, "wrap")? {
+                        let raw = input.field(&m, "message")?;
+                        input.keep_text(raw.as_deref().unwrap_or("").encode_utf16().count())?;
                         v.label = ctx.text(
-                            m.message.text(),
+                            raw.as_deref(),
                             small,
                             true,
                             Some(wrap_w.js_max(hi - lo - 2. * note_pad)),
@@ -878,9 +947,11 @@ fn draw(
             } else {
                 let mut lo = a.x.js_min(b.x);
                 let mut hi = a.x.js_max(b.x);
-                if tight || m.wrap {
+                if tight || input.flag(&m, "wrap")? {
+                    let raw = input.field(&m, "message")?;
+                    input.keep_text(raw.as_deref().unwrap_or("").encode_utf16().count())?;
                     v.label = ctx.text(
-                        m.message.text(),
+                        raw.as_deref(),
                         small,
                         true,
                         Some(wrap_w.js_max(hi - lo - 2. * msg_pad - ACT_W)),
@@ -936,16 +1007,26 @@ fn draw(
     let mut crosses_out = String::new();
     let mut y = head_bottom + 6.;
     let mut stack: Vec<usize> = vec![];
-    for (i, m) in messages.iter().enumerate() {
-        let kind = m.r#type;
+    for i in 0..count {
+        input.step()?;
+        let m = input.index(&messages, i)?;
+        let kind = input.byte(&m, "type")?;
         let view = &views[i];
         let frame = frame_of[i];
         if kind == Some(ACTIVE_START) {
-            if let Some(&c) = m.from.as_ref().and_then(|s| col_of.get(s)) {
+            if let Some(&c) = input
+                .field(&m, "from")?
+                .as_ref()
+                .and_then(|s| col_of.get(s))
+            {
                 cols[c].activations.push(y)
             }
         } else if kind == Some(ACTIVE_END) {
-            if let Some(&c) = m.from.as_ref().and_then(|s| col_of.get(s)) {
+            if let Some(&c) = input
+                .field(&m, "from")?
+                .as_ref()
+                .and_then(|s| col_of.get(s))
+            {
                 if !cols[c].activations.is_empty() {
                     y = y.js_max(end_activation(
                         &mut cols[c],
@@ -1019,24 +1100,31 @@ fn draw(
                 let h = v.label.height + 2. * 4_f64.js_max(note_pad - 4.);
                 let top = y + 10.;
                 let mut x = v.x;
-                if m.placement == Some(1) {
+                if input.byte(&m, "placement")? == Some(1) {
                     x += right_edge(a, 0) - a.x
-                } else if m.placement == Some(0) {
+                } else if input.byte(&m, "placement")? == Some(0) {
                     x += left_edge(a, 0) - a.x
                 }
                 extend(&mut min_x, &mut max_x, x, x + v.w);
-                notes_out.push_str(&format!("<g class=\"pele-note\" data-id=\"i{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\"/>{}</g>",esc_text(&m.id)?,num(x),num(top),num(v.w),num(h),ctx.svg(&v.label,x+v.w/2.,top+h/2.," class=\"pele-label\" stroke=\"none\" fill=\"var(--_fg)\"")?));
+                notes_out.push_str(&format!("<g class=\"pele-note\" data-id=\"i{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\"/>{}</g>",esc_text(&input.field(&m,"id")?.unwrap_or_default())?,num(x),num(top),num(v.w),num(h),ctx.svg(&v.label,x+v.w/2.,top+h/2.," class=\"pele-label\" stroke=\"none\" fill=\"var(--_fg)\"")?));
                 y = top + h;
                 continue;
             }
-            let st = style(kind.unwrap()).unwrap();
+            let st = kind.and_then(style).ok_or_else(|| {
+                PeleError::new(
+                    "Sequence live message kind changed to an unsupported line style",
+                    crate::compat::ErrorCode::Semantic,
+                )
+            })?;
             let label = &v.label;
             let bw = badge_width(i, &numbering, tiny, &mut ctx)?;
             let mut starting = 0;
-            for message in &messages[i + 1..] {
-                let t = message.r#type;
+            for j in i + 1..count {
+                input.step()?;
+                let message = input.index(&messages, j)?;
+                let t = input.byte(&message, "type")?;
                 if t == Some(ACTIVE_START) {
-                    if message.from == m.to {
+                    if input.field(&message, "from")? == input.field(&m, "to")? {
                         starting += 1
                     }
                 } else if !matches!(
@@ -1049,11 +1137,11 @@ fn draw(
             let up = if st.bottom { 1. } else { -1. };
             let attrs = if st.dotted { DASH } else { "" };
             let circle_to = matches!(
-                m.central_connection,
+                input.byte(&m, "centralConnection")?,
                 Some(CENTRAL_CONNECTION | CENTRAL_CONNECTION_DUAL)
             );
             let circle_from = matches!(
-                m.central_connection,
+                input.byte(&m, "centralConnection")?,
                 Some(CENTRAL_CONNECTION_REVERSE | CENTRAL_CONNECTION_DUAL)
             );
             let tail_at_end = st.at_start && !st.at_end;
@@ -1126,7 +1214,7 @@ fn draw(
                 if label.width > 0. {
                     labels_out.push_str(&format!(
                         "<g class=\"pele-edge-label\" data-id=\"i{}\">{}</g>",
-                        esc_text(&m.id)?,
+                        esc_text(&input.field(&m, "id")?.unwrap_or_default())?,
                         ctx.svg(label, out + 8. + label.width / 2., (top + bottom) / 2., "")?
                     ))
                 }
@@ -1229,7 +1317,7 @@ fn draw(
                     );
                     labels_out.push_str(&format!(
                         "<g class=\"pele-edge-label\" data-id=\"i{}\">{}</g>",
-                        esc_text(&m.id)?,
+                        esc_text(&input.field(&m, "id")?.unwrap_or_default())?,
                         backed(
                             label,
                             cx,
@@ -1249,7 +1337,7 @@ fn draw(
             }
             edges_out.push_str(&format!(
                 "<g class=\"pele-edge pele-message\" data-id=\"i{}\">{inner}</g>",
-                esc_text(&m.id)?
+                esc_text(&input.field(&m, "id")?.unwrap_or_default())?
             ));
             y = y.js_max(line_y);
             if cols[v.a].destroy_at == i as isize {
@@ -1274,13 +1362,13 @@ fn draw(
                 continue;
             }
             foot_h = foot_h.js_max(col.size.h);
-            actors_out.push_str(&actor_svg(col, y, true, &mut ctx)?);
+            actors_out.push_str(&actor_svg(input, col, y, true, &mut ctx)?);
         }
         bottom = y + foot_h;
     }
     let mut lifelines = String::new();
     for col in &cols {
-        actors_out.push_str(&actor_svg(col, col.top, false, &mut ctx)?);
+        actors_out.push_str(&actor_svg(input, col, col.top, false, &mut ctx)?);
         let end = if col.life_end >= 0. { col.life_end } else { y };
         if end > col.life_start {
             lifelines.push_str(&format!(
@@ -1294,15 +1382,19 @@ fn draw(
     }
     let mut boxes_out = String::new();
     for run in &runs {
-        let b = &db.boxes[run.index];
+        let b = &run.value;
         let x0 = cols[run.first].x - cols[run.first].size.w / 2. - box_pad - run.grow;
         let x1 = cols[run.last].x + cols[run.last].size.w / 2. + box_pad + run.grow;
-        let fill = if b.fill == "transparent" {
+        let fill = if input.field(b, "fill")?.as_deref() == Some("transparent") {
             String::new()
         } else {
-            resolve_style(&[format!("fill:{}", b.fill)]).shape
+            resolve_style(&[format!(
+                "fill:{}",
+                input.field(b, "fill")?.unwrap_or_default()
+            )])
+            .shape
         };
-        let id = if let Some(s) = b.name.as_deref().filter(|s| !s.is_empty()) {
+        let id = if let Some(s) = input.field(b, "name")?.as_deref().filter(|s| !s.is_empty()) {
             format!(" data-id=\"{}\"", esc_text(s)?)
         } else {
             String::new()
@@ -1317,8 +1409,10 @@ fn draw(
     let title_room = options.max_width.filter(|n| *n > 0.).map_or(4000., |n| {
         80_f64.js_max(n - 2. * options.padding.unwrap_or(8.))
     });
+    let raw_title = input.metadata("title")?;
+    input.keep_text(raw_title.as_deref().unwrap_or("").encode_utf16().count())?;
     let title = ctx.text(
-        db.title.as_deref(),
+        raw_title.as_deref(),
         size,
         false,
         Some(if tight { title_room } else { wrap_w }),
@@ -1404,8 +1498,8 @@ fn draw(
         height,
         size,
         options,
-        db.acc_title.as_deref(),
-        db.acc_descr.as_deref(),
+        input.metadata("accTitle")?.as_deref(),
+        input.metadata("accDescr")?.as_deref(),
         &content,
     )?;
     Ok(Rendered {

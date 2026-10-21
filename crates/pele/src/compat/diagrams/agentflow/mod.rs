@@ -74,3 +74,7 @@ impl DiagramModule for AgentFlow {
 
 mod public_model;
 pub use public_model::{AgentflowPublicOrigin, AgentflowPublicState};
+
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{render_detached, AgentflowDetachedInput};

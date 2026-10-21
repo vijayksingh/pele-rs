@@ -236,6 +236,10 @@ fn captured_gantt_retains_options_and_warning_evaluation_errors_and_reentry() {
                 .unwrap()
             {
                 DetachedInvocationStep::Complete => break,
+                DetachedInvocationStep::Resource(operation) => {
+                    reply = Some(operation.run(&mut Host));
+                    continue;
+                }
                 DetachedInvocationStep::Host(PublicHostOperation::Get { receiver, key }) => {
                     let value = if key == "options" {
                         assert!(

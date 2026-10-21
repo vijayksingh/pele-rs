@@ -293,6 +293,10 @@ fn retained_block_warnings_preserve_partial_hierarchy_mutation_reentry_and_recov
                 .unwrap()
             {
                 DetachedInvocationStep::Complete => break,
+                DetachedInvocationStep::Resource(operation) => {
+                    reply = Some(operation.run(&mut Host));
+                    continue;
+                }
                 DetachedInvocationStep::Host(op) => op,
             };
             let mut graph = doc.snapshot().unwrap();

@@ -1,6 +1,6 @@
 //! Provisional owned constructor state; no native borrow crosses a host request.
 use super::{
-    detached_invocation::{host_reply, step_metadata},
+    detached_invocation::{PublicInvocationResource, ResourceSlot},
     render_numbers, MutableDocument,
 };
 use pele::compat::{public::*, ErrorCode, PeleError};
@@ -16,6 +16,7 @@ pub struct PublicConstructorJob {
     inner: PublicConstructionJob,
     schema: String,
     diagram_type: String,
+    resource: ResourceSlot,
 }
 impl PublicConstructorJob {
     pub(super) fn new(inner: PublicConstructionJob, schema: String, diagram_type: String) -> Self {
@@ -23,6 +24,7 @@ impl PublicConstructorJob {
             inner,
             schema,
             diagram_type,
+            resource: ResourceSlot::default(),
         }
     }
     fn frame(&self, metadata: &impl serde::Serialize) -> Result<Vec<u8>, PeleError> {
@@ -107,12 +109,21 @@ impl PublicConstructorJob {
         value: JsValue,
     ) -> Result<Vec<u8>, JsValue> {
         let mut run = || -> Result<Vec<u8>, PeleError> {
-            let step = self
-                .inner
-                .resume(host_reply(reply_state, value_tag, &value)?)?;
-            self.frame(&step_metadata(step))
+            let reply = self.resource.reply(reply_state, value_tag, &value)?;
+            let step = self.inner.resume(reply)?;
+            let metadata = self.resource.metadata(step);
+            self.frame(&metadata)
         };
         run().map_err(failure)
+    }
+    pub fn take_resource(&mut self) -> Result<PublicInvocationResource, JsValue> {
+        self.resource.take()
+    }
+    pub fn accept_resource(
+        &mut self,
+        resource: &mut PublicInvocationResource,
+    ) -> Result<(), JsValue> {
+        self.resource.accept(resource)
     }
     pub fn finish(&mut self) -> Result<js_sys::Array, JsValue> {
         let mut run = || -> Result<js_sys::Array, PeleError> {

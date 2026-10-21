@@ -88,6 +88,20 @@ pub trait PublicDiagramModule: DiagramModule {
     fn detached_public_invocation(&self, _call: MethodCall) -> Option<DetachedPublicInvocation> {
         None
     }
+    /// Callback-free owner access used by an active host facade between yields.
+    #[doc(hidden)]
+    fn active_public_operation(
+        &self,
+        _state: &mut Self::PublicState,
+        _operation: super::PublicActiveOperation,
+        _budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError> {
+        Err(PeleError::new(
+            "Owned active model access is unavailable",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
     /// Method IDs, receiver identity and arguments come from this document's
     /// current arena. The module owns native behavior, including partial edits.
     fn invoke_public(
@@ -362,6 +376,13 @@ trait Erased: Send + Sync {
     fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn constructor(&self, prototype: PrototypeId) -> Option<Constructor>;
     fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation>;
+    fn active_operation(
+        &self,
+        state: &mut State,
+        operation: super::PublicActiveOperation,
+        budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError>;
+
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
     fn borrow_graph<'a>(&self, state: &'a State) -> Option<&'a ModelGraph>;
     fn has_source_layout(&self, state: &State) -> bool;
@@ -478,6 +499,18 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     }
     fn detached_invocation(&self, call: MethodCall) -> Option<DetachedPublicInvocation> {
         self.0.detached_public_invocation(call)?.for_creator::<D>()
+    }
+    fn active_operation(
+        &self,
+        state: &mut State,
+        operation: super::PublicActiveOperation,
+        budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError> {
+        self.0.active_public_operation(
+            state.downcast_mut().expect("paired public state"),
+            operation,
+            budget,
+        )
     }
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
@@ -701,6 +734,16 @@ impl CapturedPublicConstructor {
         argument: [ConstructorArgument; 2],
     ) -> Result<super::PublicConstructionJob, PeleError> {
         self.schema_view().validate()?;
+        if argument
+            .iter()
+            .take(self.argument_count() as usize)
+            .any(|value| matches!(value, ConstructorArgument::Graph(_)))
+        {
+            return Err(PeleError::new(
+                "Graph coordinates require an existing owner",
+                ErrorCode::Semantic,
+            ));
+        }
         let (state, program) = (self.constructor.begin)(argument)?;
         let document = PublicDocument {
             registration: self.registration.clone(),
@@ -723,6 +766,12 @@ impl CapturedPublicConstructor {
         argument: ConstructorArgument,
     ) -> Result<PublicDocument, PeleError> {
         self.schema_view().validate()?;
+        if !self.ignores_arguments() && matches!(argument, ConstructorArgument::Graph(_)) {
+            return Err(PeleError::new(
+                "Graph coordinates require an existing owner",
+                ErrorCode::Semantic,
+            ));
+        }
         let document = PublicDocument {
             registration: self.registration.clone(),
             state: (self.constructor.construct)(argument)?,
@@ -1517,6 +1566,30 @@ impl PublicDocument {
     pub fn diagram_type(&self) -> &DiagramId {
         &self.registration.descriptor.id
     }
+    /// Each access is callback-free; a host may release its owner guard on return.
+    /// Mutating failures retain their partial edits and current revision.
+    #[doc(hidden)]
+    pub fn active_operation(
+        &mut self,
+        operation: super::PublicActiveOperation,
+        budget: &mut super::PublicActiveBudget,
+    ) -> Result<super::PublicActiveValue, PublicError> {
+        let mutates = operation.mutates();
+        let next = if mutates {
+            Some(self.next_revision()?)
+        } else {
+            None
+        };
+        let result = self
+            .registration
+            .codec
+            .active_operation(&mut self.state, operation, budget);
+        if let Some(next) = next {
+            self.revision = next;
+        }
+        self.snapshot_read()?;
+        result
+    }
     pub fn model_schema(&self) -> &'static ModelSchema {
         self.registration.schema
     }
@@ -1681,6 +1754,23 @@ impl PublicDocument {
             )
         })?;
         job.check_resume(book, reply.is_some())?;
+        if let Some(Ok(super::PublicHostValue::Graph(atom))) = &reply {
+            let graph = self.snapshot_read()?;
+            super::captured_admission::atom(graph.reader().extent(), atom)?;
+            if let Atom::BuiltinFunction(id) = atom {
+                if self
+                    .registration
+                    .schema
+                    .method(super::MethodId(*id))
+                    .is_none()
+                {
+                    return Err(PeleError::new(
+                        "Unknown public builtin function",
+                        ErrorCode::Semantic,
+                    ));
+                }
+            }
+        }
         // Every dispatched phase owns its mutations, including partial failure
         // and cancellation. Nested operations use this current revision.
         self.revision = self.next_revision()?;

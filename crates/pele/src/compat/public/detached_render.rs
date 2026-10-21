@@ -16,10 +16,15 @@ use std::{
     sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
-pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveValueKind};
+pub use crate::compat::diagrams::sankey::{
+    LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Agentflow,
+    Sequence,
+    Class,
     XYChart,
     Swimlane,
     Flowchart,
@@ -57,6 +62,27 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn agentflow() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::agentflow::AgentFlow>(),
+            kind: Kind::Agentflow,
+        }
+    }
+
+    pub(crate) fn sequence() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::sequence::Sequence>(),
+            kind: Kind::Sequence,
+        }
+    }
+
+    pub(crate) fn class() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::class_diagram::Class>(),
+            kind: Kind::Class,
+        }
+    }
+
     pub(crate) fn xychart() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::xychart::XyChart>(),
@@ -267,6 +293,9 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Agentflow(crate::compat::diagrams::agentflow::AgentflowDetachedInput),
+    Sequence(crate::compat::diagrams::sequence::SequenceDetachedInput),
+    Class(crate::compat::diagrams::class_diagram::ClassDetachedInput),
     XYChart(crate::compat::diagrams::xychart::XYChartDetachedInput),
     Swimlane(crate::compat::diagrams::swimlane::SwimlaneDetachedInput),
     Flowchart(crate::compat::diagrams::flowchart::FlowchartDetachedInput),
@@ -298,6 +327,31 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn agentflow(
+        input: crate::compat::diagrams::agentflow::AgentflowDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::agentflow::AgentFlow>(),
+            body: Body::Agentflow(input),
+        }
+    }
+
+    pub(crate) fn sequence(
+        input: crate::compat::diagrams::sequence::SequenceDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::sequence::Sequence>(),
+            body: Body::Sequence(input),
+        }
+    }
+
+    pub(crate) fn class(input: crate::compat::diagrams::class_diagram::ClassDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::class_diagram::Class>(),
+            body: Body::Class(input),
+        }
+    }
+
     pub(crate) fn xychart(input: crate::compat::diagrams::xychart::XYChartDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::xychart::XyChart>(),
@@ -520,11 +574,14 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Agentflow(_) => Kind::Agentflow,
+            Body::Sequence(_) => Kind::Sequence,
             Body::XYChart(_) => Kind::XYChart,
             Body::Swimlane(_) => Kind::Swimlane,
             Body::Flowchart(_) => Kind::Flowchart,
             Body::Block(_) => Kind::Block,
             Body::State(_) => Kind::State,
+            Body::Class(_) => Kind::Class,
             Body::Architecture(_) => Kind::Architecture,
             Body::EventModeling(_) => Kind::EventModeling,
             Body::Usecase(_) => Kind::Usecase,
@@ -563,6 +620,12 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Agentflow(input) => crate::compat::diagrams::agentflow::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Sequence(input) => crate::compat::diagrams::sequence::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::XYChart(input) => crate::compat::diagrams::xychart::render_detached(
                 input, config, settings, read, resources,
             ),
@@ -577,6 +640,9 @@ impl DetachedPublicRender {
             ),
             Body::State(input) => crate::compat::diagrams::state::render_detached(
                 input, config, settings, read, resources,
+            ),
+            Body::Class(input) => crate::compat::diagrams::class_diagram::render_detached(
+                input, read, config, settings, resources,
             ),
             Body::Architecture(input) => crate::compat::diagrams::architecture::render_detached(
                 input, read, config, settings, resources,

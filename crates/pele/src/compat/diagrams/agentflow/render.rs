@@ -1,7 +1,8 @@
 //! Pele agentflow/render.ts, 458322a5 (MIT, kepano). Actual compound layout,
 //! shape geometry, collapsed frames, border-held routes, kind colors and resource labels.
+use super::phase::{PhaseInput, Typed};
 use super::{
-    graph::{GraphEdge, GraphNode},
+    graph::{AgentGraph, GraphEdge, GraphNode},
     model::{AgentflowModel, LabelType},
     shapes::{canonical, kind_slot},
 };
@@ -101,9 +102,27 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let selected = (|| -> Result<_, PeleError> {
-        let across = draw(db, c, o, r, false)?;
-        if !matches!(db.direction.as_deref(), Some("LR" | "RL")) {
+    render_phases(
+        &mut Typed(db),
+        db.graph
+            .as_ref()
+            .expect("parsed agentflow has its normalized graph"),
+        c,
+        o,
+        r,
+    )
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    db: &mut P,
+    graph: &AgentGraph,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let across_direction = matches!(db.metadata("direction")?.as_deref(), Some("LR" | "RL"));
+    let selected = (|| -> Result<_, P::Error> {
+        let across = draw(db, graph, c, o, r, false)?;
+        if !across_direction {
             return Ok(across);
         }
         let Some(available) = o.max_width.filter(|v| *v > 0.) else {
@@ -115,7 +134,7 @@ pub(super) fn render(
         {
             return Ok(across);
         }
-        let down = draw(db, c, o, r, true)?;
+        let down = draw(db, graph, c, o, r, true)?;
         Ok(if down.0.width < across.0.width {
             down
         } else {
@@ -179,17 +198,14 @@ fn put(
     }
     Ok(())
 }
-fn draw(
-    db: &AgentflowModel,
+fn draw<P: PhaseInput>(
+    db: &mut P,
+    graph: &AgentGraph,
     config: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     turned: bool,
-) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), PeleError> {
-    let graph = db
-        .graph
-        .as_ref()
-        .expect("parsed agentflow has its normalized graph");
+) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let edge_size = round(size * 0.875);
     let wrap = number(config, "wrappingWidth", 120.);
@@ -203,7 +219,9 @@ fn draw(
         .collect();
     let mut views = vec![];
     let mut nodes = vec![];
-    for node in &graph.nodes {
+    for (i, original) in graph.nodes.iter().enumerate() {
+        let mut node = original.clone();
+        db.resolve_styles(i, &mut node)?;
         let mut declarations = node.css_compiled_styles.clone();
         declarations.extend(node.css_styles.iter().cloned());
         let style = resolve_style(&declarations);
@@ -230,7 +248,7 @@ fn draw(
             (
                 c,
                 View {
-                    node: node.clone(),
+                    node,
                     style,
                     label,
                     shape: "group".into(),
@@ -247,7 +265,7 @@ fn draw(
             (
                 CNode::new(w, h, -1),
                 View {
-                    node: node.clone(),
+                    node,
                     style,
                     label,
                     shape: "collapsed".into(),
@@ -272,7 +290,7 @@ fn draw(
             (
                 CNode::new(s.w, s.h, -1),
                 View {
-                    node: node.clone(),
+                    node,
                     style,
                     label,
                     shape,
@@ -298,7 +316,7 @@ fn draw(
     let root = if turned {
         Dir::TB
     } else {
-        direction(db.direction.as_deref())
+        direction(db.metadata("direction")?.as_deref())
     };
     let mut depth = vec![-1_isize; nodes.len()];
     for i in 0..nodes.len() {
@@ -394,7 +412,8 @@ fn draw(
             head_room: 0.,
         },
     );
-    let title = layout_label(db.title.as_deref(), false, r, o, size, 4000., 1)?;
+    let title_text = db.metadata("title")?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, 4000., 1)?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
@@ -406,13 +425,24 @@ fn draw(
     shift_layout(&mut nodes, &mut edges, ox, oy);
     let width = (inner + 2. * pad).ceil();
     let height = (layout.height + title_height + 2. * pad).ceil();
+    let frame_access = if r.presentation_budget().is_some() {
+        Some((
+            db.metadata("accTitle")?,
+            db.metadata("title")?,
+            db.metadata("accDescr")?,
+        ))
+    } else {
+        None
+    };
     let mut presentation = r.presentation_budget().map(|budget| {
         crate::compat::presentation::FrameBuilder::new(
             budget,
             width,
             height,
-            db.acc_title.as_deref().or(db.title.as_deref()),
-            db.acc_descr.as_deref(),
+            frame_access
+                .as_ref()
+                .and_then(|(a, t, _)| a.as_deref().or(t.as_deref())),
+            frame_access.as_ref().and_then(|(_, _, d)| d.as_deref()),
         )
     });
     let mut links = vec![];
@@ -704,14 +734,16 @@ fn draw(
         ))
     }
     content.push_str(&format!("<g class=\"pele-nodes\">{nodes_out}</g>"));
+    let acc_title = db.metadata("accTitle")?;
+    let acc_descr = db.metadata("accDescr")?;
     let svg = svg::document(
         "agentflow",
         width,
         height,
         size,
         o,
-        db.acc_title.as_deref(),
-        db.acc_descr.as_deref(),
+        acc_title.as_deref(),
+        acc_descr.as_deref(),
         &content,
     )?;
     Ok((

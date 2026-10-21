@@ -109,3 +109,30 @@ The core phase-reader contract, property-read order, callback boundaries, origin
 Integration controls cover owner/lifetime/revision behavior and default typed rendering. Browser comparisons use actual pinned Pele in the same engine and compare complete SVG, dimension bits, callback traces, ordered descriptors, aliases, retained references, partial helper effects and original arbitrary throws. Existing native frame/provider tests remain independent controls. Generic JavaScript Error stack locations remain host implementation details and are retained separately in reports; PeleError source line, column and snippet remain strict comparison fields.
 
 Custom coercion, getter/Proxy behavior, sparse/malformed arrays and callback-created lone UTF16 surrogates require additional proof before a blanket compatibility claim. Rust SVG remains UTF8; replacing lone surrogates silently is not acceptable. Correctness and performance gates remain separate, and 0.3 stays blocked until both pass.
+
+## Captured calls, iterators and native method reentry
+
+Generic live operations13–18 add captured function calls, iterator acquisition,
+next, close, retained admitted graph coordinates and numeric coercion. Calls
+can carry native number bits or a fresh Date argument without JSON conversion. Rust selects operands,
+receiver, call-site error and sequencing. The JavaScript adapter performs only
+ordinary host operations. Iterator acquisition captures `next` once. Abrupt
+loop-body completion closes the iterator; an original exception takes precedence
+over a close exception. Neither ordinary completion nor a failed `next` closes
+it. Native graph iteration observes current coordinates; a final graph snapshot
+cannot reconstruct JavaScript deletion/reinsertion history.
+
+C15 invokes builtin public methods through owned continuations. A defaulted
+module hook exposes only explicitly supported callback-free active transactions;
+arbitrary borrowed invocation is not a fallback. Graph-valued replies are
+internal, owner-validated values and never accepted from the JSON wire. Consumed
+constructor arguments reject this internal reply form. Captured function calls
+release both document and continuation borrows before invoking host callbacks.
+
+Class shares its geometry with live collection traversal and an owned
+`getDisplayDetails` continuation. Sequence shares the same renderer through a
+phase source that retains the arrays selected before resource calls. Parsed
+Agentflow retains its parse-time graph cache, including original style-array
+identities when callers later replace the current vertex field. These are
+functional capabilities; platform acceptance and remaining foreign-object
+behavior must be verified separately.
