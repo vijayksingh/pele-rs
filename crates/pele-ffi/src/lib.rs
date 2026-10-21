@@ -1,4 +1,6 @@
 //! Opaque, immutable owned results. Unsafe code is confined to the C adapter.
+mod constructor_body;
+pub use constructor_body::*;
 mod constructor_host;
 pub use constructor_host::*;
 mod constructors;

@@ -152,6 +152,24 @@ PeleResult *pele_host_number_string_v17(uint64_t ieee_bits);
 PeleResult *pele_host_identity_v17(void);
 PeleResult *pele_host_primitive_number_v17(const PeleHostValueV17 *value);
 PeleResult *pele_public_constructor_policy_v17(const PelePublicConstructorV16 *constructor);
+/* Unpublished constructor bodies (v18). Same value/reply/step formats as v17.
+ * Getters/calls run only between calls. Dispose cannot overlap an active call.
+ * policy returns argumentCount, arity and argumentTransfers (retain/value).
+ * Retain arguments use caller-owned opaque identities without inspecting their
+ * values; Value arguments copy known scalars/UTF16, leaving foreign objects
+ * opaque. No argument beyond the declared transfer list is inspected.
+ * finish transfers a partial owner even when it returns an error; always free
+ * a non-null out_document. No callback may use a freed provisional job. */
+typedef struct PeleConstructionJobV18 PeleConstructionJobV18;
+PeleResult *pele_public_constructor_policy_v18(const PelePublicConstructorV16 *);
+PeleResult *pele_public_constructor_begin_v18(const PelePublicConstructorV16 *, const PeleHostValueV17 *, const PeleHostValueV17 *, PeleConstructionJobV18 **);
+PeleResult *pele_public_construction_resume_v18(PeleConstructionJobV18 *, uint32_t, const PeleHostValueV17 *, uint64_t *);
+PeleResult *pele_public_construction_snapshot_v18(PeleConstructionJobV18 *);
+PeleResult *pele_public_construction_apply_v18(PeleConstructionJobV18 *, const uint8_t *, size_t);
+PeleResult *pele_public_construction_invoke_v18(PeleConstructionJobV18 *, uint64_t, const uint8_t *, size_t, uint64_t *);
+PeleResult *pele_public_construction_get_v18(PeleConstructionJobV18 *, uint32_t, const uint8_t *, size_t);
+PeleResult *pele_public_construction_finish_v18(PeleConstructionJobV18 *, PelePublicDocument **, uint64_t *);
+void pele_public_construction_free_v18(PeleConstructionJobV18 *);
 PeleResult *pele_registry_create_v8(uint32_t mode, PeleRegistry **out_registry);
 void pele_registry_free_v8(PeleRegistry *registry);
 PeleResult *pele_registry_capabilities_v8(const PeleRegistry *registry);

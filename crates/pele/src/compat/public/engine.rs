@@ -662,6 +662,10 @@ impl CapturedPublicConstructor {
     pub fn prototype(&self) -> PrototypeId {
         self.prototype
     }
+    /// Diagram descriptor retained with this authentic registration.
+    pub fn diagram_type(&self) -> &DiagramId {
+        &self.registration.descriptor.id
+    }
     pub fn schema_view(&self) -> ModelSchemaView {
         ModelSchemaView {
             model: self.registration.schema,

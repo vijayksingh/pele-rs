@@ -34,7 +34,7 @@ extension Pele {
         public let type: String
         public let isConstructorCreated: Bool
         public private(set) var revision: UInt64
-        fileprivate init(handle: OpaquePointer, type: String, revision: UInt64, isConstructorCreated: Bool = false) {
+        internal init(handle: OpaquePointer, type: String, revision: UInt64, isConstructorCreated: Bool = false) {
             self.handle = handle; self.type = type; self.revision = revision
             self.isConstructorCreated = isConstructorCreated
         }

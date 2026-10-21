@@ -27,7 +27,7 @@ pub struct PeleHostValueV17 {
     pub units: *const u16,
     pub unit_count: usize,
 }
-unsafe fn value(input: *const PeleHostValueV17) -> Result<PublicHostValue, PeleError> {
+pub(super) unsafe fn value(input: *const PeleHostValueV17) -> Result<PublicHostValue, PeleError> {
     let Some(v) = (unsafe { input.as_ref() }) else {
         return Ok(PublicHostValue::Undefined);
     };
@@ -131,7 +131,7 @@ pub unsafe extern "C" fn pele_public_invocation_prepare_v17(
         Ok(result)
     })
 }
-fn operation(op: PublicHostOperation) -> serde_json::Value {
+pub(super) fn operation(op: PublicHostOperation) -> serde_json::Value {
     use serde_json::json;
     match op {
         PublicHostOperation::Get { receiver, key } => {
@@ -181,26 +181,7 @@ pub unsafe extern "C" fn pele_public_invocation_resume_v17(
             .inner
             .try_lock()
             .map_err(|_| public::invalid("Invocation job is already in use"))?;
-        let reply = match reply_state {
-            0 => None,
-            1 => Some(Ok(unsafe { value(reply) }?)),
-            2 => {
-                let PublicHostValue::Opaque(token) = unsafe { value(reply) }? else {
-                    return Err(public::invalid("Invalid host exception token"));
-                };
-                Some(Err(PublicError::HostException(HostExceptionToken(token))))
-            }
-            3 => {
-                let PublicHostValue::String(message) = (unsafe { value(reply) })? else {
-                    return Err(public::invalid("Invalid host TypeError message"));
-                };
-                Some(Err(PublicError::JavaScript {
-                    name: pele::compat::public::JavaScriptErrorKind::TypeError,
-                    message,
-                }))
-            }
-            _ => return Err(public::invalid("Invalid host reply state")),
-        };
+        let reply = unsafe { host_reply(reply_state, reply) }?;
         let mut document = unsafe { public::document(owner) }?;
         let result = (|| {
             let step = document.resume_detached_invocation(&mut job, reply)?;
@@ -427,4 +408,30 @@ pub unsafe extern "C" fn pele_host_primitive_number_v17(
 #[no_mangle]
 pub extern "C" fn pele_host_identity_v17() -> *mut PeleResult {
     public::bounded_call(|| public::success(super::host_functions::allocate_reference()?))
+}
+
+pub(super) unsafe fn host_reply(
+    reply_state: u32,
+    reply: *const PeleHostValueV17,
+) -> Result<Option<Result<PublicHostValue, PublicError>>, PeleError> {
+    Ok(match reply_state {
+        0 => None,
+        1 => Some(Ok(unsafe { value(reply) }?)),
+        2 => {
+            let PublicHostValue::Opaque(token) = unsafe { value(reply) }? else {
+                return Err(public::invalid("Invalid host exception token"));
+            };
+            Some(Err(PublicError::HostException(HostExceptionToken(token))))
+        }
+        3 => {
+            let PublicHostValue::String(message) = (unsafe { value(reply) })? else {
+                return Err(public::invalid("Invalid host TypeError message"));
+            };
+            Some(Err(PublicError::JavaScript {
+                name: pele::compat::public::JavaScriptErrorKind::TypeError,
+                message,
+            }))
+        }
+        _ => return Err(public::invalid("Invalid host reply state")),
+    })
 }

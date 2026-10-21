@@ -96,18 +96,4 @@ extension Pele.MutableDocument {
         let snapshot = try snapshot()
         return try hostValue(atom, graph: snapshot.graph)
     }
-    func hostValue(_ atom: Pele.PublicGraph.Atom, graph: Pele.PublicGraph) throws -> Pele.PublicHostValue {
-        switch atom {
-        case .undefined: return .undefined
-        case .null: return .null
-        case .bool(let value): return .bool(value)
-        case .number(let value): return .number(value)
-        case .string(let id):
-            guard Int(id) < graph.strings.count else { throw PeleError(code: "semantic", message: "Unknown public string") }
-            return .string(graph.strings[Int(id)])
-        case .ref(let id): return .graphReference(id)
-        case .builtinFunction(let id): return .builtinFunction(id)
-        case .hostReference(let id): return try hostValueStore.value(id)
-        }
-    }
 }
