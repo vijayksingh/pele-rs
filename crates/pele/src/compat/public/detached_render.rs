@@ -1,6 +1,7 @@
 //! Sealed, detached builtin rendering. No document borrow survives a host call.
 use super::{engine::Registration, GraphReadView, PublicError};
 use crate::compat::{
+    diagrams::info::{Info, InfoDetachedInput},
     diagrams::sankey::{render_detached, Sankey, SankeyDetachedInput},
     ErrorCode, Object, OutputLimit, PeleError, PresentationCapture, PresentationOutcome,
     RenderOptions, RenderResources, RenderResult, RenderSettings, Rendered,
@@ -14,6 +15,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Info,
     Sankey,
 }
 /// Metadata-only capability. Only this crate can mint a concrete creator token.
@@ -23,6 +25,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn info() -> Self {
+        Self {
+            creator: TypeId::of::<Info>(),
+            kind: Kind::Info,
+        }
+    }
+
     pub(crate) fn sankey() -> Self {
         Self {
             creator: TypeId::of::<Sankey>(),
@@ -40,9 +49,17 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Info(InfoDetachedInput),
     Sankey(SankeyDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn info(input: InfoDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<Info>(),
+            body: Body::Info(input),
+        }
+    }
+
     pub(crate) fn sankey(input: SankeyDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<Sankey>(),
@@ -54,6 +71,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Info(_) => Kind::Info,
             Body::Sankey(_) => Kind::Sankey,
         };
         (self.creator == TypeId::of::<D>()
@@ -69,6 +87,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Info(input) => crate::compat::diagrams::info::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Sankey(input) => render_detached(input, config, settings, read, resources),
         }
     }

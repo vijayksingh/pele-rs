@@ -16,6 +16,13 @@ The projection now reads the already admitted Agentflow graph directly instead
 of validating it again as a Flowchart instance. Fresh platform verification is
 pending this layer; configured logging callbacks still require owned rendering.
 
+Info now has an owned render capability using the shared typed/live geometry
+path. Six native integrations pass: existing fields/SVG/error-domain regressions
+and new normal/raw callback apply, nesting, late accessibility reads and recovery.
+Its title is captured before layout; accessibility is read after resource calls.
+Fresh Swift/web verification is pending. The existing UTF-16 rendering gate and
+presentation/image limitations remain unchanged.
+
 The earlier fifteen-factory checkpoint covered Sankey, Venn, Ishikawa,
 Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
 Journey, QuadrantChart and State. The latest seven-family extension passes nine
