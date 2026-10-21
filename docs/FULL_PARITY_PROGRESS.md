@@ -1,5 +1,14 @@
 # Current functional parity — incomplete (2026-10-21)
 
+Packet, Radar and Quadrant now share typed/live geometry and owned callback
+jobs. Fresh verification passes 21 native features, 12 Swift features, three
+strict C clients and 24 browser features. All 144 new callback scenarios compare
+against actual Pele in each browser engine (432 comparisons). The refreshed
+audit matches its edit/throw case in 7/33 families; 26 remain mismatched. All 22
+class-root factories construct. These counts remain scoped, not full API parity.
+See the [chart callback checkpoint](parity/2026-10-21-chart-callbacks/README.md).
+The preceding checkpoints below retain their original counts and artifacts.
+
 All 22 class-root factories plus nested ClassMember now have Rust, Swift and web
 feature proof. The latest batch passes 24 native integrations, eight Swift
 constructor features, an additional Swift Block warning feature, two strict C
