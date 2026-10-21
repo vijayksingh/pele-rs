@@ -115,7 +115,7 @@ extension Pele {
             struct Call: Encodable { let method: UInt32; let receiver: PublicGraph.Atom; let arguments: [PublicGraph.Atom] }
             let bytes = try JSONEncoder().encode(Call(method: method, receiver: receiver, arguments: arguments))
             guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public method exceeds 64 MiB JSON budget") }
-            let liveCalendar = type == "gantt" && [19, 25, 26, 28, 30].contains(method)
+            let liveCalendar = type == "gantt" && [19, 20, 25, 26, 28, 30].contains(method)
             if usesHostValues || liveCalendar, let detached = try invokeDetached(bytes, resources: resources) { return detached }
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in withHostFunctionResources(takeError) { bytes.withUnsafeBytes { input in
@@ -141,13 +141,25 @@ extension Pele {
         public func renderOperation(outputLimit: OutputLimit, options: Engine.Options = .init(), resources: HostResources = .init()) throws -> PublicRenderOutcome {
             try renderOperation(options: options, resources: resources, outputLimit: outputLimit)
         }
+        // C v11/v14 select the authenticated owned renderer internally. Keep
+        // the owner alive and disposal blocked while resource callbacks make
+        // short nested operations; acknowledge current revision on export error.
+        private func withPresentationHandle<T>(_ detached: Bool,
+            _ operation: (OpaquePointer) throws -> T) throws -> T {
+            if !detached { return try withHandle(operation) }
+            return try withDetachedLifetime { handle in
+                _ = try withHandle { _ in () }
+                defer { _ = try? withHandle { _ in () } }
+                return try operation(handle)
+            }
+        }
         private func renderOperation(options: Engine.Options, resources: HostResources, outputLimit: OutputLimit?, presentationBudget: PresentationBudget? = nil) throws -> PublicRenderOutcome {
             let settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
             let presentation = try presentationBudget?.packet()
             if presentation == nil, let detached = try renderDetached(settings: settings, resources: resources) {
                 return detached
             }
-            return try withHandle { handle in
+            return try withPresentationHandle(presentation != nil) { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in
                     withHostFunctionResources(takeError) {
                         return settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
@@ -185,7 +197,7 @@ extension Pele {
             let limit = outputLimit ?? options.outputLimit.map { OutputLimit.number(Double($0)) } ?? .undefined
             let settings = try RenderNumberEncoding(options, outputLimit: limit)
             var presentation = try budget.packet()
-            return try withHandle { handle in
+            return try withPresentationHandle(true) { handle in
                 let (response, imageError) = nativeResources.captured { native in resources.withCapturedNativeResources { host, takeError in
                     withHostFunctionResources(takeError) { withUnsafePointer(to: &presentation) { presentation in settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
                         pele_public_render_native_v14(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count,

@@ -148,23 +148,17 @@ pub unsafe extern "C" fn pele_public_render_presentation_v11(
     public::bounded_call(|| {
         let budget = unsafe { budget(packet) }?;
         let (options, limit) = unsafe { render_numbers::options(bytes, len, numbers, kind, bits) }?;
-        let mut document = unsafe { public::document(handle) }?;
-        let (outcome, presentation) = unsafe {
+        unsafe {
             super::host_functions::with_resources(handle, resources, |host| {
-                let mut capture = PresentationCapture::new(host, budget);
-                let outcome = document.render_operation_bounded_read(
+                super::detached_render::render_presented(
+                    handle,
                     expected_revision,
-                    &options,
+                    options,
                     limit,
-                    &mut capture,
-                )?;
-                Ok::<_, compat::PeleError>((outcome, capture.take().unwrap_or_else(unavailable)))
+                    budget,
+                    host,
+                )
             })
-        }?;
-        let wire = outcome.result.as_ref().map(|rendered| Presented {
-            rendered: compat::render_result_transport(rendered),
-            presentation: &presentation,
-        });
-        public::binary_metadata(outcome.revision, &outcome.graph, &wire)
+        }
     })
 }

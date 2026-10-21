@@ -1177,3 +1177,73 @@ pub unsafe extern "C" fn pele_detached_render_job_free_v15(job: *mut PeleDetache
         }
     }));
 }
+
+/// Mutable presentation entrypoints share the same owned render transaction as
+/// v15. Only preparation and final graph export hold the document lock; resource
+/// callbacks (including image approval) run with an owned job and live reader.
+pub(super) fn render_presented(
+    owner: *mut PelePublicDocument,
+    revision: u64,
+    options: pele::compat::RenderOptions,
+    limit: Option<pele::compat::OutputLimit>,
+    budget: pele::compat::PresentationBudget,
+    resources: &mut dyn pele::compat::RenderResources,
+) -> Result<PeleResult, PeleError> {
+    use super::presentation::{unavailable, Presented};
+    use pele::compat::{render_result_transport, PresentationCapture};
+
+    let mut document = unsafe { public::document(owner) }?;
+    let job = document.prepare_detached_render(
+        revision,
+        DetachedRenderRequest::Normal {
+            options: options.clone(),
+            limit,
+            enforce_native_bytes: true,
+        },
+    )?;
+    let Some(job) = job else {
+        // Foreign providers without an authenticated owned capability retain
+        // their existing synchronous contract.
+        let mut capture = PresentationCapture::new(resources, budget);
+        let outcome =
+            document.render_operation_bounded_read(revision, &options, limit, &mut capture)?;
+        let presentation = capture.take().unwrap_or_else(unavailable);
+        let wire = outcome.result.as_ref().map(|rendered| Presented {
+            rendered: render_result_transport(rendered),
+            presentation: &presentation,
+        });
+        return public::binary_metadata(outcome.revision, &outcome.graph, &wire);
+    };
+    let root = {
+        let graph = document.snapshot_read()?;
+        own(graph.reader(), graph.reader().root())?
+    };
+    drop(document);
+    let mut reader = Reader {
+        owner,
+        root,
+        identities: HashMap::new(),
+        access: call::Access::default(),
+        iterator_handles: 0,
+        iterator_advances: 0,
+    };
+    let mut capture = PresentationCapture::new(resources, budget);
+    let completion = job.run(&mut reader, &mut capture);
+    drop(capture);
+    let mut document = unsafe { public::document(owner) }?;
+    let kind = document.diagram_type().clone();
+    let outcome = document.finish_detached_render(completion)?;
+    let presentation = outcome.presentation.unwrap_or_else(unavailable);
+    let result = outcome.result.map(|value| match value {
+        DetachedRenderValue::Normal(rendered) => rendered,
+        DetachedRenderValue::Raw(rendered) => pele::compat::RenderResult {
+            diagram_type: kind,
+            rendered,
+        },
+    });
+    let wire = result.as_ref().map(|rendered| Presented {
+        rendered: render_result_transport(rendered),
+        presentation: &presentation,
+    });
+    public::binary_metadata(outcome.revision, &outcome.graph, &wire)
+}
