@@ -32,6 +32,20 @@ pub trait LiveRenderRead {
     fn root(&self) -> Self::Value;
     fn get(&mut self, receiver: &Self::Value, key: &str) -> Result<Self::Value, PublicError>;
     fn index(&mut self, receiver: &Self::Value, index: usize) -> Result<Self::Value, PublicError>;
+    /// Capture yielded values once, keeping pair/object identity for later reads.
+    /// The bound is checked before retaining another value; no callback borrow
+    /// may survive this operation. Existing custom readers opt in explicitly.
+    fn snapshot_iterable(
+        &mut self,
+        _value: &Self::Value,
+        _max_count: usize,
+    ) -> Result<Vec<Self::Value>, PublicError> {
+        Err(PeleError::new(
+            "Live iterable capture is not implemented",
+            ErrorCode::Semantic,
+        )
+        .into())
+    }
     fn kind(&self, value: &Self::Value) -> LiveValueKind;
     fn number(&self, value: &Self::Value) -> Option<f64>;
     fn truthy(&self, value: &Self::Value) -> bool;

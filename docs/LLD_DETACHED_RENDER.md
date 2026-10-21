@@ -1,5 +1,18 @@
 # Detached live rendering
 
+Info and Pie use the same authenticated owned-job lifecycle as Sankey. Typed
+and host inputs share each family's geometry through a phase-source interface.
+Info captures title before layout and reads accessibility after resource calls.
+Pie captures section iteration for each draw, reads showData per legend label,
+then title/accessibility at their upstream phases; responsive draws recapture
+the current collection. No model borrow spans a resource callback.
+
+`LiveRenderRead::snapshot_iterable` adds bounded host iteration. JavaScript
+retains yielded values; C15 creates owned pair sequences from a short Map read,
+including owned UTF-16 strings. The default rejects unsupported readers explicitly.
+No C ABI or JavaScript diagram algorithm is added. Existing malformed UTF-16,
+coercion and native graph-coordinate lifetime limits remain separate.
+
 Internal builtin capability for Sankey resource callbacks. The [oracle audit](compatibility/sankey-resource-callbacks/AUDIT.md) records the previous restoration, read-order and reentry mismatches. This design is not a claim of complete compatibility or improved performance.
 
 ## Boundary

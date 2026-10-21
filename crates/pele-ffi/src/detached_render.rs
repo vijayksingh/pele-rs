@@ -14,13 +14,14 @@ use pele::compat::{
 use std::{
     panic::{catch_unwind, AssertUnwindSafe},
     ptr,
-    sync::Mutex,
+    sync::{Arc, Mutex},
 };
 
 #[derive(Clone)]
 enum Value {
     Atom(Atom),
     String(JsString),
+    Sequence(Arc<[Value]>),
 }
 fn invalid(message: &str) -> PeleError {
     public::invalid(message)
@@ -64,6 +65,20 @@ struct Reader {
 }
 impl Reader {
     fn field(&self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
+        if let Value::Sequence(values) = receiver {
+            if key == "length" {
+                return Ok(Value::Atom(Atom::Number(values.len() as f64)));
+            }
+            if let Ok(index) = key.parse::<usize>() {
+                if index.to_string() == key {
+                    return Ok(values
+                        .get(index)
+                        .cloned()
+                        .unwrap_or(Value::Atom(Atom::Undefined)));
+                }
+            }
+            return Ok(Value::Atom(Atom::Undefined));
+        }
         if let Value::String(text) = receiver {
             if key == "length" {
                 return Ok(Value::Atom(Atom::Number(text.0.len() as f64)));
@@ -136,9 +151,53 @@ impl LiveRenderRead for Reader {
     fn index(&mut self, value: &Value, index: usize) -> Result<Value, PublicError> {
         self.field(value, &index.to_string())
     }
+    fn snapshot_iterable(
+        &mut self,
+        value: &Value,
+        max_count: usize,
+    ) -> Result<Vec<Value>, PublicError> {
+        let Value::Atom(Atom::Ref(id)) = value else {
+            return Err(invalid("Native live iterable must be a Map").into());
+        };
+        // One short immutable snapshot. Own text before releasing it; pairs are
+        // new identities just like ordinary Map iteration, never graph nodes.
+        let document = unsafe { public::document(self.owner) }?;
+        let graph = document.snapshot_read()?;
+        let read = graph.reader();
+        let header = read.header(*id as usize)?;
+        let GraphNodeKind::Map(items) = header.kind else {
+            return Err(invalid("Native live iterable must be a Map").into());
+        };
+        if items > max_count.min(8_000_000) {
+            return Err(
+                PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        let mut values = Vec::with_capacity(items);
+        let mut start = 0;
+        while start < items {
+            let mut count = 0;
+            read.map_entries(*id as usize, start, &mut |entries| {
+                count = entries.len();
+                if count == 0 || count > items - start {
+                    return Err(invalid("Invalid captured Map batch"));
+                }
+                for (key, value) in entries {
+                    values.push(Value::Sequence(Arc::from([
+                        own(read, key.clone())?,
+                        own(read, value.clone())?,
+                    ])));
+                }
+                Ok(())
+            })?;
+            start += count;
+        }
+        Ok(values)
+    }
     fn kind(&self, value: &Value) -> LiveValueKind {
         match value {
             Value::String(_) => LiveValueKind::String,
+            Value::Sequence(_) => LiveValueKind::Object,
             Value::Atom(atom) => match atom {
                 Atom::Undefined => LiveValueKind::Undefined,
                 Atom::Null => LiveValueKind::Null,

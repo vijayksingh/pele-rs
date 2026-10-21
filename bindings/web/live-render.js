@@ -11,6 +11,14 @@ export function liveRenderRead(capture) {
       switch (operation) {
         case 0: case 1: return value[key];
         case 2: return `${value}`;
+        case 4: {
+          const captured=[];
+          for(const item of value){
+            if(captured.length===key)return null; // Native budget error, not host throw.
+            captured.push(item);
+          }
+          return captured;
+        }
         case 3: {
           if (typeof value === 'string') return value;
           // Run the pinned first string operation in this engine. In particular,

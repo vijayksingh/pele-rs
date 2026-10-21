@@ -2,6 +2,7 @@
 use super::{engine::Registration, GraphReadView, PublicError};
 use crate::compat::{
     diagrams::info::{Info, InfoDetachedInput},
+    diagrams::pie::{Pie, PieDetachedInput},
     diagrams::sankey::{render_detached, Sankey, SankeyDetachedInput},
     ErrorCode, Object, OutputLimit, PeleError, PresentationCapture, PresentationOutcome,
     RenderOptions, RenderResources, RenderResult, RenderSettings, Rendered,
@@ -17,6 +18,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 enum Kind {
     Info,
     Sankey,
+    Pie,
 }
 /// Metadata-only capability. Only this crate can mint a concrete creator token.
 #[doc(hidden)]
@@ -25,6 +27,12 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn pie() -> Self {
+        Self {
+            creator: TypeId::of::<Pie>(),
+            kind: Kind::Pie,
+        }
+    }
     pub(crate) fn info() -> Self {
         Self {
             creator: TypeId::of::<Info>(),
@@ -51,8 +59,15 @@ pub struct DetachedPublicRender {
 enum Body {
     Info(InfoDetachedInput),
     Sankey(SankeyDetachedInput),
+    Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn pie(input: PieDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<Pie>(),
+            body: Body::Pie(input),
+        }
+    }
     pub(crate) fn info(input: InfoDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<Info>(),
@@ -73,6 +88,7 @@ impl DetachedPublicRender {
         let kind = match &self.body {
             Body::Info(_) => Kind::Info,
             Body::Sankey(_) => Kind::Sankey,
+            Body::Pie(_) => Kind::Pie,
         };
         (self.creator == TypeId::of::<D>()
             && self.creator == capability.creator
@@ -91,6 +107,9 @@ impl DetachedPublicRender {
                 input, config, settings, read, resources,
             ),
             Body::Sankey(input) => render_detached(input, config, settings, read, resources),
+            Body::Pie(input) => crate::compat::diagrams::pie::render_detached(
+                input, config, settings, read, resources,
+            ),
         }
     }
 }

@@ -113,6 +113,19 @@ impl PublicDiagramModule for Pie {
         state.graph = graph;
         Ok(())
     }
+    fn detached_public_render_capability(
+        &self,
+    ) -> Option<crate::compat::public::DetachedRenderCapability> {
+        Some(crate::compat::public::DetachedRenderCapability::pie())
+    }
+    fn detached_public_render(
+        &self,
+        _state: &Self::PublicState,
+    ) -> Option<crate::compat::public::DetachedPublicRender> {
+        Some(crate::compat::public::DetachedPublicRender::pie(
+            super::PieDetachedInput,
+        ))
+    }
     fn render_public(
         &self,
         state: &mut PiePublicState,

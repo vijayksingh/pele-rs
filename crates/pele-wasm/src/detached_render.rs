@@ -29,6 +29,7 @@ enum ReadCommand {
     Index = 1,
     ToString = 2,
     RequireString = 3,
+    SnapshotIterable = 4,
 }
 
 fn invalid(message: &str) -> PeleError {
@@ -109,6 +110,31 @@ impl LiveRenderRead for Reader {
             &JsValue::from_f64(index as f64),
             0,
         )
+    }
+    fn snapshot_iterable(
+        &mut self,
+        value: &JsValue,
+        max_count: usize,
+    ) -> Result<Vec<JsValue>, PublicError> {
+        let bound = max_count.min(8_000_000);
+        let values = self.call(
+            ReadCommand::SnapshotIterable,
+            value,
+            &JsValue::from_f64(bound as f64),
+            0,
+        )?;
+        if values.is_null() {
+            return Err(
+                PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
+            );
+        }
+        let array: js_sys::Array = values
+            .dyn_into()
+            .map_err(|_| invalid("Invalid captured iterable"))?;
+        if array.length() as usize > bound {
+            return Err(invalid("Invalid captured iterable length").into());
+        }
+        Ok(array.iter().collect())
     }
     fn kind(&self, value: &JsValue) -> LiveValueKind {
         if value.is_undefined() {

@@ -2,11 +2,13 @@
 mod parser;
 mod public_model;
 pub use public_model::PiePublicState;
+mod live_phase;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,
     RenderSettings, Rendered, Value,
 };
+pub(crate) use live_phase::{render_detached, PieDetachedInput};
 use serde::{Serialize, Serializer};
 #[derive(Clone, Debug)]
 pub struct PieSection {
