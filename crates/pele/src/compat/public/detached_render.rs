@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Railroad,
     Requirement,
     C4,
     Wardley,
@@ -47,6 +48,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn railroad() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::railroad::Railroad>(),
+            kind: Kind::Railroad,
+        }
+    }
+
     pub(crate) fn requirement() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::requirement::RequirementDiagram>(),
@@ -187,6 +195,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Railroad(crate::compat::diagrams::railroad::RailroadDetachedInput),
     Requirement(crate::compat::diagrams::requirement::RequirementDetachedInput),
     C4(crate::compat::diagrams::c4::C4DetachedInput),
     Wardley(crate::compat::diagrams::wardley::WardleyDetachedInput),
@@ -208,6 +217,15 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn railroad(
+        input: crate::compat::diagrams::railroad::RailroadDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::railroad::Railroad>(),
+            body: Body::Railroad(input),
+        }
+    }
+
     pub(crate) fn requirement(
         input: crate::compat::diagrams::requirement::RequirementDetachedInput,
     ) -> Self {
@@ -348,6 +366,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Railroad(_) => Kind::Railroad,
             Body::Requirement(_) => Kind::Requirement,
             Body::C4(_) => Kind::C4,
             Body::Wardley(_) => Kind::Wardley,
@@ -381,6 +400,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Railroad(input) => crate::compat::diagrams::railroad::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Requirement(input) => crate::compat::diagrams::requirement::render_detached(
                 input, config, settings, read, resources,
             ),

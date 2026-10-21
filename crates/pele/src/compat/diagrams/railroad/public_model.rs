@@ -7,10 +7,10 @@
 //! explicit capabilities; no JavaScript parser or renderer is used at runtime.
 use super::*;
 use crate::compat::public::{
-    Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString, MemberKind,
-    MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property,
-    PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId,
-    RecordKind, RecordSchema,
+    Atom, DetachedPublicRender, DetachedRenderCapability, FieldKind, FieldSchema, GraphWriter,
+    JavaScriptErrorKind, JsString, MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema,
+    ModelGraph, ModelSchema, Node, Property, PrototypeId, PrototypeParent, PrototypeSchema,
+    PublicDiagramModule, PublicError, RecordId, RecordKind, RecordSchema,
 };
 use crate::compat::ErrorCode;
 use std::collections::HashMap;
@@ -503,6 +503,15 @@ fn construct_default() -> Result<RailroadPublicState, PeleError> {
 
 impl PublicDiagramModule for Railroad {
     type PublicState = RailroadPublicState;
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::railroad())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::railroad(
+            super::RailroadDetachedInput::new(state.model.as_ref().err().cloned()),
+        ))
+    }
+
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }

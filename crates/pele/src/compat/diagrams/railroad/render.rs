@@ -1,5 +1,8 @@
 //! Railroad box algebra, track routing and responsive folding, Pele 458322a5 (MIT).
-use super::model::{RailroadModel as Model, RailroadNode as N};
+use super::{
+    model::RailroadModel as Model,
+    phase::{NodeType as N, PhaseInput},
+};
 use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::decode_entities,
@@ -7,6 +10,7 @@ use crate::compat::{
     text::{layout_label, measure},
     Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
+use std::collections::{HashMap, HashSet};
 #[derive(Clone, Copy, PartialEq)]
 enum Kind {
     Terminal,
@@ -126,76 +130,124 @@ fn leaf(
     b.id = id;
     Ok(b)
 }
-fn boxes(
-    model: &Model,
-    root: usize,
+fn boxes<I: PhaseInput>(
+    input: &mut I,
+    root: I::Node,
     m: &Metrics,
     room: f64,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
-) -> Result<(Vec<Boxed>, usize), PeleError> {
-    // The pinned measurer assigns room by object identity in breadth-first
-    // encounter order. A shared IR node uses its last assigned room everywhere.
-    let mut budgets = vec![f64::INFINITY; model.nodes.len()];
+) -> Result<(Vec<Boxed>, usize), I::Error> {
+    let mut budgets = HashMap::new();
     let mut work = 0usize;
     let budget_error = || {
-        let mut e = PeleError::new(
+        let mut error = PeleError::new(
             "Railroad layout exceeds work budget.",
             crate::compat::ErrorCode::Limit,
         );
-        e.diagram_type = Some("railroad".into());
-        e
+        error.diagram_type = Some("railroad".into());
+        error
     };
     if room != f64::INFINITY {
-        let mut pending = vec![(root, room)];
-        let mut n = 0;
-        while n < pending.len() {
+        let mut pending = vec![(root.clone(), room)];
+        let mut cursor = 0;
+        while cursor < pending.len() {
             work += 1;
             if work > 4_000_000 {
-                return Err(budget_error());
+                return Err(budget_error().into());
             }
-            let (i, width) = pending[n];
-            n += 1;
-            budgets[i] = width;
-            let node = &model.nodes[i];
-            let around = match node {
-                N::Choice(_) | N::Optional(_) => 4. * m.arc,
-                N::Repetition { min, .. } => {
-                    if *min == 0. {
+            let (node, width) = pending[cursor].clone();
+            cursor += 1;
+            budgets.insert(input.identity(&node)?, width);
+            let around = match input.kind(&node)? {
+                N::Choice | N::Optional => 4. * m.arc,
+                N::Repetition => {
+                    if input.repetition(&node)?.0 == 0. {
                         6. * m.arc
                     } else {
                         2. * m.arc
                     }
                 }
-                N::Sequence(_) => 6. * m.arc,
+                N::Sequence => 6. * m.arc,
                 _ => 0.,
             };
-            for &child in node.children() {
-                pending.push((child, 40_f64.js_max(width - around)));
+            let children = input.children(&node)?;
+            let mut index = 0;
+            while index < input.length(&children)? {
+                work += 1;
+                if work > 4_000_000 {
+                    return Err(budget_error().into());
+                }
+                pending.push((input.at(&children, index)?, 40_f64.js_max(width - around)));
+                index += 1;
             }
         }
     }
-    let mut todo = vec![(root, false)];
+    // Each frame retains its child receiver. Result slots belong to occurrences,
+    // while room assignments belong to node identity, matching shared grammars.
+    struct Frame<Node, Children> {
+        identity: u64,
+        node: Node,
+        children: Children,
+        next: usize,
+        results: Vec<usize>,
+    }
+    let children = input.children(&root)?;
+    let identity = input.identity(&root)?;
+    let mut active = HashSet::from([identity]);
+    let mut stack = vec![Frame {
+        identity,
+        node: root,
+        children,
+        next: 0,
+        results: vec![],
+    }];
     let mut a = vec![];
-    let mut indices = vec![0; model.nodes.len()];
-    while let Some((i, done)) = todo.pop() {
+    loop {
         work += 1;
         if work > 4_000_000 {
-            return Err(budget_error());
+            return Err(budget_error().into());
         }
-        let node = &model.nodes[i];
-        let room = budgets[i];
-        if !done {
-            todo.push((i, true));
-            for &n in node.children().iter().rev() {
-                todo.push((n, false));
+        let frame = stack.last_mut().expect("root frame exists until return");
+        if frame.next < input.length(&frame.children)? {
+            let child = input.at(&frame.children, frame.next)?;
+            frame.next += 1;
+            let children = input.children(&child)?;
+            let identity = input.identity(&child)?;
+            if !active.insert(identity) {
+                return Err(budget_error().into());
             }
+            stack.push(Frame {
+                identity,
+                node: child,
+                children,
+                next: 0,
+                results: vec![],
+            });
             continue;
         }
-        let kids: Vec<_> = node.children().iter().map(|i| indices[*i]).collect();
-        let value = match node {
-            N::Terminal(s) => {
-                let s = shown(s)?;
+        let Frame {
+            identity,
+            node,
+            results: kids,
+            ..
+        } = stack.pop().unwrap();
+        active.remove(&identity);
+        let room = budgets
+            .get(&input.identity(&node)?)
+            .copied()
+            .unwrap_or(f64::INFINITY);
+        let kind = input.kind(&node)?;
+        if matches!(kind, N::Optional | N::Repetition) && kids.is_empty() {
+            return Err(PeleError::new(
+                "Railroad wrapper has no child definition",
+                crate::compat::ErrorCode::Semantic,
+            )
+            .into());
+        }
+        let value = match kind {
+            N::Terminal => {
+                let s = shown(&input.text(&node, "value")?)?;
                 let text = if !s.is_empty() && s.bytes().all(|c| c == b' ') {
                     "␣".repeat(s.len())
                 } else {
@@ -206,15 +258,16 @@ fn boxes(
                     leaf(Kind::Terminal, text, String::new(), 4, m, o, r)?,
                 )
             }
-            N::Nonterminal(s) => put(
-                &mut a,
-                leaf(Kind::Nonterminal, shown(s)?, s.clone(), 0, m, o, r)?,
-            ),
-            N::Special(s) => put(
+            N::Nonterminal => {
+                let name = shown(&input.text(&node, "name")?)?;
+                let id = input.text(&node, "name")?;
+                put(&mut a, leaf(Kind::Nonterminal, name, id, 0, m, o, r)?)
+            }
+            N::Special => put(
                 &mut a,
                 leaf(
                     Kind::Special,
-                    format!("? {} ?", shown(s)?),
+                    format!("? {} ?", shown(&input.text(&node, "text")?)?),
                     String::new(),
                     2,
                     m,
@@ -222,7 +275,7 @@ fn boxes(
                     r,
                 )?,
             ),
-            N::Sequence(_) => {
+            N::Sequence => {
                 let mut width = kids.len().saturating_sub(1) as f64 * m.gap;
                 let (mut up, mut down) = (0f64, 0f64);
                 for &k in &kids {
@@ -280,7 +333,7 @@ fn boxes(
                     }
                 }
             }
-            N::Choice(_) => {
+            N::Choice => {
                 let (mut inner, mut offset) = (0f64, 0f64);
                 for (j, &k) in kids.iter().enumerate() {
                     inner = inner.js_max(a[k].width);
@@ -295,13 +348,14 @@ fn boxes(
                     Boxed::new(Kind::Choice, inner + 4. * m.arc, up, down, kids),
                 )
             }
-            N::Optional(_) => bypass(&mut a, kids[0], m),
-            N::Repetition { min, max, .. } => {
+            N::Optional => bypass(&mut a, kids[0], m),
+            N::Repetition => {
+                let (min, max) = input.repetition(&node)?;
                 let k = kids[0];
-                if *min == 1. && *max == 1. {
+                if min == 1. && max == 1. {
                     k
                 } else {
-                    let text = count(*min, *max);
+                    let text = count(min, max);
                     let reach = (a[k].down + m.sep).js_max(2. * m.arc);
                     let label = if text.is_empty() {
                         0.
@@ -318,7 +372,7 @@ fn boxes(
                     b.text = text;
                     b.reach = reach;
                     let n = put(&mut a, b);
-                    if *min == 0. {
+                    if min == 0. {
                         bypass(&mut a, n, m)
                     } else {
                         n
@@ -326,9 +380,12 @@ fn boxes(
                 }
             }
         };
-        indices[i] = value;
+        if let Some(parent) = stack.last_mut() {
+            parent.results.push(value);
+        } else {
+            return Ok((a, value));
+        }
     }
-    Ok((a, indices[root]))
 }
 struct Painter<'a> {
     a: &'a [Boxed],
@@ -564,24 +621,33 @@ pub(super) fn render(
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
     m.validate_nodes()?;
-    let loose = draw(m, c, o, r, false)?;
+    render_phases(&mut super::phase::TypedPhase(m), c, o, r)
+}
+pub(crate) fn render_phases<I: PhaseInput>(
+    input: &mut I,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, I::Error> {
+    let loose = draw(input, c, o, r, false)?;
     if o.max_width.is_none_or(|w| !(w > 0.) || loose.width <= w) {
         return Ok(loose);
     }
-    let tight = draw(m, c, o, r, true)?;
+    let tight = draw(input, c, o, r, true)?;
     Ok(if tight.width < loose.width {
         tight
     } else {
         loose
     })
 }
-fn draw(
-    model: &Model,
+fn draw<I: PhaseInput>(
+    input: &mut I,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, I::Error> {
+    input.begin_draw();
     let base = o.font_size.unwrap_or(16.);
     let font_size = option(c, "fontSize", 0., 200.);
     let size = if font_size != 0. {
@@ -628,7 +694,8 @@ fn draw(
     } else {
         4000.
     };
-    let title = layout_label(model.title.as_deref(), false, r, o, base, title_room, 1)?;
+    let title_text = input.metadata("title")?;
+    let title = layout_label(title_text.as_deref(), false, r, o, base, title_room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 16.
     } else {
@@ -639,15 +706,19 @@ fn draw(
     let mut width = title.width;
     let mut top = pad + title_height;
     let mut bottom = pad + title.height;
-    for rule in &model.rules {
+    let rules_receiver = input.rules()?;
+    let mut rule_index = 0;
+    while let Some(rule) = input.next_rule(&rules_receiver, rule_index)? {
+        rule_index += 1;
         let room = if tight {
             80f64.js_max(o.max_width.unwrap_or(320.) - 2. * pad - 4. * radius - 24. - 1.)
         } else {
             f64::INFINITY
         };
-        let (a, root) = boxes(model, rule.definition, &m, room, o, r)?;
+        let definition = input.definition(&rule)?;
+        let (a, root) = boxes(input, definition, &m, room, o, r)?;
         let b = &a[root];
-        let name = shown(&rule.name)?;
+        let name = shown(&input.rule_name(&rule)?)?;
         let baseline = top + head_height + 6. + b.up;
         let start = pad + 2. * radius;
         let left = start + 12.;
@@ -661,7 +732,7 @@ fn draw(
         } else {
             String::new()
         };
-        rules+=&format!("<g class=\"pele-rule\" data-id=\"{}\"><text class=\"pele-rule-name\" x=\"{}\" y=\"{}\" font-size=\"{}\" font-weight=\"var(--_hw)\" text-anchor=\"start\">{}</text><path class=\"pele-edge pele-track\" d=\"{}\" fill=\"none\" stroke=\"var(--_l)\"{stroke}/>{}{markers}{}</g>",esc_text(&rule.name)?,num(pad),num(top+head_height/2.+head_size*0.35),num(head_size),esc(&name),p.track,if p.arrows.is_empty(){String::new()}else{format!("<path class=\"pele-marker\" d=\"{}\" fill=\"var(--_l)\"/>",p.arrows)},p.nodes);
+        rules+=&format!("<g class=\"pele-rule\" data-id=\"{}\"><text class=\"pele-rule-name\" x=\"{}\" y=\"{}\" font-size=\"{}\" font-weight=\"var(--_hw)\" text-anchor=\"start\">{}</text><path class=\"pele-edge pele-track\" d=\"{}\" fill=\"none\" stroke=\"var(--_l)\"{stroke}/>{}{markers}{}</g>",esc_text(&input.rule_name(&rule)?)?,num(pad),num(top+head_height/2.+head_size*0.35),num(head_size),esc(&name),p.track,if p.arrows.is_empty(){String::new()}else{format!("<path class=\"pele-marker\" d=\"{}\" fill=\"var(--_l)\"/>",p.arrows)},p.nodes);
         width = width
             .js_max(end + 2. * radius - pad)
             .js_max(measure(r, o, &name, head_size, 1)?);
@@ -680,6 +751,8 @@ fn draw(
     } else {
         format!("<g class=\"pele-rules\" transform=\"translate(0.5,0.5)\" font-size=\"{}\" text-anchor=\"middle\">{rules}</g>",num(size))
     };
+    let acc_title = input.metadata("accTitle")?;
+    let acc_descr = input.metadata("accDescr")?;
     Ok(Rendered {
         svg: svg::document(
             "railroad",
@@ -687,8 +760,8 @@ fn draw(
             height,
             base,
             o,
-            model.acc_title.as_deref(),
-            model.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width,
