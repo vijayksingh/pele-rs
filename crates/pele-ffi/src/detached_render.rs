@@ -12,6 +12,7 @@ use pele::compat::{
     ErrorCode, PeleError,
 };
 use std::{
+    collections::HashMap,
     panic::{catch_unwind, AssertUnwindSafe},
     ptr,
     sync::{Arc, Mutex},
@@ -20,7 +21,7 @@ use std::{
 #[derive(Clone)]
 enum Value {
     Atom(Atom),
-    String(JsString),
+    String(Arc<JsString>),
     Sequence(Arc<[Value]>),
 }
 fn invalid(message: &str) -> PeleError {
@@ -55,7 +56,7 @@ fn string(reader: &dyn PublicGraphRead, id: u32) -> Result<JsString, PeleError> 
 }
 fn own(reader: &dyn PublicGraphRead, atom: Atom) -> Result<Value, PeleError> {
     match atom {
-        Atom::String(id) => Ok(Value::String(string(reader, id)?)),
+        Atom::String(id) => Ok(Value::String(Arc::new(string(reader, id)?))),
         atom => Ok(Value::Atom(atom)),
     }
 }
@@ -86,7 +87,7 @@ impl Reader {
             if let Ok(index) = key.parse::<usize>() {
                 if index.to_string() == key {
                     return Ok(text.0.get(index).map_or(Value::Atom(Atom::Undefined), |v| {
-                        Value::String(JsString(vec![*v]))
+                        Value::String(Arc::new(JsString(vec![*v])))
                     }));
                 }
             }
@@ -173,6 +174,26 @@ impl LiveRenderRead for Reader {
                 PeleError::new("Public model graph exceeds work budget", ErrorCode::Limit).into(),
             );
         }
+        // Retained strings belong to this snapshot. Repeated catalog IDs must
+        // share ownership: copying each occurrence multiplies admitted text by
+        // the number of Map entries before the renderer can reject a value.
+        let mut strings = HashMap::<u32, Arc<JsString>>::new();
+        let mut capture = |atom: &Atom| -> Result<Value, PeleError> {
+            match atom {
+                Atom::String(id) => {
+                    let text = match strings.get(id) {
+                        Some(text) => Arc::clone(text),
+                        None => {
+                            let text = Arc::new(string(read, *id)?);
+                            strings.insert(*id, Arc::clone(&text));
+                            text
+                        }
+                    };
+                    Ok(Value::String(text))
+                }
+                atom => Ok(Value::Atom(atom.clone())),
+            }
+        };
         let mut values = Vec::with_capacity(items);
         let mut start = 0;
         while start < items {
@@ -183,10 +204,7 @@ impl LiveRenderRead for Reader {
                     return Err(invalid("Invalid captured Map batch"));
                 }
                 for (key, value) in entries {
-                    values.push(Value::Sequence(Arc::from([
-                        own(read, key.clone())?,
-                        own(read, value.clone())?,
-                    ])));
+                    values.push(Value::Sequence(Arc::from([capture(key)?, capture(value)?])));
                 }
                 Ok(())
             })?;
@@ -226,14 +244,14 @@ impl LiveRenderRead for Reader {
     }
     fn string_units(&self, value: &Value) -> Result<Option<JsString>, PublicError> {
         Ok(if let Value::String(s) = value {
-            Some(s.clone())
+            Some(s.as_ref().clone())
         } else {
             None
         })
     }
     fn to_string(&mut self, value: &Value) -> Result<JsString, PublicError> {
         if let Value::String(s) = value {
-            return Ok(s.clone());
+            return Ok(s.as_ref().clone());
         }
         let text = match value {
             Value::Atom(Atom::Undefined) => "undefined".into(),
@@ -252,7 +270,7 @@ impl LiveRenderRead for Reader {
         site: LiveStringUse,
     ) -> Result<JsString, PublicError> {
         if let Value::String(s) = value {
-            return Ok(s.clone());
+            return Ok(s.as_ref().clone());
         }
         match value {
             Value::Atom(Atom::Undefined | Atom::Null) => Err(type_error(format!(
