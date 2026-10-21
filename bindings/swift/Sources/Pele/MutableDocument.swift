@@ -30,6 +30,7 @@ extension Pele {
         private var detachedDepth = 0
         var hostFunctions: [UInt32: HostFunctionBox] = [:]
         var hostValueStore = PublicHostStore()
+        var hostValueAccess: HostValueAccessBox?
         var usesHostValues = false
         public let type: String
         public let isConstructorCreated: Bool
@@ -44,7 +45,7 @@ extension Pele {
             if let handle {
                 active = true; self.handle = nil
                 defer { active = false }
-                pele_public_document_free_v4(handle); hostFunctions.removeAll(); hostValueStore = PublicHostStore()
+                pele_public_document_free_v4(handle); hostFunctions.removeAll(); hostValueStore = PublicHostStore(); hostValueAccess = nil
             }
         }
         func withHandle<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
@@ -73,6 +74,7 @@ extension Pele {
         func withDetachedLifetime<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
             guard let handle else { throw PeleError(code: "semantic", message: "Mutable document is closed") }
             guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
+            try ensureHostValueAccess(handle)
             detachedDepth += 1; defer { detachedDepth -= 1 }
             return try withHostFunctionErrorScope {
                 try withExtendedLifetime(self) { try operation(handle) }

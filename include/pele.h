@@ -504,6 +504,47 @@ PeleResult *pele_public_render_native_v14(PelePublicDocument *, uint64_t, const 
     const PeleRenderNumbersV9 *, uint32_t, uint64_t, const PelePresentationOptionsV11 *,
     const PeleHostResourcesV3 *, const PeleNativeResourcesV14 *);
 
+/* v20 owner-bound opaque host dispatch used by owned C15 rendering.
+ * Owner-thread confinement and no-free-during-call rules remain unchanged.
+ * Requests/UTF16 are borrowed until invoke returns. Reply release runs exactly
+ * once after validation/copy, including rejected replies. No lock spans invoke.
+ * Values use v17 tags 0..5 plus 6=current owner graph reference, 7=builtin method.
+ * Mint opaque identities through pele_host_identity_v17, the same nonreused
+ * allocator as C12 bindings; maintain an owner-local ledger and reject missing
+ * or foreign tokens. Never derive opaque IDs from graph coordinates.
+ * Get operands=[receiver]; Call=[function,receiver,...arguments]; unary=[value];
+ * comparison=[left,right]. Operation codes: 0=Get, 1=Call, 2=Truthy,
+ * 3=ToString, 4=GreaterEqual, 5=StrictEqual, 6=ToNumber.
+ * Call result: 0=Value, 1=Retain (opaque tag5 required), 2=Discard.
+ * At most 1,000,000 call arguments and 16,000,000 aggregate UTF16 units
+ * per request; reply UTF16 also at most 16,000,000. Nesting is capped at64.
+ * status 0 is unhandled (Call can fall back to C12), 1=value, 2=original exception
+ * with nonzero owner token, 3=TypeError with UTF16 message value. */
+typedef struct PeleHostRequestV20 {
+    uint32_t operation, result;
+    const PeleHostValueV17 *values;
+    size_t count;
+    const uint16_t *key; size_t key_count;
+    const uint16_t *error; size_t error_count;
+} PeleHostRequestV20;
+typedef struct PeleHostReplyV20 {
+    uint32_t status, exception;
+    PeleHostValueV17 value;
+    void *owner;
+    void (*release)(void *);
+} PeleHostReplyV20;
+typedef struct PeleHostAccessV20 {
+    uint32_t version, struct_size;
+    void *context;
+    void (*retain)(void *);
+    void (*release)(void *);
+    void (*invoke)(void *, const PeleHostRequestV20 *, PeleHostReplyV20 *);
+    uint64_t reserved[2];
+} PeleHostAccessV20;
+/* Optional table; NULL clears. Replacement releases the old context outside
+ * its binding borrow. Callback tables must not unwind across C boundaries. */
+PeleResult *pele_public_set_host_access_v20(PelePublicDocument *, const PeleHostAccessV20 *);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

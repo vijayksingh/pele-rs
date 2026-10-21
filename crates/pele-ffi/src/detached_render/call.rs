@@ -167,6 +167,17 @@ impl Reader {
         host: &mut dyn RenderResources,
         message: &str,
     ) -> Result<Value, PublicError> {
+        self.call_owned_policy(f, receiver, args, host, message, PublicHostResult::Value)
+    }
+    fn call_owned_policy(
+        &mut self,
+        f: &Value,
+        receiver: &Value,
+        args: &[Value],
+        host: &mut dyn RenderResources,
+        message: &str,
+        policy: PublicHostResult,
+    ) -> Result<Value, PublicError> {
         if self.access.depth.get() >= 64 {
             return Err(
                 PeleError::new("Public model callback depth exceeded", ErrorCode::Limit).into(),
@@ -188,6 +199,15 @@ impl Reader {
             return Err(
                 PeleError::new("Live call argument budget exceeded", ErrorCode::Limit).into(),
             );
+        }
+        if matches!(f, Value::Atom(Atom::HostReference(_))) {
+            let mut values = Vec::with_capacity(args.len() + 2);
+            values.push(f);
+            values.push(receiver);
+            values.extend(args);
+            if let Some(value) = self.opaque_operation(1, &values, "", message, policy)? {
+                return Ok(value);
+            }
         }
         let r = self.argument_atom(receiver)?;
         let args = args
@@ -276,20 +296,56 @@ impl Reader {
                             .into_iter()
                             .map(resolve)
                             .collect::<Result<Vec<_>, _>>()?;
-                        self.call_owned(&function, &receiver, &arguments, host, not_callable_error)
-                            .map(|v| (v, result))
+                        self.call_owned_policy(
+                            &function,
+                            &receiver,
+                            &arguments,
+                            host,
+                            not_callable_error,
+                            result,
+                        )
+                        .map(|v| (v, result))
                     }
                     PublicHostOperation::Truthy { value } => {
                         let value = resolve(value)?;
-                        Ok((
-                            Value::Atom(Atom::Bool(self.truthy(&value))),
-                            PublicHostResult::Value,
-                        ))
+                        let truth = if matches!(value, Value::Atom(Atom::HostReference(_))) {
+                            self.opaque_operation(2, &[&value], "", "", PublicHostResult::Value)?
+                                .ok_or_else(|| {
+                                    invalid("No owner dispatcher for opaque truthiness")
+                                })?
+                        } else {
+                            Value::Atom(Atom::Bool(self.truthy(&value)))
+                        };
+                        Ok((truth, PublicHostResult::Value))
                     }
-                    _ => Err(invalid(
-                        "Native owned method requested an unsupported host operation",
-                    )
-                    .into()),
+                    PublicHostOperation::ToString { value } => {
+                        let value = resolve(value)?;
+                        let text = self.to_string(&value)?;
+                        Ok((Value::String(Arc::new(text)), PublicHostResult::Value))
+                    }
+                    PublicHostOperation::GreaterEqual { left, right } => {
+                        let code = 4;
+                        let left = resolve(left)?;
+                        let right = resolve(right)?;
+                        let result = self
+                            .opaque_operation(
+                                code,
+                                &[&left, &right],
+                                "",
+                                "",
+                                PublicHostResult::Value,
+                            )?
+                            .ok_or_else(|| invalid("No owner dispatcher for host comparison"))?;
+                        Ok((result, PublicHostResult::Value))
+                    }
+                    PublicHostOperation::StrictEqual { left, right } => {
+                        let left = resolve(left)?;
+                        let right = resolve(right)?;
+                        let result = self
+                            .opaque_operation(5, &[&left, &right], "", "", PublicHostResult::Value)?
+                            .ok_or_else(|| invalid("No owner dispatcher for host comparison"))?;
+                        Ok((result, PublicHostResult::Value))
+                    }
                 }
             })();
             reply = Some(result.and_then(|(value, policy)| {

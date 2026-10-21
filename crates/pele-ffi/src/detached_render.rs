@@ -1,6 +1,7 @@
 //! Owned C jobs: no document or binding borrow crosses a resource callback.
 mod call;
 mod iterator;
+mod opaque;
 pub(super) mod retained;
 use super::{
     host_functions, public, PeleHostResourcesV3, PelePublicDocument, PeleRenderNumbersV9,
@@ -99,6 +100,17 @@ struct Reader {
 }
 impl Reader {
     fn field(&self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
+        if matches!(receiver, Value::Atom(Atom::HostReference(_))) {
+            return self
+                .opaque_operation(
+                    0,
+                    &[receiver],
+                    key,
+                    "",
+                    pele::compat::public::PublicHostResult::Value,
+                )?
+                .ok_or_else(|| invalid("No owner dispatcher for opaque host field").into());
+        }
         if let Value::Object(properties) = receiver {
             return Ok(properties
                 .iter()
@@ -289,6 +301,18 @@ impl LiveRenderRead for Reader {
         value: &Value,
         _: &mut dyn pele::compat::RenderResources,
     ) -> Result<f64, PublicError> {
+        if matches!(value, Value::Atom(Atom::HostReference(_))) {
+            return match self.opaque_operation(
+                6,
+                &[value],
+                "",
+                "",
+                pele::compat::public::PublicHostResult::Value,
+            )? {
+                Some(Value::Atom(Atom::Number(n))) => Ok(n),
+                _ => Err(invalid("Invalid opaque numeric reply").into()),
+            };
+        }
         match value {
             Value::Atom(Atom::Undefined) => Ok(f64::NAN),
             Value::Atom(Atom::Null) => Ok(0.),
@@ -938,6 +962,18 @@ impl LiveRenderRead for Reader {
         })
     }
     fn to_string(&mut self, value: &Value) -> Result<JsString, PublicError> {
+        if matches!(value, Value::Atom(Atom::HostReference(_))) {
+            return match self.opaque_operation(
+                3,
+                &[value],
+                "",
+                "",
+                pele::compat::public::PublicHostResult::Value,
+            )? {
+                Some(Value::String(text)) => Ok((*text).clone()),
+                _ => Err(invalid("Invalid opaque string reply").into()),
+            };
+        }
         if let Value::String(s) = value {
             return Ok(s.as_ref().clone());
         }

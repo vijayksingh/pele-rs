@@ -9,6 +9,8 @@ mod detached_render;
 pub use detached_render::*;
 mod eager_projection;
 pub use eager_projection::*;
+mod host_values;
+pub use host_values::*;
 mod host_functions;
 pub use host_functions::*;
 mod public;

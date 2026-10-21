@@ -32,11 +32,13 @@ final class PublicHostStore {
     func retain(_ value: Pele.PublicHostValue, reuseIdentity: Bool = true) throws -> UInt32 {
         if reuseIdentity, case .host(let object) = value,
            let existing = identities[ObjectIdentifier(object)] { return existing }
+        guard values.count < 1_000_000 else { throw PeleError(code: "limit", message: "Owner host value budget exceeded") }
         let id = try Pele.compatibilityResult(pele_host_identity_v17(), as: UInt32.self)
         values[id] = value
         if reuseIdentity, case .host(let object) = value { identities[ObjectIdentifier(object)] = id }
         return id
     }
+    func contains(_ id: UInt32) -> Bool { values[id] != nil }
     func value(_ id: UInt32) throws -> Pele.PublicHostValue {
         guard let value = values[id] else { throw PeleError(code: "semantic", message: "Unknown owner host identity") }
         return value

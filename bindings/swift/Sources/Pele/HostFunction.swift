@@ -79,7 +79,11 @@ extension Pele.MutableDocument {
     // pending outer failure on the same bound callable.
     func withHostFunctionErrorScope<T>(_ body: () throws -> T) rethrows -> T {
         let saved = hostFunctions.values.map { ($0, $0.error) }
-        defer { for (box, error) in saved { box.error = error } }
+        let opaqueErrors = hostValueAccess?.errors
+        defer {
+            for (box, error) in saved { box.error = error }
+            if let opaqueErrors { hostValueAccess?.errors = opaqueErrors }
+        }
         return try body()
     }
     func withHostFunctionResources<T>(_ takeError: () -> (any Error)?, _ body: () -> T) -> T {
@@ -87,7 +91,7 @@ extension Pele.MutableDocument {
             let saved = hostFunctions.values.map { ($0, $0.takeResourceError, $0.resolveHostError) }
             for box in hostFunctions.values {
                 box.error = nil; box.takeResourceError = errors
-                box.resolveHostError = { [weak self] token in self?.hostFunctions[token]?.error }
+                box.resolveHostError = { [weak self] token in self?.hostFunctions[token]?.error ?? self?.hostValueAccess?.errors[token] }
             }
             defer {
                 for (box, take, resolve) in saved {
@@ -98,7 +102,7 @@ extension Pele.MutableDocument {
         }
     }
     func originalHostFunctionError(_ result: Pele.PublicRenderResult) -> (any Error)? {
-        if case .thrown(.hostException(let token)) = result { return hostFunctions[token]?.error }
+        if case .thrown(.hostException(let token)) = result { return hostFunctions[token]?.error ?? hostValueAccess?.errors[token] }
         return nil
     }
     func clearHostFunctionErrors() { for box in hostFunctions.values { box.error = nil } }

@@ -23,13 +23,30 @@ extension HostOperationOwner {
             guard let atom else { throw invalidHost("Missing host operation value") }
             return try hostValue(atom, graph: graph)
         }
+        let values: [Pele.PublicHostValue]
         switch operation.kind {
+        case "get": values = [try value(operation.receiver)]
+        case "call": values = try [value(operation.function), value(operation.receiver)] + (operation.arguments ?? []).map { try hostValue($0, graph: graph) }
+        case "truthy", "toString", "toNumber": values = [try value(operation.value)]
+        case "greaterEqual", "strictEqual": values = [try value(operation.left), try value(operation.right)]
+        default: throw invalidHost("Unsupported native host operation")
+        }
+        return try performHostValues(kind: operation.kind, values: values, key: operation.key, notCallableError: operation.notCallableError)
+    }
+    // Shared by owned invocation steps and C15's owner-bound opaque dispatcher.
+    // Values are already losslessly owned; no model recapture occurs here.
+    func performHostValues(kind: String, values: [Pele.PublicHostValue], key: String?, notCallableError: String?) throws -> Pele.PublicHostValue {
+        func operand(_ index: Int) throws -> Pele.PublicHostValue {
+            guard values.indices.contains(index) else { throw invalidHost("Missing host operation value") }
+            return values[index]
+        }
+        switch kind {
         case "get":
-            guard let key = operation.key else { throw invalidHost("Missing host field key") }
-            return try getHost(value(operation.receiver), key: key)
+            guard let key else { throw invalidHost("Missing host field key") }
+            return try getHost(operand(0), key: key)
         case "call":
-            let function = try value(operation.function), receiver = try value(operation.receiver)
-            let arguments = try (operation.arguments ?? []).map { try hostValue($0, graph: graph) }
+            let function = try operand(0), receiver = try operand(1)
+            let arguments = Array(values.dropFirst(2))
             if case .host(let object) = function, let callable = object as? any Pele.PublicHostCallable {
                 return try callable.publicCall(receiver: receiver, arguments: arguments)
             }
@@ -55,17 +72,18 @@ extension HostOperationOwner {
                 case .thrown(let error): throw Pele.PublicOperationFailure(value: error)
                 }
             }
-            throw HostTypeError(message: operation.notCallableError ?? "Host value is not callable")
-        case "truthy": return .bool(try truthy(value(operation.value)))
-        case "toString": return .string(try stringHost(value(operation.value)))
+            throw HostTypeError(message: notCallableError ?? "Host value is not callable")
+        case "truthy": return .bool(try truthy(operand(0)))
+        case "toString": return .string(try stringHost(operand(0)))
         case "greaterEqual":
-            let left = try primitiveHost(value(operation.left), hint: .number)
-            let right = try primitiveHost(value(operation.right), hint: .number)
+            let left = try primitiveHost(operand(0), hint: .number)
+            let right = try primitiveHost(operand(1), hint: .number)
             if case .string(let a) = left, case .string(let b) = right {
                 return .bool(!a.codeUnits.lexicographicallyPrecedes(b.codeUnits))
             }
             return .bool(try numberHost(left) >= numberHost(right))
-        case "strictEqual": return .bool(try equalHost(value(operation.left), value(operation.right)))
+        case "toNumber": return .number(try numberHost(primitiveHost(operand(0), hint: .number)))
+        case "strictEqual": return .bool(try equalHost(operand(0), operand(1)))
         default: throw invalidHost("Unsupported native host operation")
         }
     }
