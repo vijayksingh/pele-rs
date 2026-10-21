@@ -105,6 +105,31 @@ static uint32_t width(void *opaque, const uint8_t *text_bytes, size_t length,
     return 0;
 }
 
+static uint32_t flow_width(void *opaque,const uint8_t *bytes,size_t length,double size,uint32_t style,const uint8_t *font,size_t font_length,const uint8_t *mono,size_t mono_length,double *value){
+    (void)bytes;(void)style;(void)font;(void)font_length;(void)mono;(void)mono_length;
+    struct Context *context=opaque;context->widths++;
+    if(!context->entered){
+        context->entered=1;success(pele_public_snapshot_v4(context->document));
+        PeleDetachedRenderJobV15 *nested=NULL;
+        success(pele_public_prepare_detached_render_v15(context->document,context->revision,NULL,0,NULL,3,0,&nested));assert(nested);
+        success(pele_detached_render_run_v15(nested,NULL));
+        outcome(pele_public_finish_detached_render_v15(context->document,nested,&context->revision),"\"Ok\":");
+        pele_detached_render_job_free_v15(nested);
+    }
+    *value=(double)length*size*.6;return 0;
+}
+static void flow_array_consumers(void){
+    const char *sources[]={"flowchart LR\nA[Alpha] --> B[Beta]\nstyle B fill:#113355\n", "swimlane-beta LR\nsubgraph Lane\nA[Alpha] --> B[Beta]\nend\nstyle B fill:#113355\n"};
+    for(size_t i=0;i<sizeof(sources)/sizeof(sources[0]);i++){
+        PelePublicDocument *document=NULL;success(pele_public_parse_v4((const uint8_t *)sources[i],strlen(sources[i]),NULL,0,&document));
+        struct Context context={document,0,0,0};PeleHostResourcesV3 resources={0};resources.base.context=&context;resources.base.width=flow_width;PeleDetachedRenderJobV15 *job=NULL;
+        success(pele_public_prepare_detached_render_v15(document,0,NULL,0,NULL,3,0,&job));assert(job);success(pele_detached_render_run_v15(job,&resources));
+        assert(context.entered&&context.widths>0&&context.revision==1);
+        assert(outcome(pele_public_finish_detached_render_v15(document,job,&context.revision),"\"Ok\":")==2);
+        pele_detached_render_job_free_v15(job);pele_public_document_free_v4(document);
+    }
+}
+
 int main(void) {
     const char *source = "sankey\nA,B,5\nB,C,3";
     PelePublicDocument *document = NULL;
@@ -149,6 +174,7 @@ int main(void) {
     pele_detached_render_job_free_v15(job);
     assert(outcome(pele_public_render_operation_with_numbers_v9(pie, pie_revision, NULL, 0, NULL, 3, 0, NULL), "\"Ok\":") == 2);
     pele_public_document_free_v4(pie);
+    flow_array_consumers();
     puts("native detached render lifecycle passed");
     return 0;
 }

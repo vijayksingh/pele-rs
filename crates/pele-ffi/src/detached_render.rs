@@ -458,8 +458,18 @@ impl LiveRenderRead for Reader {
         value: &Value,
         max_count: usize,
     ) -> Result<Vec<Value>, PublicError> {
+        if let Value::Sequence(values) = value {
+            if values.len() > max_count.min(8_000_000) {
+                return Err(PeleError::new(
+                    "Public model graph exceeds work budget",
+                    ErrorCode::Limit,
+                )
+                .into());
+            }
+            return Ok(values.to_vec());
+        }
         let Value::Atom(Atom::Ref(id)) = value else {
-            return Err(invalid("Native live iterable must be a Map").into());
+            return Err(invalid("Native live iterable must be an Array or Map").into());
         };
         // One short immutable snapshot. Own text before releasing it; pairs are
         // new identities just like ordinary Map iteration, never graph nodes.
@@ -467,8 +477,43 @@ impl LiveRenderRead for Reader {
         let graph = document.snapshot_read()?;
         let read = graph.reader();
         let header = read.header(*id as usize)?;
+        if let GraphNodeKind::Array(length) = header.kind {
+            let length = length as usize;
+            if length > max_count.min(8_000_000) {
+                return Err(PeleError::new(
+                    "Public model graph exceeds work budget",
+                    ErrorCode::Limit,
+                )
+                .into());
+            }
+            let mut strings = HashMap::<u32, Arc<JsString>>::new();
+            let mut values = vec![Value::Atom(Atom::Undefined); length];
+            let mut start = 0;
+            while start < header.properties {
+                let mut count = 0;
+                read.properties(*id as usize, start, &mut |properties| {
+                    count = properties.len();
+                    for property in properties {
+                        let key = string(read, property.key)?;
+                        if let Some(index) = key.well_formed().and_then(|s| {
+                            s.parse::<usize>()
+                                .ok()
+                                .filter(|i| *i < length && i.to_string() == s)
+                        }) {
+                            values[index] = capture_value(read, &property.value, &mut strings)?;
+                        }
+                    }
+                    Ok(())
+                })?;
+                if count == 0 || count > header.properties - start {
+                    return Err(invalid("Invalid captured property batch").into());
+                }
+                start += count;
+            }
+            return Ok(values);
+        }
         let GraphNodeKind::Map(items) = header.kind else {
-            return Err(invalid("Native live iterable must be a Map").into());
+            return Err(invalid("Native live iterable must be an Array or Map").into());
         };
         if items > max_count.min(8_000_000) {
             return Err(
