@@ -1,3 +1,4 @@
+import {setConstructorArity} from './constructor-shells.js';
 import {createHostLedger,retainHostValue,LiveFieldBindings,hostReply,performHostOperation,retainJobValue,releaseJobValues,materializeHostError} from './host-values.js';
 import {LayoutGraph,encodeSourceInput} from './layout-storage.js';
 import {decodeLayoutOutcome} from './layout-packet.js';
@@ -454,7 +455,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = [], reflecti
       registration.constructors.set(prototype.id,capturedConstructorFactory(capability,registration,rawType,liveDefinitions));
       if(typeof capability.arity==='function'){
         const constructor=Object.getOwnPropertyDescriptor(registration.prototypes.get(prototype.id),'constructor').value;
-        Object.defineProperty(constructor,'length',{value:capability.arity(),configurable:true});
+        setConstructorArity(constructor,capability.arity());
       }
     }
     return ownedDefinitions;

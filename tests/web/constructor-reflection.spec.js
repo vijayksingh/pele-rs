@@ -70,7 +70,67 @@ test('captured constructors preserve artifact names, descriptors and shared regi
   const file=info.outputPath('constructor-reflection.json');await writeFile(file,JSON.stringify(report,null,2));await info.attach('constructor-reflection',{path:file,contentType:'application/json'});
   expect(report.isolation).toEqual({distinct:true,notShared:true,namesUnforged:true,hijacked:0});
   expect(report.rows).toHaveLength(23);
-  for(const row of report.rows){expect(row.actual,row.family).toEqual(row.expected);expect(row.identity,row.family).toEqual({actual:true,expected:true});}
+  // Firefox lazily materializes intrinsic constructor name/length properties;
+  // two identical pinned oracle copies can expose different insertion order.
+  // Keep raw order in the report; compare their exact descriptor/key sets here.
+  // Prototype member order and all method/getter reflection stay strict.
+  const stableConstructor=description=>({...description,
+    constructor:Object.fromEntries(description.constructor.map(d=>[d.key,d])),
+    prototype:description.prototype.map(d=>d.key==='constructor'?{...d,value:{...d.value,keys:Object.fromEntries(d.value.keys.map(key=>[key,true]))}}:d),
+  });
+  const compare=info.project.name==='firefox'?stableConstructor:description=>description;
+  for(const row of report.rows){expect(row.actual.map(compare),row.family).toEqual(row.expected.map(compare));expect(row.identity,row.family).toEqual({actual:true,expected:true});}
   expect(report.flowAliases).toEqual(Array(9).fill(true));
   for(const row of report.closed)expect(row).toMatchObject({alias:true,independent:true});
+});
+
+
+test('captured constructors retain native class receiver, subclass and newTarget behavior',async({page},info)=>{
+  await page.goto('/examples/web/');
+  const report=await page.evaluate(async()=>{
+    const corpus=await(await fetch('/fixtures/pele/diagram-entries.json')).json();
+    const {loadRenderer}=await import('/dist/package-web/package/full.js');
+    const {disposeDiagramModel}=await import('/dist/package-web/package/diagram-entries.js');
+    const mono=await import('/dist/evidence/pele-oracle.js');
+    const renderer=await loadRenderer(),rows=[];
+    const check=(C,args,dispose)=>{
+      const values=[];
+      try{
+        class Derived extends C {}
+        const derived=new Derived(...args);values.push(derived);
+        const custom=Object.create(C.prototype),reads=[];
+        const target=new Proxy(function(){},{get(target,key,receiver){if(key==='prototype'){reads.push(key);return custom;}return Reflect.get(target,key,receiver);}});
+        const allocated=Reflect.construct(C,args,target);values.push(allocated);
+        const sentinel={original:true};let original=false;
+        const throwing=new Proxy(function(){},{get(target,key,receiver){if(key==='prototype')throw sentinel;return Reflect.get(target,key,receiver);}});
+        try{Reflect.construct(C,args,throwing);}catch(error){original=error===sentinel;}
+        return{derivedPrototype:Object.getPrototypeOf(derived)===Derived.prototype,derivedInstance:derived instanceof C,
+          derivedConstructor:derived.constructor===Derived,customPrototype:Object.getPrototypeOf(allocated)===custom,
+          inheritedConstructor:allocated.constructor===C,ownConstructor:Object.hasOwn(allocated,'constructor'),
+          constructorBackref:C.prototype.constructor===C,reads,original};
+      }finally{for(const value of values)dispose?.(value);}
+    };
+    try{
+      for(const meta of corpus.entries){
+        const fixture=corpus.cases.find(row=>row.family===meta.type),reference=(await import('/dist/evidence/pele-esm/diagrams/'+meta.type+'.js')).default;
+        const pairs=[['monolith',renderer.parse(fixture.source),mono.parse(fixture.source)],['module',renderer.parsePrepared(meta.type,fixture.source,fixture.config,fixture.title??undefined,fixture.lineOffset??0),reference.parse(fixture.source,fixture.config,fixture.title??undefined,fixture.lineOffset,{maxEdges:undefined})]];
+        for(const [lane,actual,expected]of pairs){
+          try{
+            if(Object.getPrototypeOf(expected)!==Object.prototype)rows.push({family:meta.type,lane,actual:check(actual.constructor,[],disposeDiagramModel),expected:check(expected.constructor,[])});
+          }finally{renderer.dispose(actual);}
+        }
+      }
+      const source='classDiagram\nclass A {\n+method() String\n}';
+      for(const lane of ['monolith','module']){
+        const reference=(await import('/dist/evidence/pele-esm/diagrams/class.js')).default;
+        const actual=lane==='monolith'?renderer.parse(source):renderer.parsePrepared('class',source,{},undefined,0),expected=lane==='monolith'?mono.parse(source):reference.parse(source,{},undefined,0);
+        try{rows.push({family:'ClassMember',lane,actual:check(actual.classes.get('A').methods[0].constructor,['method() String','method'],disposeDiagramModel),expected:check(expected.classes.get('A').methods[0].constructor,['method() String','method'])});}
+        finally{renderer.dispose(actual);}
+      }
+      return rows;
+    }finally{renderer.close();}
+  });
+  await writeFile(info.outputPath('constructor-new-target.json'),JSON.stringify(report,null,2));
+  expect(report).toHaveLength(46);
+  for(const row of report){expect(row.actual,row.family+'/'+row.lane).toEqual(row.expected);expect(row.actual.original).toBe(true);expect(row.actual.customPrototype).toBe(true);expect(row.actual.derivedInstance).toBe(true);}
 });
