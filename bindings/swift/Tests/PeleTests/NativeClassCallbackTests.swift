@@ -410,7 +410,7 @@ private final class ClassCallbackFailure: Error {}
           nestedCount += 1
           // The implicit refresh must never replace an explicit stale revision.
           XCTAssertThrowsError(try document.apply(before.graph, expectedRevision: before.revision)) {
-            XCTAssertEqual(($0 as? PeleError)?.message, "Stale public model revision")
+            XCTAssertEqual(($0 as? CompatibilityError)?.message, "Stale public model revision")
           }
         }
         let output = try view.object()
