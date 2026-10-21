@@ -7,6 +7,7 @@ use crate::compat::{
     text::{layout_label, measure, Label, Span},
     ErrorCode, Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
+use std::sync::Arc;
 fn literal(
     text: &str,
     r: &mut dyn RenderResources,
@@ -145,6 +146,244 @@ fn fit(
         None
     })
 }
+#[derive(Clone, Copy)]
+pub(super) enum Field {
+    Start,
+    End,
+    Bits,
+}
+impl Field {
+    pub(super) fn name(self) -> &'static str {
+        match self {
+            Self::Start => "start",
+            Self::End => "end",
+            Self::Bits => "bits",
+        }
+    }
+}
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    type Rows;
+    type Row;
+    type Block: Clone;
+    fn bits_per_row(&mut self) -> Result<f64, Self::Error>;
+    fn rows(&mut self) -> Result<Self::Rows, Self::Error>;
+    fn last_end(&mut self) -> Result<f64, Self::Error>;
+    fn row_count(&mut self, rows: &Self::Rows) -> Result<usize, Self::Error>;
+    fn has_row(&mut self, rows: &Self::Rows, index: usize) -> Result<bool, Self::Error>;
+    fn row(&mut self, rows: &Self::Rows, index: usize) -> Result<Self::Row, Self::Error>;
+    fn block_count(&mut self, row: &Self::Row) -> Result<usize, Self::Error>;
+    fn block(&mut self, row: &Self::Row, index: usize) -> Result<Self::Block, Self::Error>;
+    fn number(&mut self, block: &Self::Block, field: Field) -> Result<f64, Self::Error>;
+    fn display(&mut self, block: &Self::Block, field: Field) -> Result<String, Self::Error>;
+    fn label(&mut self, block: &Self::Block) -> Result<Arc<str>, Self::Error>;
+    fn copy_block(&mut self, block: &Self::Block) -> Result<Self::Block, Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, Self::Error>;
+}
+struct Typed<'a> {
+    model: &'a PacketModel,
+    holes: &'a [usize],
+}
+impl<'a> PhaseInput for Typed<'a> {
+    type Error = PeleError;
+    type Rows = &'a [Vec<PacketBlock>];
+    type Row = &'a [PacketBlock];
+    type Block = PacketBlock;
+    fn bits_per_row(&mut self) -> Result<f64, PeleError> {
+        Ok(self.model.bits_per_row)
+    }
+    fn rows(&mut self) -> Result<Self::Rows, PeleError> {
+        Ok(&self.model.rows)
+    }
+    fn last_end(&mut self) -> Result<f64, PeleError> {
+        Ok(self
+            .model
+            .rows
+            .last()
+            .and_then(|row| row.last())
+            .map_or(0., |b| b.end))
+    }
+    fn row_count(&mut self, rows: &Self::Rows) -> Result<usize, PeleError> {
+        Ok(rows.len())
+    }
+    fn has_row(&mut self, _: &Self::Rows, i: usize) -> Result<bool, PeleError> {
+        Ok(self.holes.binary_search(&i).is_err())
+    }
+    fn row(&mut self, rows: &Self::Rows, i: usize) -> Result<Self::Row, PeleError> {
+        if self.holes.binary_search(&i).is_ok() {
+            Err(absent_row())
+        } else {
+            Ok(&rows[i])
+        }
+    }
+    fn block_count(&mut self, row: &Self::Row) -> Result<usize, PeleError> {
+        Ok(row.len())
+    }
+    fn block(&mut self, row: &Self::Row, i: usize) -> Result<Self::Block, PeleError> {
+        Ok(row[i].clone())
+    }
+    fn number(&mut self, b: &Self::Block, f: Field) -> Result<f64, PeleError> {
+        Ok(block_number(b, f))
+    }
+    fn display(&mut self, b: &Self::Block, f: Field) -> Result<String, PeleError> {
+        Ok(js_num(block_number(b, f)))
+    }
+    fn label(&mut self, b: &Self::Block) -> Result<Arc<str>, PeleError> {
+        Ok(b.label.clone())
+    }
+    fn copy_block(&mut self, b: &Self::Block) -> Result<PacketBlock, PeleError> {
+        Ok(b.clone())
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.model.title.clone())
+    }
+    fn accessibility(&mut self, description: bool) -> Result<Option<String>, PeleError> {
+        Ok(if description {
+            self.model.acc_descr.clone()
+        } else {
+            self.model.acc_title.clone()
+        })
+    }
+}
+fn block_number(b: &PacketBlock, f: Field) -> f64 {
+    match f {
+        Field::Start => b.start,
+        Field::End => b.end,
+        Field::Bits => b.bits,
+    }
+}
+fn limit() -> PeleError {
+    let mut e = PeleError::new(
+        "Packet public model expansion exceeds the work budget",
+        ErrorCode::Limit,
+    );
+    e.diagram_type = Some("packet".into());
+    e
+}
+fn absent_row() -> PeleError {
+    let mut e = PeleError::new("row is not iterable", ErrorCode::Semantic);
+    e.diagram_type = Some("packet".into());
+    e
+}
+#[derive(Clone)]
+struct CopiedBlock<B> {
+    value: B,
+    start: Option<f64>,
+    end: Option<f64>,
+    bits: Option<f64>,
+}
+impl<B> CopiedBlock<B> {
+    fn number<P: PhaseInput<Block = B>>(&self, p: &mut P, f: Field) -> Result<f64, P::Error> {
+        let override_value = match f {
+            Field::Start => self.start,
+            Field::End => self.end,
+            Field::Bits => self.bits,
+        };
+        match override_value {
+            Some(n) => Ok(n),
+            None => p.number(&self.value, f),
+        }
+    }
+    fn display<P: PhaseInput<Block = B>>(&self, p: &mut P, f: Field) -> Result<String, P::Error> {
+        let override_value = match f {
+            Field::Start => self.start,
+            Field::End => self.end,
+            Field::Bits => self.bits,
+        };
+        match override_value {
+            Some(n) => Ok(js_num(n)),
+            None => p.display(&self.value, f),
+        }
+    }
+}
+enum DrawRows<P: PhaseInput> {
+    Live(P::Rows),
+    Reflow(Vec<Option<Vec<CopiedBlock<P::Block>>>>),
+}
+enum DrawRow<R> {
+    Live(R),
+    Reflow(usize),
+}
+enum DrawBlock<B> {
+    Live(B),
+    Copied(CopiedBlock<B>),
+}
+impl<P: PhaseInput> DrawRows<P> {
+    fn len(&self, p: &mut P) -> Result<usize, P::Error> {
+        match self {
+            Self::Live(r) => p.row_count(r),
+            Self::Reflow(r) => Ok(r.len()),
+        }
+    }
+    fn has(&self, p: &mut P, i: usize) -> Result<bool, P::Error> {
+        match self {
+            Self::Live(r) => p.has_row(r, i),
+            Self::Reflow(r) => Ok(r.get(i).is_some_and(Option::is_some)),
+        }
+    }
+    fn row(&self, p: &mut P, i: usize) -> Result<DrawRow<P::Row>, P::Error> {
+        match self {
+            Self::Live(r) => p.row(r, i).map(DrawRow::Live),
+            Self::Reflow(_) => Ok(DrawRow::Reflow(i)),
+        }
+    }
+    fn block_count(&self, p: &mut P, r: &DrawRow<P::Row>) -> Result<usize, P::Error> {
+        match r {
+            DrawRow::Live(r) => p.block_count(r),
+            DrawRow::Reflow(i) => {
+                let Self::Reflow(rows) = self else {
+                    unreachable!()
+                };
+                rows[*i]
+                    .as_ref()
+                    .map(Vec::len)
+                    .ok_or_else(|| absent_row().into())
+            }
+        }
+    }
+    fn block(
+        &self,
+        p: &mut P,
+        r: &DrawRow<P::Row>,
+        i: usize,
+    ) -> Result<DrawBlock<P::Block>, P::Error> {
+        match r {
+            DrawRow::Live(r) => p.block(r, i).map(DrawBlock::Live),
+            DrawRow::Reflow(n) => {
+                let Self::Reflow(rows) = self else {
+                    unreachable!()
+                };
+                Ok(DrawBlock::Copied(
+                    rows[*n]
+                        .as_ref()
+                        .ok_or_else(|| P::Error::from(absent_row()))?[i]
+                        .clone(),
+                ))
+            }
+        }
+    }
+}
+impl<B> DrawBlock<B> {
+    fn number<P: PhaseInput<Block = B>>(&self, p: &mut P, f: Field) -> Result<f64, P::Error> {
+        match self {
+            Self::Live(b) => p.number(b, f),
+            Self::Copied(b) => b.number(p, f),
+        }
+    }
+    fn display<P: PhaseInput<Block = B>>(&self, p: &mut P, f: Field) -> Result<String, P::Error> {
+        match self {
+            Self::Live(b) => p.display(b, f),
+            Self::Copied(b) => b.display(p, f),
+        }
+    }
+    fn label<P: PhaseInput<Block = B>>(&self, p: &mut P) -> Result<Arc<str>, P::Error> {
+        match self {
+            Self::Live(b) => p.label(b),
+            Self::Copied(b) => p.label(&b.value),
+        }
+    }
+}
 pub(super) fn render(
     m: &PacketModel,
     c: &Object,
@@ -162,7 +401,15 @@ pub(super) fn render_with_row_holes(
     r: &mut dyn RenderResources,
     holes: &[usize],
 ) -> Result<Rendered, PeleError> {
-    let across = draw(m, c, o, r, false, holes)?;
+    render_phases(&mut Typed { model: m, holes }, c, o, r)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    input: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    let across = draw(input, c, o, r, false)?;
     let Some(available) = o.max_width.filter(|w| *w > 0.) else {
         return Ok(across);
     };
@@ -170,21 +417,20 @@ pub(super) fn render_with_row_holes(
     if o.auto_direction == Some(false) || across.width <= available || available >= breakpoint {
         return Ok(across);
     }
-    let down = draw(m, c, o, r, true, holes)?;
+    let down = draw(input, c, o, r, true)?;
     Ok(if down.width < across.width {
         down
     } else {
         across
     })
 }
-fn draw(
-    m: &PacketModel,
+fn draw<P: PhaseInput>(
+    input: &mut P,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     down: bool,
-    holes: &[usize],
-) -> Result<Rendered, PeleError> {
+) -> Result<Rendered, P::Error> {
     let size = o.font_size.unwrap_or(16.);
     let label_size = round(size * 0.875);
     let bit_size = round(size * 0.625);
@@ -197,49 +443,75 @@ fn draw(
     let show_bits = packet.and_then(|p| p.get("showBits")) != Some(&Value::Bool(false));
     let descending =
         packet.and_then(|p| p.get("bitOrder")) == Some(&Value::String("descending".into()));
-    let mut bits_per_row = m.bits_per_row;
-    let mut rows = m.rows.clone();
-    let mut reflow_present = Vec::new();
+    let mut bits_per_row = input.bits_per_row()?;
+    let original_rows = input.rows()?;
+    let mut rows = DrawRows::Live(original_rows);
     if down {
-        if !holes.is_empty() {
-            // Pele's for-of reads an absent row as undefined. Error category is
-            // transported by the public-operation seam, not invented here.
-            let mut error = PeleError::new("row is not iterable", ErrorCode::Semantic);
-            error.diagram_type = Some("packet".into());
-            return Err(error);
-        }
         let count = ((o.max_width.unwrap_or(320.) - 2. * pad) / bit_width.js_min(18.))
             .floor()
             .js_max(1.);
         bits_per_row = bits_per_row.js_min(2f64.powf(count.log2().floor()).js_max(8.));
-        let last = m.rows.last().and_then(|r| r.last()).map_or(0., |b| b.end);
+        let last = input.last_end()?;
         if ((last + 1.) / bits_per_row).ceil() > 10000. {
-            bits_per_row = m.bits_per_row
+            bits_per_row = input.bits_per_row()?;
         }
         bit_width =
             bit_width.js_min(((o.max_width.unwrap_or(320.) - 2. * pad) / bits_per_row).js_max(18.));
-        let mut whole: Vec<PacketBlock> = Vec::new();
-        for b in m.rows.iter().flatten() {
-            if let Some(prev) = whole.last_mut().filter(|p| {
-                p.bits == p.end - p.start
-                    && b.bits == b.end - b.start
-                    && p.label == b.label
-                    && b.start == p.end + 1.
-                    && b.start % m.bits_per_row == 0.
-            }) {
-                prev.end = b.end;
-                prev.bits = prev.end - prev.start
-            } else {
-                whole.push(b.clone())
+        let source = input.rows()?;
+        let mut whole: Vec<CopiedBlock<P::Block>> = Vec::new();
+        let mut i = 0;
+        let mut work = 0usize;
+        while i < input.row_count(&source)? {
+            let row = input.row(&source, i)?;
+            let mut j = 0;
+            while j < input.block_count(&row)? {
+                work += 1;
+                if work > 8_000_000 {
+                    return Err(limit().into());
+                }
+                let block = input.block(&row, j)?;
+                let mut merge = false;
+                if let Some(prev) = whole.last() {
+                    if prev.number(input, Field::Bits)?
+                        == prev.number(input, Field::End)? - prev.number(input, Field::Start)?
+                    {
+                        let bits = input.number(&block, Field::Bits)?;
+                        let end = input.number(&block, Field::End)?;
+                        let start = input.number(&block, Field::Start)?;
+                        if bits == end - start
+                            && input.label(&prev.value)? == input.label(&block)?
+                            && input.number(&block, Field::Start)?
+                                == prev.number(input, Field::End)? + 1.
+                        {
+                            let start = input.number(&block, Field::Start)?;
+                            merge = start % input.bits_per_row()? == 0.;
+                        }
+                    }
+                }
+                if merge {
+                    let prev = whole.last_mut().expect("matching preceding block");
+                    prev.end = Some(input.number(&block, Field::End)?);
+                    prev.bits =
+                        Some(prev.number(input, Field::End)? - prev.number(input, Field::Start)?);
+                } else {
+                    whole.push(CopiedBlock {
+                        value: input.copy_block(&block)?,
+                        start: None,
+                        end: None,
+                        bits: None,
+                    });
+                }
+                j += 1;
             }
+            i += 1;
         }
-        rows.clear();
+        let mut split: Vec<Option<Vec<CopiedBlock<P::Block>>>> = Vec::new();
         let mut split_work = 0usize;
         for block in whole {
-            let mut start = block.start;
-            while start <= block.end {
+            let mut start = block.number(input, Field::Start)?;
+            while start <= block.number(input, Field::End)? {
                 let end = block
-                    .end
+                    .number(input, Field::End)?
                     .js_min(((start / bits_per_row).floor() + 1.) * bits_per_row - 1.);
                 let index = (start / bits_per_row).floor();
                 let next = end + 1.;
@@ -249,67 +521,64 @@ fn draw(
                     || next == start
                     || (next < start && bits_per_row.is_finite())
                 {
-                    let mut error = PeleError::new(
-                        "Packet public row splitting exceeds the work budget",
-                        ErrorCode::Limit,
-                    );
-                    error.diagram_type = Some("packet".into());
-                    return Err(error);
+                    return Err(limit().into());
                 }
-                // Negative/NaN keys are ordinary Array properties in JS. They
-                // do not become indexed rows or participate in its iterators.
                 if index >= 0. && index.is_finite() {
                     let index = index as usize;
-                    if rows.len() <= index {
-                        rows.resize_with(index + 1, Vec::new);
-                        reflow_present.resize(index + 1, false);
+                    if split.len() <= index {
+                        split.resize_with(index + 1, || None);
                     }
-                    reflow_present[index] = true;
-                    rows[index].push(PacketBlock {
-                        start,
-                        end,
+                    split[index].get_or_insert_with(Vec::new).push(CopiedBlock {
+                        start: Some(start),
+                        end: Some(end),
                         ..block.clone()
                     });
                 }
                 start = next;
             }
         }
+        rows = DrawRows::Reflow(split);
     }
     let mut labels: Vec<Vec<Label>> = Vec::new();
     if down {
-        for (i, row) in rows.iter().enumerate() {
-            if !reflow_present[i] {
-                let mut error = PeleError::new("row is not iterable", ErrorCode::Semantic);
-                error.diagram_type = Some("packet".into());
-                return Err(error);
-            }
+        let mut i = 0;
+        while i < rows.len(input)? {
+            let row = rows.row(input, i)?;
             let mut line = Vec::new();
-            for block in row {
-                let room = ((block.end - block.start + 1.) * bit_width
-                    - padding_x.js_min(bit_width - 1.)
-                    - 6.)
-                    .js_max(1.);
+            let mut j = 0;
+            while j < rows.block_count(input, &row)? {
+                let block = rows.block(input, &row, j)?;
+                let room =
+                    ((block.number(input, Field::End)? - block.number(input, Field::Start)? + 1.)
+                        * bit_width
+                        - padding_x.js_min(bit_width - 1.)
+                        - 6.)
+                        .js_max(1.);
+                let label = block.label(input)?;
                 line.push(literal(
-                    decode_entities(&block.label)?.trim_matches(space),
+                    decode_entities(&label)?.trim_matches(space),
                     r,
                     o,
                     label_size,
                     room,
-                )?)
+                )?);
+                j += 1;
             }
-            labels.push(line)
+            labels.push(line);
+            i += 1;
         }
     }
     let numbers = if show_bits { bit_size + 4. } else { 0. };
     let mut heights = Vec::new();
     let mut tops = Vec::new();
     let mut rows_height = 0.;
-    for (i, _) in rows.iter().enumerate() {
-        let mut height = if !down && holes.binary_search(&i).is_ok() {
-            f64::NAN
-        } else {
-            row_height
-        };
+    let height_count = rows.len(input)?;
+    for i in 0..height_count {
+        let present = rows.has(input, i)?;
+        if present {
+            let _ = rows.row(input, i)?;
+        }
+        let mut height = if !present { f64::NAN } else { row_height };
         if down {
             for label in &labels[i] {
                 height = height.js_max(label.height + 10.)
@@ -319,11 +588,11 @@ fn draw(
         rows_height += numbers + height + padding_y;
         heights.push(height);
     }
-    if !rows.is_empty() {
+    if rows.len(input)? != 0 {
         rows_height -= padding_y
     }
     let gap = padding_x.js_min(bit_width - 1.);
-    let width = if !rows.is_empty() {
+    let width = if rows.len(input)? != 0 {
         bits_per_row * bit_width - gap
     } else {
         0.
@@ -335,7 +604,8 @@ fn draw(
     } else {
         4000.
     };
-    let title = layout_label(m.title.as_deref(), false, r, o, size, title_room, 1)?;
+    let title_text = input.title()?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, title_room, 1)?;
     let title_height = if title.height > 0. {
         title.height + if rows_height > 0. { 12. } else { 0. }
     } else {
@@ -345,15 +615,24 @@ fn draw(
     let mut fields = String::new();
     let mut bits = String::new();
     let mut fits: Vec<(std::sync::Arc<str>, f64, Option<(String, f64)>)> = Vec::new();
-    for (i, row) in rows.iter().enumerate() {
-        if !down && holes.binary_search(&i).is_ok() {
+    let paint_count = rows.len(input)?;
+    let mut paint_work = 0usize;
+    for i in 0..paint_count {
+        if !rows.has(input, i)? {
             continue;
         }
-        let y = pad + tops[i] + numbers;
-        let height = heights[i];
-        for (j, block) in row.iter().enumerate() {
-            let count = block.end - block.start + 1.;
-            let first = block.start % bits_per_row;
+        let row = rows.row(input, i)?;
+        let y = pad + tops.get(i).copied().unwrap_or(f64::NAN) + numbers;
+        let height = heights.get(i).copied().unwrap_or(f64::NAN);
+        let mut j = 0;
+        while j < rows.block_count(input, &row)? {
+            paint_work += 1;
+            if paint_work > 8_000_000 {
+                return Err(limit().into());
+            }
+            let block = rows.block(input, &row, j)?;
+            let count = block.number(input, Field::End)? - block.number(input, Field::Start)? + 1.;
+            let first = block.number(input, Field::Start)? % bits_per_row;
             let x = left
                 + if descending {
                     bits_per_row - first - count
@@ -364,21 +643,20 @@ fn draw(
             let fitted = if down {
                 None
             } else {
+                let label = block.label(input)?;
                 let max = w - 6.;
-                if let Some((_, _, f)) =
-                    fits.iter().find(|(l, v, _)| l == &block.label && *v == max)
-                {
+                if let Some((_, _, f)) = fits.iter().find(|(l, v, _)| l == &label && *v == max) {
                     f.clone()
                 } else {
                     let f = fit(
-                        decode_entities(&block.label)?.trim_matches(space),
+                        decode_entities(&label)?.trim_matches(space),
                         max,
                         label_size,
                         round(size * 0.5),
                         r,
                         o,
                     )?;
-                    fits.push((block.label.clone(), max, f.clone()));
+                    fits.push((label.clone(), max, f.clone()));
                     f
                 }
             };
@@ -399,21 +677,24 @@ fn draw(
             } else {
                 String::new()
             };
-            fields.push_str(&format!("<g class=\"pele-node\" data-id=\"{}-{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{text}</g>",js_num(block.start),js_num(block.end),num(x),num(y),num(w),num(height)));
+            fields.push_str(&format!("<g class=\"pele-node\" data-id=\"{}-{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{text}</g>",block.display(input,Field::Start)?,block.display(input,Field::End)?,num(x),num(y),num(w),num(height)));
+            j += 1;
             if !show_bits {
                 continue;
             }
-            let leading = if descending { block.end } else { block.start };
-            let trailing = if descending { block.start } else { block.end };
+            let leading =
+                block.display(input, if descending { Field::End } else { Field::Start })?;
+            let trailing =
+                block.display(input, if descending { Field::Start } else { Field::End })?;
             if count == 1. {
                 bits.push_str(&format!(
                     "<text x=\"{}\" y=\"{}\" text-anchor=\"middle\">{}</text>",
                     num(x + w / 2.),
                     num(y - 4.),
-                    js_num(leading)
+                    leading
                 ))
             } else {
-                bits.push_str(&format!("<text x=\"{}\" y=\"{}\">{}</text><text x=\"{}\" y=\"{}\" text-anchor=\"end\">{}</text>",num(x),num(y-4.),js_num(leading),num(x+w),num(y-4.),js_num(trailing)))
+                bits.push_str(&format!("<text x=\"{}\" y=\"{}\">{}</text><text x=\"{}\" y=\"{}\" text-anchor=\"end\">{}</text>",num(x),num(y-4.),leading,num(x+w),num(y-4.),trailing))
             }
         }
     }
@@ -441,6 +722,8 @@ fn draw(
             " class=\"pele-title\" font-weight=\"var(--_tw)\""
         )
     );
+    let acc_title = input.accessibility(false)?;
+    let acc_descr = input.accessibility(true)?;
     Ok(Rendered {
         svg: svg::document(
             "packet",
@@ -448,8 +731,8 @@ fn draw(
             total_height,
             size,
             o,
-            m.acc_title.as_deref(),
-            m.acc_descr.as_deref(),
+            acc_title.as_deref(),
+            acc_descr.as_deref(),
             &content,
         )?,
         width: total_width,
