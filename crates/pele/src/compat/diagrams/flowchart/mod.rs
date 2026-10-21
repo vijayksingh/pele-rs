@@ -75,3 +75,9 @@ pub(crate) use public_model::{
     construct_with as construct_flow_with, detached_method as detached_flow_method,
     LIVE_FIELDS as FLOW_LIVE_FIELDS,
 };
+
+mod live_phase;
+mod phase;
+pub(crate) use live_phase::{
+    render_detached, render_variant as render_live_variant, FlowchartDetachedInput,
+};

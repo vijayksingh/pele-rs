@@ -50,6 +50,7 @@ impl FlowVariant for Swimlane {
             is_group: true,
             parent_id: None,
             css_styles: vec![],
+            css_styles_origin: None,
             css_compiled_styles: vec![],
             css_classes: String::new(),
             dir: None,
@@ -159,3 +160,14 @@ impl DiagramModule for Swimlane {
 
 mod public_model;
 pub use public_model::SwimlanePublicState;
+
+pub(crate) type SwimlaneDetachedInput = flowchart::FlowchartDetachedInput;
+pub(crate) fn render_detached<R: crate::compat::public::LiveRenderRead>(
+    input: &SwimlaneDetachedInput,
+    config: &Object,
+    settings: &RenderSettings,
+    read: &mut R,
+    resources: &mut dyn RenderResources,
+) -> Result<Rendered, crate::compat::public::PublicError> {
+    flowchart::render_live_variant(input, config, settings, read, resources, Some(&Swimlane))
+}

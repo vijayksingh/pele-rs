@@ -20,6 +20,8 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Swimlane,
+    Flowchart,
     Block,
     State,
     Architecture,
@@ -54,6 +56,20 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn swimlane() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::swimlane::Swimlane>(),
+            kind: Kind::Swimlane,
+        }
+    }
+
+    pub(crate) fn flowchart() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::flowchart::Flowchart>(),
+            kind: Kind::Flowchart,
+        }
+    }
+
     pub(crate) fn block() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::block::Block>(),
@@ -243,6 +259,8 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Swimlane(crate::compat::diagrams::swimlane::SwimlaneDetachedInput),
+    Flowchart(crate::compat::diagrams::flowchart::FlowchartDetachedInput),
     Block(crate::compat::diagrams::block::BlockDetachedInput),
     State(crate::compat::diagrams::state::StateDetachedInput),
     Architecture(crate::compat::diagrams::architecture::ArchitectureDetachedInput),
@@ -271,6 +289,24 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn swimlane(
+        input: crate::compat::diagrams::swimlane::SwimlaneDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::swimlane::Swimlane>(),
+            body: Body::Swimlane(input),
+        }
+    }
+
+    pub(crate) fn flowchart(
+        input: crate::compat::diagrams::flowchart::FlowchartDetachedInput,
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::flowchart::Flowchart>(),
+            body: Body::Flowchart(input),
+        }
+    }
+
     pub(crate) fn block(input: crate::compat::diagrams::block::BlockDetachedInput) -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::block::Block>(),
@@ -468,6 +504,8 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Swimlane(_) => Kind::Swimlane,
+            Body::Flowchart(_) => Kind::Flowchart,
             Body::Block(_) => Kind::Block,
             Body::State(_) => Kind::State,
             Body::Architecture(_) => Kind::Architecture,
@@ -508,6 +546,12 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Swimlane(input) => crate::compat::diagrams::swimlane::render_detached(
+                input, config, settings, read, resources,
+            ),
+            Body::Flowchart(input) => crate::compat::diagrams::flowchart::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::Block(input) => crate::compat::diagrams::block::render_detached(
                 input, config, settings, read, resources,
             ),

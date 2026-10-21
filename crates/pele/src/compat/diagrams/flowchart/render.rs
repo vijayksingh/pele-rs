@@ -1,6 +1,7 @@
 //! Pele flowchart/render.ts actual compound flowchart renderer, 458322a5 (MIT, kepano).
+use super::phase::{PhaseInput, Typed};
 use super::{
-    graph::{build_flow_graph, FlowGraph, GraphEdge, GraphNode},
+    graph::{FlowGraph, GraphEdge, GraphNode},
     model::{FlowchartModel, LabelType},
     shapes::canonical,
 };
@@ -118,7 +119,17 @@ pub(crate) fn render_flowchart(
     resources: &mut dyn RenderResources,
     variant: Option<&dyn FlowVariant>,
 ) -> Result<Rendered, PeleError> {
-    let fitted = |down, resources: &mut dyn RenderResources| {
+    render_phases(&mut Typed(db), config, options, resources, variant)
+}
+pub(super) fn render_phases<P: PhaseInput>(
+    db: &mut P,
+    config: &Object,
+    options: &RenderSettings,
+    resources: &mut dyn RenderResources,
+    variant: Option<&dyn FlowVariant>,
+) -> Result<Rendered, P::Error> {
+    let runs_across = matches!(db.direction()?.as_deref(), Some("LR" | "RL"));
+    let mut fitted = |down, resources: &mut dyn RenderResources| {
         let loose = draw(db, config, options, resources, variant, down, false)?;
         let Some(available) = options.max_width.filter(|w| *w > 0.) else {
             return Ok(loose);
@@ -127,14 +138,14 @@ pub(crate) fn render_flowchart(
             return Ok(loose);
         }
         let tight = draw(db, config, options, resources, variant, down, true)?;
-        Ok::<_, PeleError>(if tight.0.width < loose.0.width {
+        Ok::<_, P::Error>(if tight.0.width < loose.0.width {
             tight
         } else {
             loose
         })
     };
     let across = fitted(false, resources)?;
-    let selected = if matches!(db.direction.as_deref(), Some("LR" | "RL"))
+    let selected = if runs_across
         && options
             .max_width
             .filter(|w| *w > 0.)
@@ -161,15 +172,15 @@ pub(crate) fn render_flowchart(
     }
     Ok(selected.0)
 }
-fn draw(
-    db: &FlowchartModel,
+fn draw<P: PhaseInput>(
+    db: &mut P,
     config: &Object,
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     variant: Option<&dyn FlowVariant>,
     turned: bool,
     tight: bool,
-) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), PeleError> {
+) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), P::Error> {
     let group_pad = if tight { 12. } else { GROUP_PAD };
     let flow = variant
         .and_then(|v| config.get(v.diagram_type()))
@@ -182,7 +193,7 @@ fn draw(
             None
         }
     });
-    let mut graph = build_flow_graph(db, curve);
+    let mut graph = db.begin_draw(curve)?;
     if let Some(variant) = variant {
         variant.prepare(&mut graph)
     }
@@ -203,7 +214,8 @@ fn draw(
         .collect();
     let mut views = Vec::new();
     let mut cnodes = Vec::new();
-    for node in graph.nodes {
+    for mut node in graph.nodes {
+        db.resolve_styles(&mut node)?;
         let mut declarations = node.css_compiled_styles.clone();
         declarations.extend(node.css_styles.iter().cloned());
         let style = resolve_style(&declarations);
@@ -320,7 +332,7 @@ fn draw(
     let root_dir = if turned {
         Dir::TB
     } else {
-        direction(db.direction.as_deref())
+        direction(db.direction()?.as_deref())
     };
     for (i, view) in views.iter().enumerate() {
         if view.node.is_group {
@@ -414,8 +426,9 @@ fn draw(
     } else {
         compound_layout(&mut cnodes, &mut cedges, root_dir, &layout_options)
     };
+    let title_text = db.metadata("title")?;
     let title = layout_label(
-        db.title.as_deref(),
+        title_text.as_deref(),
         false,
         resources,
         options,
@@ -434,13 +447,24 @@ fn draw(
     shift_layout(&mut cnodes, &mut cedges, ox, oy);
     let width = (inner + 2. * pad).ceil();
     let height = (layout.height + title_height + 2. * pad).ceil();
+    let frame_access = if resources.presentation_budget().is_some() {
+        Some((
+            db.metadata("accTitle")?,
+            db.metadata("title")?,
+            db.metadata("accDescr")?,
+        ))
+    } else {
+        None
+    };
     let mut presentation = resources.presentation_budget().map(|budget| {
         crate::compat::presentation::FrameBuilder::new(
             budget,
             width,
             height,
-            db.acc_title.as_deref().or(db.title.as_deref()),
-            db.acc_descr.as_deref(),
+            frame_access
+                .as_ref()
+                .and_then(|(a, t, _)| a.as_deref().or(t.as_deref())),
+            frame_access.as_ref().and_then(|(_, _, d)| d.as_deref()),
         )
     });
     let mut links = Vec::new();
@@ -803,6 +827,8 @@ fn draw(
         ))
     }
     content.push_str(&format!("<g class=\"pele-nodes\">{nodes_out}</g>"));
+    let acc_title = db.metadata("accTitle")?;
+    let acc_descr = db.metadata("accDescr")?;
     Ok((
         Rendered {
             svg: svg::document(
@@ -811,8 +837,8 @@ fn draw(
                 height,
                 size,
                 options,
-                db.acc_title.as_deref(),
-                db.acc_descr.as_deref(),
+                acc_title.as_deref(),
+                acc_descr.as_deref(),
                 &content,
             )?,
             width,

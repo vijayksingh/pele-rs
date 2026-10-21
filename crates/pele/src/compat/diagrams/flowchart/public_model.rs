@@ -149,6 +149,10 @@ pub struct FlowchartPublicState {
     imported: std::cell::OnceCell<Result<FlowchartModel, PeleError>>,
 }
 impl FlowchartPublicState {
+    pub(crate) fn detached_seed(&self) -> super::FlowchartDetachedInput {
+        super::FlowchartDetachedInput::new(self.prepared_render_model().err())
+    }
+
     /// Shared DB projection for actual renderer variants such as Swimlane.
     /// Registration remains owned by the calling public document.
     pub(crate) fn prepared_render_model(&self) -> Result<&FlowchartModel, PublicError> {
@@ -2248,6 +2252,13 @@ pub(crate) fn construct_with(
     })
 }
 impl PublicDiagramModule for Flowchart {
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::flowchart())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::flowchart(state.detached_seed()))
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,

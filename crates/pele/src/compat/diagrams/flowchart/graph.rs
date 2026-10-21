@@ -12,6 +12,7 @@ pub(crate) struct GraphNode {
     pub is_group: bool,
     pub parent_id: Option<String>,
     pub css_styles: Vec<String>,
+    pub css_styles_origin: Option<usize>,
     pub css_compiled_styles: Vec<String>,
     pub css_classes: String,
     pub dir: Option<String>,
@@ -213,6 +214,7 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
             label_type: sg.label_type.clone(),
             parent_id: parent_of.get(sg.id.as_str()).map(|s| (*s).into()),
             css_styles: Vec::new(),
+            css_styles_origin: None,
             css_compiled_styles: compiled(&sg.classes),
             css_classes: sg.classes.join(" "),
             shape: if is_collapsed {
@@ -247,13 +249,14 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
         .iter()
         .map(|(k, v)| (k.as_str(), v))
         .collect();
-    for (_, v) in &model.nodes {
+    for (origin, (_, v)) in model.nodes.iter().enumerate() {
         if hidden.contains(v.id.as_str()) {
             continue;
         }
         if let Some(&i) = by_id.get(v.id.as_str()) {
             let node = &mut nodes[i];
             node.css_styles = v.styles.clone();
+            node.css_styles_origin = Some(origin);
             node.css_compiled_styles = compiled(&v.classes);
             node.css_classes = v.classes.join(" ");
             continue;
@@ -267,6 +270,7 @@ pub(crate) fn build_flow_graph(model: &FlowchartModel, default_curve: Option<&st
             label_type: v.label_type.clone(),
             parent_id: parent_of.get(v.id.as_str()).map(|s| (*s).into()),
             css_styles: v.styles.clone(),
+            css_styles_origin: Some(origin),
             css_compiled_styles: compiled(&class_names),
             css_classes: format!("default {}", v.classes.join(" ")),
             dir: v.dir.clone(),

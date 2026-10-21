@@ -8,6 +8,13 @@ use crate::compat::{
 };
 pub type SwimlanePublicState = FlowchartPublicState;
 impl PublicDiagramModule for Swimlane {
+    fn detached_public_render_capability(&self) -> Option<DetachedRenderCapability> {
+        Some(DetachedRenderCapability::swimlane())
+    }
+    fn detached_public_render(&self, state: &Self::PublicState) -> Option<DetachedPublicRender> {
+        Some(DetachedPublicRender::swimlane(state.detached_seed()))
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,

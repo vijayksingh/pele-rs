@@ -1,0 +1,6 @@
+import fs from 'node:fs';import path from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';import {runSwimlane,ORACLE_SHA256,SOURCE,MODES} from '../../tests/web/support/swimlane-live-scenarios.js';
+const sha=p=>createHash('sha256').update(fs.readFileSync(p)).digest('hex');if(sha('node_modules/pele/dist/pele.js')!==ORACLE_SHA256)throw Error('Oracle changed');
+const core=await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/core.js'))),entry=(await import(pathToFileURL(path.resolve('node_modules/pele/dist/esm/diagrams/swimlane.js')))).default;core.register(entry);
+const rows=[];for(const raw of [false,true])for(const responsive of [false,true])for(const mode of MODES)rows.push(runSwimlane(core,entry,()=>{},SOURCE,raw,responsive,mode));
+fs.writeFileSync(process.argv[2]??'fixtures/public-swimlane-live-render.json',JSON.stringify({oracleSHA256:ORACLE_SHA256,scriptSHA256:sha(new URL(import.meta.url)),scenarioSHA256:sha(new URL('../../tests/web/support/swimlane-live-scenarios.js',import.meta.url)),source:SOURCE,rows},null,2)+'\n');
+console.log(JSON.stringify({rows:rows.length,originalThrows:rows.filter(r=>r.first.original).length,unexpected:rows.filter(r=>!r.first.ok&&!r.first.original).length,unfired:rows.filter(r=>!r.fired).map(r=>[r.raw,r.mode])}));
