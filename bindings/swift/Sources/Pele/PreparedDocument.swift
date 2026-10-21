@@ -26,6 +26,8 @@ extension Pele {
             try document.apply(graph, expectedRevision: expectedRevision)
         }
         public func schema() throws -> PublicModelSchema { try document.schema() }
+        public func retainHostValue(_ value: PublicHostValue) throws -> PublicGraph.Atom { try document.retainHostValue(value) }
+        public func resolveHostValue(_ atom: PublicGraph.Atom) throws -> PublicHostValue { try document.resolveHostValue(atom) }
         public func bindHostFunction(_ function: HostFunction) throws -> PublicGraph.Atom { try document.bindHostFunction(function) }
         public func invoke(method: UInt32, receiver: PublicGraph.Atom, arguments: [PublicGraph.Atom] = [], resources: HostResources = .init()) throws -> PublicInvocationOutcome {
             try document.invoke(method: method, receiver: receiver, arguments: arguments, resources: resources)

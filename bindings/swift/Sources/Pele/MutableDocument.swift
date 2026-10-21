@@ -29,6 +29,8 @@ extension Pele {
         private var active = false
         private var detachedDepth = 0
         var hostFunctions: [UInt32: HostFunctionBox] = [:]
+        var hostValueStore = PublicHostStore()
+        var usesHostValues = false
         public let type: String
         public let isConstructorCreated: Bool
         public private(set) var revision: UInt64
@@ -42,7 +44,7 @@ extension Pele {
             if let handle {
                 active = true; self.handle = nil
                 defer { active = false }
-                pele_public_document_free_v4(handle); hostFunctions.removeAll()
+                pele_public_document_free_v4(handle); hostFunctions.removeAll(); hostValueStore = PublicHostStore()
             }
         }
         func withHandle<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
@@ -100,6 +102,7 @@ extension Pele {
             struct Call: Encodable { let method: UInt32; let receiver: PublicGraph.Atom; let arguments: [PublicGraph.Atom] }
             let bytes = try JSONEncoder().encode(Call(method: method, receiver: receiver, arguments: arguments))
             guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public method exceeds 64 MiB JSON budget") }
+            if usesHostValues, let detached = try invokeDetached(bytes) { return detached }
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host, takeError in withHostFunctionResources(takeError) { bytes.withUnsafeBytes { input in
                     pele_public_invoke_with_functions_v12(handle, revision, input.bindMemory(to: UInt8.self).baseAddress, input.count, host)

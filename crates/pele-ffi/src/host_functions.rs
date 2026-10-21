@@ -23,6 +23,16 @@ const MAX_BINDINGS: usize = 1024;
 // Identity allocation only: no callable, pointer, graph or host state is global.
 // IDs never repeat, including after close; foreign-owner references cannot alias.
 static NEXT_REFERENCE: AtomicU32 = AtomicU32::new(1);
+pub(super) fn allocate_reference() -> Result<u32, PeleError> {
+    NEXT_REFERENCE
+        .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
+        .map_err(|_| {
+            PeleError::new(
+                "Host function identity space exhausted",
+                pele::compat::ErrorCode::Limit,
+            )
+        })
+}
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct PeleHostFunctionV12 {
@@ -248,14 +258,7 @@ pub unsafe extern "C" fn pele_public_bind_host_function_v12(
                 pele::compat::ErrorCode::Limit,
             ));
         }
-        let id = NEXT_REFERENCE
-            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
-            .map_err(|_| {
-                PeleError::new(
-                    "Host function identity space exhausted",
-                    pele::compat::ErrorCode::Limit,
-                )
-            })?;
+        let id = allocate_reference()?;
         let result = public::success(serde_json::json!({"reference":id}))?;
         unsafe { table.retain.expect("validated")(table.context) };
         bindings.functions.insert(id, Rc::new(Function(table)));

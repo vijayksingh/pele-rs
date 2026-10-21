@@ -10,7 +10,7 @@ use std::{
 };
 
 pub struct PelePublicConstructorV16 {
-    constructor: CapturedPublicConstructor,
+    pub(super) constructor: CapturedPublicConstructor,
 }
 /// # Safety
 /// Registry is live, id is readable UTF-8 up to 4096 bytes, and out is writable.

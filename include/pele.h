@@ -123,6 +123,35 @@ PeleResult *pele_registry_capture_constructor_v16(const PeleRegistry *, const ui
     uint32_t prototype, PelePublicConstructorV16 **out_constructor);
 PeleResult *pele_public_constructor_construct_v16(const PelePublicConstructorV16 *, PelePublicDocument **);
 void pele_public_constructor_free_v16(PelePublicConstructorV16 *);
+/* Lossless host-value/owned invocation lane (v17). Actor/thread confined.
+ * tag 0 undefined,1 null,2 bool(payload0/1),3 IEEE bits,4 borrowed UTF16,
+ * 5 owner-local opaque identity. UTF16 is copied, <=16M units. NULL=undefined.
+ * reply_state: 0 start, 1 value, 2 original exception token (tag5),
+ * 3 JavaScript TypeError message (tag4).
+ * No host callbacks run inside these calls. Keep document alive through job free.
+ * Resume returns PELGBIN1 with Host step or Complete metadata; finish returns
+ * PELGBIN1 Result<Atom,PublicError>. Invoke host operations between calls only.
+ * Every dispatched phase advances current revision before mutation. The output
+ * revision acknowledges it even if subsequent export fails. Drop cancels future
+ * phases without rolling back accepted partial state. Native refs are graph IDs.
+ */
+typedef struct PeleHostValueV17 {
+    uint32_t version, struct_size, tag, reserved;
+    uint64_t payload;
+    const uint16_t *units;
+    size_t unit_count;
+} PeleHostValueV17;
+typedef struct PeleInvocationJobV17 PeleInvocationJobV17;
+PeleResult *pele_public_constructor_construct_with_v17(const PelePublicConstructorV16 *, const PeleHostValueV17 *, PelePublicDocument **);
+PeleResult *pele_public_invocation_prepare_v17(PelePublicDocument *, uint64_t, const uint8_t *, size_t, PeleInvocationJobV17 **);
+PeleResult *pele_public_invocation_resume_v17(PelePublicDocument *, PeleInvocationJobV17 *, uint32_t reply_state, const PeleHostValueV17 *, uint64_t *revision);
+PeleResult *pele_public_invocation_finish_v17(PelePublicDocument *, PeleInvocationJobV17 *, uint64_t *revision);
+void pele_public_invocation_free_v17(PeleInvocationJobV17 *);
+PeleResult *pele_host_number_string_v17(uint64_t ieee_bits);
+/* Shared identity namespace with v12 bound functions; IDs never repeat. */
+PeleResult *pele_host_identity_v17(void);
+PeleResult *pele_host_primitive_number_v17(const PeleHostValueV17 *value);
+PeleResult *pele_public_constructor_policy_v17(const PelePublicConstructorV16 *constructor);
 PeleResult *pele_registry_create_v8(uint32_t mode, PeleRegistry **out_registry);
 void pele_registry_free_v8(PeleRegistry *registry);
 PeleResult *pele_registry_capabilities_v8(const PeleRegistry *registry);
