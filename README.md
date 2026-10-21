@@ -19,7 +19,7 @@ web performance target is unmet. Packages are distributed through GitHub, not
 crates.io or the npm registry.
 
 **The full API port is unfinished.** The current functional audit confirms
-callback mutation gaps in 31 families. All 22 class-root families plus ClassMember
+callback mutation gaps in 29 families (one edit/throw case per family). All 22 class-root families plus ClassMember
 now have constructor factories verified through Rust, Swift and the web.
 The [constructor checkpoint](docs/parity/2026-10-21-ordered-constructors/README.md)
 records fresh artifacts and platform results. Constructor metadata and shared prototype identity remain
@@ -27,6 +27,10 @@ incomplete. See the [constructor scope](docs/LLD_PUBLIC_CONSTRUCTORS.md).
 Passing tests include checks that explicitly expect unsupported behavior;
 they do not establish complete Pele parity. See the
 [remaining-work audit](docs/parity/2026-10-21-runtime-audit/README.md).
+
+Fresh Pie/Info callback and Gantt warning checks pass in Swift and all three
+browser engines; exact WebKit diagnostic differences remain recorded.
+[Latest functional checkpoint](docs/parity/2026-10-21-live-render-families/README.md).
 
 Native normal/prepared Sankey resource callbacks support same-document helpers,
 edits and nested rendering. [Scoped verification](docs/parity/2026-10-21-native-sankey-callbacks/README.md)

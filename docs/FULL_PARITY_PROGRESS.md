@@ -13,14 +13,14 @@ The next native slice ports Agentflow's inherited raw diagnostic dispatch for
 default options. Five integrations pass, including nine pinned cases, readonly
 diagnostic-array failure/repair, shared mapping aliases and copied-helper errors.
 The projection now reads the already admitted Agentflow graph directly instead
-of validating it again as a Flowchart instance. Fresh platform verification is
-pending this layer; configured logging callbacks still require owned rendering.
+of validating it again as a Flowchart instance. Default raw dispatch passes the native feature checks. Configured logging
+callbacks still require owned rendering.
 
 Info now has an owned render capability using the shared typed/live geometry
 path. Six native integrations pass: existing fields/SVG/error-domain regressions
 and new normal/raw callback apply, nesting, late accessibility reads and recovery.
 Its title is captured before layout; accessibility is read after resource calls.
-Fresh Swift/web verification is pending. The existing UTF-16 rendering gate and
+Fresh Swift/web verification passes in the callback checkpoint below. The existing UTF-16 rendering gate and
 presentation/image limitations remain unchanged.
 
 Pie now shares typed/live draw and responsive-fit geometry. Its native feature
@@ -28,14 +28,25 @@ matches 36 pinned callback scenarios; retained entries, per-label showData, late
 title/accessibility, responsive Map replacement and nested/error recovery are
 covered. The generic live-reader interface gains bounded iterable snapshots;
 C15 owns fresh pair values before releasing its short graph read. Existing Pie
-and Info regressions and C/Swift/WASM bridge compilation pass. Fresh platform
-execution is pending this batch.
+and Info regressions and C/Swift/WASM bridge compilation pass. Fresh platform execution passes in the callback checkpoint below.
 
 Gantt's `references` helper (27) now shares native task lookup and the explicit
 warning evaluation phases. Twelve oracle cases and the prior warning feature
 pass, covering lazy keyword coercion, captured warning callee, original throws,
 partial mutations and task aliases. Calendar-driven scheduling entry points
 still need their own continuation; this slice does not certify those callbacks.
+
+The [fresh callback checkpoint](parity/2026-10-21-live-render-families/README.md)
+passes nine Swift features against the current ARM64 SDK, strict C17/C18 clients,
+and 144 paired Pie/Info browser scenarios across three engines. The broader
+browser batch passes 59/60 exact checks; two WebKit Gantt diagnostic messages
+cause the remaining failure. Separate semantic Gantt checks pass 3/3 with only
+those recorded message pairs permitted. Original failures remain archived.
+
+The refreshed 33-family audit now matches the edit/throw case in Sankey, ER, Pie
+and Info: 4 match, 29 mismatch. All 22 class-root factories construct. This is
+one observer per family, not full runtime parity. No performance work ran and
+0.3 remains blocked. The older 31-mismatch audit below is historical.
 
 The earlier fifteen-factory checkpoint covered Sankey, Venn, Ishikawa,
 Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
