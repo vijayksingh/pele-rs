@@ -13,10 +13,11 @@ private final class HostValueReply {
     let units: UnsafeMutablePointer<UInt16>?
     let count: Int
     init(_ text: Pele.JSString?) {
-        count = text?.codeUnits.count ?? 0
-        if let text, !text.codeUnits.isEmpty {
-            let storage = UnsafeMutablePointer<UInt16>.allocate(capacity: count)
-            text.codeUnits.withUnsafeBufferPointer { source in storage.initialize(from: source.baseAddress!, count: count) }
+        let length = text?.codeUnits.count ?? 0
+        count = length
+        if let text, length > 0 {
+            let storage = UnsafeMutablePointer<UInt16>.allocate(capacity: length)
+            text.codeUnits.withUnsafeBufferPointer { source in storage.initialize(from: source.baseAddress!, count: length) }
             units = storage
         } else { units = nil }
     }
