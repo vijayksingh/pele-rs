@@ -17,6 +17,7 @@ const layoutMethods={
 // private scope and one of its schema-bound, single-use tickets.
 export class ModelRegistry {
   #reflectionScope;
+  #schemaIdentities = new Map();
   constructor(scope) {
     this.#reflectionScope=scope;
     this.schemas=new Map();this.registrations=new WeakSet();this.sharedFunctions=new Map();
@@ -31,6 +32,13 @@ export class ModelRegistry {
     };
   }
   registration(schema, ticket) {
+    // Schema content is a renderer-local invariant independent of whether a
+    // registration carries native reflection authority. A failed reflection
+    // proof must not turn conflicting metadata into a fresh local identity.
+    const schemaKey=JSON.stringify([schema.id,schema.version]);
+    const schemaJSON=JSON.stringify(schema);
+    const knownSchema=this.#schemaIdentities.get(schemaKey);
+    if(knownSchema!==undefined&&knownSchema!==schemaJSON)throw new TypeError('Conflicting native model schema identity');
     const scope=this.#reflectionScope;
     const proof=ticket&&scope?.tickets.get(ticket);
     if(proof)scope.tickets.delete(ticket);
@@ -41,15 +49,16 @@ export class ModelRegistry {
     if (this.schemas.has(key)) {
       const known=this.schemas.get(key);
       if (JSON.stringify(known.schema)!==JSON.stringify(schema)) throw new TypeError('Conflicting native model schema identity');
+      this.#schemaIdentities.set(schemaKey,schemaJSON);
       return known;
     }
     if(authenticated&&scope.registrations.has(identity)){
       const known=scope.registrations.get(identity);
       if(JSON.stringify(known.schema)!==JSON.stringify(schema))throw new TypeError('Conflicting authenticated native class schema');
-      this.schemas.set(key,known);this.registrations.add(known);return known;
+      this.schemas.set(key,known);this.registrations.add(known);this.#schemaIdentities.set(schemaKey,schemaJSON);return known;
     }
     const registration = {schema, functions: new Map(), functionIds: new WeakMap(), prototypes: new Map(), prototypeIds: new WeakMap(), documents: [], constructors: new Map(), sharedIds: new Map((schema.sharedFunctions??[]).map(entry=>[entry.identity,entry.method]))};
-    this.schemas.set(key, registration);this.registrations.add(registration);
+    this.schemas.set(key, registration);this.registrations.add(registration);this.#schemaIdentities.set(schemaKey,schemaJSON);
     const sharedFunctions=authenticated?scope.sharedFunctions:this.sharedFunctions;
     const aliases=new Map((schema.sharedFunctions??[]).map(entry=>[entry.method,entry.identity]));
     const shapes=new Map((schema.functionShapes??[]).map(entry=>[entry.method,entry.constructible]));
