@@ -1,5 +1,12 @@
 # Current functional parity — incomplete (2026-10-21)
 
+Venn, Ishikawa, Timeline, Journey and TreeView now pass fresh Swift17/C3/web39
+checks, including all234 new scenarios in Swift and702 paired browser comparisons.
+Native feature slices cover45 distinct checks; final6 include callback-expanded
+text limits and repair. The web audit now matches12/33 edit/throw cases, leaving21
+mismatches. ER's existing web observer success is separate from its pending native
+owned callback route. See [current platform evidence](parity/2026-10-21-owned-tree-families/README.md).
+
 Packet, Radar and Quadrant now share typed/live geometry and owned callback
 jobs. Fresh verification passes 21 native features, 12 Swift features, three
 strict C clients and 24 browser features. All 144 new callback scenarios compare
