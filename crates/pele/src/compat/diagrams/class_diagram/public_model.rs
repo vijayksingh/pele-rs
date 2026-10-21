@@ -1,8 +1,8 @@
 //! Opt-in native ClassDb/ClassMember codec, Pele 458322a5 (MIT, kepano).
 //! Object identity belongs to the arena; render imports the existing concrete
 //! ClassModel without reparsing. Namespace maps and tag Sets retain live aliases.
-//! Root construction uses a captured factory; ClassMember construction and
-//! overridden callbacks need separate dispatch capabilities.
+//! Root and member construction use captured native factories. Member bodies
+//! yield virtual method reads/calls without retaining a state borrow.
 //! Own readonly Array length is represented by an additional flags0 property;
 //! default writable flags2 is implicit alongside scalar Array.length.
 use super::model::RelationType;
@@ -18,6 +18,8 @@ use crate::compat::{
     ErrorCode,
 };
 use std::collections::{BTreeSet, HashMap, HashSet};
+#[path = "public_model/member_constructor.rs"]
+mod member_constructor;
 const PROTO: PrototypeId = PrototypeId(1);
 const MEMBER: PrototypeId = PrototypeId(2);
 const fn field_schema(
@@ -1505,8 +1507,14 @@ impl PublicDiagramModule for Class {
         &self,
         prototype: PrototypeId,
     ) -> Option<PublicConstructorFactory<Self::PublicState>> {
-        (prototype == PROTO)
-            .then(|| PublicConstructorFactory::ignoring_arguments::<Self>(PROTO, construct_default))
+        match prototype {
+            PROTO => Some(PublicConstructorFactory::ignoring_arguments::<Self>(
+                PROTO,
+                construct_default,
+            )),
+            MEMBER => Some(member_constructor::factory()),
+            _ => None,
+        }
     }
     fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
         graph.validate_schema(self.model_schema())?;

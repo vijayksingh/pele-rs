@@ -1,0 +1,712 @@
+{
+  "oracleSHA256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "scriptSHA256": "f9735aeef41baf81d0125a7831f2527377da439831a794901c56b69e5a0c0117",
+  "classChunkSHA256": "72ac44be21639e714b9a52b1bbd30cec36b906bba1a72e648b0b2009ff2c50b4",
+  "cases": [
+    {
+      "input": "+name",
+      "kind": "attribute",
+      "fields": [
+        [
+          "id",
+          "name",
+          7
+        ],
+        [
+          "memberType",
+          "attribute",
+          7
+        ],
+        [
+          "visibility",
+          "+",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "display": {
+        "displayText": "+name",
+        "cssStyle": ""
+      },
+      "classifier": ""
+    },
+    {
+      "input": "+run(x, y) String",
+      "kind": "method",
+      "fields": [
+        [
+          "id",
+          "run",
+          7
+        ],
+        [
+          "memberType",
+          "method",
+          7
+        ],
+        [
+          "visibility",
+          "+",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "x, y",
+          7
+        ],
+        [
+          "returnType",
+          "String",
+          7
+        ]
+      ],
+      "display": {
+        "displayText": "+run(x, y) : String",
+        "cssStyle": ""
+      },
+      "classifier": ""
+    },
+    {
+      "input": "+notAMethod",
+      "kind": "method",
+      "fields": [
+        [
+          "id",
+          "notAMethod",
+          7
+        ],
+        [
+          "memberType",
+          "attribute",
+          7
+        ],
+        [
+          "visibility",
+          "+",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "display": {
+        "displayText": "+notAMethod",
+        "cssStyle": ""
+      },
+      "classifier": ""
+    },
+    {
+      "input": " + leading  ",
+      "kind": "attribute",
+      "fields": [
+        [
+          "id",
+          " + leading",
+          7
+        ],
+        [
+          "memberType",
+          "attribute",
+          7
+        ],
+        [
+          "visibility",
+          "",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "display": {
+        "displayText": "+ leading",
+        "cssStyle": ""
+      },
+      "classifier": ""
+    },
+    {
+      "input": "#value$",
+      "kind": "attribute",
+      "fields": [
+        [
+          "id",
+          "value",
+          7
+        ],
+        [
+          "memberType",
+          "attribute",
+          7
+        ],
+        [
+          "visibility",
+          "#",
+          7
+        ],
+        [
+          "classifier",
+          "$",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "display": {
+        "displayText": "#value",
+        "cssStyle": "text-decoration:underline;"
+      },
+      "classifier": "text-decoration:underline;"
+    },
+    {
+      "input": "~méthod(😀) Result*",
+      "kind": "method",
+      "fields": [
+        [
+          "id",
+          "méthod",
+          7
+        ],
+        [
+          "memberType",
+          "method",
+          7
+        ],
+        [
+          "visibility",
+          "~",
+          7
+        ],
+        [
+          "classifier",
+          "*",
+          7
+        ],
+        [
+          "parameters",
+          "😀",
+          7
+        ],
+        [
+          "returnType",
+          "Result",
+          7
+        ]
+      ],
+      "display": {
+        "displayText": "~méthod(😀) : Result",
+        "cssStyle": "font-style:italic;"
+      },
+      "classifier": "font-style:italic;"
+    },
+    {
+      "input": "",
+      "kind": "attribute",
+      "fields": [
+        [
+          "id",
+          "",
+          7
+        ],
+        [
+          "memberType",
+          "attribute",
+          7
+        ],
+        [
+          "visibility",
+          "",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "display": {
+        "displayText": "",
+        "cssStyle": ""
+      },
+      "classifier": ""
+    }
+  ],
+  "virtual": [
+    {
+      "mode": "method-true",
+      "kind": "method",
+      "trace": [
+        [
+          "parseMethod",
+          "+input()",
+          [
+            [
+              "id",
+              "",
+              7
+            ],
+            [
+              "memberType",
+              "method",
+              7
+            ],
+            [
+              "visibility",
+              "",
+              7
+            ],
+            [
+              "classifier",
+              "",
+              7
+            ],
+            [
+              "parameters",
+              "",
+              7
+            ],
+            [
+              "returnType",
+              "",
+              7
+            ]
+          ]
+        ]
+      ],
+      "ok": true,
+      "fields": [
+        [
+          "id",
+          " + custom",
+          7
+        ],
+        [
+          "memberType",
+          "method",
+          7
+        ],
+        [
+          "visibility",
+          "",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "instance": true
+    },
+    {
+      "mode": "method-false",
+      "kind": "method",
+      "trace": [
+        [
+          "parseMethod",
+          "+input()",
+          [
+            [
+              "id",
+              "",
+              7
+            ],
+            [
+              "memberType",
+              "method",
+              7
+            ],
+            [
+              "visibility",
+              "",
+              7
+            ],
+            [
+              "classifier",
+              "",
+              7
+            ],
+            [
+              "parameters",
+              "",
+              7
+            ],
+            [
+              "returnType",
+              "",
+              7
+            ]
+          ]
+        ],
+        [
+          "parseAttribute",
+          "+input()",
+          [
+            [
+              "id",
+              " + custom ",
+              7
+            ],
+            [
+              "memberType",
+              "method",
+              7
+            ],
+            [
+              "visibility",
+              "",
+              7
+            ],
+            [
+              "classifier",
+              "",
+              7
+            ],
+            [
+              "parameters",
+              "",
+              7
+            ],
+            [
+              "returnType",
+              "",
+              7
+            ]
+          ]
+        ]
+      ],
+      "ok": true,
+      "fields": [
+        [
+          "id",
+          " attribute",
+          7
+        ],
+        [
+          "memberType",
+          "method",
+          7
+        ],
+        [
+          "visibility",
+          "",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "instance": true
+    },
+    {
+      "mode": "attribute",
+      "kind": "attribute",
+      "trace": [
+        [
+          "parseAttribute",
+          "+input()",
+          [
+            [
+              "id",
+              "",
+              7
+            ],
+            [
+              "memberType",
+              "attribute",
+              7
+            ],
+            [
+              "visibility",
+              "",
+              7
+            ],
+            [
+              "classifier",
+              "",
+              7
+            ],
+            [
+              "parameters",
+              "",
+              7
+            ],
+            [
+              "returnType",
+              "",
+              7
+            ]
+          ]
+        ]
+      ],
+      "ok": true,
+      "fields": [
+        [
+          "id",
+          " attribute",
+          7
+        ],
+        [
+          "memberType",
+          "attribute",
+          7
+        ],
+        [
+          "visibility",
+          "",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ],
+      "instance": true
+    },
+    {
+      "mode": "method-throw",
+      "kind": "method",
+      "trace": [
+        [
+          "parseMethod",
+          "+input()",
+          [
+            [
+              "id",
+              "",
+              7
+            ],
+            [
+              "memberType",
+              "method",
+              7
+            ],
+            [
+              "visibility",
+              "",
+              7
+            ],
+            [
+              "classifier",
+              "",
+              7
+            ],
+            [
+              "parameters",
+              "",
+              7
+            ],
+            [
+              "returnType",
+              "",
+              7
+            ]
+          ]
+        ]
+      ],
+      "ok": false,
+      "original": true,
+      "fields": [
+        [
+          "id",
+          "",
+          7
+        ],
+        [
+          "memberType",
+          "method",
+          7
+        ],
+        [
+          "visibility",
+          "",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ]
+    },
+    {
+      "mode": "attribute-throw",
+      "kind": "attribute",
+      "trace": [
+        [
+          "parseAttribute",
+          "+input()",
+          [
+            [
+              "id",
+              "",
+              7
+            ],
+            [
+              "memberType",
+              "attribute",
+              7
+            ],
+            [
+              "visibility",
+              "",
+              7
+            ],
+            [
+              "classifier",
+              "",
+              7
+            ],
+            [
+              "parameters",
+              "",
+              7
+            ],
+            [
+              "returnType",
+              "",
+              7
+            ]
+          ]
+        ]
+      ],
+      "ok": false,
+      "original": true,
+      "fields": [
+        [
+          "id",
+          "",
+          7
+        ],
+        [
+          "memberType",
+          "attribute",
+          7
+        ],
+        [
+          "visibility",
+          "",
+          7
+        ],
+        [
+          "classifier",
+          "",
+          7
+        ],
+        [
+          "parameters",
+          "",
+          7
+        ],
+        [
+          "returnType",
+          "",
+          7
+        ]
+      ]
+    }
+  ]
+}

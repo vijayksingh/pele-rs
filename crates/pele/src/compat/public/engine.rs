@@ -455,15 +455,24 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             .0
             .public_constructor(prototype)?
             .for_creator::<D>(prototype)?;
+        let factory = Arc::new(factory);
+        let synchronous = factory.clone();
         Some(Constructor {
             class: factory.class_id(),
             state: TypeId::of::<D::PublicState>(),
             ignores_arguments: factory.ignores_arguments(),
+            argument_transfers: factory.argument_transfers(),
+            arity: factory.arity(),
             live_fields: factory.live_fields(),
             construct: Box::new(move |argument| {
-                factory
+                synchronous
                     .construct(argument)
                     .map(|state| Box::new(state) as State)
+            }),
+            begin: Box::new(move |argument| {
+                factory
+                    .begin_arguments(argument)
+                    .map(|(state, program)| (Box::new(state) as State, program))
             }),
         })
     }
@@ -581,8 +590,17 @@ struct Constructor {
     class: TypeId,
     state: TypeId,
     ignores_arguments: bool,
+    argument_transfers: &'static [super::ConstructorArgumentTransfer],
+    arity: u32,
     live_fields: &'static [super::LiveConstructorField],
     construct: Box<dyn Fn(ConstructorArgument) -> Result<State, PeleError> + Send + Sync>,
+    begin: Box<
+        dyn Fn(
+                [ConstructorArgument; 2],
+            ) -> Result<(State, Option<DetachedPublicInvocation>), PeleError>
+            + Send
+            + Sync,
+    >,
 }
 /// An authentic class factory retaining its original module registration.
 /// Registry replacement or destruction does not invalidate a captured factory.
@@ -657,6 +675,39 @@ impl CapturedPublicConstructor {
     }
     pub fn ignores_arguments(&self) -> bool {
         self.constructor.ignores_arguments
+    }
+    pub fn arity(&self) -> u32 {
+        self.constructor.arity
+    }
+    pub fn argument_count(&self) -> u32 {
+        self.argument_transfers().len() as u32
+    }
+    /// Transfer policy without inspecting arguments or consulting host type names.
+    pub fn argument_transfers(&self) -> &'static [super::ConstructorArgumentTransfer] {
+        self.constructor.argument_transfers
+    }
+    pub fn begin_construct_with(
+        &self,
+        argument: ConstructorArgument,
+    ) -> Result<super::PublicConstructionJob, PeleError> {
+        self.begin_construct_with_arguments([argument, ConstructorArgument::Undefined])
+    }
+    pub fn begin_construct_with_arguments(
+        &self,
+        argument: [ConstructorArgument; 2],
+    ) -> Result<super::PublicConstructionJob, PeleError> {
+        self.schema_view().validate()?;
+        let (state, program) = (self.constructor.begin)(argument)?;
+        let document = PublicDocument {
+            registration: self.registration.clone(),
+            state,
+            config: Object::default(),
+            revision: 0,
+            render_book: None,
+            constructor_created: true,
+        };
+        document.snapshot_read()?;
+        super::PublicConstructionJob::new(document, program)
     }
     pub fn construct(&self) -> Result<PublicDocument, PeleError> {
         self.construct_with(ConstructorArgument::Undefined)
@@ -1565,6 +1616,23 @@ impl PublicDocument {
         self.registration.codec.apply(&mut self.state, graph)?;
         self.revision = next_revision;
         Ok(())
+    }
+    pub(super) fn finish_constructor_body(&mut self) {
+        debug_assert!(self.constructor_created);
+        // These phases belong to unpublished initialization. A completed new
+        // owner starts at revision zero, just like synchronous construction.
+        self.revision = 0;
+        self.render_book = None;
+    }
+    pub(super) fn prepare_constructor_body(
+        &mut self,
+        program: DetachedPublicInvocation,
+    ) -> Result<DetachedInvocationJob, PeleError> {
+        self.next_revision()?;
+        let book = self
+            .render_book
+            .get_or_insert_with(|| Arc::new(Mutex::new(RenderBook::new())));
+        DetachedInvocationJob::new(book, self.revision, program)
     }
     /// Dispatch through the retained module, then publish every prior mutation
     /// even if the operation returns a native, JavaScript or host exception.

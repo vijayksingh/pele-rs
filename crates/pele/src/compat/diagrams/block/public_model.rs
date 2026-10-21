@@ -1836,7 +1836,150 @@ fn node_out(
     }
     Ok(properties)
 }
+fn construct_default() -> Result<BlockPublicState, PeleError> {
+    let mut out = GraphWriter::default();
+    let children = array_out(&mut out, vec![]);
+    let root_id = out.string("root");
+    let composite = out.string("composite");
+    let properties = vec![
+        out.property("id", Atom::String(root_id)),
+        out.property("type", Atom::String(composite)),
+        out.property("children", Atom::Ref(children)),
+        out.property("columns", Atom::Number(-1.0)),
+    ];
+    let hierarchy_root = out.node(Node::Object { properties });
+    // Fresh BlockDb has distinct root.children and blocks arrays. Source parsing
+    // later aliases these through setHierarchy; construction must not do so.
+    let blocks = array_out(&mut out, vec![]);
+    let edges = array_out(&mut out, vec![]);
+    let classes = out.node(Node::Map {
+        entries: vec![],
+        properties: vec![],
+    });
+    let by_id = out.node(Node::Map {
+        entries: vec![],
+        properties: vec![],
+    });
+    let pending = out.node(Node::Set {
+        values: vec![],
+        properties: vec![],
+    });
+    let edge_count = out.node(Node::Map {
+        entries: vec![],
+        properties: vec![],
+    });
+    let kind = out.string("block");
+    let mut properties = vec![
+        out.property("type", Atom::String(kind)),
+        out.property("title", Atom::Undefined),
+        out.property("root", Atom::Ref(hierarchy_root)),
+        out.property("blocks", Atom::Ref(blocks)),
+        out.property("edges", Atom::Ref(edges)),
+        out.property("classes", Atom::Ref(classes)),
+        out.property("byId", Atom::Ref(by_id)),
+    ];
+    for (id, name) in [
+        "typeStr2Type",
+        "edgeStrToEdgeData",
+        "edgeStrToEdgeStartData",
+        "edgeStrToThickness",
+        "edgeStrToPattern",
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        properties.push(out.property(name, Atom::BuiltinFunction(id as u32)));
+    }
+    properties.extend([
+        out.property("warn", Atom::Undefined),
+        out.property("pending", Atom::Ref(pending)),
+        out.property("edgeCount", Atom::Ref(edge_count)),
+        out.property("ids", Atom::Number(0.0)),
+        out.property("colors", Atom::Number(0.0)),
+        out.property("spaces", Atom::Number(0.0)),
+    ]);
+    let root = out.node(Node::Instance {
+        prototype: PROTO,
+        properties,
+    });
+    let graph = out.finish(Atom::Ref(root))?;
+    let model = imported(&graph);
+    Ok(BlockPublicState { graph, model })
+}
+fn construct_initial(_: ConstructorArgument) -> Result<BlockPublicState, PeleError> {
+    construct_default()
+}
+enum BlockConstruction {
+    Start(ConstructorArgument),
+    Warn,
+    Done,
+}
+fn resume_construction(
+    state: &mut BlockPublicState,
+    phase: &mut BlockConstruction,
+    reply: Option<PublicHostValue>,
+) -> PublicInvocationPhase {
+    fn run(
+        state: &mut BlockPublicState,
+        phase: &mut BlockConstruction,
+        reply: Option<PublicHostValue>,
+    ) -> Result<PublicInvocationPhase, PublicError> {
+        Ok(match std::mem::replace(phase, BlockConstruction::Done) {
+            BlockConstruction::Start(argument) => {
+                let options = if matches!(argument, ConstructorArgument::Undefined) {
+                    new_object(&mut state.graph, &[])?
+                } else {
+                    argument.into_atom(|value| intern(&mut state.graph, value).map(Atom::String))?
+                };
+                *phase = BlockConstruction::Warn;
+                PublicInvocationPhase::Host(PublicHostOperation::Get {
+                    receiver: options,
+                    key: "warn",
+                })
+            }
+            BlockConstruction::Warn => {
+                let value = reply
+                    .expect("awaited warn")
+                    .into_atom(|value| intern(&mut state.graph, value).map(Atom::String))?;
+                let root = state.graph.root.clone();
+                set(&mut state.graph, &root, "warn", value)?;
+                PublicInvocationPhase::Complete(Ok(Atom::Undefined))
+            }
+            BlockConstruction::Done => {
+                return Err(invalid("Block construction already finished").into())
+            }
+        })
+    }
+    let result = run(state, phase, reply);
+    state.model = imported(&state.graph);
+    match result {
+        Ok(step) => step,
+        Err(error) => PublicInvocationPhase::Complete(Err(error)),
+    }
+}
+fn constructor_body(argument: ConstructorArgument) -> DetachedPublicInvocation {
+    DetachedPublicInvocation::new::<Block, BlockPublicState, _>(
+        BlockConstruction::Start(argument),
+        resume_construction,
+    )
+}
+
 impl PublicDiagramModule for Block {
+    fn public_constructor(
+        &self,
+        prototype: PrototypeId,
+    ) -> Option<PublicConstructorFactory<Self::PublicState>> {
+        (prototype == PROTO).then(|| {
+            PublicConstructorFactory::first_value_body::<Self>(
+                PROTO,
+                construct_default,
+                construct_initial,
+                constructor_body,
+                &[],
+            )
+        })
+    }
+
     type PublicState = BlockPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA

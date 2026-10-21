@@ -1,9 +1,10 @@
 # Current functional parity — incomplete (2026-10-21)
 
-The next native-only layer adds Class, Flowchart, Swimlane and Gantt construction.
-Four native integration features pass, including forty Flow/Swimlane cases and
-nineteen Gantt warning cases. Fresh browser and C/Swift host-carrier verification
-remains pending; the cross-platform checkpoint below stays separate.
+Native factories now cover all 22 class-root families plus nested ClassMember.
+The latest integrated batch passes 13 public feature tests, including ordered
+constructor getters, virtual member parser dispatch, escaped partial receivers,
+live options and raw rendering. Fresh Swift/web verification of the ordered-body
+layer remains pending; the cross-platform checkpoint below stays separate.
 
 Fifteen class-root factories are implemented: Sankey, Venn, Ishikawa,
 Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap, Timeline,
@@ -44,7 +45,7 @@ records these concrete gaps at runtime `d7caf8c`:
   retains the edit; native restores the previous title. All 33 preserve throw
   identity and call width once. Sankey and ER retain the edit in this case.
 - **The audit found 22 constructor stubs.** Subsequent slices implement 15;
-  seven class-root families and nested ClassMember remain incomplete.
+  all 22 now have native factories, with the latest platform verification pending.
   Plain-object families are separate.
 - Native codecs still explicitly reject active lone UTF-16, sparse collection,
   dynamic coercion and overridden-dispatch cases. Some integration tests

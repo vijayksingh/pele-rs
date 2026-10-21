@@ -1,13 +1,13 @@
 //! Captured native class construction, separate from parsed-model provenance.
-use super::{Atom, JsString, PrototypeId};
+use super::{Atom, DetachedPublicInvocation, JsString, PrototypeId};
 use crate::compat::PeleError;
 use std::any::TypeId;
 
 /// Opaque builtin constructor implementation. Providers can forward discovery,
 /// but only the concrete creator registered with the engine may consume it.
 ///
-/// Ignored-argument factories never observe arguments. First-value factories
-/// retain an explicit owned scalar or owner-local opaque identity without reads.
+/// Hosts observe only the authenticated argument count. Ignored arguments are
+/// never traversed; bodies run through owned native continuations.
 #[doc(hidden)]
 pub struct PublicConstructorFactory<S> {
     creator: TypeId,
@@ -15,15 +15,26 @@ pub struct PublicConstructorFactory<S> {
     prototype: PrototypeId,
     construct: Construction<S>,
     arguments: Arguments,
+    arity: u32,
     live_fields: &'static [LiveConstructorField],
 }
 enum Arguments {
     Ignored,
     FirstValue,
+    TwoValues,
 }
 enum Construction<S> {
     Ignored(fn() -> Result<S, PeleError>),
     First(fn(ConstructorArgument) -> Result<S, PeleError>),
+    Body {
+        default: fn() -> Result<S, PeleError>,
+        initial: fn(ConstructorArgument) -> Result<S, PeleError>,
+        body: fn(ConstructorArgument) -> DetachedPublicInvocation,
+    },
+    TwoBody {
+        initial: fn([ConstructorArgument; 2]) -> Result<S, PeleError>,
+        body: fn([ConstructorArgument; 2]) -> DetachedPublicInvocation,
+    },
 }
 /// Explicit lossless first argument. Foreign identities are resolved by the
 /// owning host; construction never enumerates or coerces an opaque value.
@@ -54,6 +65,14 @@ impl PublicHostValue {
 /// Constructor arguments use the same owned scalar/foreign-value vocabulary as
 /// pre-model host reads; no document string pool is required.
 pub type ConstructorArgument = PublicHostValue;
+/// Immutable transfer policy selected by the authentic native constructor.
+/// `Value` copies known scalar values; foreign objects remain opaque.
+#[doc(hidden)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ConstructorArgumentTransfer {
+    Retain,
+    Value,
+}
 #[doc(hidden)]
 #[derive(Clone, Copy, Debug)]
 pub struct LiveConstructorField {
@@ -71,6 +90,7 @@ impl<S> PublicConstructorFactory<S> {
             prototype,
             construct: Construction::Ignored(construct),
             arguments: Arguments::Ignored,
+            arity: 0,
             live_fields: &[],
         }
     }
@@ -85,7 +105,96 @@ impl<S> PublicConstructorFactory<S> {
             prototype,
             construct: Construction::First(construct),
             arguments: Arguments::FirstValue,
+            arity: 0,
             live_fields,
+        }
+    }
+    pub(crate) fn first_value_body<D: 'static>(
+        prototype: PrototypeId,
+        default: fn() -> Result<S, PeleError>,
+        initial: fn(ConstructorArgument) -> Result<S, PeleError>,
+        body: fn(ConstructorArgument) -> DetachedPublicInvocation,
+        live_fields: &'static [LiveConstructorField],
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<D>(),
+            class: TypeId::of::<D>(),
+            prototype,
+            arguments: Arguments::FirstValue,
+            arity: 0,
+            construct: Construction::Body {
+                default,
+                initial,
+                body,
+            },
+            live_fields,
+        }
+    }
+    pub(crate) fn two_value_body<D: 'static>(
+        prototype: PrototypeId,
+        initial: fn([ConstructorArgument; 2]) -> Result<S, PeleError>,
+        body: fn([ConstructorArgument; 2]) -> DetachedPublicInvocation,
+        live_fields: &'static [LiveConstructorField],
+    ) -> Self {
+        Self {
+            creator: TypeId::of::<D>(),
+            class: TypeId::of::<D>(),
+            prototype,
+            arguments: Arguments::TwoValues,
+            arity: 2,
+            construct: Construction::TwoBody { initial, body },
+            live_fields,
+        }
+    }
+    pub(super) fn argument_transfers(&self) -> &'static [ConstructorArgumentTransfer] {
+        use ConstructorArgumentTransfer::{Retain, Value};
+        match self.arguments {
+            Arguments::Ignored => &[],
+            Arguments::FirstValue => &[Retain],
+            Arguments::TwoValues => &[Value, Value],
+        }
+    }
+    pub(super) fn arity(&self) -> u32 {
+        self.arity
+    }
+    pub(super) fn begin_arguments(
+        &self,
+        arguments: [ConstructorArgument; 2],
+    ) -> Result<(S, Option<DetachedPublicInvocation>), PeleError> {
+        if let Construction::TwoBody { initial, body } = self.construct {
+            let state = initial(arguments.clone())?;
+            let program = body(arguments)
+                .for_creator_type(self.creator)
+                .ok_or_else(|| {
+                    PeleError::new(
+                        "Constructor body has foreign creator",
+                        crate::compat::ErrorCode::Semantic,
+                    )
+                })?;
+            Ok((state, Some(program)))
+        } else {
+            let [first, _] = arguments;
+            self.begin(first)
+        }
+    }
+    pub(super) fn begin(
+        &self,
+        argument: ConstructorArgument,
+    ) -> Result<(S, Option<DetachedPublicInvocation>), PeleError> {
+        match self.construct {
+            Construction::Body { initial, body, .. } => {
+                let state = initial(argument.clone())?;
+                let program = body(argument)
+                    .for_creator_type(self.creator)
+                    .ok_or_else(|| {
+                        PeleError::new(
+                            "Constructor body has foreign creator",
+                            crate::compat::ErrorCode::Semantic,
+                        )
+                    })?;
+                Ok((state, Some(program)))
+            }
+            _ => self.construct(argument).map(|state| (state, None)),
         }
     }
     pub(crate) fn sharing_class<D: 'static>(mut self) -> Self {
@@ -108,6 +217,15 @@ impl<S> PublicConstructorFactory<S> {
         match self.construct {
             Construction::Ignored(f) => f(),
             Construction::First(f) => f(argument),
+            Construction::Body { default, .. }
+                if matches!(argument, ConstructorArgument::Undefined) =>
+            {
+                default()
+            }
+            Construction::Body { .. } | Construction::TwoBody { .. } => Err(PeleError::new(
+                "Constructor requires host evaluation",
+                crate::compat::ErrorCode::Semantic,
+            )),
         }
     }
 }

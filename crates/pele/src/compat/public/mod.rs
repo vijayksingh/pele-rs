@@ -4,8 +4,11 @@ pub(crate) mod captured_admission;
 pub(crate) mod captured_read;
 pub(crate) mod captured_write;
 mod constructor;
+mod constructor_body;
 #[doc(hidden)]
 pub use constructor::PublicConstructorFactory;
+#[doc(hidden)]
+pub use constructor_body::{PublicConstructionJob, PublicConstructionOutcome};
 mod detached_render;
 mod engine;
 #[doc(hidden)]
@@ -69,7 +72,9 @@ pub use source_input::SourceIngress;
 
 mod detached_invocation;
 #[doc(hidden)]
-pub use constructor::{ConstructorArgument, LiveConstructorField, PublicHostValue};
+pub use constructor::{
+    ConstructorArgument, ConstructorArgumentTransfer, LiveConstructorField, PublicHostValue,
+};
 #[doc(hidden)]
 pub use detached_invocation::{
     DetachedInvocationJob, DetachedInvocationStep, DetachedPublicInvocation, PublicHostOperation,

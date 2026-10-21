@@ -1,11 +1,12 @@
 # Captured public class constructors
 
-Native factories support fifteen authentic builtin root classes: Sankey, Venn,
-Ishikawa, Requirement, Railroad, C4, XYChart, ER, Architecture, Kanban, Mindmap,
-Timeline, Journey, QuadrantChart and State (`PrototypeId(1)`). They
+Native factories support all twenty-two authentic builtin root classes, plus
+ClassMember (`PrototypeId(2)` on Class). The latest native layer adds Sequence,
+Block and Agentflow and completes the root-factory inventory. They
 complement [caller-authored graph construction](DECLARED_MODEL_CONSTRUCTION.md):
 construction supplies real class defaults; graph adoption never invents defaults.
-Other root classes and nested `ClassMember` remain incomplete.
+Fresh Swift/web verification of this latest layer remains pending; native
+factory coverage does not establish full public API parity.
 
 `PublicEngine::capture_constructor(&DiagramId, PrototypeId)` returns an optional
 `CapturedPublicConstructor`. `PublicDocument::capture_constructor(PrototypeId)`
@@ -170,6 +171,42 @@ render, two Flow features covering forty pinned cases and lifecycle/scalar
 behavior, and nineteen Gantt warning cases plus defaults/raw rendering. Existing
 Flow methods/SVG regression also passed in the private candidate. This is scoped
 feature evidence, not an all-library or platform acceptance result.
+
+## Ordered constructor bodies and provisional receivers
+
+`begin_construct_with_arguments` creates an owned `PublicConstructionJob`.
+Its snapshot, apply and invoke operations expose the provisional receiver between
+native-requested host operations. No document borrow spans a getter or callback.
+The authentic factory supplies immutable `argument_transfers()` metadata:
+ignored arguments are not inspected, options retain their original host value,
+and ClassMember's two scalar arguments use owned value transfer. JavaScript
+function arity is separate from consumed argument count.
+
+Sequence reads `wrap` before `sequenceWrap`; Block reads `warn`; Agentflow
+retains options and reads `lineOffset`. Native empty builders preserve exact
+field order and fresh collection identities without parsing seed source.
+Block's initial root children and blocks are separate arrays. Agentflow keeps
+Pele's first-draw geometry cache, including edits made after that first draw.
+
+ClassMember initializes its six fields, requests virtual parseMethod and
+parseAttribute calls in upstream order, and uses existing native helper bodies
+for their defaults. `finish_retaining_receiver` preserves a receiver exposed by
+a virtual callback that subsequently throws; successful construction and retained
+failed receivers remain distinct outcomes. Finalization resets unpublished
+initialization to revision zero and never grants parsed-model provenance.
+
+Agentflow's edge, subgraph and explicit diagnostic helpers use owned phases for
+live options and logging. Nested helpers and original host exceptions retain
+partial mutations. Graph-build diagnostic callbacks, arbitrary virtual helper
+overrides and callback mutation of input arrays remain outside this slice.
+
+The consolidated native batch passes thirteen public feature tests: ordered
+Sequence/Block/Agentflow construction, ClassMember dispatch and escaped receivers,
+Agentflow live options/raw rendering, and Class/Flow/Swimlane/Gantt/shared-class
+regressions. Fixtures come from the pinned Pele entry modules. Modified string
+prototype methods, shared readonly Class enum mutation and complete constructor
+reflection identity remain explicit gaps. C/Swift and web adapters are verified
+separately against fresh artifacts.
 
 ## Web retained options and compatible raw owners
 

@@ -86,6 +86,9 @@ impl DetachedPublicInvocation {
             }),
         }
     }
+    pub(super) fn for_creator_type(self, creator: TypeId) -> Option<Self> {
+        (self.creator == creator).then_some(self)
+    }
     pub(super) fn for_creator<D: 'static>(self) -> Option<Self> {
         (self.creator == TypeId::of::<D>()).then_some(self)
     }
