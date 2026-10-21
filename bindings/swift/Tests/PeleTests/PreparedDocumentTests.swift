@@ -9,6 +9,14 @@ private final class PreparedTrace: @unchecked Sendable {
     var value: ConfigValue { lock.lock(); defer { lock.unlock() }; return .array(events) }
 }
 final class PreparedDocumentTests: XCTestCase {
+    @discardableResult
+    private func assertPublishedRevision(_ document: Pele.PreparedDocument, after previous: UInt64, _ id: String = "", file: StaticString = #filePath, line: UInt = #line) throws -> UInt64 {
+        let current = document.revision
+        XCTAssertGreaterThan(current, previous, id, file: file, line: line)
+        XCTAssertEqual(try document.snapshot().revision, current, id, file: file, line: line)
+        XCTAssertEqual(document.revision, current, id, file: file, line: line)
+        return current
+    }
     private func canonical(_ graph: Pele.PublicGraph, schema: Pele.PublicModelSchema, hosts: [UInt32: UInt32] = [:], observations: ConfigValue? = nil) -> ConfigValue {
         var ids: [UInt32: UInt32] = [:], pending: [UInt32] = [], nodes: [ConfigValue] = [], functions: [UInt32] = []
         func units(_ value: Pele.JSString) -> ConfigValue { .array(value.codeUnits.map { .number(Double($0)) }) }
@@ -88,9 +96,10 @@ final class PreparedDocumentTests: XCTestCase {
         XCTAssertEqual(canonical(try model.snapshot().graph, schema: try model.schema()), canonical(graph, schema: try model.schema()))
         let parsed = try engine.parsePrepared("pie", source: "pie\n\"One\":1\n\"Two\":2\n")
         defer { try? parsed.close() }
+        let beforeRender = model.revision
         XCTAssertEqual(try model.render().svg, try parsed.render().svg)
         XCTAssertEqual(canonical(try model.snapshot().graph, schema: try model.schema()), canonical(graph, schema: try model.schema()))
-        XCTAssertEqual(model.revision, 1)
+        try assertPublishedRevision(model, after: beforeRender)
         var edited = try model.snapshot()
         let title = try edited.graph.intern("Owned model"); try edited.graph.setField("title", value: .string(title))
         try model.apply(edited.graph, expectedRevision: edited.revision)
@@ -110,8 +119,9 @@ final class PreparedDocumentTests: XCTestCase {
         let incomplete = Pele.PublicGraph(root: .ref(0), strings: [], nodes: [.object(properties: [])])
         let model = try engine.createPrepared("pie", graph: incomplete)
         defer { try? model.close() }
+        let beforeRender = model.revision
         XCTAssertThrowsError(try model.render())
-        XCTAssertEqual(model.revision, 1)
+        try assertPublishedRevision(model, after: beforeRender)
         XCTAssertEqual(canonical(try model.snapshot().graph, schema: try model.schema()), canonical(incomplete, schema: try model.schema()))
     }
 
@@ -199,7 +209,7 @@ final class PreparedDocumentTests: XCTestCase {
                 let options = try JSONDecoder().decode(Pele.Engine.Options.self, from: JSONSerialization.data(withJSONObject: settings))
                 let revision = model.revision
                 let outcome = try model.renderOperation(config: config, options: options, resources: host)
-                XCTAssertEqual(outcome.revision, revision + 1, id)
+                XCTAssertEqual(outcome.revision, try assertPublishedRevision(model, after: revision, id), id)
                 if let error = expected["error"] as? [String: String] {
                     guard case .thrown(.javaScript(let name, let message)) = outcome.result else { XCTFail("Expected pinned error: \(id)"); return }
                     XCTAssertEqual(name, error["name"], id); XCTAssertEqual(message.stringIfWellFormed, error["message"], id)
@@ -287,25 +297,29 @@ final class PreparedDocumentTests: XCTestCase {
         try document.apply(graph, expectedRevision: document.revision)
         var options = Pele.Engine.Options(); options.now = 1_704_067_200_000
         var host = Pele.HostResources(); host.timeZone = TimeZone(secondsFromGMT: 0)!
+        let beforeRender = document.revision
         XCTAssertTrue(try document.render(options: options, resources: host).svg.contains("Prepared callback edit"))
-        XCTAssertEqual(document.revision, 2)
+        let renderedRevision = try assertPublishedRevision(document, after: beforeRender)
         XCTAssertThrowsError(try XCTUnwrap(escaped).root())
         let marker = PreparedFailure()
         function.call = { view, receiver, _ in try view.set("work", on: receiver, to: .number(91)); throw marker }
         XCTAssertThrowsError(try document.render(options: options, resources: host)) { XCTAssertTrue(($0 as? PreparedFailure) === marker) }
-        XCTAssertEqual(document.revision, 3)
+        try assertPublishedRevision(document, after: renderedRevision)
         guard case .number(let work) = try document.snapshot().graph.field("work") else { return XCTFail("Missing partial state") }
         XCTAssertEqual(work, 91)
     }
     func testRawRenderIgnoresCoreOutputLimitAndRetainsHostFailureRevision() throws {
         let document = try Pele.Engine().parsePrepared("flowchart", source: "flowchart LR\nA[One] --> B[Two]\n")
         var options = Pele.Engine.Options(); options.outputLimit = 0
-        XCTAssertTrue(try document.render(options: options).svg.contains("One")); XCTAssertEqual(document.revision, 1)
+        let beforeRender = document.revision
+        XCTAssertTrue(try document.render(options: options).svg.contains("One"))
+        let renderedRevision = try assertPublishedRevision(document, after: beforeRender)
         let failure = PreparedFailure(); var host = Pele.HostResources(); host.textWidth = { _ in throw failure }
         XCTAssertThrowsError(try document.render(resources: host)) { XCTAssertTrue(($0 as? PreparedFailure) === failure) }
-        XCTAssertEqual(document.revision, 2)
+        let failedRevision = try assertPublishedRevision(document, after: renderedRevision)
         options.padding = .nan
-        XCTAssertTrue(try document.render(options: options).width.isNaN); XCTAssertEqual(document.revision, 3)
+        XCTAssertTrue(try document.render(options: options).width.isNaN)
+        try assertPublishedRevision(document, after: failedRevision)
         try document.close(); XCTAssertThrowsError(try document.render()); try document.close()
     }
 }

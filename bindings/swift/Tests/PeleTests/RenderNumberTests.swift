@@ -11,6 +11,14 @@ private final class NumberTrace: @unchecked Sendable {
 private final class NumberClockFailure: Error {}
 private final class NumberWidthFailure: Error {}
 final class RenderNumberTests: XCTestCase {
+    @discardableResult
+    private func assertPublishedRevision(_ document: Pele.MutableDocument, after previous: UInt64, _ id: String = "", file: StaticString = #filePath, line: UInt = #line) throws -> UInt64 {
+        let current = document.revision
+        XCTAssertGreaterThan(current, previous, id, file: file, line: line)
+        XCTAssertEqual(try document.snapshot().revision, current, id, file: file, line: line)
+        XCTAssertEqual(document.revision, current, id, file: file, line: line)
+        return current
+    }
     private struct Number: Decodable {
         let kind: String
         let bits: String?
@@ -190,12 +198,13 @@ final class RenderNumberTests: XCTestCase {
                     } else {
                         let document = try engine.parseMutable(item.source); defer { try? document.close() }
                         XCTAssertEqual(arithmetic(canonical(try document.snapshot().graph)), arithmetic(item.expected.graphBefore), item.id)
+                        let beforeRender = document.revision
                         if item.expected.error != nil {
                             XCTAssertThrowsError(try document.renderOperation(options: settings, resources: host), item.id) { XCTAssertTrue(($0 as? NumberClockFailure) === sentinel, item.id) }
-                            XCTAssertEqual(document.revision, 1, item.id)
+                            try assertPublishedRevision(document, after: beforeRender, item.id)
                         } else {
                             let outcome = try document.renderOperation(options: settings, resources: host)
-                            XCTAssertEqual(outcome.revision, 1, item.id)
+                            XCTAssertEqual(outcome.revision, try assertPublishedRevision(document, after: beforeRender, item.id), item.id)
                             guard case .rendered(let rendered) = outcome.result else { return XCTFail("Expected drawing: \(item.id)") }
                             try equal(rendered, expected: item.expected, id: "\(item.id)/mutable")
                         }
@@ -203,8 +212,9 @@ final class RenderNumberTests: XCTestCase {
                         if item.expected.error != nil {
                             var recovered = settings; recovered.now = 1_704_067_200_000
                             var safe = Pele.HostResources(); safe.timeZone = TimeZone(secondsFromGMT: 0)!
+                            let beforeRecovery = document.revision
                             XCTAssertEqual(try document.render(options: recovered, resources: safe).type, item.family, item.id)
-                            XCTAssertEqual(document.revision, 2, item.id)
+                            try assertPublishedRevision(document, after: beforeRecovery, item.id)
                         }
                     }
                     XCTAssertEqual(arithmetic(trace.value), arithmetic(item.expected.calls), "\(item.id)/\(lane)")
@@ -234,8 +244,9 @@ final class RenderNumberTests: XCTestCase {
                     } else {
                         let document = try engine.parseMutable(item.source)
                         defer { try? document.close() }
+                        let beforeRender = document.revision
                         let outcome = try document.renderOperation(options: settings, resources: host)
-                        XCTAssertEqual(outcome.revision, 1, id)
+                        XCTAssertEqual(outcome.revision, try assertPublishedRevision(document, after: beforeRender, id), id)
                         guard case .rendered(let drawing) = outcome.result else {
                             return XCTFail("Expected pinned drawing: \(id)")
                         }
@@ -273,16 +284,17 @@ final class RenderNumberTests: XCTestCase {
         var host = Pele.HostResources(); host.timeZone = TimeZone(secondsFromGMT: 0)!
         host.nowMillis = { 1_704_067_200_000.5 }
         for rendered in [try engine.render(source, outputLimit: .number(.nan), options: settings, resources: host), try engine.render(immutable, outputLimit: .number(.infinity), options: settings, resources: host)] { XCTAssertEqual(rendered.type, "gantt") }
+        let beforeRender = document.revision
         let failed = try document.renderOperation(outputLimit: .number(-0.0), options: settings, resources: host)
-        XCTAssertEqual(failed.revision, 1)
+        XCTAssertEqual(failed.revision, try assertPublishedRevision(document, after: beforeRender))
         guard case .thrown(.pele(let error)) = failed.result else { return XCTFail("Expected output-limit result") }
         XCTAssertEqual(error.message, "Diagram output is longer than the limit of 0 characters.")
         let clock = NumberClockFailure(); host.nowMillis = { throw clock }
         XCTAssertThrowsError(try document.renderOperation(outputLimit: .undefined, options: settings, resources: host)) { XCTAssertTrue(($0 as? NumberClockFailure) === clock) }
-        XCTAssertEqual(document.revision, 2)
+        let clockRevision = try assertPublishedRevision(document, after: failed.revision)
         host.nowMillis = { 1_704_067_200_000.5 }; let width = NumberWidthFailure(); host.textWidth = { _ in throw width }
         XCTAssertThrowsError(try document.renderOperation(outputLimit: .undefined, options: settings, resources: host)) { XCTAssertTrue(($0 as? NumberWidthFailure) === width) }
-        XCTAssertEqual(document.revision, 3)
+        let widthRevision = try assertPublishedRevision(document, after: clockRevision)
         let scheduled = try document.snapshot().graph
         guard case .number(let scheduledNow) = try scheduled.field("now"),
               case .ref(let tasks) = try scheduled.field("tasks"),
@@ -295,6 +307,6 @@ final class RenderNumberTests: XCTestCase {
         XCTAssertEqual(task, cached)
         host.textWidth = nil
         XCTAssertEqual(try document.render(outputLimit: .null, options: settings, resources: host).type, "gantt")
-        XCTAssertEqual(document.revision, 4)
+        try assertPublishedRevision(document, after: widthRevision)
     }
 }
