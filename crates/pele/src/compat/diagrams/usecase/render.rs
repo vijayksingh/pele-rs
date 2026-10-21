@@ -222,14 +222,47 @@ fn figure(v: &View, r: &mut dyn RenderResources) -> Result<String, PeleError> {
     }
     Ok(out)
 }
+pub(super) trait PhaseInput {
+    type Error: From<PeleError>;
+    fn direction(&mut self) -> Result<String, Self::Error>;
+    fn graph(&mut self) -> Result<(Vec<graph::Node>, Vec<graph::Edge>), Self::Error>;
+    fn title(&mut self) -> Result<Option<String>, Self::Error>;
+    fn accessibility(&mut self) -> Result<(String, String), Self::Error>;
+}
+struct TypedPhase<'a>(&'a UsecaseModel);
+impl PhaseInput for TypedPhase<'_> {
+    type Error = PeleError;
+    fn direction(&mut self) -> Result<String, PeleError> {
+        Ok(self.0.direction.clone())
+    }
+    fn graph(&mut self) -> Result<(Vec<graph::Node>, Vec<graph::Edge>), PeleError> {
+        Ok(graph::build(self.0))
+    }
+    fn title(&mut self) -> Result<Option<String>, PeleError> {
+        Ok(self.0.title.clone())
+    }
+    fn accessibility(&mut self) -> Result<(String, String), PeleError> {
+        Ok((self.0.acc_title.clone(), self.0.acc_descr.clone()))
+    }
+}
 pub(super) fn render(
     m: &UsecaseModel,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let across = draw(m, c, o, r, false)?;
-    if !matches!(m.direction.as_str(), "LR" | "RL") {
+    render_phase(&mut TypedPhase(m), c, o, r)
+}
+pub(super) fn render_phase<P: PhaseInput>(
+    phase: &mut P,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, P::Error> {
+    // Upstream chooses responsive policy from entry direction before callbacks.
+    let sideways = matches!(phase.direction()?.as_str(), "LR" | "RL");
+    let across = draw(phase, c, o, r, false)?;
+    if !sideways {
         return Ok(across);
     }
     let Some(available) = o.max_width.filter(|v| *v > 0.) else {
@@ -241,21 +274,21 @@ pub(super) fn render(
     {
         return Ok(across);
     }
-    let down = draw(m, c, o, r, true)?;
+    let down = draw(phase, c, o, r, true)?;
     Ok(if down.width < across.width {
         down
     } else {
         across
     })
 }
-fn draw(
-    m: &UsecaseModel,
+fn draw<P: PhaseInput>(
+    phase: &mut P,
     config: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     turned: bool,
-) -> Result<Rendered, PeleError> {
-    let (graph_nodes, graph_edges) = graph::build(m);
+) -> Result<Rendered, P::Error> {
+    let (graph_nodes, graph_edges) = phase.graph()?;
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let tiny = round(size * 0.8125);
@@ -263,7 +296,7 @@ fn draw(
     let root = if turned {
         direction(Some("TB"))
     } else {
-        direction(Some(&m.direction))
+        direction(Some(&phase.direction()?))
     };
     let sideways = root.sideways();
     let index: HashMap<_, _> = graph_nodes
@@ -466,7 +499,8 @@ fn draw(
             head_room: 0.,
         },
     );
-    let title = layout_label(m.title.as_deref(), false, r, o, size, 4000., 1)?;
+    let title_text = phase.title()?;
+    let title = layout_label(title_text.as_deref(), false, r, o, size, 4000., 1)?;
     let title_height = if title.height > 0. {
         title.height + 12.
     } else {
@@ -798,14 +832,15 @@ fn draw(
             )
         }
     );
+    let (acc_title, acc_descr) = phase.accessibility()?;
     let svg = svg::document(
         "usecase",
         width,
         height,
         size,
         o,
-        Some(&m.acc_title),
-        Some(&m.acc_descr),
+        Some(&acc_title),
+        Some(&acc_descr),
         &content,
     )?;
     Ok(Rendered {

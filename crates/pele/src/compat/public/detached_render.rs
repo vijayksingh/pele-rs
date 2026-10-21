@@ -20,6 +20,7 @@ pub use crate::compat::diagrams::sankey::{LiveRenderRead, LiveStringUse, LiveVal
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Kind {
+    Usecase,
     GitGraph,
     Railroad,
     Requirement,
@@ -49,6 +50,13 @@ pub struct DetachedRenderCapability {
     kind: Kind,
 }
 impl DetachedRenderCapability {
+    pub(crate) fn usecase() -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::usecase::Usecase>(),
+            kind: Kind::Usecase,
+        }
+    }
+
     pub(crate) fn git_graph() -> Self {
         Self {
             creator: TypeId::of::<crate::compat::diagrams::git_graph::GitGraph>(),
@@ -203,6 +211,7 @@ pub struct DetachedPublicRender {
     body: Body,
 }
 enum Body {
+    Usecase(crate::compat::diagrams::usecase::UsecaseDetachedInput),
     GitGraph(crate::compat::diagrams::git_graph::GitGraphDetachedInput),
     Railroad(crate::compat::diagrams::railroad::RailroadDetachedInput),
     Requirement(crate::compat::diagrams::requirement::RequirementDetachedInput),
@@ -226,6 +235,13 @@ enum Body {
     Pie(PieDetachedInput),
 }
 impl DetachedPublicRender {
+    pub(crate) fn usecase(input: crate::compat::diagrams::usecase::UsecaseDetachedInput) -> Self {
+        Self {
+            creator: TypeId::of::<crate::compat::diagrams::usecase::Usecase>(),
+            body: Body::Usecase(input),
+        }
+    }
+
     pub(crate) fn git_graph(
         input: crate::compat::diagrams::git_graph::GitGraphDetachedInput,
     ) -> Self {
@@ -384,6 +400,7 @@ impl DetachedPublicRender {
         capability: &DetachedRenderCapability,
     ) -> Option<Self> {
         let kind = match &self.body {
+            Body::Usecase(_) => Kind::Usecase,
             Body::GitGraph(_) => Kind::GitGraph,
             Body::Railroad(_) => Kind::Railroad,
             Body::Requirement(_) => Kind::Requirement,
@@ -419,6 +436,9 @@ impl DetachedPublicRender {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         match &self.body {
+            Body::Usecase(input) => crate::compat::diagrams::usecase::render_detached(
+                input, config, settings, read, resources,
+            ),
             Body::GitGraph(input) => crate::compat::diagrams::git_graph::render_detached(
                 input, config, settings, read, resources,
             ),
