@@ -707,3 +707,84 @@ fn xychart_live_callbacks_preserve_captured_axes_series_labels_and_recovery() {
         }
     }
 }
+
+#[test]
+fn nan_category_stride_stops_at_unordered_comparison_and_preserves_public_output_limits() {
+    let fixture: Json = serde_json::from_str(include_str!(
+        "../../../fixtures/public-xychart-nan-category.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture["oracleSHA256"],
+        "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d"
+    );
+    assert_eq!(fixture["source"], SOURCE);
+    let engine = PublicEngine::with_builtins();
+    for row in fixture["rows"].as_array().unwrap() {
+        let raw = row["raw"].as_bool().unwrap();
+        let mut doc = engine.parse(SOURCE, &ParseOptions::default()).unwrap();
+        let graph = Rc::new(RefCell::new(doc.snapshot().unwrap()));
+        let mut read = Read(graph);
+        let mut req = request(raw, false);
+        match &mut req {
+            DetachedRenderRequest::Normal { options, .. } => {
+                options.render.padding = Some(f64::NAN)
+            }
+            DetachedRenderRequest::Raw { settings, .. } => settings.padding = Some(f64::NAN),
+        }
+        let mut host = Plain::default();
+        let job = doc
+            .prepare_detached_render(doc.revision(), req)
+            .unwrap()
+            .unwrap();
+        let done = job.run(&mut read, &mut host);
+        let actual = drawing(&rendered(
+            doc.finish_detached_render(done).unwrap().result.unwrap(),
+        ));
+        for key in ["svg", "width", "height"] {
+            assert_eq!(actual[key], row[key], "raw={raw}/{key}");
+        }
+        assert_eq!(
+            json!(host.trace),
+            row["trace"],
+            "raw={raw}/callback schedule"
+        );
+        assert!(!doc.has_active_detached_render());
+        if !raw {
+            let mut options = RenderOptions::default();
+            options.parse.preparation.config = config();
+            options.render.padding = Some(f64::NAN);
+            let mut host = Plain::default();
+            let typed = doc.render(&options, &mut host).unwrap();
+            assert_eq!(drawing(&typed.rendered), actual);
+            assert_eq!(json!(host.trace), row["trace"]);
+            let req = DetachedRenderRequest::Normal {
+                options: options.clone(),
+                limit: Some(OutputLimit::Number(1.)),
+                enforce_native_bytes: true,
+            };
+            let job = doc
+                .prepare_detached_render(doc.revision(), req)
+                .unwrap()
+                .unwrap();
+            let done = job.run(&mut read, &mut Plain::default());
+            let error = doc
+                .finish_detached_render(done)
+                .unwrap()
+                .result
+                .err()
+                .expect("output budget still enforced");
+            let PublicError::Pele(error) = error else {
+                panic!("limit error kind")
+            };
+            assert_eq!(error.code, ErrorCode::Limit);
+            assert!(!doc.has_active_detached_render());
+            let mut host = Plain::default();
+            assert_eq!(
+                drawing(&doc.render(&options, &mut host).unwrap().rendered),
+                actual
+            );
+            assert_eq!(json!(host.trace), row["trace"]);
+        }
+    }
+}

@@ -149,7 +149,8 @@ fn category_marks<P: PhaseInput>(
         let mut i = 0.;
         loop {
             let names = input.get(x, "categories")?;
-            if i >= input.count(&names)? as f64 {
+            // Preserve the upstream for-loop condition: NaN is unordered.
+            if !(i < input.count(&names)? as f64) {
                 break;
             }
             input.work(1)?;
