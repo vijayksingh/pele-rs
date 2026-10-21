@@ -193,7 +193,7 @@ fn draw<P: PhaseInput>(
             None
         }
     });
-    let mut graph = db.begin_draw(curve)?;
+    let mut graph = db.begin_draw(curve, resources)?;
     if let Some(variant) = variant {
         variant.prepare(&mut graph)
     }

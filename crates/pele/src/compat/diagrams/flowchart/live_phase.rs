@@ -1,12 +1,12 @@
 //! Captured FlowDb graph inputs; styles, direction and metadata remain phase-live.
 //! Pele 458322a5 (MIT, kepano). Geometry stays in the shared compound renderer.
 use super::{
-    graph::{build_flow_graph, FlowGraph, GraphNode},
+    graph::{finish_flow_graph, FlowGraph, GraphNode},
     model::*,
     phase::PhaseInput,
 };
 use crate::compat::{
-    public::{LiveRenderRead, LiveStringUse, LiveValueKind, PublicError},
+    public::{LiveCallArgument, LiveRenderRead, LiveStringUse, LiveValueKind, PublicError},
     DiagramType, ErrorCode, Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
 pub(crate) struct FlowchartDetachedInput {
@@ -195,8 +195,7 @@ impl<R: LiveRenderRead> Host<'_, R> {
         }
         Ok(())
     }
-    fn graph_input(&mut self) -> Result<FlowchartModel, PublicError> {
-        self.units = 0;
+    fn graph_input(&mut self, groups: &R::Value) -> Result<FlowchartModel, PublicError> {
         self.styles.clear();
         let root = self.read.root();
         let mut m = FlowchartModel::empty();
@@ -256,8 +255,7 @@ impl<R: LiveRenderRead> Host<'_, R> {
                 animation: self.scalar(&v, "animation")?,
             });
         }
-        let groups = self.root_field("subgraphs")?;
-        for v in self.values(&groups)? {
+        for v in self.values(groups)? {
             let meta = self.read.get(&v, "metadata")?;
             let metadata = if matches!(self.read.kind(&meta), LiveValueKind::Object) {
                 let view = self.optional(&meta, "view")?;
@@ -323,12 +321,110 @@ impl<R: LiveRenderRead> Host<'_, R> {
         Ok(m)
     }
 }
+struct LiveTopology<'a, 'b, R: LiveRenderRead> {
+    host: &'a mut Host<'b, R>,
+    groups: R::Value,
+    resources: &'a mut dyn RenderResources,
+}
+impl<R: LiveRenderRead> LiveTopology<'_, '_, R> {
+    fn lookup(&mut self, id: &str) -> Result<R::Value, PublicError> {
+        let root = self.host.read.root();
+        let function = self.host.read.get(&root, "subgraph")?;
+        self.host.tick(1)?;
+        self.host.read.call(
+            &function,
+            &root,
+            &[LiveCallArgument::Text(id.into())],
+            self.resources,
+            "model.subgraph is not a function",
+        )
+    }
+    fn collapsed(&mut self, value: &R::Value) -> Result<bool, PublicError> {
+        if matches!(
+            self.host.read.kind(value),
+            LiveValueKind::Undefined | LiveValueKind::Null
+        ) {
+            return Ok(false);
+        }
+        let metadata = self.host.read.get(value, "metadata")?;
+        if matches!(
+            self.host.read.kind(&metadata),
+            LiveValueKind::Undefined | LiveValueKind::Null
+        ) {
+            return Ok(false);
+        }
+        let view = self.host.read.get(&metadata, "view")?;
+        if self.host.read.kind(&view) != LiveValueKind::String {
+            return Ok(false);
+        }
+        Ok(self.host.string(&view)? == "collapsed")
+    }
+}
+impl<R: LiveRenderRead> super::topology::Source for LiveTopology<'_, '_, R> {
+    type Value = R::Value;
+    type Iter = R::Value;
+    type Error = PublicError;
+    fn groups(&mut self) -> R::Value {
+        self.groups.clone()
+    }
+    fn members(&mut self, group: &R::Value) -> Result<R::Value, PublicError> {
+        self.host.read.get(group, "nodes")
+    }
+    fn begin(&mut self, value: &R::Value) -> Result<R::Value, PublicError> {
+        self.host.read.iterator_begin(value)
+    }
+    fn next(&mut self, it: &mut R::Value) -> Result<Option<R::Value>, PublicError> {
+        self.host.read.iterator_next(it)
+    }
+    fn close(&mut self, it: &mut R::Value) {
+        let _ = self.host.read.iterator_close(it);
+    }
+    fn id(&mut self, group: &R::Value) -> Result<String, PublicError> {
+        self.host.text(group, "id")
+    }
+    fn child(&mut self, value: &R::Value) -> Result<String, PublicError> {
+        self.host.string(value)
+    }
+    fn lookup_exists(&mut self, id: &str) -> Result<bool, PublicError> {
+        let value = self.lookup(id)?;
+        Ok(self.host.read.truthy(&value))
+    }
+    fn lookup_collapsed(&mut self, id: &str) -> Result<bool, PublicError> {
+        let value = self.lookup(id)?;
+        self.collapsed(&value)
+    }
+    fn own_collapsed(&mut self, group: &R::Value) -> Result<bool, PublicError> {
+        self.collapsed(group)
+    }
+    fn work(&mut self, n: usize) -> Result<(), PublicError> {
+        self.host.tick(n)
+    }
+    fn copy_text(&mut self, text: &str) -> Result<(), PublicError> {
+        self.host.units = self.host.units.saturating_add(text.encode_utf16().count());
+        if self.host.units > 16_000_000 {
+            Err(limit().into())
+        } else {
+            Ok(())
+        }
+    }
+}
 impl<R: LiveRenderRead> PhaseInput for Host<'_, R> {
     type Error = PublicError;
-    fn begin_draw(&mut self, curve: Option<&str>) -> Result<FlowGraph, PublicError> {
-        let m = self.graph_input()?;
+    fn begin_draw(
+        &mut self,
+        curve: Option<&str>,
+        resources: &mut dyn RenderResources,
+    ) -> Result<FlowGraph, PublicError> {
+        self.units = 0;
+        let groups = self.root_field("subgraphs")?;
+        let topology = super::topology::build(&mut LiveTopology {
+            host: self,
+            groups: groups.clone(),
+            resources,
+        })?;
+        let m = self.graph_input(&groups)?;
         self.admit_compiled_styles(&m)?;
-        Ok(build_flow_graph(&m, curve))
+        Ok(finish_flow_graph(&m, curve, topology))
     }
     fn resolve_styles(&mut self, node: &mut GraphNode) -> Result<(), PublicError> {
         if let Some(i) = node.css_styles_origin {

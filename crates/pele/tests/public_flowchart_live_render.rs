@@ -87,6 +87,7 @@ fn field(graph: &ModelGraph, receiver: &Atom, key: &str) -> Atom {
 }
 #[derive(Clone)]
 enum Value {
+    Iterator(Rc<RefCell<(Value, usize)>>),
     Pair(std::sync::Arc<[Value; 2]>),
     Atom(Atom),
     String(JsString),
@@ -106,13 +107,54 @@ impl Read {
 }
 impl LiveRenderRead for Read {
     type Value = Value;
+    fn iterator_begin(&mut self, v: &Value) -> Result<Value, PublicError> {
+        Ok(Value::Iterator(Rc::new(RefCell::new((v.clone(), 0)))))
+    }
+    fn iterator_next(&mut self, it: &Value) -> Result<Option<Value>, PublicError> {
+        let Value::Iterator(it) = it else {
+            panic!("iterator")
+        };
+        let mut it = it.borrow_mut();
+        let length = self.get(&it.0, "length")?;
+        if it.1 >= self.number(&length).unwrap() as usize {
+            return Ok(None);
+        }
+        let v = self.index(&it.0, it.1)?;
+        it.1 += 1;
+        Ok(Some(v))
+    }
+    fn iterator_close(&mut self, _: &Value) -> Result<(), PublicError> {
+        Ok(())
+    }
+    fn call(
+        &mut self,
+        function: &Value,
+        receiver: &Value,
+        args: &[LiveCallArgument<Value>],
+        _: &mut dyn RenderResources,
+        _: &'static str,
+    ) -> Result<Value, PublicError> {
+        assert!(matches!(function, Value::Atom(Atom::BuiltinFunction(19))));
+        let LiveCallArgument::Text(id) = &args[0] else {
+            panic!("ID")
+        };
+        let lookup = self.get(receiver, "subgraphLookup")?;
+        self.map_get(&lookup, &Value::String(id.clone()))
+    }
     fn root(&self) -> Value {
         self.own(self.graph.borrow().root.clone())
     }
     fn get(&mut self, receiver: &Value, key: &str) -> Result<Value, PublicError> {
         self.reads.borrow_mut().push(json!(key));
         Ok(match receiver {
-            Value::Atom(atom) => self.own(field(&self.graph.borrow(), atom, key)),
+            Value::Atom(atom) => {
+                let value = field(&self.graph.borrow(), atom, key);
+                if key == "subgraph" && matches!(value, Atom::Undefined) {
+                    Value::Atom(Atom::BuiltinFunction(19))
+                } else {
+                    self.own(value)
+                }
+            }
             Value::Pair(values) => key
                 .parse::<usize>()
                 .ok()

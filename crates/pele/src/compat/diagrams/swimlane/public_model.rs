@@ -15,6 +15,15 @@ impl PublicDiagramModule for Swimlane {
         Some(DetachedPublicRender::swimlane(state.detached_seed()))
     }
 
+    fn active_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        operation: PublicActiveOperation,
+        budget: &mut PublicActiveBudget,
+    ) -> Result<PublicActiveValue, PublicError> {
+        Flowchart.active_public_operation(state, operation, budget)
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,

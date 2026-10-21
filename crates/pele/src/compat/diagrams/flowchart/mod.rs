@@ -7,6 +7,7 @@ mod parser;
 pub(crate) mod render;
 pub(crate) mod shapes;
 mod tokens;
+mod topology;
 use crate::compat::{Engine, ParseContext, ParseOptions, PeleError};
 pub use model::{FlowClassDef, FlowEdge, FlowNode, FlowSubgraph, FlowchartModel, LabelType};
 /// Parse through the same bounded preparation, directive, encoding and configuration path as Engine.

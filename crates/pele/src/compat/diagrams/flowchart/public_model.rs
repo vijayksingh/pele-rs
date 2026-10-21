@@ -2259,6 +2259,105 @@ impl PublicDiagramModule for Flowchart {
         Some(DetachedPublicRender::flowchart(state.detached_seed()))
     }
 
+    fn active_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        operation: PublicActiveOperation,
+        budget: &mut PublicActiveBudget,
+    ) -> Result<PublicActiveValue, PublicError> {
+        fn validate(g: &ModelGraph, v: &Atom) -> Result<(), PublicError> {
+            g.validate_atom(v)?;
+            if let Atom::BuiltinFunction(id) = v {
+                if SCHEMA.method(MethodId(*id)).is_none() {
+                    return Err(ty("Unknown public builtin function"));
+                }
+            }
+            Ok(())
+        }
+        fn charge(b: &mut PublicActiveBudget, n: usize) -> Result<(), PublicError> {
+            if n > b.remaining {
+                return Err(limit().into());
+            }
+            b.remaining -= n;
+            Ok(())
+        }
+        charge(budget, 1)?;
+        let result = (|| {
+            Ok(PublicActiveValue::Atom(match operation {
+                PublicActiveOperation::Validate(v) => {
+                    validate(&state.graph, &v)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Intern(s) => {
+                    charge(budget, s.0.len())?;
+                    Arena::new(&mut state.graph).string(s)?
+                }
+                PublicActiveOperation::String(v) => {
+                    validate(&state.graph, &v)?;
+                    let Atom::String(id) = v else {
+                        return Err(ty("Active model value is not a string"));
+                    };
+                    let s = &state.graph.strings[id as usize];
+                    charge(budget, s.0.len())?;
+                    return Ok(PublicActiveValue::String(s.clone()));
+                }
+                PublicActiveOperation::Object => Atom::Ref(Arena::new(&mut state.graph).object()?),
+                PublicActiveOperation::Array => {
+                    Atom::Ref(Arena::new(&mut state.graph).array(vec![])?)
+                }
+                PublicActiveOperation::Read { receiver, key } => {
+                    validate(&state.graph, &receiver)?;
+                    charge(budget, key.len())?;
+                    let a = Arena::new(&mut state.graph);
+                    let id = a.id(&receiver)?;
+                    if key == "length" {
+                        if let Node::Array { length, .. } = &a.g.nodes[id as usize] {
+                            return Ok(PublicActiveValue::Atom(Atom::Number(*length as f64)));
+                        }
+                    }
+                    a.field(id, &key)
+                }
+                PublicActiveOperation::Set {
+                    receiver,
+                    key,
+                    value,
+                } => {
+                    validate(&state.graph, &receiver)?;
+                    validate(&state.graph, &value)?;
+                    charge(budget, key.len())?;
+                    let mut a = Arena::new(&mut state.graph);
+                    let id = a.id(&receiver)?;
+                    if matches!(a.g.nodes[id as usize], Node::Array { .. }) {
+                        return Err(ty(
+                            "Active Flowchart array structural edits are unavailable",
+                        ));
+                    }
+                    a.assign(id, &key, value)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Push { receiver, value } => {
+                    validate(&state.graph, &receiver)?;
+                    validate(&state.graph, &value)?;
+                    let mut a = Arena::new(&mut state.graph);
+                    let id = a.id(&receiver)?;
+                    a.push(id, value)?;
+                    Atom::Undefined
+                }
+                PublicActiveOperation::Builtin(call) if call.method == MethodId(19) => {
+                    validate(&state.graph, &call.receiver)?;
+                    for a in &call.arguments {
+                        validate(&state.graph, a)?;
+                    }
+                    charge(budget, state.graph.nodes.len())?;
+                    invoke(&mut state.graph, call)?
+                }
+                _ => return Err(ty("Owned Flowchart active operation is unavailable")),
+            }))
+        })();
+        state.imported.take();
+        result
+    }
+
     fn public_constructor(
         &self,
         prototype: PrototypeId,
